@@ -67,7 +67,7 @@
                     <nav role="navigation" style="margin-top:20px">
                         <ul>
                             <li><a href="dashboard.html">Products</a></li>
-                            <li><a href="dashboard.html">Personal</a></li>
+                            <li><a href="dashboard.html">Personnel</a></li>
                             <li><a href="dashboard.html">Stations</a></li>
                             <li><a href="dashboard.html">Markets</a></li>
                             <li><a class="active" href="ownershiplist.html">Ownerships</a></li>
@@ -93,22 +93,23 @@
                 </div>
 
                 <div class="text-center" style="margin-top:00px">
-                    <!-- headings -->
+                    <!-- Media Type -->
                     <div class="row" style="width:80%;margin:0 auto;">
                         <div class="col-md-3" style="text-align:left">
                             <label for="ddlMediaType">Media Type</label>
                         </div>
                         <div class="col-md-9" style="text-align:left">
-                            <select id="ddlMediaType" style="height:33px"></select>
+                            <select id="ddlMediaType" class="mkaRequired" errorMessage="You must select a Media Type" style="height:33px"></select>
                         </div>
                     </div>
+                    <!-- Owner Name -->
                     <div class="row" style="width:80%;margin:0 auto;">
                         <div class="col-md-3" style="text-align:left">
                             <label for="txtOwnerName">Owner Name</label>
                         </div>
                         <div class="col-md-9" style="text-align:left">
 
-                            <input type="text" id="txtOwnerName" value="" />
+                            <input type="text" class="mkaRequired" id="txtOwnerName"  errorMessage="You must enter an Owner Name" value="" />
                         </div>
                     </div>
 
@@ -138,7 +139,7 @@
                         </div>
                         <div class="col-md-9" style="text-align:left">
 
-                            <select id="ddlParentOwner" style="height:33px"></select>
+                            <select id="ddlParentOwner" style="height:33px" class="mkaRequired" errorMessage="You must select a Parent Owner"  ></select>
                         </div>
                     </div>
                     <div class="row" style="width:80%;margin:0 auto;">
@@ -254,6 +255,21 @@
                             <div id="productList"></div>
                         </div>
                     </div>
+                    <hr />
+                    <!-- Buttons -->
+                    <div style="margin-top: 20px;margin-bottom:20px">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div>
+                                    <input value="Update" onclick="updateOwner()" style="width:100%;max-width:320px" type="button">
+                                </div>
+                                <div style="padding-top:10px">
+                                    <input value="Cancel" onclick="window.location='ownershiplist.html'" style="width:100%;max-width:320px" type="button">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
@@ -283,511 +299,555 @@
 </body>
 </html>
 <script>
-    // TEMP
+
     var ownerID = 0;
 
 
-$( document ).ready(function()
-{
-    ownerID = (getParameterByName("OwnerID") == null ? 0 : getParameterByName("OwnerID"));
+    $( document ).ready(function()
+    {
+        ownerID = (getParameterByName("OwnerID") == null ? 0 : getParameterByName("OwnerID"));
 
-    // Create Product Table
+        // Create Product Table
 
-    getProductList();
-    getMediaTypes();
+        getProductList();
+        getMediaTypes();
 
-    // get MEdia Types
+        // get MEdia Types
 
-    // get ownership
-    // This loads Media Type
-    // this loads other text boxes
-
-
-});
+        // get ownership
+        // This loads Media Type
+        // this loads other text boxes
 
 
-function continueProcess(auditID, status)
-{
-		$.blockUI();
-
-		window.localStorage.setItem("AuditId", auditID);
-
-		switch (status.toLowerCase())
-		{
-
-		    case 'open':
-		    case 'importerr':
-		        window.location = "upload.html";
-		        break;
-
-		    case 'fileindberr':
-		    case 'imported':
-		        window.location = "preprocess.html";
-		        break;
-		    case 'fileindb':
-			case 'filenormerr':
-		        window.location = "process.html";
-		        break;
-		    case 'filenorm':
-		        generateRpt(auditID);
-		        break;
-
-		}
-
-}
-function addAudit(evt)
-{
-
-	if ($("#txtTitle").val().trim()=="")
-	{
-	    bootbox.alert("You must enter a Title", function () {
-
-	    });
-	    return false;
-		//return;
-	}
-
-	//txtDescription
-
-	if ($("#inputTemplate").val() == "")
-	{
-	    bootbox.alert("You must select an Input Template", function () {
-
-	    });
-	    return false;
-	}
-
-	if ($("#outputTemplate").val() == "")
-	{
-	    bootbox.alert("You must select an Output Template", function () {
-
-	    });
-	    return false;
-	}
-
-
- $.ajax({
-	    url: ServicePrefix + '/api/Report/AddAudit',
-	    dataType: 'json',
-	    type: 'post',
-	    contentType: 'application/json',
-	    data: JSON.stringify({
-	        "inApiToken": window.localStorage.getItem("APIToken"),
-	        "inAuditorID": window.localStorage.getItem("UserID"),
-	        "inTitle": $("#txtTitle").val(),
-	        "inFileName": $("#trustFile").val(),
-			"inDescription":$("#txtDescription").val(),
-	        "inInputTemplateToken": $("#inputTemplate").val(),
-	        "inOutputTemplateID": $("#outputTemplate").val(),
-	        "inStatusToken" : "open"
-	    }),
-	    processData: false,
-	    success: function (data, textStatus, jQxhr) {
-
-	        if (data.response.status != "SUCCESS") {
-	            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-	            });
-	        }
-	        else {
-	            if (data.report.rows[0].Status == -1) {
-	                bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-	                    //
-	                });
-	            }
-				else
-	            {
-	                bootbox.alert("Audit Added to the Database!", function () {
-	                    window.localStorage.setItem("AuditId", data.report.rows[0].AuditId);
-	                    window.location = "upload.html";
-	                });
-
-				}
-	        }
-	    },
-	    error: function (jqXhr, textStatus, errorThrown) {
-	        bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-	            //window.location = "preprocess.html";
-	        });
-	    }
-	});
-
-}
-
-function getProductList()
-{
-
-    $.ajax({
-        url: ServicePrefix + '/api/Product/GetProductList',
-        dataType: 'json',
-        type: 'post',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            "inApiToken": getLocalStorage("APIToken")
-        }),
-        processData: false,
-        success: function (data, textStatus, jQxhr) {
-
-            if (data.response.status != "SUCCESS") {
-                bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-                });
-            }
-            else {
-                if (data.report.rows[0].Status == -1) {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                        //
-                    });
-                }
-                else {
-                    var str = '';
-
-                    $("#productList").html("");
-
-                    var holdOwnerID = "0";
-                    var productList = "";
-                    var holdObject = new Object();
-
-                    $.each(data.report.rows, function (index)
-                    {
-                        
-                        var obj = data.report.rows[index];
-                        str = str + '<div class="col-md-2" style="text-align:right">';
-                        str = str + '<input type="checkbox" id="chk' + obj.P_ProductID + '"/>';
-                        str = str + '</div>';
-                        str = str + '<div class="col-md-6" style="text-align:left">';
-                        str = str + obj.P_ProductID + " - " + obj.P_ProductName;
-                        str = str + '</div>';
-                        str = str + '<div class="col-md-4" style="text-align:left">';
-                        str = str + '<input id="date' + obj.P_ProductID + '" value="" />';
-                        str = str + '</div>';
-
-                    });
-
-                    $("#productList").append(str);
-
-                    if (ownerID > 0) {
-                        getOwnerProducts();
-                    }
-                }
-            }
-        },
-        error: function (jqXhr, textStatus, errorThrown) {
-            bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                //window.location = "preprocess.html";
-            });
-        }
     });
 
-}
+
+    function validationPassed()
+    {
+
+        //-----------------------------
+        // Basic Validation requires
+        // the following on each
+        // element
+        //-----------------------------
+        // class: mkaRequired
+        // custom attribute: errorMessage
+        //-----------------------------
 
 
-function getOwnerProducts()
-{
-    if (ownerID <= 0) {
-        return;
+        $(".mkaRequired").each(function (index, el)
+        {
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            // Text
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+                    bootbox.alert(errorMessage, function () { });
+                    return false;
+                }
+            }
+
+            // Select
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == "-1") {
+                    bootbox.alert(errorMessage, function () { });
+                    return false;
+                }
+            }
+
+        });
+
+
+        // CUSTOM VALIDATION CAN GO HERE
+        // CUSTOM VALIDATION CAN GO HERE
+        // CUSTOM VALIDATION CAN GO HERE
+
+
+        return true;
+        
     }
 
-    $.ajax({
-        url: ServicePrefix + '/api/Owner/GetOwnerProducts',
-        dataType: 'json',
-        type: 'post',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            "inApiToken": getLocalStorage("APIToken"),
-            "inOwnerID": ownerID
-        }),
-        processData: false,
-        success: function (data, textStatus, jQxhr) {
+    function updateOwner()
+    {
+        if (validationPassed() == false)
+        {
+            return;
+        }
 
-            if (data.response.status != "SUCCESS") {
-                bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
 
-                });
+        //str = str + '<input type="checkbox" value="' + obj.P_ProductID + '" class="chkOwnerProductList" id="chk' + obj.P_ProductID + '"/>';
+        //str = str + '</div>';
+        //str = str + '<div class="col-md-6" style="text-align:left">';
+        //str = str + obj.P_ProductID + " - " + obj.P_ProductName;
+        //str = str + '</div>';
+        //str = str + '<div class="col-md-4" style="text-align:left">';
+        //str = str + '<input id="date' + obj.P_ProductID + '" value="" />';
+
+
+        var productListObject = new Object();
+        var productListArr = new Array();
+
+        // Build object for Products
+        $(".chkOwnerProductList").each(function (index, el)
+        {
+            productListObject = new Object();
+            productListObject["productId"] = $(el).val();
+            productListObject["productSelected"] = $(el).prop("checked");
+            
+            productListObject["productDate"] = $("#date" + $(el).val()).html();
+
+            productListArr.push(productListObject);
+
+            //var eID = $(el).attr("id");
+            //var errorMessage = $(el).attr("errorMessage");
+
+            //// Text
+            //if ($(eID).prop('tagName').toLowerCase() == "input") {
+            //    if ($(eID).val().trim() == "") {
+            //        bootbox.alert(errorMessage, function () { });
+            //        return false;
+            //    }
+            //}
+
+            //// Select
+            //if ($(eID).prop('tagName').toLowerCase() == "select") {
+            //    if ($(eID).val() == "-1") {
+            //        bootbox.alert(errorMessage, function () { });
+            //        return false;
+            //    }
+            //}
+
+        });
+
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/UpdateOwner',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerId": ownerID,
+                "inOwnerName": $("#txtOwnerName").val().trim(),
+                "inClientNumberId": $("#txtClientNumber").val().trim(),
+                "inOwnerAbbreviation": $("#txtOwnerAbbreviation").val().trim(),
+                "inMediaTypeId": $("#ddlMediaType").val().trim(),
+                "inParentOwnerId": $("#ddlParentOwner").val().trim(),
+                "inVirtualOwner": $("#chkVirtualOwner").attr("checked"),
+                "inAddress": $("#txtAddress").val().trim(),
+                "inAddress2": $("#txtAddress2").val().trim(),
+                "inCity": $("#txtCity").val().trim(),
+                "inState": $("#txtState").val().trim(),
+                "inZipCode": $("#txtZipCode").val().trim(),
+                "inZipCode4": $("#txtZipCode4").val().trim(),
+                "inAreaCode": $("#txtAreaCode").val().trim(),
+                "inExtension": $("#txtExtension").val().trim(),
+                "inPhone": $("#txtPhone").val().trim(),
+                "inFaxAreaCode": $("#txtFaxAreaCode").val().trim(),
+                "inFaxPhone": $("#txtFaxPhone").val().trim(),
+                "inEmailAddress": $("#txtEmailAddress").val().trim(),
+                "inOwnerProductList" : productListArr
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {});
+                }
+                else {
+                    if (data.report.rows[0].Status == -1) {
+                        bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {});
+                    }
+                    else {
+                        // TEMP - we need to now update products...
+                        bootbox.alert('Owner Updated', function () { });
+                    }
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {});
             }
-            else {
-                if (data.report.rows[0].Status == -1) {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                        //
+        });
+
+
+
+    }
+
+    function getProductList()
+    {
+
+        $.ajax({
+            url: ServicePrefix + '/api/Product/GetProductList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
                     });
                 }
                 else {
-                    var str = '';
+                    if (data.report.rows[0].Status == -1) {
+                        bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                            //
+                        });
+                    }
+                    else {
+                        var str = '';
+
+                        $("#productList").html("");
+
+                        var holdOwnerID = "0";
+                        var productList = "";
+                        var holdObject = new Object();
+
+                        $.each(data.report.rows, function (index)
+                        {
+                        
+                            var obj = data.report.rows[index];
+                            str = str + '<div class="row">';
+                            str = str + '<div class="col-md-2" style="text-align:right">';
+                            str = str + '<input type="checkbox" value="' + obj.P_ProductID + '" class="chkOwnerProductList" id="chk' + obj.P_ProductID + '"/>';
+                            str = str + '</div>';
+                            str = str + '<div class="col-md-6" style="text-align:left">';
+                            str = str + obj.P_ProductID + " - " + obj.P_ProductName;
+                            str = str + '</div>';
+                            str = str + '<div class="col-md-4" style="text-align:left">';
+                            str = str + '<div id="date' + obj.P_ProductID + '" />';
+                            str = str + '</div>';
+                            str = str + '</div>';
+
+                        });
+
+                        $("#productList").append(str);
+
+                        if (ownerID > 0) {
+                            getOwnerProducts();
+                        }
+                    }
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    //window.location = "preprocess.html";
+                });
+            }
+        });
+
+    }
+
+    function getOwnerProducts()
+    {
+        if (ownerID <= 0) {
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerProducts',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerID": ownerID
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
+                    });
+                }
+                else {
+                    if (data.report.rows[0].Status == -1) {
+                        bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                            //
+                        });
+                    }
+                    else {
+                        var str = '';
 
    
  
-                    var holdOwnerID = "0";
-                    var productList = "";
-                    var holdObject = new Object();
+                        var holdOwnerID = "0";
+                        var productList = "";
+                        var holdObject = new Object();
 
-                    $.each(data.report.rows, function (index) {
+                        $.each(data.report.rows, function (index) {
 
-                        var obj = data.report.rows[index];
-                        if (obj.OP_DisableDate == null) {
-                            $("#chk" + obj.OP_ProductID).prop("checked", true);
-                            $("#date" + obj.OP_ProductID).val(extractDateOnly(obj.OP_ActiveDate));
-                            $("#date" + obj.OP_ProductID).css("color", "green");
-                        }
-                        else {
-                            $("#chk" + obj.OP_ProductID).prop("checked", false);
-                            $("#date" + obj.OP_ProductID).val(extractDateOnly(obj.OP_DisableDate));
-                            $("#date" + obj.OP_ProductID).css("color", "red");
-                        }
+                            var obj = data.report.rows[index];
+                            if (obj.OP_DisableDate == null) {
+                                $("#chk" + obj.OP_ProductID).prop("checked", true);
+                                $("#date" + obj.OP_ProductID).html(extractDateOnly(obj.OP_ActiveDate));
+                                $("#date" + obj.OP_ProductID).css("color", "green");
+                            }
+                            else {
+                                $("#chk" + obj.OP_ProductID).prop("checked", false);
+                                $("#date" + obj.OP_ProductID).html(extractDateOnly(obj.OP_DisableDate));
+                                $("#date" + obj.OP_ProductID).css("color", "red");
+                            }
 
-                        //str = str + '<div class="col-md-2" style="text-align:right">';
-                        //str = str + '<input type="checkbox" id="chk' + obj.P_ProductID + '"/>';
-                        //str = str + '</div>';
-                        //str = str + '<div class="col-md-6" style="text-align:left">';
-                        //str = str + obj.P_ProductID + " - " + obj.P_ProductName;
-                        //str = str + '</div>';
-                        //str = str + '<div class="col-md-4">';
-                        //str = str + '<div id="date' + obj.P_ProductID + '">DATES</div>';
-                        //str = str + '</div>';
+                            //str = str + '<div class="col-md-2" style="text-align:right">';
+                            //str = str + '<input type="checkbox" id="chk' + obj.P_ProductID + '"/>';
+                            //str = str + '</div>';
+                            //str = str + '<div class="col-md-6" style="text-align:left">';
+                            //str = str + obj.P_ProductID + " - " + obj.P_ProductName;
+                            //str = str + '</div>';
+                            //str = str + '<div class="col-md-4">';
+                            //str = str + '<div id="date' + obj.P_ProductID + '">DATES</div>';
+                            //str = str + '</div>';
 
-                    });
+                        });
 
-//                    $("#productList").append(str);
-
-
-                }
-            }
-        },
-        error: function (jqXhr, textStatus, errorThrown) {
-            bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                //window.location = "preprocess.html";
-            });
-        }
-    });
-}
-
-function getOwner() {
-
-    if (ownerID <= 0)
-    {
-        return;
-    }
-
-    $.ajax({
-        url: ServicePrefix + '/api/Owner/GetOwner',
-        dataType: 'json',
-        type: 'post',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            "inApiToken": getLocalStorage("APIToken"),
-            "inOwnerID": ownerID
-        }),
-        processData: false,
-        success: function (data, textStatus, jQxhr) {
-
-            if (data.response.status != "SUCCESS") {
-                bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-                });
-            }
-            else {
-                if (data.report.rows[0].Status == -1) {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                        //
-                    });
-                }
-                else {
-                    var str = '';
-
-                    $.each(data.report.rows, function (index) {
-
-                        var obj = data.report.rows[index];
-                        $("#txtOwnerName").val(obj["Owner Name"]);
- 
-    
-                        $("#txtClientNumber").val(obj["MKA Client Number"]);
-                        $("#txtOwnerAbbreviation").val(obj["Owner Abbreviation"]);
-
-                        $("#ddlMediaType").val(obj["Media Type ID"]);
-
-                        // need parent owner
-                        $("#ddlParentOwner").val(obj["Parent Owner ID"]);
-
-                        $("#chkVirtualOwner").prop("checked", (obj["Virtual Owner"] == 0 ? false : true));
-                        $("#txtAddress").val(obj["Address"]);
-                        $("#txtAddress2").val(obj["Address 2"]);
-                        $("#txtCity").val(obj["City"]);
-                        $("#txtState").val(obj["State"]);
-                        $("#txtZipCode").val(obj["Zip Code"]);
-                        $("#txtZipCode4").val(obj["Zip Code 4"]);
-                        $("#txtAreaCode").val(obj["Area Code"]);
-                        $("#txtExtension").val(obj["Extension"]);
-                        $("#txtPhone").val(obj["Phone"]);
-                        $("#txtFaxAreaCode").val(obj["Fax Area Code"]);
-                        $("#txtFaxPhone").val(obj["Fax Phone"]);
-                        $("#txtEmailAddress").val(obj["Email Address"]);
-
-                        //str = str + '<div class="col-md-2" style="text-align:right">';
-                        //str = str + '<input type="checkbox" id="chk' + obj.P_ProductID + '"/>';
-                        //str = str + '</div>';
-                        //str = str + '<div class="col-md-6" style="text-align:left">';
-                        //str = str + obj.P_ProductID + " - " + obj.P_ProductName;
-                        //str = str + '</div>';
-                        //str = str + '<div class="col-md-4">';
-                        //str = str + '<div id="date' + obj.P_ProductID + '">DATES</div>';
-                        //str = str + '</div>';
-
-                    });
-
-                    //                    $("#productList").append(str);
+    //                    $("#productList").append(str);
 
 
-                }
-            }
-        },
-        error: function (jqXhr, textStatus, errorThrown) {
-            bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                //window.location = "preprocess.html";
-            });
-        }
-    });
-}
-
-function buildOwnerRow(ownerName, ownerId, mediaTypeId, mediaTypeName, parentOwnerId, parentOwner, productList)
-{
-    var str = '';
-
-    // Open Row
-    str = str + '<div class="row">';
-
-    str = str + '<div class="col-md-3" style="text-align:left">';
-    str = str + ownerName;
-    str = str + '</div>';
-
-    str = str + '<div class="col-md-2" style="text-align:left">';
-    str = str + '<a href="#" onclick="editMediaType(' + mediaTypeId + ')">' + mediaTypeName + '</a>';
-    str = str + '</div>';
-    
-    str = str + '<div class="col-md-3" style="text-align:left">';
-    str = str + '<a href="#" onclick="editParentOwnership(' + parentOwnerId + ')">' + parentOwner + '</a>';
-    str = str + '</div>';
-    
-    str = str + '<div class="col-md-2" style="text-align:left">';
-    str = str + productList;
-    str = str + '</div>';
-
-    str = str + '<div class="col-md-2" style="text-align:center">';
-    str = str + '<a href="#" onclick="editOwnership(' + ownerId + ')">Edit</a>&nbsp;<a  onclick="deleteOwnership(' + ownerId + ')">Delete</a>';
-    str = str + '</div>';
-
-    // Close Row
-    str = str + '</div>';
-    return str;
-}
-function getParentOwnerList()
-{
-    $.ajax({
-        url: ServicePrefix + '/api/Owner/GetParentOwnerList',
-        dataType: 'json',
-        type: 'post',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            "inApiToken": getLocalStorage("APIToken"),
-            "inActiveOnly": "1",
-            "inAddDetails": "0"
-        }),
-        processData: false,
-        success: function (data, textStatus, jQxhr) {
-
-            if (data.response.status != "SUCCESS") {
-                bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-                });
-            }
-            else {
-                if (data.report.rows[0].Status == -1) {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                        //
-                    });
-                }
-                else {
-                    //bootbox.alert("Audit Added to the Database!", function () {
-                    //    window.localStorage.setItem("AuditId", data.report.rows[0].AuditId);
-                    //    window.location = "upload.html";
-                    //});
-                    var str = '';
-                    //console.log(JSON.stringify(data));
-                    str = '<option value="-1">-- Select a Parent Owner</option>';
-                    $.each(data.report.rows, function (index) {
-
-                        str = str + '<option value="' + data.report.rows[index].po_parentownerid + '">' + data.report.rows[index].po_parentownername + '</option>';
-
-                    });
-
-                    $("#ddlParentOwner").html(str);
-
-                    if (ownerID > 0) {
-                        getOwner();
                     }
                 }
-            }
-        },
-        error: function (jqXhr, textStatus, errorThrown) {
-            bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                //window.location = "preprocess.html";
-            });
-        }
-    });
-
-
-}
-
-function getMediaTypes()
-{
-    $.ajax({
-        url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
-        dataType: 'json',
-        type: 'post',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            "inApiToken":getLocalStorage("APIToken")
-        }),
-        processData: false,
-        success: function (data, textStatus, jQxhr) {
-
-            if (data.response.status != "SUCCESS") {
-                bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    //window.location = "preprocess.html";
                 });
             }
-            else {
-                if (data.report.rows[0].Status == -1) {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                        //
+        });
+    }
+
+    function getOwner() {
+
+        if (ownerID <= 0)
+        {
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwner',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerID": ownerID
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
                     });
                 }
                 else {
-                    //bootbox.alert("Audit Added to the Database!", function () {
-                    //    window.localStorage.setItem("AuditId", data.report.rows[0].AuditId);
-                    //    window.location = "upload.html";
-                    //});
-                    var str = '';
-                    //console.log(JSON.stringify(data));
-                    str = '<option value="-1">-- Select a Media Type</option>';
-                    $.each(data.report.rows, function (index) {
+                    if (data.report.rows[0].Status == -1) {
+                        bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                            //
+                        });
+                    }
+                    else {
+                        var str = '';
 
-                        str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+                        $.each(data.report.rows, function (index) {
+
+                            var obj = data.report.rows[index];
+                            $("#txtOwnerName").val(obj["Owner Name"]);
+ 
+    
+                            $("#txtClientNumber").val(obj["MKA Client Number"]);
+                            $("#txtOwnerAbbreviation").val(obj["Owner Abbreviation"]);
+
+                            $("#ddlMediaType").val(obj["Media Type ID"]);
+
+                            // need parent owner
+                            $("#ddlParentOwner").val(obj["Parent Owner ID"]);
+
+                            $("#chkVirtualOwner").prop("checked", (obj["Virtual Owner"] == 0 ? false : true));
+                            $("#txtAddress").val(obj["Address"]);
+                            $("#txtAddress2").val(obj["Address 2"]);
+                            $("#txtCity").val(obj["City"]);
+                            $("#txtState").val(obj["State"]);
+                            $("#txtZipCode").val(obj["Zip Code"]);
+                            $("#txtZipCode4").val(obj["Zip Code 4"]);
+                            $("#txtAreaCode").val(obj["Area Code"]);
+                            $("#txtExtension").val(obj["Extension"]);
+                            $("#txtPhone").val(obj["Phone"]);
+                            $("#txtFaxAreaCode").val(obj["Fax Area Code"]);
+                            $("#txtFaxPhone").val(obj["Fax Phone"]);
+                            $("#txtEmailAddress").val(obj["Email Address"]);
+
+                            //str = str + '<div class="col-md-2" style="text-align:right">';
+                            //str = str + '<input type="checkbox" id="chk' + obj.P_ProductID + '"/>';
+                            //str = str + '</div>';
+                            //str = str + '<div class="col-md-6" style="text-align:left">';
+                            //str = str + obj.P_ProductID + " - " + obj.P_ProductName;
+                            //str = str + '</div>';
+                            //str = str + '<div class="col-md-4">';
+                            //str = str + '<div id="date' + obj.P_ProductID + '">DATES</div>';
+                            //str = str + '</div>';
+
+                        });
+
+                        //                    $("#productList").append(str);
+
+
+                    }
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    //window.location = "preprocess.html";
+                });
+            }
+        });
+    }
+
+    function buildOwnerRow(ownerName, ownerId, mediaTypeId, mediaTypeName, parentOwnerId, parentOwner, productList)
+    {
+        var str = '';
+
+        // Open Row
+        str = str + '<div class="row">';
+
+        str = str + '<div class="col-md-3" style="text-align:left">';
+        str = str + ownerName;
+        str = str + '</div>';
+
+        str = str + '<div class="col-md-2" style="text-align:left">';
+        str = str + '<a href="#" onclick="editMediaType(' + mediaTypeId + ')">' + mediaTypeName + '</a>';
+        str = str + '</div>';
+    
+        str = str + '<div class="col-md-3" style="text-align:left">';
+        str = str + '<a href="#" onclick="editParentOwnership(' + parentOwnerId + ')">' + parentOwner + '</a>';
+        str = str + '</div>';
+    
+        str = str + '<div class="col-md-2" style="text-align:left">';
+        str = str + productList;
+        str = str + '</div>';
+
+        str = str + '<div class="col-md-2" style="text-align:center">';
+        str = str + '<a href="#" onclick="editOwnership(' + ownerId + ')">Edit</a>&nbsp;<a  onclick="deleteOwnership(' + ownerId + ')">Delete</a>';
+        str = str + '</div>';
+
+        // Close Row
+        str = str + '</div>';
+        return str;
+    }
+    function getParentOwnerList()
+    {
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetParentOwnerList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inActiveOnly": "1",
+                "inAddDetails": "0"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
 
                     });
-
-                    $("#ddlMediaType").html(str);
-
-                    getParentOwnerList();
                 }
+                else {
+                    if (data.report.rows[0].Status == -1) {
+                        bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                            //
+                        });
+                    }
+                    else {
+                        //bootbox.alert("Audit Added to the Database!", function () {
+                        //    window.localStorage.setItem("AuditId", data.report.rows[0].AuditId);
+                        //    window.location = "upload.html";
+                        //});
+                        var str = '';
+                        //console.log(JSON.stringify(data));
+                        str = '<option value="-1">-- Select a Parent Owner</option>';
+                        $.each(data.report.rows, function (index) {
+
+                            str = str + '<option value="' + data.report.rows[index].po_parentownerid + '">' + data.report.rows[index].po_parentownername + '</option>';
+
+                        });
+
+                        $("#ddlParentOwner").html(str);
+
+                        if (ownerID > 0) {
+                            getOwner();
+                        }
+                    }
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    //window.location = "preprocess.html";
+                });
             }
-        },
-        error: function (jqXhr, textStatus, errorThrown) {
-            bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                //window.location = "preprocess.html";
-            });
-        }
-    });
+        });
 
 
-}
+    }
+
+    function getMediaTypes()
+    {
+        $.ajax({
+            url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken":getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
+                    });
+                }
+                else {
+                    if (data.report.rows[0].Status == -1) {
+                        bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                            //
+                        });
+                    }
+                    else {
+                        //bootbox.alert("Audit Added to the Database!", function () {
+                        //    window.localStorage.setItem("AuditId", data.report.rows[0].AuditId);
+                        //    window.location = "upload.html";
+                        //});
+                        var str = '';
+                        //console.log(JSON.stringify(data));
+                        str = '<option value="-1">-- Select a Media Type</option>';
+                        $.each(data.report.rows, function (index) {
+
+                            str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+
+                        });
+
+                        $("#ddlMediaType").html(str);
+
+                        getParentOwnerList();
+                    }
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    //window.location = "preprocess.html";
+                });
+            }
+        });
+
+
+    }
 </script>
 

@@ -390,6 +390,6 @@ function extractDateOnly(inDate)
     }
     else
     {
-        return inDate;
+        return (inDate == null ? "&nbsp;" : inDate);
     }
 }

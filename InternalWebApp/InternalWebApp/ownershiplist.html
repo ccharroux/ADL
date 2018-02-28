@@ -63,7 +63,7 @@
                     <nav role="navigation" style="margin-top:20px">
                         <ul>
                             <li><a href="dashboard.html">Products</a></li>
-                            <li><a href="dashboard.html">Personal</a></li>
+                            <li><a href="dashboard.html">Personnel</a></li>
                             <li><a href="dashboard.html">Stations</a></li>
                             <li><a href="dashboard.html">Markets</a></li>
                             <li><a class="active" href="ownershiplist.html">Ownerships</a></li>
@@ -99,7 +99,7 @@
                         <input type="button" style="margin-left:10px" value="Search" onclick="getOwnerList()" />
                     </div>
                     <div class="col-md-2 ">
-                        <input type="button" value="+" style="padding-left:25px; padding-right:25px;background-color:blue!important;border-radius:55%!important;min-width:0px!important; font-size:36px;margin-top:-25px;float:right" onclick="show('newAudit')" />
+                        <input type="button" value="+" style="padding-left:25px; padding-right:25px;background-color:blue!important;border-radius:55%!important;min-width:0px!important; font-size:36px;margin-top:-25px;float:right" onclick="editOwnership(0)" />
                     </div>
                 </div>
 
@@ -194,310 +194,152 @@
 </html>
 <script>
 
-$( document ).ready(function()
-{
-
-
-
-
-});
-
-
-function continueProcess(auditID, status)
-{
-		$.blockUI();
-
-		window.localStorage.setItem("AuditId", auditID);
-
-		switch (status.toLowerCase())
-		{
-
-		    case 'open':
-		    case 'importerr':
-		        window.location = "upload.html";
-		        break;
-
-		    case 'fileindberr':
-		    case 'imported':
-		        window.location = "preprocess.html";
-		        break;
-		    case 'fileindb':
-			case 'filenormerr':
-		        window.location = "process.html";
-		        break;
-		    case 'filenorm':
-		        generateRpt(auditID);
-		        break;
-
-		}
-
-}
-function addAudit(evt)
-{
-
-	if ($("#txtTitle").val().trim()=="")
-	{
-	    bootbox.alert("You must enter a Title", function () {
-
-	    });
-	    return false;
-		//return;
-	}
-
-	//txtDescription
-
-	if ($("#inputTemplate").val() == "")
-	{
-	    bootbox.alert("You must select an Input Template", function () {
-
-	    });
-	    return false;
-	}
-
-	if ($("#outputTemplate").val() == "")
-	{
-	    bootbox.alert("You must select an Output Template", function () {
-
-	    });
-	    return false;
-	}
-
-
- $.ajax({
-	    url: ServicePrefix + '/api/Report/AddAudit',
-	    dataType: 'json',
-	    type: 'post',
-	    contentType: 'application/json',
-	    data: JSON.stringify({
-	        "inApiToken": window.localStorage.getItem("APIToken"),
-	        "inAuditorID": window.localStorage.getItem("UserID"),
-	        "inTitle": $("#txtTitle").val(),
-	        "inFileName": $("#trustFile").val(),
-			"inDescription":$("#txtDescription").val(),
-	        "inInputTemplateToken": $("#inputTemplate").val(),
-	        "inOutputTemplateID": $("#outputTemplate").val(),
-	        "inStatusToken" : "open"
-	    }),
-	    processData: false,
-	    success: function (data, textStatus, jQxhr) {
-
-	        if (data.response.status != "SUCCESS") {
-	            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-	            });
-	        }
-	        else {
-	            if (data.report.rows[0].Status == -1) {
-	                bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-	                    //
-	                });
-	            }
-				else
-	            {
-	                bootbox.alert("Audit Added to the Database!", function () {
-	                    window.localStorage.setItem("AuditId", data.report.rows[0].AuditId);
-	                    window.location = "upload.html";
-	                });
-
-				}
-	        }
-	    },
-	    error: function (jqXhr, textStatus, errorThrown) {
-	        bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-	            //window.location = "preprocess.html";
-	        });
-	    }
-	});
-
-}
-
-function getOwnerList()
-{
-    if ($("#searchOwner").val().trim() == 0)
+    $( document ).ready(function()
     {
-        bootbox.alert("Please enter text to search for Owner(s)", function () {
 
+
+
+
+    });
+
+    function getOwnerList()
+    {
+        if ($("#searchOwner").val().trim() == 0)
+        {
+            bootbox.alert("Please enter text to search for Owner(s)", function () {
+
+            });
+
+            return;
+
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerName": $("#searchOwner").val(),
+                "inActiveOnly": "1",
+                "inAddDetails": "1"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
+                    });
+                }
+                else {
+                    if (data.report.rows[0].Status == -1) {
+                        bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                            //
+                        });
+                    }
+                    else {
+                        var str = '';
+                        $("#ownerList").html("");
+
+                        var holdOwnerID = "0";
+                        var productList = "";
+                        var holdObject = new Object();
+
+                        $.each(data.report.rows, function (index)
+                        {
+                            str = "";
+                            var obj = data.report.rows[index];
+                            // need a control break on OwnerID
+                            //buildOwnerRow(ownerName, ownerId, mediaType, parentOwnerId, parentOwner, productList)
+
+                            if (holdOwnerID != obj.OwnerID)
+                            {
+                                if (holdOwnerID != "0")
+                                {
+                                    str = buildOwnerRow(holdObject.OwnerName, holdObject.OwnerID, holdObject.MediaTypeID, holdObject.MediaTypeName, holdObject.ParentOwnerID, holdObject.ParentOwnerName, holdObject.productList);
+                                    $("#ownerList").append(str);
+
+                                }
+                                productList = "";
+                                holdObject = new Object();
+                                holdObject.MediaTypeID = "";
+                                holdObject.MediaTypeName = "";
+                                holdObject.productList = "";
+                                holdObject.OwnerName = "";
+                                holdObject.OwnerID = "";
+                                holdObject.MediaType = "";
+                                holdObject.ParentOwnerID = "";
+                                holdObject.ParentOwnerName = "";
+                            }
+
+                            holdOwnerID = obj.OwnerID;
+                            holdObject.productList = holdObject.productList + (holdObject.productList.length == 0 ? "" : " ") + '<a href="#" onclick="editProduct(' + "'" + obj.ProductID + "'" + ')">' + obj.ProductID + '</a>';
+                            holdObject.OwnerName = obj.OwnerName;
+                            holdObject.OwnerID = obj.OwnerID;
+                            holdObject.MediaType = "MEDIA TYPE";
+                            holdObject.ParentOwnerID = obj.ParentOwnerID;
+                            holdObject.ParentOwnerName = obj.ParentOwnerName;
+                            holdObject.MediaTypeID = obj.MediaTypeID;
+                            holdObject.MediaTypeName = obj.MediaTypeName;
+
+                        });
+
+                        if ((!holdObject.OwnerName) == false) {
+                            str = buildOwnerRow(holdObject.OwnerName, holdObject.OwnerID,  holdObject.MediaTypeID, holdObject.MediaTypeName, holdObject.ParentOwnerID, holdObject.ParentOwnerName, holdObject.productList);
+                            $("#ownerList").append(str);
+                        }
+                    }
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    //window.location = "preprocess.html";
+                });
+            }
         });
-
-        return;
 
     }
 
-    $.ajax({
-        url: ServicePrefix + '/api/Owner/GetOwnerList',
-        dataType: 'json',
-        type: 'post',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            "inApiToken": getLocalStorage("APIToken"),
-            "inOwnerName": $("#searchOwner").val(),
-            "inActiveOnly": "1",
-            "inAddDetails": "1"
-        }),
-        processData: false,
-        success: function (data, textStatus, jQxhr) {
+    function buildOwnerRow(ownerName, ownerId, mediaTypeId, mediaTypeName, parentOwnerId, parentOwner, productList)
+    {
+        var str = '';
 
-            if (data.response.status != "SUCCESS") {
-                bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+        // Open Row
+        str = str + '<div class="row">';
 
-                });
-            }
-            else {
-                if (data.report.rows[0].Status == -1) {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                        //
-                    });
-                }
-                else {
-                    var str = '';
-                    $("#ownerList").html("");
+        str = str + '<div class="col-md-3" style="text-align:left">';
+        str = str + ownerName;
+        str = str + '</div>';
 
-                    var holdOwnerID = "0";
-                    var productList = "";
-                    var holdObject = new Object();
-
-                    $.each(data.report.rows, function (index)
-                    {
-                        str = "";
-                        var obj = data.report.rows[index];
-                        // need a control break on OwnerID
-                        //buildOwnerRow(ownerName, ownerId, mediaType, parentOwnerId, parentOwner, productList)
-
-                        if (holdOwnerID != obj.OwnerID)
-                        {
-                            if (holdOwnerID != "0")
-                            {
-                                str = buildOwnerRow(holdObject.OwnerName, holdObject.OwnerID, holdObject.MediaTypeID, holdObject.MediaTypeName, holdObject.ParentOwnerID, holdObject.ParentOwnerName, holdObject.productList);
-                                $("#ownerList").append(str);
-
-                            }
-                            productList = "";
-                            holdObject = new Object();
-                            holdObject.MediaTypeID = "";
-                            holdObject.MediaTypeName = "";
-                            holdObject.productList = "";
-                            holdObject.OwnerName = "";
-                            holdObject.OwnerID = "";
-                            holdObject.MediaType = "";
-                            holdObject.ParentOwnerID = "";
-                            holdObject.ParentOwnerName = "";
-                        }
-
-                        holdOwnerID = obj.OwnerID;
-                        holdObject.productList = holdObject.productList + (holdObject.productList.length == 0 ? "" : " ") + '<a href="#" onclick="editProduct(' + "'" + obj.ProductID + "'" + ')">' + obj.ProductID + '</a>';
-                        holdObject.OwnerName = obj.OwnerName;
-                        holdObject.OwnerID = obj.OwnerID;
-                        holdObject.MediaType = "MEDIA TYPE";
-                        holdObject.ParentOwnerID = obj.ParentOwnerID;
-                        holdObject.ParentOwnerName = obj.ParentOwnerName;
-                        holdObject.MediaTypeID = obj.MediaTypeID;
-                        holdObject.MediaTypeName = obj.MediaTypeName;
-
-                    });
-
-                    if ((!holdObject.OwnerName) == false) {
-                        str = buildOwnerRow(holdObject.OwnerName, holdObject.OwnerID,  holdObject.MediaTypeID, holdObject.MediaTypeName, holdObject.ParentOwnerID, holdObject.ParentOwnerName, holdObject.productList);
-                        $("#ownerList").append(str);
-                    }
-                }
-            }
-        },
-        error: function (jqXhr, textStatus, errorThrown) {
-            bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                //window.location = "preprocess.html";
-            });
-        }
-    });
-
-}
-function buildOwnerRow(ownerName, ownerId, mediaTypeId, mediaTypeName, parentOwnerId, parentOwner, productList)
-{
-    var str = '';
-
-    // Open Row
-    str = str + '<div class="row">';
-
-    str = str + '<div class="col-md-3" style="text-align:left">';
-    str = str + ownerName;
-    str = str + '</div>';
-
-    str = str + '<div class="col-md-2" style="text-align:left">';
-    str = str + '<a href="#" onclick="editMediaType(' + mediaTypeId + ')">' + mediaTypeName + '</a>';
-    str = str + '</div>';
+        str = str + '<div class="col-md-2" style="text-align:left">';
+        str = str + '<a href="#" onclick="editMediaType(' + mediaTypeId + ')">' + mediaTypeName + '</a>';
+        str = str + '</div>';
     
-    str = str + '<div class="col-md-3" style="text-align:left">';
-    str = str + '<a href="#" onclick="editParentOwnership(' + parentOwnerId + ')">' + parentOwner + '</a>';
-    str = str + '</div>';
+        str = str + '<div class="col-md-3" style="text-align:left">';
+        str = str + '<a href="#" onclick="editParentOwnership(' + parentOwnerId + ')">' + parentOwner + '</a>';
+        str = str + '</div>';
     
-    str = str + '<div class="col-md-2" style="text-align:left">';
-    str = str + productList;
-    str = str + '</div>';
+        str = str + '<div class="col-md-2" style="text-align:left">';
+        str = str + productList;
+        str = str + '</div>';
 
-    str = str + '<div class="col-md-2" style="text-align:center">';
-    str = str + '<a href="#" onclick="editOwnership(' + ownerId + ')">Edit</a>&nbsp;<a  onclick="deleteOwnership(' + ownerId + ')">Delete</a>';
-    str = str + '</div>';
+        str = str + '<div class="col-md-2" style="text-align:center">';
+        str = str + '<a href="#" onclick="editOwnership(' + ownerId + ')">Edit</a>&nbsp;<a  onclick="deleteOwnership(' + ownerId + ')">Delete</a>';
+        str = str + '</div>';
 
-    // Close Row
-    str = str + '</div>';
-    return str;
-}
+        // Close Row
+        str = str + '</div>';
+        return str;
+    }
 
-function getMediaTypes()
-{
-    $.ajax({
-        url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
-        dataType: 'json',
-        type: 'post',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            "inApiToken":getLocalStorage("APIToken")
-        }),
-        processData: false,
-        success: function (data, textStatus, jQxhr) {
+    function editOwnership(ownerID)
+    {
 
-            if (data.response.status != "SUCCESS") {
-                bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-                });
-            }
-            else {
-                if (data.report.rows[0].Status == -1) {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                        //
-                    });
-                }
-                else {
-                    //bootbox.alert("Audit Added to the Database!", function () {
-                    //    window.localStorage.setItem("AuditId", data.report.rows[0].AuditId);
-                    //    window.location = "upload.html";
-                    //});
-                    var str = '';
-                    //console.log(JSON.stringify(data));
-                    $.each(data.report.rows, function (index) {
-
-                        str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
-
-                    });
-
-                    $("#ddlMediaType").html(str);
-                }
-            }
-        },
-        error: function (jqXhr, textStatus, errorThrown) {
-            bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                //window.location = "preprocess.html";
-            });
-        }
-    });
-
-
-}
-
-function editOwnership(ownerID)
-{
-
-    window.location = "ownership.html?ownerID=" + ownerID;
+        window.location = "ownership.html?ownerID=" + ownerID;
     
-}
+    }
+
 </script>
 
