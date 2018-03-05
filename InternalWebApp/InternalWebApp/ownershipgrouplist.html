@@ -66,8 +66,8 @@
                             <li><a href="dashboard.html">Personnel</a></li>
                             <li><a href="dashboard.html">Stations</a></li>
                             <li><a href="dashboard.html">Markets</a></li>
-                            <li><a class="active" href="ownershiplist.html">Ownerships</a></li>
-                            <li><a href="ownershipgrouplist.html">Ownership Groups</a></li>
+                            <li><a  href="ownershiplist.html">Ownerships</a></li>
+                            <li><a class="active" href="ownershipgrouplist.html">Ownership Groups</a></li>
                             <li><a href="dashboard.html">Virtual Groups</a></li>
                             <li><a href="dashboard.html">Settings</a></li>
                             <li><a href="#" onclick='logout()'>Logout</a></li>
@@ -84,19 +84,19 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Ownerships</h2>
+                        <h2>Ownership Groups</h2>
                     </div>
                 </div>
 
                 <!-- search / filter area -->
                 <div class="row" style="margin-top:-25px!important">
                     <div class="col-md-10 ">
-                        <label for="search">Ownership Name</label>
-                        <input type="text" id="searchOwner" />
+                        <label for="search">Ownership Group Name</label>
+                        <input type="text" id="searchOwnerGroup" />
                         <!--<label for="ddlMediaType" style="padding-left:10px">Media Type</label>
                         <select id="ddlMediaType">
                         </select>-->
-                        <input type="button" style="margin-left:10px" value="Search" onclick="getOwnerList()" />
+                        <input type="button" style="margin-left:10px" value="Search" onclick="getOwnerGroupList()" />
                     </div>
                     <div class="col-md-2 ">
                         <input type="button" value="+" style="padding-left:25px; padding-right:25px;background-color:blue!important;border-radius:55%!important;min-width:0px!important; font-size:36px;margin-top:-25px;float:right" onclick="editOwnership(0)" />
@@ -108,23 +108,18 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="row" style="border-top:solid 1px silver;border-bottom:solid 1px silver;">
-                                <div class="col-md-3">
+                                <div class="col-md-4">
                                     <strong>
-                                        Ownership
+                                        Ownership Group
                                     </strong>
                                 </div>
 
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <strong>
-                                        Media
+                                        Owner
                                     </strong>
                                 </div>
                                 <div class="col-md-3">
-                                    <strong>
-                                        Parent Owner
-                                    </strong>
-                                </div>
-                                <div class="col-md-2">
                                     <strong>
                                         Products
                                     </strong>
@@ -135,35 +130,11 @@
                                 </div>
                             </div>
 
-                            <div id='ownerList'>
+                            <div id='ownerGroupList'>
 
                             </div>
 
                         </div>
-                    <!--<div class="col-md-8 col-md-push-1 col-sm-12 col-sm-push-0 col-xs-12 col-xs-push-0">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <input class="form-control" placeholder="Name" type="text">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <input class="form-control" placeholder="Email" type="text">
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <textarea name="" class="form-control" id="" cols="30" rows="7" placeholder="Message"></textarea>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <input value="Send Message" class="btn btn-primary" type="submit">
-                                </div>
-                            </div>
-                        </div>
-                    </div>-->
                     </div>
                 </div>
             </div>
@@ -199,23 +170,24 @@
 
         var search = getParameterByName("search");
 
-        if (!search == false) 
+        if (!search == false)
         {
             if (search.length > 0)
             {
-                $("#searchOwner").val(search);
-                getOwnerList();
+                $("#searchOwnerGroup").val(search);
+                getOwnerGroupList();
             }
         }
 
 
+
     });
 
-    function getOwnerList()
+    function getOwnerGroupList()
     {
-        if ($("#searchOwner").val().trim() == 0)
+        if ($("#searchOwnerGroup").val().trim() == 0)
         {
-            bootbox.alert("Please enter text to search for Owner(s)", function () {
+            bootbox.alert("Please enter text to search for Owner Group(s)", function () {
 
             });
 
@@ -223,19 +195,18 @@
 
         }
 
-        setLocalStorage("search", $("#searchOwner").val().trim());
+        setLocalStorage("search", $("#searchOwnerGroup").val().trim());
         setLocalStorage("searchPage", window.location);
 
         $.ajax({
-            url: ServicePrefix + '/api/Owner/GetOwnerList',
+            url: ServicePrefix + '/api/OwnerGroup/GetOwnerGroupList',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inOwnerName": $("#searchOwner").val(),
-                "inActiveOnly": "1",
-                "inAddDetails": "1"
+                "inOwnerGroupName": $("#searchOwnerGroup").val(),
+                "inActiveOnly": "1"
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -247,10 +218,10 @@
                 }
                 else {
 
-                        var str = '';
-                        $("#ownerList").html("");
+                        var str = 'No Owner Groups found';
+                        $("#ownerGroupList").html("");
 
-                        var holdOwnerID = "0";
+                        var holdOwnerGroupID = "0";
                         var productList = "";
                         var holdObject = new Object();
 
@@ -258,47 +229,42 @@
                         {
                             str = "";
                             var obj = data.report.rows[index];
-                            // need a control break on OwnerID
-                            //buildOwnerRow(ownerName, ownerId, mediaType, parentOwnerId, parentOwner, productList)
-
-                            if (holdOwnerID != obj.OwnerID)
+                            // need a control break on OwnerGroupID
+   
+                            if (holdOwnerGroupID != obj.OG_OwnerGroupID)
                             {
-                                if (holdOwnerID != "0")
+                                if (holdOwnerGroupID != "0")
                                 {
-                                    str = buildOwnerRow(holdObject.OwnerName, holdObject.OwnerID, holdObject.MediaTypeID, holdObject.MediaTypeName, holdObject.ParentOwnerID, holdObject.ParentOwnerName, holdObject.productList);
-                                    $("#ownerList").append(str);
+                                    str = buildOwnerGroupRow(holdObject.OwnerGroupName, holdObject.OwnerGroupID, holdObject.OwnerID, holdObject.OwnerName, holdObject.productList);
+                                    $("#ownerGroupList").append(str);
 
                                 }
                                 productList = "";
                                 holdObject = new Object();
-                                holdObject.MediaTypeID = "";
-                                holdObject.MediaTypeName = "";
                                 holdObject.productList = "";
                                 holdObject.OwnerName = "";
                                 holdObject.OwnerID = "";
-                                holdObject.MediaType = "";
-                                holdObject.ParentOwnerID = "";
-                                holdObject.ParentOwnerName = "";
+                                holdObject.OwnerGroupID = "";
+                                holdObject.OwnerGroupName = "";
                             }
 
-                            holdOwnerID = obj.OwnerID;
-                            holdObject.productList = holdObject.productList + (holdObject.productList.length == 0 ? "" : " ") + '<a href="#" onclick="editProduct(' + "'" + obj.ProductID + "'" + ')">' + obj.ProductID + '</a>';
-                            holdObject.OwnerName = obj.OwnerName;
-                            holdObject.OwnerID = obj.OwnerID;
-                            holdObject.MediaType = "MEDIA TYPE";
-                            holdObject.ParentOwnerID = obj.ParentOwnerID;
-                            holdObject.ParentOwnerName = obj.ParentOwnerName;
-                            holdObject.MediaTypeID = obj.MediaTypeID;
-                            holdObject.MediaTypeName = obj.MediaTypeName;
+                            holdOwnerGroupID = obj.OG_OwnerGroupID;
+                            holdObject.productList = holdObject.productList + (holdObject.productList.length == 0 ? "" : " ") + '<a href="#" onclick="editProduct(' + "'" + obj.OP_ProductID + "'" + ')">' + obj.OP_ProductID + '</a>';
+                            holdObject.OwnerName = obj.OW_OwnerName;
+                            holdObject.OwnerID = obj.OG_OwnerID;
+                            holdObject.OwnerGroupID = obj.OG_OwnerGroupID;
+                            holdObject.OwnerGroupName = obj.OG_OwnerGroupName;
+
 
                         });
 
-                        if ((!holdObject.OwnerName) == false) {
-                            str = buildOwnerRow(holdObject.OwnerName, holdObject.OwnerID,  holdObject.MediaTypeID, holdObject.MediaTypeName, holdObject.ParentOwnerID, holdObject.ParentOwnerName, holdObject.productList);
-                            $("#ownerList").append(str);
-                        }
-                    }
-                
+                        if ((!holdObject.OwnerGroupName) == false)
+                        {
+                            str = buildOwnerGroupRow(holdObject.OwnerGroupName, holdObject.OwnerGroupID, holdObject.OwnerID, holdObject.OwnerName, holdObject.productList);
+                            $("#ownerGroupList").append(str);
+                        } 
+
+                }
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
@@ -309,31 +275,27 @@
 
     }
 
-    function buildOwnerRow(ownerName, ownerId, mediaTypeId, mediaTypeName, parentOwnerId, parentOwner, productList)
+    function buildOwnerGroupRow(ownerGroupName, ownerGroupId, ownerId, ownerName, productList)
     {
         var str = '';
 
         // Open Row
         str = str + '<div class="row">';
 
-        str = str + '<div class="col-md-3" style="text-align:left">';
-        str = str + ownerName;
-        str = str + '</div>';
-
-        str = str + '<div class="col-md-2" style="text-align:left">';
-        str = str + '<a href="#" onclick="editMediaType(' + mediaTypeId + ')">' + mediaTypeName + '</a>';
+        str = str + '<div class="col-md-4" style="text-align:left">';
+        str = str + ownerGroupName;
         str = str + '</div>';
     
         str = str + '<div class="col-md-3" style="text-align:left">';
-        str = str + '<a href="#" onclick="editParentOwnership(' + parentOwnerId + ')">' + parentOwner + '</a>';
+        str = str + '<a href="#" onclick="editOwnership(' + ownerId + ')">' + ownerName + '</a>';
         str = str + '</div>';
     
-        str = str + '<div class="col-md-2" style="text-align:left">';
+        str = str + '<div class="col-md-3" style="text-align:left">';
         str = str + productList;
         str = str + '</div>';
 
         str = str + '<div class="col-md-2" style="text-align:center">';
-        str = str + '<a href="#" onclick="editOwnership(' + ownerId + ')">Edit</a>&nbsp;<a  onclick="deleteOwnership(' + ownerId + ')">Delete</a>';
+        str = str + '<a href="#" onclick="editOwnershipGroup(' + ownerGroupId + ')">Edit</a>&nbsp;<a  onclick="deleteOwnershipGroup(' + ownerGroupId + ')">Delete</a>';
         str = str + '</div>';
 
         // Close Row
@@ -341,11 +303,16 @@
         return str;
     }
 
-    function editOwnership(ownerID)
+    function editOwnershipGroup(ownerGroupID)
     {
 
-        window.location = "ownership.html?ownerID=" + ownerID;
+        window.location = "ownershipgroup.html?ownerGroupID=" + ownerGroupID;
     
+    }
+    function editOwnership(ownerID) {
+
+        window.location = "ownership.html?ownerID=" + ownerID;
+
     }
 
 </script>

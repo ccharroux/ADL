@@ -336,6 +336,15 @@ function getLocalStorage(key)
         return "";
     }
 }
+function removeLocalStorage(key)
+{
+    try {
+        window.localStorage.removetItem(key);
+    }
+    catch (err) {
+        return "";
+    }
+}
 
 function logout() {
     window.localStorage.clear();
@@ -392,4 +401,21 @@ function extractDateOnly(inDate)
     {
         return (inDate == null ? "&nbsp;" : inDate);
     }
+}
+function goBackToDashboard() {
+
+    var search = getLocalStorage("search");
+    var searchPage = getLocalStorage("searchPage");
+
+    if (searchPage.length > 0)
+    {
+        var cleanPage = searchPage.split('?');
+        if (cleanPage.length > 0) {
+            window.location = cleanPage[0] + (search.length > 0 ? "?search=" + search : "");
+            return;
+        }
+    }
+
+    // Fall thru
+    window.location = "dashboard.html";
 }
