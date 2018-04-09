@@ -74,7 +74,15 @@
                 </div>
 
                 <div class="text-center" style="margin-top:00px">
-
+                    <!-- Owner -->
+                    <div class="row" style="width:80%;margin:0 auto;">
+                        <div class="col-md-3" style="text-align:left">
+                            <label for="ddlOwner">Ownership</label>
+                        </div>
+                        <div class="col-md-9" style="text-align:left">
+                            <select class="mkaRequired" id="ddlOwner" errorMessage="You must select an Owner"></select>
+                        </div>
+                    </div>
                     <!-- Owner Group Name -->
                     <div class="row" style="width:80%;margin:0 auto;">
                         <div class="col-md-3" style="text-align:left">
@@ -206,17 +214,71 @@
 
     $( document ).ready(function()
     {
+        ServicePrefix = "http://localhost:54064";
+
+
+
         buildMainMenu("");
 
         ownerGroupID = (getParameterByName("OwnerGroupID") == null ? 0 : getParameterByName("OwnerGroupID"));
 
-        getProductList();
-        getOwnerGroup();
-        getOwnerGroupStationList();
+        getOwnerList();
+
 
 
 
     });
+
+    function getOwnerList() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerListUnFiltered',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerName": "",
+                "inActiveOnly": "1",
+                "inAddDetails": "0"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
+                    });
+                }
+                else {
+
+                    var str = '';
+
+                    $("#ddlOwner").html("<option value=''> -- Select an Owner</option>");
+
+                    var holdOwnerID = "0";
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = "<option value='" + obj.OwnerID + "'>" + obj.OwnerName + "</option>";
+                        $("#ddlOwner").append(str);
+                    });
+
+                    getProductList();
+                    getOwnerGroup();
+                    getOwnerGroupStationList();
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    //window.location = "preprocess.html";
+                });
+            }
+        });
+
+    }
 
     function validationPassed()
     {
@@ -285,54 +347,45 @@
 
             productListArr.push(productListObject);
 
-            //var eID = $(el).attr("id");
-            //var errorMessage = $(el).attr("errorMessage");
-
-            //// Text
-            //if ($(eID).prop('tagName').toLowerCase() == "input") {
-            //    if ($(eID).val().trim() == "") {
-            //        bootbox.alert(errorMessage, function () { });
-            //        return false;
-            //    }
-            //}
-
-            //// Select
-            //if ($(eID).prop('tagName').toLowerCase() == "select") {
-            //    if ($(eID).val() == "-1") {
-            //        bootbox.alert(errorMessage, function () { });
-            //        return false;
-            //    }
-            //}
-
         });
 
+        var stationListObject = new Object();
+        var stationListArr = new Array();
+
+        // Build object for 
+        $("#ddlOwnerGroupStations > option").each(function () {
+            stationListObject = new Object();
+            stationListObject["stationId"] = this.value;
+
+            stationListArr.push(this.value);
+
+            console.log(stationListObject);
+            console.log(stationListArr);
+        });
+
+        //$("#ddlOwnerGroupStations").each(function (index, el) {
+        //    stationListObject = new Object();
+        //    stationListObject["stationId"] = $(el).val();
+        //    stationListArr.push(stationListObject);
+        //    console.log(stationListObject);
+        //    console.log(stationListArr);
+        //});
+
+
+
         $.ajax({
-            url: ServicePrefix + '/api/Owner/UpdateOwner',
+            url: ServicePrefix + '/api/OwnerGroup/UpdateOwnerGroup',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inOwnerId": ownerID,
-                "inOwnerName": $("#txtOwnerName").val().trim(),
-                "inClientNumberId": $("#txtClientNumber").val().trim(),
-                "inOwnerAbbreviation": $("#txtOwnerAbbreviation").val().trim(),
-                "inMediaTypeId": $("#ddlMediaType").val().trim(),
-                "inParentOwnerId": $("#ddlParentOwner").val().trim(),
-                "inVirtualOwner": $("#chkVirtualOwner").attr("checked"),
-                "inAddress": $("#txtAddress").val().trim(),
-                "inAddress2": $("#txtAddress2").val().trim(),
-                "inCity": $("#txtCity").val().trim(),
-                "inState": $("#txtState").val().trim(),
-                "inZipCode": $("#txtZipCode").val().trim(),
-                "inZipCode4": $("#txtZipCode4").val().trim(),
-                "inAreaCode": $("#txtAreaCode").val().trim(),
-                "inExtension": $("#txtExtension").val().trim(),
-                "inPhone": $("#txtPhone").val().trim(),
-                "inFaxAreaCode": $("#txtFaxAreaCode").val().trim(),
-                "inFaxPhone": $("#txtFaxPhone").val().trim(),
-                "inEmailAddress": $("#txtEmailAddress").val().trim(),
-                "inOwnerProductList" : productListArr
+                "inOwnerId": $("#ddlOwner").val().trim(),
+                "inOwnerGroupId": ownerGroupID,
+                "inOwnerGroupName": $("#txtOwnerGroupName").val().trim(),
+                "inOwnerProductList": productListArr,
+                "inOwnerGroupMarketId": $("#ddlMarkets").val().trim(),
+                "inOwnerGroupStationList": stationListArr
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -346,7 +399,7 @@
                     }
                     else {
                         // TEMP - we need to now update products...
-                        bootbox.alert('Owner Updated', function () { });
+                        bootbox.alert('Owner Group Updated', function () { });
                     }
                 }
             },
@@ -509,6 +562,7 @@
                             var obj = data.report.rows[index];
                             $("#txtOwnerGroupName").val(obj["OG_OwnerGroupName"]);
                             ownerID = obj["OG_OwnerID"];
+                            $("#ddlOwner").val(ownerID);
 
                          });
 

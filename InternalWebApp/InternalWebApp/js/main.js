@@ -247,7 +247,7 @@ $( document ).ready(function()
 
     // Block UI Stuff
     $.blockUI.defaults.css.paddingTop='25px';
-	$.blockUI.defaults.fadeOut = 2000;
+	$.blockUI.defaults.fadeOut = 500;
 	$.blockUI.defaults.message ='<h4>Just a moment...</h4>';
 	
 
@@ -435,7 +435,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Ownerships") + 'href="ownershiplist.html">Ownerships</a></li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Ownership Groups") + 'href="ownershipgrouplist.html">Ownership Groups</a></li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="dashboard.html">Virtual Groups</a></li>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Settings") + 'href="dashboard.html">Settings</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Settings") + 'href="settings.html">Settings</a></li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
     menuItems += '    </ul>';
     menuItems += '</nav>';
