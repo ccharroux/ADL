@@ -419,3 +419,34 @@ function goBackToDashboard() {
     // Fall thru
     window.location = "dashboard.html";
 }
+
+function buildMainMenu(selectedItem) {
+
+    var menuItems = '';
+
+    menuItems += '<h1><a href="dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<nav role="navigation" style="margin-top:20px">'
+
+    menuItems += '<ul>';
+    menuItems += '       <li><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="dashboard.html">Products</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Personnel") + 'href="dashboard.html">Personnel</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Stations") + ' href="dashboard.html">Stations</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Markets") + ' href="dashboard.html">Markets</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Ownerships") + 'href="ownershiplist.html">Ownerships</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Ownership Groups") + 'href="ownershipgrouplist.html">Ownership Groups</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="dashboard.html">Virtual Groups</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Settings") + 'href="dashboard.html">Settings</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
+    menuItems += '    </ul>';
+    menuItems += '</nav>';
+
+    $("#menu").html(menuItems);
+}
+function getSelectedItemClass(selectedItem, item) {
+    if (selectedItem.toLowerCase() == item.toLowerCase()) {
+        return 'class="active"';
+    }
+    else {
+        return '';
+    }
+}
