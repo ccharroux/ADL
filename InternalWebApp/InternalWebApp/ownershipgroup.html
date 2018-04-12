@@ -94,7 +94,15 @@
                         </div>
                     </div>
 
-
+                    <!-- Nationwide -->
+                    <div class="row" style="width:80%;margin:0 auto;">
+                        <div class="col-md-3" style="text-align:left">
+                            <label for="chkNationwide">Nationwide</label>
+                        </div>
+                        <div class="col-md-9" style="text-align:left">
+                            <input type="checkbox" id="chkNationwide" />
+                        </div>
+                    </div>
 
 
                     <!-- Products -->
@@ -214,7 +222,7 @@
 
     $( document ).ready(function()
     {
-        ServicePrefix = "http://localhost:54064";
+//        ServicePrefix = "http://localhost:54064";
 
 
 
@@ -358,19 +366,7 @@
             stationListObject["stationId"] = this.value;
 
             stationListArr.push(this.value);
-
-            console.log(stationListObject);
-            console.log(stationListArr);
         });
-
-        //$("#ddlOwnerGroupStations").each(function (index, el) {
-        //    stationListObject = new Object();
-        //    stationListObject["stationId"] = $(el).val();
-        //    stationListArr.push(stationListObject);
-        //    console.log(stationListObject);
-        //    console.log(stationListArr);
-        //});
-
 
 
         $.ajax({
@@ -382,6 +378,7 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inOwnerId": $("#ddlOwner").val().trim(),
                 "inOwnerGroupId": ownerGroupID,
+                "inNationwide": $("#chkNationwide").val().trim(),
                 "inOwnerGroupName": $("#txtOwnerGroupName").val().trim(),
                 "inOwnerProductList": productListArr,
                 "inOwnerGroupMarketId": $("#ddlMarkets").val().trim(),
@@ -523,7 +520,7 @@
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    //window.location = "preprocess.html";
+                    
                 });
             }
         });
@@ -563,6 +560,14 @@
                             $("#txtOwnerGroupName").val(obj["OG_OwnerGroupName"]);
                             ownerID = obj["OG_OwnerID"];
                             $("#ddlOwner").val(ownerID);
+                            if (obj["OG_NationWide"] == true)
+                            {
+                                $("#chkNationwide").attr("checked", "checked");
+                            }
+                            else
+                            {
+                                $("#chkNationwide").removeAttr("checked");
+                            }
 
                          });
 
@@ -638,7 +643,7 @@
 
                         $.each(data.report.rows, function (index) {
 
-                            str = str + '<option value="' + data.report.rows[index].RE_REID + '">' + data.report.rows[index].RE_FullName + '</option>';
+                            str = str + '<option value="' + data.report.rows[index].OM_MarketID + "|" + data.report.rows[index].RE_REID + '">' + data.report.rows[index].RE_FullName + '</option>';
 
                         });
 
@@ -649,7 +654,6 @@
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    //window.location = "preprocess.html";
                 });
             }
         });
@@ -691,7 +695,7 @@
 
                     $.each(data.report.rows, function (index) {
 
-                        str = str + '<option value="' + data.report.rows[index].RE_REID + '">' + data.report.rows[index].RE_FullName + '</option>';
+                        str = str + '<option value="' + $("#ddlMarkets").val() + "|" + data.report.rows[index].RE_REID + '">' + data.report.rows[index].RE_FullName + '</option>';
 
                     });
 
