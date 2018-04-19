@@ -435,7 +435,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Ownerships") + 'href="ownershiplist.html">Ownerships</a></li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Ownership Groups") + 'href="ownershipgrouplist.html">Ownership Groups</a></li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="dashboard.html">Virtual Groups</a></li>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Settings") + 'href="settings.html">Settings</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Positions") + 'href="positionlist.html">Settings</a></li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
     menuItems += '    </ul>';
     menuItems += '</nav>';
