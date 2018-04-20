@@ -435,7 +435,13 @@ function buildMainMenu(selectedItem) {
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Ownerships") + 'href="ownershiplist.html">Ownerships</a></li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Ownership Groups") + 'href="ownershipgrouplist.html">Ownership Groups</a></li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="dashboard.html">Virtual Groups</a></li>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Positions") + 'href="positionlist.html">Settings</a></li>';
+    menuItems += '        <li class="dropdown"><a class="dropdown-toggle ' + getSelectedSubMenuItemClass(selectedItem, "Settings") + '" data-toggle="dropdown" role="button" aria-expanded="false">Settings <span class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="positionlist.html">Positions</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="revenuecategorieslist.html">Revenue Categories</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="formatlist.html">Formats</a></li>';
+    menuItems += '              </ul>';
+    menuItems += '        </li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
     menuItems += '    </ul>';
     menuItems += '</nav>';
@@ -447,6 +453,14 @@ function getSelectedItemClass(selectedItem, item) {
         return 'class="active"';
     }
     else {
+        return '';
+    }
+}
+
+function getSelectedSubMenuItemClass(selectedItem, item) {
+    if (selectedItem.toLowerCase() == item.toLowerCase()) {
+        return 'active';
+    } else {
         return '';
     }
 }
