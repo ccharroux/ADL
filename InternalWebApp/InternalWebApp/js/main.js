@@ -430,7 +430,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '<ul>';
     menuItems += '       <li><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="dashboard.html">Products</a></li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Personnel") + 'href="dashboard.html">Personnel</a></li>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Stations") + ' href="dashboard.html">Stations</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Stations") + ' href="stationlist.html">Stations</a></li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Markets") + ' href="marketlist.html">Markets</a></li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Ownerships") + 'href="ownershiplist.html">Ownerships</a></li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Ownership Groups") + 'href="ownershipgrouplist.html">Ownership Groups</a></li>';
