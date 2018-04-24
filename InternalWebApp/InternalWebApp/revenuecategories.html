@@ -78,10 +78,10 @@
                     <!-- Rev Category Id Insert -->
                     <div class="row" id="revCategoryIdInsertDiv" style="display:none; width:80%;margin:0 auto;padding-bottom:10px;">
                         <div class="col-md-3" style="text-align:left">
-                            <label for="txtRevenueCategoryId">Revenue Category Id</label>
+                            <label for="txtRevCategoryIdInsert">Revenue Category Id</label>
                         </div>
                         <div class="col-md-9" style="text-align:left">
-                            <input type="text" class="mkaRequired" id="txtRevenueCategoryId" errorMessage="You must enter a Revenue Category Id" value="" />
+                            <input type="text" id="txtRevCategoryIdInsert" errorMessage="You must enter a Revenue Category Id" value="" />
                         </div>
                     </div>
 
@@ -101,9 +101,8 @@
                         <div class="col-md-3" style="text-align:left">
                             <label for="txtRevCategoryName">Revenue Category Name</label>
                         </div>
-                        <div class="col-md-9" style="text-align:left">
-
-                            <input type="text" class="mkaRequired" id="txtRevCategoryName" errorMessage="You must enter a Revenue Category Name" value="" />
+                        <div class="col-md-9" style="text-align:left;">
+                            <input type="text" class="mkaRequired" style="width: 300px;" id="txtRevCategoryName" errorMessage="You must enter a Revenue Category Name" value="" />
                         </div>
                     </div>
 
@@ -117,6 +116,7 @@
                             <input type="text" class="mkaRequired" id="txtRevCategoryType" errorMessage="You must enter a Revenue Category Type" value="" />
                         </div>
                     </div>
+
                     <!--Rev Category Mrr RAB-->
                     <div class="row" style="width:80%;margin:0 auto;padding-bottom:10px;">
                         <div class="col-md-3" style="text-align:left">
@@ -127,6 +127,36 @@
                             <input type="text" class="mkaRequired" id="txtRevCategoryMrrRAB" errorMessage="You must enter a Revenue Category MRR RAB" value="" />
                         </div>
                     </div>
+
+                    <!--<div class="row" style="width:80%;margin:0 auto;padding-bottom:10px;">
+                        <div class="col-md-3" style="text-align:left">
+                            <label for="txtRevCategoryMrrRAB">MRR RAB</label>
+                        </div>
+                        <div class="col-md-9" style="text-align:left">
+                            <select class="mkaRequired"id="selRevCategoryMrrRAB" placeholder="Select" errorMessage="You must select an option for MRR RAB.">
+                                <option value="" disabled selected>Select an option</option>
+                                <option value="true">True</option>
+                                <option value="false">False</option>
+                            </select>
+                        </div>
+                    </div>-->
+
+
+
+
+
+                    <!--MRR Phase 2 Revenue Number-->
+                    <div class="row" style="width:80%;margin:0 auto;padding-bottom:10px;">
+                        <div class="col-md-3" style="text-align:left">
+                            <label for="txtRevCategoryPhase2RevNum">Phase 2 Revenue Number</label>
+                        </div>
+                        <div class="col-md-9" style="text-align:left">
+                            <input type="text"  id="txtRevCategoryPhase2RevNum" errorMessage="You must enter a Revenue Category MRR RAB" value="" />
+                            <span>*Optional</span>
+                        </div>                        
+                    </div>
+
+
 
                     <!--Rev Category RAB Order-->
                     <div class="row" style="width:80%;margin:0 auto;padding-bottom:10px;">
@@ -145,8 +175,8 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div>
-                                    <input value="Update" onclick="insertUpdate()" class="updateButton" style="width:100%;max-width:100px;" type="button"> &nbsp;&nbsp;&nbsp;
-                                    <input value="Back" onclick="goBackToDashboard();" class="goBackButton" style="width:100%;max-width:100px;" type="button">
+                                    <input value="Update" onclick="insertUpdate()" id="updateButton" style="width:100%;max-width:100px;" type="button"> &nbsp;&nbsp;&nbsp;
+                                    <input value="Back" onclick="goBackToDashboard();" style="width:100%;max-width:100px;" type="button">
                                 </div>
                             </div>
                         </div>
@@ -191,8 +221,8 @@
         //checking if position will be an update or insert
         if (revCategoryId == null || revCategoryId == "") {
             //insert
-            $("#revCategoryIdInsertDiv").addClass("show");
             $("#updateButton").prop("value", "Save");
+            $("#revCategoryIdInsertDiv").addClass("show");           
             isNew = true;
             return;
         } else {
@@ -205,7 +235,7 @@
 
     function getRevenueCategory() {
         //filling out url for ajax call
-        var url = ServicePrefix + '/api/Position/GetPosition';
+        var url = ServicePrefix + '/api/RevenueCategory/GetRevenueCategory';
 
         //filling out settings for ajax call
         var settings = {
@@ -214,7 +244,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inPositionCode": revCategoryId
+                "inRevenueCategoryId": revCategoryId
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -238,27 +268,33 @@
             $.each(data.report.rows, function (index) {
                 var obj = data.report.rows[index];
                 $("#spnRevCategoryIdUpdate").text(revCategoryId);
-                $("#txtRevCategoryName").val(obj["Position Title"]);
-                $("#txtRevCategoryType").val(obj["Position Title"]);
-                $("#txtRevCategoryMrrRAB").val(obj["Position Title"]);
-                $("#txtRevCategoryRABOrder").val(obj["Position Title"]);
+                $("#txtRevCategoryName").val(obj["Revenue Category Name"]);
+                $("#txtRevCategoryType").val(obj["Category Type"]);
+                $("#txtRevCategoryMrrRAB").val(obj["MRR RAB"]);
+                $("#txtRevCategoryPhase2RevNum").val(obj["MRR Phase 2 Revenue Number"]);
+                $("#txtRevCategoryRABOrder").val(obj["RAB Order"]);
             });
         }
     }
 
     function insertUpdate() {
+
+        //checking if new or update
+        var inRevCategoryId;
+        if (isNew == true) {
+            inRevCategoryId = $("#txtRevCategoryIdInsert").val().trim();
+            $("#txtRevCategoryIdInsert").addClass("mkaRequired");
+        } else {
+            inRevCategoryId = $("#spnRevCategoryIdUpdate").text();
+        }
+
         //validation check
         if (validationPassed() == false) {
             return;
         }
-        var inRevCategoryId;
-        if (isNew == true) {
-            inRevCategoryId = $("#txtRevCategoryIdInsert").val().trim();
-        } else {
-            inRevCategoryId = $("#txtRevCategoryIdUpdate").val().trim();
-        }
+
         //filling out url for ajax call
-        var url = ServicePrefix + '/api/Position/UpdatePosition'
+        var url = ServicePrefix + '/api/RevenueCategory/UpdateRevenueCategory'
 
         //filling out settings for ajax call
         var settings = {
@@ -267,8 +303,13 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inPositionCode": inRevCategoryId,
-                "inPositionTitle": "Testing"
+                "inRevenueCategoryId": inRevCategoryId,
+                "inRevenueCategoryName": $("#txtRevCategoryName").val().trim(),
+                "inRevenueCategoryType": $("#txtRevCategoryType").val().trim(),
+                "inMrrRAB": $("#txtRevCategoryMrrRAB").val().trim() ,
+                "inMrrPhase2RevenueNumber": $("#txtRevCategoryPhase2RevNum").val().trim(),
+                "inRABOrder": $("#txtRevCategoryRABOrder").val().trim(),
+                "inIsNew": isNew
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -290,7 +331,7 @@
             });
         }
         else {
-            bootbox.alert('Positions have successfully been updated.')
+            bootbox.alert('Revenue Category have successfully been updated.')
         }
     }
 
@@ -299,6 +340,7 @@
     }
 
     function validationPassed() {
+        var loopBreak = true;
         $(".mkaRequired").each(function (index, el) {
             var eID = "#" + $(el).attr("id");
             var errorMessage = $(el).attr("errorMessage");
@@ -307,6 +349,7 @@
             if ($(eID).prop('tagName').toLowerCase() == "input") {
                 if ($(eID).val().trim() == "") {
                     bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
                     return false;
                 }
             }
@@ -315,11 +358,21 @@
             if ($(eID).prop('tagName').toLowerCase() == "select") {
                 if ($(eID).val() == "-1") {
                     bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
                     return false;
                 }
             }
+
         });
-        return true;
+
+
+        // Check for number
+        if (isNaN($("#txtRevCategoryRABOrder").val().trim())) {
+            bootbox.alert("RAB Order must be a number.", function () { });
+            loopBreak = false;
+        }
+
+        return loopBreak;
     }
 
 </script>

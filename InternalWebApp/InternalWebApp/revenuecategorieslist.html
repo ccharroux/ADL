@@ -66,7 +66,7 @@
                     <div class="col-md-10 ">
                         <label for="search">Revenue Category Name: </label>
                         <input type="text" id="searchRevCategory" />
-                        <input type="button" class="searchButton" style="margin-left:10px;" value="Search" onclick="getRevCategoryList()" />
+                        <input type="button" style="margin-left:10px;" value="Search" onclick="getRevCategoryList()" />
                     </div>
                     <div class="col-md-2 ">
                         <input type="button" value="+" class="addNewButton" style="padding-left:25px; padding-right:25px;border-radius:55%!important;min-width:0px!important; font-size:36px;margin-top:-25px;float:right" onclick="newRevCategory()" />
@@ -94,12 +94,17 @@
                                         Category Type
                                     </strong>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-1">
                                     <strong>
                                         MRR RAB
                                     </strong>
                                 </div>
                                 <div class="col-md-2">
+                                    <strong>
+                                        Phase 2 Revenue Number
+                                    </strong>
+                                </div>
+                                <div class="col-md-1">
                                     <strong>
                                         RAB Order
                                     </strong>
@@ -112,7 +117,7 @@
                 </div>
             </div>
         </div>
-
+        </div>
         <!-- jQuery -->
         <script src="/js/jquery.min.js"></script>
         <!-- jQuery Easing -->
@@ -138,11 +143,13 @@
         </div>
         <div class="col-md-3" id="tempRevCategoryName" style="text-align:left;">
         </div>
-        <div class="col-md-2" id="tempRevCategoryType" style="text-align:left;">
+        <div class="col-md-2" id="tempRevCategoryType" style="text-align:center;">
         </div>
-        <div class="col-md-2" id="tempRevCategoryMrrRAB" style="text-align:left;">
+        <div class="col-md-1" id="tempRevCategoryMrrRAB" style="text-align:center;">
         </div>
-        <div class="col-md-2" id="tempRevCategoryRABOrder" style="text-align:left;">
+        <div class="col-md-2" id="tempRevCategoryPhase2RevNum" style="text-align:center;">
+        </div>
+        <div class="col-md-1" id="tempRevCategoryRABOrder" style="text-align:center;">
         </div>
         <div class="col-md-2" style="text-align:center;">
             <a href="#" id="tempEditRevCategory">Edit</a>&nbsp;<a id="tempDeleteRevCategory">Delete</a>
@@ -174,7 +181,7 @@
         setLocalStorage("searchPage", window.location);
 
         //filling out url for ajax call
-        var url = ServicePrefix + '/api/Position/GetPositionList';
+        var url = ServicePrefix + '/api/RevenueCategory/GetRevenueCategoryList';
 
         //filling out settings for ajax call
         var settings = {
@@ -183,7 +190,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inPositionTitle": $("#searchRevCategory").val()
+                "inRevenueCategoryName": $("#searchRevCategory").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -228,14 +235,15 @@
         var revCategoryTemplate = loadTemplate();
 
         //using .find to locate the areas you want the data to go and using .text to set the values
-        revCategoryTemplate.find("#tempRevCategoryId").text(data["Position Code"]);
-        revCategoryTemplate.find("#tempRevCategoryName").text(data["Position Title"]);
-        revCategoryTemplate.find("#tempRevCategoryType").text(data["Position Title"]);
-        revCategoryTemplate.find("#tempRevCategoryMrrRAB").text(data["Position Code"]);
-        revCategoryTemplate.find("#tempRevCategoryRABOrder").text(data["Position Title"]);
+        revCategoryTemplate.find("#tempRevCategoryId").text(data["Revenue ID"]);
+        revCategoryTemplate.find("#tempRevCategoryName").text(data["Revenue Category Name"]);
+        revCategoryTemplate.find("#tempRevCategoryType").text(data["Category Type"]);
+        revCategoryTemplate.find("#tempRevCategoryMrrRAB").text(data["MRR RAB"]);
+        revCategoryTemplate.find("#tempRevCategoryPhase2RevNum").text(data["MRR Phase 2 Revenue Number"]);
+        revCategoryTemplate.find("#tempRevCategoryRABOrder").text(data["RAB Order"]);
 
         //adding the id as a custom attribure to use on click of edit button
-        revCategoryTemplate.find("#tempEditRevCategory").attr("editid", data["Position Code"]);
+        revCategoryTemplate.find("#tempEditRevCategory").attr("editid", data["Revenue ID"]);
 
         //calling function expression when click of button with id of "#tempEditRevCategory"
         revCategoryTemplate.on("click", "#tempEditRevCategory", editRevCategory);
