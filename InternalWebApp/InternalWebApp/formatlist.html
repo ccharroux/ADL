@@ -78,7 +78,7 @@
                         <input type="button" style="margin-left:10px" value="Search" onclick="getFormatList()" />
                     </div>
                     <div class="col-md-2 ">
-                        <input type="button" value="+" class="addNewButton" style="padding-left:25px; padding-right:25px;border-radius:55%!important;min-width:0px!important; font-size:36px;margin-top:-25px;float:right" onclick="editFormat()" />
+                        <input type="button" value="+" class="addNewButton" style="padding-left:25px; padding-right:25px;border-radius:55%!important;min-width:0px!important; font-size:36px;margin-top:-25px;float:right" onclick="newFormat()" />
                     </div>
                 </div>
 
@@ -86,21 +86,15 @@
                     <!-- headings -->
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="row" style="border-top:solid 1px silver;border-bottom:solid 1px silver;">
-                                <div class="col-md-1">
-                                    <strong>
-                                        Id
-                                    </strong>
-                                </div>
-
-                                <div class="col-md-2">
-                                    <strong>
-                                        Media Type
-                                    </strong>
-                                </div>
+                            <div class="row" style="border-top:solid 1px silver;border-bottom:solid 1px silver;">                              
                                 <div class="col-md-2">
                                     <strong>
                                         Format Name
+                                    </strong>
+                                </div>
+                                <div class="col-md-2">
+                                    <strong>
+                                        Media Type
                                     </strong>
                                 </div>
                                 <div class="col-md-2">
@@ -150,8 +144,10 @@
 </html>
 <script type="text/html" id="formatRowTemplate">
     <div class="row">
-        <div class="col-md-2 tempFormatMediaType" style="text-align:left;"></div>
         <div class="col-md-2 tempFormatName" style="text-align:left;"></div>
+        <div class="col-md-2" style="text-align:left;">
+            <a href="#" class="tempFormatMediaType"></a>
+        </div>
         <div class="col-md-2 tempFormatAbbreviation" style="text-align:center;"></div>
         <div class="col-md-1 tempFormatActive" style="text-align:center;"></div>
         <div class="col-md-2 tempFormatDisableDate" style="text-align:center;"></div>
@@ -163,8 +159,10 @@
 <script>
 
     $(document).ready(function () {
-        buildMainMenu("");
+        buildMainMenu("Settings");
+
         var search = getParameterByName("search");
+
         if (!search == false) {
             if (search.length > 0) {
                 $("#searchFormat").val(search);
@@ -181,10 +179,10 @@
         }
 
         setLocalStorage("search", $("#searchFormat").val().trim());
-        setLocalStorage("search", window.location);
+        setLocalStorage("searchPage", window.location);
 
         //filling out url for ajax
-        var url = ServicePrefix + '/api/Position/GetPositionList';
+        var url = ServicePrefix + '/api/Format/GetFormatList';
 
         //filling out settings for ajax call
         var settings = {
@@ -193,7 +191,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inPositionTitle": $("#searchFormat").val().trim()
+                "inFormatName": $("#searchFormat").val().trim()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -216,7 +214,7 @@
             });
         }
         else {
-            $("#postitionList").html("");
+            $("#formatList").html("");
             $.each(data.report.rows, function (index) {
                 var obj = data.report.rows[index];
 
@@ -242,14 +240,15 @@
         var formatTemplate = loadTemplate();
 
         //using .find to locate the areas you want the data to go and using .text to set the values
-        formatTemplate.find(".tempFormatMediaType").text(data["Position Title"]);
-        formatTemplate.find(".tempFormatName").text(data["Position Title"]);
-        formatTemplate.find(".tempFormatAbbreviation").text(data["Position Title"]);
-        formatTemplate.find(".tempFormatActive").text(data["Position Title"]);
-        formatTemplate.find(".tempFormatDisableDate").text(data["Position Title"]);
+        formatTemplate.find(".tempFormatMediaType").text(data["Media Type Name"]);
+        formatTemplate.find(".tempFormatMediaType").attr("onClick", "editMediaType(" + data["Media Type ID"] + ")");
+        formatTemplate.find(".tempFormatName").text(data["Format Name"]);
+        formatTemplate.find(".tempFormatAbbreviation").text(data["Abbreviation"]);
+        formatTemplate.find(".tempFormatActive").text(data["Active"]);
+        formatTemplate.find(".tempFormatDisableDate").text(data["Disable Date"]);
 
         //adding the id as a custom attribute to use on click of edit button
-        formatTemplate.find(".tempEditFormat").attr("onClick", "editFormat(" +  data["Position Code"] + ")");
+        formatTemplate.find(".tempEditFormat").attr("onClick", "editFormat(" +  data["Format ID"] + ")");
      
         //appending whole template to html
         $("#formatList").append(formatTemplate);
@@ -261,7 +260,7 @@
 
     //redirecting to page to create new format
     function newFormat() {
-        window.location = "format.html";
+        window.location = "format.html?formatId=0";
     }
 
 </script>
