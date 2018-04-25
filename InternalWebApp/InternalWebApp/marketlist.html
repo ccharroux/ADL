@@ -145,28 +145,34 @@
 
     $( document ).ready(function()
     {
-
         buildMainMenu("Markets");
-
         getMediaTypes();
+    });
 
+    function loadLastSearch()
+    {
         var search = getParameterByName("search");
 
-        if (!search == false) 
-        {
-            if (search.length > 0)
-            {
-                var sArray = search.split("|");
+        if (!search == false) {
+            if (search.length > 0) {
+                console.log('search');
+                console.log(search);
+                console.log('search');
 
-                $("#searchMarket").val(sArray(0));
-                $("#ddlMediaType").val(sArray(1));
+                var sArray = new Array()
+                sArray = search.split("|");
+                console.log(sArray.length);
+                console.log(sArray[1]);
+
+                $("#searchMarket").val(sArray[0]);
+                $("#ddlMediaType").val(sArray[1].toString());
 
                 getMarketList();
             }
         }
 
+    }
 
-    });
     function getMediaTypes()
     {
 
@@ -199,6 +205,8 @@
 
                     $("#ddlMediaType").html(str);
 
+                    loadLastSearch();
+
                 }
 
             },
@@ -211,44 +219,44 @@
 
 
     }
-    function getMarketList()
-    {
-        if ($("#ddlMediaType").val().trim() == 0) {
-            bootbox.alert("Please select a Media Type to search for Markets", function () { });
-            return;
-        }
-
-        if ($("#searchMarket").val().trim() == 0)
+        function getMarketList()
         {
-            bootbox.alert("Please enter text to search for Markets", function () {});
-            return;
-        }
+            if ($("#ddlMediaType").val().trim() == 0) {
+                bootbox.alert("Please select a Media Type to search for Markets", function () { });
+                return;
+            }
+
+            if ($("#searchMarket").val().trim() == 0)
+            {
+                bootbox.alert("Please enter text to search for Markets", function () {});
+                return;
+            }
 
 
-        setLocalStorage("search", $("#searchMarket").val().trim() + "|" + $("#ddlMediaType").val().trim());
-        setLocalStorage("searchPage", window.location);
+            setLocalStorage("search", $("#searchMarket").val().trim() + "|" + $("#ddlMediaType").val().trim());
+            setLocalStorage("searchPage", window.location);
 
-        $.ajax({
-            url: ServicePrefix + '/api/Market/GetMarketList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inMarketName": $("#searchMarket").val(),
-                "inActiveOnly": "1",
-                "inMediaTypeID": $("#ddlMediaType").val(),
-                "inPrimaryMarketOnly": "1"
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
+            $.ajax({
+                url: ServicePrefix + '/api/Market/GetMarketList',
+                dataType: 'json',
+                type: 'post',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    "inApiToken": getLocalStorage("APIToken"),
+                    "inMarketName": $("#searchMarket").val(),
+                    "inActiveOnly": "1",
+                    "inMediaTypeID": $("#ddlMediaType").val(),
+                    "inPrimaryMarketOnly": "1"
+                }),
+                processData: false,
+                success: function (data, textStatus, jQxhr) {
 
-                if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    if (data.response.status != "SUCCESS") {
+                        bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
 
-                    });
-                }
-                else {
+                        });
+                    }
+                    else {
 
                         var str = '';
                         $("#marketList").html("");
@@ -293,47 +301,47 @@
                         }
                     }
                 
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    //window.location = "preprocess.html";
-                });
-            }
-        });
+                },
+                error: function (jqXhr, textStatus, errorThrown) {
+                    bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                        //window.location = "preprocess.html";
+                    });
+                }
+            });
 
-    }
+        }
 
-    function buildMarketRow(marketName, marketId, productList)
-    {
-        var str = '';
+        function buildMarketRow(marketName, marketId, productList)
+        {
+            var str = '';
 
-        // Open Row
-        str = str + '<div class="row">';
+            // Open Row
+            str = str + '<div class="row">';
 
-        str = str + '<div class="col-md-4" style="text-align:left">';
-        str = str + marketName;
-        str = str + '</div>';
+            str = str + '<div class="col-md-4" style="text-align:left">';
+            str = str + marketName;
+            str = str + '</div>';
 
    
-        str = str + '<div class="col-md-4" style="text-align:left">';
-        str = str + productList;
-        str = str + '</div>';
+            str = str + '<div class="col-md-4" style="text-align:left">';
+            str = str + productList;
+            str = str + '</div>';
 
-        str = str + '<div class="col-md-4" style="text-align:center">';
-        str = str + '<a href="#" onclick="editMarket(' + marketId + ')">Edit</a>&nbsp;<a  onclick="deleteMarket(' + marketId + ')">Delete</a>';
-        str = str + '</div>';
+            str = str + '<div class="col-md-4" style="text-align:center">';
+            str = str + '<a href="#" onclick="editMarket(' + marketId + ')">Edit</a>&nbsp;<a  onclick="deleteMarket(' + marketId + ')">Delete</a>';
+            str = str + '</div>';
 
-        // Close Row
-        str = str + '</div>';
-        return str;
-    }
+            // Close Row
+            str = str + '</div>';
+            return str;
+        }
 
-    function editMarket(marketId)
-    {
+        function editMarket(marketId)
+        {
 
-        window.location = "market.html?marketID=" + marketId;
+            window.location = "market.html?marketID=" + marketId;
     
-    }
+        }
 
 </script>
 
