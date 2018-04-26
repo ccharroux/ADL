@@ -77,16 +77,6 @@
 
                 <div class="text-center" style="margin-top:00px">
 
-                    <!-- Format Id -->
-                    <div class="row" id="formatIdDiv" style="display:none; width:80%;margin:0 auto;padding-bottom:10px;">
-                        <div class="col-md-3" style="text-align:left">
-                            <label for="spanFormatId">Format Id</label>
-                        </div>
-                        <div class="col-md-9" style="text-align:left">
-                            <span id="spnFormatId" />
-                        </div>
-                    </div>
-
                     <!-- Media Type -->
                     <div class="row" style="width:80%;margin:0 auto;padding-bottom:10px;">
                         <div class="col-md-3" style="text-align:left">
@@ -117,23 +107,18 @@
                         </div>
                     </div>
 
-                    <!--Active checkbox-->
-                    <div class="row" style="width:80%;margin:0 auto;padding-bottom:10px;">
-                        <div class="col-md-3" style="text-align:left">
-                            <label for="chkActive">Active</label>
-                        </div>
-                        <div class="col-md-4" style="text-align:left">
-                            <input type="checkbox" id="chkActive">
-                        </div>
-                    </div>
 
                     <!-- Buttons -->
                     <div style="margin-top: 20px;margin-bottom:20px">
                         <div class="row">
                             <div class="col-md-12">
                                 <div>
-                                    <input value="Update" id="updateButton" onclick="insertUpdate()" style="width:100%;max-width:100px;" type="button"> &nbsp;&nbsp;&nbsp;
-                                    <input value="Back" onclick="goBackToDashboard();" style="width:100%;max-width:100px;" type="button">
+                                    <div>
+                                        <input value="Update" onclick="insertUpdate()" style="width:100%;max-width:320px" type="button"> 
+                                    </div>
+                                    <div style="padding-top:10px">
+                                        <input value="Back" onclick="goBackToDashboard();" style="width:100%;max-width:320px" type="button">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -170,25 +155,15 @@
         buildMainMenu("");
         formatId = (getParameterByName("formatId") == null ? 0 : getParameterByName("formatId"));
         getMediaTypes();
-        showUpdateOrInsert();
+
     });
 
-
-    function showUpdateOrInsert() {
-        //checking if format will be an update or insert
-        if (formatId <= 0) {
-            //insert
-            $("#updateButton").prop("value", "Save");
-            return;
-        } else {
-            //update
-            $("#formatId").addClass("show");
-            getFormat();
-        }
-    }
-
-
     function getFormat() {
+
+        if (formatId <= 0) {
+            return;
+        }
+
         //filling out url for ajax call
         var url = ServicePrefix + '/api/Format/GetFormat';
 
@@ -223,12 +198,10 @@
             var str = '';
             $.each(data.report.rows, function (index) {
                 var obj = data.report.rows[index];
-                //$("#spnFormatId").val(obj["Format ID"]);
 
                 $("#ddlMediaType").val(obj["Media Type ID"]);
                 $("#txtFormatName").val(obj["Format Name"]);
                 $("#txtFormatAbbreviation").val(obj["Abbreviation"]);
-                $("#chkActive").prop("checked", (obj["Active"] == 0 ? false : true));
 
             });
         }
@@ -261,7 +234,6 @@
                 "inMediaTypeID": $("#ddlMediaType").val().trim(),
                 "inFormatName": $("#txtFormatName").val().trim(),
                 "inAbbreviation": $("#txtFormatAbbreviation").val().trim(),
-                "inActive": $("#chkActive").prop("checked")
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -292,6 +264,7 @@
     }
 
     function validationPassed() {
+        var loopBreak = true;
         $(".mkaRequired").each(function (index, el) {
             var eID = "#" + $(el).attr("id");
             var errorMessage = $(el).attr("errorMessage");
@@ -300,6 +273,7 @@
             if ($(eID).prop('tagName').toLowerCase() == "input") {
                 if ($(eID).val().trim() == "") {
                     bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
                     return false;
                 }
             }
@@ -308,11 +282,12 @@
             if ($(eID).prop('tagName').toLowerCase() == "select") {
                 if ($(eID).val() == "-1") {
                     bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
                     return false;
                 }
             }
         });
-        return true;
+        return loopBreak;
     }
 
     function getMediaTypes() {
@@ -323,21 +298,21 @@
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
-                "inApiToken":getLocalStorage("APIToken")
+                "inApiToken": getLocalStorage("APIToken")
             }),
             processData: false,
-            success: function(data, textStatus, jQxhr){
+            success: function (data, textStatus, jQxhr) {
                 getMediaTypesSuccess(data, textStatus, jQxhr);
             },
-            error: function (jqXhr, textStatus, errorThrown){
+            error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         };
 
         $.ajax(url, settings);
 
-            }
-       
+    }
+
     function getMediaTypesSuccess(data, textStatus, jQxhr) {
 
         if (data.response.status != "SUCCESS") {
@@ -357,7 +332,7 @@
             });
 
             $("#ddlMediaType").html(str);
-
+            getFormat();
         }
     }
 

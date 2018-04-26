@@ -78,14 +78,14 @@
                 <div class="text-center" style="margin-top:00px">
 
                     <!-- Position Code -->
-                    <div class="row" id="positionIdDiv" style="display:none; width:80%;margin:0 auto;padding-bottom:10px;">
+                    <!--<div class="row" id="positionIdDiv" style="display:none; width:80%;margin:0 auto;padding-bottom:10px;">
                         <div class="col-md-3" style="text-align:left">
                             <label for="txtPositionCodeInsert">Position Code</label>
                         </div>
                         <div class="col-md-9" style="text-align:left">
                             <span id="txtPositionCodeUpdate" />
                         </div>
-                    </div>
+                    </div>-->
 
                     <!-- Position Title -->
                     <div class="row" style="width:80%;margin:0 auto;">
@@ -103,8 +103,12 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div>
-                                    <input value="Update" onclick="insertUpdate()" id="updateButton" style="width:100%;max-width:100px;" type="button"> &nbsp;&nbsp;&nbsp;
-                                    <input value="Back" onclick="goBackToDashboard();" style="width:100%;max-width:100px;" type="button">
+                                    <div>
+                                        <input value="Update" onclick="insertUpdate()" style="width:100%;max-width:320px" type="button">
+                                    </div>
+                                    <div style="padding-top:10px">
+                                        <input value="Back" onclick="goBackToDashboard();" style="width:100%;max-width:320px" type="button">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -141,25 +145,16 @@
     $(document).ready(function () {
         buildMainMenu("");
         positionID = (getParameterByName("positionID") == null ? 0 : getParameterByName("positionID"));
-        showUpdateOrInsert();
+        getPosition();
 
     });
 
-    function showUpdateOrInsert() {
-        //checking if position will be an update or insert
-        if (positionID <= 0) {
-            //insert
-            $("#updateButton").prop("value", "Save");
-            return;
-        } else {
-            //update
-            $("#positionIdDiv").addClass("show");
-            getPosition();
-        }
-    }
-
-
     function getPosition() {
+
+        if (positionID <= 0) {
+            return;
+        }
+
         //filling out url for ajax call
         var url = ServicePrefix + '/api/Position/GetPosition';
 
@@ -194,7 +189,6 @@
                     var str = '';
                     $.each(data.report.rows, function (index) {
                         var obj = data.report.rows[index];
-                        $("#txtPositionCodeUpdate").text(positionID);
                         $("#txtPositionTitle").val(obj["Position Title"]);
                     });
                 }
@@ -205,11 +199,7 @@
         if (validationPassed() == false) {
             return;
         }
-        var positionCode = $("#txtPositionCodeUpdate").text().trim();
-        //update or insert check
-        if (positionCode == "") {
-            positionCode = 0;
-        }
+
         //filling out url for ajax call
         var url = ServicePrefix + '/api/Position/UpdatePosition'
 
@@ -220,7 +210,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inPositionCode": positionCode,
+                "inPositionCode": positionID,
                 "inPositionTitle": $("#txtPositionTitle").val().trim()
             }),
             processData: false,
