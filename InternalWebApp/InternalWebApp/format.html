@@ -175,7 +175,7 @@
 
 
     function showUpdateOrInsert() {
-        //checking if position will be an update or insert
+        //checking if format will be an update or insert
         if (formatId <= 0) {
             //insert
             $("#updateButton").prop("value", "Save");
@@ -236,16 +236,19 @@
 
     function insertUpdate() {
         //validation check
+        var inFormatId;
         if (validationPassed() == false) {
             return;
         }
-        var positionCode = $("#txtPositionCodeUpdate").text().trim();
         //update or insert check
-        if (positionCode == "") {
-            positionCode = 0;
+        if (formatId == 0) {
+            inFormatId = 0;
+        } else {
+            inFormatId = formatId;
         }
+
         //filling out url for ajax call
-        var url = ServicePrefix + '/api/Position/UpdatePosition'
+        var url = ServicePrefix + '/api/Format/UpdateFormat';
 
         //filling out settings for ajax call
         var settings = {
@@ -254,8 +257,11 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inPositionCode": positionCode,
-                "inPositionTitle": $("#txtPositionTitle").val().trim()
+                "inFormatId": inFormatId,
+                "inMediaTypeID": $("#ddlMediaType").val().trim(),
+                "inFormatName": $("#txtFormatName").val().trim(),
+                "inAbbreviation": $("#txtFormatAbbreviation").val().trim(),
+                "inActive": $("#chkActive").prop("checked")
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
