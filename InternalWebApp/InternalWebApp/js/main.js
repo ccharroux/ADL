@@ -431,15 +431,21 @@ function buildMainMenu(selectedItem) {
     menuItems += '       <li><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="dashboard.html">Products</a></li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Personnel") + 'href="dashboard.html">Personnel</a></li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Stations") + ' href="stationlist.html">Stations</a></li>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Markets") + ' href="marketlist.html">Markets</a></li>';
+    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Markets") + ' href="marketlist.html" role="button" aria-expanded="false">Markets <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="">Complementary Markets</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="">Internal Reports</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="">Parent Market</a></li>';
+    menuItems += '              </ul>';
+    menuItems += '        </li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Ownerships") + 'href="ownershiplist.html">Ownerships</a></li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Ownership Groups") + 'href="ownershipgrouplist.html">Ownership Groups</a></li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="dashboard.html">Virtual Groups</a></li>';
-    menuItems += '        <li class="dropdown"><a class="dropdown-toggle ' + getSelectedSubMenuItemClass(selectedItem, "Settings") + '" data-toggle="dropdown" role="button" aria-expanded="false">Settings <span class="caret"></span></a>';
+    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Settings") + ' role="button" aria-expanded="false">Settings <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="formatlist.html">Formats</a></li>';
     menuItems += '                  <li style="display:block;"><a href="positionlist.html">Positions</a></li>';
     menuItems += '                  <li style="display:block;"><a href="revenuecategorieslist.html">Revenue Categories</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="formatlist.html">Formats</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
@@ -448,6 +454,7 @@ function buildMainMenu(selectedItem) {
 
     $("#menu").html(menuItems);
 }
+
 function getSelectedItemClass(selectedItem, item) {
     if (selectedItem.toLowerCase() == item.toLowerCase()) {
         return 'class="active"';
@@ -457,10 +464,3 @@ function getSelectedItemClass(selectedItem, item) {
     }
 }
 
-function getSelectedSubMenuItemClass(selectedItem, item) {
-    if (selectedItem.toLowerCase() == item.toLowerCase()) {
-        return 'active';
-    } else {
-        return '';
-    }
-}
