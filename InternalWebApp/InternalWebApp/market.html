@@ -65,8 +65,8 @@
                 </div>
                 <div class="text-center" style="margin-top:00px">
                     <!-- Media Type -->
-                    <div class="marketForm" style="display:inline-block; width:72%">
-                        <div class="row" style="width:80%;margin:0 auto;">
+                    <!--<div class="marketForm" style="display:inline-block; width:72%">-->
+                        <div class="row" id="divLblMediaType" style="width:80%;margin:0 auto;">
                             <div class="col-md-3" style="text-align:left">
                                 <label for="lblMediaType">Media Type</label>
                             </div>
@@ -80,7 +80,25 @@
                                 <label for="txtMarketName">Market Name</label>
                             </div>
                             <div class="col-md-9" style="text-align:left">
-                                <input type="text" class="mkaRequired" id="txtMarketName" errorMessage="You must enter a Market Name" value="" />
+                                <input type="text" class="mkaRequired" id="txtMarketName" errorMessage="You must enter a Market Name." value="" />
+                            </div>
+                        </div>
+                        <!-- Market Number -->
+                        <div class="row hidden" id="divMarketNumber" style="width:80%;margin:0 auto;">
+                            <div class="col-md-3"  style="text-align:left">
+                                <label for="txtMarketNumber">Market Number</label>
+                            </div>
+                            <div class="col-md-9" style="text-align:left">
+                                <input type="text" class="mkaRequiered" id="txtMarketNumber" errorMessage="You must enter a Market Number." />
+                            </div>
+                        </div>
+                        <!-- Market Media Type for Insert-->
+                        <div class="row hidden" id="divDdlMediaType" style="width:80%;margin:0 auto;">
+                            <div class="col-md-3" style="text-align:left">
+                                <label for="ddlMediaType">Media Type</label>
+                            </div>
+                            <div class="col-md-9" style="text-align:left">
+                                <select id="ddlMediaType" style="height:33px"></select>
                             </div>
                         </div>
                         <!-- Market Size -->
@@ -112,7 +130,7 @@
                         </div>
                         <div class="row" style="width:80%;margin:0 auto;">
                             <div class="col-md-3" style="text-align:left">
-                                <label for="lblRegion">State</label>
+                                <label for="lblRegion">Region</label>
                             </div>
                             <div class="col-md-9" style="text-align:left">
                                 <label id="lblRegion"></label>
@@ -141,7 +159,8 @@
                                 <label for="ddlPartner">Partner</label>
                             </div>
                             <div class="col-md-9" style="text-align:left">
-                                <select id="ddlPartner" style="height:33px"></select>
+                                Has been moved to product pages
+                                <!--<select id="ddlPartner" style="height:33px"></select>-->
                             </div>
                         </div>
                         <div class="row" style="width:80%;margin:0 auto;">
@@ -168,40 +187,43 @@
                                 <textarea id="txtComments"></textarea>
                             </div>
                         </div>
-                    </div>
-                    <div class="buttonList" style="width:28%; display:inline-block; float:right;">
+                    <!--</div>-->
+                    <!--<div class="buttonList" style="width:28%; display:inline-block; float:right;">
                         <div>
                             <input value="MRR Revenue Definition" onclick="" style="width:100%;max-width:320px" type="button">
                         </div>
                         <div style="padding-top:10px">
                             <input value="MRR Report Setup" onclick="" style="width:100%;max-width:320px" type="button">
                         </div>
-                    </div>
+                    </div>-->
 
                     <!-- Products -->
                     <div style="margin-top: 20px;margin-bottom:20px">
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="row" style="border-top:solid 1px silver;border-bottom:solid 1px silver;width:80%;margin:0 auto;">
-                                    <div class="col-md-2" style="text-align:right">
+                                <div class="row" style="border-top:solid 1px silver;border-bottom:solid 1px silver;width:100%;margin:0 auto;">
+                                    <!--<div class="col-md-2" style="text-align:right">
                                         <strong>
                                             &nbsp;
                                         </strong>
-                                    </div>
-                                    <div class="col-md-6" style="text-align:left">
+                                    </div>-->
+                                    <div class="col-md-4" style="text-align:left">
                                         <strong>
                                             Product
                                         </strong>
                                     </div>
-                                    <div class="col-md-4" style="text-align:left">
+                                    <div class="col-md-2" style="text-align:left">
                                         <strong>
                                             Dates
                                         </strong>
                                     </div>
+                                    <div class="col-md-6">
+
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row" style="width:80%;margin:0 auto;">
+                        <div class="row" style="width:100%;margin:0 auto;">
                             <div id="productList"></div>
                         </div>
                     </div>
@@ -248,26 +270,68 @@
 
     var marketId = 0;
 
-    $( document ).ready(function()
-    {
+    $(document).ready(function () {
         buildMainMenu("Markets");
         marketId = (getParameterByName("MarketID") == null ? 0 : getParameterByName("MarketID"));
-
+        checkForInsertOrUpdate();
         getProductList();
-        getPartnerList();
+        //getPartnerList();
+        getMediaTypes();
         getMarketSizeList();
         getParentMarketList();
 
 
     });
 
+    function checkForInsertOrUpdate() {
+        if (marketId == 0 || marketId == null) {
+            $("#divMarketNumber").removeClass('hidden');
+            $("#divDdlMediaType").removeClass('hidden');
+            $("#divLblMediaType").addClass('hidden');
+        }
+    }
 
+    //function getPartnerList() {
+    //    //filling out url for ajax call
+    //    var url = ServicePrefix + '/api/Partner/GetPartnerList';
+    //    //filling out settings for ajax call
+    //    var settings = {
+    //        dataType: 'json',
+    //        type: 'post',
+    //        contentType: 'application/json',
+    //        data: JSON.stringify({
+    //            "inApiToken": getLocalStorage("APIToken")
+    //        }),
+    //        processData: false,
+    //        success: function (data, textStatus, jQxhr) {
+    //            getPartnerListSuccess(data, textStatus, jQxhr);
+    //        },
+    //        error: function (jQxhr, textStatus, errorThrown) {
+    //            genericAjaxError(jQxhr, textStatus, errorThrown);
+    //        }
+    //    }
+    //    //ajax call
+    //    $.ajax(url, settings);
+    //}
 
-    function getPartnerList() {
-        //filling out url for ajax call
-        var url = ServicePrefix + '/api/Partner/GetPartnerList';
+    //function getPartnerListSuccess(data, textStatus, jQxhr) {
+    //    if (data.response.status != "SUCCESS") {
+    //        bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+    //        });
+    //    }
+    //    else {
+    //        var str = '';
+    //        str = '<option value="-1">-- Select a Partner</option>';
+    //        $.each(data.report.rows, function (index) {
+    //            str = str + '<option value="' + data.report.rows[index].partnerId + '">' + data.report.rows[index].partnerName + '</option>';
+    //        });
+    //        $("#ddlPartner").html(str);
+    //    }
+    //}
 
-        //filling out settings for ajax call
+    function getMediaTypes() {
+        var url = ServicePrefix + '/api/MediaType/GetMediaTypeList';
+
         var settings = {
             dataType: 'json',
             type: 'post',
@@ -277,33 +341,35 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getPartnerListSuccess(data, textStatus, jQxhr);
+                getMediaTypesSuccess(data, textStatus, jQxhr);
             },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
             }
-        }
+        };
 
-        //ajax call
         $.ajax(url, settings);
 
     }
 
-    function getPartnerListSuccess(data, textStatus, jQxhr) {
+    function getMediaTypesSuccess(data, textStatus, jQxhr) {
+
         if (data.response.status != "SUCCESS") {
             bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
             });
         }
         else {
+
             var str = '';
-            str = '<option value="-1">-- Select a Partner</option>';
+            str = '<option value="-1">-- Select a Media Type</option>';
             $.each(data.report.rows, function (index) {
 
-                str = str + '<option value="' + data.report.rows[index].partnerId + '">' + data.report.rows[index].partnerName + '</option>';
+                str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
 
             });
 
-            $("#ddlPartner").html(str);
+            $("#ddlMediaType").html(str);
         }
     }
 
@@ -375,7 +441,7 @@
     }
 
     function getMarketSizeListSuccess(data, textStatus, jQxhr) {
-        if(data.response.status != "SUCCESS"){
+        if (data.response.status != "SUCCESS") {
             bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
             });
         }
@@ -436,16 +502,19 @@
 
                 var obj = data.report.rows[index];
                 str = str + '<div class="row">';
-                str = str + '<div class="col-md-2" style="text-align:right">';
-                str = str + '<input type="checkbox" value="' + obj.P_ProductID + '" class="chkOwnerProductList" id="chk' + obj.P_ProductID + '"/>';
-                str = str + '</div>';
-                str = str + '<div class="col-md-6" style="text-align:left">';
+                str = str + '<div class="col-md-4" style="text-align:left">';
                 str = str + obj.P_ProductID + " - " + obj.P_ProductName;
                 str = str + '</div>';
-                str = str + '<div class="col-md-4" style="text-align:left">';
+                str = str + '<div class="col-md-2" style="text-align:left">';
                 str = str + '<div id="date' + obj.P_ProductID + '" />';
                 str = str + '</div>';
+                str = str + '<div id="productButtons' + obj.P_ProductID + '" class="col-md-6">'
+                str = str + '<input type="button"  id="productAdd'+ obj.P_ProductID +'" class="hidden" onClick="Edit(' + marketId + ',' + obj.P_ProductID + ')" Value="Enable" />'
+                str = str + '<input type="button" id="productEdit' + obj.P_ProductID +'" class="hidden" onClick="Edit(' + marketId + ',' + obj.P_ProductID + ')" Value="Edit" />'
+                str = str + '<input type="button"  id="productDisable' + obj.P_ProductID +'" class="hidden" onClick="Edit(' + marketId + ',' + obj.P_ProductID + ')" Value="Disable" />'
+                str = str + '</div>'
                 str = str + '</div>';
+                
 
             });
 
@@ -502,16 +571,29 @@
             $.each(data.report.rows, function (index) {
 
                 var obj = data.report.rows[index];
-                if (obj.disableDate == null) {
-                    $("#chk" + obj.productId).prop("checked", true);
+                if (obj.disableDate == null && obj.activeDate != null) {
+                    $("#productEdit" + obj.productId).removeClass('hidden');
+                    $("#productDisable" + obj.productId).removeClass('hidden');
                     $("#date" + obj.productId).html(extractDateOnly(obj.activeDate));
                     $("#date" + obj.productId).css("color", "green");
                 }
-                else {
-                    $("#chk" + obj.productId).prop("checked", false);
+                else if (obj.disableDate != null && obj.activeDate == null) {
+                    $("#productAdd" +  obj.productId).removeClass('hidden');
                     $("#date" + obj.productId).html(extractDateOnly(obj.disableDate));
                     $("#date" + obj.productId).css("color", "red");
                 }
+                else if (obj.disableDate == null && obj.activeDate == null) {
+                    $("#productAdd" + obj.productId).removeClass('hidden');
+
+                }
+
+                if (obj.productId == "MRR") {
+                    var btnStr = '<input id="mrrReportSetup" value="MRR Report Setup" onclick="" type="button">';
+                    btnStr = btnStr + '<input id="mrrRevenueDefinition" value="MRR Revenue Definition" onclick="" type="button">';
+
+                    $("#productButtons" + obj.productId).append(btnStr);
+                }
+
             });
         }
     }
@@ -578,8 +660,7 @@
     }
 
 
-    function validationPassed()
-    {
+    function validationPassed() {
 
         //-----------------------------
         // Basic Validation requires
@@ -591,8 +672,7 @@
         //-----------------------------
 
 
-        $(".mkaRequired").each(function (index, el)
-        {
+        $(".mkaRequired").each(function (index, el) {
             var eID = "#" + $(el).attr("id");
             var errorMessage = $(el).attr("errorMessage");
 
@@ -624,10 +704,8 @@
 
     }
 
-    function updateOwner()
-    {
-        if (validationPassed() == false)
-        {
+    function updateOwner() {
+        if (validationPassed() == false) {
             return;
         }
 
@@ -645,8 +723,7 @@
         var productListArr = new Array();
 
         // Build object for Products
-        $(".chkOwnerProductList").each(function (index, el)
-        {
+        $(".chkOwnerProductList").each(function (index, el) {
             productListObject = new Object();
             productListObject["productId"] = $(el).val();
             productListObject["productSelected"] = $(el).prop("checked");
@@ -702,17 +779,17 @@
                 "inFaxAreaCode": $("#txtFaxAreaCode").val().trim(),
                 "inFaxPhone": $("#txtFaxPhone").val().trim(),
                 "inEmailAddress": $("#txtEmailAddress").val().trim(),
-                "inOwnerProductList" : productListArr
+                "inOwnerProductList": productListArr
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
                 if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {});
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
                 }
                 else {
                     if (data.report.rows[0].Status == -1) {
-                        bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {});
+                        bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
                     }
                     else {
                         // TEMP - we need to now update products...
@@ -721,7 +798,7 @@
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {});
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
             }
         });
 
