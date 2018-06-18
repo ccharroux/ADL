@@ -66,45 +66,40 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Ownership Group</h2>
+                        <h2>MRR Market Report Setup</h2>
                     </div>
                 </div>
 
                 <div class="text-center" style="margin-top:00px">
                     
-                    <!-- Market Name -->
-                    <div class="row" style="width:80%;margin:0 auto;">
-                        <div class="col-md-3" style="text-align:left">
-                            <label for="txtOwnerName">Market Name</label>
+                    <div class="row" style="width:80%;margin:0 auto; padding-bottom:10px;">  
+                        <div class="col-md-2" style="text-align:left">
+                            <label for="txtMarketName">Market Name:</label>
                         </div>
-                        <div class="col-md-9" style="text-align:left">
+                        <div class="col-md-10" style="text-align:left">
                             <span id="txtMarketName"></span>
-                        </div>
-                    </div>
-
-                    <!-- Stations -->
-                   
+                        </div>                       
+                    </div>                                     
                     <div class="row" style="width:80%;margin:0 auto;">
 
-                        <div class="col-md-6" style="text-align:left">
-                            <select id="ddlReports" onchange="getOwnerStationListByMarket()"></select>
-                            <hr />
-                            <select id="ddlReports" multiple size="10"></select>
+                        <div class="col-md-6" style="text-align:left">   
+                                                    
+                            <select id="ddlNonSelectedReports" multiple size="13"></select>
                         </div>
                         <div class="col-md-6" style="text-align:left">
-
-                            <select id="ddlMarketReports" multiple size="13" style="height:273px"></select>
+                            
+                            <select id="ddlSelectedReports" multiple size="13"></select>
 
                         </div>
                     </div>
                     <div class="row" style="width:80%;margin:0 auto;">
 
                         <div class="col-md-6" style="text-align:left">
-                            <input value="Add" onclick="addToGroup();" style="width:300px;background-color:green !important;" type="button">
+                            <input value="Add" onclick="addToMarket();" style="width:300px;background-color:green !important;" type="button">
                         </div>
                         <div class="col-md-6" style="text-align:left">
 
-                            <input value="Remove" onclick="removeFromReport();" style="width:300px;background-color:red !important;" type="button">
+                            <input value="Remove" onclick="removeFromMarket();" style="width:300px;background-color:red !important;" type="button">
                         </div>
                     </div>
                     <hr />
@@ -151,3 +146,98 @@
 
 </body>
 </html>
+<script>
+
+    var marketID = 0;
+    var marketName = '';
+
+    $(document).ready(function () {
+        buildMainMenu("Markets");
+        marketID = (getParameterByName("MarketId") == null ? 0 : getParameterByName("MarketId"));
+        marketName = (getParameterByName("MarketName") == null ? 0 : getParameterByName("MarketName"));
+
+        $('#txtMarketName').text(marketName);
+        getReports();
+    });
+
+    function getReports() {
+        if (marketID == 0) {
+            return;
+        }
+
+        var url = ServicePrefix + '/api/MRR/GetMarketReportList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketID
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getReportsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        }
+
+        $.ajax(url, settings);
+    }
+
+    function getReportsSuccess(data, textStatus, jQxhr) {
+        console.log("success");
+
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
+            });
+        } else {
+            var strNon = '';
+            var strSel = '';
+            $.each(data.report.rows, function (index) {
+                if (data.report.rows[index].selected == 0) {
+
+                    strNon = strNon + '<option value="' + data.report.rows[index].reportId + '">' + data.report.rows[index].reportTitle + '</option>';
+
+
+                } else if (data.report.rows[index].selected == 1) {
+
+                    strSel = strSel + '<option value="' + data.report.rows[index].reportId + '">' + data.report.rows[index].reportTitle + '</option>';
+                } 
+            });
+            $("#ddlNonSelectedReports").html(strNon);
+            $("#ddlSelectedReports").html(strSel);
+        }
+
+    }
+
+    function removeFromMarket() {
+        $('#ddlSelectedReports > option:selected').each(function () {
+            if ($('#ddlNonSelectedReports [value="' + $(this).val() + '"]').length == 0) {
+                $('#ddlNonSelectedReports').html('<option value="' + $(this).val() + '">' + $(this).text() + '</option>' + $('#ddlNonSelectedReports').html());
+                $(this).remove();
+            }
+        })
+    }
+
+    function addToMarket() {
+        $('#ddlNonSelectedReports > option:selected').each(function () {
+            if($('#ddlSelectedReports [value="' + $(this).val() + '"]').length == 0) {
+                $('#ddlSelectedReports').html('<option value"' + $(this).val() + '">' + $(this).text() + '</option>' + $('#ddlSelectedReports').html());
+                $(this).remove();
+            }
+        })
+    }
+
+
+    function genericAjaxError(jqXhr, textStatus, errorThrown) {
+        bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
+    }
+
+
+
+
+</script>
