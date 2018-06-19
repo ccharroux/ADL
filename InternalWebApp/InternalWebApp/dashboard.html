@@ -22,50 +22,7 @@
     <script src="/js/modernizr-2.6.2.min.js"></script> 
     <style>
  
-
-dt { float: left; padding: 4px; }
-
-.bar {
-margin-bottom: 10px;
-color: #fff;
-padding: 4px;
-text-align: center;
-background: -webkit-gradient(linear, left top, left bottom, from(#ff7617), to(#ba550f));
-background-color: #ff7617;
--webkit-box-reflect: below 0 -webkit-gradient(linear, left top, left bottom, from(rgba(0,0,0,0)), to(rgba(0,0,0,0.25)));
--webkit-border-radius: 2px;
--moz-border-radius: 2px;
-border-radius: 2px;
--webkit-animation-name:bar;
--webkit-animation-duration:0.5s;
--webkit-animation-iteration-count:1;
--webkit-animation-timing-function:ease-out;
-}
-
-/*#data-one { -webkit-animation-name:bar-one; }
-#data-two { -webkit-animation-name:bar-two; }
-#data-three { -webkit-animation-name:bar-three; }
-#data-four { -webkit-animation-name:bar-four; }*/
-
-/*@-webkit-keyframes bar-one {
-0% { width:0%; }
-100% { width:60%; }
-}
-
-@-webkit-keyframes bar-two {
-0% { width:0%; }
-100% { width:80%; }
-}
-
-@-webkit-keyframes bar-three {
-0% { width:0%; }
-100% { width:64%; }
-}
-
-@-webkit-keyframes bar-four {
-0% { width:0%; }
-100% { width:97%; }
-}*/
+        dt { float: left; padding: 4px; }
 
     </style>
 </head>
@@ -80,8 +37,8 @@ border-radius: 2px;
         </header>
         <div id="fh5co-contact-section" style="padding-top:50px!important">
             <div style="margin:0 auto; text-align: center;">
-                <dl style="width: 300px; margin:0 auto" id="grMRR">
-                </dl>
+                <div style="font-size:36px">Markets by Product</div>
+                <canvas id="piechart" width="400" height="400"></canvas>
             </div>
         </div>
         <!--<div id="map" data-animate-effect="fadeIn"></div>-->
@@ -110,41 +67,76 @@ border-radius: 2px;
 </body>
 </html>
 <script>
+
+    var data = [120, 100, 140];
+    var labels = ["MRR-120", "X-RAY-110", "TVB-140"];
+    var colors = ["#FFDAB9", "#E6E6FA", "#E0FFFF"];
+
     $( document ).ready(function()
     {
 
         buildMainMenu("");
-        //var search = getParameterByName("search");
 
-        //if (!search == false)
-        //{
-        //    if (search.length > 0)
-        //    {
-        //        $("#searchOwnerGroup").val(search);
-        //        getOwnerGroupList();
-        //    }
-        //}
-
-        var arr = new Array();
-        for (var i = 1; i <= 100; i++)
-        {
-            arr.push(i);
+        canvas = document.getElementById("piechart");
+        var context = canvas.getContext("2d");
+        for (var i = 0; i < data.length; i++) {
+            drawSegment(canvas, context, i);
         }
-        buildGraph(arr);
-
 
     });
 
-    function buildGraph(arr)
-    {
-        var str = "";
 
-        for (var i=0; i < arr.length; i++)
-        {
-            str = str + "<dt>" + i + "</dt>";
-            str = str + "<dd><div class='bar' style='width: " + i + "%'>" + i + "%</div></dd>";
-        }
-        
-        $("#grMRR").html(str);
+    function drawSegmentLabel(canvas, context, i) {
+        context.save();
+        var x = Math.floor(canvas.width / 2);
+        var y = Math.floor(canvas.height / 2);
+        var angle = degreesToRadians(sumTo(data, i));
+
+        context.translate(x, y);
+        context.rotate(angle);
+        var dx = Math.floor(canvas.width * 0.5) - 10;
+        var dy = Math.floor(canvas.height * 0.05);
+
+        context.textAlign = "right";
+        var fontSize = Math.floor(canvas.height / 25);
+        context.font = fontSize + "pt Helvetica";
+
+        context.fillText(labels[i], dx, dy);
+
+        context.restore();
     }
+    function degreesToRadians(degrees) {
+        return (degrees * Math.PI) / 180;
+    }
+    function sumTo(a, i) {
+        var sum = 0;
+        for (var j = 0; j < i; j++) {
+            sum += a[j];
+        }
+        return sum;
+    }
+    function drawSegment(canvas, context, i) {
+        context.save();
+        var centerX = Math.floor(canvas.width / 2);
+        var centerY = Math.floor(canvas.height / 2);
+        radius = Math.floor(canvas.width / 2);
+
+        var startingAngle = degreesToRadians(sumTo(data, i));
+        var arcSize = degreesToRadians(data[i]);
+        var endingAngle = startingAngle + arcSize;
+
+        context.beginPath();
+        context.moveTo(centerX, centerY);
+        context.arc(centerX, centerY, radius,
+                    startingAngle, endingAngle, false);
+        context.closePath();
+
+        context.fillStyle = colors[i];
+        context.fill();
+
+        context.restore();
+
+        drawSegmentLabel(canvas, context, i);
+    }
+
 </script>
