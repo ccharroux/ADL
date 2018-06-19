@@ -108,7 +108,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div>
-                                    <input value="Update" onclick="updateMarket()" style="width:100%;max-width:320px" type="button">
+                                    <input value="Update" onclick="updateMarketReports()" style="width:100%;max-width:320px" type="button">
                                 </div>
                                 <div style="padding-top:10px">
                                     <input value="Back" onclick="goBackToDashboard();" style="width:100%;max-width:320px" type="button">
@@ -188,8 +188,7 @@
     }
 
     function getReportsSuccess(data, textStatus, jQxhr) {
-        console.log("success");
-
+      
         if (data.response.status != "SUCCESS") {
             bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
 
@@ -214,6 +213,50 @@
 
     }
 
+    function updateMarketReports() {
+
+        var reports = new Array();
+
+        $('#ddlSelectedReports > option').each(function () {
+            reports.push(this.value);
+
+        });
+
+        var url = ServicePrefix + '/api/MRR/UpdateMarketReports';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketID,
+                "inReport": reports
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                updateMarketReportsSuccess(data, textStatus, jQxhr);
+
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function updateMarketReportsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+            });
+        } else {
+            bootbox.alert('Update Successful.', function () {
+            });
+        }
+    }
+
     function removeFromMarket() {
         $('#ddlSelectedReports > option:selected').each(function () {
             if ($('#ddlNonSelectedReports [value="' + $(this).val() + '"]').length == 0) {
@@ -226,12 +269,11 @@
     function addToMarket() {
         $('#ddlNonSelectedReports > option:selected').each(function () {
             if($('#ddlSelectedReports [value="' + $(this).val() + '"]').length == 0) {
-                $('#ddlSelectedReports').html('<option value"' + $(this).val() + '">' + $(this).text() + '</option>' + $('#ddlSelectedReports').html());
+                $('#ddlSelectedReports').html('<option value="' + $(this).val() + '">' + $(this).text() + '</option>' + $('#ddlSelectedReports').html());
                 $(this).remove();
             }
         })
     }
-
 
     function genericAjaxError(jqXhr, textStatus, errorThrown) {
         bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
