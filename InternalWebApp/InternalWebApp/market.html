@@ -78,10 +78,10 @@
                     <!-- Market Number -->
                     <div class="row" style="width:80%;margin:0 auto;">
                         <div class="col-md-3" style="text-align:left">
-                            <label for="txtMarketNumber">Market Number</label>
+                            <label for="txtMarketId">Market Number</label>
                         </div>
                         <div class="col-md-9" style="text-align:left">
-                            <input type="text" class="mkaRequired" id="txtMarketNumber" errorMessage="You must enter a Market Number." />
+                            <input type="text" class="mkaRequired" id="txtMarketId" errorMessage="You must enter a Market Number." />
                         </div>
                     </div>
 
@@ -94,14 +94,14 @@
                             <input type="text" class="mkaRequired" maxlength="50" id="txtMarketName" errorMessage="You must enter a Market Name." value="" />
                         </div>
                     </div>
-                                      
+
                     <!-- Market Size -->
                     <div class="row" style="width:80%;margin:0 auto;">
                         <div class="col-md-3" style="text-align:left">
                             <label for="ddlMarketSize">Market Size</label>
                         </div>
                         <div class="col-md-9" style="text-align:left">
-                            <select id="ddlMarketSize" class="mkaRequired" style="height:33px" errorMessage="You must enter a Market Size." ></select>
+                            <select id="ddlMarketSize" class="mkaRequired" style="height:33px" errorMessage="You must enter a Market Size."></select>
                         </div>
                     </div>
                     <!-- Primary Market -->
@@ -124,10 +124,10 @@
                     </div>
                     <div class="row" style="width:80%;margin:0 auto;">
                         <div class="col-md-3" style="text-align:left">
-                            <label for="lblRegion">Region</label>
+                            <label for="ddlRegion">Region</label>
                         </div>
                         <div class="col-md-9" style="text-align:left">
-                            <label id="lblRegion" class="mkaRequired"  errorMessage="You must enter a Region." ></label>
+                            <select id="ddlRegion" class="mkaRequired" disabled errorMessage="You must enter a Region."></select>
                         </div>
                     </div>
 
@@ -145,7 +145,7 @@
                             <label for="lblTimeZone">Time Zone</label>
                         </div>
                         <div class="col-md-9" style="text-align:left">
-                            <label id="lblTimeZone" class="mkaRequired" errorMessage="You must enter a Time Zone." ></label>
+                            <label id="lblTimeZone" class="mkaRequired" errorMessage="You must enter a Time Zone."></label>
                         </div>
                     </div>
                     <div class="row" style="width:80%;margin:0 auto;">
@@ -178,7 +178,7 @@
                             <label for="txtComments">Comments</label>
                         </div>
                         <div class="col-md-9" style="text-align:left">
-                            <textarea id="txtComments" maxlength="500"></textarea>
+                            <textarea id="txtComments" style="resize:none;" maxlength="500"></textarea>
                         </div>
                     </div>
                     <!--</div>-->
@@ -267,7 +267,8 @@
         buildMainMenu("Markets");
         marketId = (getParameterByName("MarketID") == null ? 0 : getParameterByName("MarketID"));
         getProductList();
-        checkForInsertOrUpdate();       
+        getRegionList();
+        checkForInsertOrUpdate();
         //getPartnerList();
         getMediaTypes();
         getMarketSizeList();
@@ -278,11 +279,11 @@
 
     function checkForInsertOrUpdate() {
         if (marketId == 0 || marketId == null) {
-                    
+
         } else {
-            $("#txtMarketNumber").prop('readonly', true);
+            $("#txtMarketId").prop('readonly', true);
             $("#ddlMediaType").prop('disabled', true);
-            $("#txtMarketNumber").val(marketId);
+            $("#txtMarketId").val(marketId);
         }
     }
 
@@ -344,6 +345,50 @@
         };
 
         $.ajax(url, settings);
+
+    }
+
+    function getRegionList() {
+
+        var url = ServicePrefix + '/api/Region/GetRegionList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getRegionListSuccess(data, textStatus, jQxhr)
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown)
+            }
+        }
+
+        $.ajax(url, settings);
+    }
+
+    function getRegionListSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
+            });
+        }
+        else {
+            var str = '';
+            str = '<option value="-1">-- Select a Region</option>';
+            $.each(data.report.rows, function (index) {
+
+                str = str + '<option value="' + data.report.rows[index].regionCode + '">' + data.report.rows[index].regionName + '</option>';
+
+            });
+
+            $("#ddlRegion").html(str);
+        }
 
     }
 
@@ -524,7 +569,7 @@
                 $("#productAddXRY").removeClass('hidden');
                 $("#productAddTVB").removeClass('hidden');
                 $("#productAddMSS").removeClass('hidden');
-                            
+
             }
         }
 
@@ -649,19 +694,19 @@
                 $("#chkPrimaryMarket").prop("checked", (obj["primaryMarket"] == true ? true : false));
                 $("#ddlParentMarket").val(obj["parentMarketId"]);
                 $("#ddlMarketSize").val(obj["marketSizeId"]);
-                $("#lblRegion").text(obj["region"]);
-                $("#lblState").text(obj["state"]);
+                //$("#lblRegion").text(obj["region"]);
+                //$("#lblState").text(obj["state"]);
                 $("#lblTimeZone").text(obj["timeZone"]);
                 $("#ddlPartner").val(obj["partnerId"])
                 $("#txtEntityName").val(obj["entityName"]);
                 $("#txtEntityNamePlural").val(obj["entityNames"]);
                 $("#txtComments").text(obj["marketComment"])
 
+                getMarketLocationInfoByParentMarket(obj["parentMarketId"]);
+
+
             });
-
         }
-
-       
 
     }
 
@@ -711,8 +756,16 @@
 
     function updateMarket() {
 
+        var inMarketId = 0
+
         if (validationPassed() == false) {
             return;
+        }
+
+        if (marketId == 0) {
+            inMarketId = $("#txtMarketId").val();
+        } else {
+            inMarketId = marketId
         }
 
         var url = ServicePrefix + "/api/Market/UpdateMarket";
@@ -724,11 +777,11 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inMarketName": $("#txtMarketName").val().trim(),
-                "inMarketID": marketId,
+                "inMarketID": inMarketId,
                 "inMediaTypeId": $("#ddlMediaType").val().trim(),
                 "inParentMarketId": $("#ddlParentMarket").val().trim(),
-                "inPrimaryMarket": $("#chkPrimaryMarket").val().trim(),
-                "inRegionCode": $("#lblRegion").text().trim(),
+                "inPrimaryMarket": $("#chkPrimaryMarket").prop("checked"),
+                "inRegionCode": $("#ddlRegion").val().trim(),
                 "inMarketSize": $("#ddlMarketSize").val().trim(),
                 "inREName": $("#txtEntityName").val().trim(),
                 "inREPluralName": $("#txtEntityNamePlural").val().trim(),
@@ -745,15 +798,14 @@
         };
 
         $.ajax(url, settings);
-        
+
     }
 
     function updateMarketSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
             bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
             });
-        } else
-        {
+        } else {
             bootbox.alert('Update successful.', function () {
             });
         }
@@ -763,21 +815,29 @@
         bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
     }
 
-    function getMarketLocationInfoByParentMarket() {
+    function getMarketLocationInfoByParentMarket(pMarketId) {
 
-        if (mediaTypeId == 0 || $("#ddlParentMarket").val() == -1) {
+        var parentMarketId = 0;
+
+        if ($("#ddlMediaType").val() <= 0 || $("#ddlParentMarket").val() <= 0) {
             return;
         }
 
-        var url = ServicePrefix + '/api/Market/GetMarketLocationInfoByParentMarket';
+        if (pMarketId == null || pMarketId == 0) {
+            parentMarketId = $("#ddlParentMarket").val();
+        } else {
+            parentMarketId = pMarketId;
+        }
         
+        var url = ServicePrefix + '/api/Market/GetMarketLocationInfoByParentMarket';
+
         var settings = {
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inParentMarketId": $("#ddlParentMarket").val(),
+                "inParentMarketId": parentMarketId,
                 "inMediaTypeId": $("#ddlMediaType").val()
             }),
             processData: false,
@@ -794,7 +854,28 @@
     }
 
     function getMarketLocationSuccess(data, textStatus, jQxhr) {
-        console.log("market location success.")
+
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
+            });
+        }
+        else {
+
+            $.each(data.report.rows, function (index) {
+
+                var obj = data.report.rows[index];
+
+                $("#ddlRegion").val(obj.marketRegionId);
+                $("#lblState").text(obj.parentStateAbbreviation);
+                $("#lblTimeZone").text(obj.parentTimeZone);
+
+            });
+
+        }
+
+
+
     }
 
     function validationPassed() {
@@ -831,6 +912,8 @@
 
         window.location = "mrrmarketreportsetup.html?marketID=" + marketId + "&marketName=" + $('#txtMarketName').val();
     }
+
+    
 
 
 </script>

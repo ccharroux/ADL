@@ -52,6 +52,21 @@
         .standardText, select {
             width: 300px !important;
         }
+
+        .marketLabel {
+            width:300px;
+            background-color:#9aadbf; 
+            padding-bottom:10px; 
+            margin-bottom:10px;
+            font-size: 13px;
+            border-radius:4px;
+            padding-top:10px
+        }
+        h5 {
+            color:black;
+            margin-bottom:5px;
+        }
+
     </style>
 </head>
 <body>
@@ -71,29 +86,52 @@
                 </div>
 
                 <div class="text-center" style="margin-top:00px">
-                    
-                    <div class="row" style="width:80%;margin:0 auto; padding-bottom:10px;">  
-                        <div class="col-md-3" style="text-align:right">
-                            <label for="txtMarketName">Market Name:</label>
+                    <div class="row" style="width:66.5%; margin:0 auto;">
+                        <div class="marketLabel">
+                            <div class="row">
+                                <div class="col-md-5" style="text-align:right;">
+                                    <label style="color:white;" for="lblMarketName">Market Name:</label>
+                                </div>
+                                <div class="col-md-6" style="text-align:left;">
+                                    <span style="color:white;" id="lblMarketName"></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-5" style="text-align:right;">
+                                    <label style="color:white;" for="lblMarketId">Market ID:</label>
+                                </div>
+                                <div class="col-md-6" style="text-align:left; ">
+                                    <span style="color:white;" id="lblMarketId"></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-5" style="text-align:right;">
+                                    <label style="color:white;" for="lblMediaType">Media Type:</label>
+                                </div>
+                                <div class="col-md-6" style="text-align:left; ">
+                                    <span style="color:white;" id="lblMediaType"></span>
+                                </div>
+                            </div>
+
                         </div>
-                        <div class="col-md-9" style="text-align:left">
-                            <span id="txtMarketName"></span>
-                        </div>                       
-                    </div>                                     
+                    </div>   
+                                                          
                     <div class="row" style="width:80%;margin:0 auto;">
 
                         <div class="col-md-6" style="text-align:center">   
-                                                    
+                             <label for="ddlNonSelectedReports">Unassigned Reports</label>                      
                             <select id="ddlNonSelectedReports" multiple size="13"></select>
                         </div>
                         <div class="col-md-6" style="text-align:center">
-                            
+                            <label for="ddlSelectedReports">Current Market Reports</label>
                             <select id="ddlSelectedReports" multiple size="13"></select>
 
                         </div>
                     </div>
                     <div class="row" style="width:80%;margin:0 auto;">
-
+                        
                         <div class="col-md-6" style="text-align:center">
                             <input value="Add" onclick="addToMarket();" style="width:300px;background-color:green !important;" type="button">
                         </div>
@@ -149,15 +187,16 @@
 <script>
 
     var marketID = 0;
-    var marketName = '';
+    //var marketName = '';
 
     $(document).ready(function () {
         buildMainMenu("Markets");
         marketID = (getParameterByName("MarketId") == null ? 0 : getParameterByName("MarketId"));
-        marketName = (getParameterByName("MarketName") == null ? 0 : getParameterByName("MarketName"));
+        //marketName = (getParameterByName("MarketName") == null ? 0 : getParameterByName("MarketName"));
 
-        $('#txtMarketName').text(marketName);
+        //$('#txtMarketName').text(marketName);
         getReports();
+        getMarket();
     });
 
     function getReports() {
@@ -279,7 +318,49 @@
         bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
     }
 
+    function getMarket() {
+        if (marketID <= 0) {
+            return;
+        }
 
+        var url = ServicePrefix + '/api/Market/GetMarket';
 
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketID": marketID
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown)
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function getMarketSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
+            });
+        } else {
+
+            $.each(data.report.rows, function (index) {
+
+                var obj = data.report.rows[index];
+
+                $("#lblMarketName").text(obj.marketName);
+                $("#lblMarketId").text(obj.marketId);
+                $("#lblMediaType").text(obj.mediaTypeName);
+            });
+        }
+    }
 
 </script>
