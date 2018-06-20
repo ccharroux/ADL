@@ -181,25 +181,13 @@
                             <textarea id="txtComments" style="resize:none;" maxlength="500"></textarea>
                         </div>
                     </div>
-                    <!--</div>-->
-                    <!--<div class="buttonList" style="width:28%; display:inline-block; float:right;">
-                        <div>
-                            <input value="MRR Revenue Definition" onclick="" style="width:100%;max-width:320px" type="button">
-                        </div>
-                        <div style="padding-top:10px">
-                            <input value="MRR Report Setup" onclick="" style="width:100%;max-width:320px" type="button">
-                        </div>
-                    </div>-->
+
                     <!-- Products -->
                     <div style="margin-top: 20px;margin-bottom:20px">
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="row" style="border-top:solid 1px silver;border-bottom:solid 1px silver;width:100%;margin:0 auto;">
-                                    <!--<div class="col-md-2" style="text-align:right">
-                                        <strong>
-                                            &nbsp;
-                                        </strong>
-                                    </div>-->
+
                                     <div class="col-md-4" style="text-align:left">
                                         <strong>
                                             Product
@@ -694,8 +682,6 @@
                 $("#chkPrimaryMarket").prop("checked", (obj["primaryMarket"] == true ? true : false));
                 $("#ddlParentMarket").val(obj["parentMarketId"]);
                 $("#ddlMarketSize").val(obj["marketSizeId"]);
-                //$("#lblRegion").text(obj["region"]);
-                //$("#lblState").text(obj["state"]);
                 $("#lblTimeZone").text(obj["timeZone"]);
                 $("#ddlPartner").val(obj["partnerId"])
                 $("#txtEntityName").val(obj["entityName"]);
@@ -756,7 +742,8 @@
 
     function updateMarket() {
 
-        var inMarketId = 0
+        var inMarketId = 0;
+        var inIsMarketNew = false;
 
         if (validationPassed() == false) {
             return;
@@ -764,6 +751,7 @@
 
         if (marketId == 0) {
             inMarketId = $("#txtMarketId").val();
+            inIsMarketNew = true;
         } else {
             inMarketId = marketId
         }
@@ -785,7 +773,9 @@
                 "inMarketSize": $("#ddlMarketSize").val().trim(),
                 "inREName": $("#txtEntityName").val().trim(),
                 "inREPluralName": $("#txtEntityNamePlural").val().trim(),
-                "inComment": $("#txtComments").val().trim()
+                "inComment": $("#txtComments").val().trim(),
+                "inIsNewMarket": inIsMarketNew
+
 
             }),
             processData: false,
@@ -806,10 +796,26 @@
             bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
             });
         } else {
-            bootbox.alert('Update successful.', function () {
+
+            $.each(data.report.rows, function (index) {
+
+                var obj = data.report.rows[index];
+
+                if (obj.Status == -1) {
+                    bootbox.alert('Market ID already belongs to ' + obj.marketName + '.', function () {
+                    });
+                } else if (obj.Status == 1) {
+                    bootbox.alert('Update successful.', function () {
+                    });
+                } else {
+                    bootbox.alert('Update has failed.', function () {
+                    });
+                }
+
             });
         }
     }
+
 
     function genericAjaxError(jQxhr, textStatus, errorThrown) {
         bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
@@ -820,6 +826,12 @@
         var parentMarketId = 0;
 
         if ($("#ddlMediaType").val() <= 0 || $("#ddlParentMarket").val() <= 0) {
+            if ($("#ddlMediaType").val() <= 0) {
+                bootbox.alert("Please choose Media Type first.", function () {
+                });
+                $("#ddlParentMarket").val(-1);
+            }
+           
             return;
         }
 
@@ -828,7 +840,7 @@
         } else {
             parentMarketId = pMarketId;
         }
-        
+
         var url = ServicePrefix + '/api/Market/GetMarketLocationInfoByParentMarket';
 
         var settings = {
@@ -910,10 +922,10 @@
 
     function goToMarketReportSetup(marketId) {
 
-        window.location = "mrrmarketreportsetup.html?marketID=" + marketId + "&marketName=" + $('#txtMarketName').val();
+        window.location = "mrrmarketreportsetup.html?marketID=" + marketId;
     }
 
-    
+
 
 
 </script>
