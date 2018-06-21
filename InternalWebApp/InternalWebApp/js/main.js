@@ -438,8 +438,10 @@ function buildMainMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="">Parent Market</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Ownerships") + 'href="ownershiplist.html">Ownerships</a></li>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Ownership Groups") + 'href="ownershipgrouplist.html">Ownership Groups</a></li>';
+    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Ownerships") + ' href="ownershiplist.html" role="button" aria-expanded="false">Ownerships <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="ownershipgrouplist.html">Ownership Groups</a></li>';
+    menuItems += '              </ul>';  
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="dashboard.html">Virtual Groups</a></li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Settings") + ' role="button" aria-expanded="false">Settings <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
@@ -454,6 +456,10 @@ function buildMainMenu(selectedItem) {
     menuItems += '</nav>';
 
     $("#menu").html(menuItems);
+}
+
+function buildXrayMenu(selectedItem) {
+    
 }
 
 function getSelectedItemClass(selectedItem, item) {
