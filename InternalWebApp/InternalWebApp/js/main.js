@@ -430,7 +430,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '<ul>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="dashboard.html" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="">XRY</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="dashboardxray.html">XRY</a></li>';
     menuItems += '                  <li style="display:block;"><a href="">MRR</a></li>';
     menuItems += '                  <li style="display:block;"><a href="">TVB</a></li>';
     menuItems += '                  <li style="display:block;"><a href="">DMA</a></li>';
@@ -467,6 +467,26 @@ function buildMainMenu(selectedItem) {
 
 function buildXrayMenu(selectedItem) {
     
+    var menuItems = '';
+
+    menuItems += '<h1><a href="dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<nav role="navigation" style="margin-top:20px">'
+
+    menuItems += '<ul>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="dashboard.html" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="dashboardxray.html">XRY</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="">MRR</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="">TVB</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="">DMA</a></li>';
+    menuItems += '              </ul>';
+    menuItems += '        </li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
+    menuItems += '    </ul>';
+    menuItems += '</nav>';
+
+    $("#menu").html(menuItems);
+
 }
 
 function getSelectedItemClass(selectedItem, item) {
