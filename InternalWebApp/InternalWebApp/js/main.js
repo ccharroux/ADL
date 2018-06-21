@@ -428,7 +428,14 @@ function buildMainMenu(selectedItem) {
     menuItems += '<nav role="navigation" style="margin-top:20px">'
 
     menuItems += '<ul>';
-    menuItems += '       <li><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="dashboard.html">Products</a></li>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="dashboard.html" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="">XRY</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="">MRR</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="">TVB</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="">DMA</a></li>';
+    menuItems += '              </ul>';
+    menuItems += '        </li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Personnel") + 'href="dashboard.html">Personnel</a></li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Stations") + ' href="stationlist.html">Stations</a></li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Markets") + ' href="marketlist.html" role="button" aria-expanded="false">Markets <span style="margin-right:10px;" class="caret"></span></a>';
