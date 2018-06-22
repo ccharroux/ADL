@@ -428,12 +428,12 @@ function buildMainMenu(selectedItem) {
     menuItems += '<nav role="navigation" style="margin-top:20px">'
 
     menuItems += '<ul>';
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="dashboard.html" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="dashboardxray.html">XRY</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="">MRR</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="">TVB</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="">DMA</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="dashboardmrr.html">MRR</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="dashboardtvb.html">TVB</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="dashboarddma.html">DMA</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Personnel") + 'href="dashboard.html">Personnel</a></li>';
@@ -465,7 +465,7 @@ function buildMainMenu(selectedItem) {
     $("#menu").html(menuItems);
 }
 
-function buildXrayMenu(selectedItem) {
+function buildXRYMenu(selectedItem) {
     
     var menuItems = '';
 
@@ -473,12 +473,12 @@ function buildXrayMenu(selectedItem) {
     menuItems += '<nav role="navigation" style="margin-top:20px">'
 
     menuItems += '<ul>';
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="dashboard.html" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="dashboardxray.html">XRY</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="">MRR</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="">TVB</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="">DMA</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="dashboardmrr.html">MRR</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="dashboardtvb.html">TVB</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="dashboarddma.html">DMA</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Advertiser") + ' href="" role="button" aria-expanded="false">Advertiser <span style="margin-right:10px;" class="caret"></span></a>';
@@ -507,6 +507,83 @@ function buildXrayMenu(selectedItem) {
     $("#menu").html(menuItems);
 
 }
+
+function buildMRRMenu(selectedItem) {
+
+    var menuItems = '';
+
+    menuItems += '<h1><a href="dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<nav role="navigation" style="margin-top:20px">'
+
+    menuItems += '<ul>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="dashboardxray.html">XRY</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="dashboardmrr.html">MRR</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="dashboardtvb.html">TVB</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="dashboarddma.html">DMA</a></li>';
+    menuItems += '              </ul>';
+    menuItems += '        </li>';
+    menuItems += '        <li><a href="dashboard.html">Dashboard</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
+    menuItems += '    </ul>';
+    menuItems += '</nav>';
+
+    $("#menu").html(menuItems);
+
+
+}
+
+function buildTVBMenu(selectedItem) {
+
+    var menuItems = '';
+
+    menuItems += '<h1><a href="dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<nav role="navigation" style="margin-top:20px">'
+
+    menuItems += '<ul>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="dashboardxray.html">XRY</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="dashboardmrr.html">MRR</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="dashboardtvb.html">TVB</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="dashboarddma.html">DMA</a></li>';
+    menuItems += '              </ul>';
+    menuItems += '        </li>';
+    menuItems += '        <li><a href="dashboard.html">Dashboard</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
+    menuItems += '    </ul>';
+    menuItems += '</nav>';
+
+    $("#menu").html(menuItems);
+
+}
+
+function buildDMAMenu(selectedItem) {
+
+    var menuItems = '';
+
+    menuItems += '<h1><a href="dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<nav role="navigation" style="margin-top:20px">'
+
+    menuItems += '<ul>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="dashboardxray.html">XRY</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="dashboardmrr.html">MRR</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="dashboardtvb.html">TVB</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="dashboarddma.html">DMA</a></li>';
+    menuItems += '              </ul>';
+    menuItems += '        </li>';
+    menuItems += '        <li><a href="dashboard.html">Dashboard</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
+    menuItems += '    </ul>';
+    menuItems += '</nav>';
+
+    $("#menu").html(menuItems);
+
+}
+
 
 function getSelectedItemClass(selectedItem, item) {
     if (selectedItem.toLowerCase() == item.toLowerCase()) {
