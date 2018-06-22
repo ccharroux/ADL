@@ -78,10 +78,90 @@
                         <h2>Region</h2>
                     </div>
                 </div>
+
+                <div class="text-center" style="margin-top:00px">
+
+                    <input type="hidden" id="txtRegionCode" value="" />
+
+                    <!-- Region Name-->
+                    <div class="row" style="width:80%;margin:0 auto;">
+                        <div class="col-md-3" style="text-align:left">
+                            <label for="txtRegionName">Region Name</label>
+                        </div>
+                        <div class="col-md-9" style="text-align:left">
+                            <input type="text" class="mkaRequired" id="txtRegionName" errorMessage="You must enter a Region Name" value="" />
+                        </div>
+                    </div>
+
+                    <!-- Media Type -->
+                    <div class="row" style="width:80%;margin:0 auto;">
+                        <div class="col-md-3" style="text-align:left">
+                            <label for="ddlMediaType">Media Type</label>
+                        </div>
+                        <div class="col-md-9" style="text-align:left">
+                            <select id="ddlMediaType" class="mkaRequired" errorMessage="You must select a Media Type" style="height:33px"></select>
+                        </div>
+                    </div>
+
+                    <!-- RAB Region Name-->
+                    <div class="row" style="width:80%;margin:0 auto;">
+                        <div class="col-md-3" style="text-align:left">
+                            <label for="txtRABRegionCode">RAB Region</label>
+                        </div>
+                        <div class="col-md-9" style="text-align:left">
+                            <input type="text" class="" id="txtRABRegionCode" readonly errorMessage="You must enter a Region Name" value="" />
+                        </div>
+                    </div>
+
+                    <!-- RAB Region Name-->
+                    <div class="row" style="width:80%;margin:0 auto;">
+                        <div class="col-md-3" style="text-align:left">
+                            <label for="txtRABRegionName">RAB Region Name</label>
+                        </div>
+                        <div class="col-md-9" style="text-align:left">
+                            <input type="text" class="" id="txtRABRegionName" readonly errorMessage="You must enter a Region Name" value="" />
+                        </div>
+                    </div>
+
+                    <!-- buttons -->
+                    <div style="margin-top: 20px;margin-bottom:20px">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div>
+                                    <div>
+                                        <input value="Update" onclick="updateRegion();" style="width:100%;max-width:320px" type="button">
+                                    </div>
+                                    <div style="padding-top:10px">
+                                        <input value="Back" onclick="goBackToDashboard();" style="width:100%;max-width:320px" type="button">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
         </div>
+
+
     </div>
 
+    <!--
+        fields id hidden
+        region name
+        media type (dropdown from api call)
+        per carl make fields read only due to lack of business requirements
+        if mediatype 1 then show these (just speculation)
+            RABRegion (not sure use)
+            RABRegionName (not sure use)
+    -->
+    <!--
+        validation
+            name
+            media type selected
+            if media type = 1
+                rabregion and name completed
+    -->
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
     <!-- jQuery Easing -->
@@ -103,25 +183,203 @@
 </html>
 <script>
 
-    var regionID = 0;
+    var regionCode = 0;
 
 
-    $( document ).ready(function()
-    {
+    $(document).ready(function () {
         buildMainMenu("Settings");
-        ownerID = (getParameterByName("OwnerID") == null ? 0 : getParameterByName("OwnerID"));
+        regionCode = (getParameterByName("regionCode") == null ? 0 : getParameterByName("regionCode"));
 
-        // Create Product Table
+        if (regionCode > 0) {
+            $("#txtRegionCode").val(regionCode);
+        }
+        else {
+            $("#txtRegionCode").val(0);
+        }
 
-        getProductList();
         getMediaTypes();
-
-        // get MEdia Types
-
-        // get ownership
-        // This loads Media Type
-        // this loads other text boxes
-
+        getRegion();
 
     });
+
+    function getMediaTypes() {
+        $.ajax({
+            url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
+                    });
+                }
+                else {
+
+                    var str = '';
+                    //console.log(JSON.stringify(data));
+                    str = '<option value="-1">-- Select a Media Type</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+
+                    });
+
+                    $("#ddlMediaType").html(str);
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    //window.location = "preprocess.html";
+                });
+            }
+        });
+    }
+
+    function getRegion() {
+        if (regionCode <= 0) {
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Region/GetRegion',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inRegionCode": regionCode
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
+                    });
+                }
+                else {
+
+                    var str = '';
+
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+
+                        $("#txtRegionCode").val(obj["regionCode"]);
+                        $("#txtRegionName").val(obj["regionName"]);
+                        $("#ddlMediaType").val(obj["mediaTypeId"]);
+                        $("#txtRABRegionCode").val(obj["rabRegionCode"]);
+                        $("#txtRABRegionName").val(obj["rabRegionName"]);
+
+                    });
+
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    //window.location = "preprocess.html";
+                });
+            }
+        });
+    }
+
+    function updateRegion() {
+
+        if (validationPassed() == false) {
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Region/UpdateRegion',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inRegionCode": $("#txtRegionCode").val().trim(),
+                "inRegionName": $("#txtRegionName").val().trim(),
+                "inMediaTypeId": $("#ddlMediaType").val().trim(),
+                "inRABRegionCode": $("#txtRABRegionCode").val().trim(),
+                "inRABRegionName": $("#txtRABRegionName").val().trim()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
+                }
+                else {
+                    if (data.report.rows[0].Status == -1) {
+                        bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
+                    }
+                    else {
+                        //get the regioncode and update the hidden field 
+                        $("#txtRegionCode").val(data.report.rows[0].regionCode);
+                        bootbox.alert('Region Updated', function () { });
+                    }
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
+            }
+        });
+
+    }
+
+    function validationPassed() {
+
+        //-----------------------------
+        // Basic Validation requires
+        // the following on each
+        // element
+        //-----------------------------
+        // class: mkaRequired
+        // custom attribute: errorMessage
+        //-----------------------------
+
+        var passedValidation = true;
+
+
+        $(".mkaRequired").each(function (index, el) {
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            // Text
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+                    bootbox.alert(errorMessage, function () { });
+                    passedValidation = false;
+                    return false;
+                }
+            }
+
+            // Select
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == "-1") {
+                    bootbox.alert(errorMessage, function () { });
+                    passedValidation = false;
+                    return false;
+                }
+            }
+
+        });
+
+
+        // CUSTOM VALIDATION CAN GO HERE
+        // CUSTOM VALIDATION CAN GO HERE
+        // CUSTOM VALIDATION CAN GO HERE
+
+
+        //return true;
+        return passedValidation;
+
+    }
+
 </script>
