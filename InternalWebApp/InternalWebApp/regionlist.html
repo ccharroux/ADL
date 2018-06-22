@@ -46,9 +46,9 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
-   
+
     <style>
-        .dataTables_length{
+        .dataTables_length {
             padding-left: 20px;
             padding-top: 10px;
         }
@@ -90,7 +90,6 @@
                 </div>
 
                 <!-- add region map image with show/hide button -->
-
                 <!-- search / filter area -->
                 <div class="row" style="margin-top:-25px!important">
                     <!--<div class="col-md-10 ">
@@ -153,7 +152,7 @@
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
-    
+
 
 </body>
 </html>
@@ -161,10 +160,12 @@
 
     $(document).ready(function () {
 
-       
+        //easier to set the api url to variable to setup datatable
         var dataTableURL = ServicePrefix + '/api/Region/GetRegionList';
 
+        //assign table to be a datatable
         $('#regionList').DataTable({
+            //this tells the table where to put the buttons
             "dom": "Blfrtip",
             "ajax": {
                 "url": dataTableURL,
@@ -176,6 +177,10 @@
                         "inApiToken": getLocalStorage("APIToken")
                     });
                 },
+                //datatables expect the json to come back with "data" as the highest level
+                //this section will convert it to format datatables is looking for
+                //you json stringigy the report rows section since this is the data we want coming back
+                //from api. Parse the json again and it will be in the expected format
                 "dataSrc": function (json) {
                     json = JSON.stringify(json.report.rows);
                     json = $.parseJSON(json);
@@ -183,10 +188,12 @@
                 }
             }
             ,
+            //this sets up the columns to show and assign them from the data being returned in the json
             "columns": [
                 { "data": 'regionName' },
-                { "data": 'regionMediaType' }
-                ,
+                { "data": 'regionMediaType' },
+                //use mRender to create a column. in this case, it is creating an edit link.
+                //you can also add other option to any of the columns like orderable and searchable
                 {
                     mRender: function (data, type, row) {
                         return '<a href="#" onclick="editRegion(' + row.regionCode + ')">Edit</a>';
@@ -195,35 +202,90 @@
                     "searchable": false
                 }
             ],
+            //setup the paging navigation buttons
             "pagingType": "full_numbers",
+            //adding buttons to the grid. built in buttons include csv, excel, pdf, print and making columns visible
             "buttons": [
                 {
                     extend: 'csv',
+                    //this section sets up the export
+                    //columns will only export the first 2 columns. can be set to visible. in this case, didn't want
+                    //export the edit link
                     exportOptions: {
-                        columns: [0,1]
+                        columns: [0, 1],
+                        format: {
+                            //can use this functionality to overwrite the column header of search dropdown lists
+                            //current brute force way of doing it. need to figure out a better way of doing this.
+                            header: function (data, columnIdx) {
+                                //return writeTitle(columnIdx) != '' ? writeTitle(columnIdx) : data;
+
+                                if (columnIdx == 1) {
+                                    return "Media Type";
+                                } else {
+                                    return data;
+                                }
+
+                            }
+                        }
                     }
                 },
                 {
                     extend: 'excel',
+                    title: 'Regions List',
                     exportOptions: {
-                        columns: [0,1]
+                        columns: [0, 1],
+                        format: {
+                            header: function (data, columnIdx) {
+                                //return writeTitle(columnIdx) != '' ? writeTitle(columnIdx) : data;
+
+                                if (columnIdx == 1) {
+                                    return "Media Type";
+                                } else {
+                                    return data;
+                                }
+
+                            }
+                        }
                     }
                 },
                 {
                     extend: 'pdf',
+                    title: 'Regions List',
                     exportOptions: {
-                        columns: [0,1]
+                        columns: [0, 1],
+                        format: {
+                            header: function (data, columnIdx) {
+                                //return writeTitle(columnIdx) != '' ? writeTitle(columnIdx) : data;
+                                if (columnIdx == 1) {
+                                    return "Media Type";
+                                } else {
+                                    return data;
+                                }
+                            }
+                        }
                     }
                 },
                 {
                     extend: 'print',
+                    title: 'Regions List',
                     exportOptions: {
-                        columns: [0,1]
+                        columns: [0, 1],
+                        format: {
+                            header: function (data, columnIdx) {
+                                //return writeTitle(columnIdx) != '' ? writeTitle(columnIdx) : data;
+                                if (columnIdx == 1) {
+                                    return "Media Type";
+                                } else {
+                                    return data;
+                                }
+                            }
+                        }
                     }
                 }
                 //,
                 //'colvis'
             ],
+            //this is the area to build the filter dropdowns. you can build multiple columns at one time.
             initComplete: function () {
                 this.api().columns(1).every(function () {
                     var column = this;
@@ -253,7 +315,7 @@
         //alert(window.location);
         setLocalStorage("searchPage", window.location);
 
-        
+
     });
 
     function editRegion(regionCode) {
