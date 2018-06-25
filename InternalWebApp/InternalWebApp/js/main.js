@@ -448,11 +448,13 @@ function buildMainMenu(selectedItem) {
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Ownerships") + ' href="ownershiplist.html" role="button" aria-expanded="false">Ownerships <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="ownershipgrouplist.html">Ownership Groups</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="">Parent Ownership</a></li>';
     menuItems += '              </ul>';  
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="dashboard.html">Virtual Groups</a></li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Settings") + ' role="button" aria-expanded="false">Settings <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="formatlist.html">Formats</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="marketsizelist.html">Market Sizes</a></li>';
     menuItems += '                  <li style="display:block;"><a href="positionlist.html">Positions</a></li>';
     menuItems += '                  <li style="display:block;"><a href="regionlist.html">Regions</a></li>';
     menuItems += '                  <li style="display:block;"><a href="revenuecategorieslist.html">Revenue Categories</a></li>';
