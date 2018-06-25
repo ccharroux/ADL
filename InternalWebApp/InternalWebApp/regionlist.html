@@ -163,6 +163,8 @@
         //easier to set the api url to variable to setup datatable
         var dataTableURL = ServicePrefix + '/api/Region/GetRegionList';
 
+        $.fn.dataTable.ext.errMode = 'none';
+
         //assign table to be a datatable
         $('#regionList').DataTable({
             //this tells the table where to put the buttons
@@ -182,9 +184,20 @@
                 //you json stringigy the report rows section since this is the data we want coming back
                 //from api. Parse the json again and it will be in the expected format
                 "dataSrc": function (json) {
-                    json = JSON.stringify(json.report.rows);
-                    json = $.parseJSON(json);
-                    return json;
+
+                    if (json.response.status.toUpperCase() === "SUCCESS") {
+                        
+                        json = JSON.stringify(json.report.rows);
+                        json = $.parseJSON(json);
+                        return json;
+
+                    }
+                    else {
+                        bootbox.alert('Process Failed.\n\r\n\r' + json.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                        });
+
+                        return json;
+                    }
                 }
             }
             ,
@@ -314,7 +327,6 @@
         //setLocalStorage("search", $("#searchOwner").val().trim());
         //alert(window.location);
         setLocalStorage("searchPage", window.location);
-
 
     });
 
