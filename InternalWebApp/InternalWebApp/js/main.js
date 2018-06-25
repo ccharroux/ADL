@@ -454,6 +454,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Settings") + ' role="button" aria-expanded="false">Settings <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="formatlist.html">Formats</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="marketsizelist.html">Market Sizes</a></li>';
     menuItems += '                  <li style="display:block;"><a href="positionlist.html">Positions</a></li>';
     menuItems += '                  <li style="display:block;"><a href="regionlist.html">Regions</a></li>';
     menuItems += '                  <li style="display:block;"><a href="revenuecategorieslist.html">Revenue Categories</a></li>';
