@@ -262,14 +262,20 @@
     $(document).ready(function () {
         buildMainMenu("Markets");
         marketId = (getParameterByName("MarketID") == null ? 0 : getParameterByName("MarketID"));
-        getProductList();
-        getRegionList();
         checkForInsertOrUpdate();
-        //getPartnerList();
+        
+               
         getMediaTypes();
-        getMarketSizeList();
-        getParentMarketList();
 
+        //load of data
+        //getMediaTypes(); 
+        //=> getRegionList(); 
+        //=> getMarketSizeList();
+        //=> getParentMarketList();
+        //=> getProductList(); 
+        //=> getMarketProduct();        
+        //=> getMarket();
+        //=> getMarketLocationInfoByParentMarket();
 
     });
 
@@ -282,44 +288,6 @@
             $("#txtMarketId").val(marketId);
         }
     }
-
-    //function getPartnerList() {
-    //    //filling out url for ajax call
-    //    var url = ServicePrefix + '/api/Partner/GetPartnerList';
-    //    //filling out settings for ajax call
-    //    var settings = {
-    //        dataType: 'json',
-    //        type: 'post',
-    //        contentType: 'application/json',
-    //        data: JSON.stringify({
-    //            "inApiToken": getLocalStorage("APIToken")
-    //        }),
-    //        processData: false,
-    //        success: function (data, textStatus, jQxhr) {
-    //            getPartnerListSuccess(data, textStatus, jQxhr);
-    //        },
-    //        error: function (jQxhr, textStatus, errorThrown) {
-    //            genericAjaxError(jQxhr, textStatus, errorThrown);
-    //        }
-    //    }
-    //    //ajax call
-    //    $.ajax(url, settings);
-    //}
-
-    //function getPartnerListSuccess(data, textStatus, jQxhr) {
-    //    if (data.response.status != "SUCCESS") {
-    //        bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-    //        });
-    //    }
-    //    else {
-    //        var str = '';
-    //        str = '<option value="-1">-- Select a Partner</option>';
-    //        $.each(data.report.rows, function (index) {
-    //            str = str + '<option value="' + data.report.rows[index].partnerId + '">' + data.report.rows[index].partnerName + '</option>';
-    //        });
-    //        $("#ddlPartner").html(str);
-    //    }
-    //}
 
     function getMediaTypes() {
         var url = ServicePrefix + '/api/MediaType/GetMediaTypeList';
@@ -341,6 +309,30 @@
         };
 
         $.ajax(url, settings);
+
+    }
+
+    function getMediaTypesSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
+            });
+        }
+        else {
+
+            var str = '';
+            str = '<option value="-1">-- Select a Media Type</option>';
+            $.each(data.report.rows, function (index) {
+
+                str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+
+            });
+
+            $("#ddlMediaType").html(str);
+        }
+
+        getRegionList();
 
     }
 
@@ -386,27 +378,50 @@
             $("#ddlRegion").html(str);
         }
 
+        getMarketSizeList();
+
     }
 
-    function getMediaTypesSuccess(data, textStatus, jQxhr) {
+    function getMarketSizeList() {
+        var url = ServicePrefix + '/api/MarketSize/GetMarketSizeList';
 
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketSizeListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getMarketSizeListSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
             bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
             });
         }
         else {
-
             var str = '';
-            str = '<option value="-1">-- Select a Media Type</option>';
+            str = '<option value="-1">-- Select a Market Size</option>';
             $.each(data.report.rows, function (index) {
 
-                str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
-
+                str = str + '<option value="' + data.report.rows[index].marketSizeId + '">' + data.report.rows[index].marketSizeDescription + '</option>';
             });
-
-            $("#ddlMediaType").html(str);
+            $("#ddlMarketSize").html(str);
         }
+        getParentMarketList();
+       
+
     }
 
     function getParentMarketList() {
@@ -447,49 +462,11 @@
             });
             $("#ddlParentMarket").html(str);
 
-            if (marketId > 0) {
-                getMarket();
-            }
+
         }
-    }
 
-    function getMarketSizeList() {
-        var url = ServicePrefix + '/api/MarketSize/GetMarketSizeList';
+        getProductList();
 
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getMarketSizeListSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
-
-    }
-
-    function getMarketSizeListSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-            });
-        }
-        else {
-            var str = '';
-            str = '<option value="-1">-- Select a Market Size</option>';
-            $.each(data.report.rows, function (index) {
-
-                str = str + '<option value="' + data.report.rows[index].marketSizeId + '">' + data.report.rows[index].marketSizeDescription + '</option>';
-            });
-            $("#ddlMarketSize").html(str);
-        }
     }
 
     function getProductList() {
@@ -569,6 +546,8 @@
             }
         }
 
+       
+
     }
 
     function getMarketProducts() {
@@ -640,6 +619,11 @@
 
             });
         }
+        if (marketId > 0) {
+            getMarket();
+        }
+       
+        
     }
 
     function getMarket() {
@@ -694,7 +678,7 @@
                 $("#ddlPartner").val(obj["partnerId"])
                 $("#txtEntityName").val(obj["entityName"]);
                 $("#txtEntityNamePlural").val(obj["entityNames"]);
-                $("#txtComments").text(obj["marketComment"])
+                $("#txtComments").text(obj["marketComment"]);
 
                 getMarketLocationInfoByParentMarket(obj["parentMarketId"]);
 
@@ -823,7 +807,6 @@
             });
         }
     }
-
 
     function genericAjaxError(jQxhr, textStatus, errorThrown) {
         bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
