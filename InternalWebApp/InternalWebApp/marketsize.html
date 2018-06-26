@@ -78,7 +78,7 @@
                             <label for="txt">Market Size Description</label>
                         </div>
                         <div class="col-md-9" style="text-align:left">
-                            <input type="text" class="mkaRequired" id="txtMarketSizeDescription" errorMessage="You must enter a Market Size Description." value="" />
+                            <input type="text" class="mkaRequired" id="txtMarketSizeDescription" maxlength="8" errorMessage="You must enter a Market Size Description." value="" />
                         </div>
                     </div>
 
@@ -145,7 +145,7 @@
             return;
         }
 
-        var url = '/api/MarketSize/GetMarketSize';
+        var url = ServicePrefix + '/api/MarketSize/GetMarketSize';
 
         var settings = {
             dataType: 'json',
@@ -170,26 +170,95 @@
 
     function getMarketSizeSuccess(data, textStatus, jQxhr) {
 
-
         if (data.response.status != "SUCCESS") {
             bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
 
             });
         }
         else {
+            $.each(data.report.rows, function (index) {
 
-            console.log('working');
+                var obj = data.report.rows[index];
 
+                $("#txtMarketSizeId").val(obj["marketSizeId"]);
+                $("#txtMarketSizeDescription").val(obj["marketSizeDescription"]);
 
+            });          
         }
+    }
+
+    function updateMarketSize() {
+
+        if (validationPassed() == false) {
+            return;
+        }
+
+        var url = ServicePrefix + '/api/MarketSize/UpdateMarketSize';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketSizeID": $("#txtMarketSizeId").val().trim(),
+                "inMarketSizeDescription": $("#txtMarketSizeDescription").val().trim()
+            }),
+            success: function (data, textStatus, jQxhr) {
+                updateMarketSizeSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
 
     }
 
+    function updateMarketSizeSuccess(data, textStatus, jQxhr) {
 
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
+        }
+        else {
+            if (data.report.rows[0].Status == -1) {
+                bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
+            }
+            else {
+
+                $("#txtMarketSizeId").val(data.report.rows[0].marketSizeId);
+                bootbox.alert('Market Size Updated', function () { });
+            }
+        }
+
+
+    }
 
     function genericAjaxError(jQxhr, textStatus, errorThrown) {
         bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
     }
+
+    function validationPassed() {
+
+        var loopBreak = true;
+        $(".mkaRequired").each(function (index, el) {
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            // Text
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+           
+        });
+        return loopBreak;
+    }
+
 
 
 </script>
