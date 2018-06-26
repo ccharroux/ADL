@@ -164,9 +164,19 @@
                 //you json stringigy the report rows section since this is the data we want coming back
                 //from api. Parse the json again and it will be in the expected format
                 "dataSrc": function (json) {
-                    json = JSON.stringify(json.report.rows);
-                    json = $.parseJSON(json);
-                    return json;
+                    if (json.response.status.toUpperCase() === "SUCCESS") {
+
+                        json = JSON.stringify(json.report.rows);
+                        json = $.parseJSON(json);
+                        return json;
+
+                    }
+                    else {
+                        bootbox.alert('Process Failed.\n\r\n\r' + json.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                        });
+
+                        return json;
+                    }
                 }
             }
             ,
