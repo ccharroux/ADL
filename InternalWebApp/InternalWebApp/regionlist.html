@@ -92,14 +92,6 @@
                 <!-- add region map image with show/hide button -->
                 <!-- search / filter area -->
                 <div class="row" style="margin-top:-25px!important">
-                    <!--<div class="col-md-10 ">
-                        <label for="search">Ownership Name</label>
-                        <input type="text" id="searchOwner" />
-                        <label for="ddlMediaType" style="padding-left:10px">Media Type</label>
-                        <select id="ddlMediaType">
-                        </select>
-                        <input type="button" style="margin-left:10px" value="Search" onclick="getOwnerList()" />
-                    </div>-->
                     <div class="col-md-12" style="text-align:right;">
                         <input type="button" value="+" class="addNewButton" style="padding-left:25px; padding-right:25px;border-radius:55%!important;min-width:0px!important; font-size:36px;margin-top:-25px;float:right" onclick="editRegion(0)" />
                     </div>
@@ -108,11 +100,17 @@
                 <div style="margin-top: 20px;">
                     <table id="regionList">
                         <thead>
-                            <tr>
-                                <th>Region</th>
-                                <th>Media Type</th>
-                                <th></th>
-                            </tr>
+                        <tr>
+                            <!-- class exportColumn is used to tell the export buttons which columns to use -->
+                            <!-- class filterColumn is used to tell the datatable which columns to build a filter dropdown -->
+                            <!-- custom attribute data-export-title is used to override column heading 
+                            especially on filterable columns and will use this value on exports -->
+                            <!-- custom attribute data-filter-title is used to set the all value display text
+                            on filterable columns  -->
+                            <th class="exportColumn">Region</th>
+                            <th class="exportColumn filterColumn" data-filter-title="&nbsp;--&nbsp;All Media Types" data-export-title="Media Type">Media Type</th>
+                            <th></th>
+                        </tr>
                         </thead>
                         <tfoot>
                             <tr>
@@ -163,6 +161,20 @@
         //easier to set the api url to variable to setup datatable
         var dataTableURL = ServicePrefix + '/api/Region/GetRegionList';
 
+        //create and set this variable to use the same report title 
+        //for all exports that you want a title on
+        var reportTitle = "Regions List";
+
+        //call this function to get back an array of columns to use for
+        //for the export list. If you want export columns by export type,
+        //add a new class and call the function
+        var exportColumns = returnTableColumnsByClass("regionList", "exportColumn");
+
+        //call this function and pass the filter column class name
+        //this will be used to let the table know what column to create a 
+        //dropdown column on
+        var filterColumns = returnTableColumnsByClass("regionList", "filterColumn");
+
         $.fn.dataTable.ext.errMode = 'none';
 
         //assign table to be a datatable
@@ -211,7 +223,7 @@
                 //you can also add other option to any of the columns like orderable and searchable
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="#" onclick="editRegion(' + row.regionCode + ')">Edit</a>&nbsp;&nbsp;<a href="#" onclick="deleteRegion(' + row.regionCode + ')">Delete</a>';
+                        return '<a href="#" onclick="editRegion(' + row.regionCode + ')">Edit</a>&nbsp;<a href="#" onclick="deleteRegion(' + row.regionCode + ')">Delete</a>';
                     },
                     "orderable": false,
                     "searchable": false,
@@ -228,72 +240,52 @@
                     //columns will only export the first 2 columns. can be set to visible. in this case, didn't want
                     //export the edit link
                     exportOptions: {
-                        columns: [0, 1],
+                        //this is where you put the exportColumns variable or whatever list of columns to export
+                        columns: exportColumns,
                         format: {
                             //can use this functionality to overwrite the column header of search dropdown lists
                             //current brute force way of doing it. need to figure out a better way of doing this.
                             header: function (data, columnIdx) {
-                                //return writeTitle(columnIdx) != '' ? writeTitle(columnIdx) : data;
-
-                                if (columnIdx == 1) {
-                                    return "Media Type";
-                                } else {
-                                    return data;
-                                }
-
+                                //the call to this function will get the titles to use on the exports.
+                                //you can override the column name by using a custom attribute.
+                                //was built for the filter columns since the return the select html in the data object
+                                return returnExportColumnHeadingTitle("regionList", data, columnIdx);
                             }
                         }
                     }
                 },
                 {
                     extend: 'excel',
-                    title: 'Regions List',
+                    title: reportTitle,
                     exportOptions: {
-                        columns: [0, 1],
+                        columns: exportColumns,
                         format: {
                             header: function (data, columnIdx) {
-                                //return writeTitle(columnIdx) != '' ? writeTitle(columnIdx) : data;
-
-                                if (columnIdx == 1) {
-                                    return "Media Type";
-                                } else {
-                                    return data;
-                                }
-
+                                return returnExportColumnHeadingTitle("regionList", data, columnIdx);
                             }
                         }
                     }
                 },
                 {
                     extend: 'pdf',
-                    title: 'Regions List',
+                    title: reportTitle,
                     exportOptions: {
-                        columns: [0, 1],
+                        columns: exportColumns,
                         format: {
                             header: function (data, columnIdx) {
-                                //return writeTitle(columnIdx) != '' ? writeTitle(columnIdx) : data;
-                                if (columnIdx == 1) {
-                                    return "Media Type";
-                                } else {
-                                    return data;
-                                }
+                                return returnExportColumnHeadingTitle("regionList", data, columnIdx);
                             }
                         }
                     }
                 },
                 {
                     extend: 'print',
-                    title: 'Regions List',
+                    title: reportTitle,
                     exportOptions: {
-                        columns: [0, 1],
+                        columns: exportColumns,
                         format: {
                             header: function (data, columnIdx) {
-                                //return writeTitle(columnIdx) != '' ? writeTitle(columnIdx) : data;
-                                if (columnIdx == 1) {
-                                    return "Media Type";
-                                } else {
-                                    return data;
-                                }
+                                return returnExportColumnHeadingTitle("regionList", data, columnIdx);
                             }
                         }
                     }
@@ -302,10 +294,16 @@
                 //'colvis'
             ],
             //this is the area to build the filter dropdowns. you can build multiple columns at one time.
+            //build funtion to get columns to build filter
+            //issue is the first option of all text
+            //try to add custom attribute for the all
             initComplete: function () {
-                this.api().columns(1).every(function () {
+                this.api().columns(filterColumns).every(function () {
                     var column = this;
-                    var select = $('<select><option value="">&nbsp;--&nbsp;All Media Types</option></select>')
+
+                    var filterTitle = $("#regionList th").eq(column.index()).data("filter-title");
+
+                    var select = $('<select><option value="">' + filterTitle + '</option></select>')
                         .appendTo($(column.header()).empty())
                         .on('change', function () {
                             var val = $.fn.dataTable.util.escapeRegex(
@@ -318,13 +316,33 @@
                         });
 
                     column.data().unique().sort().each(function (d, j) {
-                        select.append('<option value="' + d + '">' + d + '</option>')
+                        select.append('<option value="' + d + '">' + d + '</option>');
                     });
                 });
+                
+                //this adds a button after the search box
+                //in this case, added an image to the button
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
             },
             createdRow: function (row, data, index) {
                 $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
             }
+        });
+
+        //this adds the clear functionality to the clear button
+        //based on timing of when the button was added to the dom,
+        //attached the click on the body and passing the button id
+        $("body").on("click", "#clear_search_button", function () {
+            //this gets the datatable and gives access to the apis
+            var table = $("#regionList").DataTable();
+            //this redraws the table and passes no search data 
+            //returning all rows back into the table unless there are any
+            //filter columns set
+            table.search('').draw();
         });
 
         buildMainMenu("Settings");

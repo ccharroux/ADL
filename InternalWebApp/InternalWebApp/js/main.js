@@ -596,3 +596,26 @@ function getSelectedItemClass(selectedItem, item) {
     }
 }
 
+function returnExportColumnHeadingTitle(tableName, data, columnIndex) {
+
+    if ($("#" + tableName + " th").eq(columnIndex).data("export-title") != null
+            &&
+        $("#" + tableName + " th").eq(columnIndex).data("export-title").length > 0)
+    {
+
+        return $("#" + tableName + " th").eq(columnIndex).data("export-title");
+    } else {
+
+        return data;
+    }
+}
+
+function returnTableColumnsByClass(tableName, className) {
+    var arrExportColumn = [];
+
+    $('#' + tableName + ' .' + className).each(function () {
+        arrExportColumn.push($(this).index());
+    });
+
+    return arrExportColumn;
+}
