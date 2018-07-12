@@ -109,6 +109,7 @@
                             on filterable columns  -->
                             <th class="exportColumn">Region</th>
                             <th class="exportColumn filterColumn" data-filter-title="&nbsp;--&nbsp;All Media Types" data-export-title="Media Type">Media Type</th>
+                            <!-- this is the action (edit/delete) column -->
                             <th></th>
                         </tr>
                         </thead>
@@ -244,11 +245,10 @@
                         columns: exportColumns,
                         format: {
                             //can use this functionality to overwrite the column header of search dropdown lists
-                            //current brute force way of doing it. need to figure out a better way of doing this.
                             header: function (data, columnIdx) {
                                 //the call to this function will get the titles to use on the exports.
                                 //you can override the column name by using a custom attribute.
-                                //was built for the filter columns since the return the select html in the data object
+                                //was built for the filter columns since they return the select html in the data object
                                 return returnExportColumnHeadingTitle("regionList", data, columnIdx);
                             }
                         }
@@ -291,16 +291,19 @@
                     }
                 }
                 //,
+                //this button is supposed to handle column visibility
+                //however it isn't working on our site
                 //'colvis'
             ],
             //this is the area to build the filter dropdowns. you can build multiple columns at one time.
-            //build funtion to get columns to build filter
-            //issue is the first option of all text
-            //try to add custom attribute for the all
+            //built funtion to get columns to build filters
+            //add custom attribute for the all
             initComplete: function () {
                 this.api().columns(filterColumns).every(function () {
                     var column = this;
 
+                    //if you made a columnn a filter but don't assign a name, 
+                    //the column will display - undefined
                     var filterTitle = $("#regionList th").eq(column.index()).data("filter-title");
 
                     var select = $('<select><option value="">' + filterTitle + '</option></select>')
@@ -325,6 +328,7 @@
                 $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
             },
             createdRow: function (row, data, index) {
+                //this adds the class to every row
                 $(row).addClass('single-line-height');
             },
             language: {
