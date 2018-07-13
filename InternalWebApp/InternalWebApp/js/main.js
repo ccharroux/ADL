@@ -619,3 +619,15 @@ function returnTableColumnsByClass(tableName, className) {
 
     return arrExportColumn;
 }
+
+function returnProductListLinks(row) {
+    var productList = "";
+
+    productList += row.MRR.trim().length > 0 ? '<a href="#" onclick="editProduct(\'' + row.MRR + '\')">' + row.MRR + '</a>&nbsp;' : '';
+    productList += row.XRY.trim().length > 0 ? '<a href="#" onclick="editProduct(\'' + row.XRY + '\')">' + row.XRY + '</a>&nbsp;' : '';
+    productList += row.MSS.trim().length > 0 ? '<a href="#" onclick="editProduct(\'' + row.MSS + '\')">' + row.MSS + '</a>&nbsp;' : '';
+    productList += row.TVB.trim().length > 0 ? '<a href="#" onclick="editProduct(\'' + row.TVB + '\')">' + row.TVB + '</a>&nbsp;' : '';
+    productList += row.DMA.trim().length > 0 ? '<a href="#" onclick="editProduct(\'' + row.DMA + '\')">' + row.DMA + '</a>&nbsp;' : '';
+
+    return productList;
+}
