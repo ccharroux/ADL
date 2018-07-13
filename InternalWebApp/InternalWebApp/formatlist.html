@@ -41,6 +41,10 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
+    
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
 
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
@@ -81,43 +85,30 @@
                         <input type="button" value="+" class="addNewButton" style="padding-left:25px; padding-right:25px;border-radius:55%!important;min-width:0px!important; font-size:36px;margin-top:-25px;float:right" onclick="newFormat()" />
                     </div>
                 </div>
-
-                <div class="text-center" style="margin-top:20px">
-                    <!-- headings -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="row" style="border-top:solid 1px silver;border-bottom:solid 1px silver;">                              
-                                <div class="col-md-3" style="text-align:left">
-                                    <strong>
-                                        Format Name
-                                    </strong>
-                                </div>
-                                <div class="col-md-8" style="text-align:left">
-                                    <strong>
-                                        Media Type
-                                    </strong>
-                                </div>
-                                <!--<div class="col-md-2">
-                                    <strong>
-                                        Abbreviation
-                                    </strong>
-                                </div>
-                                <div class="col-md-1">
-                                    <strong>
-                                        Active
-                                    </strong>
-                                </div>
-                                <div class="col-md-2">
-                                    <strong>
-                                        Disable Date
-                                    </strong>
-                                </div>-->
-                            </div>
-                            <div id='formatList'>
-                            </div>
-                        </div>
-                    </div>
+                
+                <!-- start datatable coding-->
+                
+                <div class="dataTable-top-margin">
+                    <table id="dtFormatList">
+                        <thead>
+                        <tr>
+                            <th class="exportColumn">Format Name</th>
+                            <th class="exportColumn">Media Type</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tfoot>
+                        <tr>
+                            <th>Format Name</th>
+                            <th>Media Type</th>
+                            <th></th>
+                        </tr>
+                        </tfoot>
+                    </table>
                 </div>
+
+                <!-- end datatable coding-->
+
             </div>
         </div>
     </div>
@@ -140,6 +131,15 @@
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
 
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+
 </body>
 </html>
 <script type="text/html" id="formatRowTemplate">
@@ -159,6 +159,116 @@
 <script>
 
     $(document).ready(function () {
+
+        var reportTitle = "Formats List";
+        var exportColumns = returnTableColumnsByClass("dtFormatList", "exportColumn");
+
+        $("#dtFormatList").DataTable({
+            "dom": "Blfrtip",
+            "data": [],
+            "columns": [
+                {
+                    "data": 'Format Name'
+                },
+                {
+                    mRender: function(data, type, row) {
+                        var mediaTypeID = row["Media Type ID"];
+                        var mediaTypeName = row["Media Type Name"];
+                        return '<a href="#" onclick="editMediaType(' + mediaTypeID + ')">' + mediaTypeName + '</a>';
+                    }
+                },
+                {
+                    mRender: function (data, type, row) {
+                        var formatID = row["Format ID"];
+                        return '<a href="#" onclick="editFormat(' + formatID + ')">Edit</a>&nbsp;<a href="#" onclick="deleteFormat(' + formatID + ')">Delete</a>';
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": "text-align-right"
+                }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [
+               {
+                   extend: 'csv',
+                   //this section sets up the export
+                   //columns will only export the first 2 columns. can be set to visible. in this case, didn't want
+                   //export the edit link
+                   exportOptions: {
+                       //this is where you put the exportColumns variable or whatever list of columns to export
+                       columns: exportColumns,
+                       format: {
+                           //can use this functionality to overwrite the column header of search dropdown lists
+                           header: function (data, columnIdx) {
+                               //the call to this function will get the titles to use on the exports.
+                               //you can override the column name by using a custom attribute.
+                               //was built for the filter columns since they return the select html in the data object
+                               return returnExportColumnHeadingTitle("dtFormatList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'excel',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtFormatList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'pdf',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtFormatList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtFormatList", data, columnIdx);
+                           }
+                       }
+                   }
+               }
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            initComplete: function() {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+
+        $("body").on("click",
+            "#clear_search_button",
+            function() {
+                var table = $("#dtFormatList").DataTable();
+                table.search('').draw();
+            });
+
         buildMainMenu("Settings");
 
         var search = getParameterByName("search");
@@ -195,10 +305,23 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getFormatListSuccess(data, textStatus, jQxhr);
+
+                var tableJson;
+
+                if (data.response.status.toUpperCase() === "SUCCESS") {
+                    data = JSON.stringify(data.report.rows);
+                    tableJson = $.parseJSON(data);
+                } else {
+                    tableJson = data;
+                }
+
+                var table = $("#dtFormatList").DataTable();
+                table.clear().draw();
+                table.rows.add(tableJson).draw();
+                
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errotThrown);
+                genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         }
 
@@ -207,51 +330,9 @@
 
     }
 
-    //ajax getFormatList Success function
-    function getFormatListSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-            });
-        }
-        else {
-            $("#formatList").html("");
-            $.each(data.report.rows, function (index) {
-                var obj = data.report.rows[index];
-
-                //appending html script template
-                appendTemplate(obj);
-            });
-        }
-    }
-
     //ajax error function
     function genericAjaxError(jqXhr, textStatus, errorThrown) {
         bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
-    }
-
-    //finding and loading the html template
-    function loadTemplate() {
-        var formatTemplate = $($("#formatRowTemplate").html());
-        return formatTemplate;
-    }
-
-    function appendTemplate(data) {
-        //loading the html template
-        var formatTemplate = loadTemplate();
-
-        //using .find to locate the areas you want the data to go and using .text to set the values
-        formatTemplate.find(".tempFormatMediaType").text(data["Media Type Name"]);
-        formatTemplate.find(".tempFormatMediaType").attr("onClick", "editMediaType(" + data["Media Type ID"] + ")");
-        formatTemplate.find(".tempFormatName").text(data["Format Name"]);
-        //formatTemplate.find(".tempFormatAbbreviation").text(data["Abbreviation"]);
-        //formatTemplate.find(".tempFormatActive").text(data["Active"]);
-        //formatTemplate.find(".tempFormatDisableDate").text(data["Disable Date"]);
-
-        //adding the id as a custom attribute to use on click of edit button
-        formatTemplate.find(".tempEditFormat").attr("onClick", "editFormat(" +  data["Format ID"] + ")");
-     
-        //appending whole template to html
-        $("#formatList").append(formatTemplate);
     }
 
     function editFormat(formatId) {
@@ -261,6 +342,20 @@
     //redirecting to page to create new format
     function newFormat() {
         window.location = "format.html?formatId=0";
+    }
+
+    function deleteFormat(formatId) {
+
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+
+    }
+
+    function editMediaType(mediaTypeId) {
+
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+
     }
 
 </script>
