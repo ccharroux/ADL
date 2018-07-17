@@ -36,6 +36,10 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
+    
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
 
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
@@ -49,57 +53,52 @@
 </head>
 <body>
     <div id="fh5co-page">
-        <header id="fh5co-header" role="banner" style="background-color:#34587a">
+        <header id="fh5co-header" role="banner">
             <div class="container">
                 <div class="header-inner" id="menu">
                 </div>
             </div>
         </header>
-        <div id="fh5co-contact-section" style="padding-top:50px!important">
+        <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
                         <h2>Revenue Category</h2>
                     </div>
                 </div>
-                <div class="row" style="margin-top:-25px!important">
+                <div class="row search-section" >
                     <div class="col-md-10 ">
                         <label for="search">Revenue Category Name: </label>
                         <input type="text" id="searchRevCategory" />
-                        <input type="button" style="margin-left:10px;" value="Search" onclick="getRevCategoryList()" />
+                        <input type="button" class="search-button" value="Search" onclick="getRevCategoryList()" />
                     </div>
                     <div class="col-md-2 ">
-                        <input type="button" value="+" class="addNewButton" style="padding-left:25px; padding-right:25px;border-radius:55%!important;min-width:0px!important; font-size:36px;margin-top:-25px;float:right" onclick="newRevCategory()" />
+                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="newRevCategory()" />
                     </div>
                 </div>
 
-                <div class="text-center" style="margin-top:20px">
-                    <!-- headings -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="row" style="border-top:solid 1px silver;border-bottom:solid 1px silver;">
-                                <div class="col-md-1" style="text-align:left">
-                                    <strong>
-                                        ID
-                                    </strong>
-                                </div>
-
-                                <div class="col-md-3" style="text-align:left">
-                                    <strong>
-                                        Revenue Category Name
-                                    </strong>
-                                </div>
-                                <div class="col-md-6" style="text-align:left">
-                                    <strong>
-                                        Category Type
-                                    </strong>
-                                </div>
-                            </div>
-                            <div id='revCategoryList'>
-                            </div>
-                        </div>
-                    </div>
+                <!-- start datatable-->
+                <div class="dataTable-top-margin">
+                    <table id="dtRevCategoryList"  class="stripe">
+                        <thead>
+                        <tr>
+                            <th class="exportColumn">ID</th>
+                            <th class="exportColumn">Revenue Category Name</th>
+                            <th class="exportColumn">Category Type</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tfoot>
+                        <tr>
+                            <th>ID</th>
+                            <th>Revenue Category Name</th>
+                            <th>Category Type</th>
+                            <th></th>
+                        </tr>
+                        </tfoot>
+                    </table>
                 </div>
+                <!-- end datatable -->
             </div>
         </div>
     </div>
@@ -120,24 +119,122 @@
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
 
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+
 </body>
 </html>
-<script type="text/html" id="revCategoryRowTemplate">
-    <div class="row">
-        <div class="col-md-1 tempRevCategoryId" style="text-align:left">
-        </div>
-        <div class="col-md-3 tempRevCategoryName" style="text-align:left;">
-        </div>
-        <div class="col-md-6 tempRevCategoryType" style="text-align:left;">
-        </div>
-        <div class="col-md-2" style="text-align:center;">
-            <a href="#" class="tempEditRevCategory">Edit</a>&nbsp;<a>Delete</a>
-        </div>
-    </div>
-</script>
+
 <script>
 
     $(document).ready(function () {
+
+        var reportTitle = 'Revenue Category List';
+        var exportColumns = returnTableColumnsByClass("dtRevCategoryList", "exportColumn");
+
+        $("#dtRevCategoryList").DataTable({
+            "dom": "Blfrtip",
+            "data": [],
+            "columns": [
+                { "data": 'Revenue ID' },
+                { "data": 'Revenue Category Name' },
+                { "data": 'Category Type' },
+                {
+                    mRender: function(data, type, row) {
+                        //var formatID = row["Format ID"];
+                        //editRevCategory(revCategoryId, revCategoryName, revCategoryType)
+
+                        var editCategoryParams = "'" + row["Revenue ID"] + "','" + row["Revenue Category Name"] + "','" + row["Category Type"] + "'";
+
+                        return '<a href="#" onclick="editRevCategory(' + editCategoryParams + ')">Edit</a>&nbsp;<a href="#" onclick="deleteRevCategory(' + editCategoryParams + ')">Delete</a>';
+
+
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": "text-align-right"
+                }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [
+               {
+                   extend: 'csv',
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtRevCategoryList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'excel',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtRevCategoryList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'pdf',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtRevCategoryList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtRevCategoryList", data, columnIdx);
+                           }
+                       }
+                   }
+               }
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            initComplete: function () {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+
+        $("body").on("click",
+            "#clear_search_button",
+            function () {
+                var table = $("#dtRevCategoryList").DataTable();
+                table.search('').draw();
+            });
+
         buildMainMenu("Settings");
         var search = getParameterByName("search");
 
@@ -189,12 +286,22 @@
             bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
             });
         } else {
-            $("#revCategoryList").html("");
-            $.each(data.report.rows, function (index) {
-                var obj = data.report.rows[index];
-                //appending html script template
-                appendTemplate(obj);
-            });
+
+            var tableJson;
+
+            if (data.response.status.toUpperCase() === "SUCCESS") {
+                data = JSON.stringify(data.report.rows);
+                tableJson = $.parseJSON(data);
+            } else {
+                bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                });
+
+                tableJson = data;
+            }
+
+            var table = $("#dtRevCategoryList").DataTable();
+            table.clear().draw();
+            table.rows.add(tableJson).draw();
         }
     }
 
@@ -203,30 +310,13 @@
         bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
     }
 
-    //finding and loading the html template
-    function loadTemplate() {
-        var revCategoryTemplate = $($("#revCategoryRowTemplate").html());
-        return revCategoryTemplate;
-    }
-
-    function appendTemplate(data) {
-        //loading the html template
-        var revCategoryTemplate = loadTemplate();
-
-        //using .find to locate the areas you want the data to go and using .text to set the values
-        revCategoryTemplate.find(".tempRevCategoryId").text(data["Revenue ID"]);
-        revCategoryTemplate.find(".tempRevCategoryName").text(data["Revenue Category Name"]);
-        revCategoryTemplate.find(".tempRevCategoryType").text(data["Category Type"]);
-
-        //adding the id as an onclick attribure to use on edit button
-        revCategoryTemplate.find(".tempEditRevCategory").attr("onClick", "editRevCategory(" + "'" + data["Revenue ID"] + "'" + ",'" + data["Revenue Category Name"] + "','" + data["Category Type"] + "')");
-
-        //appending whole template to html
-        $("#revCategoryList").append(revCategoryTemplate);
-    }
-
     function editRevCategory(revCategoryId, revCategoryName, revCategoryType) {
         window.location = "revenuecategories.html?revCategoryId=" + revCategoryId.trim() + "&revCategoryName=" + revCategoryName.trim() + "&revCategoryType=" + revCategoryType.trim();
+    }
+
+    function deleteRevCategory(revCategoryId, revCategoryName, revCategoryType) {
+        bootbox.alert('This functionality is still under development.', function () {
+        });
     }
 
     function newRevCategory() {
