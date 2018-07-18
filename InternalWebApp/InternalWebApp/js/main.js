@@ -631,3 +631,26 @@ function returnProductListLinks(row) {
 
     return productList;
 }
+
+function populateDataTable(tableName, data) {
+    var tableJson;
+
+    if (data.response.status.toUpperCase() === "SUCCESS") {
+        data = JSON.stringify(data.report.rows);
+        tableJson = $.parseJSON(data);
+    } else {
+        bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+        });
+
+        tableJson = data;
+    }
+
+    var table = $("#" + tableName).DataTable();
+    table.clear().draw();
+    table.rows.add(tableJson).draw();
+}
+
+//ajax error function
+function genericAjaxError(jqXhr, textStatus, errorThrown) {
+    bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
+}
