@@ -54,6 +54,19 @@
             height: 33px;
             margin-bottom: 3px;
         }
+
+        .marketLabel {
+            width: 66.5%;
+            background-color: #9aadbf;
+            padding-bottom: 10px;
+            margin: 0 auto;
+            font-size: 16px;
+            border-radius: 4px;
+            padding-top: 10px;
+            text-align: center !important;
+            margin-bottom: 40px;
+            color:white;
+        }
     </style>
 </head>
 <body>
@@ -73,6 +86,26 @@
                 </div>
             </div>
             <div class="text-center" style="margin-top:00px">
+                <!--Market Label-->
+                <div class="marketLabel hidden">
+                    <div class="row">
+                        <div class="col-md-12 font16" style="text-align:center;">
+                            <span id="lblMarketName"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 font16" style="text-align:center; ">
+                            <span id="lblMarketId"></span>
+                        </div>
+
+                        <div class="col-md-6 font16" style="text-align:center; ">
+                            <span id="lblMediaType"></span>
+                        </div>
+                    </div>
+
+                </div>
+
                 <input type="hidden" id="txtMarketId" />
 
                 <!--Reporting Period-->
@@ -226,18 +259,8 @@
         parentMarketId = (getParameterByName("ParentMarketId") == null ? 0 : getParameterByName("ParentMarketId"));
         productId = (getParameterByName("ProductId") == null ? 0 : getParameterByName("ProductId"));
 
-        getReportingPeriods();
-
-        var dateObj = new Date();
-        var month = dateObj.getUTCMonth() + 1; //months from 1-12
-        var day = dateObj.getUTCDate();
-        var year = dateObj.getUTCFullYear();
-
-        var newDate = year + "-" + month + "-" + day;
-
-        console.log(newDate);
-
-
+       
+        getMarket();
         //flow of load data
         //getReportingPeriods()
         //getAssociatedMarkets()
@@ -557,6 +580,57 @@
         }
 
     }
+
+    function getMarket() {
+        if (marketId <= 0) {
+            return;
+        }
+
+        var url = ServicePrefix + '/api/Market/GetMarket';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketID": marketId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown)
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function getMarketSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
+            });
+        } else {
+
+            $.each(data.report.rows, function (index) {
+
+                var obj = data.report.rows[index];
+
+                $("#lblMarketName").text("Market Name: " + obj.marketName);
+                $("#lblMarketId").text("Market ID: " + obj.marketId);
+                $("#lblMediaType").text("Media Type: " + obj.mediaTypeName);
+            });
+
+            $(".marketLabel").removeClass("hidden");
+            getReportingPeriods();
+        }
+    }
+
+
+
 
 
     function hideShowMarketHoldDate() {
