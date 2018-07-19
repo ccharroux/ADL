@@ -90,10 +90,10 @@
 
                 <!-- new datatable start -->
                 <div class="dataTable-top-margin">
-                    <table id="dtOwnerList" class="stripe">
+                    <table id="dtOwnershipList" class="stripe">
                         <thead>
                             <tr>
-                                <th class="exportColumn">Ownership</th>
+                                <th class="exportColumn">Ownership Name</th>
                                 <th class="exportColumn">Media Type</th>
                                 <th class="exportColumn">Parent Owner</th>
                                 <th class="exportColumn">Products</th>
@@ -102,7 +102,7 @@
                         </thead>
                         <tfoot>
                             <tr>
-                                <th>Ownership</th>
+                                <th>Ownership Name</th>
                                 <th>Media Type</th>
                                 <th>Parent Owner</th>
                                 <th>Products</th>
@@ -150,11 +150,11 @@
 
     $(document).ready(function () {
 
-        var reportTitle = "Ownership List";
-        var exportColumns = returnTableColumnsByClass("dtOwnerList", "exportColumn");
-        //var filterColumns = returnTableColumnsByClass("dtOwnerList", "filterColumn");
+        var reportTitle = "Ownerships List";
+        var exportColumns = returnTableColumnsByClass("dtOwnershipList", "exportColumn");
+        //var filterColumns = returnTableColumnsByClass("dtOwnershipList", "filterColumn");
 
-        $("#dtOwnerList").DataTable({
+        $("#dtOwnershipList").DataTable({
             "dom": "Blfrtip",
             "data": [],
             "columns": [
@@ -199,7 +199,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtOwnershipList", data, columnIdx);
                            }
                        }
                    }
@@ -211,7 +211,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtOwnershipList", data, columnIdx);
                            }
                        }
                    }
@@ -223,7 +223,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtOwnershipList", data, columnIdx);
                            }
                        }
                    }
@@ -235,7 +235,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtOwnershipList", data, columnIdx);
                            }
                        }
                    }
@@ -250,7 +250,7 @@
                 //this.api().columns(filterColumns).every(function () {
                 //    var column = this;
 
-                //    var filterTitle = $("#dtOwnerList th").eq(column.index()).data("filter-title");
+                //    var filterTitle = $("#dtOwnershipList th").eq(column.index()).data("filter-title");
 
                 //    var select = $('<select><option value="">' + filterTitle + '</option></select>')
                 //        .appendTo($(column.header()).empty())
@@ -285,7 +285,7 @@
         $("body").on("click",
             "#clear_search_button",
             function () {
-                var table = $("#dtOwnerList").DataTable();
+                var table = $("#dtOwnershipList").DataTable();
                 table.search('').draw();
             });
 
@@ -329,37 +329,10 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-                    });
-                }
-                else {
-
-                    var tableJson;
-
-                    if (data.response.status.toUpperCase() === "SUCCESS") {
-                        data = JSON.stringify(data.report.rows);
-                        tableJson = $.parseJSON(data);
-                    } else {
-                        bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                        });
-
-                        tableJson = data;
-                    }
-
-                    var table = $("#dtOwnerList").DataTable();
-                    table.clear().draw();
-                    table.rows.add(tableJson).draw();
-
-                }
-
+                populateDataTable("dtOwnershipList", data);
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    //window.location = "preprocess.html";
-                });
+                genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
 

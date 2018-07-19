@@ -440,36 +440,11 @@
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
-                if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-                    });
-                }
-                else {
-
-                    var tableJson;
-
-                    if (data.response.status.toUpperCase() === "SUCCESS") {
-                        data = JSON.stringify(data.report.rows);
-                        tableJson = $.parseJSON(data);
-                    } else {
-                        bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                        });
-
-                        tableJson = data;
-                    }
-
-                    var table = $("#dtStationList").DataTable();
-                    table.clear().draw();
-                    table.rows.add(tableJson).draw();
-
-                }
+                populateDataTable("dtStationList", data);
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    //window.location = "preprocess.html";
-                });
+                genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
 

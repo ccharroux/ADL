@@ -1,4 +1,5 @@
-﻿<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+﻿<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]><!-->
@@ -50,11 +51,11 @@
 
     <!-- FOR IE9 below -->
     <!--[if lt IE 9]>
-    <script src="js/respond.min.js"></script>
+        <script src="js/respond.min.js"></script>
     <![endif]-->
-
 </head>
 <body>
+
     <div id="fh5co-page">
         <header id="fh5co-header" role="banner">
             <div class="container">
@@ -65,44 +66,38 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Positions</h2>
-                    </div>
-                </div>
-                <div class="row search-section">
-                    <div class="col-md-10 ">
-                        <label for="search">Position Title: </label>
-                        <input type="text" id="searchPosition" />
-                        <input type="button" class="search-button" value="Search" onclick="getPositionList()" />
-                    </div>
-                    <div class="col-md-2 ">
-                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="newPosition()" />
+                        <h2>Sub Industries</h2>
                     </div>
                 </div>
 
-                <!-- start datatable-->
+                <!-- search / filter area -->
+                <div class="row search-section">
+                    <div class="col-md-12">
+                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editSubIndustry(0,0)" /> <!-- consider using -1 for new sub industry since 0 exists in database -->
+                    </div>
+                </div>
 
                 <div class="dataTable-top-margin">
-                    <table id="dtPostionList" class="stripe">
+                    <table id="dtSubIndustryList" class="stripe">
                         <thead>
                         <tr>
-                            <th>Position Code</th>
-                            <th class="exportColumn">Position Title</th>
+                            <th class="exportColumn">Sub Industry Name</th>
+                            <th class="exportColumn">Industry Name</th>
                             <th></th>
                         </tr>
                         </thead>
                         <tfoot>
                         <tr>
-                            <th>Position Code</th>
-                            <th>Position Title</th>
+                            <th>Sub Industry Name</th>
+                            <th>Industry Name</th>
                             <th></th>
                         </tr>
                         </tfoot>
                     </table>
                 </div>
-
-                <!-- end datatable-->
             </div>
         </div>
+
     </div>
 
     <!-- jQuery -->
@@ -131,74 +126,117 @@
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
 
-
 </body>
 </html>
-
-
 <script>
-
     $(document).ready(function () {
 
-        var reportTitle = 'Position List';
-        var exportColumns = returnTableColumnsByClass("dtPostionList", "exportColumn");
+        var reportTitle = 'Sub Industries List';
+        var exportColumns = returnTableColumnsByClass("dtSubIndustryList", "exportColumn");
+        var dataTableURL = ServicePrefix + '/api/SubIndustry/GetSubIndustryList';
 
-        $("#dtPostionList").DataTable({
+        $("#dtSubIndustryList").DataTable({
             "dom": "Blfrtip",
-            "data": [],
+            "ajax": {
+                "url": dataTableURL,
+                "dataType": "json",
+                "contentType": "application/json",
+                "type": "POST",
+                "data": function (d) {
+                    return JSON.stringify({
+                        "inApiToken": getLocalStorage("APIToken"),
+                        "inShowDisabled": false
+                    });
+                },
+                "dataSrc": function (json) {
+                    if (json.response.status.toUpperCase() === "SUCCESS") {
+
+                        json = JSON.stringify(json.report.rows);
+                        json = $.parseJSON(json);
+                        return json;
+
+                    }
+                    else {
+                        bootbox.alert('Process Failed.\n\r\n\r' + json.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                        });
+
+                        return json;
+                    }
+                }
+            },
             "columns": [
-                {"data": 'Position Code'},
-                { "data": 'Position Title' },
+                { "data": 'subIndustryName' },
+                {
+                    //"data": 'industryName' 
+                    mRender: function(data, type, row) {
+                        return '<a href="#" onclick="editIndustry(' + row.industryId + ')">' + row.industryName + '</a>';
+                    }
+                },
                 {
                     mRender: function (data, type, row) {
-                        
-                        return '<a href="#" onclick="editPosition(' + row['Position Code'] + ')">Edit</a>&nbsp;<a href="#" onclick="deletePosition(' + row['Position Code'] + ')">Delete</a>';
 
+                        var editParams = "";
+                        editParams +=  row.industryId + "," + row.subIndustryId;
+
+                        return '<a href="#" onclick="editSubIndustry(' + editParams + ')">Edit</a>&nbsp;<a href="#" onclick="deleteSubIndustry(' + editParams + ')">Delete</a>';
                     },
                     "orderable": false,
                     "searchable": false,
                     "className": "text-align-right"
                 }
             ],
-            "columnDefs": [
-                {
-                    "targets": [0],
-                    "visible": false,
-                    "searchable": false,
-                    "orderData": 0
-                }
-            ],
-            //setup the paging navigation buttons
             "pagingType": "full_numbers",
             "buttons": [
                 {
                     extend: 'csv',
                     exportOptions: {
-                        columns: exportColumns
+                        columns: exportColumns,
+                        format: {
+                            header: function (data, columnIdx) {
+                                return returnExportColumnHeadingTitle("dtSubIndustryList", data, columnIdx);
+                            }
+                        }
                     }
                 },
                 {
                     extend: 'excel',
                     title: reportTitle,
                     exportOptions: {
-                        columns: exportColumns
+                        columns: exportColumns,
+                        format: {
+                            header: function (data, columnIdx) {
+                                return returnExportColumnHeadingTitle("dtSubIndustryList", data, columnIdx);
+                            }
+                        }
                     }
                 },
                 {
                     extend: 'pdf',
                     title: reportTitle,
                     exportOptions: {
-                        columns: exportColumns
+                        columns: exportColumns,
+                        format: {
+                            header: function (data, columnIdx) {
+                                return returnExportColumnHeadingTitle("dtSubIndustryList", data, columnIdx);
+                            }
+                        }
                     }
                 },
                 {
                     extend: 'print',
                     title: reportTitle,
                     exportOptions: {
-                        columns: exportColumns
+                        columns: exportColumns,
+                        format: {
+                            header: function (data, columnIdx) {
+                                return returnExportColumnHeadingTitle("dtSubIndustryList", data, columnIdx);
+                            }
+                        }
                     }
                 }
                 //,
+                //this button is supposed to handle column visibility
+                //however it isn't working on our site
                 //'colvis'
             ],
             initComplete: function () {
@@ -208,78 +246,33 @@
                 $(row).addClass('single-line-height');
             },
             language: {
-                //this changes search box label from Search: to Filter Results:
                 search: "Filter Results:"
             }
         });
 
         $("body").on("click",
             "#clear_search_button",
-            function() {
-                var table = $("#dtPostionList").DataTable();
+            function () {
+                var table = $("#dtSubIndustryList").DataTable();
                 table.search('').draw();
             });
 
-        buildMainMenu("Settings");
-        var search = getParameterByName("search");
-
-        if (!search == false) {
-            if (search.length > 0) {
-                $("#searchPosition").val(search);
-                getPositionList();
-            }
-        }
-
+        buildXRYMenu("Utility");
+        setLocalStorage("searchPage", window.location);
     });
 
-    function getPositionList() {
-        if ($("#searchPosition").val().trim() == 0) {
-            bootbox.alert("Please enter text to search for Position(s)", function () {
-            });
-
-            return;
-        }
-
-        setLocalStorage("search", $("#searchPosition").val().trim());
-        setLocalStorage("searchPage", window.location);
-
-        //filling out url for ajax call
-        var url = ServicePrefix + '/api/Position/GetPositionList';
-
-        //filling out settings for ajax call
-        var settings = {
-            dataType: 'json',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inPositionTitle": $("#searchPosition").val().trim()
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                populateDataTable("dtPostionList", data);
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        }
-
-        //ajax call
-        $.ajax(url, settings);
-
-    }
-    
-    function editPosition(positionId) {
-        window.location = "position.html?positionID=" + positionId;
-    }
-
-    function deletePosition(positionId) {
+    function editSubIndustry(industryId, subIndustryId) {
         bootbox.alert('This functionality is still under development.', function () {
         });
     }
 
-    function newPosition() {
-        window.location = "position.html";
+    function deleteSubIndustry(industryId, subIndustryId) {
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+    }
+
+    function editIndustry(industryId) {
+        bootbox.alert('This functionality is still under development.', function () {
+        });
     }
 </script>
-

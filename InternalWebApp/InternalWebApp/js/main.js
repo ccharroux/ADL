@@ -448,7 +448,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Ownerships") + ' href="ownershiplist.html" role="button" aria-expanded="false">Ownerships <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="ownershipgrouplist.html">Ownership Groups</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="">Parent Ownership</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="parentownershiplist.html">Parent Ownership</a></li>';
     menuItems += '              </ul>';  
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="dashboard.html">Virtual Groups</a></li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Settings") + ' role="button" aria-expanded="false">Settings <span style="margin-right:10px;" class="caret"></span></a>';
@@ -496,8 +496,8 @@ function buildXRYMenu(selectedItem) {
     menuItems += '        </li>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="">Industry</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="">Sub Industry</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="industrylist.html">Industry</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="subindustrylist.html">Sub Industry</a></li>';
     menuItems += '                  <li style="display:block;"><a href="">Nielson Market</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
@@ -630,4 +630,27 @@ function returnProductListLinks(row) {
     productList += row.DMA.trim().length > 0 ? '<a href="#" onclick="editProduct(\'' + row.DMA.toUpperCase() + '\')">' + row.DMA.toUpperCase() + '</a>&nbsp;' : '';
 
     return productList;
+}
+
+function populateDataTable(tableName, data) {
+    var tableJson;
+
+    if (data.response.status.toUpperCase() === "SUCCESS") {
+        data = JSON.stringify(data.report.rows);
+        tableJson = $.parseJSON(data);
+    } else {
+        bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+        });
+
+        tableJson = data;
+    }
+
+    var table = $("#" + tableName).DataTable();
+    table.clear().draw();
+    table.rows.add(tableJson).draw();
+}
+
+//ajax error function
+function genericAjaxError(jqXhr, textStatus, errorThrown) {
+    bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
 }

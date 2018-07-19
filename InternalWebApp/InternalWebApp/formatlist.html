@@ -177,18 +177,10 @@
             "buttons": [
                {
                    extend: 'csv',
-                   //this section sets up the export
-                   //columns will only export the first 2 columns. can be set to visible. in this case, didn't want
-                   //export the edit link
                    exportOptions: {
-                       //this is where you put the exportColumns variable or whatever list of columns to export
                        columns: exportColumns,
                        format: {
-                           //can use this functionality to overwrite the column header of search dropdown lists
                            header: function (data, columnIdx) {
-                               //the call to this function will get the titles to use on the exports.
-                               //you can override the column name by using a custom attribute.
-                               //was built for the filter columns since they return the select html in the data object
                                return returnExportColumnHeadingTitle("dtFormatList", data, columnIdx);
                            }
                        }
@@ -291,23 +283,8 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                var tableJson;
-
-                if (data.response.status.toUpperCase() === "SUCCESS") {
-                    data = JSON.stringify(data.report.rows);
-                    tableJson = $.parseJSON(data);
-                } else {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    });
-
-                    tableJson = data;
-                }
-
-                var table = $("#dtFormatList").DataTable();
-                table.clear().draw();
-                table.rows.add(tableJson).draw();
-                
+                //populateTable(data);
+                populateDataTable("dtFormatList", data);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -317,11 +294,6 @@
         //ajax call
         $.ajax(url, settings);
 
-    }
-
-    //ajax error function
-    function genericAjaxError(jqXhr, textStatus, errorThrown) {
-        bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
     }
 
     function editFormat(formatId) {
