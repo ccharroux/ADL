@@ -493,6 +493,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Agency") + ' href="" role="button" aria-expanded="false">Agency <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="">Station Agency</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="parentagencylist.html">Parent Agency</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';

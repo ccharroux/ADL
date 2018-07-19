@@ -68,39 +68,37 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Parent Advertisers</h2>
+                        <h2>Parent Agencies</h2>
                     </div>
                 </div>
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-10 ">
-                        <label for="search">Parent Advertiser Name</label>
+                        <label for="searchFormat">Parent Agency Name</label>
                         <input type="text" id="searchFormat" />
                         <!--<label for="ddlMediaType" style="padding-left:10px">Media Type</label>
                         <select id="ddlMediaType">
                         </select>-->
-                        <input type="button" class="search-button" value="Search" onclick="getParentAdvertiserList()" />
+                        <input type="button" class="search-button" value="Search" onclick="getParentAgencyList()" />
                     </div>
                     <div class="col-md-2 ">
-                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editParentAdvertiser(0)" />
+                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editParentAgency(0)" />
                     </div>
                 </div>
 
                 <!-- start datatable coding-->
 
                 <div class="dataTable-top-margin">
-                    <table id="dtParentAdvertiserList" class="stripe">
+                    <table id="dtParentAgencyList" class="stripe">
                         <thead>
                             <tr>
-                                <th class="exportColumn">Parent Advertiser Name</th>
-                                <th class="exportColumn">Industry</th>
+                                <th class="exportColumn">Parent Agency Name</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <th>Parent Advertiser Name</th>
-                                <th>Industry</th>
+                                <th>Parent Agency Name</th>
                                 <th></th>
                             </tr>
                         </tfoot>
@@ -146,26 +144,19 @@
 
     $(document).ready(function () {
 
-        var reportTitle = "Parent Advertisers List";
-        var exportColumns = returnTableColumnsByClass("dtParentAdvertiserList", "exportColumn");
+        var reportTitle = "Parent Agencies List";
+        var exportColumns = returnTableColumnsByClass("dtParentAgencyList", "exportColumn");
 
-        $("#dtParentAdvertiserList").DataTable({
+        $("#dtParentAgencyList").DataTable({
             "dom": "Blfrtip",
             "data": [],
             "columns": [
                 {
-                    "data": 'parentAdvertiserName'
-                },
-                {
-                    mRender: function(data, type, row) {
-                        
-                        var industryShortDescription = row["IN_ShortDescription"];
-                        return '<a href="#" onclick="editIndustry(' + row.industryID + ')">' + industryShortDescription + '</a>';
-                    }
+                    "data": 'parentAgencyName'
                 },
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="#" onclick="editParentAdvertiser(' + row.parentAdvertiserId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteParentAdvertiser(' + row.parentAdvertiserId + ')">Delete</a>';
+                        return '<a href="#" onclick="editParentAgency(' + row.parentAgencyId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteParentAgency(' + row.parentAgencyId + ')">Delete</a>';
                     },
                     "orderable": false,
                     "searchable": false,
@@ -180,7 +171,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtParentAdvertiserList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtParentAgencyList", data, columnIdx);
                            }
                        }
                    }
@@ -192,7 +183,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtParentAdvertiserList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtParentAgencyList", data, columnIdx);
                            }
                        }
                    }
@@ -204,7 +195,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtParentAdvertiserList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtParentAgencyList", data, columnIdx);
                            }
                        }
                    }
@@ -216,7 +207,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtParentAdvertiserList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtParentAgencyList", data, columnIdx);
                            }
                        }
                    }
@@ -242,11 +233,11 @@
         $("body").on("click",
             "#clear_search_button",
             function() {
-                var table = $("#dtParentAdvertiserList").DataTable();
+                var table = $("#dtParentAgencyList").DataTable();
                 table.search('').draw();
             });
 
-        buildXRYMenu("Advertiser");
+        buildXRYMenu("Agency");
         setLocalStorage("searchPage", window.location);
 
         //buildMainMenu("Settings");
@@ -256,14 +247,14 @@
         if (!search == false) {
             if (search.length > 0) {
                 $("#searchFormat").val(search);
-                getParentAdvertiserList();
+                getParentAgencyList();
             }
         }
     });
 
-    function getParentAdvertiserList() {
+    function getParentAgencyList() {
         if ($("#searchFormat").val().trim() == 0) {
-            bootbox.alert("Please enter text to search for Parent Advertisers(s)", function () {
+            bootbox.alert("Please enter text to search for Parent Agencies(s)", function () {
             });
             return;
         }
@@ -272,7 +263,7 @@
         setLocalStorage("searchPage", window.location);
 
         //filling out url for ajax
-        var url = ServicePrefix + '/api/ParentAdvertiser/GetParentAdvertiserList';
+        var url = ServicePrefix + '/api/ParentAgency/GetParentAgencyList';
 
         //filling out settings for ajax call
         var settings = {
@@ -281,13 +272,13 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inParentAdvertiserName": $("#searchFormat").val().trim(),
+                "inParentAgencyName": $("#searchFormat").val().trim(),
                 "inShowDisabled": false
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 //populateTable(data);
-                populateDataTable("dtParentAdvertiserList", data);
+                populateDataTable("dtParentAgencyList", data);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -299,17 +290,12 @@
 
     }
 
-    function editParentAdvertiser(parentAdvertiserId) {
+    function editParentAgency(parentAgencyId) {
         bootbox.alert('This functionality is still under development.', function () {
         });
     }
 
-    function deleteParentAdvertiser(parentAdvertiserId) {
-        bootbox.alert('This functionality is still under development.', function () {
-        });
-    }
-
-    function editIndustry(industryId) {
+    function deleteParentAgency(parentAgencyId) {
         bootbox.alert('This functionality is still under development.', function () {
         });
     }
