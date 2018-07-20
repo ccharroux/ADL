@@ -68,36 +68,41 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Parent Agencies</h2>
+                        <h2>Agencies</h2>
                     </div>
                 </div>
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-10 ">
-                        <label for="searchFormat">Parent Agency Name</label>
+                        <label for="ddlMarket" class="dropdown-label">Market</label>
+                        <select id="ddlMarket" class="dropdown-select"></select>
+
+                        <label for="searchFormat">Agency Name</label>
                         <input type="text" id="searchFormat" />
                         <!--<label for="ddlMediaType" style="padding-left:10px">Media Type</label>
                         <select id="ddlMediaType">
                         </select>-->
-                        <input type="button" class="search-button" value="Search" onclick="getParentAgencyList()" />
+                        <input type="button" class="search-button" value="Search" onclick="getAgencyList()" />
                     </div>
                     <div class="col-md-2 ">
-                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editParentAgency(0)" />
+                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editAgency(0)" />
                     </div>
                 </div>
 
                 <!-- start datatable coding-->
 
                 <div class="dataTable-top-margin">
-                    <table id="dtParentAgencyList" class="stripe">
+                    <table id="dtAgencyList" class="stripe">
                         <thead>
                             <tr>
+                                <th class="exportColumn">Agency Name</th>
                                 <th class="exportColumn">Parent Agency Name</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
+                                <th>Agency Name</th>
                                 <th>Parent Agency Name</th>
                                 <th></th>
                             </tr>
@@ -144,19 +149,26 @@
 
     $(document).ready(function () {
 
-        var reportTitle = "Parent Agencies List";
-        var exportColumns = returnTableColumnsByClass("dtParentAgencyList", "exportColumn");
+        var reportTitle = "Agencies List";
+        var exportColumns = returnTableColumnsByClass("dtAgencyList", "exportColumn");
 
-        $("#dtParentAgencyList").DataTable({
+        $("#dtAgencyList").DataTable({
             "dom": "Blfrtip",
             "data": [],
             "columns": [
+                { "data": 'agencyName' },
                 {
-                    "data": 'parentAgencyName'
+                    mRender: function (data, type, row) {
+                        if (row.parentAgencyId === 0) {
+                            return '';
+                        } else {
+                            return '<a href="#" onclick="editParentAgency(' + row.parentAgencyId + ')">' + row.parentAgencyName + '</a>';
+                        }
+                    }
                 },
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="#" onclick="editParentAgency(' + row.parentAgencyId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteParentAgency(' + row.parentAgencyId + ')">Delete</a>';
+                        return '<a href="#" onclick="editAgency(' + row.parentAgencyId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteAgency(' + row.parentAgencyId + ')">Delete</a>';
                     },
                     "orderable": false,
                     "searchable": false,
@@ -171,7 +183,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtParentAgencyList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtAgencyList", data, columnIdx);
                            }
                        }
                    }
@@ -183,7 +195,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtParentAgencyList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtAgencyList", data, columnIdx);
                            }
                        }
                    }
@@ -195,7 +207,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtParentAgencyList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtAgencyList", data, columnIdx);
                            }
                        }
                    }
@@ -207,7 +219,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtParentAgencyList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtAgencyList", data, columnIdx);
                            }
                        }
                    }
@@ -217,7 +229,7 @@
                //however it isn't working on our site
                //'colvis'
             ],
-            initComplete: function() {
+            initComplete: function () {
                 $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
             },
             createdRow: function (row, data, index) {
@@ -232,39 +244,110 @@
 
         $("body").on("click",
             "#clear_search_button",
-            function() {
-                var table = $("#dtParentAgencyList").DataTable();
+            function () {
+                var table = $("#dtAgencyList").DataTable();
                 table.search('').draw();
             });
 
         buildXRYMenu("Agency");
-        setLocalStorage("searchPage", window.location);
+        getMarketList();
+        //setLocalStorage("searchPage", window.location);
 
-        //buildMainMenu("Settings");
+        //var search = getParameterByName("search");
 
+        //if (!search == false) {
+        //    if (search.length > 0) {
+        //        $("#searchFormat").val(search);
+        //        getParentAgencyList();
+        //    }
+        //}
+    });
+
+    function getMarketList() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketListByProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": 'XRY',
+                "inActiveOnly ": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
+                    });
+                }
+                else {
+
+                    var str = '';
+                    //console.log(JSON.stringify(data));
+                    str = '<option value="">-- Select a Market</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
+
+                    });
+
+                    $("#ddlMarket").html(str);
+
+                    loadLastSearch();
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+
+    function loadLastSearch() {
         var search = getParameterByName("search");
         //var search = getLocalStorage("search");
 
         if (!search == false) {
             if (search.length > 0) {
-                $("#searchFormat").val(search);
-                getParentAgencyList();
+                console.log('search');
+                console.log(search);
+                console.log('search');
+
+                var sArray = new Array();
+                sArray = search.split("|");
+                console.log(sArray.length);
+                console.log(sArray[1]);
+
+                $("#searchFormat").val(sArray[0]);
+                $("#ddlMarket").val(sArray[1].toString());
+
+                getAgencyList();
             }
         }
-    });
 
-    function getParentAgencyList() {
+    }
+
+    function getAgencyList() {
         if ($("#searchFormat").val().trim() == 0) {
-            bootbox.alert("Please enter text to search for Parent Agencies(s)", function () {
+            bootbox.alert("Please enter text to search for Agencies(s)", function () {
             });
             return;
         }
 
-        setLocalStorage("search", $("#searchFormat").val().trim());
+        var searchCriteria = $("#searchFormat").val().trim() + "|" + $("#ddlMarket").val().trim();
+
+        setLocalStorage("search", searchCriteria);
         setLocalStorage("searchPage", window.location);
 
         //filling out url for ajax
-        var url = ServicePrefix + '/api/ParentAgency/GetParentAgencyList';
+        var url = ServicePrefix + '/api/Agency/GetAgencyList';
 
         //filling out settings for ajax call
         var settings = {
@@ -273,13 +356,14 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inParentAgencyName": $("#searchFormat").val().trim(),
+                "inMarketId": $("#ddlMarket").val(),
+                "inAgencyName": $("#searchFormat").val().trim(),
                 "inShowDisabled": false
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 //populateTable(data);
-                populateDataTable("dtParentAgencyList", data);
+                populateDataTable("dtAgencyList", data);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -291,12 +375,17 @@
 
     }
 
-    function editParentAgency(parentAgencyId) {
+    function editAgency(agencyId) {
         bootbox.alert('This functionality is still under development.', function () {
         });
     }
 
-    function deleteParentAgency(parentAgencyId) {
+    function deleteAgency(agencyId) {
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+    }
+
+    function editParentAgency(parentAgencyId) {
         bootbox.alert('This functionality is still under development.', function () {
         });
     }
