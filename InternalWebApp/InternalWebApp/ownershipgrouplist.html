@@ -5,7 +5,7 @@
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]><!-->
 <html class="no-js">
- <!--<![endif]-->
+<!--<![endif]-->
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -43,8 +43,12 @@
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
 
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
+
     <!-- Modernizr JS -->
-    <script src="/js/modernizr-2.6.2.min.js"></script> 
+    <script src="/js/modernizr-2.6.2.min.js"></script>
 
     <!-- FOR IE9 below -->
     <!--[if lt IE 9]>
@@ -61,7 +65,7 @@
                 <div class="header-inner" id="menu"></div>
             </div>
         </header>
-        <div id="fh5co-contact-section" style="padding-top:50px!important">
+        <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
@@ -70,54 +74,42 @@
                 </div>
 
                 <!-- search / filter area -->
-                <div class="row" style="margin-top:-25px!important">
+                <div class="row search-section">
                     <div class="col-md-10 ">
-                        <label for="search">Ownership Group Name</label>
+                        <label for="searchOwnerGroup">Ownership Group Name</label>
                         <input type="text" id="searchOwnerGroup" />
                         <!--<label for="ddlMediaType" style="padding-left:10px">Media Type</label>
                         <select id="ddlMediaType">
                         </select>-->
-                        <input type="button" style="margin-left:10px" value="Search" onclick="getOwnerGroupList()" />
+                        <input type="button" class="search-button" value="Search" onclick="getOwnerGroupList()" />
                     </div>
                     <div class="col-md-2 ">
-                        <input type="button" value="+" class="addNewButton" style="padding-left:25px; padding-right:25px;border-radius:55%!important;min-width:0px!important; font-size:36px;margin-top:-25px;float:right" onclick="editOwnership(0)" />
+                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editOwnershipGroup(0)" />
                     </div>
                 </div>
-
-                <div class="text-center" style="margin-top:20px">
-                    <!-- headings -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="row" style="border-top:solid 1px silver;border-bottom:solid 1px silver;">
-                                <div class="col-md-4" style="text-align:left">
-                                    <strong>
-                                        Ownership Group
-                                    </strong>
-                                </div>
-
-                                <div class="col-md-3" style="text-align:left">
-                                    <strong>
-                                        Owner
-                                    </strong>
-                                </div>
-                                <div class="col-md-3" style="text-align:left">
-                                    <strong>
-                                        Products
-                                    </strong>
-                                </div>
-                                <div class="col-md-2">
-                                    <strong>
-                                    </strong>
-                                </div>
-                            </div>
-
-                            <div id='ownerGroupList'>
-
-                            </div>
-
-                        </div>
-                    </div>
+               
+                <!-- start datatable-->
+                <div class="dataTable-top-margin">
+                    <table id="dtOwnershipGroupList" class="stripe">
+                        <thead>
+                            <tr>
+                                <th class="exportColumn">Ownership Group Name</th>
+                                <th class="exportColumn">Owner</th>
+                                <th class="exportColumn">Products</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Ownership Group Name</th>
+                                <th>Owner</th>
+                                <th>Products</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
+                <!-- end datatable -->
             </div>
         </div>
         <!--<div id="map" data-animate-effect="fadeIn"></div>-->
@@ -142,33 +134,144 @@
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
 
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+
 </body>
 </html>
 <script>
 
-    $( document ).ready(function()
-    {
+    $(document).ready(function () {
+        var reportTitle = "Ownership Groups List";
+        var exportColumns = returnTableColumnsByClass("dtOwnershipGroupList", "exportColumn");
+
+        $("#dtOwnershipGroupList").DataTable({
+            "dom": "Blfrtip",
+            "data": [],
+            "columns": [
+                { "data": 'OG_OwnerGroupName' },
+                {
+                    mRender: function (data, type, row) {
+                        return '<a href="#" onclick="editOwnership(' +
+                            row.OG_OwnerID +
+                            ')">' +
+                            row.OW_OwnerName +
+                            '</a>';
+                    }
+                },
+                {
+                    mRender: function (data, type, row) {
+
+                        return returnProductListLinks(row);
+
+                    }
+                },
+                {
+                    mRender: function (data, type, row) {
+
+                        return '<a href="#" onclick="editOwnershipGroup(' + row.OG_OwnerGroupID + ')">Edit</a>&nbsp;<a href="#" onclick="deleteOwnershipGroup(' + row.OG_OwnerGroupID + ')">Delete</a>';
+
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": "text-align-right"
+                }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [
+               {
+                   extend: 'csv',
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtOwnershipGroupList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'excel',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtOwnershipGroupList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'pdf',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtOwnershipGroupList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtOwnershipGroupList", data, columnIdx);
+                           }
+                       }
+                   }
+               }
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            initComplete: function () {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+
+        $("body").on("click",
+            "#clear_search_button",
+            function () {
+                var table = $("#dtOwnershipGroupList").DataTable();
+                table.search('').draw();
+            });
+
 
         buildMainMenu("Ownerships");
         var search = getParameterByName("search");
 
-        if (!search == false)
-        {
-            if (search.length > 0)
-            {
+        if (!search == false) {
+            if (search.length > 0) {
                 $("#searchOwnerGroup").val(search);
                 getOwnerGroupList();
             }
         }
 
-
-
     });
 
-    function getOwnerGroupList()
-    {
-        if ($("#searchOwnerGroup").val().trim() == 0)
-        {
+    function getOwnerGroupList() {
+        if ($("#searchOwnerGroup").val().trim() == 0) {
             bootbox.alert("Please enter text to search for Owner Group(s)", function () {
 
             });
@@ -193,104 +296,32 @@
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
-                if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    populateDataTable("dtOwnershipGroupList", data);
 
-                    });
-                }
-                else {
-
-                        var str = 'No Owner Groups found';
-                        $("#ownerGroupList").html("");
-
-                        var holdOwnerGroupID = "0";
-                        var productList = "";
-                        var holdObject = new Object();
-
-                        $.each(data.report.rows, function (index)
-                        {
-                            str = "";
-                            var obj = data.report.rows[index];
-                            // need a control break on OwnerGroupID
-   
-                            if (holdOwnerGroupID != obj.OG_OwnerGroupID)
-                            {
-                                if (holdOwnerGroupID != "0")
-                                {
-                                    str = buildOwnerGroupRow(holdObject.OwnerGroupName, holdObject.OwnerGroupID, holdObject.OwnerID, holdObject.OwnerName, holdObject.productList);
-                                    $("#ownerGroupList").append(str);
-
-                                }
-                                productList = "";
-                                holdObject = new Object();
-                                holdObject.productList = "";
-                                holdObject.OwnerName = "";
-                                holdObject.OwnerID = "";
-                                holdObject.OwnerGroupID = "";
-                                holdObject.OwnerGroupName = "";
-                            }
-
-                            holdOwnerGroupID = obj.OG_OwnerGroupID;
-                            holdObject.productList = holdObject.productList + (holdObject.productList.length == 0 ? "" : " ") + '<a href="#" onclick="editProduct(' + "'" + obj.OP_ProductID + "'" + ')">' + obj.OP_ProductID + '</a>';
-                            holdObject.OwnerName = obj.OW_OwnerName;
-                            holdObject.OwnerID = obj.OG_OwnerID;
-                            holdObject.OwnerGroupID = obj.OG_OwnerGroupID;
-                            holdObject.OwnerGroupName = obj.OG_OwnerGroupName;
-
-
-                        });
-
-                        if ((!holdObject.OwnerGroupName) == false)
-                        {
-                            str = buildOwnerGroupRow(holdObject.OwnerGroupName, holdObject.OwnerGroupID, holdObject.OwnerID, holdObject.OwnerName, holdObject.productList);
-                            $("#ownerGroupList").append(str);
-                        } 
-
-                }
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    //window.location = "preprocess.html";
-                });
+                genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
 
     }
 
-    function buildOwnerGroupRow(ownerGroupName, ownerGroupId, ownerId, ownerName, productList)
-    {
-        var str = '';
-
-        // Open Row
-        str = str + '<div class="row">';
-
-        str = str + '<div class="col-md-4" style="text-align:left">';
-        str = str + ownerGroupName;
-        str = str + '</div>';
-    
-        str = str + '<div class="col-md-3" style="text-align:left">';
-        str = str + '<a href="#" onclick="editOwnership(' + ownerId + ')">' + ownerName + '</a>';
-        str = str + '</div>';
-    
-        str = str + '<div class="col-md-3" style="text-align:left">';
-        str = str + productList;
-        str = str + '</div>';
-
-        str = str + '<div class="col-md-2" style="text-align:center">';
-        str = str + '<a href="#" onclick="editOwnershipGroup(' + ownerGroupId + ')">Edit</a>&nbsp;<a  onclick="deleteOwnershipGroup(' + ownerGroupId + ')">Delete</a>';
-        str = str + '</div>';
-
-        // Close Row
-        str = str + '</div>';
-        return str;
-    }
-
-    function editOwnershipGroup(ownerGroupID)
-    {
+    function editOwnershipGroup(ownerGroupID) {
 
         window.location = "ownershipgroup.html?ownerGroupID=" + ownerGroupID;
-    
+
     }
+
+    function deleteOwnershipGroup(ownerGroupID) {
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+    }
+
+    function editProduct(productId) {
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+    }
+
     function editOwnership(ownerID) {
 
         window.location = "ownership.html?ownerID=" + ownerID;
