@@ -78,8 +78,8 @@
                         <label for="ddlStation" class="search-ddl-label">Station</label>
                         <select id="ddlStation" class="search-ddl-select" style=""></select>
 
-                        <label for="searchStation">Agency Name</label>
-                        <input type="text" id="searchStation" />
+                        <label for="searchText">Agency Name</label>
+                        <input type="text" id="searchText" />
 
                         <input type="button" class="search-button" style="" value="Search" onclick="getStationAgencyList()" />
                     </div>
@@ -261,7 +261,7 @@
         //    if (search.length > 0) {
         //        var sArray = search.split("|");
 
-        //        $("#searchStation").val(sArray(0));
+        //        $("#searchText").val(sArray(0));
         //        $("#ddlMediaType").val(sArray(1));
 
         //        getStationList();
@@ -306,6 +306,7 @@
                     });
 
                     //sure add code here to do the previous search
+                    loadLastSearch();
                 }
 
             },
@@ -317,6 +318,23 @@
         });
     }
 
+    function loadLastSearch() {
+        var search = getParameterByName("search");
+
+        if (!search == false) {
+            if (search.length > 0) {
+
+                var sArray = new Array();
+                sArray = search.split("|");
+
+                $("#searchText").val(sArray[0]);
+                $("#ddlStation").val(sArray[1].toString());
+
+                getStationAgencyList();
+            }
+        }
+    }
+
     function getStationAgencyList() {
 
         if ($("#ddlStation").val() === "") {
@@ -324,11 +342,16 @@
             return;
         }
 
-        if ($("#searchStation").val() === "") {
-            bootbox.alert("Please select/enter at least 1 filter for the Agency Search", function () { });
+        if ($("#searchText").val() === "") {
+            bootbox.alert("Please enter text to search for Agencies", function () { });
             return;
         }
    
+        var searchCriteria = $("#searchText").val().trim() + "|" + $("#ddlStation").val().trim();
+
+        setLocalStorage("search", searchCriteria);
+        setLocalStorage("searchPage", window.location);
+
         $.ajax({
             url: ServicePrefix + '/api/StationAgency/GetStationAgencyList',
             dataType: 'json',
@@ -336,7 +359,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inStationAgencyName": $("#searchStation").val(),
+                "inStationAgencyName": $("#searchText").val(),
                 "inActiveOnly": "1",
                 "inREID": $("#ddlStation").val()
             }),
@@ -351,9 +374,6 @@
             }
         });
     }
-
-    
-    
 
     function editStationAgency(stationAgencyId) {
 
