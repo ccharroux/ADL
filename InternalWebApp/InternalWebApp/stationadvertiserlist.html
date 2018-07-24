@@ -68,7 +68,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Station Agencies</h2>
+                        <h2>Station Advertisers</h2>
                     </div>
                 </div>
 
@@ -78,31 +78,31 @@
                         <label for="ddlStation" class="search-ddl-label">Station</label>
                         <select id="ddlStation" class="search-ddl-select" style=""></select>
 
-                        <label for="searchStation">Agency Name</label>
+                        <label for="searchStation">Advertiser Name</label>
                         <input type="text" id="searchStation" />
 
-                        <input type="button" class="search-button" style="" value="Search" onclick="getStationAgencyList()" />
+                        <input type="button" class="search-button" style="" value="Search" onclick="getStationAdvertiserList()" />
                     </div>
                     <div class="col-md-2 ">
-                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editStationAgency(0)" /> <!-- editOwnership(0) -->
+                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editStationAdvertiser(0)" /> <!-- editOwnership(0) -->
                     </div>
                 </div>
 
                 <!-- start datatable-->
 
                 <div class="dataTable-top-margin">
-                    <table id="dtStationAgencyList" class="stripe">
+                    <table id="dtStationAdvertiserList" class="stripe">
                         <thead>
                             <tr>
-                                <th class="exportColumn">Station Agency Name</th>
-                                <th class="exportColumn">Agency</th>
+                                <th class="exportColumn">Station Advertiser Name</th>
+                                <th class="exportColumn">Advertiser</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <th>Station Agency Name</th>
-                                <th>Agency</th>
+                                <th>Station Advertiser Name</th>
+                                <th>Advertiser</th>
                                 <th></th>
                             </tr>
                         </tfoot>
@@ -150,25 +150,25 @@
 
     $(document).ready(function () {
 
-        var reportTitle = 'Station Agencies List';
-        var exportColumns = returnTableColumnsByClass("dtStationAgencyList", "exportColumn");
+        var reportTitle = 'Station Advertisers List';
+        var exportColumns = returnTableColumnsByClass("dtStationAdvertiserList", "exportColumn");
 
-        $("#dtStationAgencyList").DataTable({
+        $("#dtStationAdvertiserList").DataTable({
             "dom": "Blfrtip",
             "data": [],
             "columns": [
-                { "data": 'stationAgencyName' },
+                { "data": 'stationAdvertiserName' },
                 {
                     mRender: function (data, type, row) {
 
-                        return '<a href="#" onclick="editStationAgency(' + row.agencyId + ')">' + row.agencyName + '</a>';
+                        return '<a href="#" onclick="editStationAdvertiser(' + row.advertiserId + ')">' + row.advertiserName + '</a>';
 
                     }
                 },
                 {
                     mRender: function (data, type, row) {
 
-                        return '<a href="#" onclick="editStationAgency(' + row.stationAgencyId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteStationAgency(' + row.stationAgencyId + ')">Delete</a>';
+                        return '<a href="#" onclick="editStationAdvertiser(' + row.stationAdvertiserId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteStationAdvertiser(' + row.stationAdvertiserId + ')">Delete</a>';
 
                     },
                     "orderable": false,
@@ -184,7 +184,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtStationAgencyList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtStationAdvertiserList", data, columnIdx);
                            }
                        }
                    }
@@ -196,7 +196,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtStationAgencyList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtStationAdvertiserList", data, columnIdx);
                            }
                        }
                    }
@@ -208,7 +208,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtStationAgencyList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtStationAdvertiserList", data, columnIdx);
                            }
                        }
                    }
@@ -220,7 +220,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtStationAgencyList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtStationAdvertiserList", data, columnIdx);
                            }
                        }
                    }
@@ -246,11 +246,11 @@
         $("body").on("click",
             "#clear_search_button",
             function () {
-                var table = $("#dtStationAgencyList").DataTable();
+                var table = $("#dtStationAdvertiserList").DataTable();
                 table.search('').draw();
             });
 
-        buildXRYMenu("Agency");
+        buildXRYMenu("Advertiser");
 
         getStationList();
 
@@ -317,33 +317,33 @@
         });
     }
 
-    function getStationAgencyList() {
+    function getStationAdvertiserList() {
 
         if ($("#ddlStation").val() === "") {
-            bootbox.alert("Please choose a station for the Agency Search", function () { });
+            bootbox.alert("Please choose a station for the Advertiser Search", function () { });
             return;
         }
 
         if ($("#searchStation").val() === "") {
-            bootbox.alert("Please select/enter at least 1 filter for the Agency Search", function () { });
+            bootbox.alert("Please select/enter at least 1 filter for the Advertiser Search", function () { });
             return;
         }
-   
+
         $.ajax({
-            url: ServicePrefix + '/api/StationAgency/GetStationAgencyList',
+            url: ServicePrefix + '/api/StationAdvertiser/GetStationAdvertiserList',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inStationAgencyName": $("#searchStation").val(),
+                "inStationAdvertiserName": $("#searchStation").val(),
                 "inActiveOnly": "1",
                 "inREID": $("#ddlStation").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
-                populateDataTable("dtStationAgencyList", data);
+                populateDataTable("dtStationAdvertiserList", data);
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -352,24 +352,24 @@
         });
     }
 
-    
-    
 
-    function editStationAgency(stationAgencyId) {
 
-        bootbox.alert('This functionality is still under development.', function () {
-        });
 
-    }
-
-    function deleteStationAgency(stationAgencyId) {
+    function editStationAdvertiser(stationAdvertiserId) {
 
         bootbox.alert('This functionality is still under development.', function () {
         });
 
     }
 
-    function editStationAgency(agencyId) {
+    function deleteStationAdvertiser(stationAdvertiserId) {
+
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+
+    }
+
+    function editStationAdvertiser(advertiserId) {
 
         bootbox.alert('This functionality is still under development.', function () {
         });
