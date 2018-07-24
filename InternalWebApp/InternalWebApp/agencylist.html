@@ -77,8 +77,8 @@
                         <label for="ddlMarket" class="dropdown-label">Market</label>
                         <select id="ddlMarket" class="dropdown-select"></select>
 
-                        <label for="searchFormat">Agency Name</label>
-                        <input type="text" id="searchFormat" />
+                        <label for="searchText">Agency Name</label>
+                        <input type="text" id="searchText" />
                         <!--<label for="ddlMediaType" style="padding-left:10px">Media Type</label>
                         <select id="ddlMediaType">
                         </select>-->
@@ -251,16 +251,7 @@
 
         buildXRYMenu("Agency");
         getMarketList();
-        //setLocalStorage("searchPage", window.location);
-
-        //var search = getParameterByName("search");
-
-        //if (!search == false) {
-        //    if (search.length > 0) {
-        //        $("#searchFormat").val(search);
-        //        getParentAgencyList();
-        //    }
-        //}
+        
     });
 
     function getMarketList() {
@@ -312,20 +303,14 @@
 
     function loadLastSearch() {
         var search = getParameterByName("search");
-        //var search = getLocalStorage("search");
 
         if (!search == false) {
             if (search.length > 0) {
-                console.log('search');
-                console.log(search);
-                console.log('search');
 
                 var sArray = new Array();
                 sArray = search.split("|");
-                console.log(sArray.length);
-                console.log(sArray[1]);
 
-                $("#searchFormat").val(sArray[0]);
+                $("#searchText").val(sArray[0]);
                 $("#ddlMarket").val(sArray[1].toString());
 
                 getAgencyList();
@@ -335,13 +320,18 @@
     }
 
     function getAgencyList() {
-        if ($("#searchFormat").val().trim() == 0) {
-            bootbox.alert("Please enter text to search for Agencies(s)", function () {
+        if ($("#ddlMarket").val().trim() == 0) {
+            bootbox.alert("Please select a Market to search for Agencies", function () { });
+            return;
+        }
+
+        if ($("#searchText").val().trim() == 0) {
+            bootbox.alert("Please enter text to search for Agencies", function () {
             });
             return;
         }
 
-        var searchCriteria = $("#searchFormat").val().trim() + "|" + $("#ddlMarket").val().trim();
+        var searchCriteria = $("#searchText").val().trim() + "|" + $("#ddlMarket").val().trim();
 
         setLocalStorage("search", searchCriteria);
         setLocalStorage("searchPage", window.location);
@@ -357,13 +347,14 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inMarketId": $("#ddlMarket").val(),
-                "inAgencyName": $("#searchFormat").val().trim(),
+                "inAgencyName": $("#searchText").val().trim(),
                 "inShowDisabled": false
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                //populateTable(data);
+
                 populateDataTable("dtAgencyList", data);
+
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
