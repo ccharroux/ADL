@@ -79,8 +79,8 @@
                         <label for="ddlOwner" class="search-ddl-label">Owner</label>
                         <select id="ddlOwner" class="search-ddl-select" style=""></select>
 
-                        <label for="searchStation">Station Name</label>
-                        <input type="text" id="searchStation" />
+                        <label for="searchText">Station Name</label>
+                        <input type="text" id="searchText" />
 
 
                         <input type="button" class="search-button" style="" value="Search" onclick="getStationList()" />
@@ -284,20 +284,8 @@
         buildMainMenu("Stations");
 
         getOwnerList();
-        getMediaTypes();
+        
 
-        var search = getParameterByName("search");
-
-        if (!search == false) {
-            if (search.length > 0) {
-                var sArray = search.split("|");
-
-                $("#searchStation").val(sArray(0));
-                $("#ddlMediaType").val(sArray(1));
-
-                getStationList();
-            }
-        }
 
 
     });
@@ -338,6 +326,8 @@
                     });
 
                 }
+
+                getMediaTypes();
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -380,6 +370,20 @@
 
                     $("#ddlMediaType").html(str);
 
+
+                    var search = getParameterByName("search");
+
+                    if (!search == false) {
+                        if (search.length > 0) {
+                            var sArray = search.split("|");
+
+                            $("#searchText").val(sArray[0]);
+                            $("#ddlMediaType").val(sArray[1].toString());
+                            $("#ddlOwner").val(sArray[2].toString());
+
+                            getStationList();
+                        }
+                    }
                 }
 
             },
@@ -410,7 +414,7 @@
             searchCtr = searchCtr + 1;
         }
 
-        if ($("#searchStation").val().trim() == 0) {
+        if ($("#searchText").val().trim() == 0) {
             searchCtr = searchCtr;
         }
         else {
@@ -422,7 +426,7 @@
             return;
         }
 
-        //setLocalStorage("search", $("#searchStation").val().trim() + "|" + $("#ddlMediaType").val().trim());
+        setLocalStorage("search", $("#searchText").val().trim() + "|" + $("#ddlMediaType").val().trim() + "|" + $("#ddlOwner").val().trim());
         setLocalStorage("searchPage", window.location);
 
         $.ajax({
@@ -432,7 +436,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inStationName": $("#searchStation").val(),
+                "inStationName": $("#searchText").val(),
                 "inActiveOnly": "1",
                 "inOwnerID": $("#ddlOwner").val(),
                 "inMediaTypeID": $("#ddlMediaType").val()
