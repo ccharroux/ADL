@@ -74,8 +74,8 @@
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-10 ">
-                        <label for="searchFormat">Parent Agency Name</label>
-                        <input type="text" id="searchFormat" />
+                        <label for="searchText">Parent Agency Name</label>
+                        <input type="text" id="searchText" />
                         <!--<label for="ddlMediaType" style="padding-left:10px">Media Type</label>
                         <select id="ddlMediaType">
                         </select>-->
@@ -238,29 +238,18 @@
             });
 
         buildXRYMenu("Agency");
-        setLocalStorage("searchPage", window.location);
 
-        //buildMainMenu("Settings");
-
-        var search = getParameterByName("search");
-        //var search = getLocalStorage("search");
-
-        if (!search == false) {
-            if (search.length > 0) {
-                $("#searchFormat").val(search);
-                getParentAgencyList();
-            }
-        }
+        loadLastSearch();
     });
 
     function getParentAgencyList() {
-        if ($("#searchFormat").val().trim() == 0) {
+        if ($("#searchText").val().trim() == 0) {
             bootbox.alert("Please enter text to search for Parent Agencies(s)", function () {
             });
             return;
         }
 
-        setLocalStorage("search", $("#searchFormat").val().trim());
+        setLocalStorage("search", $("#searchText").val().trim());
         setLocalStorage("searchPage", window.location);
 
         //filling out url for ajax
@@ -273,7 +262,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inParentAgencyName": $("#searchFormat").val().trim(),
+                "inParentAgencyName": $("#searchText").val().trim(),
                 "inShowDisabled": false
             }),
             processData: false,
@@ -289,6 +278,17 @@
         //ajax call
         $.ajax(url, settings);
 
+    }
+
+    function loadLastSearch() {
+        var search = getParameterByName("search");
+
+        if (!search == false) {
+            if (search.length > 0) {
+                $("#searchText").val(search);
+                getParentAgencyList();
+            }
+        }
     }
 
     function editParentAgency(parentAgencyId) {
