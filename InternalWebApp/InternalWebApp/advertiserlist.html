@@ -68,7 +68,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Agencies</h2>
+                        <h2>Advertisers</h2>
                     </div>
                 </div>
                 <!-- search / filter area -->
@@ -77,12 +77,12 @@
                         <label for="ddlMarket" class="dropdown-label">Market</label>
                         <select id="ddlMarket" class="dropdown-select"></select>
 
-                        <label for="searchFormat">Agency Name</label>
+                        <label for="searchFormat">Advertiser Name</label>
                         <input type="text" id="searchFormat" />
                         <!--<label for="ddlMediaType" style="padding-left:10px">Media Type</label>
                         <select id="ddlMediaType">
                         </select>-->
-                        <input type="button" class="search-button" value="Search" onclick="getAgencyList()" />
+                        <input type="button" class="search-button" value="Search" onclick="getAdvertiserList()" />
                     </div>
                     <div class="col-md-2 ">
                         <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editAgency(0)" />
@@ -92,11 +92,11 @@
                 <!-- start datatable coding-->
 
                 <div class="dataTable-top-margin">
-                    <table id="dtAgencyList" class="stripe">
+                    <table id="dtAdvertiserList" class="stripe">
                         <thead>
                             <tr>
-                                <th class="exportColumn">Agency Name</th>
-                                <th class="exportColumn">Parent Agency</th>
+                                <th class="exportColumn">Advertiser Name</th>
+                                <th class="exportColumn">Parent Advertiser</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -149,26 +149,26 @@
 
     $(document).ready(function () {
 
-        var reportTitle = "Agencies List";
-        var exportColumns = returnTableColumnsByClass("dtAgencyList", "exportColumn");
+        var reportTitle = "Advertisers List";
+        var exportColumns = returnTableColumnsByClass("dtAdvertiserList", "exportColumn");
 
-        $("#dtAgencyList").DataTable({
+        $("#dtAdvertiserList").DataTable({
             "dom": "Blfrtip",
             "data": [],
             "columns": [
-                { "data": 'agencyName' },
+                { "data": 'advertiserName' },
                 {
                     mRender: function (data, type, row) {
-                        if (row.parentAgencyId === 0) {
+                        if (row.parentAdvertiserId === 0) {
                             return '';
                         } else {
-                            return '<a href="#" onclick="editParentAgency(' + row.parentAgencyId + ')">' + row.parentAgencyName + '</a>';
+                            return '<a href="#" onclick="editParentAgency(' + row.parentAdvertiserId + ')">' + row.parentAdvertiserName + '</a>';
                         }
                     }
                 },
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="#" onclick="editAgency(' + row.agencyId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteAgency(' + row.agencyId + ')">Delete</a>';
+                        return '<a href="#" onclick="editAgency(' + row.advertiserId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteAgency(' + row.advertiserId + ')">Delete</a>';
                     },
                     "orderable": false,
                     "searchable": false,
@@ -183,7 +183,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtAgencyList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtAdvertiserList", data, columnIdx);
                            }
                        }
                    }
@@ -195,7 +195,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtAgencyList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtAdvertiserList", data, columnIdx);
                            }
                        }
                    }
@@ -207,7 +207,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtAgencyList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtAdvertiserList", data, columnIdx);
                            }
                        }
                    }
@@ -219,7 +219,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtAgencyList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtAdvertiserList", data, columnIdx);
                            }
                        }
                    }
@@ -245,11 +245,11 @@
         $("body").on("click",
             "#clear_search_button",
             function () {
-                var table = $("#dtAgencyList").DataTable();
+                var table = $("#dtAdvertiserList").DataTable();
                 table.search('').draw();
             });
 
-        buildXRYMenu("Agency");
+        buildXRYMenu("Advertiser");
         getMarketList();
         //setLocalStorage("searchPage", window.location);
 
@@ -328,13 +328,13 @@
                 $("#searchFormat").val(sArray[0]);
                 $("#ddlMarket").val(sArray[1].toString());
 
-                getAgencyList();
+                getAdvertiserList();
             }
         }
 
     }
 
-    function getAgencyList() {
+    function getAdvertiserList() {
         if ($("#searchFormat").val().trim() == 0) {
             bootbox.alert("Please enter text to search for Agencies(s)", function () {
             });
@@ -347,7 +347,7 @@
         setLocalStorage("searchPage", window.location);
 
         //filling out url for ajax
-        var url = ServicePrefix + '/api/Agency/GetAgencyList';
+        var url = ServicePrefix + '/api/Advertiser/GetAdvertiserList';
 
         //filling out settings for ajax call
         var settings = {
@@ -357,13 +357,13 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inMarketId": $("#ddlMarket").val(),
-                "inAgencyName": $("#searchFormat").val().trim(),
+                "inAdvertiserName": $("#searchFormat").val().trim(),
                 "inShowDisabled": false
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 //populateTable(data);
-                populateDataTable("dtAgencyList", data);
+                populateDataTable("dtAdvertiserList", data);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
