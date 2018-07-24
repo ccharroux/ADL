@@ -73,26 +73,28 @@
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-12">
-                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editIndustry(0)" />
+                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editNielsenMarket(0)" />
                     </div>
                 </div>
 
-                <!--<div class="dataTable-top-margin">
+                <div class="dataTable-top-margin">
                     <table id="dtNielsenMarketNamesList" class="stripe">
                         <thead>
                             <tr>
-                                <th class="exportColumn">Industry Name</th>
+                                <th class="exportColumn">Nielsen Market Name</th>
+                                <th class="exportColumn">Market Name</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <th>Industry Name</th>
+                                <th>Nielsen Market Name</th>
+                                <th>Market Name</th>
                                 <th></th>
                             </tr>
                         </tfoot>
                     </table>
-                </div>-->
+                </div>
             </div>
         </div>
 
@@ -131,130 +133,131 @@
 
         var reportTitle = 'Nielsen Market Names List';
         var exportColumns = returnTableColumnsByClass("dtNielsenMarketNamesList", "exportColumn");
-        var dataTableURL = ServicePrefix + '/api/Industry/GetNielsenMarketList';
+        var dataTableURL = ServicePrefix + '/api/NielsenMarket/GetNielsenMarketList';
 
-        //$("#dtIndustryList").DataTable({
-        //    "dom": "Blfrtip",
-        //    "ajax": {
-        //        "url": dataTableURL,
-        //        "dataType": "json",
-        //        "contentType": "application/json",
-        //        "type": "POST",
-        //        "data": function (d) {
-        //            return JSON.stringify({
-        //                "inApiToken": getLocalStorage("APIToken")
-        //            });
-        //        },
-        //        "dataSrc": function (json) {
-        //            if (json.response.status.toUpperCase() === "SUCCESS") {
+        $("#dtNielsenMarketNamesList").DataTable({
+            "dom": "Blfrtip",
+            "ajax": {
+                "url": dataTableURL,
+                "dataType": "json",
+                "contentType": "application/json",
+                "type": "POST",
+                "data": function (d) {
+                    return JSON.stringify({
+                        "inApiToken": getLocalStorage("APIToken")
+                    });
+                },
+                "dataSrc": function (json) {
+                    if (json.response.status.toUpperCase() === "SUCCESS") {
 
-        //                json = JSON.stringify(json.report.rows);
-        //                json = $.parseJSON(json);
-        //                return json;
+                        json = JSON.stringify(json.report.rows);
+                        json = $.parseJSON(json);
+                        return json;
 
-        //            }
-        //            else {
-        //                bootbox.alert('Process Failed.\n\r\n\r' + json.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-        //                });
+                    }
+                    else {
+                        bootbox.alert('Process Failed.\n\r\n\r' + json.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                        });
 
-        //                return json;
-        //            }
-        //        }
-        //    },
-        //    "columns": [
-        //        { "data": 'industryName' },
-        //        {
-        //            mRender: function (data, type, row) {
-        //                return '<a href="#" onclick="editIndustry(' + row.industryId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteIndustry(' + row.industryId + ')">Delete</a>';
-        //            },
-        //            "orderable": false,
-        //            "searchable": false,
-        //            "className": "text-align-right"
-        //        }
-        //    ],
-        //    "pagingType": "full_numbers",
-        //    "buttons": [
-        //        {
-        //            extend: 'csv',
-        //            exportOptions: {
-        //                columns: exportColumns,
-        //                format: {
-        //                    header: function (data, columnIdx) {
-        //                        return returnExportColumnHeadingTitle("dtNielsenMarketNamesList", data, columnIdx);
-        //                    }
-        //                }
-        //            }
-        //        },
-        //        {
-        //            extend: 'excel',
-        //            title: reportTitle,
-        //            exportOptions: {
-        //                columns: exportColumns,
-        //                format: {
-        //                    header: function (data, columnIdx) {
-        //                        return returnExportColumnHeadingTitle("dtNielsenMarketNamesList", data, columnIdx);
-        //                    }
-        //                }
-        //            }
-        //        },
-        //        {
-        //            extend: 'pdf',
-        //            title: reportTitle,
-        //            exportOptions: {
-        //                columns: exportColumns,
-        //                format: {
-        //                    header: function (data, columnIdx) {
-        //                        return returnExportColumnHeadingTitle("dtNielsenMarketNamesList", data, columnIdx);
-        //                    }
-        //                }
-        //            }
-        //        },
-        //        {
-        //            extend: 'print',
-        //            title: reportTitle,
-        //            exportOptions: {
-        //                columns: exportColumns,
-        //                format: {
-        //                    header: function (data, columnIdx) {
-        //                        return returnExportColumnHeadingTitle("dtNielsenMarketNamesList", data, columnIdx);
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        //,
-        //        //this button is supposed to handle column visibility
-        //        //however it isn't working on our site
-        //        //'colvis'
-        //    ],
-        //    initComplete: function () {
-        //        $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
-        //    },
-        //    createdRow: function (row, data, index) {
-        //        $(row).addClass('single-line-height');
-        //    },
-        //    language: {
-        //        search: "Filter Results:"
-        //    }
-        //});
+                        return json;
+                    }
+                }
+            },
+            "columns": [
+                { "data": 'nielsenMarketName' },
+                { "data": 'marketName'},
+                {
+                    mRender: function (data, type, row) {
+                        return '<a href="#" onclick="editNielsenMarket(' + row.marketId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteNielsenMarket(' + row.marketId + ')">Delete</a>';
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": "text-align-right"
+                }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [
+                {
+                    extend: 'csv',
+                    exportOptions: {
+                        columns: exportColumns,
+                        format: {
+                            header: function (data, columnIdx) {
+                                return returnExportColumnHeadingTitle("dtNielsenMarketNamesList", data, columnIdx);
+                            }
+                        }
+                    }
+                },
+                {
+                    extend: 'excel',
+                    title: reportTitle,
+                    exportOptions: {
+                        columns: exportColumns,
+                        format: {
+                            header: function (data, columnIdx) {
+                                return returnExportColumnHeadingTitle("dtNielsenMarketNamesList", data, columnIdx);
+                            }
+                        }
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    title: reportTitle,
+                    exportOptions: {
+                        columns: exportColumns,
+                        format: {
+                            header: function (data, columnIdx) {
+                                return returnExportColumnHeadingTitle("dtNielsenMarketNamesList", data, columnIdx);
+                            }
+                        }
+                    }
+                },
+                {
+                    extend: 'print',
+                    title: reportTitle,
+                    exportOptions: {
+                        columns: exportColumns,
+                        format: {
+                            header: function (data, columnIdx) {
+                                return returnExportColumnHeadingTitle("dtNielsenMarketNamesList", data, columnIdx);
+                            }
+                        }
+                    }
+                }
+                //,
+                //this button is supposed to handle column visibility
+                //however it isn't working on our site
+                //'colvis'
+            ],
+            initComplete: function () {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                search: "Filter Results:"
+            }
+        });
 
-        //$("body").on("click",
-        //    "#clear_search_button",
-        //    function () {
-        //        var table = $("#dtNielsenMarketNamesList").DataTable();
-        //        table.search('').draw();
-        //    });
+        $("body").on("click",
+            "#clear_search_button",
+            function () {
+                var table = $("#dtNielsenMarketNamesList").DataTable();
+                table.search('').draw();
+            });
 
         buildXRYMenu("Utility");
         setLocalStorage("searchPage", window.location);
 
     });
 
-    function editIndustry(industryId) {
+    function editNielsenMarket(nielsenMarketId) {
         bootbox.alert('This functionality is still under development.', function () {
         });
     }
 
-    function deleteIndustry(industryId) {
+    function deleteNielsenMarket(nielsenMarketId) {
         bootbox.alert('This functionality is still under development.', function () {
         });
     }
