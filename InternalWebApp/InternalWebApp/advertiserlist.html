@@ -77,8 +77,8 @@
                         <label for="ddlMarket" class="dropdown-label">Market</label>
                         <select id="ddlMarket" class="dropdown-select"></select>
 
-                        <label for="searchFormat">Advertiser Name</label>
-                        <input type="text" id="searchFormat" />
+                        <label for="searchText">Advertiser Name</label>
+                        <input type="text" id="searchText" />
                         <!--<label for="ddlMediaType" style="padding-left:10px">Media Type</label>
                         <select id="ddlMediaType">
                         </select>-->
@@ -251,16 +251,7 @@
 
         buildXRYMenu("Advertiser");
         getMarketList();
-        //setLocalStorage("searchPage", window.location);
-
-        //var search = getParameterByName("search");
-
-        //if (!search == false) {
-        //    if (search.length > 0) {
-        //        $("#searchFormat").val(search);
-        //        getParentAgencyList();
-        //    }
-        //}
+     
     });
 
     function getMarketList() {
@@ -312,20 +303,13 @@
 
     function loadLastSearch() {
         var search = getParameterByName("search");
-        //var search = getLocalStorage("search");
 
         if (!search == false) {
             if (search.length > 0) {
-                console.log('search');
-                console.log(search);
-                console.log('search');
-
                 var sArray = new Array();
                 sArray = search.split("|");
-                console.log(sArray.length);
-                console.log(sArray[1]);
 
-                $("#searchFormat").val(sArray[0]);
+                $("#searchText").val(sArray[0]);
                 $("#ddlMarket").val(sArray[1].toString());
 
                 getAdvertiserList();
@@ -335,13 +319,19 @@
     }
 
     function getAdvertiserList() {
-        if ($("#searchFormat").val().trim() == 0) {
-            bootbox.alert("Please enter text to search for Agencies(s)", function () {
+
+        if ($("#ddlMarket").val().trim() == 0) {
+            bootbox.alert("Please select a Market to search for Advertisers", function () { });
+            return;
+        }
+
+        if ($("#searchText").val().trim() == 0) {
+            bootbox.alert("Please enter text to search for Advertisers", function () {
             });
             return;
         }
 
-        var searchCriteria = $("#searchFormat").val().trim() + "|" + $("#ddlMarket").val().trim();
+        var searchCriteria = $("#searchText").val().trim() + "|" + $("#ddlMarket").val().trim();
 
         setLocalStorage("search", searchCriteria);
         setLocalStorage("searchPage", window.location);
@@ -357,7 +347,7 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inMarketId": $("#ddlMarket").val(),
-                "inAdvertiserName": $("#searchFormat").val().trim(),
+                "inAdvertiserName": $("#searchText").val().trim(),
                 "inShowDisabled": false
             }),
             processData: false,
