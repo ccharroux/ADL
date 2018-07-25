@@ -74,8 +74,8 @@
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-10 ">
-                        <label for="search">Parent Advertiser Name</label>
-                        <input type="text" id="searchFormat" />
+                        <label for="searchText">Parent Advertiser Name</label>
+                        <input type="text" id="searchText" />
                         <!--<label for="ddlMediaType" style="padding-left:10px">Media Type</label>
                         <select id="ddlMediaType">
                         </select>-->
@@ -247,28 +247,31 @@
             });
 
         buildXRYMenu("Advertiser");
-        setLocalStorage("searchPage", window.location);
 
-        //buildMainMenu("Settings");
+        loadLastSearch();
 
+    });
+
+    function loadLastSearch() {
         var search = getParameterByName("search");
 
         if (!search == false) {
             if (search.length > 0) {
-                $("#searchFormat").val(search);
+                $("#searchText").val(search);
                 getParentAdvertiserList();
             }
         }
-    });
+    }
 
     function getParentAdvertiserList() {
-        if ($("#searchFormat").val().trim() == 0) {
+
+        if ($("#searchText").val().trim() === "") {
             bootbox.alert("Please enter text to search for Parent Advertisers(s)", function () {
             });
             return;
         }
 
-        setLocalStorage("search", $("#searchFormat").val().trim());
+        setLocalStorage("search", $("#searchText").val().trim());
         setLocalStorage("searchPage", window.location);
 
         //filling out url for ajax
@@ -281,7 +284,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inParentAdvertiserName": $("#searchFormat").val().trim(),
+                "inParentAdvertiserName": $("#searchText").val().trim(),
                 "inShowDisabled": false
             }),
             processData: false,
