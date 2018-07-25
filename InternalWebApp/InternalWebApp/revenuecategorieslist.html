@@ -73,7 +73,7 @@
                         <input type="button" class="search-button" value="Search" onclick="getRevCategoryList()" />
                     </div>
                     <div class="col-md-2 ">
-                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="newRevCategory()" />
+                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editRevCategory('','')" />
                     </div>
                 </div>
 
@@ -147,7 +147,7 @@
                         //var formatID = row["Format ID"];
                         //editRevCategory(revCategoryId, revCategoryName, revCategoryType)
 
-                        var editCategoryParams = "'" + row["Revenue ID"] + "','" + row["Revenue Category Name"] + "','" + row["Category Type"] + "'";
+                        var editCategoryParams = "'" + row["Revenue ID"] + "','" + row["Category Type"] + "'";
 
                         return '<a href="#" onclick="editRevCategory(' + editCategoryParams + ')">Edit</a>&nbsp;<a href="#" onclick="deleteRevCategory(' + editCategoryParams + ')">Delete</a>';
 
@@ -233,6 +233,11 @@
             });
 
         buildMainMenu("Settings");
+        loadLastSearch();
+
+    });
+
+    function loadLastSearch() {
         var search = getParameterByName("search");
 
         if (!search == false) {
@@ -241,7 +246,7 @@
                 getRevCategoryList();
             }
         }
-    });
+    }
 
     function getRevCategoryList() {
         if ($("#searchText").val().trim() == 0) {
@@ -250,6 +255,7 @@
             });
             return;
         }
+
         setLocalStorage("search", $("#searchText").val().trim());
         setLocalStorage("searchPage", window.location);
 
@@ -278,41 +284,17 @@
         $.ajax(url, settings);
     }
 
-    function getRevCategorySuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-            });
-        } else {
-
-            var tableJson;
-
-            if (data.response.status.toUpperCase() === "SUCCESS") {
-                data = JSON.stringify(data.report.rows);
-                tableJson = $.parseJSON(data);
-            } else {
-                bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                });
-
-                tableJson = data;
-            }
-
-            var table = $("#dtRevCategoryList").DataTable();
-            table.clear().draw();
-            table.rows.add(tableJson).draw();
-        }
+    function editRevCategory(revCategoryId, revCategoryType) {
+        window.location = "revenuecategory.html?revCategoryId=" + revCategoryId.trim() + "&revCategoryType=" + revCategoryType.trim();
     }
 
-    function editRevCategory(revCategoryId, revCategoryName, revCategoryType) {
-        window.location = "revenuecategories.html?revCategoryId=" + revCategoryId.trim() + "&revCategoryName=" + revCategoryName.trim() + "&revCategoryType=" + revCategoryType.trim();
-    }
-
-    function deleteRevCategory(revCategoryId, revCategoryName, revCategoryType) {
+    function deleteRevCategory(revCategoryId, revCategoryType) {
         bootbox.alert('This functionality is still under development.', function () {
         });
     }
 
-    function newRevCategory() {
-        window.location = "revenuecategories.html";
-    }
+    //function newRevCategory() {
+    //    window.location = "revenuecategory.html";
+    //}
 
 </script>
