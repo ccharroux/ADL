@@ -656,3 +656,7 @@ function populateDataTable(tableName, data) {
 function genericAjaxError(jqXhr, textStatus, errorThrown) {
     bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
 }
+
+function addZero(n) {
+    return n < 10 ? '0' + n : '' + n;
+}
