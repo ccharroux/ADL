@@ -65,6 +65,8 @@
                 </div>
                 <div class="text-center margin-top-0">
 
+                    <input type="hidden" id="hdnParentMarketId" />
+
                     <!--Market Label-->
                     <div class="market-label hidden">
                         <div class="row">
@@ -122,10 +124,13 @@
                     <!--Cluster Exclusivity-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left" >
-                            <label for="chkClustExclusivity">Cluster Exclusivity</label>
+                            <label>Cluster Exclusivity</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="checkbox" id="chkClustExclusivity" />
+                            <input type="radio" id="rdCluster" value="Cluster" name="clusterExclusivity" />
+                            <label for="rdCluster">Cluster</label>
+                            <input type="radio" id="rdStation" value="Station" name="clusterExclusivity" checked/>
+                            <label for="rdStation">Station</label>
                         </div>
                     </div>
 
@@ -186,7 +191,7 @@
                             <label for="chkMarketOnHold">Market On Hold</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="checkbox" id="chkMarketOnHold" onchange="hideShowMarketHoldDate()" />
+                          <input type="checkbox" id="chkMarketOnHold" />
                         </div>
                     </div>
 
@@ -206,11 +211,12 @@
                             <label for="ddlRecipientAccess">Recipient Access</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlRecipientAccess" class="mkaRequired" onchange="hideShowLimitedMarkets()">
-                                <option value="All">All</option>
-                                <option value="None">None</option>
-                                <option value="Limited">Limited</option>
-                            </select>
+                            <input type="radio" id="rdAll" name="limitedAccess" value="0" checked onchange="hideShowLimitedMarkets()" />
+                            <label for="rdAll">All</label>
+                            <input type="radio" id="rdNone" name="limitedAccess" value="-1" onchange="hideShowLimitedMarkets()" />
+                            <label for="rdNone">None</label>
+                            <input type="radio" id="rdLimited" name="limitedAccess" onchange="hideShowLimitedMarkets()" />
+                            <label for="rdLimited">Limited</label>
                         </div>
                     </div>
 
@@ -228,7 +234,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div>
-                                    <input value="Update" onclick="updateMarket()" class="default-button" type="button">
+                                    <input value="Update" onclick="updateXRYProduct()" class="default-button" type="button">
                                 </div>
                                 <div class="back-button-div">
                                     <input value="Back" onclick="goBackToMarketPage();" class="default-button" type="button">
@@ -266,15 +272,12 @@
 <script>
 
     var marketId = 0;
-    var productId = 0;
-    var parentMarketId = 0;
-
+    var productId = "XRY";
+   
     $(document).ready(function () {
         buildMainMenu("Markets");
         marketId = (getParameterByName("MarketId") == null ? 0 : getParameterByName("MarketId"));
-        productId = (getParameterByName("ProductId") == null ? 0 : getParameterByName("ProductId"));
-        parentMarketId = (getParameterByName("ParentMarketId") == null ? 0 : getParameterByName("ParentMarketId"));
-
+        
         getMarket();
 
         //Flow of Data
@@ -330,6 +333,7 @@
                 $("#lblMarketName").text("Market Name: " + obj.marketName);
                 $("#lblMarketId").text("Market ID: " + obj.marketId);
                 $("#lblMediaType").text("Media Type: " + obj.mediaTypeName);
+                $("#hdnParentMarketId").text(obj.parentMarketId);
             });
 
             $(".market-label").removeClass("hidden");
@@ -531,7 +535,7 @@
 
     function getAssociatedMarkets() {
 
-        if (parentMarketId == 0 || productId == 0) {
+        if ($("#hdnParentMarketId").text() == null || $("#hdnParentMarketId").text() == "") {
             return;
         }
 
@@ -543,7 +547,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inParentMarketId": parentMarketId,
+                "inParentMarketId": $("#hdnParentMarketId").text(),
                 "inProductId": productId,
                 "inMediaTypeId": 2
 
@@ -627,6 +631,7 @@
 
             if (count == 0) {
                 $("#ddlRecipientAccess").val("All");
+                hideShowLimitedMarkets();
             }
 
             if (count > 1) {
@@ -637,6 +642,7 @@
             if (count == 1) {
                 if (data.report.rows[0].otherMarketId == -1) {
                     $("#ddlRecipientAccess").val("None");
+                    hideShowLimitedMarkets();
                 } else {
                     $("#ddlRecipientAccess").val("Limited");
                     hideShowLimitedMarkets();
@@ -690,7 +696,9 @@
                 $("#ddlProcessor").val(obj["operatorId"]);
 
                 if (obj["exclusivityMethod"].toLowerCase() == "cluster") {
-                    $("#chkClustExclusivity").prop("checked", true);
+                    $("#rdCluster").prop("checked", true);
+                } else {
+                    $("#rdStation").prop("checked", true);
                 }
                 $("#txtMinEntities").val(obj["minimumStationsYTD"]);
                 $("#txtMinMarketShare").val(obj["minimumShareYTD"]);
@@ -706,14 +714,47 @@
 
     function updateXRYProduct() {
         
-        var url = ServicePrefix + '';
+        var marketIdList = [];
+
+        if ($("#rdNone").prop("checked")) {
+            marketIdList.push($("#rdNone").val());
+        } else {
+
+            $(".associatedMarkets").each(function () {
+                if ($(this).prop("checked")) {
+                    marketIdList.push($(this).data("marketid"));
+                }
+            });
+            if (!marketIdList.length) {
+                marketIdList = 0;
+            }
+        }
+
+        //console.log($("input[name=clusterExclusivity]:checked").val())
+       
+        var url = ServicePrefix + '/api/market/UpdateMarketProductProperties';
 
         var settings = {
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
-            data: JSON.stringif({
-                "inApiToken": getLocalStorage("APIToken")
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": productId,
+                "inMarketId": marketId,
+                "inPartnerId": $("#ddlPartnerList").val(),                       
+                "inPeriodId": $("#ddlReportingFrequency").val(),
+                "inSubmittingPeriodId": $("#ddlSubmittingFrequency").val(),
+                "inMarketOnHold": $("#chkMarketOnHold").prop("checked"),
+                "inOtherMarketIdList": marketIdList,
+                "inMinimumStationsYTD": $("#txtMinEntities").val(),
+                "inMinimumShareYTD": $("#txtMinMarketShare").val(),
+                "inMinimumNewspaperRevenue": $("#txtNewsRevMinimum").val(),
+                "inOperatorId": $("#ddlProcessor").val(),
+                "inVersion": 5,
+                "inQueryCutOff": "test",
+                "inExclusivityMethod": $("input[name=clusterExclusivity]:checked").val(),
+                "inNumberPriorYears": "1"
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -746,7 +787,7 @@
 
     function hideShowLimitedMarkets() {
 
-        if ($("#ddlRecipientAccess").val() == "Limited") {
+        if ($("#rdLimited").is(":checked")) {
             if ($("#divAssociatedMarkets").hasClass("hidden")) {
                 $("#divAssociatedMarkets").removeClass("hidden");
             }

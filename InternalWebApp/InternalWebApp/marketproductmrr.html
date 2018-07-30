@@ -45,8 +45,6 @@
         .standardText, select {
             width: 300px !important;
         }
-       
-              
     </style>
 </head>
 <body>
@@ -85,7 +83,10 @@
 
                     </div>
 
-                    <input type="hidden" id="txtMarketId" />
+                    <input type="hidden" id="hdnMarketId" />
+                    <input type="hidden" id="hdnParentMarketId" />
+                    <input type="hidden" id="hdnReportingPeriod" />
+                    <input type="hidden" id="hdnSubmittingPeriod" />
 
                     <!--Reporting Period-->
                     <div class="row input-row">
@@ -172,14 +173,16 @@
                     <div class="row input-row">
 
                         <div class="col-md-3 text-align-left">
-                            <label for="ddlRecipientAccess">Recipient Access</label>
+                            <label>Recipient Access</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlRecipientAccess" class="mkaRequired" onchange="hideShowLimitedMarkets()">
-                                <option value="All">All</option>
-                                <option value="None">None</option>
-                                <option value="Limited">Limited</option>
-                            </select>
+                            <input type="radio" id="rdAll" name="limitedAccess" value="0" checked onchange="hideShowLimitedMarkets()" />
+                            <label for="rdAll">All</label>
+                            <input type="radio" id="rdNone" name="limitedAccess" value="-1" onchange="hideShowLimitedMarkets()" />
+                            <label for="rdNone">None</label>
+                            <input type="radio" id="rdLimited" name="limitedAccess" onchange="hideShowLimitedMarkets()" />
+                            <label for="rdLimited">Limited</label>
+
                         </div>
                     </div>
 
@@ -230,15 +233,13 @@
 </html>
 <script>
     var marketId = 0;
-    var parentMarketId = 0;
-    var productId = 0;
+    var productId = "MRR";
 
     $(document).ready(function () {
         buildMainMenu("Markets");
         marketId = (getParameterByName("MarketId") == null ? 0 : getParameterByName("MarketId"));
-        parentMarketId = (getParameterByName("ParentMarketId") == null ? 0 : getParameterByName("ParentMarketId"));
-        productId = (getParameterByName("ProductId") == null ? 0 : getParameterByName("ProductId"));
-
+        //parentMarketId = (getParameterByName("ParentMarketId") == null ? 0 : getParameterByName("ParentMarketId"));
+        
 
         getMarket();
         //flow of load data
@@ -249,7 +250,7 @@
         //getSubmissionPeriodHoldStatus()
         //getPartnerList()
         //getProductProperties()
-        
+
     });
 
     function getMarket() {
@@ -293,6 +294,7 @@
                 $("#lblMarketName").text("Market Name: " + obj.marketName);
                 $("#lblMarketId").text("Market ID: " + obj.marketId);
                 $("#lblMediaType").text("Media Type: " + obj.mediaTypeName);
+                $("#hdnParentMarketId").text(obj.parentMarketId);
             });
 
             $(".market-label").removeClass("hidden");
@@ -347,7 +349,7 @@
 
     function getAssociatedMarkets() {
 
-        if (parentMarketId == 0 || productId == 0) {
+        if ($("#hdnParentMarketId").val() == null || $("#hdnParentMarketI").val() == "") {
             return;
         }
 
@@ -359,7 +361,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inParentMarketId": parentMarketId,
+                "inParentMarketId": $("#hdnParentMarketId").text(),
                 "inProductId": productId,
                 "inMediaTypeId": 2
 
@@ -442,79 +444,28 @@
             });
 
             if (count == 0) {
-                $("#ddlRecipientAccess").val("All");
+                $("#rdAll").prop("checked", true);
+                hideShowLimitedMarkets();
             }
 
             if (count > 1) {
-                $("#ddlRecipientAccess").val("Limited");
+                $("#rdLimited").prop("checked", true);
                 hideShowLimitedMarkets();
             }
 
             if (count == 1) {
                 if (data.report.rows[0].otherMarketId == -1) {
-                    $("#ddlRecipientAccess").val("None");
+                    $("#rdNone").prop("checked", true);
+                    hideShowLimitedMarkets();
                 } else {
-                    $("#ddlRecipientAccess").val("Limited");
+                   $("#rdLimited").prop("checked", true);
                     hideShowLimitedMarkets();
                 }
             }
 
 
-            getSubmissionPeriodHoldStatus();
-        }
-    }
-
-    function getSubmissionPeriodHoldStatus() {
-
-        var url = ServicePrefix + '/api/Market/GetMarketProduct';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inMarketId": marketId,
-                "inProductId": productId
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getSubmissionPeriodHoldStatusSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
-
-    }
-
-    function getSubmissionPeriodHoldStatusSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-            });
-        } else {
-
-            $.each(data.report.rows, function (index) {
-
-                var obj = data.report.rows[index];
-
-                $("#ddlReportingPeriod").val("" + obj["periodId"] + obj["submittingPeriodID"]);
-                $("#chkMarketOnHold").prop("checked", (obj["onHoldFlag"] == true ? true : false));
-
-                if (obj["onHoldDate"] != "" && obj["onHoldDate"] != null) {
-                    $("#txtMarketOnHoldDate").text(extractDateOnly(obj["onHoldDate"]));
-                    $("#divMarketOnHoldDate").removeClass("hidden");
-                }
-
-            });
-
             getPartnerList();
         }
-
     }
 
     function getPartnerList() {
@@ -605,6 +556,15 @@
                 $("#chkAboveBelow").prop("checked", (obj["aboveBelow"] == true ? true : false));
                 $("#chkFullDisclosure").prop("checked", (obj["fullDisclosure"] == true ? true : false));
                 $("#ddlPartnerList").val(obj["partnerId"]);
+                $("#ddlReportingPeriod").val("" + obj["period"] + obj["submittingPeriod"]);
+                $("#hdnReportingPeriod").text(obj["period"]);
+                $("#hdnSubmittingPeriod").text(obj["period"]);
+                $("#chkMarketOnHold").prop("checked", (obj["onHoldFlag"] == true ? true : false));
+                
+                if (obj["onHOldDate"] != "" && obj["onHoldDate"] != null) {
+                    $("#txtMarketOnHoldDate").text(extractDateOnly(obj["onHoldDate"]));
+                    $("#divMarketOnHoldDate").removeClass("hidden");
+                }
 
             });
         }
@@ -613,14 +573,55 @@
 
     function updateMRRProduct() {
 
-        var url = ServicePrefix + '';
+        var reportingPeriod = $("#ddlReportingPeriod").val().charAt(0);
+        var submittingPeriod = $("#ddlReportingPeriod").val().charAt(1);
+
+        var marketIdList = [];
+
+        if ($("#rdNone").prop("checked")) {
+            marketIdList.push($("#rdNone").val());
+        } else {
+
+            $(".associatedMarkets").each(function () {
+                if ($(this).prop("checked")) {
+                    marketIdList.push($(this).data("marketid"));
+                }
+            });
+            if (!marketIdList.length) {
+                marketIdList = 0;
+            }
+        }
+       
+        console.log(marketIdList);
+
+        var url = ServicePrefix + '/api/market/UpdateMarketProductProperties';
 
         var settings = {
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": productId,
+                "inMarketId": marketId,
+                "inPartnerId": $("#ddlPartnerList").val(),
+                "inPhase2Id": marketId,
+                "inRatings": $("#chkPwrRatiosRating").prop("checked"),
+                "inBands": $("#chkMeasureBands").prop("checked"),
+                "inAboveBelow": $("#chkAboveBelow").prop("checked"),
+                "inFullDisclosure": $("#chkFullDisclosure").prop("checked"),
+                "inPeriodId": reportingPeriod,
+                "inSubmittingPeriodId": submittingPeriod,
+                "inMarketOnHold": $("#chkMarketOnHold").prop("checked"),
+                "inOtherMarketIdList": marketIdList,
+                "inMinimumStationsYTD": null,
+                "inMinimumShareYTD": null,
+                "inOperatorId": null,
+                "inVersion": null,
+                "inQueryCutOff": null,
+                "inExclusivityMethod": null,
+                "inNumberPriorYears": null
+               
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -654,7 +655,7 @@
 
     function hideShowLimitedMarkets() {
 
-        if ($("#ddlRecipientAccess").val() == "Limited") {
+        if ($("#rdLimited").is(":checked")) {
             if ($("#divAssociatedMarkets").hasClass("hidden")) {
                 $("#divAssociatedMarkets").removeClass("hidden");
             }
