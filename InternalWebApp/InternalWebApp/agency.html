@@ -59,7 +59,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Advertiser</h2>
+                        <h2>Agency</h2>
                     </div>
                 </div>
                 <div class="text-center" style="margin-top: 0">
@@ -67,10 +67,7 @@
                     <!--
                     id,
                     name,
-                    industry,
-                    subindustry,
-                    parentadvertiser,
-                    media code,
+                    account type,
                     activedate,
                     active,
                     disabledate
@@ -87,56 +84,30 @@
                     </div>
 
                     <div class="row input-row">
-                        <input type="hidden" id="txtAdvertiserId" /> <!-- not sure if worth showing identity field -->
+                        <input type="hidden" id="txtAgencyId" /> <!-- not sure if worth showing identity field -->
                         <div class="col-md-3 text-align-left">
-                            <label for="txtAdvertiserName">Advertiser Name</label>
+                            <label for="txtAgencyName">Agency Name</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" class="mkaRequired" maxlength="50" id="txtAdvertiserName" errorMessage="You must enter an Advertiser Name." value="" />
-                        </div>
-                    </div>
-
-
-
-                    <!--
-                    industry
-                    -->
-                    <div class="row input-row">
-                        <div class="col-md-3 text-align-left">
-                            <label for="ddlIndustry" class="">Industry</label>
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <select id="ddlIndustry" class="mkaRequired" style="" errorMessage="You must select an Industry."></select>
-                        </div>
-                    </div>
-                    <!--
-                    subindustry
-                    -->
-
-                    <div class="row input-row">
-                        <div class="col-md-3 text-align-left">
-                            <label for="ddlSubIndustry" class="">Sub Industry</label>
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <select id="ddlSubIndustry" class="mkaRequired" style="" errorMessage="You must select a Sub Industry."></select>
+                            <input type="text" class="mkaRequired" maxlength="50" id="txtAgencyName" errorMessage="You must enter an Agency Name." value="" />
                         </div>
                     </div>
 
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="ddlParentAdvertiser" class="">Parent Advertiser</label>
+                            <label for="ddlAccountType" class="">Account Type</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlParentAdvertiser" class="" style="" errorMessage=""></select>
+                            <select id="ddlAccountType" class="mkaRequired" style="" errorMessage="You must select an Account Type."></select>
                         </div>
                     </div>
 
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="ddlMediaCode" class="">Media Code</label>
+                            <label for="ddlParentAgency" class="">Parent Agency</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlMediaCode" class="mkaRequired" style="" errorMessage="You must select a Media Code."></select>
+                            <select id="ddlParentAgency" class="" style="" errorMessage=""></select>
                         </div>
                     </div>
 
@@ -155,6 +126,15 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input type="checkbox" id="chkActive" value="">
+                        </div>
+                    </div>
+                    
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtChangeDate">Change Date</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" id="txtChangeDate" value="" maxlength="50" placeholder="MM/DD/YYYY" readonly />
                         </div>
                     </div>
 
@@ -207,13 +187,13 @@
 
 <script>
 
-    var advertiserId = 0;
+    var agencyId = 0;
 
     $(document).ready(function () {
 
         buildXRYMenu("Advertiser");
 
-        advertiserId = (getParameterByName("AdvertiserID") == null ? 0 : getParameterByName("AdvertiserID"));
+        agencyId = (getParameterByName("AgencyID") == null ? 0 : getParameterByName("AgencyID"));
 
         getMarketList();
 
@@ -228,10 +208,7 @@
                 $(".disable-date").show();
             }
         });
-
-        $("#ddlIndustry").change(function () {
-            getSubIndustryList($(this).val(), '');
-        });
+       
     });
 
     function getMarketList() {
@@ -271,7 +248,7 @@
 
                     });
 
-                    getMediaCodeList();
+                    getAccountTypeList();;
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -280,14 +257,14 @@
                 });
             }
         });
-        
+
     }
 
-    function getMediaCodeList() {
+    function getAccountTypeList() {
 
         //getIndustryList
         $.ajax({
-            url: ServicePrefix + '/api/MediaCode/GetMediaCodeList',
+            url: ServicePrefix + '/api/AccountType/GetAccountTypeList',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
@@ -308,19 +285,19 @@
 
                         var str = '';
 
-                        $("#ddlMediaCode").html("<option value='-1'> -- Select a Media Code</option>");
+                        $("#ddlAccountType").html("<option value='-1'> -- Select an Account Type</option>");
 
                         //var holdOwnerID = "0";
 
                         $.each(data.report.rows, function (index) {
                             var obj = data.report.rows[index];
-                            str = "<option value='" + obj.mediaCodeId + "'>" + addZero(obj.mediaCodeId) + " - " + obj.mediaCodeDescription + "</option>";
-                            $("#ddlMediaCode").append(str);
+                            str = "<option value='" + obj.accountTypeId + "'>" + obj.accountTypeId + " - " + obj.accountTypeName + "</option>";
+                            $("#ddlAccountType").append(str);
                         });
 
                     });
 
-                    getIndustryList();
+                    getParentAgencyList();
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -331,59 +308,10 @@
         });
     }
 
-    function getIndustryList() {
+    function getParentAgencyList() {
 
         $.ajax({
-            url: ServicePrefix + '/api/Industry/GetIndustryList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-                    });
-                }
-                else {
-
-                    $.each(data.report.rows, function () {
-
-                        var str = '';
-
-                        $("#ddlIndustry").html("<option value='-1'> -- Select an Industry</option>");
-
-                        //var holdOwnerID = "0";
-
-                        $.each(data.report.rows, function (index) {
-                            var obj = data.report.rows[index];
-                            str = "<option value='" + obj.industryId + "'>" + addZero(obj.industryId) + " - " + obj.industryName + "</option>";
-                            $("#ddlIndustry").append(str);
-                        });
-
-                    });
-
-                    //getAdvertiser();
-                    getParentAdvertiserList();
-                }
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    //window.location = "preprocess.html";
-                });
-            }
-        });
-
-    }
-
-    function getParentAdvertiserList() {
-
-        $.ajax({
-            url: ServicePrefix + '/api/ParentAdvertiser/GetParentAdvertiserList',
+            url: ServicePrefix + '/api/ParentAgency/GetParentAgencyList',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
@@ -401,19 +329,19 @@
                 }
                 else {
 
-                    $("#ddlParentAdvertiser").html("<option value='-1'> -- Select a Parent Advertiser</option>");
+                    $("#ddlParentAgency").html("<option value='-1'> -- Select a Parent Agency</option>");
                     var str = '';
 
                     $.each(data.report.rows, function (index) {
-                        
+
                         var obj = data.report.rows[index];
-                        str += "<option value='" + obj.parentAdvertiserId + "'>" + obj.parentAdvertiserName + "</option>";
+                        str += "<option value='" + obj.parentAgencyId + "'>" + obj.parentAgencyName + "</option>";
 
                     });
 
-                    $("#ddlParentAdvertiser").append(str);
+                    $("#ddlParentAgency").append(str);
 
-                    getAdvertiser();
+                    getAgency();
 
                 }
             },
@@ -435,20 +363,20 @@
         $("#chkActive").prop('checked', true);
     }
 
-    function getAdvertiser() {
-        if (advertiserId <= 0) {
+    function getAgency() {
+        if (agencyId <= 0) {
             initializeActiveDate();
             return;
         }
 
         $.ajax({
-            url: ServicePrefix + '/api/Advertiser/GetAdvertiser',
+            url: ServicePrefix + '/api/Agency/GetAgency',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inAdvertiserId": advertiserId
+                "inAgencyId": agencyId
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -470,32 +398,31 @@
                             $("#ddlMarket").val(obj["marketId"]);
                         }
 
-                        $("#txtAdvertiserId").val(obj["advertiserId"]);
-                        $("#txtAdvertiserName").val(obj["advertiserName"]);
+                        $("#txtAgencyId").val(obj["agencyId"]);
+                        $("#txtAgencyName").val(obj["agencyName"]);
 
-                        $("#ddlIndustry").val(obj["industryId"]);
+                        $("#ddlAccountType").val(obj["accountTypeId"]);
 
-                        if (obj["parentAdvertiserId"]=== null || obj["parentAdvertiserId"].length === 0) {
-                            $("#ddlParentAdvertiser").val(-1);
+                        if (obj["parentAgencyId"] === null || obj["parentAgencyId"].length === 0) {
+                            $("#ddlParentAgency").val(-1);
                         } else {
-                            $("#ddlParentAdvertiser").val(obj["parentAdvertiserId"]);
-                        }
-
-                        if (obj["mediaCodeId"] === null || obj["mediaCodeId"].length === 0) {
-                            $("#ddlMediaCode").val(-1);
-                        } else {
-                            $("#ddlMediaCode").val(obj["mediaCodeId"]);
+                            $("#ddlParentAgency").val(obj["parentAgencyId"]);
                         }
 
                         if (obj["dateSetup"] !== null) {
                             var activeDate = new Date(obj["dateSetup"]);
-                            console.log(activeDate);
                             $("#txtActiveDate").val(addZero(activeDate.getMonth() + 1) + '/' + addZero(activeDate.getDate()) + '/' + activeDate.getFullYear());
                         }
 
                         if (obj["disableDate"] === null) {
                             $("#chkActive").prop('checked', true);
                         }
+
+                        if (obj["dateChanged"] !== null) {
+                            var changeDate = new Date(obj["dateChanged"]);
+                            $("#txtChangeDate").val(addZero(changeDate.getMonth() + 1) + '/' + addZero(changeDate.getDate()) + '/' + changeDate.getFullYear());
+                        }
+
 
                         //there is a last changed date that can possibly be displayed (dateChanged)
 
@@ -525,58 +452,7 @@
 
     }
 
-    function getSubIndustryList(industryId, subIndustryId) {
-        $.ajax({
-            url: ServicePrefix + '/api/SubIndustry/GetSubIndustryList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inShowDisabled": false,
-                "inIndustryId": industryId
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-                    });
-                }
-                else {
-
-                    $.each(data.report.rows, function (index) {
-
-                        var str = '';
-
-                        $("#ddlSubIndustry").html("<option value='-1'> -- Select a Sub Industry</option>");
-
-                        //var holdOwnerID = "0";
-
-                        $.each(data.report.rows, function (index) {
-                            var obj = data.report.rows[index];
-                            str = "<option value='" + obj.subIndustryId + "'>" + addZero(obj.subIndustryId) + " - " + obj.subIndustryName + "</option>";
-                            $("#ddlSubIndustry").append(str);
-                        });
-
-                        if (subIndustryId.length === 0) {
-                            $("#ddlSubIndustry").val(-1);
-                        } else {
-                            $("#ddlSubIndustry").val(subIndustryId);
-                        }
-                    });
-
-                }
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    //window.location = "preprocess.html";
-                });
-            }
-        });
-
-    }
+   
 
     function validationPassed() {
         var loopBreak = true;
