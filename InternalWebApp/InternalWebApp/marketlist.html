@@ -76,13 +76,15 @@
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-10 ">
-                        <label for="ddlMediaType" class="dropdown-label">Media Type</label>
-                        <select id="ddlMediaType" class="dropdown-select"></select>
+                        <!--<label for="ddlMediaType" class="dropdown-label">Media Type</label>
+                        <select id="ddlMediaType" class="dropdown-select"></select>-->
 
                         <label for="searchText">Market Name</label>
-                        <input type="text" id="searchText" />
+                        <input type="text" id="searchText" onkeyup="getMarketList()"/>
 
-                        <input type="button" class="search-button" style="" value="Search" onclick="getMarketList()" />
+                        <label for="searchTextNumber">Market Number</label>
+                        <input type="text" id="searchTextNumber" value="" />
+                        <!--<input type="button" class="search-button" style="" value="Search" onclick="getMarketList()" />-->
                     </div>
                     <div class="col-md-2 ">
                         <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editMarket(0)" />
@@ -95,6 +97,7 @@
                         <thead>
                             <tr>
                                 <th class="exportColumn">Market</th>
+                                <th class="exportColumn">Media Type</th>
                                 <th class="exportColumn">Products</th>
                                 <th></th>
                             </tr>
@@ -102,6 +105,7 @@
                         <tfoot>
                             <tr>
                                 <th>Market</th>
+                                <th>Media Type</th>
                                 <th>Products</th>
                                 <th></th>
                             </tr>
@@ -146,7 +150,24 @@
 </html>
 <script>
 
+
+
+
+
     $(document).ready(function () {
+
+        var input = document.getElementById("searchTextNumber");
+        // Execute a function when the user releases a key on the keyboard
+        input.addEventListener("keyup", function (event) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Number 13 is the "Enter" key on the keyboard
+            if (event.keyCode === 13) {
+
+                editMarket(document.getElementById("searchTextNumber").value);
+            }
+        });
+
         var reportTitle = "Markets List";
         var exportColumns = returnTableColumnsByClass("dtMarketList", "exportColumn");
 
@@ -157,11 +178,20 @@
                 { "data": 'marketName' },
                 {
                     mRender: function (data, type, row) {
+                        return '<a href="#" onclick="editMediaType(' + row.mediaTypeId + ')">' + row.mediaType + '</a>';
+
+                    },
+                    "orderable": true,
+                    "searchable": true
+                },
+                {
+                    mRender: function (data, type, row) {
 
                         return returnProductListLinks(row);
                         
                     }
                 },
+
                 {
                     mRender: function (data, type, row) {
 
@@ -249,7 +279,7 @@
             });
 
         buildMainMenu("Markets");
-        getMediaTypes();
+        //getMediaTypes();
 
     });
 
@@ -263,7 +293,7 @@
                 sArray = search.split("|");
 
                 $("#searchText").val(sArray[0]);
-                $("#ddlMediaType").val(sArray[1].toString());
+                //$("#ddlMediaType").val(sArray[1].toString());
 
                 getMarketList();
             }
@@ -271,65 +301,62 @@
 
     }
 
-    function getMediaTypes() {
+    //function getMediaTypes() {
 
-        $.ajax({
-            url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
+    //    $.ajax({
+    //        url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
+    //        dataType: 'json',
+    //        type: 'post',
+    //        contentType: 'application/json',
+    //        data: JSON.stringify({
+    //            "inApiToken": getLocalStorage("APIToken")
+    //        }),
+    //        processData: false,
+    //        success: function (data, textStatus, jQxhr) {
 
-                if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+    //            if (data.response.status != "SUCCESS") {
+    //                bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
 
-                    });
-                }
-                else {
+    //                });
+    //            }
+    //            else {
 
-                    var str = '';
-                    //console.log(JSON.stringify(data));
-                    str = '<option value="">-- Select a Media Type</option>';
-                    $.each(data.report.rows, function (index) {
+    //                var str = '';
+    //                //console.log(JSON.stringify(data));
+    //                str = '<option value="">-- Select a Media Type</option>';
+    //                $.each(data.report.rows, function (index) {
 
-                        str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+    //                    str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
 
-                    });
+    //                });
 
-                    $("#ddlMediaType").html(str);
+    //                $("#ddlMediaType").html(str);
 
-                    loadLastSearch();
+    //                loadLastSearch();
 
-                }
+    //            }
 
 
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                //bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                //    //window.location = "preprocess.html";
-                //});
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
+    //        },
+    //        error: function (jqXhr, textStatus, errorThrown) {
+    //            //bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+    //            //    //window.location = "preprocess.html";
+    //            //});
+    //            genericAjaxError(jqXhr, textStatus, errorThrown);
+    //        }
+    //    });
+    //}
 
     function getMarketList() {
-        if ($("#ddlMediaType").val().trim() == 0) {
-            bootbox.alert("Please select a Media Type to search for Markets", function () { });
+
+        if ($("#searchText").val().trim().length <= 2)
+        {
+            var table = $("#dtMarketList").DataTable();
+            table.clear().draw();
             return;
         }
 
-        if ($("#searchText").val().trim() == 0) {
-            bootbox.alert("Please enter text to search for Markets", function () { });
-            return;
-        }
-
-
-        setLocalStorage("search", $("#searchText").val().trim() + "|" + $("#ddlMediaType").val().trim());
+        setLocalStorage("search", $("#searchText").val().trim());
         setLocalStorage("searchPage", window.location);
 
         $.ajax({
@@ -341,7 +368,7 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inMarketName": $("#searchText").val(),
                 "inActiveOnly": "1",
-                "inMediaTypeID": $("#ddlMediaType").val(),
+                //"inMediaTypeID": $("#ddlMediaType").val(),
                 "inPrimaryMarketOnly": "0"
             }),
             processData: false,
@@ -374,5 +401,6 @@
         });
 
     }
+
 </script>
 
