@@ -80,7 +80,7 @@
                         <select id="ddlMediaType" class="dropdown-select"></select>-->
 
                         <label for="searchText">Market Name</label>
-                        <input type="text" id="searchText" onkeyup="getMarketList()"/>
+                        <input type="text" id="searchText" />
 
                         <label for="searchTextNumber">Market Number</label>
                         <input type="text" id="searchTextNumber" value="" />
@@ -167,7 +167,17 @@
                 editMarket(document.getElementById("searchTextNumber").value);
             }
         });
+        var input = document.getElementById("searchText");
+        // Execute a function when the user releases a key on the keyboard
+        input.addEventListener("keyup", function (event) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Number 13 is the "Enter" key on the keyboard
+            if (event.keyCode === 13) {
 
+                getMarketList();
+            }
+        });
         var reportTitle = "Markets List";
         var exportColumns = returnTableColumnsByClass("dtMarketList", "exportColumn");
 
@@ -368,11 +378,19 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inMarketName": $("#searchText").val(),
                 "inActiveOnly": "1",
-                //"inMediaTypeID": $("#ddlMediaType").val(),
                 "inPrimaryMarketOnly": "0"
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
+                if (data.response.status.toUpperCase() === "SUCCESS")
+                {
+                    if (data.report.rows.length == 1)
+                    {
+                        var id = data.report.rows[0].marketid;
+                        editMarket(id);
+                        return;
+                    }
+                }
                 populateDataTable("dtMarketList", data);
             },
             error: function (jqXhr, textStatus, errorThrown) {

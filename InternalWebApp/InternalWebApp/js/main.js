@@ -634,6 +634,8 @@ function returnProductListLinks(row) {
     return productList;
 }
 
+
+
 function populateDataTable(tableName, data) {
     var tableJson;
 
