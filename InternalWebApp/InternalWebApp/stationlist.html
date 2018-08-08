@@ -77,7 +77,7 @@
                 <div class="row search-section">
                     <div class="col-md-10 ">
                         <label for="ddlOwner" class="search-ddl-label">Owner</label>
-                        <select id="ddlOwner" class="search-ddl-select" style="" onchange="getStationList()"></select>
+                        <select id="ddlOwner" class="search-ddl-select" style="" onchange="getStationListByOwner()"></select>
 
                         <label for="searchText">Station Name</label>
                         <input type="text" id="searchText" />
@@ -165,6 +165,17 @@
 
     $(document).ready(function () {
 
+        var input = document.getElementById("searchText");
+        // Execute a function when the user releases a key on the keyboard
+        input.addEventListener("keyup", function (event) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Number 13 is the "Enter" key on the keyboard
+            if (event.keyCode === 13) {
+                $("#ddlOwner").val("");
+                getStationList();
+            }
+        });
         var reportTitle = 'Station List';
         var exportColumns = returnTableColumnsByClass("dtStationList", "exportColumn");
 
@@ -300,6 +311,12 @@
 
 
     });
+
+    function getStationListByOwner()
+    {
+        $("#searchText").val("");
+        getStationList();
+    }
 
     function getOwnerList() {
 
@@ -451,7 +468,7 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inStationName": $("#searchText").val(),
                 "inActiveOnly": "1",
-                "inOwnerID": $("#ddlOwner").val()
+              "inOwnerID": $("#ddlOwner").val() == 0 ? null : $("#ddlOwner").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
