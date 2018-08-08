@@ -77,7 +77,7 @@
                 <div class="row search-section">
                     <div class="col-md-10 ">
                         <label for="ddlOwner" class="search-ddl-label">Owner</label>
-                        <select id="ddlOwner" class="search-ddl-select" style=""></select>
+                        <select id="ddlOwner" class="search-ddl-select" style="" onchange="getStationList()"></select>
 
                         <label for="searchText">Station Name</label>
                         <input type="text" id="searchText" />
@@ -90,12 +90,12 @@
                     </div>
                 </div>
 
-                <div class="row search-section">
+                <!--<div class="row search-section">
                     <div class="col-md-12">
                         <label for="ddlMediaType" class="search-ddl-label" style="">Media Type</label>
                         <select id="ddlMediaType" class="search-ddl-select" style=""></select>
                     </div>
-                </div>
+                </div>-->
 
                 <!-- start datatable-->
 
@@ -106,6 +106,7 @@
                                 <th class="exportColumn">Station</th>
                                 <th class="exportColumn">Owner</th>
                                 <th class="exportColumn">Market</th>
+                                <th class="exportColumn">Media Type</th>
                                 <th class="exportColumn">Products</th>
                                 <th></th>
                             </tr>
@@ -115,6 +116,7 @@
                                 <th>Station</th>
                                 <th>Owner</th>
                                 <th>Market</th>
+                                <th>Media Type</th>
                                 <th>Products</th>
                                 <th></th>
                             </tr>
@@ -186,6 +188,15 @@
                         var marketID = row["marketid"];
                         var marketName = row["marketName"];
                         return '<a href="#" onclick="editMarket(' + marketID + ')">' + marketName + '</a>';
+
+                    }
+                },
+                {
+                    mRender: function (data, type, row) {
+
+                        var mediaTypeId = row["mediaTypeId"];
+                        var mediaType = row["mediaType"];
+                        return '<a href="#" onclick="editMediaType(' + mediaTypeId + ')">' + mediaType + '</a>';
 
                     }
                 },
@@ -327,7 +338,7 @@
 
                 }
 
-                getMediaTypes();
+                loadLastSearch();
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -339,50 +350,50 @@
 
     }
 
-    function getMediaTypes() {
+    //function getMediaTypes() {
 
-        $.ajax({
-            url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
+    //    $.ajax({
+    //        url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
+    //        dataType: 'json',
+    //        type: 'post',
+    //        contentType: 'application/json',
+    //        data: JSON.stringify({
+    //            "inApiToken": getLocalStorage("APIToken")
+    //        }),
+    //        processData: false,
+    //        success: function (data, textStatus, jQxhr) {
 
-                if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+    //            if (data.response.status != "SUCCESS") {
+    //                bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
 
-                    });
-                }
-                else {
+    //                });
+    //            }
+    //            else {
 
-                    var str = '';
-                    //console.log(JSON.stringify(data));
-                    str = '<option value="">-- Select a Media Type</option>';
-                    $.each(data.report.rows, function (index) {
+    //                var str = '';
+    //                //console.log(JSON.stringify(data));
+    //                str = '<option value="">-- Select a Media Type</option>';
+    //                $.each(data.report.rows, function (index) {
 
-                        str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+    //                    str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
 
-                    });
+    //                });
 
-                    $("#ddlMediaType").html(str);
+    //                $("#ddlMediaType").html(str);
 
-                    loadLastSearch();
-                }
+    //                loadLastSearch();
+    //            }
 
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    //window.location = "preprocess.html";
-                });
-            }
-        });
+    //        },
+    //        error: function (jqXhr, textStatus, errorThrown) {
+    //            bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+    //                //window.location = "preprocess.html";
+    //            });
+    //        }
+    //    });
 
 
-    }
+    //}
 
     function loadLastSearch() {
         var search = getParameterByName("search");
@@ -392,8 +403,7 @@
                 var sArray = search.split("|");
 
                 $("#searchText").val(sArray[0]);
-                $("#ddlMediaType").val(sArray[1].toString());
-                $("#ddlOwner").val(sArray[2].toString());
+                $("#ddlOwner").val(sArray[1].toString());
 
                 getStationList();
             }
@@ -403,12 +413,12 @@
     function getStationList() {
         var searchCtr = 0
 
-        if ($("#ddlMediaType").val().trim() == 0) {
-            searchCtr = searchCtr;
-        }
-        else {
-            searchCtr = searchCtr + 1;
-        }
+        //if ($("#ddlMediaType").val().trim() == 0) {
+        //    searchCtr = searchCtr;
+        //}
+        //else {
+        //    searchCtr = searchCtr + 1;
+        //}
 
         if ($("#ddlOwner").val().trim() == 0) {
             searchCtr = searchCtr;
@@ -429,7 +439,7 @@
             return;
         }
 
-        setLocalStorage("search", $("#searchText").val().trim() + "|" + $("#ddlMediaType").val().trim() + "|" + $("#ddlOwner").val().trim());
+        setLocalStorage("search", $("#searchText").val().trim() + "|" + $("#ddlOwner").val().trim());
         setLocalStorage("searchPage", window.location);
 
         $.ajax({
@@ -441,8 +451,7 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inStationName": $("#searchText").val(),
                 "inActiveOnly": "1",
-                "inOwnerID": $("#ddlOwner").val(),
-                "inMediaTypeID": $("#ddlMediaType").val()
+                "inOwnerID": $("#ddlOwner").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -490,6 +499,11 @@
         });
 
     }
+    function editMediaType(mediaTypeId) {
 
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+
+    }
 </script>
 
