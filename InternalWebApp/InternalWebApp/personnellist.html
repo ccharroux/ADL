@@ -69,7 +69,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Stations</h2>
+                        <h2>Personnel</h2>
                     </div>
                 </div>
 
@@ -77,54 +77,41 @@
                 <div class="row search-section">
                     <div class="col-md-10 ">
                         <label for="ddlOwner" class="search-ddl-label">Owner</label>
-                        <select id="ddlOwner" class="search-ddl-select" style="" onchange="getStationListByOwner()"></select><br />
+                        <select id="ddlOwner" class="search-ddl-select" style="" onchange="getPersonnelByOwner()"></select><br />
 
-                        <label for="searchText" class="search-ddl-label">Station Name</label>
-                        <input type="text" id="searchText" />
+                        <label for="searchText"class="search-ddl-label">Email</label>
+                        <input type="text" id="searchText" value="" /><br />
 
-
+                        <label for="searchTextNumber"class="search-ddl-label">Name</label>
+                        <input type="text" id="searchText2" value="" />
                     </div>
                     <div class="col-md-2 ">
-                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editStation(0)" /> <!-- editOwnership(0) -->
+                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editMarket(0)" />
                     </div>
                 </div>
 
-                <!--<div class="row search-section">
-                    <div class="col-md-12">
-                        <label for="ddlMediaType" class="search-ddl-label" style="">Media Type</label>
-                        <select id="ddlMediaType" class="search-ddl-select" style=""></select>
-                    </div>
-                </div>-->
-
                 <!-- start datatable-->
-
                 <div class="dataTable-top-margin">
-                    <table id="dtStationList" class="stripe">
+                    <table id="dtPersonnelList" class="stripe">
                         <thead>
                             <tr>
-                                <th class="exportColumn">Station</th>
+                                <th class="exportColumn">Name</th>
+                                <th class="exportColumn">Email Address</th>
                                 <th class="exportColumn">Owner</th>
-                                <th class="exportColumn">Market</th>
-                                <th class="exportColumn">Media Type</th>
-                                <th class="exportColumn">Products</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <th>Station</th>
+                                <th>Name</th>
+                                <th>Email Address</th>
                                 <th>Owner</th>
-                                <th>Market</th>
-                                <th>Media Type</th>
-                                <th>Products</th>
                                 <th></th>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
-
                 <!-- end datatable -->
-
             </div>
         </div>
         <!--<div id="map" data-animate-effect="fadeIn"></div>-->
@@ -162,65 +149,63 @@
 </html>
 <script>
 
+
+
+
+
     $(document).ready(function () {
 
         var input = document.getElementById("searchText");
+        var input2 = document.getElementById("searchText2");
+
         // Execute a function when the user releases a key on the keyboard
         input.addEventListener("keyup", function (event) {
             // Cancel the default action, if needed
             event.preventDefault();
             // Number 13 is the "Enter" key on the keyboard
             if (event.keyCode === 13) {
-                $("#ddlOwner").val("");
-                getStationList();
+
+                getPersonnelByEmail();
             }
         });
-        var reportTitle = 'Station List';
-        var exportColumns = returnTableColumnsByClass("dtStationList", "exportColumn");
 
-        $("#dtStationList").DataTable({
+        // Execute a function when the user releases a key on the keyboard
+        input2.addEventListener("keyup", function (event) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Number 13 is the "Enter" key on the keyboard
+            if (event.keyCode === 13) {
+
+                getPersonnelByName();
+            }
+        });
+
+        var reportTitle = "Personnel List";
+        var exportColumns = returnTableColumnsByClass("dtPersonnelList", "exportColumn");
+
+        $("#dtPersonnelList").DataTable({
             "dom": "Blfrtip",
             "data": [],
             "columns": [
-                { "data": 'stationName' },
+                { "data": 'name' },
+                { "data": 'emailAddress' },
                 {
                     mRender: function (data, type, row) {
 
-                        var ownerID = row["ownerid"];
-                        var ownerName = row["ownerName"];
-                        return '<a href="#" onclick="editOwner(' + ownerID + ')">' + ownerName + '</a>';
-
-                    }
+                        if (row.ownerId == "-1") {
+                            return row.ownerName;
+                        }
+                        else {
+                            return '<a href="#" onclick="editOwnership(' + row.ownerId + ')">' + row.ownerName + '</a>';
+                        }
+                    },
+                    "orderable": true,
+                    "searchable": true
                 },
                 {
                     mRender: function (data, type, row) {
 
-                        var marketID = row["marketid"];
-                        var marketName = row["marketName"];
-                        return '<a href="#" onclick="editMarket(' + marketID + ')">' + marketName + '</a>';
-
-                    }
-                },
-                {
-                    mRender: function (data, type, row) {
-
-                        var mediaTypeId = row["mediaTypeId"];
-                        var mediaType = row["mediaType"];
-                        return '<a href="#" onclick="editMediaType(' + mediaTypeId + ')">' + mediaType + '</a>';
-
-                    }
-                },
-                {
-                    mRender: function (data, type, row) {
-
-                        return returnProductListLinks(row);
-
-                    }
-                },
-                {
-                    mRender: function (data, type, row) {
-
-                        return '<a href="#" onclick="editStation(' + row.stationid + ')">Edit</a>&nbsp;<a href="#" onclick="deleteStation(' + row.stationid + ')">Delete</a>';
+                        return '<a href="#" onclick="editPersonnel(' + row.personnelId + ')">Edit</a>&nbsp;<a href="#" onclick="deletePersonnel(' + row.marketId + ')">Delete</a>';
 
                     },
                     "orderable": false,
@@ -236,7 +221,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtStationList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtPersonnelList", data, columnIdx);
                            }
                        }
                    }
@@ -248,7 +233,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtStationList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtPersonnelList", data, columnIdx);
                            }
                        }
                    }
@@ -260,7 +245,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtStationList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtPersonnelList", data, columnIdx);
                            }
                        }
                    }
@@ -272,7 +257,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtStationList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtPersonnelList", data, columnIdx);
                            }
                        }
                    }
@@ -295,26 +280,37 @@
             }
         });
 
+
         $("body").on("click",
             "#clear_search_button",
             function () {
-                var table = $("#dtStationList").DataTable();
+                var table = $("#dtPersonnelList").DataTable();
                 table.search('').draw();
             });
 
-        buildMainMenu("Stations");
+        buildMainMenu("Personnel");
 
         getOwnerList();
-        
-
-
 
     });
 
-    function getStationListByOwner()
+    function getPersonnelByName()
     {
+        $("#ddlOwner").val("");
         $("#searchText").val("");
-        getStationList();
+        getPersonnelList();
+    }
+
+    function getPersonnelByEmail() {
+        $("#ddlOwner").val("");
+        $("#searchText2").val("");
+        getPersonnelList();
+    }
+
+    function getPersonnelByOwner() {
+        $("#searchText").val("");
+        $("#searchText2").val("");
+        getPersonnelList();
     }
 
     function getOwnerList() {
@@ -365,76 +361,56 @@
         });
 
     }
-
-
     function loadLastSearch() {
+
         var search = getParameterByName("search");
 
         if (!search == false) {
             if (search.length > 0) {
-                var sArray = search.split("|");
+                var sArray = new Array();
+                sArray = search.split("|");
 
-                $("#searchText").val(sArray[0]);
-                $("#ddlOwner").val(sArray[1].toString());
+                $("#ddlOwner").val(sArray[0]);
+                $("#searchText").val(sArray[1].toString());
+                $("#searchText2").val(sArray[2].toString());
 
-                getStationList();
+                getPersonnelList();
             }
         }
+
     }
 
-    function getStationList() {
+    function getPersonnelList() {
 
-
-        var table = $("#dtStationList").DataTable();
+        var table = $("#dtPersonnelList").DataTable();
         table.clear().draw();
 
-        var searchCtr = 0
-
-        //if ($("#ddlMediaType").val().trim() == 0) {
-        //    searchCtr = searchCtr;
-        //}
-        //else {
-        //    searchCtr = searchCtr + 1;
+        //if ($("#searchText").val().trim().length <= 2)
+        //{
+        //    var table = $("#dtPersonnelList").DataTable();
+        //    table.clear().draw();
+        //    return;
         //}
 
-        if ($("#ddlOwner").val().trim() == 0) {
-            searchCtr = searchCtr;
-        }
-        else {
-            searchCtr = searchCtr + 1;
-        }
-
-        if ($("#searchText").val().trim() == 0) {
-            searchCtr = searchCtr;
-        }
-        else {
-            searchCtr = searchCtr + 1;
-        }
-
-        if (searchCtr == 0) {
-            bootbox.alert("Please select/enter at least 1 filter for the Station Search", function () { });
-            return;
-        }
-
-        setLocalStorage("search", $("#searchText").val().trim() + "|" + $("#ddlOwner").val().trim());
+        setLocalStorage("search", $("#ddlOwner").val().trim() + "|" + $("#searchText").val().trim() + "|" + $("#searchText2").val().trim());
         setLocalStorage("searchPage", window.location);
 
+        //ServicePrefix = 'localhost:54064';
+        //alert(ServicePrefix);
         $.ajax({
-            url: ServicePrefix + '/api/Station/GetStationList',
+            url: ServicePrefix + '/api/Personnel/GetPersonnelListByOwnerEmailName',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inStationName": $("#searchText").val(),
-                "inActiveOnly": "1",
-              "inOwnerID": $("#ddlOwner").val() == 0 ? null : $("#ddlOwner").val()
+                "inOwnerID": $("#ddlOwner").val() == 0 ? null : $("#ddlOwner").val(),
+                "inEmailAddress": $("#searchText").val(),
+                "inLastName": $("#searchText2").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                populateDataTable("dtStationList", data);
-
+                populateDataTable("dtPersonnelList", data);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -443,6 +419,26 @@
 
     }
 
+    function editPersonnel(personnelId) {
+
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+
+    }
+
+    function deletePersonnel(personnelId) {
+
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+
+    }
+
+    function editPersonnel(personnelId) {
+
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+
+    }
 
     function editMarket(marketId) {
 
@@ -450,37 +446,11 @@
 
     }
 
-    function editOwner(ownerId) {
+    function editOwnership(ownerID) {
 
-        window.location = "ownership.html?ownerID=" + ownerId;
-
-    }
-
-    function editStation(stationId) {
-
-        bootbox.alert('This functionality is still under development.', function () {
-        });
+        window.location = "ownership.html?ownerID=" + ownerID;
 
     }
 
-    function deleteStation(stationId) {
-
-        bootbox.alert('This functionality is still under development.', function () {
-        });
-
-    }
-
-    function editProduct(productId) {
-
-        bootbox.alert('This functionality is still under development.', function () {
-        });
-
-    }
-    function editMediaType(mediaTypeId) {
-
-        bootbox.alert('This functionality is still under development.', function () {
-        });
-
-    }
 </script>
 

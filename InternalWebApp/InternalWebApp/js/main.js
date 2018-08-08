@@ -436,7 +436,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="dashboarddma.html">DMA</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Personnel") + 'href="dashboard.html">Personnel</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Personnel") + 'href="personnellist.html">Personnel</a></li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Stations") + ' href="stationlist.html">Stations</a></li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Markets") + ' href="marketlist.html" role="button" aria-expanded="false">Markets <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
