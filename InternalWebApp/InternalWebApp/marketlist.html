@@ -156,19 +156,19 @@
 
     $(document).ready(function () {
 
+
         var input = document.getElementById("searchTextNumber");
-        // Execute a function when the user releases a key on the keyboard
         input.addEventListener("keyup", function (event) {
             // Cancel the default action, if needed
             event.preventDefault();
             // Number 13 is the "Enter" key on the keyboard
             if (event.keyCode === 13) {
-
+                setLocalStorage("search", "");
                 editMarket(document.getElementById("searchTextNumber").value);
             }
         });
+
         var input = document.getElementById("searchText");
-        // Execute a function when the user releases a key on the keyboard
         input.addEventListener("keyup", function (event) {
             // Cancel the default action, if needed
             event.preventDefault();
@@ -178,6 +178,7 @@
                 getMarketList();
             }
         });
+
         var reportTitle = "Markets List";
         var exportColumns = returnTableColumnsByClass("dtMarketList", "exportColumn");
 
@@ -205,7 +206,7 @@
                 {
                     mRender: function (data, type, row) {
 
-                        return '<a href="#" onclick="editMarket(' + row.marketid + ')">Edit</a>&nbsp;<a href="#" onclick="deleteMarket(' + row.marketId + ')">Delete</a>';
+                        return '<a href="#" onclick="editMarket(' + row.marketId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteMarket(' + row.marketId + ')">Delete</a>';
 
                     },
                     "orderable": false,
@@ -289,73 +290,27 @@
             });
 
         buildMainMenu("Markets");
-        //getMediaTypes();
 
+        loadLastSearch();
     });
 
     function loadLastSearch() {
+
         var search = getParameterByName("search");
-        //var search = getLocalStorage("search");
 
         if (!search == false) {
             if (search.length > 0) {
                 var sArray = new Array();
                 sArray = search.split("|");
 
-                $("#searchText").val(sArray[0]);
-                //$("#ddlMediaType").val(sArray[1].toString());
+                $("#searchText").val(sArray[0].toString());
+                $("#searchTextNumber").val(sArray[1].toString());
 
                 getMarketList();
             }
         }
 
     }
-
-    //function getMediaTypes() {
-
-    //    $.ajax({
-    //        url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
-    //        dataType: 'json',
-    //        type: 'post',
-    //        contentType: 'application/json',
-    //        data: JSON.stringify({
-    //            "inApiToken": getLocalStorage("APIToken")
-    //        }),
-    //        processData: false,
-    //        success: function (data, textStatus, jQxhr) {
-
-    //            if (data.response.status != "SUCCESS") {
-    //                bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-    //                });
-    //            }
-    //            else {
-
-    //                var str = '';
-    //                //console.log(JSON.stringify(data));
-    //                str = '<option value="">-- Select a Media Type</option>';
-    //                $.each(data.report.rows, function (index) {
-
-    //                    str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
-
-    //                });
-
-    //                $("#ddlMediaType").html(str);
-
-    //                loadLastSearch();
-
-    //            }
-
-
-    //        },
-    //        error: function (jqXhr, textStatus, errorThrown) {
-    //            //bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-    //            //    //window.location = "preprocess.html";
-    //            //});
-    //            genericAjaxError(jqXhr, textStatus, errorThrown);
-    //        }
-    //    });
-    //}
 
     function getMarketList() {
 
@@ -366,7 +321,7 @@
             return;
         }
 
-        setLocalStorage("search", $("#searchText").val().trim());
+        setLocalStorage("search", $("#searchText").val().trim() + '|' + $("#searchTextNumber").val().trim());
         setLocalStorage("searchPage", window.location);
 
         $.ajax({
@@ -386,7 +341,8 @@
                 {
                     if (data.report.rows.length == 1)
                     {
-                        var id = data.report.rows[0].marketid;
+                        var id = data.report.rows[0].marketId;
+                        setLocalStorage("search", "");
                         editMarket(id);
                         return;
                     }
@@ -402,7 +358,7 @@
 
     function editMarket(marketId) {
 
-        window.location = "market.html?marketID=" + marketId;
+        window.location = "market.html?marketId=" + marketId;
 
     }
 
