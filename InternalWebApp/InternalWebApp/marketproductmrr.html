@@ -55,7 +55,7 @@
                 <div class="header-inner" id="menu"></div>
             </div>
         </header>
-        <div id="fh5co-contact-section contact-section">
+        <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
@@ -187,11 +187,11 @@
                     </div>
 
                     <!--Select Limited-->
-                    <div class="row hidden input-row limited-markets" id="divAssociatedMarkets">
+                    <div class="row hidden input-row " id="divAssociatedMarkets">
                         <div class="col-md-3 text-align-left">
                             <label for="selectLimited">Select Limited</label>
                         </div>
-                        <div class="col-md-9 text-align-left" id="selectLimited">
+                        <div class="col-md-9 text-align-left limited-markets" id="selectLimited">
                         </div>
                     </div>
 
@@ -234,12 +234,12 @@
 <script>
     var marketId = 0;
     var productId = "MRR";
+    var productIsNew = 0;
 
     $(document).ready(function () {
         buildMainMenu("Markets");
         marketId = (getParameterByName("MarketId") == null ? 0 : getParameterByName("MarketId"));
-        //parentMarketId = (getParameterByName("ParentMarketId") == null ? 0 : getParameterByName("ParentMarketId"));
-        
+        productIsNew = (getParameterByName("ProductNew") == null ? 0 : getParameterByName("ProductNew"));
 
         getMarket();
         //flow of load data
@@ -247,7 +247,6 @@
         //getReportingPeriods()
         //getAssociatedMarkets()
         //getSelectedLimitedMarkets()
-        //getSubmissionPeriodHoldStatus()
         //getPartnerList()
         //getProductProperties()
 
@@ -282,7 +281,7 @@
 
     function getMarketSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
             });
         } else {
@@ -329,7 +328,7 @@
     function getReportingPeriodsSuccess(data, textStatus, jQxhr) {
 
         if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
             });
         }
@@ -381,88 +380,23 @@
 
     function getAssociatedMarketsSuccess(data, text) {
         if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
             });
         } else {
             var str = '';
+            var cntr = 0
             $.each(data.report.rows, function (index) {
+                cntr += 1
                 str = str + '<div class="row" style="padding:inherit">'
                 str = str + '<input type="checkbox" class="associatedMarkets" id="chk' + data.report.rows[index].marketId + '" data-marketid="' + data.report.rows[index].marketId + '">'
                 str = str + '<label for="chk' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName.trim() + '</label></div>'
             });
+
+            if (cntr == 0) {
+                str = str + "No other markets available."
+            }
             $("#selectLimited").html(str);
-
-            getSelectedLimitedMarkets();
-        }
-    }
-
-    function getSelectedLimitedMarkets() {
-
-        var url = ServicePrefix + '/api/Market/GetMarketProductRecipientAssignmentList';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inMarketId": marketId,
-                "inProductId": productId
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getSelectedLimitedMarketsSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, ErrorThrown) {
-                genericAjaxError(jQxhr, textStatus, ErrorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
-
-    }
-
-    function getSelectedLimitedMarketsSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-            });
-        }
-        else {
-
-            var count = 0
-            $.each(data.report.rows, function (index) {
-                count += 1
-                $(".associatedMarkets").each(function () {
-                    if (data.report.rows[index].otherMarketId == $(this).data("marketid")) {
-                        $("#chk" + data.report.rows[index].otherMarketId).prop("checked", true);
-                    }
-
-                });
-            });
-
-            if (count == 0) {
-                $("#rdAll").prop("checked", true);
-                hideShowLimitedMarkets();
-            }
-
-            if (count > 1) {
-                $("#rdLimited").prop("checked", true);
-                hideShowLimitedMarkets();
-            }
-
-            if (count == 1) {
-                if (data.report.rows[0].otherMarketId == -1) {
-                    $("#rdNone").prop("checked", true);
-                    hideShowLimitedMarkets();
-                } else {
-                   $("#rdLimited").prop("checked", true);
-                    hideShowLimitedMarkets();
-                }
-            }
-
 
             getPartnerList();
         }
@@ -495,7 +429,7 @@
     function getPartnerListSuccess(data, textStatus, jQxhr) {
 
         if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
             });
         } else {
@@ -509,9 +443,88 @@
 
             $("#ddlPartnerList").html(str);
 
+            getSelectedLimitedMarkets();
+
         }
-        getProductProperties();
+
     }
+
+    function getSelectedLimitedMarkets() {
+
+        if (productIsNew == 1) {
+            return;
+        }
+
+        var url = ServicePrefix + '/api/Market/GetMarketProductRecipientAssignmentList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId,
+                "inProductId": productId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getSelectedLimitedMarketsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, ErrorThrown) {
+                genericAjaxError(jQxhr, textStatus, ErrorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getSelectedLimitedMarketsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
+
+            });
+        }
+        else {
+
+            var count = 0
+            $.each(data.report.rows, function (index) {
+                count += 1
+                $(".associatedMarkets").each(function () {
+                    if (data.report.rows[index].otherMarketId == $(this).data("marketid")) {
+                        $("#chk" + data.report.rows[index].otherMarketId).prop("checked", true);
+                    }
+
+                });
+            });
+
+            if (count == 0) {
+                $("#rdAll").prop("checked", true);
+                hideShowLimitedMarkets();
+            }
+
+            if (count > 1) {
+                $("#rdLimited").prop("checked", true);
+                hideShowLimitedMarkets();
+            }
+
+            if (count == 1) {
+                if (data.report.rows[0].otherMarketId == -1) {
+                    $("#rdNone").prop("checked", true);
+                    hideShowLimitedMarkets();
+                } else {
+                    $("#rdLimited").prop("checked", true);
+                    hideShowLimitedMarkets();
+                }
+            }
+
+
+            getProductProperties();
+        }
+    }
+
+
 
     function getProductProperties() {
 
@@ -543,7 +556,7 @@
     function getProductPropertiesSuccess(data, textStatus, jQxhr) {
 
         if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
             });
         } else {
@@ -560,7 +573,7 @@
                 $("#hdnReportingPeriod").text(obj["period"]);
                 $("#hdnSubmittingPeriod").text(obj["period"]);
                 $("#chkMarketOnHold").prop("checked", (obj["onHoldFlag"] == true ? true : false));
-                
+
                 if (obj["onHOldDate"] != "" && obj["onHoldDate"] != null) {
                     $("#txtMarketOnHoldDate").text(extractDateOnly(obj["onHoldDate"]));
                     $("#divMarketOnHoldDate").removeClass("hidden");
@@ -573,14 +586,22 @@
 
     function updateMRRProduct() {
 
+        if (validationPassed() == false) {
+            return;
+        }
+
         var reportingPeriod = $("#ddlReportingPeriod").val().charAt(0);
         var submittingPeriod = $("#ddlReportingPeriod").val().charAt(1);
 
         var marketIdList = [];
 
+        if ($("#rdAll").prop("checked")) {
+
+        }
         if ($("#rdNone").prop("checked")) {
             marketIdList.push($("#rdNone").val());
-        } else {
+        }
+        if ($("#rdLimited").prop("checked")) {
 
             $(".associatedMarkets").each(function () {
                 if ($(this).prop("checked")) {
@@ -588,11 +609,12 @@
                 }
             });
             if (!marketIdList.length) {
-                marketIdList = 0;
+                bootbox.alert("If 'limited' is selected, you must select at least one other market. ", function () {
+                });
+                return;
             }
         }
-       
-        console.log(marketIdList);
+
 
         var url = ServicePrefix + '/api/market/UpdateMarketProductProperties';
 
@@ -614,14 +636,8 @@
                 "inSubmittingPeriodId": submittingPeriod,
                 "inMarketOnHold": $("#chkMarketOnHold").prop("checked"),
                 "inOtherMarketIdList": marketIdList,
-                "inMinimumStationsYTD": null,
-                "inMinimumShareYTD": null,
-                "inOperatorId": null,
-                "inVersion": null,
-                "inQueryCutOff": null,
-                "inExclusivityMethod": null,
-                "inNumberPriorYears": null
-               
+
+
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -637,19 +653,23 @@
     }
 
     function updateMRRProductSuccess(data, textStatus, jQxhr) {
-        console.log("success");
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
+
+            });
+        } else {
+            bootbox.alert('MRR Product has successfully been updated.');
+        }
     }
 
     function hideShowMarketHoldDate() {
 
         if ($("#chkMarketOnHold").prop("checked")) {
-            if ($("#divMarketOnHoldDate").hasClass("hidden")) {
+            if ($("#txtMarketOnHoldDate").text() !== "") {
                 $("#divMarketOnHoldDate").removeClass("hidden");
             }
         } else {
-            if ($("#divMarketOnHoldDate").hasClass("hidden") == false) {
-                $("#divMarketOnHoldDate").addClass("hidden");
-            }
+            $("#divMarketOnHoldDate").addClass("hidden");
         }
     }
 
@@ -669,5 +689,36 @@
     function goBackToMarketPage() {
         window.location = "market.html?marketId=" + marketId;
     }
+
+    function validationPassed() {
+
+        var loopBreak = true;
+        $(".mkaRequired").each(function (index, el) {
+
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+
+            }
+
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == "-1") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+        });
+
+        return loopBreak;
+    }
+
 
 </script>

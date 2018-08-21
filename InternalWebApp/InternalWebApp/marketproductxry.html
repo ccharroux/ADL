@@ -45,7 +45,6 @@
         .standardText, select {
             width: 300px !important;
         }
-
     </style>
 </head>
 <body>
@@ -66,6 +65,8 @@
                 <div class="text-center margin-top-0">
 
                     <input type="hidden" id="hdnParentMarketId" />
+                    <input type="hidden" id="hdnQueryCutOff"/>
+                    <input type="hidden" id="hdnNumberPriorYears" />
 
                     <!--Market Label-->
                     <div class="market-label hidden">
@@ -99,11 +100,11 @@
 
                     <!--Submitting Frequency-->
                     <div class="row input-row">
-                        <div class="col-md-3 text-align-left" >
+                        <div class="col-md-3 text-align-left">
                             <label for="ddlSubmittingFrequency">Submitting Frequency</label>
                         </div>
-                        <div class="col-md-9 text-align-left" >
-                            <select class="mkaRequirerd" id="ddlSubmittingFrequency" errorMessage="You must select a Submitting Frequency."></select>
+                        <div class="col-md-9 text-align-left">
+                            <select class="mkaRequired" id="ddlSubmittingFrequency" errorMessage="You must select a Submitting Frequency."></select>
                         </div>
                     </div>
 
@@ -113,8 +114,8 @@
                         <div class="col-md-3 text-align-left">
                             <label for="ddlProcessor">X-Ray Processor</label>
                         </div>
-                        <div class="col-md-9 text-align-left" >
-                            <select class="mkaRequired" id="ddlProcessor" errorMessage="You must select an X-Ray Processor"></select>
+                        <div class="col-md-9 text-align-left">
+                            <select class="mkaRequired" id="ddlProcessor" errorMessage="You must select an X-Ray Processor."></select>
                         </div>
                     </div>
 
@@ -123,13 +124,13 @@
 
                     <!--Cluster Exclusivity-->
                     <div class="row input-row">
-                        <div class="col-md-3 text-align-left" >
+                        <div class="col-md-3 text-align-left">
                             <label>Cluster Exclusivity</label>
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input type="radio" id="rdCluster" value="Cluster" name="clusterExclusivity" />
                             <label for="rdCluster">Cluster</label>
-                            <input type="radio" id="rdStation" value="Station" name="clusterExclusivity" checked/>
+                            <input type="radio" id="rdStation" value="Station" name="clusterExclusivity" checked />
                             <label for="rdStation">Station</label>
                         </div>
                     </div>
@@ -140,27 +141,27 @@
                             <label for="txtMinEntities">Minimum Entities YTD</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="txtMinEntities" />
+                            <input type="text" id="txtMinEntities" class="mkaRequired" errorMessage="You must enter a Minimum Entities YTD."/>
                         </div>
                     </div>
 
                     <!--Miminum Market Share YTD-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtMinMarketShare">Minimum Market Share YTD</label>
+                            <label for="txtMinMarketShare">Minimum Market Share YTD %</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="txtMinMarketShare" />
+                            <input type="text" id="txtMinMarketShare" value="0" />
                         </div>
                     </div>
 
                     <!--Maximum Market Share YTD-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtMaxMarketShare">Maximum Market Share YTD</label>
+                            <label for="txtMaxMarketShare">Maximum Market Share YTD %</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="txtMaxMarketShare" />
+                            <input type="text" id="txtMaxMarketShare" value="0" />
                         </div>
                     </div>
 
@@ -170,7 +171,7 @@
                             <label for="txtNewsRevMinimum">Newspaper Revenue Minimum</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="txtNewsRevMinimum" />
+                            <input type="text" id="txtNewsRevMinimum" value="0" class="mkaRequired" errorMessage="You must enter a Newspaper Revenue Minimum." />
                         </div>
                     </div>
                     <hr />
@@ -181,7 +182,7 @@
                             <label for="ddlPartnerList">Partner</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlPartnerList" class="mkaRequired"></select>
+                            <select id="ddlPartnerList" class="mkaRequired" value="0" errorMessage="You must select a Partner."></select>
                         </div>
                     </div>
 
@@ -191,7 +192,7 @@
                             <label for="chkMarketOnHold">Market On Hold</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                          <input type="checkbox" id="chkMarketOnHold" />
+                            <input type="checkbox" id="chkMarketOnHold" onchange="hideShowMarketHoldDate()" />
                         </div>
                     </div>
 
@@ -221,11 +222,11 @@
                     </div>
 
                     <!--Select Limited-->
-                    <div class="row hidden input-row limited-markets" id="divAssociatedMarkets">
+                    <div class="row hidden input-row " id="divAssociatedMarkets">
                         <div class="col-md-3 text-align-left">
                             <label for="selectLimited">Select Limited</label>
                         </div>
-                        <div class="col-md-9 text-align-left" id="selectLimited" >
+                        <div class="col-md-9 text-align-left limited-markets" id="selectLimited">
                         </div>
                     </div>
 
@@ -273,11 +274,12 @@
 
     var marketId = 0;
     var productId = "XRY";
-   
+    var productIsNew = 0;
+
     $(document).ready(function () {
         buildMainMenu("Markets");
         marketId = (getParameterByName("MarketId") == null ? 0 : getParameterByName("MarketId"));
-        
+        productIsNew = (getParameterByName("ProductNew") == null ? 0 : getParameterByName("ProductNew"));
         getMarket();
 
         //Flow of Data
@@ -321,7 +323,7 @@
 
     function getMarketSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
             });
         } else {
@@ -369,7 +371,7 @@
     function getPeriodListSuccess(data, textStatus, jQxhr) {
 
         if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
             });
         } else {
@@ -416,7 +418,7 @@
 
     function getProcessorListSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
             });
         } else {
@@ -460,7 +462,7 @@
     function getPartnerListSuccess(data, textStatus, jQxhr) {
 
         if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
             });
         } else {
@@ -474,62 +476,9 @@
 
             $("#ddlPartnerList").html(str);
 
-            getSubmissionPeriodHoldStatus();
-        }
-
-
-    }
-
-    function getSubmissionPeriodHoldStatus() {
-
-        var url = ServicePrefix + '/api/Market/GetMarketProduct';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inMarketId": marketId,
-                "inProductId": productId
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getSubmissionPeriodHoldStatusSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
-
-    }
-
-    function getSubmissionPeriodHoldStatusSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-            });
-        } else {
-
-            $.each(data.report.rows, function (index) {
-
-                var obj = data.report.rows[index];
-
-                $("#ddlReportingFrequency").val("" + obj["periodId"] + obj["submittingPeriodID"]);
-                $("#chkMarketOnHold").prop("checked", (obj["onHoldFlag"] == true ? true : false));
-
-                if (obj["onHoldDate"] != "" && obj["onHoldDate"] != null) {
-                    $("#txtMarketOnHoldDate").text(extractDateOnly(obj["onHoldDate"]));
-                    $("#divMarketOnHoldDate").removeClass("hidden");
-                }
-
-            });
-
             getAssociatedMarkets();
         }
+
 
     }
 
@@ -567,16 +516,21 @@
 
     function getAssociatedMarketsSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
             });
         } else {
             var str = '';
+            var cntr = 0
             $.each(data.report.rows, function (index) {
+                cntr += 1
                 str = str + '<div class="row" style="padding:inherit">'
                 str = str + '<input type="checkbox" class="associatedMarkets" id="chk' + data.report.rows[index].marketId + '" data-marketid="' + data.report.rows[index].marketId + '">'
                 str = str + '<label for="chk' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName.trim() + '</label></div>'
             });
+            if (cntr == 0) {
+                str = str + "No other markets available."
+            }
             $("#selectLimited").html(str);
 
             getSelectedLimitedMarkets();
@@ -584,6 +538,10 @@
     }
 
     function getSelectedLimitedMarkets() {
+
+        if (productIsNew == 1) {
+            return;
+        }
 
         var url = ServicePrefix + '/api/Market/GetMarketProductRecipientAssignmentList';
 
@@ -612,7 +570,7 @@
     function getSelectedLimitedMarketsSuccess(data, textStatus, jQxhr) {
 
         if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
             });
         }
@@ -630,21 +588,21 @@
             });
 
             if (count == 0) {
-                $("#ddlRecipientAccess").val("All");
+                $("#rdAll").prop("checked", true);
                 hideShowLimitedMarkets();
             }
 
             if (count > 1) {
-                $("#ddlRecipientAccess").val("Limited");
+                $("#rdLimited").prop("checked", true);
                 hideShowLimitedMarkets();
             }
 
             if (count == 1) {
                 if (data.report.rows[0].otherMarketId == -1) {
-                    $("#ddlRecipientAccess").val("None");
+                    $("#rdNone").prop("checked", true);
                     hideShowLimitedMarkets();
                 } else {
-                    $("#ddlRecipientAccess").val("Limited");
+                    $("#rdLimited").prop("checked", true);
                     hideShowLimitedMarkets();
                 }
             }
@@ -683,7 +641,7 @@
 
     function getProductPropertiesSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
             });
         } else {
@@ -705,7 +663,14 @@
                 $("#txtMaxMarketShare").val(obj["maximumShareYTD"]);
                 $("#txtNewsRevMinimum").val(obj["minimumNewspaperRevenue"]);
                 $("#ddlPartnerList").val(obj["partnerId"]);
-               
+                $("#chkMarketOnHold").prop("checked", (obj["onHoldFlag"] == true ? true : false));
+                $("#hdnQueryCutOff").val(obj["queryCutOff"]);
+                $("#hdnNumberPriorYears").val(obj["numberPriorYears"]);
+
+                if (obj["onHoldDate"] != "" && obj["onHoldDate"] != null) {
+                    $("#txtMarketOnHoldDate").text(extractDateOnly(obj["onHoldDate"]));
+                    $("#divMarketOnHoldDate").removeClass("hidden");
+                }
             });
 
 
@@ -713,12 +678,21 @@
     }
 
     function updateXRYProduct() {
-        
-        var marketIdList = [];
 
+        if (validationPassed() == false) {
+            return;
+        }
+
+        var marketIdList = [];
+        var queryCutOff = null;
+        var numberPriorYears = null;
+        var newsMinRev = 0;
+        if ($("#rdAll").prop("checked")) {
+        }
         if ($("#rdNone").prop("checked")) {
             marketIdList.push($("#rdNone").val());
-        } else {
+        }
+        if ($("#rdLimited").prop("checked")) {
 
             $(".associatedMarkets").each(function () {
                 if ($(this).prop("checked")) {
@@ -726,12 +700,19 @@
                 }
             });
             if (!marketIdList.length) {
-                marketIdList = 0;
+                bootbox.alert("If 'limited' is selected, you must select at least one other market. ", function () {
+                });
+                return;
             }
         }
+        
+        if ($("#hdnQueryCutOff").val().trim() != "") {
+            queryCutOff = $("#hdnQueryCutOff").val().trim();
+        }
+        if ($("#hdnNumberPriorYears").val().trim() != "" && $("#hdnNumberPriorYears").val().trim() != 0) {
+            numberPriorYears = $("#hdnNumberPriorYears").val().trim();
+        }
 
-        //console.log($("input[name=clusterExclusivity]:checked").val())
-       
         var url = ServicePrefix + '/api/market/UpdateMarketProductProperties';
 
         var settings = {
@@ -742,19 +723,20 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inProductId": productId,
                 "inMarketId": marketId,
-                "inPartnerId": $("#ddlPartnerList").val(),                       
-                "inPeriodId": $("#ddlReportingFrequency").val(),
-                "inSubmittingPeriodId": $("#ddlSubmittingFrequency").val(),
+                "inPartnerId": $("#ddlPartnerList").val().trim(),
+                "inPeriodId": $("#ddlReportingFrequency").val().trim(),
+                "inSubmittingPeriodId": $("#ddlSubmittingFrequency").val().trim(),
                 "inMarketOnHold": $("#chkMarketOnHold").prop("checked"),
                 "inOtherMarketIdList": marketIdList,
-                "inMinimumStationsYTD": $("#txtMinEntities").val(),
-                "inMinimumShareYTD": $("#txtMinMarketShare").val(),
-                "inMinimumNewspaperRevenue": $("#txtNewsRevMinimum").val(),
-                "inOperatorId": $("#ddlProcessor").val(),
+                "inMinimumStationsYTD": $("#txtMinEntities").val().trim(),
+                "inMinimumShareYTD": $("#txtMinMarketShare").val().trim(),
+                "inMaximumShareYTD": $("#txtMaxMarketShare").val().trim(),
+                "inMinimumNewspaperRevenue": $("#txtNewsRevMinimum").val().trim(),
+                "inOperatorId": $("#ddlProcessor").val().trim(),
                 "inVersion": 5,
-                "inQueryCutOff": "test",
-                "inExclusivityMethod": $("input[name=clusterExclusivity]:checked").val(),
-                "inNumberPriorYears": "1"
+                "inQueryCutOff": queryCutOff,
+                "inExclusivityMethod": $("input[name=clusterExclusivity]:checked").val().trim(),
+                "inNumberPriorYears": numberPriorYears
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -769,19 +751,23 @@
     }
 
     function updateXRYProductSuccess(data, textStatus, jQxhr) {
-        console.log("success")
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
+
+            });
+        } else {
+            bootbox.alert('XRY Product has successfully been updated.');
+        }
     }
 
     function hideShowMarketHoldDate() {
 
         if ($("#chkMarketOnHold").prop("checked")) {
-            if ($("#divMarketOnHoldDate").hasClass("hidden")) {
+            if ($("#txtMarketOnHoldDate").text() !== "") {
                 $("#divMarketOnHoldDate").removeClass("hidden");
             }
         } else {
-            if ($("#divMarketOnHoldDate").hasClass("hidden") == false) {
-                $("#divMarketOnHoldDate").addClass("hidden");
-            }
+            $("#divMarketOnHoldDate").addClass("hidden");
         }
     }
 
@@ -800,6 +786,36 @@
 
     function goBackToMarketPage() {
         window.location = "market.html?marketId=" + marketId;
+    }
+
+    function validationPassed() {
+
+        var loopBreak = true;
+        $(".mkaRequired").each(function (index, el) {
+
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+
+            }
+
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == "-1") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+        });
+
+        return loopBreak;
     }
 
 </script>
