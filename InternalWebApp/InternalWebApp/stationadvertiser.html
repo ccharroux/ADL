@@ -74,22 +74,202 @@
                     <!--
                     station,
                     market,
-                            
+
                     -->
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="ddlStations">Station</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <select id="ddlStations"></select>
+                        </div>
+                    </div>
 
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="ddlMarkets">Market</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <select id="ddlMarkets" disabled="disabled"></select>
+                        </div>
+                    </div>
 
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtStationAdvertiser">Advertiser</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" id="txtStationAdvertiser" />
+                        </div>
+                    </div>
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtStationAdvertiserCode">Advertiser Code</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" id="txtStationAdvertiserCode" />
+                        </div>
+                    </div>
 
+                    <div class="row input-row">
+                        <div class="col-md-12">
+                            <div>
+                                <input value="Search Market" onclick="searchMarket();" class="default-button" type="button">
+                            </div>
+                        </div>
+                    </div>
 
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtMarketAdvertiser">Market Advertiser</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" id="txtMarketAdvertiser" />
+                        </div>
+                    </div>
+
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtMarketAdvertiserId">Market Advertiser ID</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" id="txtMarketAdvertiserId" />
+                        </div>
+                    </div>
 
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+    <!-- jQuery Easing -->
+    <script src="/js/jquery.easing.1.3.js"></script>
+    <!-- Bootstrap -->
+    <script src="/js/bootstrap.min.js"></script>
+    <!-- Bootbox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+    <!-- Waypoints -->
+    <script src="/js/jquery.waypoints.min.js"></script>
+    <!-- BlockUI JS -->
+    <script src="/js/blockUI.js"></script>
+    <!-- Config JS -->
+    <script src="/js/config.js"></script>
+    <!-- MAIN JS -->
+    <script src="/js/main.js"></script>
+    <!-- SEARCH JS -->
+    <script src="/js/search.js"></script>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+
 </body>
 </html>
 <script>
     //get station list add data-primary-market this will be used to set the market list
     //get market list list is ready only
     //get station advertiser unless is 0
-    
+    var stationAdvertiserId = 0;
+
+    $(document).ready(function () {
+
+        stationAdvertiserId = (getParameterByName("StationAdvertiserID") == null ? 0 : getParameterByName("StationAdvertiserID"));
+
+        //get station list
+        getStationList();
+
+        buildXRYMenu("Advertiser");
+
+        $("#ddlStations").on('change',
+            function () {
+                var marketId = $(this).find(':selected').data('market-id');
+                $("#ddlMarkets").val(marketId);
+            });
+    });
+
+    function getStationList() {
+        //api ServicePrefix + '/api/Station/GetStationListByProduct'
+        $.ajax({
+            url: ServicePrefix + '/api/Station/GetStationListByProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": 'XRY'
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status.toUpperCase() === "SUCCESS") {
+                    var $stationList = $("#ddlStations");
+
+                    $.each(data.report.rows,
+                        function () {
+                            var element = $('<option></option>');
+                            element.val(this.reid).html(this.fullName);
+                            element.attr("data-market-id", this.primaryMarketId);
+                            $stationList.append(element);
+                        });
+
+                    getMarketList();
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function getMarketList() {
+        //GetMarketListByProduct
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketListByProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": 'XRY'
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status.toUpperCase() === "SUCCESS") {
+                    var $marketList = $("#ddlMarkets");
+
+                    $.each(data.report.rows,
+                        function () {
+                            var element = $('<option></option>');
+                            element.val(this.marketId).html(this.marketName);
+                            $marketList.append(element);
+                        });
+
+                }
+
+                setMarketValue();
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function setMarketValue() {
+        var marketId = $("#ddlStations").find(':selected').data('market-id');
+        $("#ddlMarkets").val(marketId);
+    }
+
+    function searchMarket() {
+        //this will set stuff and call search page
+        alert('doing search stuff');
+    }
 </script>
