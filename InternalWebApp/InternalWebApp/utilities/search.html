@@ -85,11 +85,15 @@
                 </div>
 
                 <div class="row">
-                    <p id="previousPage"></p>
+                    <p>Search for: <span id="previousPage"></span></p>
                 </div>
                 <div class="dataTable-top-margin">
                     <!-- data table -->
                     <table id="dtSearchResults" class="stripe"></table>
+                </div>
+                
+                <div class="row generic-row stationmarket">
+                    <p>search link cancel</p>
                 </div>
 
                 <!-- button -->
@@ -146,14 +150,37 @@
         //get data
         //build/load datatable
         //hide and show buttons
+        //menu??
+
         searchCriteria = $.parseJSON(getLocalStorage("gSearchCriteria"));
         getSearchData(searchCriteria);
 
         $("#pageHeading").html(searchCriteria["searchHeading"]);
-
+        $("#previousPage").html(searchCriteria["advertiserName"]);
         //unremark when done with page coding
         //setLocalStorage("gSearchCriteria", "");
 
+        $('.generic-row').hide();
+        $('.' + searchCriteria["searchToken"].toLowerCase()).show();
+
+        $('#dtSearchResults').on('click', 'tbody tr', function () {
+            var table = $('#dtSearchResults').DataTable();
+
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+                var idx = table.cell('.selected', 0).index();
+                var data = table.rows(idx.row).data();
+                console.log(data[0].marketId);
+            }
+            //console.log('click: ' + Math.random());
+            
+        });
+
+       
     });
 
 </script>
