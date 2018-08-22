@@ -36,8 +36,7 @@
         processData: false,
         success: function (data, textStatus, jQxhr) {
             if (data.response.status.toUpperCase() === "SUCCESS") {
-                var jsonData = JSON.stringify(data.report.rows);
-                loadSearchResults(jsonData);
+                loadSearchResults(data);
             }
         },
         error: function (jqXhr, textStatus, errorThrown) {
@@ -48,4 +47,41 @@
 
 function loadSearchResults(data) {
     console.log(data);
+
+    //build columns json
+    //var cols = [
+    //{ "mDataProp": "Field1", sTitle: "Date", sType : "date"},
+    //{ "mDataProp": "Field2", sTitle: "Number", sType : "numeric"},
+    //{ "mDataProp": "Field3" , "sTitle": "FName", sType : "string"},
+    //{ "mDataProp": "Field4" ,  sTitle: "LName", sType : "string"}
+    //];
+    //data.report.rows
+
+    var results = data["report"]["rows"];
+    //console.log(results);
+
+    var cols = [];
+
+    if (results.length > 0) {
+        var columnsIn = results[0];
+        for (var key in columnsIn) {
+            //console.log(key); // here is your column name you are looking for
+            var col = new tableColumn(key);
+            cols.push(col);
+        }
+    }
+
+   // var colJson = JSON.stringify(cols);
+
+    var searchTable = $("#dtSearchResults").dataTable({
+        "aaData": results,
+        "aoColumns": cols
+    });
+
+
+}
+
+function tableColumn(fieldTitle) {
+    this.mDataProp = fieldTitle;
+    this.sTitle = fieldTitle;
 }
