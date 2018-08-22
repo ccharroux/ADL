@@ -114,7 +114,7 @@
                     <div class="row input-row">
                         <div class="col-md-12">
                             <div>
-                                <input value="Search Market" onclick="searchMarket();" class="default-button" type="button">
+                                <input value="Search Market Advertiser" onclick="searchMarketAdvertiser();" class="default-button" type="button">
                             </div>
                         </div>
                     </div>
@@ -136,6 +136,48 @@
                             <input type="text" id="txtMarketAdvertiserId" />
                         </div>
                     </div>
+
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtActiveDate">Active Date</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" id="txtActiveDate" value="" maxlength="50" placeholder="MM/DD/YYYY" readonly />
+                        </div>
+                    </div>
+
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="chkActive">Active</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="checkbox" id="chkActive" value="">
+                        </div>
+                    </div>
+
+                    <div class="row disable-date input-row" style="display: none;">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtDisableDate">Disable Date</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" id="txtDisableDate" value="" maxlength="50" placeholder="MM/DD/YYYY" readonly />
+                        </div>
+                    </div>
+                    
+                    <!-- Buttons -->
+                    <div class="default-button-section">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div>
+                                    <input value="Update" onclick="updateStationAdvertiser()" class="default-button" type="button">
+                                </div>
+                                <div style="padding-top:10px">
+                                    <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Buttons-->
 
                 </div>
             </div>
@@ -187,6 +229,18 @@
 
         buildXRYMenu("Advertiser");
 
+        $("#chkActive").change(function () {
+            if (this.checked) {
+                $(".disable-date").hide();
+            } else {
+                if ($("#txtDisableDate").val().length <= 0) {
+                    var todaysDate = new Date();
+                    $("#txtDisableDate").val(addZero(todaysDate.getMonth() + 1) + '/' + addZero(todaysDate.getDate()) + '/' + todaysDate.getFullYear());
+                }
+                $(".disable-date").show();
+            }
+        });
+
         $("#ddlStations").on('change',
             function () {
                 var marketId = $(this).find(':selected').data('market-id');
@@ -209,6 +263,8 @@
             success: function (data, textStatus, jQxhr) {
                 if (data.response.status.toUpperCase() === "SUCCESS") {
                     var $stationList = $("#ddlStations");
+
+                    $stationList.append("<option value='-1' data-market-id='-1'> -- Select a Station</option>");
 
                     $.each(data.report.rows,
                         function () {
@@ -245,6 +301,8 @@
                 if (data.response.status.toUpperCase() === "SUCCESS") {
                     var $marketList = $("#ddlMarkets");
 
+                    $marketList.append("<option value='-1'></option>");
+
                     $.each(data.report.rows,
                         function () {
                             var element = $('<option></option>');
@@ -255,6 +313,7 @@
                 }
 
                 setMarketValue();
+                getStationAdvertiser();
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -268,8 +327,88 @@
         $("#ddlMarkets").val(marketId);
     }
 
-    function searchMarket() {
+    function getStationAdvertiser(parameters) {
+        if (stationAdvertiserId <= 0) {
+            initializeActiveDate();
+            return;
+        }
+
+        //get station advertiser
+    }
+
+    function initializeActiveDate() {
+        var activeDate = new Date();
+        console.log(activeDate);
+        $("#txtActiveDate").val(addZero(activeDate.getMonth() + 1) + '/' + addZero(activeDate.getDate()) + '/' + activeDate.getFullYear());
+
+        $("#chkActive").prop('checked', true);
+    }
+
+    function searchMarketAdvertiser() {
         //this will set stuff and call search page
-        alert('doing search stuff');
+        if ($("#ddlStations").val() === "-1") {
+            alert('select station');
+            return;
+        }
+
+        if ($("#txtStationAdvertiser").val().length === 0) {
+            alert('enter advertiser name');
+            return;
+        }
+
+        //setLocalStorage("search", searchCriteria);
+        //setLocalStorage("searchPage", window.location);
+
+        //setLocalStorage();
+        setLocalStorage("gSearchPage", window.location);
+        var searchCriteriaObj = {
+            "searchToken": "STATIONMARKET",
+            "stationID": $("#ddlStations").val(),
+            "marketID" : $("#ddlMarkets").val(),
+            "advertisterName": $("#txtStationAdvertiser").val(),
+            "searchHeading": "Market Advertiser Search"
+        }
+        setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
+        console.log(getLocalStorage("gSearchCriteria"));
+
+        //alert('doing search stuff');
+        window.location = "/utilities/search.html";
+    }
+
+    function validationPassed() {
+        var loopBreak = true;
+        $(".mkaRequired").each(function (index, el) {
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            // Text
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+            // Select
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == "-1") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+        });
+
+        return loopBreak;
+    }
+
+    function updateStationAdvertiser() {
+        if (validationPassed() == false) {
+            return;
+        }
+
+        bootbox.alert('This functionality is still under development.', function () {
+        });
     }
 </script>
