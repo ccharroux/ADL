@@ -42,10 +42,6 @@
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
 
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
-
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
 
@@ -124,7 +120,7 @@
                             <label for="txtMarketAdvertiser">Market Advertiser</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="txtMarketAdvertiser" />
+                            <input type="text" id="txtMarketAdvertiser" disabled="disabled" />
                         </div>
                     </div>
 
@@ -133,7 +129,7 @@
                             <label for="txtMarketAdvertiserId">Market Advertiser ID</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="txtMarketAdvertiserId" />
+                            <input type="text" id="txtMarketAdvertiserId" disabled="disabled" />
                         </div>
                     </div>
 
@@ -200,17 +196,6 @@
     <script src="/js/config.js"></script>
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
-    <!-- SEARCH JS -->
-    <script src="/js/search.js"></script>
-
-    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
 
 </body>
 </html>
@@ -329,11 +314,114 @@
 
     function getStationAdvertiser(parameters) {
         if (stationAdvertiserId <= 0) {
+            loadMarketAdvertiserSearchResults();
             initializeActiveDate();
             return;
         }
 
-        //get station advertiser
+        $.ajax({
+            url: ServicePrefix + '/api/StationAdvertiser/GetStationAdvertiser',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationAdvertiserId": stationAdvertiserId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
+                    });
+                }
+                else {
+
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+
+                        $('#ddlStations').val(obj["reportEntityId"]).change();
+                        $('#txtStationAdvertiser').val(obj["stationAdvertiserName"]);
+                        $('#txtStationAdvertiserCode').val(obj["stationAdvertiserCode"]);
+
+                        if (obj["dateSetup"] !== null) {
+                            var activeDate = new Date(obj["dateSetup"]);
+                            console.log(activeDate);
+                            $("#txtActiveDate").val(addZero(activeDate.getMonth() + 1) + '/' + addZero(activeDate.getDate()) + '/' + activeDate.getFullYear());
+                        }
+
+                        if (obj["disableDate"] === null) {
+                            $("#chkActive").prop('checked', true);
+                        }
+
+                        ////there is a last changed date that can possibly be displayed (dateChanged)
+
+                        if (obj["disableDate"] !== null) {
+                            var disableDate = new Date(obj["disableDate"]);
+                            $("#txtDisableDate").val(addZero(disableDate.getMonth() + 1) +
+                                '/' +
+                                addZero(disableDate.getDate()) +
+                                '/' +
+                                disableDate.getFullYear());
+                            $(".disable-date").show();
+                        } else {
+                            $(".disable-date").hide();
+                        }
+
+                        //get advertiser based on advertiser that comes back
+                        getMaketAdvertiser(obj["advertiserId"]);
+                    });
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    //window.location = "preprocess.html";
+                });
+            }
+        });
+
+    }
+
+    function getMaketAdvertiser(advertiserId) {
+        $.ajax({
+            url: ServicePrefix + '/api/Advertiser/GetAdvertiser',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inAdvertiserId": advertiserId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
+                    });
+                }
+                else {
+
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+
+                        $('#txtMarketAdvertiser').val(obj["advertiserName"]);
+                        $('#txtMarketAdvertiserId').val(obj["advertiserId"]);
+
+                    });
+
+                    loadMarketAdvertiserSearchResults();
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    //window.location = "preprocess.html";
+                });
+            }
+        });
     }
 
     function initializeActiveDate() {
@@ -360,19 +448,50 @@
         //setLocalStorage("searchPage", window.location);
 
         //setLocalStorage();
-        setLocalStorage("gSearchPage", window.location);
+        //setLocalStorage("gSearchPage", window.location);
         var searchCriteriaObj = {
             "searchToken": "STATIONMARKET",
             "stationID": $("#ddlStations").val(),
             "marketID" : $("#ddlMarkets").val(),
             "advertiserName": $("#txtStationAdvertiser").val(),
-            "searchHeading": "Market Advertiser Search"
+            "advertiserCode" : $("#txtStationAdvertiserCode").val(),
+            "searchHeading": "Market Advertiser Search",
+            "marketAdvertiserName": $("#txtMarketAdvertiser").val(),
+            "searchPage": window.location
         }
+
         setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
-        console.log(getLocalStorage("gSearchCriteria"));
+        //console.log(getLocalStorage("gSearchCriteria"));
 
         //alert('doing search stuff');
         window.location = "/utilities/search.html";
+    }
+
+    function loadMarketAdvertiserSearchResults() {
+
+        if(getLocalStorage("gSearchResults").length <= 0) {
+            return;
+        }
+
+        var searchResults = $.parseJSON(getLocalStorage("gSearchResults"));
+
+        //console.log(searchResults);
+
+        if (stationAdvertiserId <= 0) {
+            //load everthing but market advertiser and id
+            $('#ddlStations').val(searchResults["stationID"]).change();
+            $('#txtStationAdvertiser').val(searchResults["advertiserName"]);
+            $('#txtStationAdvertiserCode').val(searchResults["advertiserCode"]);
+        }
+
+        
+        $("#txtMarketAdvertiser").val(searchResults["marketAdvertiserName"]);
+
+        if (searchResults.marketAdvertiserId !== undefined) {
+            $("#txtMarketAdvertiserId").val(searchResults["marketAdvertiserId"]);
+        }
+
+        setLocalStorage("gSearchResults", "");
     }
 
     function validationPassed() {
