@@ -13,6 +13,10 @@
 
     switch (searchCriteria["searchToken"].toUpperCase()) {
         case "STATIONMARKET":
+            if ($("#chkSearchAllMarkets").is(':checked')) {
+                bootbox.alert('Searching all markets functionality is still under development.', function () {
+                });
+            }
             var searchText = "";
             if ($('#txtSearchString').val().length > 0) {
                 searchText = $('#txtSearchString').val();
