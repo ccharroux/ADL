@@ -8,18 +8,18 @@
     var apiToken = getLocalStorage("APIToken");
     var keepColumns = [];
     var hideColumns = [];
-
+    var searchText = ";"
     //console.log(searchCriteria["searchToken"]);
 
     switch (searchCriteria["searchToken"].toUpperCase()) {
         case "STATIONMARKET":
-            if ($("#chkSearchAllMarkets").is(':checked')) {
-                bootbox.alert('Searching all markets functionality is still under development.', function () {
+            if ($('.search-all-markets:visible').is(':checked')) {
+                bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
                 });
             }
-            var searchText = "";
-            if ($('#txtSearchString').val().length > 0) {
-                searchText = $('#txtSearchString').val();
+
+            if ($('.search-text:visible').val().length > 0) {
+                searchText = $('.search-text:visible').val();
             } else {
                 searchText = searchCriteria["marketAdvertiserName"].length > 0 ? searchCriteria["marketAdvertiserName"] : searchCriteria["advertiserName"];
             }
@@ -39,6 +39,38 @@
             keepColumns.push("advertiserName");
             keepColumns.push("marketId");
             keepColumns.push("marketName");
+            $("#previousPage").html(searchCriteria["advertiserName"]);
+            break;
+        case "STATIONAGENCY":
+            if ($('.search-all-markets:visible').is(':checked')) {
+                bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
+                });
+            }
+
+            if ($('.search-text:visible').val().length > 0) {
+                searchText = $('.search-text:visible').val();
+            } else {
+                searchText = searchCriteria["marketAgencyName"].length > 0 ? searchCriteria["marketAgencyName"] : searchCriteria["agencyName"];
+            }
+
+            apiParameters = {
+                "inApiToken": apiToken,
+                "inMarketId": searchCriteria["marketID"],
+                "inAgencyName": searchText,
+                "inShowDisabled": false
+            }
+            api = "/api/Agency/GetAgencyList";
+
+            //hide columns
+            hideColumns.push("agencyId");
+            hideColumns.push("marketId");
+
+            //keep columns
+            keepColumns.push("agencyId");
+            keepColumns.push("agencyName");
+            keepColumns.push("marketId");
+            keepColumns.push("marketName");
+            $("#previousPage").html(searchCriteria["agencyName"]);
             break;
         default:
     }
@@ -173,6 +205,45 @@ function linkAdvertiser(searchCriteria) {
 }
 
 function fixAdvertiser() {
+    bootbox.alert('This functionality is still under development.', function () {
+    });
+}
+
+function linkAgency(searchCriteria) {
+    //will need to load local storage
+    //will probably implement history -1
+    //check if line is selected if not error
+
+    var searchTable = $('#dtSearchResults').DataTable();
+    if (searchTable.rows('.selected').any() === false) {
+        bootbox.alert('Select an agency to link.', function () {
+        });
+        return;
+    }
+
+    var rowData = searchTable.rows('.selected').data();
+    var searchResults = {};
+
+    for (var key in searchCriteria) {
+        searchResults[key] = searchCriteria[key];
+    }
+
+    //console.log(searchResults);
+    //console.log(rowData);
+
+    searchResults['marketAgencyId'] = rowData[0].agencyId;
+    searchResults['marketAgencyName'] = rowData[0].agencyName;
+
+    //console.log(searchResults);
+
+    setLocalStorage("gSearchResults", JSON.stringify(searchResults));
+
+    var searchPage = searchCriteria["searchPage"]["href"];
+    window.location = searchPage;
+
+}
+
+function fixAgency() {
     bootbox.alert('This functionality is still under development.', function () {
     });
 }

@@ -47,11 +47,11 @@
 
     <!-- FOR IE9 below -->
     <!--[if lt IE 9]>
-    <script src="js/respond.min.js"></script>
+        <script src="js/respond.min.js"></script>
     <![endif]-->
-   
 </head>
 <body>
+
     <div id="fh5co-page">
         <header id="fh5co-header" role="banner">
             <div class="container">
@@ -63,15 +63,11 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Station Advertiser</h2>
+                        <h2>Station Agency</h2>
                     </div>
                 </div>
                 <div class="text-center" style="margin-top: 0">
-                    <!--
-                    station,
-                    market,
 
-                    -->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="ddlStations">Station</label>
@@ -92,44 +88,44 @@
 
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtStationAdvertiser">Advertiser</label>
+                            <label for="txtStationAgency">Agency</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input class="mkaRequired field-width-325" maxlength="120" type="text" id="txtStationAdvertiser" errorMessage="Enter an Advertiser Name."/>
+                            <input class="mkaRequired field-width-325" maxlength="120" type="text" id="txtStationAgency" errorMessage="Enter an Agency Name." />
                         </div>
                     </div>
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtStationAdvertiserCode">Advertiser Code</label>
+                            <label for="txtStationAgencyCode">Agency Code</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input class="field-width-325" type="text" id="txtStationAdvertiserCode" />
+                            <input class="field-width-325" type="text" id="txtStationAgencyCode" />
                         </div>
                     </div>
 
                     <div class="row input-row">
                         <div class="col-md-12">
                             <div>
-                                <input value="Search Market Advertiser" onclick="searchMarketAdvertiser();" class="default-button" type="button">
+                                <input value="Search Market Agency" onclick="searchMarketAgency();" class="default-button" type="button">
                             </div>
                         </div>
                     </div>
 
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtMarketAdvertiser">Market Advertiser</label>
+                            <label for="txtMarketAgency">Market Agency</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input class="mkaRequired field-width-325" type="text" id="txtMarketAdvertiser" disabled="disabled" errorMessage="Please use the Search Market Advertiser to link a Market Advertiser."/>
+                            <input class="mkaRequired field-width-325" type="text" id="txtMarketAgency" disabled="disabled" errorMessage="Please use the Search Market Agency to link a Market Agency." />
                         </div>
                     </div>
 
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtMarketAdvertiserId">Market Advertiser ID</label>
+                            <label for="txtMarketAgencyId">Market Agency ID</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input class="field-width-325" type="text" id="txtMarketAdvertiserId" disabled="disabled" />
+                            <input class="field-width-325" type="text" id="txtMarketAgencyId" disabled="disabled" />
                         </div>
                     </div>
 
@@ -159,13 +155,13 @@
                             <input class="field-width-325" type="text" id="txtDisableDate" value="" maxlength="50" placeholder="MM/DD/YYYY" readonly />
                         </div>
                     </div>
-                    
+
                     <!-- Buttons -->
                     <div class="default-button-section">
                         <div class="row">
                             <div class="col-md-12">
                                 <div>
-                                    <input value="Update" onclick="updateStationAdvertiser()" class="default-button" type="button">
+                                    <input value="Update" onclick="updateStationAgency()" class="default-button" type="button">
                                 </div>
                                 <div style="padding-top:10px">
                                     <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button">
@@ -174,6 +170,7 @@
                         </div>
                     </div>
                     <!-- End Buttons-->
+
 
                 </div>
             </div>
@@ -200,19 +197,16 @@
 </body>
 </html>
 <script>
-    //get station list add data-primary-market this will be used to set the market list
-    //get market list list is ready only
-    //get station advertiser unless is 0
-    var stationAdvertiserId = 0;
+    var stationAgencyId = 0;
 
     $(document).ready(function () {
 
-        stationAdvertiserId = (getParameterByName("StationAdvertiserID") == null ? 0 : getParameterByName("StationAdvertiserID"));
+        stationAgencyId = (getParameterByName("StationAgencyID") == null ? 0 : getParameterByName("StationAgencyID"));
 
-        //get station list
         getStationList();
 
-        buildXRYMenu("Advertiser");
+
+        buildXRYMenu("Agency");
 
         $("#chkActive").change(function () {
             if (this.checked) {
@@ -231,6 +225,7 @@
                 var marketId = $(this).find(':selected').data('market-id');
                 $("#ddlMarkets").val(marketId);
             });
+
     });
 
     function getStationList() {
@@ -298,7 +293,7 @@
                 }
 
                 setMarketValue();
-                getStationAdvertiser();
+                getStationAgency();
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -312,21 +307,21 @@
         $("#ddlMarkets").val(marketId);
     }
 
-    function getStationAdvertiser() {
-        if (stationAdvertiserId <= 0) {
-            loadMarketAdvertiserSearchResults();
+    function getStationAgency() {
+        if (stationAgencyId <= 0) {
+            loadMarketAgencySearchResults();
             initializeActiveDate();
             return;
         }
 
         $.ajax({
-            url: ServicePrefix + '/api/StationAdvertiser/GetStationAdvertiser',
+            url: ServicePrefix + '/api/StationAgency/GetStationAgency',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inStationAdvertiserId": stationAdvertiserId
+                "inStationAgencyId": stationAgencyId
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -343,8 +338,8 @@
                         var obj = data.report.rows[index];
 
                         $('#ddlStations').val(obj["reportEntityId"]).change();
-                        $('#txtStationAdvertiser').val(obj["stationAdvertiserName"]);
-                        $('#txtStationAdvertiserCode').val(obj["stationAdvertiserCode"]);
+                        $('#txtStationAgency').val(obj["stationAgencyName"]);
+                        $('#txtStationAgencyCode').val(obj["stationAgencyCode"]);
 
                         if (obj["dateSetup"] !== null) {
                             var activeDate = new Date(obj["dateSetup"]);
@@ -371,7 +366,7 @@
                         }
 
                         //get advertiser based on advertiser that comes back
-                        getMarketAdvertiser(obj["advertiserId"]);
+                        getMarketAgency(obj["agencyId"]);
                     });
                 }
             },
@@ -381,18 +376,17 @@
                 });
             }
         });
-
     }
 
-    function getMarketAdvertiser(advertiserId) {
+    function getMarketAgency(agencyId) {
         $.ajax({
-            url: ServicePrefix + '/api/Advertiser/GetAdvertiser',
+            url: ServicePrefix + '/api/Agency/GetAgency',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inAdvertiserId": advertiserId
+                "inAgencyId": agencyId
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -408,12 +402,12 @@
 
                         var obj = data.report.rows[index];
 
-                        $('#txtMarketAdvertiser').val(obj["advertiserName"]);
-                        $('#txtMarketAdvertiserId').val(obj["advertiserId"]);
+                        $('#txtMarketAgency').val(obj["agencyName"]);
+                        $('#txtMarketAgencyId').val(obj["agencyId"]);
 
                     });
 
-                    loadMarketAdvertiserSearchResults();
+                    loadMarketAgencySearchResults();
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -432,26 +426,53 @@
         $("#chkActive").prop('checked', true);
     }
 
-    function searchMarketAdvertiser() {
+    function loadMarketAgencySearchResults() {
+
+        if (getLocalStorage("gSearchResults").length <= 0) {
+            return;
+        }
+
+        var searchResults = $.parseJSON(getLocalStorage("gSearchResults"));
+
+        console.log(searchResults);
+
+        if (stationAgencyId <= 0) {
+            //load everthing but market advertiser and id
+            $('#ddlStations').val(searchResults["stationID"]).change();
+            $('#txtStationAgency').val(searchResults["agencyName"]);
+            $('#txtStationAgencyCode').val(searchResults["agencyCode"]);
+        }
+
+
+        $("#txtMarketAgency").val(searchResults["marketAgencyName"]);
+
+        if (searchResults.marketAgencyId !== undefined) {
+            $("#txtMarketAgencyId").val(searchResults["marketAgencyId"]);
+        }
+
+        setLocalStorage("gSearchResults", "");
+    }
+
+    function searchMarketAgency() {
         //this will set stuff and call search page
         if ($("#ddlStations").val() === "-1") {
             alert('select station');
             return;
         }
 
-        if ($("#txtStationAdvertiser").val().length === 0) {
-            alert('enter advertiser name');
+        if ($("#txtStationAgency").val().length === 0) {
+            alert('enter agency name');
             return;
         }
 
         var searchCriteriaObj = {
-            "searchToken": "STATIONMARKET",
+            "searchToken": "STATIONAGENCY",
             "stationID": $("#ddlStations").val(),
-            "marketID" : $("#ddlMarkets").val(),
-            "advertiserName": $("#txtStationAdvertiser").val(),
-            "advertiserCode" : $("#txtStationAdvertiserCode").val(),
-            "searchHeading": "Market Advertiser Search",
-            "marketAdvertiserName": $("#txtMarketAdvertiser").val(),
+            "marketID": $("#ddlMarkets").val(),
+            "agencyName": $("#txtStationAgency").val(),
+            "agencyCode": $("#txtStationAgencyCode").val(),
+            "searchHeading": "Market Agency Search",
+            "marketAgencyName": $("#txtMarketAgency").val(),
             "searchPage": window.location
         }
 
@@ -460,33 +481,6 @@
 
         //alert('doing search stuff');
         window.location = "/utilities/search.html";
-    }
-
-    function loadMarketAdvertiserSearchResults() {
-
-        if(getLocalStorage("gSearchResults").length <= 0) {
-            return;
-        }
-
-        var searchResults = $.parseJSON(getLocalStorage("gSearchResults"));
-
-        //console.log(searchResults);
-
-        if (stationAdvertiserId <= 0) {
-            //load everthing but market advertiser and id
-            $('#ddlStations').val(searchResults["stationID"]).change();
-            $('#txtStationAdvertiser').val(searchResults["advertiserName"]);
-            $('#txtStationAdvertiserCode').val(searchResults["advertiserCode"]);
-        }
-
-        
-        $("#txtMarketAdvertiser").val(searchResults["marketAdvertiserName"]);
-
-        if (searchResults.marketAdvertiserId !== undefined) {
-            $("#txtMarketAdvertiserId").val(searchResults["marketAdvertiserId"]);
-        }
-
-        setLocalStorage("gSearchResults", "");
     }
 
     function validationPassed() {
@@ -517,7 +511,7 @@
         return loopBreak;
     }
 
-    function updateStationAdvertiser() {
+    function updateStationAgency() {
         if (validationPassed() === false) {
             return;
         }
