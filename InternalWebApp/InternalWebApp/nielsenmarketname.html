@@ -73,19 +73,41 @@
 
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="ddlMarket">Market</label>
+                            <label for="txtMarketId">MKA Market ID</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlMarket" class="mkaRequired" errorMessage="You must select a Market"></select>
+                            <input type="text" id="txtMarketId" readonly />
                         </div>
                     </div>
+
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="ddlMarket">MKA Market Name</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <select id="ddlMarket" onchange="marketChange()" class="mkaRequired" errorMessage="You must select a Market"></select>
+                        </div>
+                    </div>
+
+
+                    <div class="row input-row hidden" id="divNielsenMarketId" >
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtNielsenMarketId">Nielsen Market ID</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" id="txtNielsenMarketId" readonly />
+                        </div>
+                    </div>
+
+
+
 
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="txtNielsenMarketName">Nielsen Market Name</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="txtNielsenMarketName" class="mkaRequired" errorMessage="You must enter a Nielsen Market Name" value="" maxlength="50" />
+                            <input type="text" id="txtNielsenMarketName" maxlength="50" class="mkaRequired" errorMessage="You must enter a Nielsen Market Name" value="" maxlength="50" />
                         </div>
                     </div>
 
@@ -136,7 +158,7 @@
 </html>
 <script>
     var marketId = 0;
-    $(document).ready(function() {
+    $(document).ready(function () {
 
         marketId = (getParameterByName("marketID") == null ? 0 : getParameterByName("marketID"));
 
@@ -144,57 +166,128 @@
 
         if (marketId === "0") {
             //load unlinked markets
-            loadUnlinkedMarkets();
+            loadMarkets(false);
+
         } else {
             //load linked markets
             //load the nielsen market with that ID
+            $("#divNielsenMarketId").removeClass("hidden");
+            loadMarkets(true);
+
         }
+
 
         buildXRYMenu("Utility");
         setLocalStorage("search", '');
         setLocalStorage("searchPage", window.location);
     });
 
-    function loadUnlinkedMarkets() {
-        console.log('in loadUnlinkedMarkets');
-        $.ajax({
-            url: ServicePrefix + '/api/NielsenMarket/GetNielsenMarketList',
+
+
+    function loadMarkets(linked) {
+
+        var url = ServicePrefix + '/api/NielsenMarket/GetNielsenMarketList';
+
+        var settings = {
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inLinkedToMarket": false
+                "inLinkedToMarket": linked
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    bootbox.alert(
-                        'Process Failed.\n\r\n\r' +
-                        data.response.errorMessage[0] +
-                        '.\n\r\n\rDevelopement has been notified and is looking into this issue.',
-                        function() {
-
-                        });
-                } else {
-                    var str = '';
-                    //console.log(JSON.stringify(data));
-                    str = '<option value="-1">-- Select a Market</option>';
-                    $.each(data.report.rows, function (index) {
-
-                        str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + ' (' + data.report.rows[index].marketId + ')' + '</option>';
-
-                    });
-
-                    $("#ddlMarket").html(str);
-                }
+                loadMarketsSuccess(data, textStatus, jQxhr);
             },
-            error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
             }
-        });
+        };
+
+        $.ajax(url, settings);
+
     }
+
+    function loadMarketsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
+
+            });
+        } else {
+            var str = '';
+            
+            str = '<option value="-1">-- Select a Market</option>';
+            $.each(data.report.rows, function (index) {
+
+                str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName  + '</option>';
+
+            });
+
+            $("#ddlMarket").html(str);
+
+            if (marketId !== "0") {
+                getNielsenMarket();
+
+                $("#ddlMarket").val(marketId);
+                $("#ddlMarket").attr('disabled', 'disabled');
+            }
+        }
+    }
+
+    function getNielsenMarket() {
+        
+        var url = ServicePrefix + '/api/NielsenMarket/GetNielsenMarket';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getNielsenMarketSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+        
+    }
+
+    function getNielsenMarketSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
+
+            });
+        } else {
+
+            $.each(data.report.rows, function (index) {
+                var obj = data.report.rows[index];
+
+                $("#txtMarketId").val(obj["marketId"]);
+                $("#ddlMarketId").val(obj["marketId"]);
+                $("#txtNielsenMarketId").val(obj["nielsenMarketId"]);
+                $("#txtNielsenMarketName").val(obj["nielsenMarketName"]);
+
+            })
+        }
+
+
+    }
+
+    function marketChange() {
+        $("#txtMarketId").val($("#ddlMarket").val());
+    }
+
+
+
 
     function validationPassed() {
 
@@ -210,14 +303,14 @@
         var passedValidation = true;
 
 
-        $(".mkaRequired").each(function(index, el) {
+        $(".mkaRequired").each(function (index, el) {
             var eID = "#" + $(el).attr("id");
             var errorMessage = $(el).attr("errorMessage");
 
             // Text
             if ($(eID).prop('tagName').toLowerCase() == "input") {
                 if ($(eID).val().trim() == "") {
-                    bootbox.alert(errorMessage, function() {});
+                    bootbox.alert(errorMessage, function () { });
                     passedValidation = false;
                     return false;
                 }
@@ -226,7 +319,7 @@
             // Select
             if ($(eID).prop('tagName').toLowerCase() == "select") {
                 if ($(eID).val() == "-1") {
-                    bootbox.alert(errorMessage, function() {});
+                    bootbox.alert(errorMessage, function () { });
                     passedValidation = false;
                     return false;
                 }
@@ -241,6 +334,10 @@
         }
         bootbox.alert('This functionality is still under development.', function () {
         });
+    }
+
+    function goBackToDashboard() {
+        window.location = 'nielsenmarketnamelist.html';
     }
 </script>
 <!--
