@@ -70,6 +70,7 @@
             keepColumns.push("agencyName");
             keepColumns.push("marketId");
             keepColumns.push("marketName");
+            //may need to add account type to the api to be returned
             $("#previousPage").html(searchCriteria["agencyName"]);
             break;
         default:
