@@ -6,10 +6,8 @@
     var api = "";
     var apiParameters = "";
     var apiToken = getLocalStorage("APIToken");
-    var keepColumns = [];
-    var hideColumns = [];
-    var searchText = ";"
-    //console.log(searchCriteria["searchToken"]);
+    var searchText = "";
+    var columns = [];
 
     switch (searchCriteria["searchToken"].toUpperCase()) {
         case "STATIONMARKET":
@@ -32,13 +30,41 @@
             }
             api = "/api/Advertiser/GetAdvertiserList";
 
-            hideColumns.push("advertiserId");
-            hideColumns.push("marketId");
+            columns.push({
+                "sTitle": "AdvertiserID",
+                "bVisible": false,
+                "mData": "advertiserId",
+                "bSortable": false
+            });
 
-            keepColumns.push("advertiserId");
-            keepColumns.push("advertiserName");
-            keepColumns.push("marketId");
-            keepColumns.push("marketName");
+            columns.push({
+                "sTitle": "Advertiser Name",
+                "mData": "advertiserName",
+                "bSortable": true
+            });
+
+            columns.push({
+                "sTitle": "MarketID",
+                "bVisible": false,
+                "mData": "marketId",
+                "bSortable": false
+            });
+
+            columns.push({
+                "sTitle": "Market Name",
+                "mData": "marketName",
+                "bSortable": true
+            });
+
+            columns.push({
+                "mRender": function(data, type, row) {
+                    return '<a href="#" onclick="linkAdvertiserByLink(' + row.advertiserId +')">Link Advertiser</a>';
+                },
+                "bSortable": false,
+                "searchable": false,
+                "className": "text-align-right"
+            });
+
             $("#previousPage").html(searchCriteria["advertiserName"]);
             break;
         case "STATIONAGENCY":
@@ -61,15 +87,42 @@
             }
             api = "/api/Agency/GetAgencyList";
 
-            //hide columns
-            hideColumns.push("agencyId");
-            hideColumns.push("marketId");
+            columns.push({
+                "sTitle": "AgencyID",
+                "bVisible": false,
+                "mData": "agencyId",
+                "bSortable": false
+            });
 
-            //keep columns
-            keepColumns.push("agencyId");
-            keepColumns.push("agencyName");
-            keepColumns.push("marketId");
-            keepColumns.push("marketName");
+            columns.push({
+                "sTitle": "Agency Name",
+                "mData": "agencyName",
+                "bSortable": true
+            });
+
+            columns.push({
+                "sTitle": "MarketID",
+                "bVisible": false,
+                "mData": "marketId",
+                "bSortable": false
+            });
+
+            columns.push({
+                "sTitle": "Market Name",
+                "mData": "marketName",
+                "bSortable": true
+            });
+
+            columns.push({
+                "mRender": function (data, type, row) {
+                    return '<a href="#" onclick="linkAgencyByLink(' + row.agencyId + ')">Link Agency</a>';
+                },
+                "bSortable": false,
+                "searchable": false,
+                "className": "text-align-right"
+            });
+
+
             //may need to add account type to the api to be returned
             $("#previousPage").html(searchCriteria["agencyName"]);
             break;
@@ -86,7 +139,8 @@
         processData: false,
         success: function (data, textStatus, jQxhr) {
             if (data.response.status.toUpperCase() === "SUCCESS") {
-                loadSearchResults(data, keepColumns, hideColumns);
+                //loadSearchResults(data, keepColumns, hideColumns, columns);
+                loadSearchResults(data, columns);
             }
         },
         error: function (jqXhr, textStatus, errorThrown) {
@@ -95,43 +149,11 @@
     });
 }
 
-function loadSearchResults(data, keepColumns, hideColumns) {
+//function loadSearchResults(data, keepColumns, hideColumns, columns) {
+function loadSearchResults(data, columns) {
 
     var results = data["report"]["rows"];
-    var cols = [];
-
-    if (results.length > 0) {
-        var columnsIn = results[0];
-        for (var key in columnsIn) {
-
-            if (keepColumns.indexOf(key) !== -1) {
-                var visible = false;
-
-                if (hideColumns.indexOf(key) !== -1) {
-                    visible = false;
-                } else {
-                    visible = true;
-                }
-
-                var col = new tableColumn(key, visible);
-                cols.push(col);
-            }
-        }
-    } else {
-        for (var i = 0; i < keepColumns.length; i++) {
-            var visible = false;
-
-            if (hideColumns.indexOf(keepColumns[i]) !== -1) {
-                visible = false;
-            } else {
-                visible = true;
-            }
-
-            var col = new tableColumn(keepColumns[i], visible);
-            cols.push(col);
-        }
-    }
-
+    
     var searchTable;
 
     if ($.fn.DataTable.isDataTable('#dtSearchResults')) {
@@ -141,7 +163,8 @@ function loadSearchResults(data, keepColumns, hideColumns) {
 
     searchTable = $("#dtSearchResults").DataTable({
         "aaData": results,
-        "aoColumns": cols,
+        "aoColumns": columns,
+        "select": true,
         language: {
             search: "Filter Results:"
         }
@@ -156,7 +179,9 @@ function tableColumn(fieldTitle, visible) {
     this.bVisible = visible;
 }
 
-function cancelSearch(searchCriteria) {
+function cancelSearch() {
+
+    //console.log(searchCriteria);
 
     var searchResults = {};
 
@@ -171,7 +196,20 @@ function cancelSearch(searchCriteria) {
 
 }
 
-function linkAdvertiser(searchCriteria) {
+function linkAdvertiserByLink(advertiserId) {
+
+    var rowId = $('#dtSearchResults').dataTable()
+        .fnFindCellRowIndexes(advertiserId, 0);
+
+    var table = $('#dtSearchResults').DataTable();
+    table.row(rowId).select();
+    
+
+    //searchCriteria is the global variable version
+    linkAdvertiser();
+}
+
+function linkAdvertiser() {
     //will need to load local storage
     //will probably implement history -1
     //check if line is selected if not error
@@ -190,13 +228,8 @@ function linkAdvertiser(searchCriteria) {
         searchResults[key] = searchCriteria[key];
     }
 
-    //console.log(searchResults);
-    //console.log(rowData);
-
     searchResults['marketAdvertiserId'] = rowData[0].advertiserId;
     searchResults['marketAdvertiserName'] = rowData[0].advertiserName;
-
-    //console.log(searchResults);
 
     setLocalStorage("gSearchResults", JSON.stringify(searchResults));
 
@@ -210,7 +243,20 @@ function fixAdvertiser() {
     });
 }
 
-function linkAgency(searchCriteria) {
+function linkAgencyByLink(agencyId) {
+
+    var rowId = $('#dtSearchResults').dataTable()
+        .fnFindCellRowIndexes(agencyId, 0);
+
+    var table = $('#dtSearchResults').DataTable();
+    table.row(rowId).select();
+
+
+    //searchCriteria is the global variable version
+    linkAgency();
+}
+
+function linkAgency() {
     //will need to load local storage
     //will probably implement history -1
     //check if line is selected if not error
@@ -229,13 +275,8 @@ function linkAgency(searchCriteria) {
         searchResults[key] = searchCriteria[key];
     }
 
-    //console.log(searchResults);
-    //console.log(rowData);
-
     searchResults['marketAgencyId'] = rowData[0].agencyId;
     searchResults['marketAgencyName'] = rowData[0].agencyName;
-
-    //console.log(searchResults);
 
     setLocalStorage("gSearchResults", JSON.stringify(searchResults));
 
