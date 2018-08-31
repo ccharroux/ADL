@@ -22,6 +22,7 @@
                 searchText = searchCriteria["marketAdvertiserName"].length > 0 ? searchCriteria["marketAdvertiserName"] : searchCriteria["advertiserName"];
             }
 
+            //setup the parameters for the API
             apiParameters = {
                 "inApiToken": apiToken,
                 "inMarketId": searchCriteria["marketID"],
@@ -30,37 +31,43 @@
             }
             api = "/api/Advertiser/GetAdvertiserList";
 
+            //setup the columns to be used in the datatable
+            //title sets the column name
+            //visible determines if the column will show in the datatable or not
+            //data links the column to the data that comes back in the results
+            //orderable determines if the column can be sorted or not
+            //see https://datatables.net/reference/option/columns
             columns.push({
-                "sTitle": "AdvertiserID",
-                "bVisible": false,
-                "mData": "advertiserId",
-                "bSortable": false
+                "title": "AdvertiserID",
+                "visible": false,
+                "data": "advertiserId",
+                "orderable": false
             });
 
             columns.push({
-                "sTitle": "Advertiser Name",
-                "mData": "advertiserName",
-                "bSortable": true
+                "title": "Advertiser Name",
+                "data": "advertiserName",
+                "orderable": true
             });
 
             columns.push({
-                "sTitle": "MarketID",
-                "bVisible": false,
-                "mData": "marketId",
-                "bSortable": false
+                "title": "MarketID",
+                "visible": false,
+                "data": "marketId",
+                "orderable": false
             });
 
             columns.push({
-                "sTitle": "Market Name",
-                "mData": "marketName",
-                "bSortable": true
+                "title": "Market Name",
+                "data": "marketName",
+                "orderable": true
             });
 
             columns.push({
                 "mRender": function(data, type, row) {
                     return '<a href="#" onclick="linkAdvertiserByLink(' + row.advertiserId +')">Link Advertiser</a>';
                 },
-                "bSortable": false,
+                "orderable": false,
                 "searchable": false,
                 "className": "text-align-right"
             });
@@ -130,6 +137,10 @@
     }
 
     //make api call and return data
+    //this occurs regardless of the token
+    //the url is based on what was assigned in the previous switch statement
+    //data is assigned the apiparameters also created in the switch statement
+    //when call is successful it will call loadSearchResults
     $.ajax({
         url: ServicePrefix + api,
         dataType: 'json',
@@ -139,7 +150,6 @@
         processData: false,
         success: function (data, textStatus, jQxhr) {
             if (data.response.status.toUpperCase() === "SUCCESS") {
-                //loadSearchResults(data, keepColumns, hideColumns, columns);
                 loadSearchResults(data, columns);
             }
         },
@@ -149,40 +159,44 @@
     });
 }
 
-//function loadSearchResults(data, keepColumns, hideColumns, columns) {
 function loadSearchResults(data, columns) {
-
+    //data is the data from the ajax call
+    //columns is the array that was built previously
+  
+    //assigns the data from the ajax call
     var results = data["report"]["rows"];
     
+    //creating a variable that will used for datatable functions later
     var searchTable;
 
+    //if the datatable already exists need to destroy it before building it
+    //again with new results from the search.
+    //if you try to destroy before it is a datatable, an error will occur.
+    //this code will only destroy it if the table is a datatable.
     if ($.fn.DataTable.isDataTable('#dtSearchResults')) {
         searchTable = $('#dtSearchResults').DataTable();
         searchTable.destroy();
     }
 
+    //this code rebuilds the datatable with the updated data from the search 
+    //or initial load.
     searchTable = $("#dtSearchResults").DataTable({
-        "aaData": results,
-        "aoColumns": columns,
+        "data": results,
+        "columns": columns,
         "select": true,
         language: {
             search: "Filter Results:"
         }
     });
 
-
-}
-
-function tableColumn(fieldTitle, visible) {
-    this.mDataProp = fieldTitle;
-    this.sTitle = fieldTitle;
-    this.bVisible = visible;
 }
 
 function cancelSearch() {
 
-    //console.log(searchCriteria);
-
+    //loops through the search criteria that was initially sent 
+    //to the search page. This reloads it into a json object and
+    //loads it into local storage.
+    //the page that the window location is sent to will load this data from local storage.
     var searchResults = {};
 
     for (var key in searchCriteria) {
@@ -191,6 +205,7 @@ function cancelSearch() {
 
     setLocalStorage("gSearchResults", JSON.stringify(searchResults));
 
+    //sends user back to page that called the search page
     var searchPage = searchCriteria["searchPage"]["href"];
     window.location = searchPage;
 
@@ -198,22 +213,20 @@ function cancelSearch() {
 
 function linkAdvertiserByLink(advertiserId) {
 
+    //finds the datatable rowid
     var rowId = $('#dtSearchResults').dataTable()
         .fnFindCellRowIndexes(advertiserId, 0);
 
+    //this will select the row that the link was clicked
     var table = $('#dtSearchResults').DataTable();
     table.row(rowId).select();
     
-
-    //searchCriteria is the global variable version
     linkAdvertiser();
 }
 
 function linkAdvertiser() {
-    //will need to load local storage
-    //will probably implement history -1
-    //check if line is selected if not error
 
+    //leaving this code here in case need to add the link button back in
     var searchTable = $('#dtSearchResults').DataTable();
     if (searchTable.rows('.selected').any() === false) {
         bootbox.alert('Select an advertiser to link.', function () {
@@ -221,9 +234,14 @@ function linkAdvertiser() {
         return;
     }
 
+    //get the data for the selected row
     var rowData = searchTable.rows('.selected').data();
     var searchResults = {};
 
+    //loops through the search criteria that was initially sent 
+    //to the search page. This reloads it into a json object and
+    //loads it into local storage.
+    //the page that the window location is sent to will load this data from local storage.
     for (var key in searchCriteria) {
         searchResults[key] = searchCriteria[key];
     }
@@ -233,6 +251,7 @@ function linkAdvertiser() {
 
     setLocalStorage("gSearchResults", JSON.stringify(searchResults));
 
+    //sends user back to page that called the search page
     var searchPage = searchCriteria["searchPage"]["href"];
     window.location = searchPage;
 
@@ -251,16 +270,13 @@ function linkAgencyByLink(agencyId) {
     var table = $('#dtSearchResults').DataTable();
     table.row(rowId).select();
 
-
-    //searchCriteria is the global variable version
     linkAgency();
+
 }
 
 function linkAgency() {
-    //will need to load local storage
-    //will probably implement history -1
-    //check if line is selected if not error
-
+  
+    //leaving this code here in case need to add the link button back in
     var searchTable = $('#dtSearchResults').DataTable();
     if (searchTable.rows('.selected').any() === false) {
         bootbox.alert('Select an agency to link.', function () {
@@ -271,6 +287,10 @@ function linkAgency() {
     var rowData = searchTable.rows('.selected').data();
     var searchResults = {};
 
+    //loops through the search criteria that was initially sent 
+    //to the search page. This reloads it into a json object and
+    //loads it into local storage.
+    //the page that the window location is sent to will load this data from local storage.
     for (var key in searchCriteria) {
         searchResults[key] = searchCriteria[key];
     }
@@ -280,6 +300,7 @@ function linkAgency() {
 
     setLocalStorage("gSearchResults", JSON.stringify(searchResults));
 
+    //sends user back to page that called the search page
     var searchPage = searchCriteria["searchPage"]["href"];
     window.location = searchPage;
 
