@@ -9,8 +9,11 @@
     var searchText = "";
     var columns = [];
 
+    console.log(searchCriteria);
+
     switch (searchCriteria["searchToken"].toUpperCase()) {
         case "STATIONMARKET":
+        case "MEDIAMARKET":
             if ($('.search-all-markets:visible').is(':checked')) {
                 bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
                 });
