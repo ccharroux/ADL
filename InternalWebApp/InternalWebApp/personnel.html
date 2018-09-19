@@ -138,25 +138,29 @@
                         </div>
                     </div>
 
-                    <!--Ownership-->
-                    <div class="row input-row">
-                        <div class="col-md-3 text-align-left">
-                            <label for="ddlOwnership">Ownership</label>
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <select id="ddlOwnersip" class="field-width-325"></select>
-                        </div>
-                    </div>
+                    <hr />
+                    <!--Ownership--><!--Assigned Ownerships-->
 
-                    <!--Assigned Ownerships-->
-                    <div class="row input-row">
-                        <div class="col-md-3 text-align-left">
+                    <div class="row input-row">                        
+                        <div class="col-md-5 text-align-left">
+                            <label for="ddlOwnership">Ownership</label>
+                            <select id="ddlOwnership" multiple size="7" class="field-width-325"></select>
+                        </div>   
+                        
+                        <div class="col-md-2 text-align-left min-height-142 margin-top-50">
+                            <input type="button" class="background-green" onclick="addOwnership();" value="Add" />
+                            <input type="button" class="background-red margin-top-10" onclick="removeOwnership();" value="Remove" />
+                        </div>
+                        <div class="col-md-5 text-align-left pull-right">
                             <label for="ddlAssignedOwnerships">Assigned Ownerships</label>
+                            <select id="ddlAssignedOwnerships" multiple size="7" class="field-width-325"></select>
+                            <!--<div id="divAssignedOwnerships" class="col-md-12 field-width-325 text-align-left height-142 overflow-x-auto silver-border">
+
+                            </div>-->
                         </div>
-                        <div class="col-md-9 text-align-left">
-                            <select id="ddlAssignedOwnerships" class="field-width-325"></select>
-                        </div>
+                        
                     </div>
+                    <hr />
 
                     <!--Address1-->
                     <div class="row input-row">
@@ -225,7 +229,7 @@
                         <div class="col-md-9 text-align-left">
                             <input type="text" id="txtPhoneAreaCode" maxlength="3" size="3" />&nbsp;
                             <input type="text" id="txtPhoneNumber" maxlength="7" size="7" />&nbsp;
-                            <input type="text" id="txtPhoneNumberExt" maxlength="4" size="4" placeholder="ext." />
+                            <input type="text" id="txtPhoneNumberExt" maxlength="4" size="4" />
                         </div>
                     </div>
 
@@ -352,7 +356,7 @@
         buildMainMenu("Personnel");
         personnelID = (getParameterByName("personnelid") == null ? 0 : getParameterByName("personnelid"));
         getStateList();
-        getPositionList();
+
     });
 
     function getStateList() {
@@ -382,7 +386,6 @@
 
             });
         } else {
-            console.log(data);
             var str = '';
             str = '<option value="-1">-- Select a State</option>';
             $.each(data.report.rows, function (index) {
@@ -390,7 +393,46 @@
             });
             $("#ddlState").html(str);
         }
-        getProductList();
+        getPositionList();
+    }
+
+    function getPositionList() {
+        var url = ServicePrefix + '/api/Position/GetPositionList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getPositionListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        }
+
+        $.ajax(url, settings);
+
+    }
+
+    function getPositionListSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
+            });
+        } else {
+            var str = '';
+            str = '<option value="-1">-- Select Position</option>';
+            $.each(data.report.rows, function (index) {
+                str = str + '<option value="' + data.report.rows[index]["Position Code"] + '">' + data.report.rows[index]["Position Title"] + '</option>';
+            });
+
+            $("#ddlPosition").html(str);
+            getProductList();
+        }
     }
 
     function getProductList() {
@@ -425,12 +467,7 @@
             var str = '';
 
             $("#productList").html("");
-
-            var holdOwnerID = "0";
-            var productList = "";
-            var holdObject = new Object();
-
-
+        
             $.each(data.report.rows, function (index) {
 
                 var obj = data.report.rows[index];
@@ -445,7 +482,6 @@
                 str = str + '</div>';
                 str = str + '<div id="productButtons' + obj.P_ProductID + '" class="col-md-6" style="text-align:left;">'
                 str = str + '<input type="button" id="productAdd' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="enableProduct(' + '\'' + obj.P_ProductID + '\')" Value="Enable" />'
-                str = str + '<input type="button" id="productEdit' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="editProduct(' + '\'' + obj.P_ProductID + '\')" Value="Edit" />'
                 str = str + '<input type="button" id="productDisable' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="disableProduct(' + '\'' + obj.P_ProductID + '\')" Value="Disable" />'
                 str = str + '</div>'
                 str = str + '</div>';
@@ -455,8 +491,8 @@
             $("#productList").append(str);
 
             if (personnelID > 0) {
-                
 
+                getPersonnelProductList();
 
             } else {
                 $("#productAddDMA").removeClass('hidden');
@@ -468,46 +504,174 @@
         }
     }
 
+    function getPersonnelProductList() {
 
-    function getPositionList() {
-        var url = ServicePrefix + '/api/Position/GetPositionList';
+        var url = ServicePrefix + '/api/Personnel/GetPersonnelProductList';
 
         var settings = {
             dataType: 'json',
-            type: 'POST',
+            type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")                
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelID
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getPositionListSuccess(data, textStatus, jQxhr);
+                getPersonnelProductListSuccess(data, textStatus, jQxhr);
             },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
             }
-        }
+        };
 
         $.ajax(url, settings);
 
     }
 
-    function getPositionListSuccess(data, textStatus, jQxhr) {
+    function getPersonnelProductListSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
             bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
+
             });
         } else {
-            var str = '';
-            str = '<option value="-1">-- Select Position</option>';
-            $.each(data.report.rows, function (index) {
-                str = str + '<option value="' + data.report.rows[index]["Position Code"] + '">' + data.report.rows[index]["Position Title"] + '</option>';
-            });
 
-            $("#ddlPosition").html(str);
-            getPersonnel();
+            $.each(data.report.rows, function (index) {
+
+                var obj = data.report.rows[index];
+                if (obj.activeDate != null && obj.active == true) {
+                    $("#productDisable" + obj.productId).removeClass('hidden');
+                    $("#date" + obj.productId).html(extractDateOnly(obj.activeDate));
+                    $("#date" + obj.productId).css("color", "green");
+                }
+                else if (obj.disableDate != null && obj.active == false) {
+                    $("#productAdd" + obj.productId).removeClass('hidden');
+                    $("#date" + obj.productId).html(extractDateOnly(obj.disableDate));
+                    $("#date" + obj.productId).css("color", "red");
+                }
+                else if (obj.disableDate == null && obj.activeDate == null) {
+                    $("#productAdd" + obj.productId).removeClass('hidden');
+                }
+            })
+
+            getPersonnelAssignedOwnershipList();
+
         }
     }
 
+    function getPersonnelAssignedOwnershipList() {
+
+        var url = ServicePrefix + '/api/Personnel/GetPersonnelAssignedOwnershipList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelID
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getPersonnelAssignedOwnershipListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+        $.ajax(url, settings);
+    }
+
+    function getPersonnelAssignedOwnershipListSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
+
+            });
+        } else {
+
+            //$("#divAssignedOwnerships").html();
+            var str = '';
+
+            console.log(data);
+            $.each(data.report.rows, function (index) {
+
+                var obj = data.report.rows[index];
+
+                
+                //str = str + '<div class="row">';
+                //str = str + '<div class="col-md-12" style="text-align:left">';
+                //str = str + obj.ownerName;                
+                //str = str + '<button type="button" class="close" onClick="removeOwnership(' + '\'' + obj.ownerId + '\')" >';
+                //str = str + '<span>&times;</span>';
+                //str = str + '</button>'
+                //str = str + '</div>';
+                //str = str + '</div>';
+                
+                str = str + '<option value="' + obj.ownerId + '">' + obj.ownerName + '</option>';
+
+            })
+
+            $("#ddlAssignedOwnerships").append(str);
+
+            getOwnershipList();
+        }        
+
+    }
+
+    function getOwnershipList() {
+
+        var url = ServicePrefix + '/api/Owner/GetOwnerList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inActiveOnly": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOwnershipListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+        $.ajax(url, settings);
+    }
+
+    function getOwnershipListSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
+
+            });
+        } else {
+            var str = '';
+            console.log(data);
+            
+
+            $.each(data.report.rows, function (index) {
+                var isAssigned = false;                
+                var obj = data.report.rows[index];
+
+                $("#ddlAssignedOwnerships > option").each(function () {                    
+                    if (this.value == obj.OwnerID) {
+                        isAssigned = true;
+                    }
+                })
+                if (isAssigned != true) {
+                    str = str + '<option value="' + obj.OwnerID + '">' + obj.OwnerName + '</option>';
+                } else {
+
+                }
+            });
+            $("#ddlOwnership").html(str);
+            getPersonnel();
+        }
+    }
 
     function getPersonnel() {
 
@@ -539,7 +703,7 @@
     }
 
     function getPersonnelSuccess(data, textStatus, jQxhr) {
-        
+
         if (data.response.status != "SUCCESS") {
             bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
@@ -566,7 +730,7 @@
                 $("#txtPhoneNumber").val(obj["phone"]);
                 $("#txtPhoneNumberExt").val(obj["extension"]);
                 $("#txtMobileAreaCode").val(obj["mobileAreaCode"]);
-                $("#txtMobileNumber").val(obj["mobilePone"]);
+                $("#txtMobileNumber").val(obj["mobilePhone"]);
                 $("#txtFaxAreaCode").val(obj["faxAreaCode"]);
                 $("#txtFaxNumber").val(obj["faxPhone"]);
                 $("#txtEmailAddress").val(obj["email"]);
@@ -574,6 +738,38 @@
                 $("#txtComment").val(obj["comment"]);
             })
         }
+
+    }
+
+    function addOwnership() {
+        $('#ddlOwnership > option:selected').each(function () {
+            if ($('#ddlAssignedOwnerships [value="' + $(this).val() + '"]').length == 0) {
+                $('#ddlAssignedOwnerships').html('<option value="' + $(this).val() + '">' + $(this).text() + '</option>' + $('#ddlAssignedOwnerships').html());
+                $(this).remove();
+            }
+        })
+    }
+
+    function removeOwnership() {
+        $('#ddlAssignedOwnerships > option:selected').each(function () {
+            if ($('#ddlOwnership [value="' + $(this).val() + '"]').length == 0) {
+                $('#ddlOwnership').html('<option value="' + $(this).val() + '">' + $(this).text() + '</option>' + $('#ddlOwnership').html());
+                $(this).remove();
+            }
+        })
+    }
+
+    function enableProduct() {
+
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+
+    }
+
+    function disableProduct() {
+
+        bootbox.alert('This functionality is still under development.', function () {
+        });
 
     }
 
