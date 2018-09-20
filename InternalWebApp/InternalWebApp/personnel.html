@@ -63,7 +63,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Personnel</h2>
+                        <h2 class="inline-block">Personnel</h2> &nbsp;&nbsp; <a class="hidden" id="anchorTag" href="#ancProducts">Product List</a>
                     </div>
                 </div>
                 <div class="text-center margin-top-0">
@@ -73,8 +73,13 @@
                         <div class="col-md-3 text-align-left">
                             <label for="txtFirstName">First Name</label>
                         </div>
-                        <div class="col-md-9 text-align-left">
+                        <div class="col-md-5 text-align-left">
                             <input type="text" class="mkaRequired field-width-325" id="txtFirstName" maxlength="35" errorMessage="You must enter a First Name." />
+                        </div>
+                        <div class="col-md-2 text-align-center">
+                            <div class="gray-label width-130">
+                                <span id="spnWebStatus"></span>
+                            </div>                            
                         </div>
                     </div>
 
@@ -108,7 +113,7 @@
                         </div>
                     </div>
 
-                    <!--Salutation-->
+                    <!--Suffix-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="txtSuffix">Suffix</label>
@@ -137,30 +142,6 @@
                             <select id="ddlPosition" class="field-width-325"></select>
                         </div>
                     </div>
-
-                    <hr />
-                    <!--Ownership--><!--Assigned Ownerships-->
-
-                    <div class="row input-row">                        
-                        <div class="col-md-5 text-align-left">
-                            <label for="ddlOwnership">Ownership</label>
-                            <select id="ddlOwnership" multiple size="7" class="field-width-325"></select>
-                        </div>   
-                        
-                        <div class="col-md-2 text-align-left min-height-142 margin-top-50">
-                            <input type="button" class="background-green" onclick="addOwnership();" value="Add" />
-                            <input type="button" class="background-red margin-top-10" onclick="removeOwnership();" value="Remove" />
-                        </div>
-                        <div class="col-md-5 text-align-left pull-right">
-                            <label for="ddlAssignedOwnerships">Assigned Ownerships</label>
-                            <select id="ddlAssignedOwnerships" multiple size="7" class="field-width-325"></select>
-                            <!--<div id="divAssignedOwnerships" class="col-md-12 field-width-325 text-align-left height-142 overflow-x-auto silver-border">
-
-                            </div>-->
-                        </div>
-                        
-                    </div>
-                    <hr />
 
                     <!--Address1-->
                     <div class="row input-row">
@@ -285,8 +266,41 @@
                         </div>
                     </div>
 
+                    <!--Buttons-->
+                    <div class="default-button-section">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div>
+                                    <input value="Update" onclick="updatePersonnel();" class="default-button" type="button" />
+                                </div>
+                                <div class="back-button-div">
+                                    <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <!--Ownership--><!--Assigned Ownerships-->
+                    <div class="row input-row">
+
+                        <div class="col-md-6 text-align-left">
+                            <label for="ddlAssignedOwnerships">Current Assigned Ownerships</label>
+                            <select id="ddlAssignedOwnerships" multiple size="7" class="field-width-325"></select>
+                            <input type="button" class="default-button background-red" onclick="removeOwnership();" value="Remove" />
+                        </div>
+
+                        <div class="col-md-5 text-align-left">
+                            <label for="ddlOwnership">Ownerships</label>
+                            <select id="ddlOwnership" multiple size="7" class="field-width-325"></select>
+                            <input type="button" class="default-button background-green" onclick="addOwnership();" value="Add" />
+                        </div>
+
+                    </div>
+
                     <!--Products-->
-                    <div id="divProductList" class="default-button-section">
+                    <a id="ancProducts"></a>
+                    <div id="divProductList" class="default-button-section hidden">
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="row product-list-header width-100">
@@ -315,9 +329,6 @@
                     <div class="default-button-section">
                         <div class="row">
                             <div class="col-md-12">
-                                <div>
-                                    <input value="Update" onclick="updatePersonnel();" class="default-button" type="button" />
-                                </div>
                                 <div class="back-button-div">
                                     <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button" />
                                 </div>
@@ -431,7 +442,15 @@
             });
 
             $("#ddlPosition").html(str);
-            getProductList();
+
+            if (personnelID <= 0) {
+                getOwnershipList();
+
+            } else {
+                $("#divProductList").removeClass('hidden');
+                $("#anchorTag").removeClass('hidden');
+                getProductList();
+            }            
         }
     }
 
@@ -467,7 +486,7 @@
             var str = '';
 
             $("#productList").html("");
-        
+
             $.each(data.report.rows, function (index) {
 
                 var obj = data.report.rows[index];
@@ -590,24 +609,11 @@
             });
         } else {
 
-            //$("#divAssignedOwnerships").html();
             var str = '';
 
-            console.log(data);
             $.each(data.report.rows, function (index) {
 
                 var obj = data.report.rows[index];
-
-                
-                //str = str + '<div class="row">';
-                //str = str + '<div class="col-md-12" style="text-align:left">';
-                //str = str + obj.ownerName;                
-                //str = str + '<button type="button" class="close" onClick="removeOwnership(' + '\'' + obj.ownerId + '\')" >';
-                //str = str + '<span>&times;</span>';
-                //str = str + '</button>'
-                //str = str + '</div>';
-                //str = str + '</div>';
-                
                 str = str + '<option value="' + obj.ownerId + '">' + obj.ownerName + '</option>';
 
             })
@@ -615,7 +621,7 @@
             $("#ddlAssignedOwnerships").append(str);
 
             getOwnershipList();
-        }        
+        }
 
     }
 
@@ -650,14 +656,12 @@
             });
         } else {
             var str = '';
-            console.log(data);
-            
 
             $.each(data.report.rows, function (index) {
-                var isAssigned = false;                
+                var isAssigned = false;
                 var obj = data.report.rows[index];
 
-                $("#ddlAssignedOwnerships > option").each(function () {                    
+                $("#ddlAssignedOwnerships > option").each(function () {
                     if (this.value == obj.OwnerID) {
                         isAssigned = true;
                     }
@@ -736,12 +740,86 @@
                 $("#txtEmailAddress").val(obj["email"]);
                 $("#txtAltEmailAddress").val(obj["altEmail"]);
                 $("#txtComment").val(obj["comment"]);
+
+                getPersonnelWebSetup();
             })
         }
 
     }
 
+    function getPersonnelWebSetup() {
+
+        var url = ServicePrefix + '/api/Personnel/GetPersonnelWebSetupStatus';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelID
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getPersonnelWebSetupSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        }
+
+        $.ajax(url, settings);
+
+    }
+
+    function getPersonnelWebSetupSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
+
+            });
+        } else {
+
+            $.each(data.report.rows, function (index) {
+                var obj = data.report.rows[index];
+                var status = -1;
+                console.log(obj.status);
+                console.log(obj.notificationStatus);
+
+
+                if (obj.status != null) {
+                    if (obj.status == 0) {
+                        status = 0;
+                    }
+                    if (obj.status == 2) {
+                        status = 2;
+                    }
+                }
+                if (obj.notificationStatus != null && obj.notificationStatus == 1) {
+                    status = 1
+                }
+
+                if (status == 0) {
+                    $("#spnWebStatus").text("WEB User");
+                }
+                if (status == 2) {
+                    $("#spnWebStatus").text("Notified");
+                }
+                if (status == 1) {
+                    $("#spnWebStatus").text("Pending");
+                }
+
+            });
+        }
+    }
+
+
     function addOwnership() {
+
+        if ($('#ddlOwnership > option:selected').length == 0) {
+            bootbox.alert('Select an Ownership to add.');
+        }
+
         $('#ddlOwnership > option:selected').each(function () {
             if ($('#ddlAssignedOwnerships [value="' + $(this).val() + '"]').length == 0) {
                 $('#ddlAssignedOwnerships').html('<option value="' + $(this).val() + '">' + $(this).text() + '</option>' + $('#ddlAssignedOwnerships').html());
@@ -751,6 +829,11 @@
     }
 
     function removeOwnership() {
+
+        if ($('#ddlAssignedOwnerships > option:selected').length == 0) {
+            bootbox.alert('Select an Ownership to remove.');
+        }
+
         $('#ddlAssignedOwnerships > option:selected').each(function () {
             if ($('#ddlOwnership [value="' + $(this).val() + '"]').length == 0) {
                 $('#ddlOwnership').html('<option value="' + $(this).val() + '">' + $(this).text() + '</option>' + $('#ddlOwnership').html());

@@ -49,10 +49,7 @@
     <script src="js/respond.min.js"></script>
     <![endif]-->
     <style>
-        .standardText, select {
-            width: 300px !important;
-        }
-        
+
     </style>
 </head>
 <body>
@@ -93,24 +90,24 @@
                                                           
                     <div class="row input-row">
 
-                        <div class="col-md-6 text-align-center">   
-                             <label for="ddlNonSelectedReports">Unassigned Reports</label>                      
-                            <select id="ddlNonSelectedReports" class="font-14" multiple size="13"></select>
-                        </div>
                         <div class="col-md-6 text-align-center">
                             <label for="ddlSelectedReports">Current Market Reports</label>
-                            <select id="ddlSelectedReports" class="font-14" multiple size="13"></select>
-
+                            <select id="ddlSelectedReports" class="font-14 field-width-325" multiple size="13"></select>
                         </div>
+
+                        <div class="col-md-6 text-align-center">
+                            <label for="ddlNonSelectedReports">Unassigned Reports</label>
+                            <select id="ddlNonSelectedReports" class="font-14 field-width-325" multiple size="13"></select>
+                        </div>
+
                     </div>
-                    <div class="row input-row">
-                        
+                    <div class="row input-row">                        
+                        <div class="col-md-6 text-align-center">
+                            <input value="Remove" onclick="removeFromMarket();" class="default-button background-red" type="button">
+                        </div>
+
                         <div class="col-md-6 text-align-center">
                             <input value="Add" onclick="addToMarket();" class="default-button background-green" type="button">
-                        </div>
-                        <div class="col-md-6 text-align-center">
-
-                            <input value="Remove" onclick="removeFromMarket();" class="default-button background-red" type="button">
                         </div>
                     </div>
                     <hr />
@@ -126,7 +123,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -139,7 +135,6 @@
     <script src="/js/jquery.min.js"></script>
     <!-- jQuery Easing -->
     <script src="/js/jquery.easing.1.3.js"></script>
-
     <!-- Bootstrap -->
     <script src="/js/bootstrap.min.js"></script>
     <!-- Bootbox -->
@@ -160,17 +155,62 @@
 <script>
 
     var marketID = 0;
-    //var marketName = '';
 
     $(document).ready(function () {
         buildMainMenu("Markets");
         marketID = (getParameterByName("MarketId") == null ? 0 : getParameterByName("MarketId"));
-        //marketName = (getParameterByName("MarketName") == null ? 0 : getParameterByName("MarketName"));
-
-        //$('#txtMarketName').text(marketName);
-        getReports();
+        
         getMarket();
     });
+
+    function getMarket() {
+        if (marketID <= 0) {
+            return;
+        }
+
+        var url = ServicePrefix + '/api/Market/GetMarket';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketID": marketID
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown)
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function getMarketSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
+            });
+        } else {
+
+            $.each(data.report.rows, function (index) {
+
+                var obj = data.report.rows[index];
+
+                $("#lblMarketName").text("Market Name: " + obj.marketName);
+                $("#lblMarketId").text("Market ID: " + obj.marketId);
+                $("#lblMediaType").text("Media Type: " + obj.mediaTypeName);
+            });
+            $(".market-label").removeClass("hidden");
+
+            getReports();
+
+        }
+    }
 
     function getReports() {
         if (marketID == 0) {
@@ -289,52 +329,6 @@
 
     function genericAjaxError(jqXhr, textStatus, errorThrown) {
         bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
-    }
-
-    function getMarket() {
-        if (marketID <= 0) {
-            return;
-        }
-
-        var url = ServicePrefix + '/api/Market/GetMarket';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inMarketID": marketID
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getMarketSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown)
-            }
-        };
-
-        $.ajax(url, settings);
-    }
-
-    function getMarketSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-            });
-        } else {
-
-            $.each(data.report.rows, function (index) {
-
-                var obj = data.report.rows[index];
-
-                $("#lblMarketName").text("Market Name: " + obj.marketName);
-                $("#lblMarketId").text("Market ID: " + obj.marketId);
-                $("#lblMediaType").text("Media Type: " + obj.mediaTypeName);
-            });
-            $(".market-label").removeClass("hidden");
-        }
     }
 
     function goBackToMarketPage() {
