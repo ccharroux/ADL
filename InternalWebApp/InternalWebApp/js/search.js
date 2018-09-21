@@ -26,6 +26,7 @@
             }
 
             //setup the parameters for the API
+            
             apiParameters = {
                 "inApiToken": apiToken,
                 "inMarketId": searchCriteria["marketID"],
@@ -135,6 +136,131 @@
 
             //may need to add account type to the api to be returned
             $("#previousPage").html(searchCriteria["agencyName"]);
+            break;
+        case "PARENTADV":
+
+            if ($('.search-all-markets:visible').is(':checked')) {
+                bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
+                });
+            }
+
+            if ($('.search-text:visible').val().length > 0) {
+                searchText = $('.search-text:visible').val();
+            } else {
+                searchText = searchCriteria["parentAdvertiserName"].length > 0 ? searchCriteria["parentAdvertiserName"] : searchCriteria["advertiserName"];
+            }
+
+
+            apiParameters = {
+                "inApiToken": apiToken,
+                "inParentAdvertiserName": searchText,
+                "inShowDisabled": false
+            }
+            api = "/api/ParentAdvertiser/GetParentAdvertiserList";
+
+            columns.push({
+                "title": "ParentAdvertiserID",
+                "visible": false,
+                "mData": "parentAdvertiserId",
+                "orderable": false
+            });
+
+            columns.push({
+                "title": "Parent Advertiser Name",
+                "mData": "parentAdvertiserName",
+                "orderable": true
+            });
+
+            columns.push({
+                "title": "Industry",
+                "visible": true,
+                "mData": "IN_ShortDescription",
+                "orderable": true
+            });
+
+            columns.push({
+                "title": "SubIndustry Name",
+                "mData": "SI_Description",
+                "orderable": true
+            });
+
+            columns.push({
+                "mRender": function (data, type, row) {
+                    return '<a href="#" onclick="linkParentAdvertiserByLink(' + row.parentAdvertiserId + ')">Assign Parent Advertiser</a>';
+                },
+                "orderable": false,
+                "searchable": false,
+                "className": "text-align-right"
+            });
+
+            //need to document this more
+            $("#previousPage").html(searchCriteria["advertiserName"]);
+            break;
+        case "LINKADV":
+            if ($('.search-all-markets:visible').is(':checked')) {
+                bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
+                });
+            }
+
+            if ($('.search-text:visible').val().length > 0) {
+                searchText = $('.search-text:visible').val();
+            } else {
+                searchText = searchCriteria["linkedAdvertiserName"].length > 0 ? searchCriteria["linkedAdvertiserName"] : searchCriteria["advertiserName"];
+            }
+
+            //setup the parameters for the API
+
+            apiParameters = {
+                "inApiToken": apiToken,
+                "inMarketId": searchCriteria["marketID"],
+                "inAdvertiserName": searchText,
+                "inShowDisabled": false
+            }
+            api = "/api/Advertiser/GetAdvertiserList";
+
+            //setup the columns to be used in the datatable
+            //title sets the column name
+            //visible determines if the column will show in the datatable or not
+            //data links the column to the data that comes back in the results
+            //orderable determines if the column can be sorted or not
+            //see https://datatables.net/reference/option/columns
+            columns.push({
+                "title": "AdvertiserID",
+                "visible": false,
+                "mData": "advertiserId",
+                "orderable": false
+            });
+
+            columns.push({
+                "title": "Advertiser Name",
+                "mData": "advertiserName",
+                "orderable": true
+            });
+
+            columns.push({
+                "title": "MarketID",
+                "visible": false,
+                "mData": "marketId",
+                "orderable": false
+            });
+
+            columns.push({
+                "title": "Market Name",
+                "mData": "marketName",
+                "orderable": true
+            });
+
+            columns.push({
+                "mRender": function (data, type, row) {
+                    return '<a href="#" onclick="linkNewAdvertiserByLink(' + row.advertiserId + ')">Link Advertiser</a>';
+                },
+                "orderable": false,
+                "searchable": false,
+                "className": "text-align-right"
+            });
+
+            $("#previousPage").html(searchCriteria["advertiserName"]);
+
             break;
         default:
     }
@@ -312,4 +438,79 @@ function linkAgency() {
 function fixAgency() {
     bootbox.alert('This functionality is still under development.', function () {
     });
+}
+
+function linkParentAdvertiserByLink(parentAdvertiserId) {
+    var rowId = $('#dtSearchResults').dataTable()
+        .fnFindCellRowIndexes(parentAdvertiserId, 0);
+
+    console.log(rowId);
+
+    var table = $('#dtSearchResults').DataTable();
+    table.row(rowId).select();
+
+    linkParentAdvertiser();
+}
+
+function linkParentAdvertiser() {
+    var searchTable = $('#dtSearchResults').DataTable();
+    if (searchTable.rows('.selected').any() === false) {
+        bootbox.alert('Select a parent advertiser to assign.', function () {
+        });
+        return;
+    }
+
+    var rowData = searchTable.rows('.selected').data();
+    var searchResults = {};
+
+    for (var key in searchCriteria) {
+        searchResults[key] = searchCriteria[key];
+    }
+
+    searchResults["parentAdvertiserID"] = rowData[0].parentAdvertiserId;
+    searchResults["parentAdvertiserName"] = rowData[0].parentAdvertiserName;
+
+    setLocalStorage("gSearchResults", JSON.stringify(searchResults));
+
+    //sends user back to page that called the search page
+    var searchPage = searchCriteria["searchPage"]["href"];
+    window.location = searchPage;
+
+}
+
+function linkNewAdvertiserByLink(advertiserId) {
+    var rowId = $('#dtSearchResults').dataTable()
+        .fnFindCellRowIndexes(advertiserId, 0);
+
+    console.log(rowId);
+
+    var table = $('#dtSearchResults').DataTable();
+    table.row(rowId).select();
+
+    linkNewAdvertiser();
+}
+
+function linkNewAdvertiser() {
+    var searchTable = $('#dtSearchResults').DataTable();
+    if (searchTable.rows('.selected').any() === false) {
+        bootbox.alert('Select an advertiser to assign.', function () {
+        });
+        return;
+    }
+
+    var rowData = searchTable.rows('.selected').data();
+    var searchResults = {};
+
+    for (var key in searchCriteria) {
+        searchResults[key] = searchCriteria[key];
+    }
+
+    searchResults["linkedAdvertiserID"] = rowData[0].advertiserId;
+    searchResults["linkedAdvertiserName"] = rowData[0].advertiserName;
+
+    setLocalStorage("gSearchResults", JSON.stringify(searchResults));
+
+    //sends user back to page that called the search page
+    var searchPage = searchCriteria["searchPage"]["href"];
+    window.location = searchPage;
 }
