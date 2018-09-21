@@ -277,6 +277,7 @@
     var advertiserId = 0;
     var bLinkAdvertiser = false;
     var bLinkParentAdvertiser = false;
+    var bIsNew = true;
 
     $(document).ready(function () {
 
@@ -285,6 +286,7 @@
         advertiserId = (getParameterByName("AdvertiserID") == null ? 0 : getParameterByName("AdvertiserID"));
         $("#txtAdvertiserId").val(advertiserId);
 
+        bIsNew = advertiserId > 0;
 
         getMarketList();
 
@@ -709,13 +711,75 @@
         //if changing linked advertisers give a warning and store value
         if ($("#txtLinkedAdvertiserId").val().length > 0 &&
             $("#oldLinkedAdvertiserId").val() !== $("#txtLinkedAdvertiserId").val()) {
+            //can't do bootbox since it's async
             //do confirm box
+            //if cancel return
+            //else set bLinkAdvertiser to true
         }
         //if linking parent advertisers give a warning and store value
         if ($('#chkLinkParent').is(':checked') && $("#txtParentOwnershipId").val().length > 0 &&
             $("#oldParentAdvertiserId").val() !== $("#txtParentOwnershipId").val()) {
+            //can't do bootbox since it's async
             //do confirm box
+            //if cancel return
+            //else set bLinkParentAdvertiser to true
         }
+
+        return;
+
+        $.ajax({
+            url: ServicePrefix + '/api/',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inShowDisabled": false,
+                "inIndustryId": industryId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+
+                    });
+                }
+                else {
+
+                    if (bLinkParentAdvertiser) {
+                        //make call to update link advertiser
+                        //make call to disable old parent advertiser
+                        //write log "Parent Advertiser Name"
+                    }
+
+                    if (bLinkAdvertiser) {
+                        //make call to update advertiser links
+                        //part of update get station advertiser count
+                        //part of update get media advertiser count
+                        //write log "Station Advertiser Code" if station advertiser count > 0
+                        //write log "Media Advertiser Code" if media advertiser count > 0
+                        //check for advertiser revenues
+                        //if > 0 update revenues (should be a separate api call)
+                        //write log "Advertiser ID" passing # of revenue records
+                    }
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    //window.location = "preprocess.html";
+                });
+            }
+        });
+
+        //do update
+        //if update successful
+        //log name, industry, subindustry changes make part of update api
+        //separate api call to handle change of parent advertiser to be linked
+        //separate api call to handle change of linked advertiser
+        //need to look at the ramifications of unlinking a parent advertiser
+        //need to deal with revenue items too
+            
 
         bootbox.alert('This functionality is still under development.', function () {
         });
