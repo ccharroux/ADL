@@ -205,11 +205,12 @@
 
         getIndustryList();
 
-        //disabling the industry dropdown on 
-        if (subIndustryId !== "-1" && industryId !== "0") {
-            //disable the industry dropdown
-            $("#ddlIndustry").prop('disabled', true);
-        }
+        //disabling the industry dropdown on
+        //allowing updating of industry until product says not to allow
+        //if (subIndustryId !== "-1" && industryId !== "0") {
+        //    //disable the industry dropdown
+        //    $("#ddlIndustry").prop('disabled', true);
+        //}
 
         //$("#chkActive").change(function () {
         //    if (this.checked) {
@@ -369,7 +370,7 @@
                 "inSubIndustryName": $("#txtSubIndustryName").val().toUpperCase(),
                 "inIsNew": $("#txtSubIndustryId").val() === '-1'
             }),
-    
+
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
@@ -385,49 +386,30 @@
                     $.each(data.report.rows, function (index) {
 
                         var obj = data.report.rows[index];
-                        
+
 
                         if ($("#txtSubIndustryId").val() === '-1') {
                             bReloadPage = true;
                         }
 
-                        switch(obj["status"]) {
-                            case -3:
-                                //general error no records updated
-                                bootbox.alert('Process Failed.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
-                                });
-                                break;
-                            case -2:
-                                //can't find record to update
-                                bootbox.alert('Process Failed.\n\r\n\rCannot find industry - ' + $("#ddlIndustry").val() +' and subindustry - '+ $("#txtSubIndustryName").val() +' to update.', function () {
+                        $("#txtSubIndustryId").val(obj["status"]);
+                        //message that was updated
+                        bootbox.alert('The subindustry - ' + $("#txtSubIndustryName").val() + ' was updated successfully.', function () {
 
-                                });
-                                break;
-                            case -1:
-                                //duplicate key
-                                bootbox.alert('Industry - ' + $("#ddlIndustry").val() +' and SubIndustry - '+ $("#txtSubIndustryName").val() +' already exists.', function () {
-                                });
-                                break;
-                            default:
-                                $("#txtSubIndustryId").val(obj["status"]);
-                                //message that was updated
-                                bootbox.alert('The subindustry - ' + $("#txtSubIndustryName").val() + ' was updated successfully.', function () {
+                        });
 
-                                });
-
-                                if (bReloadPage) {
-                                    //reload page with new query string with the new subindustry id
-                                    window.location = "subindustry.html?IndustryID=" +
-                                        $("#ddlIndustry").val() +
-                                        "&SubIndustryID=" +
-                                        $("#txtSubIndustryId").val();
-                                }
+                        if (bReloadPage) {
+                            //reload page with new query string with the new subindustry id
+                            window.location = "subindustry.html?IndustryID=" +
+                                $("#ddlIndustry").val() +
+                                "&SubIndustryID=" +
+                                $("#txtSubIndustryId").val();
                         }
 
                     });
 
-                    
+
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
