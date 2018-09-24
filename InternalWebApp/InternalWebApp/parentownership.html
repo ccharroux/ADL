@@ -453,7 +453,7 @@
                 "inAddress1": $("#txtAddress").val(),
                 "inAddress2": $("#txtAddress2").val(),
                 "inCity": $("#txtCity").val(),
-                "inState": $("#ddlState").val() !== "-1" ? $("#ddlState").val() : "",
+                "inState": $("#ddlState").val() !== "-1" ? $("#ddlState").val() : null,
                 "inZipCode": $("#txtZipCode").val(),
                 "inZipCode4": $("#txtZipCode4").val(),
                 "inPhoneAreaCode": $("#txtAreaCode").val(),
@@ -489,31 +489,14 @@
 
                         var obj = data.report.rows[index];
 
-                        console.log(obj["status"]);
+                        $("#txtParentOwnershipId").val(obj["_updateStatus"]);
+                        //message that was updated
+                        bootbox.alert('The parent ownership - ' + $("#txtParentOwnershipName").val() + ' was updated successfully.', function () {
+                        });
 
-                        switch (obj["status"]) {
-                            case -3:
-                                bootbox.alert('Process Failed.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
-                                });
-                                break;
-                            case -2:
-                                bootbox.alert('Process Failed.\n\r\n\rCannot find parent ownership - ' + $("#txtParentOwnershipName").val() + ' to update.', function () {
-                                });
-                                break;
-                            case -1:
-                                bootbox.alert('Process Failed.\n\r\n\r' + $("#txtParentOwnershipName").val() + ' already exists.', function () {
-                                });
-                                break;
-                            default:
-                                $("#txtParentOwnershipId").val(obj["status"]);
-                                //message that was updated
-                                bootbox.alert('The parent ownership - ' + $("#txtParentOwnershipName").val() + ' was updated successfully.', function () {
-                                });
-
-                                if (bReloadPage) {
-                                    //reload page with new query string with the new parentownership id
-                                    window.location = "parentownership.html?parentOwnershipID=" + $("#txtParentOwnershipId").val();
-                                }
+                        if (bReloadPage) {
+                            //reload page with new query string with the new parentownership id
+                            window.location = "parentownership.html?parentOwnershipID=" + $("#txtParentOwnershipId").val();
                         }
 
                     });
