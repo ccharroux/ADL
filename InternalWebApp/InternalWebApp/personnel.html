@@ -63,10 +63,16 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2 class="inline-block">Personnel</h2> &nbsp;&nbsp; <a class="hidden" id="anchorTag" href="#ancProducts">Product List</a>
+                        <h2 class="inline-block">Personnel</h2> &nbsp;&nbsp; 
+                        <a class="hidden" id="aTProductList" href="#ancProducts">Product List</a> &nbsp;
+                        <a class="hidden" id="aTOwnerships" href="#ancOwnerships">Ownerships</a>
                     </div>
                 </div>
                 <div class="text-center margin-top-0">
+
+                    <!--Hidden Inputs-->
+                    <input type="hidden" id="hdnEmail" value="" />
+                    <input type="hidden" id="hdnOwnership" value="" />
 
                     <!--First Name-->
                     <div class="row input-row">
@@ -198,7 +204,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input type="text" id="txtZipCode" maxlength="5" size="5" />&nbsp;-&nbsp;
-                            <input type="text" id="txtZipCodeExt" maxlength="4" size="4" />
+                            <input type="text" id="txtZip4" maxlength="4" size="4" />
                         </div>
                     </div>
 
@@ -210,7 +216,7 @@
                         <div class="col-md-9 text-align-left">
                             <input type="text" id="txtPhoneAreaCode" maxlength="3" size="3" />&nbsp;
                             <input type="text" id="txtPhoneNumber" maxlength="7" size="7" />&nbsp;
-                            <input type="text" id="txtPhoneNumberExt" maxlength="4" size="4" />
+                           Ext. &nbsp;<input type="text" id="txtPhoneNumberExt" maxlength="4" size="4" />
                         </div>
                     </div>
 
@@ -283,16 +289,16 @@
                     <hr />
                     <!--Ownership--><!--Assigned Ownerships-->
                     <div class="row input-row">
-
+                        <a id="ancOwnerships"></a>
                         <div class="col-md-6 text-align-left">
                             <label for="ddlAssignedOwnerships">Current Assigned Ownerships</label>
-                            <select id="ddlAssignedOwnerships" multiple size="7" class="field-width-325"></select>
+                            <select id="ddlAssignedOwnerships" size="7" class="field-width-325"></select>
                             <input type="button" class="default-button background-red" onclick="removeOwnership();" value="Remove" />
                         </div>
 
                         <div class="col-md-5 text-align-left">
                             <label for="ddlOwnership">Ownerships</label>
-                            <select id="ddlOwnership" multiple size="7" class="field-width-325"></select>
+                            <select id="ddlOwnership" size="7" class="field-width-325"></select>
                             <input type="button" class="default-button background-green" onclick="addOwnership();" value="Add" />
                         </div>
 
@@ -448,7 +454,8 @@
 
             } else {
                 $("#divProductList").removeClass('hidden');
-                $("#anchorTag").removeClass('hidden');
+                $("#aTProductList").removeClass('hidden');
+                $("#aTOwnerships").removeClass('hidden');
                 getProductList();
             }            
         }
@@ -727,9 +734,13 @@
                 $("#txtAddress2").val(obj["address2"]);
                 $("#txtAddress3").val(obj["address3"]);
                 $("#txtCity").val(obj["city"]);
-                $("#ddlState").val(obj["stateAbbreviation"]);
+                if (obj["stateAbbreviation"] == null) {
+                    $("#ddlState").val(-1);
+                } else {
+                    $("#ddlState").val(obj["stateAbbreviation"]);
+                }
                 $("#txtZipCode").val(obj["zipCode"]);
-                $("#txtZipCodeExt").val(obj["zip4"]);
+                $("#txtZip4").val(obj["zip4"]);
                 $("#txtPhoneAreaCode").val(obj["areaCode"]);
                 $("#txtPhoneNumber").val(obj["phone"]);
                 $("#txtPhoneNumberExt").val(obj["extension"]);
@@ -864,8 +875,103 @@
     }
 
     function updatePersonnel() {
-        bootbox.alert('This functionality is still under development.', function () {
+
+        if (validationPassed() == false){
+            return;
+        }
+
+        var url = ServicePrefix + '/api/Personnel/UpdatePersonnel';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelID,
+                "inSalutation": $("#txtSalutation").val().trim(),
+                "inLastName": $("#txtLastName").val().trim(),
+                "inFirstName": $("#txtFirstName").val().trim(),
+                "inMiddleInitial": $("#txtMiddleInitial").val().trim(),
+                "inSuffix": $("#txtSuffix").val().trim(),
+                "inPositionCode": $("#ddlPosition").val().trim(),
+                "inTitle": $("#txtTitle").val().trim(),
+                "inAddress1": $("#txtAddress1").val().trim(),
+                "inAddress2": $("#txtAddress2").val().trim(),
+                "inAddress3": $("#txtAddress3").val().trim(),
+                "inCity": $("#txtCity").val().trim(),
+                "inStateAbbreviation": $("#ddlState").val() !== "-1" ? $("#ddlState").val() : "",
+                "inZipCode": $("#txtZipCode").val().trim(),
+                "inZip4": $("#txtZip4").val().trim(),
+                "inAreaCode": $("#txtPhoneAreaCode").val().trim(),
+                "inPhone": $("#txtPhoneNumber").val().trim(),
+                "inExtension": $("#txtPhoneNumberExt").val().trim(),
+                "inFaxAreaCode": $("#txtFaxAreaCode").val().trim(),
+                "inFaxPhone": $("#txtFaxNumber").val().trim(),
+                "inMobileAreaCode": $("#txtMobileAreaCode").val().trim(),
+                "inMobilePhone": $("#txtMobileNumber").val().trim(),
+                "inEmail": $("#txtEmailAddress").val().trim(),
+                "inAltEmail": $("#txtAltEmailAddress").val().trim(),
+                "inComment": $("#txtComment").val().trim()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                updatePersonnelSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+        $.ajax(url, settings);
+    }
+
+    function updatePersonnelSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
+
+            });
+        } else {
+
+            bootbox.alert('Personnel update successful.');
+        }
+
+    }
+
+
+    function validationPassed() {
+
+        var loopBreak = true;
+        $(".mkaRequired").each(function (index, el) {
+
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+
+            }
+
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == "-1") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
         });
+
+        return loopBreak;
+    }
+
+    function checkIfBothEmailAndOwnershipChanged() {
+
+
     }
 
 </script>
