@@ -65,7 +65,7 @@
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
                         <h2 class="inline-block">Personnel</h2> &nbsp;&nbsp; 
                         <a class="hidden" id="aTProductList" href="#ancProducts">Product List</a> &nbsp;
-                        <a class="hidden" id="aTOwnerships" href="#ancOwnerships">Ownerships</a>
+                        <a class="hidden" id="aTOwnershipList" href="#ancOwnerships">Ownerships</a>
                     </div>
                 </div>
                 <div class="text-center margin-top-0">
@@ -73,6 +73,7 @@
                     <!--Hidden Inputs-->
                     <input type="hidden" id="hdnEmail" value="" />
                     <input type="hidden" id="hdnOwnership" value="" />
+                    <input type="hidden" id="hdnPersonnelId" />
 
                     <!--First Name-->
                     <div class="row input-row">
@@ -285,62 +286,69 @@
                             </div>
                         </div>
                     </div>
+                    <div id="hideOwnerAndProduct" class="hidden">
 
-                    <hr />
-                    <!--Ownership--><!--Assigned Ownerships-->
-                    <div class="row input-row">
-                        <a id="ancOwnerships"></a>
-                        <div class="col-md-6 text-align-left">
-                            <label for="ddlAssignedOwnerships">Current Assigned Ownerships</label>
-                            <select id="ddlAssignedOwnerships" size="7" class="field-width-325"></select>
-                            <input type="button" class="default-button background-red" onclick="removeOwnership();" value="Remove" />
+                        <hr />
+                        <!--Ownership--><!--Assigned Ownerships-->
+                        <div class="row input-row">
+                            <a id="ancOwnerships"></a>
+                            <div class="col-md-6 text-align-left">
+                                <label for="ddlAssignedOwnerships">Current Assigned Ownerships</label>
+                                <select id="ddlAssignedOwnerships" size="7" class="field-width-325"></select>
+                                <input type="button" class="default-button background-red" onclick="removeOwnership();" value="Remove" />
+                            </div>
+
+                            <div class="col-md-5 text-align-left">
+                                <label for="ddlOwnership">Ownerships</label>
+                                <select id="ddlOwnership" size="7" class="field-width-325"></select>
+                                <input type="button" class="default-button background-green" onclick="addOwnership();" value="Add" />
+                            </div>
+
                         </div>
 
-                        <div class="col-md-5 text-align-left">
-                            <label for="ddlOwnership">Ownerships</label>
-                            <select id="ddlOwnership" size="7" class="field-width-325"></select>
-                            <input type="button" class="default-button background-green" onclick="addOwnership();" value="Add" />
+                        <!--Products-->
+                        <a id="ancProducts"></a>
+                        <div class="default-button-section ">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="row product-list-header width-100">
+                                        <div class="col-md-4 text-align-left">
+                                            <strong>
+                                                Product
+                                            </strong>
+                                        </div>
+                                        <div class="col-md-2 text-align-left">
+                                            <strong>
+                                                Dates
+                                            </strong>
+                                        </div>
+                                        <div class="col-md-6">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row margin-0-auto width-100">
+                                <div id="productList"></div>
+                            </div>
                         </div>
+                        <hr />
 
-                    </div>
-
-                    <!--Products-->
-                    <a id="ancProducts"></a>
-                    <div id="divProductList" class="default-button-section hidden">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="row product-list-header width-100">
-                                    <div class="col-md-4 text-align-left">
-                                        <strong>
-                                            Product
-                                        </strong>
-                                    </div>
-                                    <div class="col-md-2 text-align-left">
-                                        <strong>
-                                            Dates
-                                        </strong>
-                                    </div>
-                                    <div class="col-md-6">
-
+                        <!--Buttons-->
+                        <div class="default-button-section">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="back-button-div">
+                                        <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button" />
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row margin-0-auto width-100">
-                            <div id="productList"></div>
-                        </div>
+
                     </div>
-                    <hr />
-                    <!--Buttons-->
-                    <div class="default-button-section">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="back-button-div">
-                                    <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
+
+
                 </div>
             </div>
         </div>
@@ -372,6 +380,7 @@
     $(document).ready(function () {
         buildMainMenu("Personnel");
         personnelID = (getParameterByName("personnelid") == null ? 0 : getParameterByName("personnelid"));
+
         getStateList();
 
     });
@@ -453,9 +462,9 @@
                 getOwnershipList();
 
             } else {
-                $("#divProductList").removeClass('hidden');
+                $("#hideOwnerAndProduct").removeClass('hidden');
                 $("#aTProductList").removeClass('hidden');
-                $("#aTOwnerships").removeClass('hidden');
+                $("#aTOwnershipList").removeClass('hidden');
                 getProductList();
             }            
         }
@@ -880,6 +889,11 @@
             return;
         }
 
+
+        if (personnelID <= 0) {
+            $("#hdnPersonnelId").val(personnelID);
+        }
+
         var url = ServicePrefix + '/api/Personnel/UpdatePersonnel';
 
         var settings = {
@@ -933,13 +947,42 @@
             });
         } else {
 
-            bootbox.alert('Personnel update successful.');
+            var bReloadPage = false;
+
+            $.each(data.report.rows, function (index) {
+
+                var obj = data.report.rows[index];
+
+                if ($("#hdnPersonnelId").val() === '0') {
+                    bReloadPage = true;
+                    $("#hdnPersonnelId").val(obj["_updateStatus"]);
+                }
+
+                bootbox.alert('Personnel update successful.');
+
+                if (bReloadPage) {
+                    window.location = "personnel.html?personnelID=" + $("#hdnPersonnelId").val();
+                }
+            });
+
         }
 
     }
 
+    function isEmail() {
+
+        var email = $("#txtEmailAddress").val().trim()
+        var regex = /^([a-zA-Z0-9_.+'-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        return regex.test(email);
+
+    }
 
     function validationPassed() {
+
+        if (isEmail() == false) {
+            bootbox.alert("You must enter a valid email address.");
+            return false;
+        }
 
         var loopBreak = true;
         $(".mkaRequired").each(function (index, el) {
