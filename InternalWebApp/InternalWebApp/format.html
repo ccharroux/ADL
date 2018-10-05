@@ -77,6 +77,7 @@
                 </div>
 
                 <div class="text-center margin-top-0">
+                    <input type="hidden" id="txtFormatID" value=""/>
 
                     <!-- Media Type -->
                     <div class="row input-row">
@@ -154,7 +155,10 @@
 
     $(document).ready(function () {
         buildMainMenu("");
+
         formatId = (getParameterByName("formatId") == null ? 0 : getParameterByName("formatId"));
+        $("#txtFormatID").val(formatId);
+        
         getMediaTypes();
 
     });
@@ -256,7 +260,24 @@
             });
         }
         else {
-            bootbox.alert('Format have successfully been updated.')
+
+            var bReloadPage = false;
+            $.each(data.report.rows, function (index) {
+
+                var obj = data.report.rows[index];
+
+                if ($("#txtFormatID").val() === '0') {
+                    bReloadPage = true;
+                    $("#txtFormatID").val(obj["Format ID"]);
+                }
+
+                bootbox.alert('Format have successfully been updated.');
+
+                if (bReloadPage) {
+                    window.location = "format.html?formatId=" + $("#txtFormatID").val();
+                }
+            });
+
         }
     }
 
