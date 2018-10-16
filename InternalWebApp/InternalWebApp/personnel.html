@@ -840,15 +840,42 @@
             return;
         }
 
-        bootbox.alert('This functionality is still under development.', function () {
-        });
+        var ownerId = $('#ddlOwnership > option:selected').val();
 
-        //$('#ddlOwnership > option:selected').each(function () {
-        //    if ($('#ddlAssignedOwnerships [value="' + $(this).val() + '"]').length == 0) {
-        //        $('#ddlAssignedOwnerships').html('<option value="' + $(this).val() + '">' + $(this).text() + '</option>' + $('#ddlAssignedOwnerships').html());
-        //        $(this).remove();
-        //    }
-        //})
+        var url = ServicePrefix + '/api/Personnel/InsertPersonnelOwner';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerId": ownerId,
+                "inPersonnelId": personnelID
+            }),
+            success: function (data, textStatus, jQxhr) {
+                addOwnershipSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+        $.ajax(url, settings);
+       
+    }
+
+    function addOwnershipSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] , function () { });
+        } else {
+            bootbox.alert("Ownership has been added successfully.")
+            $('#ddlOwnership > option:selected').each(function () {
+                if ($('#ddlAssignedOwnerships [value="' + $(this).val() + '"]').length == 0) {
+                    $('#ddlAssignedOwnerships').html('<option value="' + $(this).val() + '">' + $(this).text() + '</option>' + $('#ddlAssignedOwnerships').html());
+                    $(this).remove();
+                }
+            })
+        }
     }
 
     function removeOwnership() {
@@ -858,29 +885,125 @@
             return;
         }
 
-        bootbox.alert('This functionality is still under development.', function () {
-        });
+        var ownerId = $('#ddlAssignedOwnerships > option:selected').val();
 
-        //$('#ddlAssignedOwnerships > option:selected').each(function () {
-        //    if ($('#ddlOwnership [value="' + $(this).val() + '"]').length == 0) {
-        //        $('#ddlOwnership').html('<option value="' + $(this).val() + '">' + $(this).text() + '</option>' + $('#ddlOwnership').html());
-        //        $(this).remove();
-        //    }
-        //})
+        var url = ServicePrefix + '/api/Personnel/DeletePersonnelOwner';
+        
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerID": ownerId,
+                "inPersonnelId": personnelID
+            }),
+            success: function (data, textStatus, jQxhr) {
+                removeOwnershipSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        }
+
+        $.ajax(url, settings);       
     }
 
-    function enableProduct() {
+    function removeOwnershipSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
+        } else {
+            $.each(data.report.rows, function (index) {
+                var obj = data.report.rows[index];
+                $('#ddlAssignedOwnerships > option:selected').each(function () {
+                    if ($('#ddlOwnership [value="' + $(this).val() + '"]').length == 0) {
+                        $('#ddlOwnership').html('<option value="' + $(this).val() + '">' + $(this).text() + '</option>' + $('#ddlOwnership').html());
+                        $(this).remove();
+                    }
+                })
 
-        bootbox.alert('This functionality is still under development.', function () {
-        });
+                if (obj['_updateStatus'] == -1) {
+                    bootbox.alert("Ownership has been removed but ContactId: " + personnelID + " has active/submitted surveys and hence can not be deleted from ContactMSS table. In order to delete this contact, first delete all survey assignments.");
+                } else {
+                    bootbox.alert("Ownership has been removed successfully.")
+                }               
+            });                
+        }
+    }
+
+    function enableProduct(productId) {
+
+        var url = ServicePrefix + '/api/Personnel/UpdatePersonnelProduct';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": productId,
+                "inPersonnelId": personnelID,
+                "inActivate": 1
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                enableProductSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
 
     }
 
-    function disableProduct() {
 
-        bootbox.alert('This functionality is still under development.', function () {
-        });
+    function enableProductSuccess(data, textStatus, jQxhr) {
 
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
+        } else {            
+            bootbox.alert("Product has been enabled successfully.", function () {
+                window.location = "personnel.html?personnelID=" + personnelID;
+            });
+        }
+
+    }
+
+    function disableProduct(productId) {
+        var url = ServicePrefix + '/api/Personnel/UpdatePersonnelProduct';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": productId,
+                "inPersonnelId": personnelID,
+                "inActivate": 0
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                disableProductSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+        $.ajax(url, settings);
+    }
+
+    function disableProductSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
+        } else {            
+            bootbox.alert("Product has been disabled successfully.", function () {
+                window.location = "personnel.html?personnelID=" + personnelID;
+
+            });
+        }
     }
 
     function updatePersonnel() {
@@ -888,7 +1011,6 @@
         if (validationPassed() == false){
             return;
         }
-
 
         if (personnelID <= 0) {
             $("#hdnPersonnelId").val(personnelID);
@@ -958,15 +1080,14 @@
                     $("#hdnPersonnelId").val(obj["_updateStatus"]);
                 }
 
-                bootbox.alert('Personnel update successful.');
+                bootbox.alert('Personnel update successful.', function () {
+                    if (bReloadPage) {
+                        window.location = "personnel.html?personnelID=" + $("#hdnPersonnelId").val();
+                    }
+                });
 
-                if (bReloadPage) {
-                    window.location = "personnel.html?personnelID=" + $("#hdnPersonnelId").val();
-                }
             });
-
         }
-
     }
 
     function isEmail() {
