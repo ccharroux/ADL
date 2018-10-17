@@ -55,9 +55,9 @@
             width:300px!important;
         }
 
-        #ddlOwnerGroupStations{
+        /*#ddlOwnerGroupStations{
             height:273px;
-        }
+        }*/
     </style>
 </head>
 <body>
@@ -78,6 +78,7 @@
                 </div>
 
                 <div class="text-center margin-top-0">
+                    <input type="hidden" id="txtOwnershipGroupID" value="" />
                     <!-- Owner -->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
@@ -94,7 +95,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
 
-                            <input type="text" class="mkaRequired" id="txtOwnerGroupName" maxlength="35"  errorMessage="You must enter an Owner Group Name" value="" />
+                            <input type="text" class="mkaRequired" id="txtOwnerGroupName" maxlength="35" errorMessage="You must enter an Owner Group Name" value=""/>
                         </div>
                     </div>
 
@@ -104,7 +105,7 @@
                             <label for="chkNationwide">Nationwide</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="checkbox" id="chkNationwide" />
+                            <input type="checkbox" id="chkNationwide"/>
                         </div>
                     </div>
 
@@ -138,49 +139,66 @@
                             <div id="productList"></div>
                         </div>
                     </div>
-                    <hr />
+                    <hr/>
 
                     <!-- Stations -->
                     <div class="row input-row">
                         <div class="col-md-6 text-align-left">
-                            <label for="ddlStaions">Stations</label>
+                            <label for="ddlStations">Stations</label>
                         </div>
-                        <div class="col-md-6 text-align-left">
+                        <!--<div class="col-md-6 text-align-left">
                             <label for="ddlOwnerGroupStaions">Owner Group Stations</label>
-                        </div>
+                        </div>-->
                     </div>
                     <div class="row input-row">
 
                         <div class="col-md-6 text-align-left">
-                            <select id="ddlMarkets"  onchange="getOwnerStationListByMarket()">
+                            <select id="ddlMarkets" onchange="getOwnerStationListByMarket()">
 
                             </select>
-                            <hr />
-                            <select id="ddlStations" multiple size="10">
+                            <hr/>
+                            <!--<select id="ddlStations" multiple size="10">
 
-                            </select>
+                            </select>-->
                         </div>
-                        <div class="col-md-6 text-align-left">
+                        <!--<div class="col-md-6 text-align-left">
 
                             <select id="ddlOwnerGroupStations" multiple size="13"></select>
 
+                        </div>-->
+                    </div>
+                    <div class="row input-row">
+                        <div class="col-md-12 text-align-left">
+                            <label for="ddlOwnerGroupStations">Owner Group Stations</label>
                         </div>
+
+                        <div class="col-md-6 text-align-left">
+                            <select id="ddlOwnerGroupStations" multiple size="13"></select>
+                        </div>
+                        <div class="col-md-6 text-align-left">
+                            <select id="ddlStations" multiple size="13"></select>
+                        </div>
+
                     </div>
                     <div class="row input-row">
 
+
+                        <div class="col-md-6 text-align-left">
+
+                            <input value="Remove" onclick="removeFromGroup();" class="default-button background-red" type="button">
+                        </div>
                         <div class="col-md-6 text-align-left">
                             <input value="Add" onclick="addToGroup();" class="default-button background-green" type="button">
                         </div>
-                        <div class="col-md-6 text-align-left">
-
-                            <input value="Remove" onclick="removeFromGroup();" class="default-button background-red"  type="button">
-                        </div>
                     </div>
-                    <hr />
+                    <hr/>
                     <!-- Buttons -->
                     <div class="default-button-section">
-                        <div class="row">
-                            <div class="col-md-12">
+                        <div class="row input-row">
+                            <div class="col-md-3">
+
+                            </div>
+                            <div class="col-md-9 text-align-left">
                                 <div>
                                     <input value="Update" onclick="updateOwner()" class="default-button" type="button">
                                 </div>
@@ -233,11 +251,16 @@
         buildMainMenu("Ownerships");
 
         ownerGroupID = (getParameterByName("OwnerGroupID") == null ? 0 : getParameterByName("OwnerGroupID"));
+        $("#txtOwnershipGroupID").val(ownerGroupID);
 
         getOwnerList();
 
 
-
+        $("#ddlOwner").change(function () {
+            //console.log("owner change " + $(this).val());
+            ownerID = $(this).val();
+            getMarketListByOwner();
+        });
 
     });
 
@@ -258,7 +281,7 @@
             success: function (data, textStatus, jQxhr) {
 
                 if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
                     });
                 }
@@ -284,7 +307,7 @@
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
                     //window.location = "preprocess.html";
                 });
             }
@@ -347,8 +370,13 @@
             return;
         }
 
+        console.log("in update");
+
         var productListObject = new Object();
         var productListArr = new Array();
+
+        //this may be okay without re-enabling it.
+        //$("#ddlOwner").prop("disabled", false);
 
         // Build object for Products
         $(".chkOwnerProductList").each(function (index, el)
@@ -387,27 +415,35 @@
                 "inNationwide": $("#chkNationwide").val().trim(),
                 "inOwnerGroupName": $("#txtOwnerGroupName").val().trim(),
                 "inOwnerProductList": productListArr,
-                "inOwnerGroupMarketId": $("#ddlMarkets").val().trim(),
+                "inOwnerGroupMarketId": $("#ddlMarkets").val(),
                 "inOwnerGroupStationList": stationListArr
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
                 if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {});
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {});
                 }
                 else {
-                    if (data.report.rows[0].Status == -1) {
-                        bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {});
-                    }
-                    else {
+                  
+                    //var bReloadPage = false;
+                    var obj = data.report.rows[0];
+
+                    //if (ownerGroupID === "0") {
+                    //    bReloadPage = true;
+                        $("#txtOwnershipGroupID").val(obj.ID);
+                    //}
+
                         // TEMP - we need to now update products...
                         bootbox.alert('Owner Group Updated', function () { });
-                    }
+                    
+                    //if (bReloadPage) {
+                        window.location = "ownershipgroup.html?OwnerGroupID=" + $("#txtOwnershipGroupID").val();
+                    //}
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {});
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {});
             }
         });
 
@@ -430,7 +466,7 @@
             success: function (data, textStatus, jQxhr) {
 
                 if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
                     });
                 }
@@ -444,15 +480,16 @@
                         {
                         
                             var obj = data.report.rows[index];
+                            var productId = obj.P_ProductID.toUpperCase();
                             str = str + '<div class="row">';
                             str = str + '<div class="col-md-2 text-align-right">';
-                            str = str + '<input type="checkbox" value="' + obj.P_ProductID + '" class="chkOwnerProductList" id="chk' + obj.P_ProductID + '"/>';
+                            str = str + '<input type="checkbox" value="' + productId + '" class="chkOwnerProductList" id="chk' + productId + '"/>';
                             str = str + '</div>';
                             str = str + '<div class="col-md-6 text-align-left">';
-                            str = str + obj.P_ProductID + " - " + obj.P_ProductName;
+                            str = str + productId + " - " + obj.P_ProductName;
                             str = str + '</div>';
                             str = str + '<div class="col-md-4 text-align-left">';
-                            str = str + '<div id="date' + obj.P_ProductID + '" />';
+                            str = str + '<div id="date' + productId + '" />';
                             str = str + '</div>';
                             str = str + '</div>';
 
@@ -467,7 +504,7 @@
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
                     //window.location = "preprocess.html";
                 });
             }
@@ -494,38 +531,32 @@
             success: function (data, textStatus, jQxhr) {
 
                 if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
                     });
                 }
                 else {
 
-
                         $.each(data.report.rows, function (index) {
 
                             var obj = data.report.rows[index];
-                            if (obj.OP_DisableDate == null) {
-                                $("#chk" + obj.OGP_ProductID).prop("checked", true);
-                                $("#date" + obj.OGP_ProductID).html(extractDateOnly(obj.OGP_ActiveDate));
-                                $("#date" + obj.OGP_ProductID).css("color", "green");
+                            var ogpProductId = obj.OGP_ProductID.toUpperCase();
+                            if (obj.OGP_DisableDate == null) {
+                                $("#chk" + ogpProductId).prop("checked", true);
+                                $("#date" + ogpProductId).html(extractDateOnly(obj.OGP_ActiveDate));
+                                $("#date" + ogpProductId).css("color", "green");
                             }
                             else {
-                                $("#chk" + obj.OGP_ProductID).prop("checked", false);
-                                $("#date" + obj.OGP_ProductID).html(extractDateOnly(obj.OGP_DisableDate));
-                                $("#date" + obj.OGP_ProductID).css("color", "red");
+                                $("#chk" + ogpProductId).prop("checked", false);
+                                $("#date" + ogpProductId).html(extractDateOnly(obj.OGP_DisableDate));
+                                $("#date" + ogpProductId).css("color", "red");
                             }
-
-
                         });
 
- 
-
-
-                    
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
                     
                 });
             }
@@ -552,7 +583,7 @@
             success: function (data, textStatus, jQxhr) {
 
                 if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
                     });
                 }
@@ -577,11 +608,14 @@
 
                          });
 
+                        $("#ddlOwner").prop("disabled", true);
+
+
                         getMarketListByOwner();
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
                     //window.location = "preprocess.html";
                 });
             }
@@ -639,7 +673,7 @@
             success: function (data, textStatus, jQxhr) {
 
                 if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
                     });
                 }
@@ -659,13 +693,14 @@
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
                 });
             }
         });
 
 
     }
+
     function getOwnerStationListByMarket()
     {
         if ($("#ddlMarkets").val()=="")
@@ -691,7 +726,7 @@
             success: function (data, textStatus, jQxhr) {
 
                 if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
                     });
                 }
@@ -711,7 +746,7 @@
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
                     //window.location = "preprocess.html";
                 });
             }
@@ -722,9 +757,13 @@
     function getMarketListByOwner()
     {
 
+        //console.log(ownerID);
+
         if (ownerID <= 0) {
             return;
         }
+
+        
 
         $.ajax({
             url: ServicePrefix + '/api/Owner/GetMarketListByOwner',
@@ -739,7 +778,7 @@
             success: function (data, textStatus, jQxhr) {
 
                 if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
                     });
                 }
@@ -759,7 +798,7 @@
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
                     //window.location = "preprocess.html";
                 });
             }

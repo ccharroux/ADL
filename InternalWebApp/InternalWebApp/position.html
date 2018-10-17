@@ -78,6 +78,7 @@
                 <div class="text-center margin-top-0">
 
                     <!-- Position Code -->
+                    <input type="hidden" id="txtPositionID" value=""/>
                     <!--<div class="row input-row" id="positionIdDiv" >
                         <div class="col-md-3 text-align-left">
                             <label for="txtPositionCodeInsert">Position Code</label>
@@ -94,14 +95,17 @@
                         </div>
                         <div class="col-md-9 text-align-left">
 
-                            <input type="text" class="mkaRequired" id="txtPositionTitle" maxlength="40" errorMessage="You must enter a Position Title" value="" />
+                            <input type="text" class="mkaRequired field-width-325" id="txtPositionTitle" maxlength="40" errorMessage="You must enter a Position Title" value="" />
                         </div>
                     </div>
 
                     <!-- Buttons -->
                     <div class="default-button-section">
-                        <div class="row">
-                            <div class="col-md-12">
+                        <div class="row input-row">
+                            <div class="col-md-3">
+
+                            </div>
+                            <div class="col-md-9 text-align-left">
                                 <div>
                                     <div>
                                         <input value="Update" onclick="insertUpdate()" class="default-button" type="button">
@@ -145,6 +149,7 @@
     $(document).ready(function () {
         buildMainMenu("");
         positionID = (getParameterByName("positionID") == null ? 0 : getParameterByName("positionID"));
+        $("#txtPositionID").val(positionID);
         getPosition();
 
     });
@@ -182,7 +187,7 @@
     //ajax call success
     function ajaxGetPositionSuccess(data, textStatus, jQxhr) {
                 if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
                     });
                 }
                 else {
@@ -201,7 +206,7 @@
         }
 
         //filling out url for ajax call
-        var url = ServicePrefix + '/api/Position/UpdatePosition'
+        var url = ServicePrefix + '/api/Position/UpdatePosition';
 
         //filling out settings for ajax call
         var settings = {
@@ -229,16 +234,29 @@
         if (data.response.status != "SUCCESS") {
             bootbox.alert({
                 //title: 'Process Failed',
-                message: 'Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { }
+                message: 'Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () { }
             });
         }
         else {
-            bootbox.alert('Positions have successfully been updated.')
+            
+            var bReloadPage = false;
+            var obj = data.report.rows[0];
+
+            if ($("#txtPositionID").val() === "0") {
+                bReloadPage = true;
+                $("#txtPositionID").val(obj._updateStatus);
+            }
+
+            bootbox.alert('Positions have successfully been updated.');
+
+            if (bReloadPage) {
+                window.location = "position.html?positionID=" + $("#txtPositionID").val();
+            }
         }
     }
 
     function genericAjaxError(jqXhr, textStatus, errorThrown) {
-        bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
+        bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () { });
     }
 
     function validationPassed() {
