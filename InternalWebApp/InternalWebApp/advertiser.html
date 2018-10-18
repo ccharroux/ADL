@@ -92,11 +92,10 @@
                             <label for="txtAdvertiserName">Advertiser Name</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" class="mkaRequired field-width-325" maxlength="50" id="txtAdvertiserName" errorMessage="You must enter an Advertiser Name." value="" />
+                            <input type="hidden" id="oldAdvertiserName" value=""/>
+                            <input type="text" class="mkaRequired field-width-325" maxlength="50" id="txtAdvertiserName" errorMessage="You must enter an Advertiser Name." value=""/>
                         </div>
                     </div>
-
-
 
                     <!--
                     industry
@@ -106,6 +105,7 @@
                             <label for="ddlIndustry" class="">Industry</label>
                         </div>
                         <div class="col-md-9 text-align-left">
+                            <input type="hidden" id="oldIndustryId" value=""/>
                             <select id="ddlIndustry" class="mkaRequired field-width-325" style="" errorMessage="You must select an Industry."></select>
                         </div>
                     </div>
@@ -118,6 +118,7 @@
                             <label for="ddlSubIndustry" class="">Sub Industry</label>
                         </div>
                         <div class="col-md-9 text-align-left">
+                            <input type="hidden" id="oldSubIndustryId"/>
                             <select id="ddlSubIndustry" class="mkaRequired field-width-325" style="" errorMessage="You must select a Sub Industry."></select>
                         </div>
                     </div>
@@ -138,12 +139,13 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input type="hidden" id="oldParentAdvertiserId" value="" />
-                            <input type="hidden" id="txtParentAdvertiserId" value=""/>
+                            <input type="hidden" id="oldParentAdvertiserName" value="" />
+                            <input type="hidden" id="txtParentAdvertiserId" value="" />
                             <input type="text" id="txtParentAdvertiserName" class="field-width-325" style="" errorMessage="">
-                            
+
                         </div>
                     </div>
-                    
+
                     <div class="row input-row">
                         <div class="col-md-3">
 
@@ -199,8 +201,8 @@
                             <label for="txtLinkedAdvertiserId">Linked Advertiser ID</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="hidden" id="oldLinkedAdvertiserId" value=""/>
-                            <input class="field-width-325 disabled" type="text" id="txtLinkedAdvertiserId" disabled="disabled"/>
+                            <input type="hidden" id="oldLinkedAdvertiserId" value="" />
+                            <input class="field-width-325 disabled" type="text" id="txtLinkedAdvertiserId" disabled="disabled" />
                         </div>
                     </div>
 
@@ -277,7 +279,7 @@
     var advertiserId = 0;
     var bLinkAdvertiser = false;
     var bLinkParentAdvertiser = false;
-    var bIsNew = true;
+    var bIsNew = false;
 
     $(document).ready(function () {
 
@@ -324,9 +326,7 @@
             success: function (data, textStatus, jQxhr) {
 
                 if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-                    });
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
                 else {
 
@@ -350,9 +350,7 @@
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    //window.location = "preprocess.html";
-                });
+                MKAErrorMessageRtn(errorThrown);
             }
         });
 
@@ -373,9 +371,7 @@
             success: function (data, textStatus, jQxhr) {
 
                 if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-                    });
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
                 else {
 
@@ -399,9 +395,7 @@
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    //window.location = "preprocess.html";
-                });
+                MKAErrorMessageRtn(errorThrown);
             }
         });
     }
@@ -420,9 +414,7 @@
             success: function (data, textStatus, jQxhr) {
 
                 if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-                    });
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
                 else {
 
@@ -448,9 +440,7 @@
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    //window.location = "preprocess.html";
-                });
+                MKAErrorMessageRtn(errorThrown);
             }
         });
 
@@ -471,9 +461,7 @@
             success: function (data, textStatus, jQxhr) {
 
                 if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-                    });
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
                 else {
 
@@ -494,9 +482,7 @@
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    //window.location = "preprocess.html";
-                });
+                MKAErrorMessageRtn(errorThrown);
             }
         });
 
@@ -533,9 +519,7 @@
             success: function (data, textStatus, jQxhr) {
 
                 if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-                    });
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
                 else {
 
@@ -557,12 +541,13 @@
                         //if (obj["parentAdvertiserId"] === null || obj["parentAdvertiserId"].length === 0) {
                         //    $("#txtParentAdvertiserId").val(-1);
                         //} else {
-                            $("#txtParentAdvertiserId").val(obj["parentAdvertiserId"]);
-                            $("#oldParentAdvertiserId").val(obj["parentAdvertiserId"]);
+                        $("#txtParentAdvertiserId").val(obj["parentAdvertiserId"]);
+                        $("#oldParentAdvertiserId").val(obj["parentAdvertiserId"]);
                         //}
 
                         //will need the parent advertiser name
                         $("#txtParentAdvertiserName").val(obj["parentAdvertiserName"]);
+                        $("#oldParentAdvertiserName").val(obj["parentAdvertiserName"]);
 
                         //need to add linked advertiser id and name
                         $("#txtLinkedAdvertiserId").val(obj["linkedToAdvertiserId"]);
@@ -606,9 +591,7 @@
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    //window.location = "preprocess.html";
-                });
+                MKAErrorMessageRtn(errorThrown);
             }
         });
 
@@ -635,9 +618,7 @@
             success: function (data, textStatus, jQxhr) {
 
                 if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-                    });
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
                 else {
 
@@ -665,9 +646,7 @@
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    //window.location = "preprocess.html";
-                });
+                MKAErrorMessageRtn(errorThrown);
             }
         });
 
@@ -708,44 +687,103 @@
 
         //may need to add to the update proc to check for duplicate names
 
-        //if changing linked advertisers give a warning and store value
-        if ($("#txtLinkedAdvertiserId").val().length > 0 &&
-            $("#oldLinkedAdvertiserId").val() !== $("#txtLinkedAdvertiserId").val()) {
-            //can't do bootbox since it's async
-            //do confirm box
-            //if cancel return
-            //else set bLinkAdvertiser to true
-        }
+        //if 
+
+
         //if linking parent advertisers give a warning and store value
         if ($('#chkLinkParent').is(':checked') && $("#txtParentOwnershipId").val().length > 0 &&
             $("#oldParentAdvertiserId").val() !== $("#txtParentOwnershipId").val()) {
-            //can't do bootbox since it's async
-            //do confirm box
             //if cancel return
             //else set bLinkParentAdvertiser to true
+            var parentAdvertiserMessage = "You are about to move parent advertiser " + $("#oldParentAdvertiserName").val() +
+                "'s revenue to parent advertiser " + $("#txtParentAdvertiserName").val() +
+                ".  This action is irreversible.  \n\r\n\r Do you wish to proceed?";
+
+            bootbox.confirm(parentAdvertiserMessage,
+                function (result) {
+
+                    if (result) {
+                        bLinkParentAdvertiser = true;
+                    } else {
+                        return;
+                    }
+
+                    if ($("#txtLinkedAdvertiserId").val().length > 0 &&
+                        $("#oldLinkedAdvertiserId").val() !== $("#txtLinkedAdvertiserId").val()) {
+                        //if cancel return
+                        //else set bLinkAdvertiser to true
+                        var advertiserMessage = "You are about to move " +
+                            $("#txtAdvertiserName").val() +
+                            "'s revenue history to " +
+                            $("#txtLinkedAdvertiser").val() +
+                            ".  This action is irreversible. \n\r\n\r Do you wish to proceed?";
+
+                        bootbox.confirm(advertiserMessage,
+                            function (result) {
+
+                                if (result) {
+                                    bLinkAdvertiser = true;
+                                } else {
+                                    return;
+                                }
+                            });
+                    }
+                });
+        }
+            //if changing linked advertisers give a warning and store value
+        else if ($("#txtLinkedAdvertiserId").val().length > 0 &&
+            $("#oldLinkedAdvertiserId").val() !== $("#txtLinkedAdvertiserId").val()) {
+            //if cancel return
+            //else set bLinkAdvertiser to true
+            var advertiserMessage = "You are about to move " +
+                $("#txtAdvertiserName").val() +
+                "'s revenue history to " +
+                $("#txtLinkedAdvertiser").val() +
+                ".  This action is irreversible. \n\r\n\r Do you wish to proceeed?";
+            bootbox.confirm(advertiserMessage,
+                function (result) {
+
+                    if (result) {
+                        bLinkAdvertiser = true;
+                    } else {
+                        return;
+                    }
+                });
         }
 
-        return;
+
+
+        //return;
 
         $.ajax({
-            url: ServicePrefix + '/api/',
+            url: ServicePrefix + '/api/Advertiser/UpdateAdvertiser',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inShowDisabled": false,
-                "inIndustryId": industryId
+                "inAdvertiserId": $("#txtAdvertiserId").val(),
+                "inAdvertiserName": $("#txtAdvertiserName").val(),
+                "inOldAdvertiserName": $("#oldParentAdvertiserName").val(),
+                "inIndustryId": $("#ddlIndustry").val(),
+                "inOldIndustryId": $("#oldIndustryId").val(),
+                "inSubIndustryId": $("#ddlSubIndustry").val(),
+                "inOldSubIndustryId": $("#oldSubIndustryId").val(),
+                "inLinkedParentAdvertiserId": $("#txtParentOwnershipId").val(),
+                "inMarketId": $("#ddlMarket").val(),
+                "inLinkedAdvertiserId": $("#txtLinkedAdvertiserId").val(),
+                "inMediaCodeId": $("#ddlMediaCode").val(),
+                "inIsNew": bIsNew
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
                 if (data.response.status != "SUCCESS") {
-                    bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-
-                    });
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
                 else {
+
+
 
                     if (bLinkParentAdvertiser) {
                         //make call to update link advertiser
@@ -766,9 +804,7 @@
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    //window.location = "preprocess.html";
-                });
+                MKAErrorMessageRtn(errorThrown);
             }
         });
 
@@ -779,10 +815,10 @@
         //separate api call to handle change of linked advertiser
         //need to look at the ramifications of unlinking a parent advertiser
         //need to deal with revenue items too
-            
 
-        bootbox.alert('This functionality is still under development.', function () {
-        });
+
+        //bootbox.alert('This functionality is still under development.', function () {
+        //});
     }
 
     function searchParentAdvertiser() {
@@ -804,10 +840,11 @@
             "industryID": $("#ddlIndustry").val(),
             "subIndustryID": $("#ddlSubIndustry").val(),
             "oldParentAdvertiserID": $("#oldParentAdvertiserId").val(),
+            "oldParentAdvertiserName": $("#oldParentAdvertiserName").val(),
             "parentAdvertiserID": $("#txtParentOwnershipId").val(),
             "parentAdvertiserName": $("#txtParentAdvertiserName").val(),
             "mediaCodeID": $("#ddlMediaCode").val(),
-            "oldLinkedAdvertiserID": $("#oldLinkedAdvertiserId").val(), 
+            "oldLinkedAdvertiserID": $("#oldLinkedAdvertiserId").val(),
             "linkedAdvertiserID": $("#txtLinkedAdvertiserId").val(),
             "linkedAdvertiserName": $("#txtLinkedAdvertiser").val(),
             "activeDate": $("#txtActiveDate").val(),
@@ -832,6 +869,7 @@
             "industryID": $("#ddlIndustry").val(),
             "subIndustryID": $("#ddlSubIndustry").val(),
             "oldParentAdvertiserID": $("#oldParentAdvertiserId").val(),
+            "oldParentAdvertiserName": $("#oldParentAdvertiserName").val(),
             "parentAdvertiserID": $("#txtParentOwnershipId").val(),
             "parentAdvertiserName": $("#txtParentAdvertiserName").val(),
             "mediaCodeID": $("#ddlMediaCode").val(),
@@ -853,7 +891,7 @@
 
     }
 
-    
+
     function loadSearchResults() {
         if (getLocalStorage("gSearchResults").length <= 0) {
             return;
@@ -876,6 +914,7 @@
         //    "subIndustryID": $("#ddlSubIndustry").val(), need to deal with this
         getSubIndustryList(searchResults["industryID"], searchResults["subIndustryID"]);
         $("#oldParentAdvertiserId").val(searchResults["oldParentAdvertiserID"]);
+        $("#oldParentAdvertiserName").val(searchResults["oldParentAdvertiserName"]);
         $("#txtParentOwnershipId").val(searchResults["parentAdvertiserID"]);
         $("#txtParentAdvertiserName").val(searchResults["parentAdvertiserName"]);
         $("#ddlMediaCode").val(searchResults["mediaCodeID"]);
@@ -883,7 +922,7 @@
         $("#txtLinkedAdvertiserId").val(searchResults["linkedAdvertiserID"]);
         $("#txtLinkedAdvertiser").val(searchResults["linkedAdvertiserName"]);
         $("#txtActiveDate").val(searchResults["activeDate"]);
-        $('#chkActive').prop( "checked", searchResults["active"]);
+        $('#chkActive').prop("checked", searchResults["active"]);
         $('#txtChangeDate').val(searchResults["changeDate"]),
 
 
