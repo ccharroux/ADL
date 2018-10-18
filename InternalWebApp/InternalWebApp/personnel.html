@@ -998,11 +998,32 @@
     function disableProductSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
             bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
-        } else {            
-            bootbox.alert("Product has been disabled successfully.", function () {
-                window.location = "personnel.html?personnelID=" + personnelID;
+        } else {
+            var message = $("#txtFirstName").val() + " no longer has any active products, delete all Personnel Notification History?"
+            $.each(data.report.rows, function (index) {
+                var obj = data.report.rows[index];
 
-            });
+                if (obj["_updateStatus"] == 2) {
+                    bootbox.confirm(message, function (result) {
+                        
+                        if (result) {
+                            bootbox.alert("This fuctionality is still under development.", function () {
+                                window.location = "personnel.html?personnelID=" + personnelID;
+                            });
+                        } else {
+                            bootbox.alert("Product has been disabled successfully.", function () {
+                                window.location = "personnel.html?personnelID=" + personnelID;
+
+                            });
+                        }
+                    });
+                } else {
+                    bootbox.alert("Product has been disabled successfully.", function () {
+                        window.location = "personnel.html?personnelID=" + personnelID;
+
+                    });
+                }
+            });           
         }
     }
 
