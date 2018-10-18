@@ -96,8 +96,11 @@
                     </div>
 
                     <div class="default-button-section">
-                        <div class="row">
-                            <div class="col-md-12">
+                        <div class="row input-row">
+                            <div class="col-md-3">
+
+                            </div>
+                            <div class="col-md-9 text-align-left">
                                 <div>
                                     <input value="Update" onclick="updateNielsenMarketName()" class="default-button" type="button">
                                 </div>
@@ -239,17 +242,16 @@
             });
         } else {
 
-            $.each(data.report.rows, function (index) {
-                var obj = data.report.rows[index];
+            $.each(data.report.rows,
+                function(index) {
+                    var obj = data.report.rows[index];
 
-                $("#txtMarketId").val(obj["marketId"]);
-                $("#ddlMarketId").val(obj["marketId"]);               
-                $("#txtNielsenMarketName").val(obj["nielsenMarketName"]);
+                    $("#txtMarketId").val(obj["marketId"]);
+                    $("#ddlMarketId").val(obj["marketId"]);
+                    $("#txtNielsenMarketName").val(obj["nielsenMarketName"]);
 
-            })
+                });
         }
-
-
     }
 
     function marketChange() {
@@ -296,7 +298,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inMarketId": (marketId == 0 ? $("#txtMarketId").val().trim() : marketId),
+                "inMarketId": $("#txtMarketId").val(),
                 "inNielsenMarketName": $("#txtNielsenMarketName").val().trim()
             }),
             processData: false,
@@ -320,7 +322,17 @@
             });
         } else {
 
+            var bReloadPage = false;
+
+            if (marketId === "0") {
+                bReloadPage = true;
+            }
+
             bootbox.alert('Market - Nielsen Name has successfully been updated.');
+
+            if (bReloadPage) {
+                window.location = "nielsenmarketname.html?marketID=" + $("#txtMarketId").val();
+            }
 
         }
     }
