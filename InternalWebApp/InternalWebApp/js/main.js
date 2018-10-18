@@ -190,45 +190,44 @@
 }());
 
 
-function processSuccessResult(data, successMessage)
-{
-    if (data.response.status != "SUCCESS") 
-    {
-        bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () 
-        {
-            return false;
-            //window.location = "preprocess.html";
-        });
-    }
-    else 
-    {
-        if (data.report.rows[0].Status == -1)
-        {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () 
-            {
-                return false;
-                //window.location = "preprocess.html";
-            });
-        }
-        else
-        {
-            if (successMessage != null && successMessage.length > 0)
-            {
-                bootbox.alert(successMessage, function () 
-                {
-                    console.log('return now');
-                    return true;
-                    //window.location = successRedirect;
-                });
-            }
-            else
-            {
-                return true;
-            }
+//function processSuccessResult(data, successMessage)
+//{
+//    if (data.response.status != "SUCCESS") 
+//    {
+//        bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () 
+//        {
+//            return false;
+//            //window.location = "preprocess.html";
+//        });
+//    }
+//    else 
+//    {
+//        if (data.report.rows[0].Status == -1)
+//        {
+//            bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () 
+//            {
+//                return false;
+//                //window.location = "preprocess.html";
+//            });
+//        }
+//        else
+//        {
+//            if (successMessage != null && successMessage.length > 0)
+//            {
+//                bootbox.alert(successMessage, function () 
+//                {
+//                    console.log('return now');
+//                    return true;
+//                });
+//            }
+//            else
+//            {
+//                return true;
+//            }
                     	
-        }
-    }
-}
+//        }
+//    }
+//}
 
 
 
@@ -418,6 +417,28 @@ function goBackToDashboard() {
 
     // Fall thru
     window.location = "dashboard.html";
+}
+
+function MKAErrorMessageRtn(message, url)
+{
+    var newMessage = "";
+    if (message.toLowerCase().indexOf('token is invalid') > -1)
+    {
+        bootbox.alert(newMessage, function ()
+        {
+            window.location = "login.html";
+        });
+    }
+    else if (message.toLowerCase().indexOf('authentication failed') > -1)
+    {
+        newMessage = "Authentication Failed";
+        console.log(message);
+        bootbox.alert(newMessage, function () {});
+    }
+    else
+    {
+        bootbox.alert('Process Failed.\n\r\n\r' + message + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () { });
+    }
 }
 
 function buildMainMenu(selectedItem) {
@@ -673,9 +694,8 @@ function populateDataTable(tableName, data) {
         data = JSON.stringify(data.report.rows);
         tableJson = $.parseJSON(data);
     } else {
-        bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-        });
 
+        MKAErrorMessageRtn(data.response.errorMessage[0]);
         tableJson = data;
     }
 
@@ -686,7 +706,9 @@ function populateDataTable(tableName, data) {
 
 //ajax error function
 function genericAjaxError(jqXhr, textStatus, errorThrown) {
-    bootbox.alert('Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
+
+    MKAErrorMessageRtn(errorThrown);
+
 }
 
 function addZero(n) {
