@@ -1007,9 +1007,7 @@
                     bootbox.confirm(message, function (result) {
                         
                         if (result) {
-                            bootbox.alert("This fuctionality is still under development.", function () {
-                                window.location = "personnel.html?personnelID=" + personnelID;
-                            });
+                            deletePersonnelNotificationByPersonnelId();
                         } else {
                             bootbox.alert("Product has been disabled successfully.", function () {
                                 window.location = "personnel.html?personnelID=" + personnelID;
@@ -1026,6 +1024,43 @@
             });           
         }
     }
+
+    function deletePersonnelNotificationByPersonnelId() {
+        var url = ServicePrefix + '/api/Personnel/DeletePersonnelNotificationByPersonnelId';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelID
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deletePersonnelNotificationSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+        $.ajax(url, settings);
+    }
+
+    function deletePersonnelNotificationSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
+
+            });
+        } else {
+            bootbox.alert("Product has been disabled successfully.", function () {
+                window.location = "personnel.html?personnelID=" + personnelID;
+
+            });
+        }
+    }
+
 
     function updatePersonnel() {
 
