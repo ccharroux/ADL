@@ -65,7 +65,7 @@
                             <label for="ddlMediaType">Media Type</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlMediaType" class="mkaRequired field-width-325" onchange="checkMediaType()" errorMessage="You must select a Media Type."></select>
+                            <select id="ddlMediaType" class="mkaRequired field-width-325" onchange="getOwnerListByMediaType(this.value)" errorMessage="You must select a Media Type."></select>
                         </div>
                     </div>
 
@@ -142,10 +142,10 @@
                     <!--Full Name-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtFormat">Format</label>
+                            <label for="txtFormat">Full Name</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="txtFormat" class="mkaRequired field-width-325" errorMessage="You must enter a Full Name." />
+                            <input type="text" id="txtFullName" class="mkaRequired field-width-325" errorMessage="You must enter a Full Name." />
                         </div>
                     </div>
 
@@ -506,13 +506,14 @@
 
         var settings = {
             dataType: 'json',
+            type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken")
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getAffiliationList(data, textStatus, jQxhr);
+                getAffiliationListSuccess(data, textStatus, jQxhr);
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
@@ -522,7 +523,7 @@
         $.ajax(url, settings);
     }
 
-    function getAffiliationList(data, textStatus, jQxhr) {
+    function getAffiliationListSuccess(data, textStatus, jQxhr) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
@@ -536,8 +537,259 @@
             $("#ddlAffiliation").html(str);
         }
 
+        getFormatList();
+       
     }
 
+    function getFormatList() {
+        
+        var url = ServicePrefix + '/api/Format/GetFormatList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getFormatListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jqxhr, textStatus, errorThrown);
+            }
+        };
+        $.ajax(url, settings);
+    }
+
+    function getFormatListSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            var str = '';
+            str = '<option value="-1">-- Select a Format</option>';
+            $.each(data.report.rows, function (index) {
+                str = str + '<option value="' + data.report.rows[index]["Format ID"] + '">' + data.report.rows[index]["Format Name"] + '</option>';
+            });
+            $("#ddlFormat").html(str);
+
+        }
+
+        getOwnerListByMediaType(1);
+
+    }
+
+
+    function getOwnerListByMediaType(mediaTypeId) {
+
+        if (mediaTypeId <= 0) {
+            return;
+        }
+
+        var url = ServicePrefix + '/api/Owner/GetOwnerList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMediaTypeId": mediaTypeId,
+                "inActiveOnly": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOwnerListByMediaTypeSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getOwnerListByMediaTypeSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+
+            var str = '';
+            str = '<option value="-1">-- Select an Ownership</option>';
+            $.each(data.report.rows, function (index) {
+                str = str + '<option value="' + data.report.rows[index].OwnerID + '">' + data.report.rows[index].OwnerName + '</option>';
+            });
+            $("#ddlOwnership").html(str);
+
+        }
+
+        getMarketBandList();
+
+    }
+    
+    function getMarketBandList() {
+        
+        var url = ServicePrefix + '/api/Market/GetMarketBandList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketBandListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function getMarketBandListSuccess(data, textStatus, jqxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            var str = '';
+            str = '<option value="1">-- Select a Suffix</option>';
+
+            $.each(data.report.rows, function (index) {
+                str = str + '<option value="' + data.report.rows[index].marketBand + '">' + data.report.rows[index].marketBand + '</option>';
+            });
+            $("#ddlSuffix").html(str); 
+        }
+        getMarketList(1);
+    }
+
+    function getMarketList(mediaTypeId) {
+
+        if (mediaTypeId <= 0) {
+            return;
+        }
+
+        var url = ServicePrefix + '/api/Market/GetMarketList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inActiveOnly": "1",
+                "inMediaTypeId": mediaTypeId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+
+    function getMarketListSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+
+            var str = '';
+            str = '<option value="-1">-- Select a  Market</option>';
+            $.each(data.report.rows, function (index) {
+                str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
+
+            });
+        }
+        getStation();
+    }
+
+
+    function getStation() {
+
+        if (stationId <= 0) {
+            return;
+        }
+
+        var url = ServicePrefix + '/api/Station/GetStation';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId
+            }),
+            proccessData: false,
+            success: function (data, textStatus, jQxhr) {
+                getStationSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function getStationSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            $.each(data.report.rows, function (index) {
+                var obj = data.report.rows[index];
+
+                $("#ddlMediaType").val(obj["mediaTypeId"]);
+                $("#txtCallLetter").val(obj["callLetters"]);
+                $("#ddlSuffix").val(obj["suffix"]);
+                $("#txtMKAClientNumber").val(obj["clientId"]);
+                $("#ddlMarket").val(obj["marketId"]);
+                $("#ddlOwnership").val(obj["ownerId"]);
+                $("#ddlFormat").val(obj["formatId"]);
+                $("#ddlAffiliation").val(obj["affiliationId"]);
+                $("#txtFullName").val(obj["fullName"]);
+                $("#txtNickname").val(obj["nickname"]);
+                $("#ddlPrimaryDemo").val(obj["primaryDemo"]);
+                $("#ddlSecondaryDemo").val(obj["secondaryDemo"]);
+                $("#txtAddress1").val(obj["address1"]);
+                $("#txtAddress2").val(obj["address2"]);
+                $("#txtCity").val(obj["city"]);
+                $("#ddlState").val(obj["stateAbbreviation"]);
+                $("#txtZipcode").val(obj["zipCode"]);
+                $("#txtZip4").val(obj["zip4"]);
+                $("#txtPhoneAreaCode").val(obj["areaCode"]);
+                $("#txtPhoneNumber").val(obj["phone"]);
+                $("#txtPhoneNumberExt").val(obj["extension"]);
+                $("#txtFaxAreaCode").val(obj["faxAreaCode"]);
+                $("#txtFaxNumber").val(obj["faxPhone"]);
+                $("#txtEmailAddress").val(obj["emailAddress"]);
+                $("#txtGeneralComment").val(obj["comment"]);
+                $("#txtBillingNotes").val(obj["billingNote"]);
+            })
+        }
+
+    }
+
+
+   
+    function updateStation() {
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+    } 
    
 
 </script>
