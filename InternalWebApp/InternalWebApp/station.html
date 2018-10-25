@@ -59,13 +59,21 @@
                     </div>
                 </div>
                 <div class="text-center margin-top-0">
+
+                    <!--Hidden Inputs-->
+                    <input type="hidden" id="hdnMarketId" value="" />
+                    <input type="hidden" id="hdnOwnershipId" value="" />
+                    <input type="hidden" id="hdnFormatId" value="" />
+
+
+
                     <!-- Market Media Type For Insert-->
                     <div class="row input-row">
                         <div id="divMediaType" class="col-md-3 text-align-left">
                             <label for="ddlMediaType">Media Type</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlMediaType" class="mkaRequired field-width-325" onchange="getOwnerListByMediaType(this.value)" errorMessage="You must select a Media Type."></select>
+                            <select id="ddlMediaType" class="mkaRequired field-width-325" onchange="onChangeMediaType(this.value);" errorMessage="You must select a Media Type."></select>
                         </div>
                     </div>
 
@@ -95,7 +103,7 @@
                             <label for="txtMKAClientNumber">MKA Client Number</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" maxlength="7" class="field-width-325" id="txtMkAClientNumber" />
+                            <input type="text" maxlength="7" class="field-width-325" id="txtMKAClientNumber" />
                         </div>
                     </div>
 
@@ -120,7 +128,7 @@
                     </div>
 
                     <!--Format-->
-                    <div class="row input-row">
+                    <div id="divFormat" class="hidden row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="ddlFormat">Format</label>
                         </div>
@@ -130,7 +138,7 @@
                     </div>
 
                     <!--Affiliation-->
-                    <div class="row input-row">
+                    <div id="divAffiliation" class="hidden row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="ddlAffiliation">Affiliation</label>
                         </div>
@@ -369,7 +377,10 @@
     function checkForInsertOrUpdate() {
 
         if (stationId == 0 || stationId == null) {
-
+           
+        } else {
+            $("#ddlMarket").prop("disabled", true);
+            $("#ddlMediaType").prop("disabled", true);
         }
     }
 
@@ -537,100 +548,10 @@
             $("#ddlAffiliation").html(str);
         }
 
-        getFormatList();
+        getMarketBandList();
        
     }
-
-    function getFormatList() {
-        
-        var url = ServicePrefix + '/api/Format/GetFormatList';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getFormatListSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jqxhr, textStatus, errorThrown);
-            }
-        };
-        $.ajax(url, settings);
-    }
-
-    function getFormatListSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-        } else {
-            var str = '';
-            str = '<option value="-1">-- Select a Format</option>';
-            $.each(data.report.rows, function (index) {
-                str = str + '<option value="' + data.report.rows[index]["Format ID"] + '">' + data.report.rows[index]["Format Name"] + '</option>';
-            });
-            $("#ddlFormat").html(str);
-
-        }
-
-        getOwnerListByMediaType(1);
-
-    }
-
-
-    function getOwnerListByMediaType(mediaTypeId) {
-
-        if (mediaTypeId <= 0) {
-            return;
-        }
-
-        var url = ServicePrefix + '/api/Owner/GetOwnerList';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inMediaTypeId": mediaTypeId,
-                "inActiveOnly": true
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getOwnerListByMediaTypeSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
-
-    }
-
-    function getOwnerListByMediaTypeSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-        } else {
-
-            var str = '';
-            str = '<option value="-1">-- Select an Ownership</option>';
-            $.each(data.report.rows, function (index) {
-                str = str + '<option value="' + data.report.rows[index].OwnerID + '">' + data.report.rows[index].OwnerName + '</option>';
-            });
-            $("#ddlOwnership").html(str);
-
-        }
-
-        getMarketBandList();
-
-    }
-    
+  
     function getMarketBandList() {
         
         var url = ServicePrefix + '/api/Market/GetMarketBandList';
@@ -666,11 +587,100 @@
                 str = str + '<option value="' + data.report.rows[index].marketBand + '">' + data.report.rows[index].marketBand + '</option>';
             });
             $("#ddlSuffix").html(str); 
+        }      
+        getStation();
+    }
+
+    function getStation() {
+
+        if (stationId <= 0) {
+            getMarketList(null);
+            return;
         }
-        getMarketList(1);
+
+        var url = ServicePrefix + '/api/Station/GetStation';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId
+            }),
+            proccessData: false,
+            success: function (data, textStatus, jQxhr) {
+                getStationSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function getStationSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            var marketId = '';
+            $.each(data.report.rows, function (index) {
+                var obj = data.report.rows[index];
+
+                $("#ddlMediaType").val(obj["mediaTypeId"]);
+                $("#txtCallLetter").val(obj["callLetters"]);
+                $("#ddlSuffix").val(obj["suffix"]);
+                $("#txtMKAClientNumber").val(obj["clientId"]);
+
+                $("#hdnMarketId").val(obj["marketId"]);
+                $("#hdnOwnershipId").val(obj["ownerId"]);
+              
+                $("#txtFullName").val(obj["fullName"]);
+                $("#txtNickname").val(obj["nickname"]);
+                $("#ddlPrimaryDemo").val(obj["primaryDemo"]);
+                $("#ddlSecondaryDemo").val(obj["secondaryDemo"]);
+                $("#txtAddress1").val(obj["address1"]);
+                $("#txtAddress2").val(obj["address2"]);
+                $("#txtCity").val(obj["city"]);
+                $("#ddlState").val(obj["stateAbbreviation"]);
+                $("#txtZipcode").val(obj["zipCode"]);
+                $("#txtZip4").val(obj["zip4"]);
+                $("#txtPhoneAreaCode").val(obj["areaCode"]);
+                $("#txtPhoneNumber").val(obj["phone"]);
+                $("#txtPhoneNumberExt").val(obj["extension"]);
+                $("#txtFaxAreaCode").val(obj["faxAreaCode"]);
+                $("#txtFaxNumber").val(obj["faxPhone"]);
+                $("#txtEmailAddress").val(obj["emailAddress"]);
+                $("#txtGeneralComment").val(obj["comment"]);
+                $("#txtBillingNotes").val(obj["billingNote"]);
+
+                if (obj["formatId"] != "" && obj["formatId"] != null) {
+
+                    $("#ddlFormat").val(obj["formatId"]);
+                    $("#divFormat").removeClass("hidden");
+                    $("#hdnFormatId").val(obj["formatId"])
+                }
+
+                if (obj["affiliationId"] != "" && obj["affiliationId"] != null) {
+
+                    $("#ddlAffiliation").val(obj["affiliationId"]);
+                    $("#divAffiliation").removeClass("hidden");
+
+                }
+
+            });
+        }
+
+        var mediaType = $("#ddlMediaType").val();
+        getMarketList(mediaType);
+
     }
 
     function getMarketList(mediaTypeId) {
+
+        //gets called again on change of media type
 
         if (mediaTypeId <= 0) {
             return;
@@ -712,18 +722,30 @@
                 str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
 
             });
+            $("#ddlMarket").html(str);
+
+            if ($("#hdnMarketId").val() != "") {
+                $("#ddlMarket").val($("#hdnMarketId").val());
+                $("#hdnMarketId").val("");
+            } else {
+                $("#ddlMarkt").val("-1");
+            }
+
+           
         }
-        getStation();
+
+        var mediaTypeId = $("#ddlMediaType").val();
+        getOwnerListByMediaType(mediaTypeId);
+
     }
 
-
-    function getStation() {
-
-        if (stationId <= 0) {
+    function getOwnerListByMediaType(mediaTypeId) {
+        
+        if (mediaTypeId <= 0) {
             return;
         }
 
-        var url = ServicePrefix + '/api/Station/GetStation';
+        var url = ServicePrefix + '/api/Owner/GetOwnerList';
 
         var settings = {
             dataType: 'json',
@@ -731,11 +753,12 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inStationId": stationId
+                "inMediaTypeId": mediaTypeId,
+                "inActiveOnly": true
             }),
-            proccessData: false,
+            processData: false,
             success: function (data, textStatus, jQxhr) {
-                getStationSuccess(data, textStatus, jQxhr);
+                getOwnerListByMediaTypeSuccess(data, textStatus, jQxhr);
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
@@ -743,46 +766,111 @@
         };
 
         $.ajax(url, settings);
+
     }
 
-    function getStationSuccess(data, textStatus, jQxhr) {
+    function getOwnerListByMediaTypeSuccess(data, textStatus, jQxhr) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
         } else {
-            $.each(data.report.rows, function (index) {
-                var obj = data.report.rows[index];
 
-                $("#ddlMediaType").val(obj["mediaTypeId"]);
-                $("#txtCallLetter").val(obj["callLetters"]);
-                $("#ddlSuffix").val(obj["suffix"]);
-                $("#txtMKAClientNumber").val(obj["clientId"]);
-                $("#ddlMarket").val(obj["marketId"]);
-                $("#ddlOwnership").val(obj["ownerId"]);
-                $("#ddlFormat").val(obj["formatId"]);
-                $("#ddlAffiliation").val(obj["affiliationId"]);
-                $("#txtFullName").val(obj["fullName"]);
-                $("#txtNickname").val(obj["nickname"]);
-                $("#ddlPrimaryDemo").val(obj["primaryDemo"]);
-                $("#ddlSecondaryDemo").val(obj["secondaryDemo"]);
-                $("#txtAddress1").val(obj["address1"]);
-                $("#txtAddress2").val(obj["address2"]);
-                $("#txtCity").val(obj["city"]);
-                $("#ddlState").val(obj["stateAbbreviation"]);
-                $("#txtZipcode").val(obj["zipCode"]);
-                $("#txtZip4").val(obj["zip4"]);
-                $("#txtPhoneAreaCode").val(obj["areaCode"]);
-                $("#txtPhoneNumber").val(obj["phone"]);
-                $("#txtPhoneNumberExt").val(obj["extension"]);
-                $("#txtFaxAreaCode").val(obj["faxAreaCode"]);
-                $("#txtFaxNumber").val(obj["faxPhone"]);
-                $("#txtEmailAddress").val(obj["emailAddress"]);
-                $("#txtGeneralComment").val(obj["comment"]);
-                $("#txtBillingNotes").val(obj["billingNote"]);
-            })
+            var str = '';
+            str = '<option value="-1">-- Select an Ownership</option>';
+            $.each(data.report.rows, function (index) {
+                str = str + '<option value="' + data.report.rows[index].OwnerID + '">' + data.report.rows[index].OwnerName + '</option>';
+            });
+
+            $("#ddlOwnership").html(str);
+
+            if ($("#hdnOwnershipId").val() != "") {
+                $("#ddlOwnership").val($("#hdnOwnershipId").val());
+                $("#hdnOwnershipId").val("");
+            } else {
+                $("#ddlOwnership").val("-1");
+            }
+         
         }
 
+        var mediaTypeId = $("#ddlMediaType").val();
+        getFormatList(mediaTypeId);
+
     }
+
+    function getFormatList(mediaTypeId) {
+
+        if (mediaTypeId <= 0) {
+            return;
+        }
+      
+        var url = ServicePrefix + '/api/Format/GetFormatList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMediaTypeId": mediaTypeId
+                }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getFormatListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jqxhr, textStatus, errorThrown);
+            }
+        };
+        $.ajax(url, settings);
+    }
+
+    function getFormatListSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            var str = '';
+            str = '<option value="-1">-- Select a Format</option>';
+            $.each(data.report.rows, function (index) {
+                str = str + '<option value="' + data.report.rows[index]["Format ID"] + '">' + data.report.rows[index]["Format Name"] + '</option>';
+            });
+            $("#ddlFormat").html(str);
+
+            if ($("#hdnFormatId").val() != "") {
+                $("#ddlFormat").val($("#hdnFormatId").val());
+                $("#hdnFormatId").val("");
+            } else {
+                $("#ddlFormat").val("-1");
+            }
+
+        }
+        
+        
+    }
+
+
+
+    function onChangeMediaType(mediaTypeId) {
+
+        getMarketList(mediaTypeId);
+
+        if (mediaTypeId == 2) {
+            $("#divAffiliation").removeClass("hidden");
+
+            if ($("#divFormat").hasClass("hidden") == false) {
+                $("#divFormat").addClass("hidden");
+            }
+
+        } else {
+            $("#divFormat").removeClass("hidden");
+
+            if ($("#divAffiliation").hasClass("hidden") == false) {
+                $("#divAffiliation").addClass("hidden");
+            }
+        }
+    
+    }
+
 
 
    
