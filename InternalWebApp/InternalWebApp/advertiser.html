@@ -92,8 +92,8 @@
                             <label for="txtAdvertiserName">Advertiser Name</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="hidden" id="oldAdvertiserName" value=""/>
-                            <input type="text" class="mkaRequired field-width-325" maxlength="50" id="txtAdvertiserName" errorMessage="You must enter an Advertiser Name." value=""/>
+                            <input type="hidden" id="oldAdvertiserName" value="" />
+                            <input type="text" class="mkaRequired field-width-325" maxlength="50" id="txtAdvertiserName" errorMessage="You must enter an Advertiser Name." value="" />
                         </div>
                     </div>
 
@@ -105,7 +105,7 @@
                             <label for="ddlIndustry" class="">Industry</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="hidden" id="oldIndustryId" value=""/>
+                            <input type="hidden" id="oldIndustryId" value="" />
                             <select id="ddlIndustry" class="mkaRequired field-width-325" style="" errorMessage="You must select an Industry."></select>
                         </div>
                     </div>
@@ -118,7 +118,7 @@
                             <label for="ddlSubIndustry" class="">Sub Industry</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="hidden" id="oldSubIndustryId"/>
+                            <input type="hidden" id="oldSubIndustryId" />
                             <select id="ddlSubIndustry" class="mkaRequired field-width-325" style="" errorMessage="You must select a Sub Industry."></select>
                         </div>
                     </div>
@@ -543,7 +543,7 @@
 
                         $("#txtParentAdvertiserId").val(obj["parentAdvertiserId"]);
                         $("#oldParentAdvertiserId").val(obj["parentAdvertiserId"]);
-                        
+
                         //will need the parent advertiser name
                         $("#txtParentAdvertiserName").val(obj["parentAdvertiserName"]);
                         $("#oldParentAdvertiserName").val(obj["parentAdvertiserName"]);
@@ -686,7 +686,8 @@
 
         //if linking parent advertisers give a warning and store value
         if ($('#chkLinkParent').is(':checked') && $("#txtParentAdvertiserId").val().length > 0 &&
-            $("#oldParentAdvertiserId").val() !== $("#txtParentAdvertiserId").val()) {
+            $("#oldParentAdvertiserId").val() !== $("#txtParentAdvertiserId").val() &&
+            $("#oldParentAdvertiserId").val().length > 0) {
             //if cancel return
             //else set bLinkParentAdvertiser to true
             var parentAdvertiserMessage = "You are about to move parent advertiser " + $("#oldParentAdvertiserName").val() +
@@ -703,7 +704,8 @@
                     }
 
                     if ($("#txtLinkedAdvertiserId").val().length > 0 &&
-                        $("#oldLinkedAdvertiserId").val() !== $("#txtLinkedAdvertiserId").val()) {
+                        $("#oldLinkedAdvertiserId").val() !== $("#txtLinkedAdvertiserId").val() &&
+                        $("#oldLinkedAdvertiserId").val().length > 0) {
                         //if cancel return
                         //else set bLinkAdvertiser to true
                         var advertiserMessage = "You are about to move " +
@@ -713,7 +715,7 @@
                             ".  This action is irreversible. \n\r\n\r Do you wish to proceed?";
 
                         bootbox.confirm(advertiserMessage,
-                            function(result) {
+                            function (result) {
 
                                 if (result) {
                                     bLinkAdvertiser = true;
@@ -730,7 +732,8 @@
         }
             //if changing linked advertisers give a warning and store value
         else if ($("#txtLinkedAdvertiserId").val().length > 0 &&
-            $("#oldLinkedAdvertiserId").val() !== $("#txtLinkedAdvertiserId").val()) {
+            $("#oldLinkedAdvertiserId").val() !== $("#txtLinkedAdvertiserId").val() &&
+            $("#oldLinkedAdvertiserId").val().length > 0) {
             //if cancel return
             //else set bLinkAdvertiser to true
             var advertiserMessage = "You are about to move " +
@@ -760,7 +763,7 @@
 
     function callUpdateAdvertiserApi() {
 
-        console.log("update advertiser");
+        //console.log("update advertiser");
 
         //return;
 
@@ -778,7 +781,10 @@
                 "inOldIndustryId": $("#oldIndustryId").val(),
                 "inSubIndustryId": $("#ddlSubIndustry").val(),
                 "inOldSubIndustryId": $("#oldSubIndustryId").val(),
-                "inLinkedParentAdvertiserId": $("#txtParentOwnershipId").val(),
+                "inLinkedParentAdvertiserId": $("#txtParentAdvertiserId").val(),
+                "inLinkedParentAdvertiserName": $("#txtParentAdvertiserName").val(),
+                "inOldLinkedParentAdvertiserId": $("#oldParentAdvertiserId").val(),
+                "inOldLinkedParentAdvertiserName": $("#oldParentAdvertiserName").val(),
                 "inMarketId": $("#ddlMarket").val(),
                 "inLinkedAdvertiserId": $("#txtLinkedAdvertiserId").val(),
                 "inMediaCodeId": $("#ddlMediaCode").val(),
@@ -792,15 +798,25 @@
                 }
                 else {
 
+                    if (bIsNew) {
+
+                        var obj = data.report.rows[0];
+
+                        $("#txtAdvertiserId").val(obj["_updateStatus"]);
+
+                        window.location = "advertiser.html?AdvertiserID=" + $("#txtAdvertiserId").val();
+                    }
 
 
                     if (bLinkParentAdvertiser) {
                         //make call to update link advertiser
                         //make call to disable old parent advertiser
                         //write log "Parent Advertiser Name"
-                    }
 
-                    if (bLinkAdvertiser) {
+                        //do a call if bLinkAdvertiser is true
+                        linkParentAdvertiser();
+                    }
+                    else if (bLinkAdvertiser) {
                         //make call to update advertiser links
                         //part of update get station advertiser count
                         //part of update get media advertiser count
@@ -809,6 +825,7 @@
                         //check for advertiser revenues
                         //if > 0 update revenues (should be a separate api call)
                         //write log "Advertiser ID" passing # of revenue records
+                        linkAdvertiser();
                     }
                 }
             },
@@ -830,24 +847,83 @@
         //});
     }
 
+    function linkParentAdvertiser() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/ParentAdvertiser/LinkParentAdvertiser',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOldParentAdvertiserId": $("#oldParentAdvertiserId").val(),
+                "inNewParentAdvertiserId": $("#txtParentAdvertiserId").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    disableParentAdvertiser();
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
+
+       
+    }
+
+    function disableParentAdvertiser() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/ParentAdvertiser/DisableParentAdvertiser',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOldParentAdvertiserId": $("#oldParentAdvertiserId").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    if (bLinkAdvertiser) {
+                        linkAdvertiser();
+                    }
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
+
+        
+    }
+
+    function linkAdvertiser() {
+
+    }
+
     function searchParentAdvertiser() {
-
-        //console.log('hello');
-        //console.log($("#txtParentAdvertiserName").val().length);
-
-        //if ($("#txtParentAdvertiserName").val().length === 0) {
-        //    bootbox.alert('You must enter text to start searching for a parent advertiser.', function () {
-        //    });
-        //    return;
-        //}
 
         var searchCriteriaObj = {
             "searchToken": "PARENTADV",
             "marketID": $("#ddlMarket").val(),
             "advertiserID": $("#txtAdvertiserId").val(),
+            "oldAdvertiserName": $("#oldAdvertiserName").val(),
             "advertiserName": $("#txtAdvertiserName").val(),
             "industryID": $("#ddlIndustry").val(),
+            "oldIndustryID": $("#oldIndustryId").val(),
             "subIndustryID": $("#ddlSubIndustry").val(),
+            "oldSubIndustryID": $("#oldSubIndustryId").val(),
             "oldParentAdvertiserID": $("#oldParentAdvertiserId").val(),
             "oldParentAdvertiserName": $("#oldParentAdvertiserName").val(),
             "parentAdvertiserID": $("#txtParentAdvertiserId").val(),
