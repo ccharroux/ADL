@@ -289,6 +289,31 @@ $( document ).ready(function()
 	    }
 		
 	}
+
+	var loc = window.location.toString().toLocaleLowerCase();
+	var environment = "";
+
+	if (loc.indexOf("devmediainternal.millerkaplan.com") > -1)
+	{
+	    environment = "&nbsp;DEV";
+	}
+
+	if (loc.indexOf("localhost") > -1) {
+	    environment = "&nbsp;DEV";
+	}
+
+	if (loc.indexOf("stagingmediainternal.millerkaplan.com") > -1)
+	{
+	    environment = "&nbsp;STAGING";
+	}
+	if (loc.indexOf("demomediainternal.millerkaplan.com") > -1) {
+	    environment = "&nbsp;DEMO";
+	}
+
+	if (environment.length > 0) {
+	    $("#fh5co-header").prepend("<div class='container' style='color:white; background:red; font-weight:600'>" + environment + "</div>");
+	}
+
 });
 
 function checkTokenTime()
