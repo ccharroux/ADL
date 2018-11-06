@@ -371,8 +371,16 @@ function removeLocalStorage(key)
 }
 
 function logout() {
+
     window.localStorage.clear();
-    window.location = "index.html";
+
+    var whereAreYou = window.location.toString();
+
+   // var counter = whereAreYou.replace("//", "/").split('/').length - 1;
+
+    var locationToRedirect = "/login.html";
+
+    window.location = locationToRedirect;
 }
 
 // Miscellaneous 
