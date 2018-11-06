@@ -478,41 +478,48 @@ function buildMainMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/dashboard.html">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">'
 
     menuItems += '<ul>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="dashboardmrr.html">MRR</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboardxray.html">XRY</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboardtvb.html">TVB</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboardmss.html">MSS</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboarddma.html">DMA</a></li>';
+    menuItems += productDashboard('mrr');
+    //menuItems += '                  <li style="display:block;"><a href="/dashboardmrr.html">MRR</a></li>';
+    //menuItems += '                  <li style="display:block;"><a href="/dashboardxray.html">XRY</a></li>';
+    menuItems += productDashboard('xry');
+    menuItems += productDashboard('tvb');
+    //menuItems += '                  <li style="display:block;"><a href="/dashboardtvb.html">TVB</a></li>';
+    //menuItems += '                  <li style="display:block;"><a href="/dashboardmss.html">MSS</a></li>';
+    menuItems += productDashboard('mss');
+
+    //menuItems += '                  <li style="display:block;"><a href="/dashboarddma.html">DMA</a></li>';
+    menuItems += productDashboard('dma');
+
     menuItems += '              </ul>';
     menuItems += '        </li>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Personnel") + 'href="personnellist.html">Personnel</a></li>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Stations") + ' href="stationlist.html">Stations</a></li>';
-    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Markets") + ' href="marketlist.html" role="button" aria-expanded="false">Markets <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Personnel") + 'href="/personnellist.html">Personnel</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Stations") + ' href="/stationlist.html">Stations</a></li>';
+    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Markets") + ' href="/marketlist.html" role="button" aria-expanded="false">Markets <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="">Complementary Markets</a></li>';
     menuItems += '                  <li style="display:block;"><a href="">Internal Reports</a></li>';
     menuItems += '                  <li style="display:block;"><a href="">Parent Market</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
-    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Ownerships") + ' href="ownershiplist.html" role="button" aria-expanded="false">Ownerships <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Ownerships") + ' href="/ownershiplist.html" role="button" aria-expanded="false">Ownerships <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="ownershipgrouplist.html">Ownership Groups</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="parentownershiplist.html">Parent Ownership</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/ownershipgrouplist.html">Ownership Groups</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/parentownershiplist.html">Parent Ownership</a></li>';
     menuItems += '              </ul>';  
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="dashboard.html">Virtual Groups</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="/dashboard.html">Virtual Groups</a></li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Settings") + ' role="button" aria-expanded="false">Settings <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="formatlist.html">Formats</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="marketsizelist.html">Market Sizes</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="positionlist.html">Positions</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="regionlist.html">Regions</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="revenuecategorieslist.html">Revenue Categories</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/formatlist.html">Formats</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/marketsizelist.html">Market Sizes</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/positionlist.html">Positions</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/regionlist.html">Regions</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/revenuecategorieslist.html">Revenue Categories</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
@@ -526,40 +533,40 @@ function buildXRYMenu(selectedItem) {
     
     var menuItems = '';
 
-    menuItems += '<h1><a href="dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/dashboard.html">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">'
 
     menuItems += '<ul>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="dashboardmrr.html">MRR</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboardxray.html">XRY</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboardtvb.html">TVB</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboardmss.html">MSS</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboarddma.html">DMA</a></li>';
+    menuItems += productDashboard('mrr');
+    menuItems += productDashboard('xry');
+    menuItems += productDashboard('tvb');
+    menuItems += productDashboard('mss');
+    menuItems += productDashboard('dma');
     menuItems += '              </ul>';
     menuItems += '        </li>';
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Advertiser") + ' href="advertiserlist.html" role="button" aria-expanded="false">Advertiser <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Advertiser") + ' href="/advertiserlist.html" role="button" aria-expanded="false">Advertiser <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="stationadvertiserlist.html">Station Advertiser</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="mediaadvertiserlist.html">Media Advertiser</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="parentadvertiserlist.html">Parent Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/stationadvertiserlist.html">Station Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/mediaadvertiserlist.html">Media Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/parentadvertiserlist.html">Parent Advertiser</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Agency") + ' href="agencylist.html" role="button" aria-expanded="false">Agency <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Agency") + ' href="/agencylist.html" role="button" aria-expanded="false">Agency <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="stationagencylist.html">Station Agency</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="parentagencylist.html">Parent Agency</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/stationagencylist.html">Station Agency</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/parentagencylist.html">Parent Agency</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="industrylist.html">Industry</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="subindustrylist.html">Sub Industry</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="nielsenmarketnamelist.html">Nielson Market</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/industrylist.html">Industry</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/subindustrylist.html">Sub Industry</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/nielsenmarketnamelist.html">Nielson Market</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
-    menuItems += '        <li><a href="dashboard.html">Dashboard</a></li>';
+    menuItems += productDashboard('');
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
     menuItems += '    </ul>';
     menuItems += '</nav>';
@@ -572,20 +579,20 @@ function buildMRRMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/dashboard.html">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">'
 
     menuItems += '<ul>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="dashboardmrr.html">MRR</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboardxray.html">XRY</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboardtvb.html">TVB</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboardmss.html">MSS</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboarddma.html">DMA</a></li>';
+    menuItems += productDashboard('mrr');
+    menuItems += productDashboard('xry');
+    menuItems += productDashboard('tvb');
+    menuItems += productDashboard('mss');
+    menuItems += productDashboard('dma');
     menuItems += '              </ul>';
     menuItems += '        </li>';
-    menuItems += '        <li><a href="dashboard.html">Dashboard</a></li>';
+    menuItems += productDashboard('');
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
     menuItems += '    </ul>';
     menuItems += '</nav>';
@@ -599,45 +606,45 @@ function buildTVBMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/dashboard.html">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">'
 
     menuItems += '<ul>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="dashboardmrr.html">MRR</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboardxray.html">XRY</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboardtvb.html">TVB</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboardmss.html">MSS</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboarddma.html">DMA</a></li>';
+    menuItems += productDashboard('mrr');
+    menuItems += productDashboard('xry');
+    menuItems += productDashboard('tvb');
+    menuItems += productDashboard('mss');
+    menuItems += productDashboard('dma');
     menuItems += '              </ul>';
     menuItems += '        </li>';
-    menuItems += '        <li><a href="dashboard.html">Dashboard</a></li>';
+    menuItems += productDashboard('');
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
     menuItems += '    </ul>';
     menuItems += '</nav>';
 
     $("#menu").html(menuItems);
-
+    console.log(menuItems);
 }
 
 function buildMSSMenu(selectedItem) {
     var menuItems = '';
 
-    menuItems += '<h1><a href="dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/dashboard.html">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">'
 
     menuItems += '<ul>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="dashboardmrr.html">MRR</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboardxray.html">XRY</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboardtvb.html">TVB</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboardmss.html">MSS</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboarddma.html">DMA</a></li>';
+    menuItems += productDashboard('mrr');
+    menuItems += productDashboard('xry');
+    menuItems += productDashboard('tvb');
+    menuItems += productDashboard('mss');
+    menuItems += productDashboard('dma');
     menuItems += '              </ul>';
     menuItems += '        </li>';
-    menuItems += '        <li><a href="dashboard.html">Dashboard</a></li>';
+    menuItems += productDashboard('');
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
     menuItems += '    </ul>';
     menuItems += '</nav>';
@@ -656,22 +663,58 @@ function buildDMAMenu(selectedItem) {
     menuItems += '<ul>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="dashboardmrr.html">MRR</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboardxray.html">XRY</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboardtvb.html">TVB</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboardmss.html">MSS</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="dashboarddma.html">DMA</a></li>';
+    menuItems += productDashboard('mrr');
+    menuItems += productDashboard('xry');
+    menuItems += productDashboard('tvb');
+    menuItems += productDashboard('mss');
+    menuItems += productDashboard('dma');
     menuItems += '              </ul>';
     menuItems += '        </li>';
-    menuItems += '        <li><a href="dashboard.html">Dashboard</a></li>';
+
+    menuItems += productDashboard('');
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
     menuItems += '    </ul>';
     menuItems += '</nav>';
 
     $("#menu").html(menuItems);
 
+
 }
 
+function productDashboard(productId)
+{
+    var strOut = '';
+    var style = '';
+
+    switch(productId.toLowerCase()) 
+    {
+        case '':
+            strOut = '<a href="/dashboard.html">Dashboard</a>';
+            break;
+        case 'mrr':
+            style = 'display:block;';
+            strOut = '<a href="/dashboardmrr.html">MRR</a>';
+            break;
+        case 'xry':
+            style = 'display:block;';
+            strOut = '<a href="/dashboardxray.html">XRY</a>';
+            break;
+        case 'tvb':
+            style = 'display:block;';
+            strOut = '<a href="/dashboardtvb.html">TVB</a>';
+            break;
+        case 'mss':
+            style = 'display:block;';
+            strOut = '<a href="/dashboardmss.html">MSS</a>';
+            break;
+        case 'dma':
+            style = 'display:block;';
+            strOut = '<a href="/dashboarddma.html">DMA</a>';
+            break;
+    }
+
+    return '<li style="' + style +'">' + strOut + '</li>';
+}
 
 function getSelectedItemClass(selectedItem, item) {
     if (selectedItem.toLowerCase() == item.toLowerCase()) {

@@ -11,8 +11,6 @@
     <title>MKA Internal Media Site</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-
-
     <!-- Facebook and Twitter integration -->
     <meta property="og:title" content="" />
     <meta property="og:image" content="" />
@@ -124,6 +122,8 @@
     <script src="/js/config.js"></script>
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
+    <!-- genericReport JS -->
+    <script src="/js/genericReport.js"></script>
 
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
@@ -148,15 +148,17 @@
     var columns = [];
     var columnsToDisplay = new Array();
     var columnsToExport = new Array();
-
+    var reportId = 0;
     $(document).ready(function () {
 
+        reportId = getParameterByName("reportId");
 //        var reportTitle = "Agencies List";
 //        var exportColumns = returnTableColumnsByClass("dtAgencyList", "exportColumn");
 
-        reportObject = getReportObject();
+        reportObject = getReportObject(reportId);
         $("#reportTitle").html(reportObject.reportTitle);
-        reportFilterArray = getReportFilterArray();
+
+        reportFilterArray = getReportFilterArray(reportId);
 
         $("body").on("click",
             "#clear_search_button",
@@ -172,68 +174,6 @@
 //        getMarketList();
         
     });
-
-    function getReportFilterArray()
-    {
-
-        var arrayFilters = new Array();
-
-        var arrayObject = new Object();
-        arrayObject = {
-            token: "Market",
-            jsCall: "getMarketList",
-            objectName: "ddlMarket",
-            required: true
-        }
-        arrayFilters.push(arrayObject);
-
-        arrayObject = new Object();
-        arrayObject = {
-            token: "Year",
-            jsCall: "getYearList",
-            objectName: "ddlYear",
-            required: true
-        }
-        arrayFilters.push(arrayObject);
-
-        arrayObject = new Object();
-        arrayObject = {
-            token: "Period",
-            objectName: "ddlPeriod",
-            jsCall: "getPeriodList",
-            required: true
-        }
-        arrayFilters.push(arrayObject);
-
-        return arrayFilters;
-    }
-    function getReportObject()
-    {
-        var tempObject = new Object();
-
-        columnsToDisplay = new Array();
-
-
-        columnsToDisplay.push("Category");
-        columnsToDisplay.push("Current Amount");
-        columnsToDisplay.push("Previous Amount");
-        columnsToDisplay.push("Period Pct");
-        columnsToDisplay.push("Current Amount YTD");
-        columnsToDisplay.push("Previous Amount YTD");
-        columnsToDisplay.push("YTD Pct");
-
-        tempObject = 
-        {
-            reportTitle: "Market Summary",
-            apiControllerAction: "/api/MRRReport/GetMarketSummary",
-            apiType: "get",
-            columnsToDisplay: columnsToDisplay
-        }
-
-
-
-        return tempObject;
-    }
 
     function displayFilters(arrayFilters)
     {
