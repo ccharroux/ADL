@@ -43,7 +43,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
-
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
 
@@ -51,6 +51,18 @@
     <!--[if lt IE 9]>
     <script src="js/respond.min.js"></script>
     <![endif]-->
+
+    <style>
+        .rptView
+        {
+            margin-left: 5px;
+        }
+        .rptStartDate, .rptEndDate
+        {
+            max-width:100px;
+            text-align: center;
+        }
+    </style>
 
 </head>
 <body>
@@ -72,23 +84,40 @@
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-12 ">
-                        
-                        <label for="ddlMarket" class="dropdown-label rptView rptMarket">Market</label>
-                        <select id="ddlMarket" apiInput="inMarketId" class="dropdown-select rptView rptMarket"></select>
+                        <div class="form-group" style="display:table-cell">
+                            <label for="ddlMarket" class="dropdown-label rptView rptMarket">Market</label>
+                            <select id="ddlMarket" apiInput="inMarketId" class="dropdown-select rptView rptMarket"></select>
+                        </div>
+                        <div class="form-group" style="display:table-cell">
+                            <label for="ddlStation" class="dropdown-label rptView rptStation">Station</label>
+                            <select id="ddlStation" apiInput="inStationId" class="dropdown-select rptView rptStation"></select>
+                        </div>
+                        <div class="form-group" style="display:table-cell">
+                            <label for="ddlOwner" class="dropdown-label rptView rptOwner">Owner</label>
+                            <select id="ddlOwner" apiInput="inOwnerId" class="dropdown-select rptView rptOwner"></select>
+                        </div>
+                        <div class="form-group" style="display:table-cell">
+                            <label for="ddlYear" class="dropdown-label rptView rptYear">Year</label>
+                            <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView rptYear"></select>
+                        </div>
+                        <div class="form-group" style="display:table-cell">
+                            <label for="ddlPeriod" class="dropdown-label rptView rptPeriod">Period</label>
+                            <select id="ddlPeriod" apiInput="inPeriod" class="dropdown-select rptView rptPeriod"></select>
+                        </div>
+                        <div class="form-group" style="display:table-cell">
+                            <label for="dtStartDate" class="dropdown-label rptStartDate rptView">Start Date</label>
+                            <input type="text" id="dtStartDate" class="rptStartDate rptView" apiInput="inStartDate">
+                        </div>
+                        <div class="form-group" style="display:table-cell">
+                            <label for="dtEndDate" class="dropdown-label rptEndDate rptView">End Date</label>
+                            <input type="text" id="dtEndDate" class="rptEndDate rptView" apiInput="inEndDate">
+                        </div>
 
-                        <label for="ddlStation" class="dropdown-label rptView rptStation">Station</label>
-                        <select id="ddlStation" apiInput="inStationId" class="dropdown-select rptView rptStation"></select>
+                        <div class="form-group" style="display:table-cell">
+                            <label for="btnReport" class="dropdown-label">&nbsp;</label>
+                            <input type="button" id="btnReport" class="search-button" value="Show" onclick="getReport()" />
+                        </div>
 
-                        <label for="ddlOwner" class="dropdown-label rptView rptOwner">Owner</label>
-                        <select id="ddlOwner" apiInput="inOwnerId" class="dropdown-select rptView rptOwner"></select>
-
-                        <label for="ddlYear" class="dropdown-label rptView rptYear">Year</label>
-                        <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView rptYear"></select>
-
-                        <label for="ddlPeriod" class="dropdown-label rptView rptPeriod">Period</label>
-                        <select id="ddlPeriod" apiInput="inPeriod" class="dropdown-select rptView rptPeriod"></select>
-
-                        <input type="button" class="search-button" value="Show" onclick="getReport()" />
                     </div>
                 </div>
 
@@ -133,6 +162,8 @@
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+    
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 </body>
 </html>
@@ -149,6 +180,8 @@
     var columnsToDisplay = new Array();
     var columnsToExport = new Array();
     var reportId = 0;
+
+
     $(document).ready(function () {
 
         reportId = getParameterByName("reportId");
@@ -161,14 +194,22 @@
             });
             return false;
         }
-//        var reportTitle = "Agencies List";
-//        var exportColumns = returnTableColumnsByClass("dtAgencyList", "exportColumn");
 
+        // setup date pickers
+        $(function () {
+            $("#dtStartDate").datepicker();
+            $("#dtEndDate").datepicker();
+        });
+
+
+        // get report objects
         reportObject = getReportObject(reportId);
-        $("#reportTitle").html(reportObject.reportTitle);
-
         reportFilterArray = getReportFilterArray(reportId);
 
+        // report title
+        $("#reportTitle").html(reportObject.reportTitle);
+
+        // clear
         $("body").on("click",
             "#clear_search_button",
             function () {
@@ -176,11 +217,11 @@
                 table.search('').draw();
             });
 
+        // build menu
         buildMainMenu("");
 
+        // display filters
         displayFilters(reportFilterArray);
-
-//        getMarketList();
         
     });
 
@@ -203,9 +244,17 @@
         var classToShow = "rpt" + filterObject.token;
         $("." + classToShow).show();
 
+        if (filterObject.jsCall == null)
+        {
+            return;
+        }
+
         window[filterObject.jsCall]();
     }
 
+    //--------------------------------
+    // Filters get loaded here
+    //--------------------------------
     function getYearList()
     {
         var str = '';
@@ -327,24 +376,59 @@
 
     }
 
+    function getOwnerList() {
 
-    function loadLastSearch() {
-        var search = getParameterByName("search");
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerListUnFiltered',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerName": "",
+                "inActiveOnly": "1",
+                "inAddDetails": "0"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
 
-        if (!search == false) {
-            if (search.length > 0) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
 
-                var sArray = new Array();
-                sArray = search.split("|");
+                }
+                else {
 
-                $("#searchText").val(sArray[0]);
-                $("#ddlMarket").val(sArray[1].toString());
+                    var str = '';
 
-                getAgencyList();
+                    $("#ddlOwner").html("<option value=''> -- Select an Owner</option>");
+
+                    var holdOwnerID = "0";
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = "<option value='" + obj.OwnerID + "'>" + obj.OwnerName + "</option>";
+                        $("#ddlOwner").append(str);
+                    });
+
+  
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
             }
-        }
+        });
 
     }
+
+    //--------------------------------
+    // Filters get loaded end here
+    //--------------------------------
+
+    //----------------------
+    // BEGIN: load of the reports and supporting routines
+    //---------------------
 
     function getReport() {
 
@@ -370,10 +454,15 @@
         //------------------------
         // loop thru filters
         //------------------------
+        var itemsToCheck = $('.rptView');
+        var itemsToCheckLength = itemsToCheck.length;
+
         $('.rptView').each(function (index, item)
         {
             if ($(item).is(":visible"))
             {
+                console.log($(item).prop("tagName"));
+
                 if ($(item).prop("tagName") != "LABEL")
                 {
                     var nameOfParm = $(item).attr("apiInput");
@@ -411,12 +500,44 @@
                             }
                         }
                     }
+
+                    if ($(item).prop("tagName") == "INPUT") {
+                        if ($(item).val() != "") {
+                            if (reportObject.apiType.toLowerCase() == "post") {
+                                apiParameters[nameOfParm] = $(item).val();
+                            }
+                            else {
+                                api = api + "&" + nameOfParm + "=" + $(item).val();
+                            }
+
+                        }
+                        else {
+                            if (isRequired) {
+                                var msg = "Please select a " + nameOfParm.toLowerCase().replace("in", "").replace("id", "");
+                                bootbox.alert(msg, function () { });
+                                return false;
+                            }
+                        }
+                    }
+
   
                 }
             }
+
+            // when done with the loop
+            // get the report
+            if (index == (itemsToCheckLength - 1)) {
+                getTheReportAJAX();
+            }
         });
 
-  
+
+
+    }
+    function getTheReportAJAX()
+    {
+        ServicePrefix = "http://localhost:54064";
+
 
         $.ajax({
             url: ServicePrefix + api,
@@ -425,20 +546,23 @@
             contentType: 'application/json',
             data: JSON.stringify(apiParameters),
             processData: false,
-            success: function (data, textStatus, jQxhr)
-            {
-                if (data.response.status.toUpperCase() === "SUCCESS")
-                {
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status.toUpperCase() === "SUCCESS") {
 
                     buildColumnsArray(data);
 
+                }
+                else
+                {
+                    var msg = data.response.errorMessage[0];
+                    bootbox.alert(msg, function () { });
+                    return false;
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
-
     }
     function destroyDataTable()
     {
@@ -563,4 +687,29 @@
         });
 
     }
+    //----------------------
+    // END: load of the reports and supporting routines
+    //---------------------
+
+    //--------------------
+    // misc
+    //--------------------
+    function loadLastSearch() {
+        var search = getParameterByName("search");
+
+        if (!search == false) {
+            if (search.length > 0) {
+
+                var sArray = new Array();
+                sArray = search.split("|");
+
+                $("#searchText").val(sArray[0]);
+                $("#ddlMarket").val(sArray[1].toString());
+
+                getAgencyList();
+            }
+        }
+
+    }
+
 </script>
