@@ -116,7 +116,8 @@ function getReportObject_MRRMarketSummary()
         reportTitle: "Market Summary",
         apiControllerAction: "/api/MRRReport/GetMarketSummary",
         apiType: "get",
-        columnsToDisplay: columnsToDisplay
+        columnsToDisplay: columnsToDisplay,
+        product: 'mmr'
     }
 
     return tempObject;
@@ -182,7 +183,8 @@ function getReportObject_XRAYUsage() {
         reportTitle: "XRay Usage Report",
         apiControllerAction: "/api/XRAYReport/GetXRayUsage",
         apiType: "get",
-        columnsToDisplay: columnsToDisplay
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry'
     }
 
     return tempObject;
@@ -249,7 +251,8 @@ function getReportObject_MRRUsage() {
         reportTitle: "MRR Usage Report",
         apiControllerAction: "/api/MRRReport/GetMRRUsage",
         apiType: "get",
-        columnsToDisplay: columnsToDisplay
+        columnsToDisplay: columnsToDisplay,
+        product: 'mmr'
     }
 
     return tempObject;
@@ -316,7 +319,8 @@ function getReportObject_TVBUsage() {
         reportTitle: "TVB Usage Report",
         apiControllerAction: "/api/TVBReport/GetTVBUsage",
         apiType: "get",
-        columnsToDisplay: columnsToDisplay
+        columnsToDisplay: columnsToDisplay,
+        product: 'tvb'
     }
 
     return tempObject;
