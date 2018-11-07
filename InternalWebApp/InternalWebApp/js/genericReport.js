@@ -3,6 +3,35 @@ const rptXRAYUsage = 2
 const rptMRRUsage = 3
 const rptTVBUsage = 4
 
+
+function buildReportArray()
+{
+    var reportCounter = 1
+    var success = true;
+    var reportArray = new Array();
+
+    do 
+    {
+        var outObject = getReportObject(reportCounter);
+
+        if (outObject.apiControllerAction == null)
+        {
+            success = false;
+        }
+        else
+        {
+            reportArray.push(outObject);
+            reportCounter++
+        }
+    }
+    while (success == true);
+
+    return reportArray;
+}
+
+//---------------------------
+// Generic Report Wrapper Routines
+//---------------------------
 function getReportObject(inReportId)
 {
 
@@ -113,11 +142,12 @@ function getReportObject_MRRMarketSummary()
 
     tempObject =
     {
+        id: 1,
         reportTitle: "Market Summary",
         apiControllerAction: "/api/MRRReport/GetMarketSummary",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'mmr'
+        product: 'mrr'
     }
 
     return tempObject;
@@ -180,6 +210,7 @@ function getReportObject_XRAYUsage() {
 
     tempObject =
     {
+        id: 2,
         reportTitle: "XRay Usage Report",
         apiControllerAction: "/api/XRAYReport/GetXRayUsage",
         apiType: "get",
@@ -248,11 +279,12 @@ function getReportObject_MRRUsage() {
 
     tempObject =
     {
+        id: 1,
         reportTitle: "MRR Usage Report",
         apiControllerAction: "/api/MRRReport/GetMRRUsage",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'mmr'
+        product: 'mrr'
     }
 
     return tempObject;
@@ -316,6 +348,7 @@ function getReportObject_TVBUsage() {
 
     tempObject =
     {
+        id: 4,
         reportTitle: "TVB Usage Report",
         apiControllerAction: "/api/TVBReport/GetTVBUsage",
         apiType: "get",

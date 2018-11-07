@@ -482,6 +482,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '<nav role="navigation" style="margin-top:20px">'
 
     menuItems += '<ul>';
+    menuItems += buildGenericReportsLink(selectedItem);
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += productDashboard('mrr');
@@ -537,6 +538,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += '<nav role="navigation" style="margin-top:20px">'
 
     menuItems += '<ul>';
+    menuItems += buildGenericReportsLink(selectedItem);
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += productDashboard('mrr');
@@ -583,6 +585,7 @@ function buildMRRMenu(selectedItem) {
     menuItems += '<nav role="navigation" style="margin-top:20px">'
 
     menuItems += '<ul>';
+    menuItems += buildGenericReportsLink(selectedItem);
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += productDashboard('mrr');
@@ -610,6 +613,7 @@ function buildTVBMenu(selectedItem) {
     menuItems += '<nav role="navigation" style="margin-top:20px">'
 
     menuItems += '<ul>';
+    menuItems += buildGenericReportsLink(selectedItem);
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += productDashboard('mrr');
@@ -635,6 +639,7 @@ function buildMSSMenu(selectedItem) {
     menuItems += '<nav role="navigation" style="margin-top:20px">'
 
     menuItems += '<ul>';
+    menuItems += buildGenericReportsLink(selectedItem);
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += productDashboard('mrr');
@@ -661,6 +666,7 @@ function buildDMAMenu(selectedItem) {
     menuItems += '<nav role="navigation" style="margin-top:20px">'
 
     menuItems += '<ul>';
+    menuItems += buildGenericReportsLink(selectedItem);
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += productDashboard('mrr');
@@ -715,8 +721,17 @@ function productDashboard(productId)
 
     return '<li style="' + style +'">' + strOut + '</li>';
 }
+function buildGenericReportsLink(selectedItem)
+{
+    var strOut = '';
+    var style = '';
 
-function getSelectedItemClass(selectedItem, item) {
+    strOut = '<a ' + getSelectedItemClass(selectedItem, "Reports") +' href="/genericReportList.html">Reports</a>';
+
+    return '<li style="' + style + '">' + strOut + '</li>';
+}
+function getSelectedItemClass(selectedItem, item)
+{
     if (selectedItem.toLowerCase() == item.toLowerCase()) {
         return 'class="active"';
     }
