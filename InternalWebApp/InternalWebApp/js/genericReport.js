@@ -279,7 +279,7 @@ function getReportObject_MRRUsage() {
 
     tempObject =
     {
-        id: 1,
+        id: 3,
         reportTitle: "MRR Usage Report",
         apiControllerAction: "/api/MRRReport/GetMRRUsage",
         apiType: "get",
