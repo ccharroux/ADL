@@ -81,7 +81,7 @@
                     </div>
                 </div>
                 <!-- start datatable-->
-                <div class="dataTable-top-margin">
+                <div class="dataTable-top-margin" style="padding-top:10px; padding-bottom:10px">
                     <table id="dtPersonnelAssignmentList" class="stripe"></table>
                 </div>
                 <!-- end datatable -->
@@ -198,6 +198,9 @@
 
     var personnelId = 0;
     var nameOfUser = "";
+    var columns = [];
+    var columnsToDisplay = new Array();
+    var columnsToExport = new Array();
 
     $(document).ready(function () {
 
@@ -216,6 +219,10 @@
 //        });
 
         personnelId = getParameterByName("PersonnelId");
+        if (personnelId == null)
+        {
+            window.location = "/dashboard.html";
+        }
         nameOfUser = getParameterByName("Name");
 
         $("#nameOfPersonnel").html(nameOfUser.toUpperCase());
@@ -234,6 +241,7 @@
 
         buildMainMenu("Personnel");
         loadProductList();
+        loadPersonnelAssignmentList("dtPersonnelAssignmentList");
 
         //getOwnerList();
 
@@ -256,13 +264,189 @@
             $("#btnAssign").show();
         }
 
-        loadPersonnelAssignmentList();
+        loadPersonnelAssignmentList("dtPersonnelAssignmentList");
         loadMarketList();
     }
-    function loadPersonnelAssignmentList()
+
+    function loadPersonnelAssignmentList(dataTable)
     {
+        var apiParameters = new Object();
+        var columns = [];
+        var apiToken = getLocalStorage("APIToken");
+        var api = '/api/personnel/GetPersonnelAssigmentList'
+
+        apiParameters["inApiToken"] = apiToken;
+        apiParameters["inPersonnelId"] = personnelId;
+
+
+        if ($("#ddlProduct").val() != "")
+        {
+            apiParameters["inProductId"] = $("#ddlProduct").val();
+        }
+
+
+        $.ajax({
+            url: ServicePrefix + api,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify(apiParameters),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status.toUpperCase() === "SUCCESS") {
+
+                    buildColumnsArray(data, dataTable);
+
+                }
+                else {
+                    var msg = data.response.errorMessage[0];
+                    bootbox.alert(msg, function () { });
+                    return false;
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function destroyDataTable(tableToDestroy)
+    {
+            if ($.fn.DataTable.isDataTable('#' + tableToDestroy)) {
+                var searchTable = $('#' + tableToDestroy).DataTable();
+                searchTable.destroy();
+                $('#' + tableToDestroy).hide();
+            }
 
     }
+
+    function buildColumnsArray(dataObj, dataTable)
+    {
+
+        columnsToDisplay.length = 0;
+        columnsToDisplay.push("MarketId");
+        columnsToDisplay.push("MarketName");
+        columnsToDisplay.push("StationId");
+        columnsToDisplay.push("Station");
+        columnsToDisplay.push("Product");
+        columnsToDisplay.push("Report/Access");
+        columnsToDisplay.push("Manager");
+        columnsToDisplay.push("Submitter");
+
+        columnsToExport = new Array();
+
+        if (!dataObj["report"]["rows"]) {
+            destroyDataTable("dtPersonnelAssignmentList");
+            return;
+        }
+
+        if (dataObj["report"]["rows"].length == 0) {
+            destroyDataTable("dtPersonnelAssignmentList");
+            return;
+        }
+
+        $('#dtPersonnelAssignmentList').show();
+
+        var data = dataObj["report"]["rows"][0];
+        var ctr = -1;
+        columns = [];
+
+        $.each(data, function (objectName, objectValue)
+        {
+
+            if (columnsToDisplay.includes(objectName))
+            {
+                var className = "";
+
+                if (isNaN(objectValue) == false)
+                {
+                    className = "text-align-right";
+                }
+
+                ctr++;
+                columnsToExport.push(ctr);
+
+                columns.push({
+                    "title": objectName,
+                    "visible": true,
+                    "mData": objectName,
+                    "orderable": true,
+                    "className": className
+                });
+            }
+        });
+
+        loadResults(dataObj, columns, dataTable);
+    }
+
+    function loadResults(data, columns, dataTable) {
+            //data is the data from the ajax call
+            //columns is the array that was built previously
+
+            //assigns the data from the ajax call
+            var results = data["report"]["rows"];
+
+            //creating a variable that will used for datatable functions later
+            var searchTable;
+
+            //if the datatable already exists need to destroy it before building it
+            //again with new results from the search.
+            //if you try to destroy before it is a datatable, an error will occur.
+            //this code will only destroy it if the table is a datatable.
+            if ($.fn.DataTable.isDataTable('#' + dataTable)) {
+                searchTable = $('#' + dataTable).DataTable();
+                searchTable.destroy();
+            }
+
+
+            //this code rebuilds the datatable with the updated data from the search 
+            //or initial load.
+
+
+            var searchTable2 = $("#" + dataTable).DataTable({
+                "dom": "Blfrtip",
+                "data": results,
+                "columns": columns,
+                "select": true,
+                language: {
+                    search: "Filter Results:"
+                },
+                "buttons": [
+                   //{
+                   //    extend: 'csv',
+                   //    exportOptions: {
+                   //        columns: columnsToExport
+                   //    }
+                   //},
+                   {
+                       extend: 'excel',
+                       title: "Personnel Assignments",
+                       exportOptions: {
+                           columns: columnsToExport
+                       }
+                   },
+                   //{
+                   //    extend: 'pdf',
+                   //    title: reportObject.reportTitle,
+                   //    exportOptions: {
+                   //        columns: columnsToExport
+                   //     }
+                   //},
+                   {
+                       extend: 'print',
+                       title: "Personnel Assignments",
+                       exportOptions: {
+                           columns: columnsToExport
+
+                       }
+                   }
+                ],
+            });
+
+ 
+
+    }
+
     function loadStations()
     {
 
