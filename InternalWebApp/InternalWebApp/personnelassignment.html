@@ -69,10 +69,10 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Personnel</h2>
+                        <h2>Personnel Assignment</h2>
+                        <h3 id="nameOfPersonnel"></h3>
                     </div>
                 </div>
-
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-12">
@@ -80,12 +80,9 @@
                         <select id="ddlProduct" class="search-ddl-select" style="" onchange="loadScreenForProductChange()"></select>
                     </div>
                 </div>
-
                 <!-- start datatable-->
                 <div class="dataTable-top-margin">
-                    <table id="dtPersonnelAssignmentList" class="stripe">
-
-                    </table>
+                    <table id="dtPersonnelAssignmentList" class="stripe"></table>
                 </div>
                 <!-- end datatable -->
 
@@ -99,15 +96,15 @@
                             <select id="ddlStation" class="search-ddl-select" style="" multiple size="10"></select>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-6 ProductChoices" id="MRRChoices" style="display:none">
                         <div style="border:silver solid 1px; border-radius:15px; padding:5px 5px 5px 5px; background-color:Highlight">
                             <hr />
-                            <input type="checkbox" id="chkMRRAdministrator"style="margin-right:5px" /><label for="chkMRRAdministrator">Administrator</label>
+                            <input type="checkbox" id="chkMRRAdministrator" style="margin-right:5px" /><label for="chkMRRAdministrator">Administrator</label>
                             <hr />
                             <input type="radio" name="radContactMRR" id="radMRRNotAContact" style="margin-right:5px" checked="checked" /><label for="radMRRNotAContact">Not a Contact</label>
                             <br />
-                            <input type="radio" name="radContactMRR"  id="radMRRPrimaryContact" style="margin-right:5px" /><label for="radMRRPrimaryContact">Primary Contact</label>
+                            <input type="radio" name="radContactMRR" id="radMRRPrimaryContact" style="margin-right:5px" /><label for="radMRRPrimaryContact">Primary Contact</label>
                             <br />
                             <input type="radio" name="radContactMRR" id="radMRRSecondaryContact" style="margin-right:5px" /><label for="radMRRSecondaryContact">Secondary Contact</label>
                             <hr />
@@ -153,16 +150,19 @@
                             <select id="ddlRepFirms" class="search-ddl-select" style="" multiple size="10"></select>
                         </div>
                     </div>
+                </div>
 
-
+                <div class="row">
+                    <div class="col-md-12" style="width:100%;text-align:center">
+                        <hr />
+                        <input value="Assign" id="btnAssign" class="default-button" type="button" style="display:none" />
+                    </div>
                 </div>
 
             </div>
+            <!--<div id="map" data-animate-effect="fadeIn"></div>-->
         </div>
-        <!--<div id="map" data-animate-effect="fadeIn"></div>-->
-
     </div>
-
 
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
@@ -197,6 +197,7 @@
 
 
     var personnelId = 0;
+    var nameOfUser = "";
 
     $(document).ready(function () {
 
@@ -215,7 +216,9 @@
 //        });
 
         personnelId = getParameterByName("PersonnelId");
+        nameOfUser = getParameterByName("Name");
 
+        $("#nameOfPersonnel").html(nameOfUser.toUpperCase());
 
      //   var reportTitle = "Personnel List";
      //   var exportColumns = returnTableColumnsByClass("dtPersonnelList", "exportColumn");
@@ -242,8 +245,16 @@
         $(".ProductChoices").hide();
 
         // show selected choice
- 
         $("#" + $("#ddlProduct").val() + "Choices").show();
+
+        // hide / show assign button
+        if ($("#ddlProduct").val() == "") {
+            $("#btnAssign").hide();
+        }
+        else
+        {
+            $("#btnAssign").show();
+        }
 
         loadPersonnelAssignmentList();
         loadMarketList();
