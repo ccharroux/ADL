@@ -87,10 +87,10 @@
                 <!-- end datatable -->
 
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-6" id="marketChoice" style="display:none">
                         <div style="border:silver solid 1px; border-radius:15px; padding:5px 5px 5px 5px; background-color:Highlight">
                             <label for="ddlMarket" class="search-ddl-label">Market</label>
-                            <select id="ddlMarket" class="search-ddl-select" style="" onchange="loadStations()"></select>
+                            <select id="ddlMarket" class="search-ddl-select" style="" onchange="loadStationList()"></select>
                             <br />
                             <label for="ddlStation" class="search-ddl-label" style="vertical-align: top;">Stations</label>
                             <select id="ddlStation" class="search-ddl-select" style="" multiple size="10"></select>
@@ -258,10 +258,12 @@
         // hide / show assign button
         if ($("#ddlProduct").val() == "") {
             $("#btnAssign").hide();
+            $("#marketChoice").hide();
         }
         else
         {
             $("#btnAssign").show();
+            $("#marketChoice").show();
         }
 
         loadPersonnelAssignmentList("dtPersonnelAssignmentList");
@@ -447,8 +449,67 @@
 
     }
 
-    function loadStations()
+    function loadStationList()
     {
+        var str = '';
+        var controlToLoad = "#ddlStation";
+
+        $(controlToLoad).html("");
+        //str = str + '<option value="">';
+        //str = str + '-- Select a Market';
+        //str = str + '</option>';
+        //$(controlToLoad).append(str);
+
+        var apiParameters = new Object();
+        var apiToken = getLocalStorage("APIToken");
+
+        apiParameters["inApiToken"] = apiToken;
+        apiParameters["inMarketId"] = $("#ddlMarket").val();
+
+        if ($("#ddlProduct").val() != "") {
+            apiParameters["inProductId"] = $("#ddlProduct").val();
+        }
+
+
+        $.ajax({
+            url: ServicePrefix + '/api/Station/GetStationListByMarket',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify(apiParameters),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+
+                    $.each(data.report.rows, function (index) {
+
+                        str = '';
+                        var obj = data.report.rows[index];
+
+                        str = str + '<option value="' + obj.reid + '">';
+                        str = str + (obj.fullName).toUpperCase();
+                        str = str + '</option>';
+
+                        $(controlToLoad).append(str);
+
+                    });
+
+
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+
 
     }
 
@@ -562,69 +623,6 @@
 
     }
 
-    function getPersonnelByName()
-    {
-        $("#ddlOwner").val("");
-        $("#searchText").val("");
-        getPersonnelList();
-    }
-
-    function getPersonnelByEmail() {
-        $("#ddlOwner").val("");
-        $("#searchText2").val("");
-        getPersonnelList();
-    }
-
-    function getPersonnelByOwner() {
-        $("#searchText").val("");
-        $("#searchText2").val("");
-        getPersonnelList();
-    }
-
-    function getOwnerList() {
-
-        $.ajax({
-            url: ServicePrefix + '/api/Owner/GetOwnerListUnFiltered',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inOwnerName": "",
-                "inActiveOnly": "1",
-                "inAddDetails": "0"
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-
-                    var str = '';
-
-                    $("#ddlOwner").html("<option value=''> -- Select an Owner</option>");
-
-                    //var holdOwnerID = "0";
-
-                    $.each(data.report.rows, function (index) {
-                        var obj = data.report.rows[index];
-                        str = "<option value='" + obj.OwnerID + "'>" + obj.OwnerName + "</option>";
-                        $("#ddlOwner").append(str);
-                    });
-
-                }
-
-                loadLastSearch();
-
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                MKAErrorMessageRtn(errorThrown);
-            }
-        });
-
-    }
     function loadLastSearch() {
 
         var search = getParameterByName("search");
@@ -641,69 +639,6 @@
                 getPersonnelList();
             }
         }
-
-    }
-
-    function getPersonnelList() {
-
-        var table = $("#dtPersonnelList").DataTable();
-        table.clear().draw();
-
-        //if ($("#searchText").val().trim().length <= 2)
-        //{
-        //    var table = $("#dtPersonnelList").DataTable();
-        //    table.clear().draw();
-        //    return;
-        //}
-
-        setLocalStorage("search", $("#ddlOwner").val().trim() + "|" + $("#searchText").val().trim() + "|" + $("#searchText2").val().trim());
-        setLocalStorage("searchPage", window.location);
-
-        $.ajax({
-            url: ServicePrefix + '/api/Personnel/GetPersonnelListByOwnerEmailName',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inOwnerID": $("#ddlOwner").val() == 0 ? null : $("#ddlOwner").val(),
-                "inEmailAddress": $("#searchText").val(),
-                "inLastName": $("#searchText2").val()
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                if (data.response.status.toUpperCase() === "SUCCESS") {
-                    if (data.report.rows.length == 1) {
-                        var id = data.report.rows[0].personnelId;
-
-                        setLocalStorage("search", "");
-                        //editPersonnel(id);
-                        //return;
-                    }
-                }
-                populateDataTable("dtPersonnelList", data);
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-
-    }
-
-    function editOwnership(ownerId)
-    {
-        window.location = "ownership.html?ownerId=" + ownerId;
-    }
-    function editPersonnel(personnelId) {
-
-        window.location = "personnel.html?personnelID=" + personnelId;
-
-    }
-
-    function deletePersonnel(personnelId) {
-
-        bootbox.alert('This functionality is still under development.', function () {
-        });
 
     }
 
