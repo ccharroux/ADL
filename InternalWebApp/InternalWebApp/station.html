@@ -110,7 +110,7 @@
                     <!--Market/Market ID-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="ddlMarket">Market</label>
+                            <label for="ddlMarket">Primary Market</label>
                         </div>
                         <div class="col-md-9 text-align-left">
                             <select id="ddlMarket" class="field-width-325"></select>
@@ -173,14 +173,14 @@
                             <label for="ddlPrimaryDemo">Primary Demo</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlPrimaryDemo" class="field-width-325"></select> 
+                            <select id="ddlPrimaryDemo" class="field-width-325"></select>
                         </div>
                     </div>
 
                     <!--Secondary Demo-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="ddlSecondaryDemo">Secondary Domo</label>
+                            <label for="ddlSecondaryDemo">Secondary Demo</label>
                         </div>
                         <div class="col-md-9 text-align-left">
                             <select id="ddlSecondaryDemo" class="field-width-325"></select>
@@ -213,7 +213,7 @@
                             <label for="txtCity">City</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" maxlength="25" id="txtCity" class="mkaRequired field-width-325" errorMessage="You must enter a City."/>
+                            <input type="text" maxlength="25" id="txtCity" class="mkaRequired field-width-325" errorMessage="You must enter a City." />
                         </div>
                     </div>
 
@@ -224,7 +224,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <select id="ddlState" class="mkaRequired field-width-325" errorMessage="You must select a State."></select>
-                        </div> 
+                        </div>
                     </div>
 
                     <!--Zipcode-->
@@ -234,7 +234,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input type="text" id="txtZipcode" size="5" maxlength="5" class="mkaRequired" errorMessage="You must enter a Zipcode" />&nbsp;-&nbsp;
-                            <input type="text" id="txtZip4" maxlength="4" size="4"/>
+                            <input type="text" id="txtZip4" maxlength="4" size="4" />
                         </div>
                     </div>
 
@@ -244,7 +244,7 @@
                             <label for="txtPhoneNumber">Phone Number</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="txtPhoneAreaCode" size="3" maxlength="3"/> &nbsp;
+                            <input type="text" id="txtPhoneAreaCode" size="3" maxlength="3" /> &nbsp;
                             <input type="text" id="txtPhoneNumber" maxlength="7" size="7" /> &nbsp;
                             Ext. &nbsp;<input type="text" id="txtPhoneNumberExt" maxlength="4" size="4" />
                         </div>
@@ -326,10 +326,10 @@
                             </div>
                             <div class="col-md-9 text-align-left">
                                 <div>
-                                    <input value="Update" onclick="updateStation();" class="default-button" type="button"/>
+                                    <input value="Update" onclick="updateStation();" class="default-button" type="button" />
                                 </div>
                                 <div class="back-button-div">
-                                    <input value="Back" onclick="goBackToDashBoard();" class="default-button" type="button" />
+                                    <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button" />
                                 </div>
                             </div>
                         </div>
@@ -377,10 +377,20 @@
     function checkForInsertOrUpdate() {
 
         if (stationId == 0 || stationId == null) {
-           
+
+            $("#ddlMarket").prop("disabled", true);
+            $("#ddlOwnership").prop("disabled", true);
+            $("#ddlMarket").addClass("disabled");
+            $("#ddlOwnership").addClass("disabled");
+
         } else {
+            //$("#ddlMarket").removeClass("hidden");
+            //$("#ddlOwnership").removeClass("hidden");
+
             $("#ddlMarket").prop("disabled", true);
             $("#ddlMediaType").prop("disabled", true);
+            $("#ddlMarket").addClass("disabled");
+            $("#ddlMediaType").addClass("disabled");
         }
     }
 
@@ -486,7 +496,7 @@
                 genericAjaxError(jQxhr, textStatus, errorThrown);
             }
         }
-        
+
         $.ajax(url, settings);
     }
 
@@ -549,11 +559,11 @@
         }
 
         getMarketBandList();
-       
+
     }
-  
+
     function getMarketBandList() {
-        
+
         var url = ServicePrefix + '/api/Market/GetMarketBandList';
 
         var settings = {
@@ -586,17 +596,17 @@
             $.each(data.report.rows, function (index) {
                 str = str + '<option value="' + data.report.rows[index].marketBand + '">' + data.report.rows[index].marketBand + '</option>';
             });
-            $("#ddlSuffix").html(str); 
-        }      
+            $("#ddlSuffix").html(str);
+        }
         getStation();
     }
 
     function getStation() {
 
         if (stationId <= 0) {
-            getMarketList(null);
             return;
         }
+        //getting station first before load of other dropdown lists because those dropdown list values depend on the mediaTypeId returned from getStation
 
         var url = ServicePrefix + '/api/Station/GetStation';
 
@@ -633,10 +643,6 @@
                 $("#txtCallLetter").val(obj["callLetters"]);
                 $("#ddlSuffix").val(obj["suffix"]);
                 $("#txtMKAClientNumber").val(obj["clientId"]);
-
-                $("#hdnMarketId").val(obj["marketId"]);
-                $("#hdnOwnershipId").val(obj["ownerId"]);
-              
                 $("#txtFullName").val(obj["fullName"]);
                 $("#txtNickname").val(obj["nickname"]);
                 $("#ddlPrimaryDemo").val(obj["primaryDemo"]);
@@ -656,11 +662,18 @@
                 $("#txtGeneralComment").val(obj["comment"]);
                 $("#txtBillingNotes").val(obj["billingNote"]);
 
+
+                //set marketId, formatId, and ownerId to hidden fields to be used after market/format/ownership dropdowns
+                //load with lists using mediaTypeId returned from this api 
+
+                $("#hdnMarketId").val(obj["marketId"]); 
+                $("#hdnOwnershipId").val(obj["ownerId"]);
+
                 if (obj["formatId"] != "" && obj["formatId"] != null) {
 
                     $("#ddlFormat").val(obj["formatId"]);
                     $("#divFormat").removeClass("hidden");
-                    $("#hdnFormatId").val(obj["formatId"])
+                    $("#hdnFormatId").val(obj["formatId"]);
                 }
 
                 if (obj["affiliationId"] != "" && obj["affiliationId"] != null) {
@@ -675,6 +688,7 @@
 
         var mediaType = $("#ddlMediaType").val();
         getMarketList(mediaType);
+        getProductList();
 
     }
 
@@ -695,7 +709,8 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inActiveOnly": "1",
-                "inMediaTypeId": mediaTypeId
+                "inMediaTypeId": mediaTypeId,
+                "inPrimaryMarketOnly": "1"
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -731,7 +746,7 @@
                 $("#ddlMarkt").val("-1");
             }
 
-           
+
         }
 
         var mediaTypeId = $("#ddlMediaType").val();
@@ -740,7 +755,7 @@
     }
 
     function getOwnerListByMediaType(mediaTypeId) {
-        
+
         if (mediaTypeId <= 0) {
             return;
         }
@@ -789,7 +804,7 @@
             } else {
                 $("#ddlOwnership").val("-1");
             }
-         
+
         }
 
         var mediaTypeId = $("#ddlMediaType").val();
@@ -802,7 +817,7 @@
         if (mediaTypeId <= 0) {
             return;
         }
-      
+
         var url = ServicePrefix + '/api/Format/GetFormatList';
 
         var settings = {
@@ -812,7 +827,7 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inMediaTypeId": mediaTypeId
-                }),
+            }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 getFormatListSuccess(data, textStatus, jQxhr);
@@ -845,14 +860,86 @@
 
         }
         
-        
     }
 
+    function getProductList() {
+        
+        var url = ServicePrefix + '/api/Product/GetProductList';
 
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getProductListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+        $.ajax(url, settings);
+    }
+
+    function getProductListSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+           
+            var str = '';
+
+            $("#productList").html("");
+
+            $.each(data.report.rows, function (index) {
+
+                var obj = data.report.rows[index];
+                var productId = "" + obj.P_ProductId;
+
+                str = str + '<div class="row" style="padding-top:3px;">';
+                str = str + '<div class="col-md-4" style="text-align:left">';
+                str = str + obj.P_ProductID + " - " + obj.P_ProductName;
+                str = str + '</div>';
+                str = str + '<div class="col-md-2" style="text-align:left">';
+                str = str + '<div id="date' + obj.P_ProductID + '" />';
+                str = str + '</div>';
+                str = str + '<div id="productButtons' + obj.P_ProductID + '" class="col-md-6" style="text-align:left;">';
+                str = str + '<input type="button" id="productAdd' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="enableProduct(' + '\'' + obj.P_ProductID + '\')" Value="Enable" />';
+                str = str + '<input type="button" id="productDisable' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="disableProduct(' + '\'' + obj.P_ProductID + '\')" Value="Disable" />';
+                str = str + '</div>';
+                str = str + '</div>';
+            });
+
+            $("#productList").append(str);
+
+            if (stationId > 0) {
+                $("#divProductList").removeClass("hidden");
+            }
+
+        }
+    }
 
     function onChangeMediaType(mediaTypeId) {
 
-        getMarketList(mediaTypeId);
+        if (mediaTypeId == -1) {
+            $("#ddlMarket").prop("disabled", true);
+            $("#ddlOwnership").prop("disabled", true);
+            $("#ddlMarket").addClass("disabled");
+            $("#ddlOwnership").addClass("disabled");
+            $("#ddlMarket").html("");
+            $("#ddlOwnership").html("");
+        } else {
+
+            $("#ddlMarket").prop("disabled", false);
+            $("#ddlOwnership").prop("disabled", false);
+            $("#ddlMarket").removeClass("disabled");
+            $("#ddlOwnership").removeClass("disabled");
+
+
+            getMarketList(mediaTypeId);
+        }
 
         if (mediaTypeId == 2) {
             $("#divAffiliation").removeClass("hidden");
@@ -868,16 +955,13 @@
                 $("#divAffiliation").addClass("hidden");
             }
         }
-    
+
     }
 
-
-
-   
     function updateStation() {
         bootbox.alert('This functionality is still under development.', function () {
         });
-    } 
-   
+    }
+
 
 </script>
