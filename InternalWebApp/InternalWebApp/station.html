@@ -343,7 +343,6 @@
 
     </div>
 
-
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
     <!-- jQuery Easing -->
@@ -372,6 +371,7 @@
         stationId = (getParameterByName("StationID") == null ? 0 : getParameterByName("StationID"));
         checkForInsertOrUpdate()
         getMediaTypeList();
+
     });
 
     function checkForInsertOrUpdate() {
@@ -384,8 +384,6 @@
             $("#ddlOwnership").addClass("disabled");
 
         } else {
-            //$("#ddlMarket").removeClass("hidden");
-            //$("#ddlOwnership").removeClass("hidden");
 
             $("#ddlMarket").prop("disabled", true);
             $("#ddlMediaType").prop("disabled", true);
@@ -664,9 +662,9 @@
 
 
                 //set marketId, formatId, and ownerId to hidden fields to be used after market/format/ownership dropdowns
-                //load with lists using mediaTypeId returned from this api 
+                //load with lists using mediaTypeId returned from this api
 
-                $("#hdnMarketId").val(obj["marketId"]); 
+                $("#hdnMarketId").val(obj["marketId"]);
                 $("#hdnOwnershipId").val(obj["ownerId"]);
 
                 if (obj["formatId"] != "" && obj["formatId"] != null) {
@@ -859,11 +857,11 @@
             }
 
         }
-        
+
     }
 
     function getProductList() {
-        
+
         var url = ServicePrefix + '/api/Product/GetProductList';
 
         var settings = {
@@ -888,7 +886,7 @@
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
         } else {
-           
+
             var str = '';
 
             $("#productList").html("");
@@ -906,7 +904,8 @@
                 str = str + '<div id="date' + obj.P_ProductID + '" />';
                 str = str + '</div>';
                 str = str + '<div id="productButtons' + obj.P_ProductID + '" class="col-md-6" style="text-align:left;">';
-                str = str + '<input type="button" id="productAdd' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="enableProduct(' + '\'' + obj.P_ProductID + '\')" Value="Enable" />';
+                str = str + '<input type="button" id="productAdd' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="enableEditProduct(' + '\'' + obj.P_ProductID + '\')" Value="Enable" />';
+                str = str + '<input type="button" id="productEdit' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="enableEditProduct(' + '\'' + obj.P_ProductID + '\')" Value="Edit" />';
                 str = str + '<input type="button" id="productDisable' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="disableProduct(' + '\'' + obj.P_ProductID + '\')" Value="Disable" />';
                 str = str + '</div>';
                 str = str + '</div>';
@@ -916,10 +915,66 @@
 
             if (stationId > 0) {
                 $("#divProductList").removeClass("hidden");
+                getStationProductList();
             }
 
         }
     }
+
+    function getStationProductList() {
+
+        var url = ServicePrefix + '/api/Station/GetStationProductList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getStationProductListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        }
+        $.ajax(url, settings);
+    }
+
+    function getStationProductListSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+
+            $.each(data.report.rows, function (index) {
+
+                var obj = data.report.rows[index];
+
+                if (obj.activeDate != null & obj.active == true) {
+                    $("#productEdit" + obj.productId).removeClass("hidden");
+                    $("#productDisable" + obj.productId).removeClass("hidden");
+                    $("#date" + obj.productId).html(extractDateOnly(obj.activeDate));
+                    $("#date" + obj.productId).css("color", "green");
+                }
+
+                else if (obj.disableDate != null && obj.active == false) {
+                    $("#productAdd" + obj.productId).removeClass("hidden");
+                    $("#date" + obj.productId).html(extractDateOnly(obj.disableDate));
+                    $("#date" + obj.productId).css("color", "red");
+                }
+                else if (obj.disableDate == null && obj.activeDate == null) {
+                    $("#productAdd" + obj.productId).removeClass("hidden");
+                }
+
+            })
+
+        }
+    }
+
 
     function onChangeMediaType(mediaTypeId) {
 
@@ -963,5 +1018,44 @@
         });
     }
 
+    function disableProduct(productId) {
+        bootbox.alert('This functionality is still under development.', function () {
+
+        });
+    }
+
+    function enableEditProduct(productId) {
+
+        var location = '';
+
+        switch (productId.toLowerCase()) {
+            case '':
+                location = 'station.html?StationID=' + stationId;
+                break;
+            case 'mrr':
+                location = 'stationproductmrr.html?StationID=' + stationId;
+                break;
+            case 'xry':
+                location = 'stationproductxry.html?StationID=' + stationId;
+                break;
+            case 'tvb':
+                location = 'stationproducttvb.html?StationID=' + stationId;
+                break;
+            case 'mss':
+                bootbox.alert('There is no station product page for MSS.', function () {
+
+                });
+                return;
+            case 'dma':
+                bootbox.alert('This functionality is still under development.', function () {
+
+                });
+                return;
+        }
+               
+        window.location = location;
+    }
+
+   
 
 </script>
