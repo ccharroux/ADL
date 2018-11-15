@@ -1,12 +1,41 @@
-const rptMRRMarketSummary = 1
-const rptXRAYUsage = 2
-const rptMRRUsage = 3
-const rptTVBUsage = 4
-const rptMarketRevenueHourlyActivity = 5
-const rptUserActivity = 6
-const rptUserActivityDetail = 7
-const rptUserQuerySummary = 8
-const rptUserQuerySummaryByOwner = 9
+var ctr = 1
+var rptMRRMarketSummary = ctr
+ctr++;
+var rptXRAYUsage = ctr
+ctr++;
+var rptMRRUsage = ctr;
+ctr++;
+var rptTVBUsage = ctr;
+ctr++;
+var rptMarketRevenueHourlyActivity = ctr;
+ctr++;
+var rptUserActivity = ctr;
+ctr++;
+var rptUserActivityDetail = ctr;
+ctr++;
+var rptUserQuerySummary = ctr;
+ctr++;
+var rptUserQuerySummaryByOwner = ctr;
+ctr++;
+var rptUserListing = ctr;
+ctr++;
+var rptTraining = ctr;
+ctr++;
+var rptAEStatus = ctr;
+ctr++;
+var rptNationwideRecipients = ctr;
+ctr++;
+var rptNewUserListing = ctr;
+ctr++;
+var rptStationChangeHistory = ctr;
+ctr++;
+var rptMarketRevenueXRay = ctr;
+ctr++;
+var rptStationListing = ctr;
+ctr++;
+var rptMarketDelivery = ctr;
+ctr++;
+var rptTVBUserListing = ctr;
 
 function buildReportArray()
 {
@@ -41,42 +70,101 @@ function getReportObject(inReportId)
 
     var arrayObject = new Object();
 
-    if (inReportId == rptMRRMarketSummary) {
+    if (inReportId == rptMRRMarketSummary)
+    {
         arrayObject = getReportObject_MRRMarketSummary();
     }
 
     if (inReportId == rptXRAYUsage)
     {
         arrayObject = getReportObject_XRAYUsage();
-
     }
 
-    if (inReportId == rptMRRUsage) {
+    if (inReportId == rptMRRUsage)
+    {
         arrayObject = getReportObject_MRRUsage();
     }
 
-    if (inReportId == rptTVBUsage) {
+    if (inReportId == rptTVBUsage)
+    {
         arrayObject = getReportObject_TVBUsage();
     }
 
-    if (inReportId == rptMarketRevenueHourlyActivity) {
+    if (inReportId == rptMarketRevenueHourlyActivity)
+    {
         arrayObject = getReportObject_MarketRevenueHourlyActivity();
     }
 
-    if (inReportId == rptUserActivity) {
+    if (inReportId == rptUserActivity)
+    {
         arrayObject = getReportObject_UserActivity();
     }
 
-    if (inReportId == rptUserActivityDetail) {
+    if (inReportId == rptUserActivityDetail)
+    {
         arrayObject = getReportObject_UserActivityDetail();
     }
 
-    if (inReportId == rptUserQuerySummary) {
+    if (inReportId == rptUserQuerySummary)
+    {
         arrayObject = getReportObject_UserQuerySummary();
     }
-    if (inReportId == rptUserQuerySummaryByOwner) {
+
+    if (inReportId == rptUserQuerySummaryByOwner)
+    {
         arrayObject = getReportObject_UserQuerySummaryByOwner();
     }
+
+    if (inReportId == rptUserListing)
+    {
+        arrayObject = getReportObject_UserListing();
+    }
+
+    if (inReportId == rptTraining)
+    {
+        arrayObject = getReportObject_Training();
+    }
+
+    if (inReportId == rptAEStatus)
+    {
+        arrayObject = getReportObject_AEStatus();
+    }
+
+    if (inReportId == rptNationwideRecipients)
+    {
+        arrayObject = getReportObject_NationwideRecipients();
+    }
+
+    if (inReportId == rptNewUserListing)
+    {
+        arrayObject = getReportObject_NewUserListing();
+    }
+
+    if (inReportId == rptStationChangeHistory)
+    {
+        arrayObject = getReportObject_StationChangeHistory();
+    }
+
+    if (inReportId == rptMarketRevenueXRay)
+    {
+        arrayObject = getReportObject_MarketRevenueXRay();
+    }
+
+    if (inReportId == rptStationListing)
+    {
+        arrayObject = getReportObject_StationListing();
+    }
+
+    if (inReportId == rptMarketDelivery)
+    {
+        arrayObject = getReportObject_MarketDelivery();
+    }
+
+    if (inReportId == rptTVBUserListing)
+    {
+        arrayObject = getReportObject_TVBUserListing();
+    }
+
     return arrayObject;
 }
 function getReportFilterArray(inReportId) {
@@ -123,6 +211,47 @@ function getReportFilterArray(inReportId) {
     if (inReportId == rptUserQuerySummaryByOwner) {
         arrayFilters = getReportFilterArray_UserQuerySummaryByOwner();
     }
+
+    if (inReportId == rptUserListing) {
+        arrayFilters = getReportFilterArray_UserListing();
+    }
+
+    if (inReportId == rptTraining) {
+        arrayFilters = getReportFilterArray_Training();
+    }
+
+    if (inReportId == rptAEStatus) {
+        arrayFilters = getReportFilterArray_AEStatus();
+    }
+
+    if (inReportId == rptNationwideRecipients) {
+        arrayFilters = getReportFilterArray_NationwideRecipients();
+    }
+
+    if (inReportId == rptNewUserListing) {
+        arrayFilters = getReportFilterArray_NewUserListing();
+    }
+
+    if (inReportId == rptStationChangeHistory) {
+        arrayFilters = getReportFilterArray_StationChangeHistory();
+    }
+
+    if (inReportId == rptMarketRevenueXRay) {
+        arrayFilters = getReportFilterArray_MarketRevenueXRay();
+    }
+
+    if (inReportId == rptStationListing) {
+        arrayFilters = getReportFilterArray_StationListing();
+    }
+
+    if (inReportId == rptMarketDelivery) {
+        arrayFilters = getReportFilterArray_MarketDelivery();
+    }
+
+    if (inReportId == rptTVBUserListing) {
+        arrayFilters = getReportFilterArray_TVBUserListing();
+    }
+
     return arrayFilters;
 }
 
@@ -470,7 +599,6 @@ function getReportObject_MarketRevenueHourlyActivity() {
 
 }
 
-
 // rptUserActivity
 function getReportFilterArray_UserActivity() {
 
@@ -737,3 +865,677 @@ function getReportObject_UserQuerySummaryByOwner() {
     return tempObject;
 
 }
+// rptUserListing
+function getReportFilterArray_UserListing() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    //arrayObject = {
+    //    token: "StartDate",
+    //    jsCall: null,
+    //    objectName: "dtStartDate",
+    //    required: true
+    //}
+    //arrayFilters.push(arrayObject);
+
+    //arrayObject = {
+    //    token: "EndDate",
+    //    jsCall: null,
+    //    objectName: "dtEndDate",
+    //    required: true
+    //}
+    //arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_UserListing() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("AccessLevel");
+    columnsToDisplay.push("FirstName");
+    columnsToDisplay.push("LastName");
+    columnsToDisplay.push("Email");
+    columnsToDisplay.push("Phone");
+    columnsToDisplay.push("Position");
+    columnsToDisplay.push("MarketName");
+    columnsToDisplay.push("OwnerName");
+
+    tempObject =
+    {
+        id: rptUserListing,
+        reportTitle: "User Listing",
+        apiControllerAction: "/api/PersonnelReport/GetUserListing",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ''
+    }
+
+    return tempObject;
+
+}
+
+//-----------------------
+// controllers not done
+//------------------------
+// rptAEStatus
+function getReportFilterArray_AEStatus() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketList",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+ 
+    return arrayFilters;
+}
+function getReportObject_AEStatus() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("AE_AEID");
+    columnsToDisplay.push("AE_NAME");
+    columnsToDisplay.push("SA_PersonnelID");
+    columnsToDisplay.push("SA_Primary");
+    columnsToDisplay.push("AE Status");
+    columnsToDisplay.push("User_Name");
+    columnsToDisplay.push("User Status");
+    columnsToDisplay.push("Last Activity");
+
+    tempObject =
+    {
+        id: rptAEStatus,
+        reportTitle: "XRay - Account Executive Status",
+        apiControllerAction: "/api/XRAYReport/GetAEStatus",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry'
+    }
+
+    return tempObject;
+
+}
+
+// rptMarketDelivery
+function getReportFilterArray_MarketDelivery() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_MarketDelivery() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("MarketID");
+    columnsToDisplay.push("OwnerID");
+    columnsToDisplay.push("Period");
+    columnsToDisplay.push("Revision");
+    columnsToDisplay.push("MRRReleased");
+    columnsToDisplay.push("XRYReleased");
+    columnsToDisplay.push("MarketName");
+    columnsToDisplay.push("OwnerName");
+    columnsToDisplay.push("PeriodDisplay");
+
+    tempObject =
+    {
+        id: rptMarketDelivery,
+        reportTitle: "Market Delivery",
+        apiControllerAction: "/api/XRAYReport/GetUserQuerySummaryByOwner",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ''
+    }
+
+    return tempObject;
+
+}
+
+
+// rptTVBUserListing
+function getReportFilterArray_TVBUserListing() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_TVBUserListing() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("AccessLevel");
+    columnsToDisplay.push("FirstName");
+    columnsToDisplay.push("LastName");
+    columnsToDisplay.push("Email");
+    columnsToDisplay.push("Phone");
+    columnsToDisplay.push("Position");
+    columnsToDisplay.push("MarketName");
+    columnsToDisplay.push("OwnerName");
+
+    tempObject =
+    {
+        id: rptUserQuerySummaryByOwner,
+        reportTitle: "TVB User Listing",
+        apiControllerAction: "/api/TVBReport/GetUserListing",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'tvb'
+    }
+
+    return tempObject;
+
+}
+
+
+// rptNewUserListing
+function getReportFilterArray_NewUserListing() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_NewUserListing() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("PersonnelID");
+    columnsToDisplay.push("DateAdded");
+    columnsToDisplay.push("FirstName");
+    columnsToDisplay.push("LastName");
+    columnsToDisplay.push("Email");
+    columnsToDisplay.push("PositionName");
+    columnsToDisplay.push("MarketID");
+    columnsToDisplay.push("MarketName");
+    columnsToDisplay.push("OwnerID");
+    columnsToDisplay.push("OwnerName");
+    columnsToDisplay.push("LoggedIn");
+    columnsToDisplay.push("QueriesRun");
+
+
+    tempObject =
+    {
+        id: rptUserQuerySummaryByOwner,
+        reportTitle: "New User Listing",
+        apiControllerAction: "/api/XRAYReport/GetNewUserListing",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ''
+    }
+
+    return tempObject;
+
+}
+
+// rptStationListing
+function getReportFilterArray_StationListing() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_StationListing() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("ProductID");
+    columnsToDisplay.push("MarketID");
+    columnsToDisplay.push("MarketName");
+    columnsToDisplay.push("OwnerID");
+    columnsToDisplay.push("OwnerName");
+    columnsToDisplay.push("StationID");
+    columnsToDisplay.push("StationName");
+    columnsToDisplay.push("FormatName");
+    columnsToDisplay.push("ActiveDate");
+    columnsToDisplay.push("DisableDate");
+    columnsToDisplay.push("ClientID");
+
+    tempObject =
+    {
+        id: rptUserQuerySummaryByOwner,
+        reportTitle: "Station Listing",
+        apiControllerAction: "/api/StationReport/GetStationListing",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ''
+    }
+
+    return tempObject;
+
+}
+
+//-----------------------
+// FrontEnd not done
+//------------------------
+
+
+
+// rptTraining
+function getReportFilterArray_Training() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_Training() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("MarketID");
+    columnsToDisplay.push("MarketName");
+    columnsToDisplay.push("OwnerID");
+    columnsToDisplay.push("OwnerName");
+    columnsToDisplay.push("NumberUsers");
+    columnsToDisplay.push("QueryName");
+    columnsToDisplay.push("NumberUsersThisQuery");
+    columnsToDisplay.push("NumberRequests");
+
+    tempObject =
+    {
+        id: rptUserQuerySummaryByOwner,
+        reportTitle: "XRay Query Summary - By Owner",
+        apiControllerAction: "/api/XRAYReport/GetUserQuerySummaryByOwner",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry'
+    }
+
+    return tempObject;
+
+}
+
+
+// rptNationwideRecipents
+function getReportFilterArray_NationwideRecipients() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_NationwideRecipients() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("MarketID");
+    columnsToDisplay.push("MarketName");
+    columnsToDisplay.push("OwnerID");
+    columnsToDisplay.push("OwnerName");
+    columnsToDisplay.push("NumberUsers");
+    columnsToDisplay.push("QueryName");
+    columnsToDisplay.push("NumberUsersThisQuery");
+    columnsToDisplay.push("NumberRequests");
+
+    tempObject =
+    {
+        id: rptUserQuerySummaryByOwner,
+        reportTitle: "XRay Query Summary - By Owner",
+        apiControllerAction: "/api/XRAYReport/GetUserQuerySummaryByOwner",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry'
+    }
+
+    return tempObject;
+
+}
+
+
+// rptStationChangeHistory
+function getReportFilterArray_StationChangeHistory() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_StationChangeHistory() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("MarketID");
+    columnsToDisplay.push("MarketName");
+    columnsToDisplay.push("OwnerID");
+    columnsToDisplay.push("OwnerName");
+    columnsToDisplay.push("NumberUsers");
+    columnsToDisplay.push("QueryName");
+    columnsToDisplay.push("NumberUsersThisQuery");
+    columnsToDisplay.push("NumberRequests");
+
+    tempObject =
+    {
+        id: rptUserQuerySummaryByOwner,
+        reportTitle: "XRay Query Summary - By Owner",
+        apiControllerAction: "/api/XRAYReport/GetUserQuerySummaryByOwner",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry'
+    }
+
+    return tempObject;
+
+}
+
+// rptMarketRevenueXRay
+function getReportFilterArray_MarketRevenueXRay() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MarketRevenueXRay() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("MarketID");
+    columnsToDisplay.push("MarketName");
+    columnsToDisplay.push("OwnerID");
+    columnsToDisplay.push("OwnerName");
+    columnsToDisplay.push("NumberUsers");
+    columnsToDisplay.push("QueryName");
+    columnsToDisplay.push("NumberUsersThisQuery");
+    columnsToDisplay.push("NumberRequests");
+
+    tempObject =
+    {
+        id: rptUserQuerySummaryByOwner,
+        reportTitle: "XRay Query Summary - By Owner",
+        apiControllerAction: "/api/XRAYReport/GetUserQuerySummaryByOwner",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry'
+    }
+
+    return tempObject;
+
+}
+
+
+
+
+
+
