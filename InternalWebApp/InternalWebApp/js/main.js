@@ -454,12 +454,14 @@ function goBackToDashboard() {
 
 function MKAErrorMessageRtn(message, url)
 {
+
     var newMessage = "";
     if (message.toLowerCase().indexOf('token is invalid') > -1)
     {
+        newMessage = "Your Token has expired - Please login again";
         bootbox.alert(newMessage, function ()
         {
-            window.location = "login.html";
+            window.location = "/login.html";
         });
     }
     else if (message.toLowerCase().indexOf('authentication failed') > -1)
