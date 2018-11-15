@@ -10,6 +10,8 @@ function getSearchData(searchCriteria) {
     //make api call can return the data
     //turn into json that the datatable can understand
     //console.log(searchCriteria);
+    
+    
 
     switch (searchCriteria["searchToken"].toUpperCase()) {
         case "STATIONMARKET":
@@ -300,6 +302,7 @@ function buildAdvertiserSearch(searchCriteria) {
     }
     api = "/api/Advertiser/GetAdvertiserList";
 
+    columns = [];
     //setup the columns to be used in the datatable
     //title sets the column name
     //visible determines if the column will show in the datatable or not
@@ -365,6 +368,8 @@ function buildAgencySearch(searchCriteria) {
     }
     api = "/api/Agency/GetAgencyList";
 
+    columns = [];
+
     columns.push({
         "sTitle": "AgencyID",
         "bVisible": false,
@@ -426,6 +431,8 @@ function buildParentAdvertiserSearch(searchCriteria) {
     }
     api = "/api/ParentAdvertiser/GetParentAdvertiserList";
 
+    columns = [];
+
     columns.push({
         "title": "ParentAdvertiserID",
         "visible": false,
@@ -463,6 +470,7 @@ function buildParentAdvertiserSearch(searchCriteria) {
 
     //need to document this more
     $("#previousPage").html(searchCriteria["advertiserName"]);
+
 }
 
 function buildLinkAdvertiserSearch(searchCriteria) {
@@ -493,6 +501,8 @@ function buildLinkAdvertiserSearch(searchCriteria) {
     //data links the column to the data that comes back in the results
     //orderable determines if the column can be sorted or not
     //see https://datatables.net/reference/option/columns
+    columns = [];
+
     columns.push({
         "title": "AdvertiserID",
         "visible": false,
@@ -529,4 +539,5 @@ function buildLinkAdvertiserSearch(searchCriteria) {
     });
 
     $("#previousPage").html(searchCriteria["advertiserName"]);
+
 }
