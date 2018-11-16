@@ -932,10 +932,6 @@ function getReportObject_UserListing() {
     return tempObject;
 
 }
-
-//-----------------------
-// controllers not done
-//------------------------
 // rptAEStatus
 function getReportFilterArray_AEStatus() {
 
@@ -958,7 +954,7 @@ function getReportObject_AEStatus() {
 
     columnsToDisplay = new Array();
     columnsToDisplay.push("AE_AEID");
-    columnsToDisplay.push("AE_NAME");
+    columnsToDisplay.push("AE Name");
     columnsToDisplay.push("SA_PersonnelID");
     columnsToDisplay.push("SA_Primary");
     columnsToDisplay.push("AE Status");
@@ -970,7 +966,7 @@ function getReportObject_AEStatus() {
     {
         id: rptAEStatus,
         reportTitle: "XRay - Account Executive Status",
-        apiControllerAction: "/api/XRAYReport/GetAEStatus",
+        apiControllerAction: "/api/AccountExecutiveReport/GetAEStatus",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'xry'
@@ -1031,9 +1027,9 @@ function getReportObject_MarketDelivery() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("MarketID");
-    columnsToDisplay.push("OwnerID");
-    columnsToDisplay.push("Period");
+    ////columnsToDisplay.push("MarketID");
+    ////columnsToDisplay.push("OwnerID");
+    //columnsToDisplay.push("Period");
     columnsToDisplay.push("Revision");
     columnsToDisplay.push("MRRReleased");
     columnsToDisplay.push("XRYReleased");
@@ -1045,7 +1041,7 @@ function getReportObject_MarketDelivery() {
     {
         id: rptMarketDelivery,
         reportTitle: "Market Delivery",
-        apiControllerAction: "/api/XRAYReport/GetUserQuerySummaryByOwner",
+        apiControllerAction: "/api/MarketReport/GetMarketDelivery",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ''
@@ -1054,8 +1050,6 @@ function getReportObject_MarketDelivery() {
     return tempObject;
 
 }
-
-
 // rptTVBUserListing
 function getReportFilterArray_TVBUserListing() {
 
@@ -1097,9 +1091,9 @@ function getReportObject_TVBUserListing() {
 
     tempObject =
     {
-        id: rptUserQuerySummaryByOwner,
+        id: rptTVBUserListing,
         reportTitle: "TVB User Listing",
-        apiControllerAction: "/api/TVBReport/GetUserListing",
+        apiControllerAction: "/api/TVBReport/GetTVBUserListing",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'tvb'
@@ -1108,8 +1102,6 @@ function getReportObject_TVBUserListing() {
     return tempObject;
 
 }
-
-
 // rptNewUserListing
 function getReportFilterArray_NewUserListing() {
 
@@ -1171,9 +1163,9 @@ function getReportObject_NewUserListing() {
 
     tempObject =
     {
-        id: rptUserQuerySummaryByOwner,
+        id: rptNewUserListing,
         reportTitle: "New User Listing",
-        apiControllerAction: "/api/XRAYReport/GetNewUserListing",
+        apiControllerAction: "/api/PersonnelReport/GetNewUserListing",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ''
@@ -1182,6 +1174,17 @@ function getReportObject_NewUserListing() {
     return tempObject;
 
 }
+
+//-----------------------
+// controllers not done
+//------------------------
+
+
+
+
+
+
+
 
 // rptStationListing
 function getReportFilterArray_StationListing() {

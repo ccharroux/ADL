@@ -85,6 +85,10 @@
                 <div class="row search-section">
                     <div class="col-md-12 ">
                         <div class="form-group" style="display:table-cell">
+                            <label for="ddlProduct" class="dropdown-label rptView rptProduct">Product</label>
+                            <select id="ddlProduct" apiInput="inProductId" class="dropdown-select rptView rptProduct"></select>
+                        </div>
+                        <div class="form-group" style="display:table-cell">
                             <label for="ddlMarket" class="dropdown-label rptView rptMarket">Market</label>
                             <select id="ddlMarket" apiInput="inMarketId" class="dropdown-select rptView rptMarket"></select>
                         </div>
@@ -181,11 +185,20 @@
     var columnsToExport = new Array();
     var reportId = 0;
 
+    var startDate = "";
+    var endDate = "";
 
     $(document).ready(function () {
 
         //var outReportArray = buildReportArray();
         //console.log(outReportArray);
+        var d = new Date();
+        var currentMonth = d.getMonth() + 1;
+        var currentYear = d.getFullYear();
+        var lastDayOfTheMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+
+        document.getElementById('dtStartDate').value = (currentMonth + "/01/" + currentYear);
+        document.getElementById('dtEndDate').value = (currentMonth + "/" + lastDayOfTheMonth.getDate() + "/" + currentYear);
 
         reportId = getParameterByName("reportId");
 
@@ -304,7 +317,47 @@
         }
         $("#ddlPeriod").html(str);
     }
+    function getProductList() {
 
+        $.ajax({
+            url: ServicePrefix + '/api/Product/GetProductList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")//,
+                //              "inStationName": $("#searchText").val(),
+//                "inActiveOnly": "1"//,
+                //             "inOwnerID": $("#ddlOwner").val() == 0 ? null : $("#ddlOwner").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Product</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].P_ProductID + '">' + data.report.rows[index].P_ProductName + '</option>';
+
+                    });
+
+                    $("#ddlProduct").html(str);
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
 
     function getStationList() {
 
@@ -549,7 +602,7 @@
     }
     function getTheReportAJAX()
     {
-      //  ServicePrefix = "http://localhost:54064";
+      //ServicePrefix = "http://localhost:54064";
 
 
         $.ajax({
