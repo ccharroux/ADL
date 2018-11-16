@@ -965,7 +965,7 @@ function getReportObject_AEStatus() {
     tempObject =
     {
         id: rptAEStatus,
-        reportTitle: "XRay - Account Executive Status",
+        reportTitle: "XRay Account Executive Status",
         apiControllerAction: "/api/AccountExecutiveReport/GetAEStatus",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -1377,17 +1377,6 @@ function getReportObject_StationChangeHistory() {
     return tempObject;
 
 }
-//-----------------------
-// controllers not done
-//------------------------
-
-
-//-----------------------
-// FrontEnd not done
-//------------------------
-
-
-
 
 // rptNationwideRecipents
 function getReportFilterArray_NationwideRecipients() {
@@ -1412,14 +1401,6 @@ function getReportFilterArray_NationwideRecipients() {
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getMarketList",
-        objectName: "ddlMarket",
-        required: false
-    }
-    arrayFilters.push(arrayObject);
-
-    arrayObject = {
         token: "Owner",
         jsCall: "getOwnerList",
         objectName: "ddlOwner",
@@ -1434,20 +1415,20 @@ function getReportObject_NationwideRecipients() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("MarketID");
-    columnsToDisplay.push("MarketName");
-    columnsToDisplay.push("OwnerID");
-    columnsToDisplay.push("OwnerName");
-    columnsToDisplay.push("NumberUsers");
-    columnsToDisplay.push("QueryName");
-    columnsToDisplay.push("NumberUsersThisQuery");
-    columnsToDisplay.push("NumberRequests");
+    columnsToDisplay.push("OwnerGroupID");
+    columnsToDisplay.push("OwnerGroupName");
+    columnsToDisplay.push("PersonnelID");
+    columnsToDisplay.push("Email");
+    columnsToDisplay.push("FirstName");
+    columnsToDisplay.push("LastName");
+    columnsToDisplay.push("FirstNationwideQuery");
+    columnsToDisplay.push("NationwideQueryCount");
 
     tempObject =
     {
-        id: rptUserQuerySummaryByOwner,
-        reportTitle: "XRay Query Summary - By Owner",
-        apiControllerAction: "/api/XRAYReport/GetUserQuerySummaryByOwner",
+        id: rptNationwideRecipients,
+        reportTitle: "XRay Nationwide Queries",
+        apiControllerAction: "/api/XRAYReport/GetNationwideRecipients",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'xry'
@@ -1457,36 +1438,35 @@ function getReportObject_NationwideRecipients() {
 
 }
 
-
-
-
 // rptMarketRevenueXRay
 function getReportFilterArray_MarketRevenueXRay() {
 
     var arrayFilters = new Array();
     var arrayObject = new Object();
-
+    arrayObject = new Object();
     arrayObject = {
-        token: "StartDate",
-        jsCall: null,
-        objectName: "dtStartDate",
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
         required: true
     }
     arrayFilters.push(arrayObject);
 
+    arrayObject = new Object();
     arrayObject = {
-        token: "EndDate",
-        jsCall: null,
-        objectName: "dtEndDate",
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
         required: true
     }
     arrayFilters.push(arrayObject);
+ 
 
     arrayObject = {
         token: "Market",
         jsCall: "getMarketList",
         objectName: "ddlMarket",
-        required: false
+        required: true
     }
     arrayFilters.push(arrayObject);
 
@@ -1505,28 +1485,35 @@ function getReportObject_MarketRevenueXRay() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("MarketID");
-    columnsToDisplay.push("MarketName");
-    columnsToDisplay.push("OwnerID");
-    columnsToDisplay.push("OwnerName");
-    columnsToDisplay.push("NumberUsers");
-    columnsToDisplay.push("QueryName");
-    columnsToDisplay.push("NumberUsersThisQuery");
-    columnsToDisplay.push("NumberRequests");
+    columnsToDisplay.push("RowName");
+    columnsToDisplay.push("RevenueClusterMRR");
+    columnsToDisplay.push("RevenueClusterXRY");
+    columnsToDisplay.push("RevenueClusterDifference");
+    columnsToDisplay.push("RevenueMarketMRR");
+    columnsToDisplay.push("RevenueMarketXRY");
+    columnsToDisplay.push("RevenueMarketDifference");
 
     tempObject =
     {
-        id: rptUserQuerySummaryByOwner,
-        reportTitle: "XRay Query Summary - By Owner",
-        apiControllerAction: "/api/XRAYReport/GetUserQuerySummaryByOwner",
+        id: rptMarketRevenueXRay,
+        reportTitle: "MRR / XRay Revenue Comparision",
+        apiControllerAction: "/api/Report/GetMarketRevenueRevenueXRay",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'xry'
+        product: ''
     }
 
     return tempObject;
 
 }
+
+
+ 
+
+
+
+
+
 
 
 
