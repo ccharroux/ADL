@@ -270,7 +270,7 @@ function getReportFilterArray_MRRMarketSummary()
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketList",
+        jsCall: "getMRRMarketList",
         objectName: "ddlMarket",
         required: true
     }
@@ -343,11 +343,10 @@ function getReportFilterArray_XRAYUsage() {
         objectName: "dtEndDate",
         required: true
     }
-    arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketList",
+        jsCall: "getXRYMarketList",
         objectName: "ddlMarket",
         required: false
     }
@@ -416,7 +415,7 @@ function getReportFilterArray_MRRUsage() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketList",
+        jsCall: "getMRRMarketList",
         objectName: "ddlMarket",
         required: false
     }
@@ -485,7 +484,7 @@ function getReportFilterArray_TVBUsage() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketList",
+        jsCall: "getTVBMarketList",
         objectName: "ddlMarket",
         required: false
     }
@@ -554,7 +553,7 @@ function getReportFilterArray_MarketRevenueHourlyActivity() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketList",
+        jsCall: "getMRRMarketList",
         objectName: "ddlMarket",
         required: false
     }
@@ -623,7 +622,7 @@ function getReportFilterArray_UserActivity() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketList",
+        jsCall: "getXRyMarketList",
         objectName: "ddlMarket",
         required: false
     }
@@ -692,7 +691,7 @@ function getReportFilterArray_UserActivityDetail() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketList",
+        jsCall: "getXRYMarketList",
         objectName: "ddlMarket",
         required: false
     }
@@ -760,7 +759,7 @@ function getReportFilterArray_UserQuerySummary() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketList",
+        jsCall: "getXRYMarketList",
         objectName: "ddlMarket",
         required: false
     }
@@ -822,7 +821,6 @@ function getReportFilterArray_UserQuerySummaryByOwner() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketList",
         objectName: "ddlMarket",
         required: false
     }
@@ -889,7 +887,7 @@ function getReportFilterArray_UserListing() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketList",
+        jsCall: "getMarketListAll",
         objectName: "ddlMarket",
         required: false
     }
@@ -940,7 +938,7 @@ function getReportFilterArray_AEStatus() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketList",
+        jsCall: "getXRYMarketList",
         objectName: "ddlMarket",
         required: true
     }
@@ -1000,7 +998,7 @@ function getReportFilterArray_MarketDelivery() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketList",
+        jsCall: "getMarketListAll",
         objectName: "ddlMarket",
         required: false
     }
@@ -1059,7 +1057,7 @@ function getReportFilterArray_TVBUserListing() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketList",
+        jsCall: "getTVBMarketList",
         objectName: "ddlMarket",
         required: false
     }
@@ -1126,7 +1124,7 @@ function getReportFilterArray_NewUserListing() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketList",
+        jsCall: "getMarketListAll",
         objectName: "ddlMarket",
         required: false
     }
@@ -1189,7 +1187,7 @@ function getReportFilterArray_StationListing() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketList",
+        jsCall: "getMarketListAll",
         objectName: "ddlMarket",
         required: false
     }
@@ -1260,7 +1258,7 @@ function getReportFilterArray_Training() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketList",
+        jsCall: "getMarketListAll",
         objectName: "ddlMarket",
         required: false
     }
@@ -1330,7 +1328,7 @@ function getReportFilterArray_StationChangeHistory() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketList",
+        jsCall: "getMarketListAll",
         objectName: "ddlMarket",
         required: false
     }
@@ -1464,7 +1462,7 @@ function getReportFilterArray_MarketRevenueXRay() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketList",
+        jsCall: "getMarketListAll",
         objectName: "ddlMarket",
         required: true
     }
