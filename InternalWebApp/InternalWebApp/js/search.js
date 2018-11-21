@@ -27,6 +27,9 @@ function getSearchData(searchCriteria) {
         case "LINKADV":
             buildLinkAdvertiserSearch(searchCriteria);
             break;
+        case "PERSONNEL":
+            buildPersonnelSearch(searchCriteria);
+            break;
         default:
     }
 
@@ -206,18 +209,31 @@ function fixAgency() {
 }
 
 function linkParentAdvertiserByLink(parentAdvertiserId) {
-    var rowId = $('#dtSearchResults').dataTable()
-        .fnFindCellRowIndexes(parentAdvertiserId, 0);
+
+    var rowId = $('#dtSearchResults').dataTable().fnFindCellRowIndexes(parentAdvertiserId, 0);
 
     //console.log(rowId);
 
     var table = $('#dtSearchResults').DataTable();
     table.row(rowId).select();
 
-    linkParentAdvertiser();
+    setTimeout(linkParentAdvertiser, 500);
+   
+}
+
+function linkPersonnelByLink(personnelId)
+{
+ 
+    var rowId = $('#dtSearchResults').dataTable().fnFindCellRowIndexes(personnelId, 0);
+
+    var table = $('#dtSearchResults').DataTable();
+    table.row(rowId).select();
+
+    setTimeout(linkPersonnel, 500);
 }
 
 function linkParentAdvertiser() {
+
     var searchTable = $('#dtSearchResults').DataTable();
     if (searchTable.rows('.selected').any() === false) {
         bootbox.alert('Select a parent advertiser to assign.', function () {
@@ -253,6 +269,33 @@ function linkNewAdvertiserByLink(advertiserId) {
     table.row(rowId).select();
 
     linkNewAdvertiser();
+}
+
+function linkPersonnel()
+{
+    var searchTable = $('#dtSearchResults').DataTable();
+
+    if (searchTable.rows('.selected').any() === false)
+    {
+        bootbox.alert('Select an person.', function () {});
+        return;
+    }
+
+    var rowData = searchTable.rows('.selected').data();
+    var searchResults = {};
+
+    for (var key in searchCriteria) {
+        searchResults[key] = searchCriteria[key];
+    }
+
+    searchResults["personnelId"] = rowData[0].personnelId;
+    searchResults["txtPersonnel"] = rowData[0].name;
+
+    setLocalStorage("gSearchResults", JSON.stringify(searchResults));
+
+    //sends user back to page that called the search page
+    var searchPage = searchCriteria["searchPage"]["href"];
+    window.location = searchPage;
 }
 
 function linkNewAdvertiser() {
@@ -472,7 +515,75 @@ function buildParentAdvertiserSearch(searchCriteria) {
     $("#previousPage").html(searchCriteria["advertiserName"]);
 
 }
+function buildPersonnelSearch(searchCriteria)
+{
+    //if ($('.search-all-markets:visible').is(':checked')) {
+    //    bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
+    //    });
+    //}
 
+ 
+
+    if ($('.search-text:visible').val().length > 0)
+    {
+        searchText = $('.search-text:visible').val();
+    }
+    else
+    {
+        searchText = searchCriteria["txtPersonnel"].length > 0 ? searchCriteria["txtPersonnel"] : "";
+    }
+
+    //setup the parameters for the API
+
+    apiParameters = {
+        "inApiToken": apiToken,
+        "inLastName": searchText
+    }
+    api = "/api/Personnel/GetPersonnelListLastName";
+
+    columns = [];
+
+    columns.push({
+        "title": "Name",
+        "visible": true,
+        "mData": "name",
+        "orderable": false
+    });
+
+    columns.push({
+        "title": "Email",
+        "visible": true,
+        "mData": "emailAddress",
+        "orderable": false
+    });
+
+    columns.push({
+        "title": "Personnel Id",
+        "visible": true,
+        "mData": "personnelId",
+        "orderable": false
+    });
+
+    columns.push({
+        "title": "Owner Name",
+        "visible" : true,
+        "mData": "ownerName",
+        "orderable": false
+    });
+
+    columns.push({
+        "mRender": function (data, type, row) {
+            return '<a href="#" onclick="linkPersonnelByLink(' + row.personnelId + ')">Select</a>';
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+
+    $("#previousPage").html(searchText.length == 0 ? "Person" : searchText);
+
+}
 function buildLinkAdvertiserSearch(searchCriteria) {
     if ($('.search-all-markets:visible').is(':checked')) {
         bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {

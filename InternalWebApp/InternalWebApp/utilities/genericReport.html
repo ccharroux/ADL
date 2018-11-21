@@ -100,6 +100,14 @@
                             <label for="ddlOwner" class="dropdown-label rptView rptOwner">Owner</label>
                             <select id="ddlOwner" apiInput="inOwnerId" class="dropdown-select rptView rptOwner"></select>
                         </div>
+                        <div class="form-group rptView rptPersonnel" style="display:table-cell">
+                            <div class="form-group" style="display:table-cell;">
+                                <label for="hidPersonnel" class="dropdown-label rptView rptPersonnel">Personnel</label>
+                                <input type="text" id="txtPersonnel"  onclick="getPersonnel()" readonly class="dropdown-select rptView rptPersonnel" />
+                                <input type="hidden" id="hidPersonnel" apiInput="inPersonnelId" class="dropdown-select rptView rptPersonnel" />
+                            </div>
+ 
+                        </div>
                         <div class="form-group" style="display:table-cell">
                             <label for="ddlYear" class="dropdown-label rptView rptYear">Year</label>
                             <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView rptYear"></select>
@@ -192,13 +200,9 @@
 
         //var outReportArray = buildReportArray();
         //console.log(outReportArray);
-        var d = new Date();
-        var currentMonth = d.getMonth() + 1;
-        var currentYear = d.getFullYear();
-        var lastDayOfTheMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0);
 
-        document.getElementById('dtStartDate').value = (currentMonth + "/01/" + currentYear);
-        document.getElementById('dtEndDate').value = (currentMonth + "/" + lastDayOfTheMonth.getDate() + "/" + currentYear);
+
+        LoadDefaultDates();
 
         reportId = getParameterByName("reportId");
 
@@ -219,7 +223,6 @@
         // get report objects
         reportObject = getReportObject(reportId);
         reportFilterArray = getReportFilterArray(reportId);
- 
 
         if (reportObject.apiControllerAction == null)
         {
@@ -246,9 +249,72 @@
 
         // display filters
         displayFilters(reportFilterArray);
+
+        loadAdvancedSearch();
         
     });
 
+    function loadAdvancedSearch()
+    {
+
+        var searchResults = getLocalStorage("gSearchResults");
+ 
+
+        if (!searchResults)
+        {
+            return;
+        }
+
+        var searchCriteria = $.parseJSON(searchResults);
+
+        if (searchCriteria["searchToken"] == "PERSONNEL")
+        {
+
+            // load newly found data
+            $("#txtPersonnel").val(searchCriteria["txtPersonnel"]);
+            $("#hidPersonnel").val(searchCriteria["personnelId"]);
+
+            // clear out the storage
+            searchCriteria["txtPersonnel"] = "";
+            searchCriteria["personnelId"] = "";
+
+            // save it
+            setLocalStorage("gSearchResults", JSON.stringify(searchCriteria));
+
+
+            $("#ddlMarket").val(searchCriteria["ddlMarket"]);
+            $("#ddlOwner").val(searchCriteria["ddlOwner"]);
+        }
+
+    }
+
+    function saveLoadedControlSelection(control)
+    {
+        var searchResults = getLocalStorage("gSearchResults");
+
+        if (!searchResults) {
+            return;
+        }
+
+        var searchCriteria = $.parseJSON(searchResults);
+        $("#" + control).val(searchCriteria[control]);
+
+    }
+
+    function LoadDefaultDates()
+    {
+        var d = new Date();
+        var currentMonth = d.getMonth() + 1;
+        var currentYear = d.getFullYear();
+        var lastDayOfTheMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+
+        $("#dtStartDate").val(currentMonth + "/01/" + currentYear);
+        $("#dtEndDate").val(currentMonth + "/" + lastDayOfTheMonth.getDate() + "/" + currentYear);
+
+        saveLoadedControlSelection("dtStartDate");
+        saveLoadedControlSelection("dtEndDate");
+
+    }
     function displayFilters(arrayFilters)
     {
        // console.log(arrayFilters);
@@ -258,7 +324,7 @@
 
         for (var i = 0; i < arrayFilters.length; i++)
         {
-           // console.log(arrayFilters[i]);
+            console.log(arrayFilters[i]);
             activateFilter(arrayFilters[i]);
         }
 
@@ -295,8 +361,31 @@
         }
 
         $("#ddlYear").html(str);
+        saveLoadedControlSelection("ddlYear");
     }
 
+    function getPersonnel()
+    {
+
+
+        var searchCriteriaObj = {
+            "searchToken": "PERSONNEL",
+            "ddlProduct": $("#ddlProduct").val(),
+            "ddlMarket": $("#ddlMarket").val(),
+            "ddlStation": $("#ddlStation").val(),
+            "ddlOwner": $("#ddlOwner").val(),
+            "ddlYear": $("#ddlYear").val(),
+            "ddlPeriod": $("#ddlPeriod").val(),
+            "dtStartDate": $("#dtStartDate").val(),
+            "dtEndDate": $("#dtEndDate").val(),
+            "txtPersonnel": $("#txtPersonnel").html(),
+            "searchPage": window.location
+        }
+
+        setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
+
+        window.location = "/utilities/search.html";
+    }
 
     function getPeriodList() {
 
@@ -316,6 +405,7 @@
             str = str + '<option value="Q' + i.toString() + '">Quarter - ' + i.toString() + '</option>';
         }
         $("#ddlPeriod").html(str);
+        saveLoadedControlSelection("ddlPeriod");
     }
     function getProductList() {
 
@@ -347,7 +437,7 @@
                     });
 
                     $("#ddlProduct").html(str);
-
+                    saveLoadedControlSelection("ddlProduct");
                 }
 
 
@@ -389,6 +479,7 @@
                     });
 
                     $("#ddlStation").html(str);
+                    saveLoadedControlSelection("ddlStation");
 
                 }
 
@@ -445,6 +536,7 @@
                     });
 
                     $("#ddlMarket").html(str);
+                    saveLoadedControlSelection("ddlMarket");
 
                 }
 
@@ -485,7 +577,7 @@
                     });
 
                     $("#ddlMarket").html(str);
-
+                    saveLoadedControlSelection("ddlMarket");
                 }
 
 
@@ -527,12 +619,12 @@
 
                     $.each(data.report.rows, function (index) {
                         var obj = data.report.rows[index];
-                        str = "<option value='" + obj.OwnerID + "'>" + obj.OwnerName + "</option>";
-                        $("#ddlOwner").append(str);
+                        str = str + "<option value='" + obj.OwnerID + "'>" + obj.OwnerName + "</option>";
+
                     });
 
-  
-
+                    $("#ddlOwner").append(str);
+                    saveLoadedControlSelection("ddlOwner");
                 }
 
             },
@@ -550,8 +642,75 @@
     //----------------------
     // BEGIN: load of the reports and supporting routines
     //---------------------
+    function getReport()
+    {
 
-    function getReport() {
+        $("#noDataFound").hide();
+
+        api = reportObject.apiControllerAction;
+        apiParameters = new Object();
+        apiToken = getLocalStorage("APIToken");
+        searchText = "";
+        columns = [];
+
+        //------------------------
+        //setup the parameters for the API
+        //------------------------
+
+        if (reportObject.apiType.toLowerCase() == "post") {
+            apiParameters["inApiToken"] = apiToken;
+        }
+        else {
+            api = api + "?inApiToken=" + apiToken;
+        }
+
+        //------------------------
+        // loop thru filters
+        //------------------------
+        var itemsToCheckLength = reportFilterArray.length;
+        $.each(reportFilterArray, function (objectName, objectValue)
+        {
+            console.log(JSON.stringify(objectName));
+            var control = objectValue.objectName;
+
+
+            var nameOfParm = $("#" + control).attr("apiInput");
+            var item = "#" + control;
+            var isRequired = objectValue.required;
+
+            //if ($(item).prop("tagName") == "SELECT") {
+
+            if ($(item).val() != "") {
+                if (reportObject.apiType.toLowerCase() == "post") {
+                    apiParameters[nameOfParm] = $(item).val();
+                }
+                else {
+                    api = api + "&" + nameOfParm + "=" + $(item).val();
+                }
+
+            }
+            else {
+                if (isRequired) {
+                    var msg = "Please select a " + nameOfParm.toLowerCase().replace("in", "").replace("id", "");
+                    bootbox.alert(msg, function () { });
+                    return false;
+                }
+            }
+
+            // when done with the loop
+            // get the report
+            if (objectName == (itemsToCheckLength - 1)) {
+                getTheReportAJAX();
+            }
+
+        });
+
+
+
+
+
+    }
+    function getReportOld() {
 
         $("#noDataFound").hide();
 
@@ -582,65 +741,64 @@
         {
             if ($(item).is(":visible"))
             {
-              //  console.log($(item).prop("tagName"));
+                console.log($(item).prop("tagName"));
 
-                if ($(item).prop("tagName") != "LABEL")
+                if ($(item).prop("tagName") != "LABEL" && 
+                    $(item).prop("tagName") != "DIV")
                 {
                     var nameOfParm = $(item).attr("apiInput");
-                    var control = $(item).attr("Id");
 
-                    var isRequired = false;
-
-                    $.each(reportFilterArray, function (objectName, objectValue)
+                    if (nameOfParm != undefined)
                     {
-                        if (control.toLowerCase() == objectValue.objectName.toLowerCase()) {
-                            isRequired = objectValue.required;
-                        }
-                    });
+                        var control = $(item).attr("Id");
+
+                        var isRequired = false;
+
+                        $.each(reportFilterArray, function (objectName, objectValue) {
+                            if (control.toString().toLowerCase() == objectValue.objectName.toString().toLowerCase()) {
+                                isRequired = objectValue.required;
+                            }
+                        });
 
 
-                    if ($(item).prop("tagName") == "SELECT")
-                    {
-                        if ($(item).val() != "")
-                        {
-                            if (reportObject.apiType.toLowerCase() == "post")
-                            {
-                                apiParameters[nameOfParm] = $(item).val();
+                        if ($(item).prop("tagName") == "SELECT") {
+                            if ($(item).val() != "") {
+                                if (reportObject.apiType.toLowerCase() == "post") {
+                                    apiParameters[nameOfParm] = $(item).val();
+                                }
+                                else {
+                                    api = api + "&" + nameOfParm + "=" + $(item).val();
+                                }
+
                             }
                             else {
-                                api = api + "&" + nameOfParm + "=" + $(item).val();
+                                if (isRequired) {
+                                    var msg = "Please select a " + nameOfParm.toLowerCase().replace("in", "").replace("id", "");
+                                    bootbox.alert(msg, function () { });
+                                    return false;
+                                }
                             }
-
                         }
-                        else
-                        {
-                            if (isRequired) {
-                                var msg = "Please select a " + nameOfParm.toLowerCase().replace("in", "").replace("id", "");
-                                bootbox.alert(msg, function () { });
-                                return false;
+
+                        if ($(item).prop("tagName") == "INPUT") {
+                            if ($(item).val() != "") {
+                                if (reportObject.apiType.toLowerCase() == "post") {
+                                    apiParameters[nameOfParm] = $(item).val();
+                                }
+                                else {
+                                    api = api + "&" + nameOfParm + "=" + $(item).val();
+                                }
+
+                            }
+                            else {
+                                if (isRequired) {
+                                    var msg = "Please select a " + nameOfParm.toLowerCase().replace("in", "").replace("id", "");
+                                    bootbox.alert(msg, function () { });
+                                    return false;
+                                }
                             }
                         }
                     }
-
-                    if ($(item).prop("tagName") == "INPUT") {
-                        if ($(item).val() != "") {
-                            if (reportObject.apiType.toLowerCase() == "post") {
-                                apiParameters[nameOfParm] = $(item).val();
-                            }
-                            else {
-                                api = api + "&" + nameOfParm + "=" + $(item).val();
-                            }
-
-                        }
-                        else {
-                            if (isRequired) {
-                                var msg = "Please select a " + nameOfParm.toLowerCase().replace("in", "").replace("id", "");
-                                bootbox.alert(msg, function () { });
-                                return false;
-                            }
-                        }
-                    }
-
   
                 }
             }
@@ -663,7 +821,7 @@
         $.ajax({
             url: ServicePrefix + api,
             dataType: 'json',
-            type: reportObject.apiType.toLowerCase(),
+            type: reportObject.apiType.toString().toLowerCase(),
             contentType: 'application/json',
             data: JSON.stringify(apiParameters),
             processData: false,

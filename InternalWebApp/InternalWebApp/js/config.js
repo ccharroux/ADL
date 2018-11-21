@@ -1,5 +1,5 @@
 var gTimeToExpire = 6000; // seconds
-var ServicePrefix = "http://devservices.millerkaplan.com";
+var ServicePrefix = "https://devservices.millerkaplan.com";
 
 
 if (window.location.toString().toLowerCase().indexOf("devmediainternal.millerkaplan.com") > -1) {

@@ -622,7 +622,7 @@ function getReportFilterArray_UserActivity() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getXRyMarketList",
+        jsCall: "getXRYMarketList",
         objectName: "ddlMarket",
         required: false
     }
@@ -821,6 +821,7 @@ function getReportFilterArray_UserQuerySummaryByOwner() {
 
     arrayObject = {
         token: "Market",
+        jsCall: "getXRYMarketList",
         objectName: "ddlMarket",
         required: false
     }
@@ -869,26 +870,18 @@ function getReportFilterArray_UserListing() {
     var arrayFilters = new Array();
     var arrayObject = new Object();
 
-    //arrayObject = {
-    //    token: "StartDate",
-    //    jsCall: null,
-    //    objectName: "dtStartDate",
-    //    required: true
-    //}
-    //arrayFilters.push(arrayObject);
-
-    //arrayObject = {
-    //    token: "EndDate",
-    //    jsCall: null,
-    //    objectName: "dtEndDate",
-    //    required: true
-    //}
-    //arrayFilters.push(arrayObject);
-
     arrayObject = {
         token: "Market",
         jsCall: "getMarketListAll",
         objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Personnel",
+        jsCall: null,
+        objectName: "hidPersonnel",
         required: false
     }
     arrayFilters.push(arrayObject);
