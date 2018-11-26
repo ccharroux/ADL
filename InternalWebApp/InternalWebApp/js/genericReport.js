@@ -1,3 +1,8 @@
+
+
+var reportObjectArray = new Array();
+var reportFilterObjectArray = new Array();
+
 var ctr = 1
 const rptMRRMarketSummary = ctr
 
@@ -46,6 +51,11 @@ var rptParentOwnershipList = ctr;
 ctr++;
 var rptOwnershipList = ctr;
 
+// -- Stations
+ctr++;
+var rptActiveStationList = ctr;
+ctr++;
+var rptDisabledStationList = ctr;
 
 function buildReportArray()
 {
@@ -208,11 +218,19 @@ function getReportObject(inReportId)
         arrayObject = getReportObject_ParentOwnershipList();
         //
     }
+
+    if (inReportId == rptActiveStationList) {
+        arrayObject = getReportObject_ActiveStationList();
+    }
+
+    if (inReportId == rptDisabledStationList) {
+        arrayObject = getReportObject_DisabledStationList();
+    }
+
    // }
 
     return arrayObject;
 }
-
 function getReportFilterArray(inReportId) 
 {
 
@@ -346,6 +364,16 @@ function getReportFilterArray(inReportId)
         {
             arrayFilters = getReportFilterArray_OwnershipList();
             
+        }
+
+        if (inReportId == rptActiveStationList)
+        {
+            arrayFilters = getReportFilterArray_ActiveStationList();
+        }
+
+        if (inReportId == rptDisabledStationList)
+        {
+            arrayFilters = getReportFilterArray_DisabledStationList();
         }
     //}
 
@@ -1715,16 +1743,141 @@ function getReportObject_MarketRevenueXRay() {
 
 }
 
+// Active Station
+function getReportFilterArray_ActiveStationList() {
 
- 
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_ActiveStationList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("stationID");
+    columnsToDisplay.push("stationName");
+    columnsToDisplay.push("stationFullName");
+    columnsToDisplay.push("formatName");
+    columnsToDisplay.push("affiliationName");
+    columnsToDisplay.push("ownerName");
+    columnsToDisplay.push("marketName");
+    columnsToDisplay.push("stationClientNumber");
+    columnsToDisplay.push("stationNickname");
+    columnsToDisplay.push("productID");
+    columnsToDisplay.push("mrrManagerName");
 
 
+    tempObject =
+    {
+        id: rptActiveStationList,
+        reportTitle: "Active Stations",
+        apiControllerAction: "/api/StationReport/GetActiveStationListing",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'station'
+    }
 
+    return tempObject;
+}
 
+// Disabled Station
+function getReportFilterArray_DisabledStationList() {
 
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
 
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_DisabledStationList() {
 
+    var tempObject = new Object();
 
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("stationID");
+    columnsToDisplay.push("stationName");
+    columnsToDisplay.push("stationFullName");
+    columnsToDisplay.push("formatName");
+    columnsToDisplay.push("affiliationName");
+    columnsToDisplay.push("ownerName");
+    columnsToDisplay.push("marketName");
+    columnsToDisplay.push("stationClientNumber");
+    columnsToDisplay.push("stationNickname");
+    columnsToDisplay.push("productID");
+    columnsToDisplay.push("productDisableDate");
+
+    tempObject =
+    {
+        id: rptDisabledStationList,
+        reportTitle: "Disabled Stations",
+        apiControllerAction: "/api/StationReport/GetDisabledStationListing",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'station'
+    }
+
+    return tempObject;
+}
