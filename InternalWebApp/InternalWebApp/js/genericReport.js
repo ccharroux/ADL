@@ -1,5 +1,6 @@
 var ctr = 1
-var rptMRRMarketSummary = ctr
+const rptMRRMarketSummary = ctr
+
 ctr++;
 var rptXRAYUsage = ctr
 ctr++;
@@ -37,6 +38,15 @@ var rptMarketDelivery = ctr;
 ctr++;
 var rptTVBUserListing = ctr;
 
+// -- Parent Ownership
+ctr++;
+var rptParentOwnershipList = ctr;
+
+// -- Ownership
+ctr++;
+var rptOwnershipList = ctr;
+
+
 function buildReportArray()
 {
     var reportCounter = 1
@@ -70,187 +80,274 @@ function getReportObject(inReportId)
 
     var arrayObject = new Object();
 
+    //switch (inReportId)
+    //{
+    
     if (inReportId == rptMRRMarketSummary)
     {
         arrayObject = getReportObject_MRRMarketSummary();
+        //
     }
 
     if (inReportId == rptXRAYUsage)
     {
         arrayObject = getReportObject_XRAYUsage();
+        //
     }
 
-    if (inReportId == rptMRRUsage)
+    if (inReportId ==  rptMRRUsage)
     {
-        arrayObject = getReportObject_MRRUsage();
+        arrayObject = getReportObject_MRRUsage(); 
+        //
     }
 
-    if (inReportId == rptTVBUsage)
+    if (inReportId ==  rptTVBUsage)
     {
-        arrayObject = getReportObject_TVBUsage();
+        arrayObject = getReportObject_TVBUsage(); 
+        //
     }
 
-    if (inReportId == rptMarketRevenueHourlyActivity)
+    if (inReportId ==  rptMarketRevenueHourlyActivity)
     {
         arrayObject = getReportObject_MarketRevenueHourlyActivity();
+        //
     }
 
-    if (inReportId == rptUserActivity)
+    if (inReportId ==  rptUserActivity)
     {
         arrayObject = getReportObject_UserActivity();
+        //
     }
 
-    if (inReportId == rptUserActivityDetail)
+    if (inReportId ==  rptUserActivityDetail)
     {
         arrayObject = getReportObject_UserActivityDetail();
+        //
     }
 
-    if (inReportId == rptUserQuerySummary)
+    if (inReportId ==  rptUserQuerySummary)
     {
         arrayObject = getReportObject_UserQuerySummary();
+        //
     }
 
-    if (inReportId == rptUserQuerySummaryByOwner)
+    if (inReportId ==  rptUserQuerySummaryByOwner)
     {
         arrayObject = getReportObject_UserQuerySummaryByOwner();
+        //
     }
 
-    if (inReportId == rptUserListing)
+    if (inReportId ==  rptUserListing)
     {
         arrayObject = getReportObject_UserListing();
+        //
     }
 
-    if (inReportId == rptTraining)
+    if (inReportId ==  rptTraining)
     {
         arrayObject = getReportObject_Training();
+        //
     }
 
-    if (inReportId == rptAEStatus)
+    if (inReportId ==  rptAEStatus)
     {
         arrayObject = getReportObject_AEStatus();
+        //
     }
 
-    if (inReportId == rptNationwideRecipients)
+    if (inReportId ==  rptNationwideRecipients)
     {
         arrayObject = getReportObject_NationwideRecipients();
+        //
     }
 
-    if (inReportId == rptNewUserListing)
+    if (inReportId ==  rptNewUserListing)
     {
         arrayObject = getReportObject_NewUserListing();
+        //
     }
 
-    if (inReportId == rptStationChangeHistory)
+    if (inReportId ==  rptStationChangeHistory)
     {
         arrayObject = getReportObject_StationChangeHistory();
+        //
     }
 
-    if (inReportId == rptMarketRevenueXRay)
+    if (inReportId ==  rptMarketRevenueXRay)
     {
         arrayObject = getReportObject_MarketRevenueXRay();
+        //
     }
 
-    if (inReportId == rptStationListing)
+    if (inReportId ==  rptStationListing)
     {
         arrayObject = getReportObject_StationListing();
+        //
     }
 
-    if (inReportId == rptMarketDelivery)
+    if (inReportId ==  rptMarketDelivery)
     {
         arrayObject = getReportObject_MarketDelivery();
+        //
     }
 
-    if (inReportId == rptTVBUserListing)
+    if (inReportId ==  rptTVBUserListing)
     {
         arrayObject = getReportObject_TVBUserListing();
+        //
     }
+
+    if (inReportId == rptOwnershipList)
+    {
+        arrayObject = getReportObject_OwnershipList();
+        //
+    }
+
+    if (inReportId == rptParentOwnershipList)
+    {
+        arrayObject = getReportObject_ParentOwnershipList();
+        //
+    }
+   // }
 
     return arrayObject;
 }
-function getReportFilterArray(inReportId) {
+
+function getReportFilterArray(inReportId) 
+{
 
     var arrayFilters = new Array();
 
-    if (inReportId == rptMRRMarketSummary) {
-        arrayFilters = getReportFilterArray_MRRMarketSummary();
-    }
+    //switch (inReportId)
+    //{
+        if (inReportId ==  rptMRRMarketSummary)
+        {
+            arrayFilters = getReportFilterArray_MRRMarketSummary();
+            
+        }
 
-    if (inReportId == rptXRAYUsage)
-    {
-        arrayFilters = getReportFilterArray_XRAYUsage();
+        if (inReportId ==   rptXRAYUsage)
+        {
+            arrayFilters = getReportFilterArray_XRAYUsage();
+            
 
-    }
+        }
 
-    if (inReportId == rptMRRUsage) {
-        arrayFilters = getReportFilterArray_MRRUsage();
+        if (inReportId ==   rptMRRUsage) 
+        {
+            arrayFilters = getReportFilterArray_MRRUsage();
+            
+        }
 
-    }
+        if (inReportId ==   rptTVBUsage) 
+        {
+            arrayFilters = getReportFilterArray_TVBUsage();
+            
+        }
 
-    if (inReportId == rptTVBUsage) {
-        arrayFilters = getReportFilterArray_TVBUsage();
+        if (inReportId ==   rptMarketRevenueHourlyActivity)
+        {
+            arrayFilters = getReportFilterArray_MarketRevenueHourlyActivity();
+            
+        }
 
-    }
+        if (inReportId ==   rptUserActivity) 
+        {
+            arrayFilters = getReportFilterArray_UserActivity();
+            
+        }
 
-    if (inReportId == rptMarketRevenueHourlyActivity) {
-        arrayFilters = getReportFilterArray_MarketRevenueHourlyActivity();
-    }
+        if (inReportId ==   rptUserActivityDetail)
+        {
+            arrayFilters = getReportFilterArray_UserActivityDetail();
+            
+        }
 
-    if (inReportId == rptUserActivity) {
-        arrayFilters = getReportFilterArray_UserActivity();
-    }
-
-    if (inReportId == rptUserActivityDetail) {
-        arrayFilters = getReportFilterArray_UserActivityDetail();
-    }
-
-    if (inReportId == rptUserQuerySummary) {
-        arrayFilters = getReportFilterArray_UserQuerySummary();
-    }
+        if (inReportId ==   rptUserQuerySummary)
+        {
+            arrayFilters = getReportFilterArray_UserQuerySummary();
+            
+        }
 
 
-    if (inReportId == rptUserQuerySummaryByOwner) {
-        arrayFilters = getReportFilterArray_UserQuerySummaryByOwner();
-    }
+        if (inReportId ==  rptUserQuerySummaryByOwner)
+        {
+            arrayFilters = getReportFilterArray_UserQuerySummaryByOwner();
+            
+        }
 
-    if (inReportId == rptUserListing) {
-        arrayFilters = getReportFilterArray_UserListing();
-    }
+        if (inReportId ==  rptUserListing)
+        {
+            arrayFilters = getReportFilterArray_UserListing();
+            
+        }
 
-    if (inReportId == rptTraining) {
-        arrayFilters = getReportFilterArray_Training();
-    }
+        if (inReportId ==  rptTraining)
+        {
+            arrayFilters = getReportFilterArray_Training();
+            
+        }
 
-    if (inReportId == rptAEStatus) {
-        arrayFilters = getReportFilterArray_AEStatus();
-    }
+        if (inReportId ==  rptAEStatus)
+        {
+            arrayFilters = getReportFilterArray_AEStatus();
+            
+        }
 
-    if (inReportId == rptNationwideRecipients) {
-        arrayFilters = getReportFilterArray_NationwideRecipients();
-    }
+        if (inReportId ==  rptNationwideRecipients)
+        {
+            arrayFilters = getReportFilterArray_NationwideRecipients();
+            
+        }
 
-    if (inReportId == rptNewUserListing) {
-        arrayFilters = getReportFilterArray_NewUserListing();
-    }
+        if (inReportId ==  rptNewUserListing)
+        {
+            arrayFilters = getReportFilterArray_NewUserListing();
+            
+        }
 
-    if (inReportId == rptStationChangeHistory) {
-        arrayFilters = getReportFilterArray_StationChangeHistory();
-    }
+        if (inReportId ==  rptStationChangeHistory)
+        {
+            arrayFilters = getReportFilterArray_StationChangeHistory();
+            
+        }
 
-    if (inReportId == rptMarketRevenueXRay) {
-        arrayFilters = getReportFilterArray_MarketRevenueXRay();
-    }
+        if (inReportId ==  rptMarketRevenueXRay)
+        {
+            arrayFilters = getReportFilterArray_MarketRevenueXRay();
+            
+        }
 
-    if (inReportId == rptStationListing) {
-        arrayFilters = getReportFilterArray_StationListing();
-    }
+        if (inReportId ==  rptStationListing)
+        {
+            arrayFilters = getReportFilterArray_StationListing();
+            
+        }
 
-    if (inReportId == rptMarketDelivery) {
-        arrayFilters = getReportFilterArray_MarketDelivery();
-    }
+        if (inReportId ==  rptMarketDelivery)
+        {
+            arrayFilters = getReportFilterArray_MarketDelivery();
+            
+        }
 
-    if (inReportId == rptTVBUserListing) {
-        arrayFilters = getReportFilterArray_TVBUserListing();
-    }
+        if (inReportId ==  rptTVBUserListing)
+        {
+            arrayFilters = getReportFilterArray_TVBUserListing();
+            
+        }
+
+        if (inReportId ==  rptParentOwnershipList)
+        {
+            arrayFilters = getReportFilterArray_ParentOwnershipList();
+            
+        }
+
+        if (inReportId ==  rptOwnershipList)
+        {
+            arrayFilters = getReportFilterArray_OwnershipList();
+            
+        }
+    //}
 
     return arrayFilters;
 }
@@ -259,7 +356,127 @@ function getReportFilterArray(inReportId) {
 // REPORT AREA
 //-------------------------
 
+// Parent Ownership
+function getReportFilterArray_ParentOwnershipList() {
 
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    //arrayObject = {
+    //    token:  "Market",
+    //    jsCall:  "getMRRMarketList",
+    //    objectName:  "ddlMarket",
+    //    required:  true
+    //}
+    //arrayFilters.push(arrayObject);
+
+    //arrayObject = new Object();
+    //arrayObject = {
+    //    token:  "Year",
+    //    jsCall:  "getYearList",
+    //    objectName:  "ddlYear",
+    //    required:  true
+    //}
+    //arrayFilters.push(arrayObject);
+
+    //arrayObject = new Object();
+    //arrayObject = {
+    //    token:  "Period",
+    //    objectName:  "ddlPeriod",
+    //    jsCall:  "getPeriodList",
+    //    required:  true
+    //}
+    //arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_ParentOwnershipList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("parentOwnerID");
+    columnsToDisplay.push("parentOwnerName");
+    columnsToDisplay.push("parentOwnerActive");
+    columnsToDisplay.push("ownerID");
+    columnsToDisplay.push("ownerName");
+    columnsToDisplay.push("ownerAbbreviation");
+    columnsToDisplay.push("productID");
+    columnsToDisplay.push("productActiveDate");
+    columnsToDisplay.push("productDisableDate");
+
+    tempObject =
+    {
+        id: rptParentOwnershipList,
+        reportTitle: "Parent Ownership List",
+        apiControllerAction: "/api/ParentOwnershipReport/GetParentOwnershipList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'misc'
+    }
+
+    return tempObject;
+}
+
+// Ownership
+function getReportFilterArray_OwnershipList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    //arrayObject = {
+    //    token:  "Market",
+    //    jsCall:  "getMRRMarketList",
+    //    objectName:  "ddlMarket",
+    //    required:  true
+    //}
+    //arrayFilters.push(arrayObject);
+
+    //arrayObject = new Object();
+    //arrayObject = {
+    //    token:  "Year",
+    //    jsCall:  "getYearList",
+    //    objectName:  "ddlYear",
+    //    required:  true
+    //}
+    //arrayFilters.push(arrayObject);
+
+    //arrayObject = new Object();
+    //arrayObject = {
+    //    token:  "Period",
+    //    objectName:  "ddlPeriod",
+    //    jsCall:  "getPeriodList",
+    //    required:  true
+    //}
+    //arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_OwnershipList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("ownerName");
+    columnsToDisplay.push("ownerID");
+    columnsToDisplay.push("ownerAbbreviation");
+    columnsToDisplay.push("parentOwnerName");
+    columnsToDisplay.push("productID");
+    columnsToDisplay.push("productActiveDate");
+    columnsToDisplay.push("productDisableDate");
+
+    tempObject =
+    {
+        id: rptOwnershipList,
+        reportTitle: "Ownership List",
+        apiControllerAction: "/api/OwnerReport/GetOwnerList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'misc'
+    }
+
+    return tempObject;
+}
 
 // MRR Market Summary
 function getReportFilterArray_MRRMarketSummary()
@@ -278,19 +495,19 @@ function getReportFilterArray_MRRMarketSummary()
 
     arrayObject = new Object();
     arrayObject = {
-        token: "Year",
-        jsCall: "getYearList",
-        objectName: "ddlYear",
-        required: true
+        token:  "Year",
+        jsCall:  "getYearList",
+        objectName:  "ddlYear",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = new Object();
     arrayObject = {
-        token: "Period",
-        objectName: "ddlPeriod",
-        jsCall: "getPeriodList",
-        required: true
+        token:  "Period",
+        objectName:  "ddlPeriod",
+        jsCall:  "getPeriodList",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
@@ -313,11 +530,11 @@ function getReportObject_MRRMarketSummary()
     tempObject =
     {
         id: rptMRRMarketSummary,
-        reportTitle: "Market Summary",
-        apiControllerAction: "/api/MRRReport/GetMarketSummary",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: 'mrr'
+        reportTitle:  "Market Summary",
+        apiControllerAction:  "/api/MRRReport/GetMarketSummary",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  'mrr'
     }
 
     return tempObject;
@@ -330,33 +547,33 @@ function getReportFilterArray_XRAYUsage() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token: "StartDate",
-        jsCall: null,
-        objectName: "dtStartDate",
-        required: true
+        token:  "StartDate",
+        jsCall:  null,
+        objectName:  "dtStartDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "EndDate",
-        jsCall: null,
-        objectName: "dtEndDate",
-        required: true
+        token:  "EndDate",
+        jsCall:  null,
+        objectName:  "dtEndDate",
+        required:  true
     }
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getXRYMarketList",
-        objectName: "ddlMarket",
-        required: false
+        token:  "Market",
+        jsCall:  "getXRYMarketList",
+        objectName:  "ddlMarket",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Owner",
-        jsCall: "getOwnerList",
-        objectName: "ddlOwner",
-        required: false
+        token:  "Owner",
+        jsCall:  "getOwnerList",
+        objectName:  "ddlOwner",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
@@ -380,11 +597,11 @@ function getReportObject_XRAYUsage() {
     tempObject =
     {
         id: rptXRAYUsage,
-        reportTitle: "XRay Usage Report",
-        apiControllerAction: "/api/XRAYReport/GetXRayUsage",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: 'xry'
+        reportTitle:  "XRay Usage Report",
+        apiControllerAction:  "/api/XRAYReport/GetXRayUsage",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  'xry'
     }
 
     return tempObject;
@@ -398,34 +615,34 @@ function getReportFilterArray_MRRUsage() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token: "StartDate",
-        jsCall: null,
-        objectName: "dtStartDate",
-        required: true
+        token:  "StartDate",
+        jsCall:  null,
+        objectName:  "dtStartDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "EndDate",
-        jsCall: null,
-        objectName: "dtEndDate",
-        required: true
+        token:  "EndDate",
+        jsCall:  null,
+        objectName:  "dtEndDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getMRRMarketList",
-        objectName: "ddlMarket",
-        required: false
+        token:  "Market",
+        jsCall:  "getMRRMarketList",
+        objectName:  "ddlMarket",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Owner",
-        jsCall: "getOwnerList",
-        objectName: "ddlOwner",
-        required: false
+        token:  "Owner",
+        jsCall:  "getOwnerList",
+        objectName:  "ddlOwner",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
@@ -449,11 +666,11 @@ function getReportObject_MRRUsage() {
     tempObject =
     {
         id: rptMRRUsage,
-        reportTitle: "MRR Usage Report",
-        apiControllerAction: "/api/MRRReport/GetMRRUsage",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: 'mrr'
+        reportTitle:  "MRR Usage Report",
+        apiControllerAction:  "/api/MRRReport/GetMRRUsage",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  'mrr'
     }
 
     return tempObject;
@@ -467,34 +684,34 @@ function getReportFilterArray_TVBUsage() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token: "StartDate",
-        jsCall: null,
-        objectName: "dtStartDate",
-        required: true
+        token:  "StartDate",
+        jsCall:  null,
+        objectName:  "dtStartDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "EndDate",
-        jsCall: null,
-        objectName: "dtEndDate",
-        required: true
+        token:  "EndDate",
+        jsCall:  null,
+        objectName:  "dtEndDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getTVBMarketList",
-        objectName: "ddlMarket",
-        required: false
+        token:  "Market",
+        jsCall:  "getTVBMarketList",
+        objectName:  "ddlMarket",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Owner",
-        jsCall: "getOwnerList",
-        objectName: "ddlOwner",
-        required: false
+        token:  "Owner",
+        jsCall:  "getOwnerList",
+        objectName:  "ddlOwner",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
@@ -518,11 +735,11 @@ function getReportObject_TVBUsage() {
     tempObject =
     {
         id: rptTVBUsage,
-        reportTitle: "TVB Usage Report",
-        apiControllerAction: "/api/TVBReport/GetTVBUsage",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: 'tvb'
+        reportTitle:  "TVB Usage Report",
+        apiControllerAction:  "/api/TVBReport/GetTVBUsage",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  'tvb'
     }
 
     return tempObject;
@@ -536,34 +753,34 @@ function getReportFilterArray_MarketRevenueHourlyActivity() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token: "StartDate",
-        jsCall: null,
-        objectName: "dtStartDate",
-        required: true
+        token:  "StartDate",
+        jsCall:  null,
+        objectName:  "dtStartDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "EndDate",
-        jsCall: null,
-        objectName: "dtEndDate",
-        required: true
+        token:  "EndDate",
+        jsCall:  null,
+        objectName:  "dtEndDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getMRRMarketList",
-        objectName: "ddlMarket",
-        required: false
+        token:  "Market",
+        jsCall:  "getMRRMarketList",
+        objectName:  "ddlMarket",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Owner",
-        jsCall: "getOwnerList",
-        objectName: "ddlOwner",
-        required: false
+        token:  "Owner",
+        jsCall:  "getOwnerList",
+        objectName:  "ddlOwner",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
@@ -587,11 +804,11 @@ function getReportObject_MarketRevenueHourlyActivity() {
     tempObject =
     {
         id: rptMarketRevenueHourlyActivity,
-        reportTitle: "MRR Hourly Usage",
-        apiControllerAction: "/api/MRRReport/GetHourlyActivity",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: 'mrr'
+        reportTitle:  "MRR Hourly Usage",
+        apiControllerAction:  "/api/MRRReport/GetHourlyActivity",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  'mrr'
     }
 
     return tempObject;
@@ -605,34 +822,34 @@ function getReportFilterArray_UserActivity() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token: "StartDate",
-        jsCall: null,
-        objectName: "dtStartDate",
-        required: true
+        token:  "StartDate",
+        jsCall:  null,
+        objectName:  "dtStartDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "EndDate",
-        jsCall: null,
-        objectName: "dtEndDate",
-        required: true
+        token:  "EndDate",
+        jsCall:  null,
+        objectName:  "dtEndDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getXRYMarketList",
-        objectName: "ddlMarket",
-        required: false
+        token:  "Market",
+        jsCall:  "getXRYMarketList",
+        objectName:  "ddlMarket",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Owner",
-        jsCall: "getOwnerList",
-        objectName: "ddlOwner",
-        required: false
+        token:  "Owner",
+        jsCall:  "getOwnerList",
+        objectName:  "ddlOwner",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
@@ -656,11 +873,11 @@ function getReportObject_UserActivity() {
     tempObject =
     {
         id: rptUserActivity,
-        reportTitle: "XRay User Activity",
-        apiControllerAction: "/api/XRAYReport/GetUserActivity",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: 'xry'
+        reportTitle:  "XRay User Activity",
+        apiControllerAction:  "/api/XRAYReport/GetUserActivity",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  'xry'
     }
 
     return tempObject;
@@ -674,34 +891,34 @@ function getReportFilterArray_UserActivityDetail() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token: "StartDate",
-        jsCall: null,
-        objectName: "dtStartDate",
-        required: true
+        token:  "StartDate",
+        jsCall:  null,
+        objectName:  "dtStartDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "EndDate",
-        jsCall: null,
-        objectName: "dtEndDate",
-        required: true
+        token:  "EndDate",
+        jsCall:  null,
+        objectName:  "dtEndDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getXRYMarketList",
-        objectName: "ddlMarket",
-        required: false
+        token:  "Market",
+        jsCall:  "getXRYMarketList",
+        objectName:  "ddlMarket",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Owner",
-        jsCall: "getOwnerList",
-        objectName: "ddlOwner",
-        required: false
+        token:  "Owner",
+        jsCall:  "getOwnerList",
+        objectName:  "ddlOwner",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
@@ -724,11 +941,11 @@ function getReportObject_UserActivityDetail() {
     tempObject =
     {
         id: rptUserActivityDetail,
-        reportTitle: "XRay User Activity - Detail",
-        apiControllerAction: "/api/XRAYReport/GetUserActivityDetail",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: 'xry'
+        reportTitle:  "XRay User Activity - Detail",
+        apiControllerAction:  "/api/XRAYReport/GetUserActivityDetail",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  'xry'
     }
 
     return tempObject;
@@ -742,34 +959,34 @@ function getReportFilterArray_UserQuerySummary() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token: "StartDate",
-        jsCall: null,
-        objectName: "dtStartDate",
-        required: true
+        token:  "StartDate",
+        jsCall:  null,
+        objectName:  "dtStartDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "EndDate",
-        jsCall: null,
-        objectName: "dtEndDate",
-        required: true
+        token:  "EndDate",
+        jsCall:  null,
+        objectName:  "dtEndDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getXRYMarketList",
-        objectName: "ddlMarket",
-        required: false
+        token:  "Market",
+        jsCall:  "getXRYMarketList",
+        objectName:  "ddlMarket",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Owner",
-        jsCall: "getOwnerList",
-        objectName: "ddlOwner",
-        required: false
+        token:  "Owner",
+        jsCall:  "getOwnerList",
+        objectName:  "ddlOwner",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
@@ -786,11 +1003,11 @@ function getReportObject_UserQuerySummary() {
     tempObject =
     {
         id: rptUserQuerySummary,
-        reportTitle: "XRay Query Summary",
-        apiControllerAction: "/api/XRAYReport/GetUserQuerySummary",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: 'xry'
+        reportTitle:  "XRay Query Summary",
+        apiControllerAction:  "/api/XRAYReport/GetUserQuerySummary",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  'xry'
     }
 
     return tempObject;
@@ -804,34 +1021,34 @@ function getReportFilterArray_UserQuerySummaryByOwner() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token: "StartDate",
-        jsCall: null,
-        objectName: "dtStartDate",
-        required: true
+        token:  "StartDate",
+        jsCall:  null,
+        objectName:  "dtStartDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "EndDate",
-        jsCall: null,
-        objectName: "dtEndDate",
-        required: true
+        token:  "EndDate",
+        jsCall:  null,
+        objectName:  "dtEndDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getXRYMarketList",
-        objectName: "ddlMarket",
-        required: false
+        token:  "Market",
+        jsCall:  "getXRYMarketList",
+        objectName:  "ddlMarket",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Owner",
-        jsCall: "getOwnerList",
-        objectName: "ddlOwner",
-        required: false
+        token:  "Owner",
+        jsCall:  "getOwnerList",
+        objectName:  "ddlOwner",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
@@ -854,11 +1071,11 @@ function getReportObject_UserQuerySummaryByOwner() {
     tempObject =
     {
         id: rptUserQuerySummaryByOwner,
-        reportTitle: "XRay Query Summary - By Owner",
-        apiControllerAction: "/api/XRAYReport/GetUserQuerySummaryByOwner",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: 'xry'
+        reportTitle:  "XRay Query Summary - By Owner",
+        apiControllerAction:  "/api/XRAYReport/GetUserQuerySummaryByOwner",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  'xry'
     }
 
     return tempObject;
@@ -871,26 +1088,26 @@ function getReportFilterArray_UserListing() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getMarketListAll",
-        objectName: "ddlMarket",
-        required: false
+        token:  "Market",
+        jsCall:  "getMarketListAll",
+        objectName:  "ddlMarket",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Personnel",
-        jsCall: null,
-        objectName: "hidPersonnel",
-        required: false
+        token:  "Personnel",
+        jsCall:  null,
+        objectName:  "hidPersonnel",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Owner",
-        jsCall: "getOwnerList",
-        objectName: "ddlOwner",
-        required: false
+        token:  "Owner",
+        jsCall:  "getOwnerList",
+        objectName:  "ddlOwner",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
@@ -913,11 +1130,11 @@ function getReportObject_UserListing() {
     tempObject =
     {
         id: rptUserListing,
-        reportTitle: "User Listing",
-        apiControllerAction: "/api/PersonnelReport/GetUserListing",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: ''
+        reportTitle:  "User Listing",
+        apiControllerAction:  "/api/PersonnelReport/GetUserListing",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  ''
     }
 
     return tempObject;
@@ -930,10 +1147,10 @@ function getReportFilterArray_AEStatus() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getXRYMarketList",
-        objectName: "ddlMarket",
-        required: true
+        token:  "Market",
+        jsCall:  "getXRYMarketList",
+        objectName:  "ddlMarket",
+        required:  true
     }
     arrayFilters.push(arrayObject);
  
@@ -956,11 +1173,11 @@ function getReportObject_AEStatus() {
     tempObject =
     {
         id: rptAEStatus,
-        reportTitle: "XRay Account Executive Status",
-        apiControllerAction: "/api/AccountExecutiveReport/GetAEStatus",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: 'xry'
+        reportTitle:  "XRay Account Executive Status",
+        apiControllerAction:  "/api/AccountExecutiveReport/GetAEStatus",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  'xry'
     }
 
     return tempObject;
@@ -974,41 +1191,41 @@ function getReportFilterArray_MarketDelivery() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token: "StartDate",
-        jsCall: null,
-        objectName: "dtStartDate",
-        required: true
+        token:  "StartDate",
+        jsCall:  null,
+        objectName:  "dtStartDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "EndDate",
-        jsCall: null,
-        objectName: "dtEndDate",
-        required: true
+        token:  "EndDate",
+        jsCall:  null,
+        objectName:  "dtEndDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getMarketListAll",
-        objectName: "ddlMarket",
-        required: false
+        token:  "Market",
+        jsCall:  "getMarketListAll",
+        objectName:  "ddlMarket",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Owner",
-        jsCall: "getOwnerList",
-        objectName: "ddlOwner",
-        required: false
+        token:  "Owner",
+        jsCall:  "getOwnerList",
+        objectName:  "ddlOwner",
+        required:  false
     }
     arrayFilters.push(arrayObject);
     arrayObject = {
-        token: "Product",
-        jsCall: "getProductList",
-        objectName: "ddlProduct",
-        required: true
+        token:  "Product",
+        jsCall:  "getProductList",
+        objectName:  "ddlProduct",
+        required:  true
     }
     arrayFilters.push(arrayObject);
     return arrayFilters;
@@ -1031,11 +1248,11 @@ function getReportObject_MarketDelivery() {
     tempObject =
     {
         id: rptMarketDelivery,
-        reportTitle: "Market Delivery",
-        apiControllerAction: "/api/MarketReport/GetMarketDelivery",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: ''
+        reportTitle:  "Market Delivery",
+        apiControllerAction:  "/api/MarketReport/GetMarketDelivery",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  ''
     }
 
     return tempObject;
@@ -1049,18 +1266,18 @@ function getReportFilterArray_TVBUserListing() {
 
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getTVBMarketList",
-        objectName: "ddlMarket",
-        required: false
+        token:  "Market",
+        jsCall:  "getTVBMarketList",
+        objectName:  "ddlMarket",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Owner",
-        jsCall: "getOwnerList",
-        objectName: "ddlOwner",
-        required: false
+        token:  "Owner",
+        jsCall:  "getOwnerList",
+        objectName:  "ddlOwner",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
@@ -1083,11 +1300,11 @@ function getReportObject_TVBUserListing() {
     tempObject =
     {
         id: rptTVBUserListing,
-        reportTitle: "TVB User Listing",
-        apiControllerAction: "/api/TVBReport/GetTVBUserListing",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: 'tvb'
+        reportTitle:  "TVB User Listing",
+        apiControllerAction:  "/api/TVBReport/GetTVBUserListing",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  'tvb'
     }
 
     return tempObject;
@@ -1100,34 +1317,34 @@ function getReportFilterArray_NewUserListing() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token: "StartDate",
-        jsCall: null,
-        objectName: "dtStartDate",
-        required: true
+        token:  "StartDate",
+        jsCall:  null,
+        objectName:  "dtStartDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "EndDate",
-        jsCall: null,
-        objectName: "dtEndDate",
-        required: true
+        token:  "EndDate",
+        jsCall:  null,
+        objectName:  "dtEndDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getMarketListAll",
-        objectName: "ddlMarket",
-        required: false
+        token:  "Market",
+        jsCall:  "getMarketListAll",
+        objectName:  "ddlMarket",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Owner",
-        jsCall: "getOwnerList",
-        objectName: "ddlOwner",
-        required: false
+        token:  "Owner",
+        jsCall:  "getOwnerList",
+        objectName:  "ddlOwner",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
@@ -1155,11 +1372,11 @@ function getReportObject_NewUserListing() {
     tempObject =
     {
         id: rptNewUserListing,
-        reportTitle: "New User Listing",
-        apiControllerAction: "/api/PersonnelReport/GetNewUserListing",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: ''
+        reportTitle:  "New User Listing",
+        apiControllerAction:  "/api/PersonnelReport/GetNewUserListing",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  ''
     }
 
     return tempObject;
@@ -1171,26 +1388,26 @@ function getReportFilterArray_StationListing() {
     var arrayFilters = new Array();
     var arrayObject = new Object();
     arrayObject = {
-        token: "Product",
-        jsCall: "getProductList",
-        objectName: "ddlProduct",
-        required: true
+        token:  "Product",
+        jsCall:  "getProductList",
+        objectName:  "ddlProduct",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getMarketListAll",
-        objectName: "ddlMarket",
-        required: false
+        token:  "Market",
+        jsCall:  "getMarketListAll",
+        objectName:  "ddlMarket",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Owner",
-        jsCall: "getOwnerList",
-        objectName: "ddlOwner",
-        required: false
+        token:  "Owner",
+        jsCall:  "getOwnerList",
+        objectName:  "ddlOwner",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
@@ -1216,11 +1433,11 @@ function getReportObject_StationListing() {
     tempObject =
     {
         id: rptStationListing,
-        reportTitle: "Station Listing",
-        apiControllerAction: "/api/StationReport/GetStationListing",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: ''
+        reportTitle:  "Station Listing",
+        apiControllerAction:  "/api/StationReport/GetStationListing",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  ''
     }
 
     return tempObject;
@@ -1234,34 +1451,34 @@ function getReportFilterArray_Training() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token: "StartDate",
-        jsCall: null,
-        objectName: "dtStartDate",
-        required: true
+        token:  "StartDate",
+        jsCall:  null,
+        objectName:  "dtStartDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "EndDate",
-        jsCall: null,
-        objectName: "dtEndDate",
-        required: true
+        token:  "EndDate",
+        jsCall:  null,
+        objectName:  "dtEndDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getMarketListAll",
-        objectName: "ddlMarket",
-        required: false
+        token:  "Market",
+        jsCall:  "getMarketListAll",
+        objectName:  "ddlMarket",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Owner",
-        jsCall: "getOwnerList",
-        objectName: "ddlOwner",
-        required: false
+        token:  "Owner",
+        jsCall:  "getOwnerList",
+        objectName:  "ddlOwner",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
@@ -1286,11 +1503,11 @@ function getReportObject_Training() {
     tempObject =
     {
         id: rptTraining,
-        reportTitle: "Training",
-        apiControllerAction: "/api/Report/GetTraining",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: ''
+        reportTitle:  "Training",
+        apiControllerAction:  "/api/Report/GetTraining",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  ''
     }
 
     return tempObject;
@@ -1304,34 +1521,34 @@ function getReportFilterArray_StationChangeHistory() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token: "StartDate",
-        jsCall: null,
-        objectName: "dtStartDate",
-        required: true
+        token:  "StartDate",
+        jsCall:  null,
+        objectName:  "dtStartDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "EndDate",
-        jsCall: null,
-        objectName: "dtEndDate",
-        required: true
+        token:  "EndDate",
+        jsCall:  null,
+        objectName:  "dtEndDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getMarketListAll",
-        objectName: "ddlMarket",
-        required: false
+        token:  "Market",
+        jsCall:  "getMarketListAll",
+        objectName:  "ddlMarket",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Owner",
-        jsCall: "getOwnerList",
-        objectName: "ddlOwner",
-        required: false
+        token:  "Owner",
+        jsCall:  "getOwnerList",
+        objectName:  "ddlOwner",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
@@ -1358,11 +1575,11 @@ function getReportObject_StationChangeHistory() {
     tempObject =
     {
         id: rptStationChangeHistory,
-        reportTitle: "Station Change History",
-        apiControllerAction: "/api/StationReport/GetStationChangeHistory",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: ''
+        reportTitle:  "Station Change History",
+        apiControllerAction:  "/api/StationReport/GetStationChangeHistory",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  ''
     }
 
     return tempObject;
@@ -1376,26 +1593,26 @@ function getReportFilterArray_NationwideRecipients() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token: "StartDate",
-        jsCall: null,
-        objectName: "dtStartDate",
-        required: true
+        token:  "StartDate",
+        jsCall:  null,
+        objectName:  "dtStartDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "EndDate",
-        jsCall: null,
-        objectName: "dtEndDate",
-        required: true
+        token:  "EndDate",
+        jsCall:  null,
+        objectName:  "dtEndDate",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Owner",
-        jsCall: "getOwnerList",
-        objectName: "ddlOwner",
-        required: false
+        token:  "Owner",
+        jsCall:  "getOwnerList",
+        objectName:  "ddlOwner",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
@@ -1418,11 +1635,11 @@ function getReportObject_NationwideRecipients() {
     tempObject =
     {
         id: rptNationwideRecipients,
-        reportTitle: "XRay Nationwide Queries",
-        apiControllerAction: "/api/XRAYReport/GetNationwideRecipients",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: 'xry'
+        reportTitle:  "XRay Nationwide Queries",
+        apiControllerAction:  "/api/XRAYReport/GetNationwideRecipients",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  'xry'
     }
 
     return tempObject;
@@ -1436,36 +1653,36 @@ function getReportFilterArray_MarketRevenueXRay() {
     var arrayObject = new Object();
     arrayObject = new Object();
     arrayObject = {
-        token: "Year",
-        jsCall: "getYearList",
-        objectName: "ddlYear",
-        required: true
+        token:  "Year",
+        jsCall:  "getYearList",
+        objectName:  "ddlYear",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = new Object();
     arrayObject = {
-        token: "Period",
-        objectName: "ddlPeriod",
-        jsCall: "getPeriodList",
-        required: true
+        token:  "Period",
+        objectName:  "ddlPeriod",
+        jsCall:  "getPeriodList",
+        required:  true
     }
     arrayFilters.push(arrayObject);
  
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getMarketListAll",
-        objectName: "ddlMarket",
-        required: true
+        token:  "Market",
+        jsCall:  "getMarketListAll",
+        objectName:  "ddlMarket",
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Owner",
-        jsCall: "getOwnerList",
-        objectName: "ddlOwner",
-        required: false
+        token:  "Owner",
+        jsCall:  "getOwnerList",
+        objectName:  "ddlOwner",
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
@@ -1487,11 +1704,11 @@ function getReportObject_MarketRevenueXRay() {
     tempObject =
     {
         id: rptMarketRevenueXRay,
-        reportTitle: "MRR / XRay Revenue Comparision",
-        apiControllerAction: "/api/Report/GetMarketRevenueRevenueXRay",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: ''
+        reportTitle:  "MRR / XRay Revenue Comparision",
+        apiControllerAction:  "/api/Report/GetMarketRevenueRevenueXRay",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product:  ''
     }
 
     return tempObject;
