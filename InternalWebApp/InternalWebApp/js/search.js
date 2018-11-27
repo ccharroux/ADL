@@ -212,12 +212,13 @@ function linkParentAdvertiserByLink(parentAdvertiserId) {
 
     var rowId = $('#dtSearchResults').dataTable().fnFindCellRowIndexes(parentAdvertiserId, 0);
 
+    //console.log(parentAdvertiserId);
     //console.log(rowId);
 
     var table = $('#dtSearchResults').DataTable();
     table.row(rowId).select();
 
-    setTimeout(linkParentAdvertiser, 500);
+    setTimeout(linkParentAdvertiser(),500);
    
 }
 
@@ -248,8 +249,8 @@ function linkParentAdvertiser() {
         searchResults[key] = searchCriteria[key];
     }
 
-    searchResults["parentAdvertiserID"] = rowData[0].parentAdvertiserId;
-    searchResults["parentAdvertiserName"] = rowData[0].parentAdvertiserName;
+    searchResults["linkParentAdvertiserID"] = rowData[0].parentAdvertiserId;
+    searchResults["linkParentAdvertiserName"] = rowData[0].parentAdvertiserName;
 
     setLocalStorage("gSearchResults", JSON.stringify(searchResults));
 

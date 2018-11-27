@@ -42,9 +42,9 @@
         <script src="js/respond.min.js"></script>
     <![endif]-->
     <style>
-        .standardText, select {
+        /*.standardText, select {
             width: 300px !important;
-        }
+        }*/
     </style>
 </head>
 <body>
@@ -79,40 +79,76 @@
                             <label for="txtParentAdvertiserName">Parent Advertiser Name</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" class="mkaRequired" maxlength="50" id="txtParentAdvertiserName" errorMessage="You must enter a Parent Advertiser Name." value="" />
+                            <input type="text" class="mkaRequired field-width-325" maxlength="50" id="txtParentAdvertiserName" errorMessage="You must enter a Parent Advertiser Name." value="" />
                         </div>
                     </div>
 
-                    <!--
-                    industry
-                    -->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="ddlIndustry" class="">Industry</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlIndustry" class="mkaRequired" style="" errorMessage="You must select an Industry."></select>
+                            <select id="ddlIndustry" class="mkaRequired field-width-325" style="" errorMessage="You must select an Industry."></select>
                         </div>
                     </div>
-                    <!--
-                    subindustry
-                    -->
-                    
+
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="ddlSubIndustry" class="">Sub Industry</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlSubIndustry" class="mkaRequired" style="" errorMessage="You must select a Sub Industry."></select>
+                            <select id="ddlSubIndustry" class="mkaRequired field-width-325" style="" errorMessage="You must select a Sub Industry."></select>
                         </div>
                     </div>
+
+                    <div class="row input-row link-parent-advertiser">
+                        <div class="col-md-3">
+
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <div>
+                                <input value="Search Parent Advertiser" onclick="searchLinkParentAdvertiser();" class="default-button" type="button">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row input-row link-parent-advertiser">
+                        <div class="col-md-3">
+
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <div>
+                                <input value="Link Parent Advertiser" onclick="linkParentAdvertiserQuestion();" class="default-button" type="button">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row input-row link-parent-advertiser">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtLinkedParentAdvertiser">Linked Parent Advertiser</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input class="field-width-325 disabled" type="text" id="txtLinkedParentAdvertiser" disabled="disabled" errorMessage="Please use the Search Parent Advertiser to link a Parent Advertiser." /><span id="parentLinkedMessage" class="hidden to-be-linked-message">* Will be linked</span>
+                        </div>
+                    </div>
+
+                    <div class="row input-row link-parent-advertiser">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtLinkedParentAdvertiserId">Linked Parent Advertiser ID</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <!-- <input type="hidden" id="oldLinkedAdvertiserId" value="" />-->
+                            <input class="field-width-325 disabled" type="text" id="txtLinkedParentAdvertiserId" disabled="disabled" />
+                        </div>
+                    </div>
+
 
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="txtActiveDate">Active Date</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="txtActiveDate" value="" maxlength="50" placeholder="MM/DD/YYYY" readonly />
+                            <input type="text" id="txtActiveDate" class="field-width-325" value="" maxlength="50" placeholder="MM/DD/YYYY" readonly />
                         </div>
                     </div>
 
@@ -121,7 +157,16 @@
                             <label for="chkActive">Active</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="checkbox" id="chkActive" value="">
+                            <input type="checkbox" id="chkActive" value="" disabled="disabled">
+                        </div>
+                    </div>
+
+                    <div class="row input-row change-date">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtChangeDate">Change Date</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" class="field-width-325" id="txtChangeDate" value="" maxlength="50" disabled="disabled" />
                         </div>
                     </div>
 
@@ -137,8 +182,11 @@
                     <!-- end inputs -->
                     <!-- Buttons -->
                     <div class="default-button-section">
-                        <div class="row">
-                            <div class="col-md-12">
+                        <div class="row input-row">
+                            <div class="col-md-3">
+
+                            </div>
+                            <div class="col-md-9 text-align-left">
                                 <div>
                                     <input value="Update" onclick="updateParentAdvertiser()" class="default-button" type="button">
                                 </div>
@@ -174,12 +222,17 @@
 </html>
 <script>
     var parentAdvertiserId = 0;
+    var bLinkParentAdvertiser = false;
+    var bIsNew = false;
 
     $(document).ready(function () {
 
         buildXRYMenu("Advertiser");
 
         parentAdvertiserId = (getParameterByName("ParentAdvertiserID") == null ? 0 : getParameterByName("ParentAdvertiserID"));
+        $("#txtParentAdvertiserId").val(parentAdvertiserId);
+
+        bIsNew = parentAdvertiserId <= 0;
 
         getIndustryList();
 
@@ -195,8 +248,8 @@
             }
         });
 
-        $("#ddlIndustry").change(function() {
-            getSubIndustryList($(this).val(),'');
+        $("#ddlIndustry").change(function () {
+            getSubIndustryList($(this).val(), '');
         });
     });
 
@@ -249,6 +302,11 @@
     function getParentAdvertiser() {
         if (parentAdvertiserId <= 0) {
             initializeActiveDate();
+            //hide link parent advertiser section items
+            //$('.link-parent').hide();
+            $('.link-parent-advertiser').hide();
+            $('.change-date').hide();
+            loadSearchResults();
             return;
         }
 
@@ -290,6 +348,12 @@
 
                         //there is a last changed date that can possibly be displayed (dateChanged)
 
+                        if (obj["dateChanged"] !== null) {
+                            var changeDate = new Date(obj["dateChanged"]);
+                            $("#txtChangeDate").val(addZero(changeDate.getMonth() + 1) + '/' + addZero(changeDate.getDate()) + '/' + changeDate.getFullYear());
+                        }
+
+
                         if (obj["disableDate"] !== null) {
                             var disableDate = new Date(obj["disableDate"]);
                             $("#txtDisableDate").val(addZero(disableDate.getMonth() + 1) +
@@ -303,7 +367,7 @@
                         }
 
                         getSubIndustryList(obj["industryId"], obj["subIndustryId"]);
-
+                        loadSearchResults();
                     });
                 }
             },
@@ -405,8 +469,166 @@
             return;
         }
 
-        bootbox.alert('This functionality is still under development.', function () {
+        $.ajax({
+            url: ServicePrefix + '/api/ParentAdvertiser/UpdateParentAdvertiser',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inParentAdvertiserId": $("#txtParentAdvertiserId").val(),
+                "inParentAdvertiserName": $("#txtParentAdvertiserName").val(),
+                "inIndustryId": $("#ddlIndustry").val(),
+                "inSubIndustryId": $("#ddlSubIndustry").val(),
+                "inIsNew": bIsNew
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    if (bIsNew) {
+
+                        var obj = data.report.rows[0];
+
+                        $("#txtParentAdvertiserId").val(obj["_updateStatus"]);
+
+                        window.location = "parentadvertiser.html?ParentAdvertiserID=" + $("#txtParentAdvertiserId").val();
+                    }
+
+
+                    if (bLinkParentAdvertiser) {
+                        linkParentAdvertiser();
+                    }
+                    else {
+                        window.location = "parentadvertiser.html?ParentAdvertiserID=" + $("#txtParentAdvertiserId").val();
+                    }
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
         });
+
+    }
+
+    function linkParentAdvertiser() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/ParentAdvertiser/LinkParentAdvertiser',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOldParentAdvertiserId": $("#txtParentAdvertiserId").val(),
+                "inNewParentAdvertiserId": $("#txtLinkedParentAdvertiserId").val()
+            }),
+            processData: false,
+            success: function(data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    window.location = "parentadvertiser.html?ParentAdvertiserID=" + $("#txtParentAdvertiserId").val();
+                }
+
+            },
+            error: function(jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
+
+    }
+
+    function searchLinkParentAdvertiser() {
+
+        var searchCriteriaObj = {
+            "searchToken": "PARENTADV",
+            "parentAdvertiserID": $("#txtParentAdvertiserId").val(),
+            "parentAdvertiserName": $("#txtParentAdvertiserName").val(),
+            "industryID": $("#ddlIndustry").val(),
+            "subIndustryID": $("#ddlSubIndustry").val(),
+            "linkParentAdvertiserID": $("#txtLinkedParentAdvertiserId").val(),
+            "linkParentAdvertiserName": $("#txtLinkedParentAdvertiser").val(),
+            "activeDate": $("#txtActiveDate").val(),
+            "active": $('#chkActive').is(':checked'),
+            "changeDate": $('#txtChangeDate').val(),
+            "searchHeading": "Parent Advertiser Search",
+            "searchPage": window.location
+        }
+
+        setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
+
+        window.location = "/utilities/search.html";
+    }
+
+    function loadSearchResults() {
+        if (getLocalStorage("gSearchResults").length <= 0) {
+            return;
+        }
+
+        var searchResults = $.parseJSON(getLocalStorage("gSearchResults"));
+
+        //console.log("search results");
+        //console.log(searchResults);
+
+        $("#txtParentAdvertiserId").val(searchResults["parentAdvertiserID"]);
+        $("#txtParentAdvertiserName").val(searchResults["parentAdvertiserName"]);
+        $("#ddlIndustry").val(searchResults["industryID"]);
+        getSubIndustryList(searchResults["industryID"], searchResults["subIndustryID"]);
+        $("#txtLinkedParentAdvertiserId").val(searchResults["linkParentAdvertiserID"]);
+        $("#txtLinkedParentAdvertiser").val(searchResults["linkParentAdvertiserName"]);
+        $("#txtActiveDate").val(searchResults["activeDate"]);
+        $('#chkActive').prop("checked", searchResults["active"]);
+        $('#txtChangeDate').val(searchResults["changeDate"]);
+
+        setLocalStorage("gSearchResults", "");
+    }
+
+    function linkParentAdvertiserQuestion() {
+        //still need to work this question out etc.
+        var errorMessage = "";
+
+        if ($("#txtLinkedParentAdvertiserId").val().length > 0 &&
+            $("#txtParentAdvertiserId").val() !== $("#txtLinkedParentAdvertiserId").val()) {
+
+            var parentAdvertiserMessage = "You are about to move parent advertiser " +
+                $("#txtParentAdvertiserName").val() +
+                "'s revenue to parent advertiser " +
+                $("#txtLinkedParentAdvertiser").val() +
+                ".  This action is irreversible.  \n\r\n\r Do you wish to proceed?";
+
+            bootbox.confirm(parentAdvertiserMessage,
+                function (result) {
+
+                    if (result) {
+                        bLinkParentAdvertiser = true;
+                        $("#parentLinkedMessage").removeClass("hidden");
+                        $("#txtLinkedParentAdvertiser").addClass("to-be-linked");
+                    } else {
+                        $("#parentLinkedMessage").addClass("hidden");
+                        $("#txtLinkedParentAdvertiser").removeClass("to-be-linked");
+                        return;
+                    }
+                });
+        } else if ($("#txtLinkedParentAdvertiserId").val().length > 0 &&
+            $("#txtParentAdvertiserId").val() === $("#txtLinkedParentAdvertiserId").val()) {
+
+            errorMessage = "You cannot link a parent advertiser to itself.";
+            bootbox.alert(errorMessage, function() {
+                $("#txtLinkedParentAdvertiserId").val("");
+                $("#txtLinkedParentAdvertiser").val("");
+            });
+        }
+        else {
+            errorMessage = "If you would like to link the Parent Advertiser, you need to choose a new Parent Advertiser first. \n\r" +
+                " Followed by clicking Link Parent Advertiser.";
+            bootbox.alert(errorMessage, function () { });
+        }
     }
 
 </script>
