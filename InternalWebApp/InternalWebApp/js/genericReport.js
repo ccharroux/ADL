@@ -62,6 +62,11 @@ var rptStationChanges = ctr;
 ctr++;
 var rptMRREstimatedStationList = ctr;
 
+ctr++;
+var rptMRRStationManagerList = ctr;
+
+ctr++;
+var rptDetailedStationSetup = ctr;
 
 function buildReportArray()
 {
@@ -240,6 +245,16 @@ function getReportObject(inReportId)
     if (inReportId == rptMRREstimatedStationList) {
         arrayObject = getReportObject_MRREstimatedStationList();
     }
+
+    if (inReportId == rptDetailedStationSetup) {
+        arrayObject = getReportObject_DetailedStationSetup();
+    }
+
+    if (inReportId == rptMRRStationManagerList) {
+        arrayObject = getReportObject_MRRStationManagerList();
+    }
+
+
     // }
 
     return arrayObject;
@@ -395,6 +410,14 @@ function getReportFilterArray(inReportId)
 
         if (inReportId == rptMRREstimatedStationList) {
             arrayFilters = getReportFilterArray_MRREstimatedStationList();
+        }
+
+        if (inReportId == rptDetailedStationSetup) {
+            arrayFilters = getReportFilterArray_DetailedStationSetup();
+        }
+
+        if (inReportId == rptMRRStationManagerList) {
+            arrayFilters = getReportFilterArray_MRRStationManagerList();
         }
 
     //}
@@ -1999,7 +2022,6 @@ function getReportFilterArray_MRREstimatedStationList() {
     var arrayFilters = new Array();
     var arrayObject = new Object();
 
- 
 
     arrayObject = {
         token: "Market",
@@ -2046,6 +2068,149 @@ function getReportObject_MRREstimatedStationList() {
         id: rptMRREstimatedStationList,
         reportTitle: "MRR Estimated Station List",
         apiControllerAction: "/api/MRRReport/GetMRREstimatedStationList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr'
+    }
+
+    return tempObject;
+
+}
+
+// rptDetailedStationSetup
+function getReportFilterArray_DetailedStationSetup() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationList",
+        objectName: "ddlStation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_DetailedStationSetup() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("stationName");
+    columnsToDisplay.push("formatName");
+    columnsToDisplay.push("affiliationName");
+    columnsToDisplay.push("ownerName");
+    columnsToDisplay.push("marketName");
+    columnsToDisplay.push("stationClientNumber");
+    columnsToDisplay.push("stationNickname");
+    columnsToDisplay.push("stationAddress");
+    columnsToDisplay.push("stationPhone");
+    columnsToDisplay.push("stationEmail");
+    columnsToDisplay.push("stationPreviousName");
+    columnsToDisplay.push("stationComment");
+    columnsToDisplay.push("productID");
+    columnsToDisplay.push("productActiveDate");
+    columnsToDisplay.push("productDisableDate");
+
+    tempObject =
+    {
+        id: rptDetailedStationSetup,
+        reportTitle: "Detailed Station Setup",
+        apiControllerAction: "/api/MRRReport/GetDetailedStationSetup",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'station'
+    }
+
+    return tempObject;
+
+}
+
+// rptMRRStationManagerList
+function getReportFilterArray_MRRStationManagerList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationList",
+        objectName: "ddlStation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MRRStationManagerList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("stationName");
+    columnsToDisplay.push("formatName");
+    columnsToDisplay.push("affiliationName");
+    columnsToDisplay.push("ownerName");
+    columnsToDisplay.push("marketName");
+    columnsToDisplay.push("managerName");
+    columnsToDisplay.push("managerPosition");
+    columnsToDisplay.push("managerTitle");
+    columnsToDisplay.push("managerAddress");
+    columnsToDisplay.push("managerPhone");
+    columnsToDisplay.push("managerEmail");
+    columnsToDisplay.push("managerComment");
+
+    tempObject =
+    {
+        id: rptMRRStationManagerList,
+        reportTitle: "MRR Station Manager List",
+        apiControllerAction: "/api/MRRReport/GetMRRStationManagerList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'mrr'
