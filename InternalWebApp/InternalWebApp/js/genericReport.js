@@ -2143,7 +2143,7 @@ function getReportObject_DetailedStationSetup() {
     {
         id: rptDetailedStationSetup,
         reportTitle: "Detailed Station Setup",
-        apiControllerAction: "/api/MRRReport/GetDetailedStationSetup",
+        apiControllerAction: "/api/StationReport/GetDetailedStationSetup",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'station'
