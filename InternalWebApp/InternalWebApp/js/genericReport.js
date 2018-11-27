@@ -56,6 +56,8 @@ ctr++;
 var rptActiveStationList = ctr;
 ctr++;
 var rptDisabledStationList = ctr;
+ctr++;
+var rptStationChanges = ctr;
 
 function buildReportArray()
 {
@@ -227,7 +229,10 @@ function getReportObject(inReportId)
         arrayObject = getReportObject_DisabledStationList();
     }
 
-   // }
+    if (inReportId == rptStationChanges) {
+        arrayObject = getReportObject_StationChanges();
+    }
+    // }
 
     return arrayObject;
 }
@@ -374,6 +379,10 @@ function getReportFilterArray(inReportId)
         if (inReportId == rptDisabledStationList)
         {
             arrayFilters = getReportFilterArray_DisabledStationList();
+        }
+
+        if (inReportId == rptStationChanges) {
+            arrayFilters = getReportFilterArray_StationChanges();
         }
     //}
 
@@ -1880,4 +1889,95 @@ function getReportObject_DisabledStationList() {
     }
 
     return tempObject;
+}
+
+// rptStationChanges
+function getReportFilterArray_StationChanges() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token:  "Year",
+        jsCall:  "getYearList",
+        objectName:  "ddlYear",
+        required:  true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token:  "Period",
+        objectName:  "ddlPeriod",
+        jsCall:  "getPeriodList",
+        required:  true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: true 
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationList",
+        objectName: "ddlStation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_StationChanges() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    //columnsToDisplay.push("marketID");
+    columnsToDisplay.push("marketName");
+    columnsToDisplay.push("marketReleaseDate");
+    //columnsToDisplay.push("stationID");
+    columnsToDisplay.push("stationFullName");
+    columnsToDisplay.push("ownerName");
+    columnsToDisplay.push("activityType");
+    columnsToDisplay.push("activityDate");
+    columnsToDisplay.push("stationAddress");
+    //columnsToDisplay.push("stationAddress2");
+    //columnsToDisplay.push("stationState");
+    //columnsToDisplay.push("stationZIP");
+    columnsToDisplay.push("stationComment");
+
+    tempObject =
+    {
+        id: rptStationChanges,
+        reportTitle: "Station Changes",
+        apiControllerAction: "/api/StationReport/GetStationChanges",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'station'
+    }
+
+    return tempObject;
+
 }
