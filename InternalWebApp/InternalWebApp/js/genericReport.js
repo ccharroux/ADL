@@ -59,6 +59,10 @@ var rptDisabledStationList = ctr;
 ctr++;
 var rptStationChanges = ctr;
 
+ctr++;
+var rptMRREstimatedStationList = ctr;
+
+
 function buildReportArray()
 {
     var reportCounter = 1
@@ -232,6 +236,10 @@ function getReportObject(inReportId)
     if (inReportId == rptStationChanges) {
         arrayObject = getReportObject_StationChanges();
     }
+
+    if (inReportId == rptMRREstimatedStationList) {
+        arrayObject = getReportObject_MRREstimatedStationList();
+    }
     // }
 
     return arrayObject;
@@ -384,6 +392,11 @@ function getReportFilterArray(inReportId)
         if (inReportId == rptStationChanges) {
             arrayFilters = getReportFilterArray_StationChanges();
         }
+
+        if (inReportId == rptMRREstimatedStationList) {
+            arrayFilters = getReportFilterArray_MRREstimatedStationList();
+        }
+
     //}
 
     return arrayFilters;
@@ -644,7 +657,6 @@ function getReportObject_XRAYUsage() {
     return tempObject;
 }
 
-
 // MRR Usage
 function getReportFilterArray_MRRUsage() {
 
@@ -712,7 +724,6 @@ function getReportObject_MRRUsage() {
 
     return tempObject;
 }
-
 
 // TVB Usage
 function getReportFilterArray_TVBUsage() {
@@ -1976,6 +1987,68 @@ function getReportObject_StationChanges() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'station'
+    }
+
+    return tempObject;
+
+}
+
+// rptMRREstimatedStationList
+function getReportFilterArray_MRREstimatedStationList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+ 
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+ 
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationList",
+        objectName: "ddlStation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MRREstimatedStationList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("stationName");
+    columnsToDisplay.push("formatName");
+    columnsToDisplay.push("affiliationName");
+    columnsToDisplay.push("ownerName");
+    columnsToDisplay.push("mrrManagerName");
+    columnsToDisplay.push("marketName");
+
+    tempObject =
+    {
+        id: rptMRREstimatedStationList,
+        reportTitle: "MRR Estimated Station List",
+        apiControllerAction: "/api/MRRReport/GetMRREstimatedStationList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr'
     }
 
     return tempObject;

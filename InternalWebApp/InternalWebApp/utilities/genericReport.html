@@ -66,6 +66,10 @@
         {
             width: 100%!important;
         }
+        .requiredText
+        {
+            color: red!important;
+        }
     </style>
 
 </head>
@@ -88,23 +92,23 @@
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-12 ">
-                        <div class="form-group" style="display:inline-block">
+                        <div class="form-group rptView rptProduct" style="display:inline-block">
                             <label for="ddlProduct" class="dropdown-label rptView rptProduct">Product</label>
                             <select id="ddlProduct" apiInput="inProductId" class="dropdown-select rptView rptProduct"></select>
                         </div>
-                        <div class="form-group" style="display:inline-block">
+                        <div class="form-group rptView rptMediaType" style="display:inline-block">
                             <label for="ddlMediaType" class="dropdown-label rptView rptMediaType">Media Type</label>
                             <select id="ddlMediaType" apiInput="inMediaTypeId" class="dropdown-select rptView rptMediaType"></select>
                         </div>
-                        <div class="form-group" style="display:inline-block">
+                        <div class="form-group rptView rptMarket" style="display:inline-block">
                             <label for="ddlMarket" class="dropdown-label rptView rptMarket">Market</label>
                             <select id="ddlMarket" apiInput="inMarketId" class="dropdown-select rptView rptMarket"></select>
                         </div>
-                        <div class="form-group" style="display:inline-block">
+                        <div class="form-group rptView rptStation" style="display:inline-block">
                             <label for="ddlStation" class="dropdown-label rptView rptStation">Station</label>
                             <select id="ddlStation" apiInput="inStationId" class="dropdown-select rptView rptStation"></select>
                         </div>
-                        <div class="form-group" style="display:inline-block">
+                        <div class="form-group rptView rptOwner" style="display:inline-block">
                             <label for="ddlOwner" class="dropdown-label rptView rptOwner">Owner</label>
                             <select id="ddlOwner" apiInput="inOwnerId" class="dropdown-select rptView rptOwner"></select>
                         </div>
@@ -117,19 +121,19 @@
                             </div>
  
                         </div>
-                        <div class="form-group" style="display:inline-block">
+                        <div class="form-group rptView rptYear" style="display:inline-block">
                             <label for="ddlYear" class="dropdown-label rptView rptYear">Year</label>
                             <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView rptYear"></select>
                         </div>
-                        <div class="form-group" style="display:inline-block">
+                        <div class="form-group rptView rptPeriod" style="display:inline-block">
                             <label for="ddlPeriod" class="dropdown-label rptView rptPeriod">Period</label>
                             <select id="ddlPeriod" apiInput="inPeriod" class="dropdown-select rptView rptPeriod"></select>
                         </div>
-                        <div class="form-group" style="display:inline-block">
+                        <div class="form-group rptStartDate rptView" style="display:inline-block">
                             <label for="dtStartDate" class="dropdown-label rptStartDate rptView">Start Date</label>
                             <input type="text" id="dtStartDate" class="rptStartDate rptView" apiInput="inStartDate">
                         </div>
-                        <div class="form-group" style="display:inline-block">
+                        <div class="form-group rptEndDate rptView" style="display:inline-block">
                             <label for="dtEndDate" class="dropdown-label rptEndDate rptView">End Date</label>
                             <input type="text" id="dtEndDate" class="rptEndDate rptView" apiInput="inEndDate">
                         </div>
@@ -338,8 +342,15 @@
 
         for (var i = 0; i < arrayFilters.length; i++)
         {
-            console.log(arrayFilters[i]);
             activateFilter(arrayFilters[i]);
+            if (arrayFilters[i].required == true)
+            {
+ 
+                var input = $("#" + arrayFilters[i].objectName);
+                $("label[for=" + input.attr("id") + "]").css("color", "red");
+                $("label[for=" + input.attr("id") + "]").prepend(" * ");
+
+            }
         }
 
     }
@@ -364,7 +375,7 @@
     function getYearList()
     {
         var str = '';
-        str = '<option value="">-- Select a Year</option>';
+        str = '<option value="">-- Select a Year --</option>';
 
         var thisYear = (new Date()).getFullYear();
 
@@ -397,7 +408,7 @@
                 else {
 
                     var str = '';
-                    str = '<option value="">-- Select a Media Type</option>';
+                    str = '<option value="">-- Select a Media Type --</option>';
                     $.each(data.report.rows, function (index) {
 
                         str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
@@ -446,7 +457,7 @@
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
         var str = '';
-        str = '<option value="">-- Select a Period</option>';
+        str = '<option value="">-- Select a Period --</option>';
 
         for (var i = 1; i <= 12; i++) {
 
@@ -469,10 +480,7 @@
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")//,
-                //              "inStationName": $("#searchText").val(),
-//                "inActiveOnly": "1"//,
-                //             "inOwnerID": $("#ddlOwner").val() == 0 ? null : $("#ddlOwner").val()
+                "inApiToken": getLocalStorage("APIToken")
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -483,7 +491,7 @@
                 else {
 
                     var str = '';
-                    str = '<option value="">-- Select a Product</option>';
+                    str = '<option value="">-- Select a Product --</option>';
                     $.each(data.report.rows, function (index) {
 
                         str = str + '<option value="' + data.report.rows[index].P_ProductID + '">' + data.report.rows[index].P_ProductName + '</option>';
@@ -512,9 +520,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-  //              "inStationName": $("#searchText").val(),
-                "inActiveOnly": "1"//,
-   //             "inOwnerID": $("#ddlOwner").val() == 0 ? null : $("#ddlOwner").val()
+                "inActiveOnly": "1"
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -525,7 +531,7 @@
                 else {
 
                     var str = '';
-                    str = '<option value="">-- Select a Station</option>';
+                    str = '<option value="">-- Select a Station --</option>';
                     $.each(data.report.rows, function (index) {
 
                         str = str + '<option value="' + data.report.rows[index].stationId + '">' + data.report.rows[index].stationName + '</option>';
@@ -582,7 +588,7 @@
                 else {
 
                     var str = '';
-                    str = '<option value="">-- Select a Market</option>';
+                    str = '<option value="">-- Select a Market --</option>';
                     $.each(data.report.rows, function (index) {
 
                         str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
@@ -623,7 +629,7 @@
                 else {
 
                     var str = '';
-                    str = '<option value="">-- Select a Market</option>';
+                    str = '<option value="">-- Select a Market --</option>';
                     $.each(data.report.rows, function (index) {
 
                         str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
@@ -667,7 +673,7 @@
 
                     var str = '';
 
-                    $("#ddlOwner").html("<option value=''> -- Select an Owner</option>");
+                    $("#ddlOwner").html("<option value=''> -- Select an Owner --</option>");
 
                     var holdOwnerID = "0";
 
@@ -941,13 +947,21 @@
 
         $.each(data, function (objectName, objectValue) {
 
-            if (reportObject.columnsToDisplay.includes(objectName)) {
+            if (reportObject.columnsToDisplay.includes(objectName))
+            {
                 var className = "";
-
-                if (isNaN(objectValue) == false)
-                {
-                    className = "text-align-right";
-
+ 
+                if (!objectValue) {
+                    className = "";
+                }
+                else {
+                    if (isNaN(objectValue) == false && objectValue.length > 0) {
+                        className = "text-align-right";
+                    }
+                    else
+                    {
+                        className = "";
+                    }
                 }
 
                 ctr++;
