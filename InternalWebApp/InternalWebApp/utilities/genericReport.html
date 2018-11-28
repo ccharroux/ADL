@@ -112,6 +112,10 @@
                             <label for="ddlOwner" class="dropdown-label rptView rptOwner">Owner</label>
                             <select id="ddlOwner" apiInput="inOwnerId" class="dropdown-select rptView rptOwner"></select>
                         </div>
+                        <div class="form-group rptView rptOwnerGroup" style="display:inline-block">
+                            <label for="ddlOwnerGroup" class="dropdown-label rptView rptOwnerGroup">Owner</label>
+                            <select id="ddlOwnerGroup" apiInput="inOwnerId" class="dropdown-select rptView rptOwnerGroup"></select>
+                        </div>
                         <div class="form-group rptView rptPersonnel" style="display:inline-block">
                             <div class="form-group" style="display:table-cell;">
                                 <label for="hidPersonnel" class="dropdown-label rptView rptPersonnel">Personnel</label>
@@ -696,6 +700,48 @@
 
     }
 
+    function getOwnerGroupList() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/OwnerGroup/GetOwnerGroupList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    var str = '';
+
+                    $("#ddlOwnerGroup").html("<option value=''> -- Select an Owner Group --</option>");
+
+                    var holdOwnerID = "0";
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = str + "<option value='" + obj.OG_OwnerGroupID + "'>" + obj.OG_OwnerGroupName + "</option>";
+
+                    });
+
+                    $("#ddlOwnerGroup").append(str);
+                    saveLoadedControlSelection("ddlOwnerGroup");
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
     //--------------------------------
     // Filters get loaded end here
     //--------------------------------

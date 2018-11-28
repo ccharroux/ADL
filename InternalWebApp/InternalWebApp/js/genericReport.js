@@ -32,7 +32,7 @@ reportName.push("rptStationChanges");
 reportName.push("rptMRREstimatedStationList");
 reportName.push("rptMRRStationManagerList");
 reportName.push("rptDetailedStationSetup");
-
+reportName.push("rptOwnershipGroupList");
 
 function buildReportArray()
 {
@@ -82,18 +82,9 @@ function buildReportObjectArray()
 }
 function getReportObject(inReportId)
 {
-    var arrayObject = new Object();
-
-    //for (var x = 0; x < reportObjectArray.length; x++)
-    //{
-    //    if (inReportId == reportObjectArray[x].id)
-    //    {
-    arrayObject = reportObjectArray[inReportId];
-    //        break;
-    //    }
-    //}
-
-    return arrayObject;
+ 
+    return reportObjectArray[inReportId];
+  
 }
 
 
@@ -1886,6 +1877,56 @@ function getReportObject_MRRStationManagerList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'mrr'
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_OwnershipGroupList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "OwnerGroup",
+        jsCall: "getOwnerGroupList",
+        objectName: "ddlOwnerGroup",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_OwnershipGroupList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("ownerGroupID");
+    columnsToDisplay.push("ownerGroupName");
+    columnsToDisplay.push("ownerGroupProductID");
+    columnsToDisplay.push("ownerGroupProductActiveDate");
+    columnsToDisplay.push("ownerGroupProductDisableDate");
+ 
+
+    tempObject =
+    {
+ 
+        reportTitle: "Ownership Group List",
+        apiControllerAction: "/api/OwnerGroupReport/GetOwnershipGroupList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'ownergroup'
     }
 
     return tempObject;
