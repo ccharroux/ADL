@@ -1,72 +1,38 @@
-
-
 var reportObjectArray = new Array();
 var reportFilterObjectArray = new Array();
 
-var ctr = 1
-const rptMRRMarketSummary = ctr
-
-ctr++;
-var rptXRAYUsage = ctr
-ctr++;
-var rptMRRUsage = ctr;
-ctr++;
-var rptTVBUsage = ctr;
-ctr++;
-var rptMarketRevenueHourlyActivity = ctr;
-ctr++;
-var rptUserActivity = ctr;
-ctr++;
-var rptUserActivityDetail = ctr;
-ctr++;
-var rptUserQuerySummary = ctr;
-ctr++;
-var rptUserQuerySummaryByOwner = ctr;
-ctr++;
-var rptUserListing = ctr;
-ctr++;
-var rptTraining = ctr;
-ctr++;
-var rptAEStatus = ctr;
-ctr++;
-var rptNationwideRecipients = ctr;
-ctr++;
-var rptNewUserListing = ctr;
-ctr++;
-var rptStationChangeHistory = ctr;
-ctr++;
-var rptMarketRevenueXRay = ctr;
-ctr++;
-var rptStationListing = ctr;
-ctr++;
-var rptMarketDelivery = ctr;
-ctr++;
-var rptTVBUserListing = ctr;
-
+var reportName = new Array();
+reportName.push("rptMRRMarketSummary")
+reportName.push("rptXRAYUsage")
+reportName.push("rptMRRUsage");
+reportName.push("rptTVBUsage");
+reportName.push("rptMarketRevenueHourlyActivity");
+reportName.push("rptUserActivity");
+reportName.push("rptUserActivityDetail");
+reportName.push("rptUserQuerySummary");
+reportName.push("rptUserQuerySummaryByOwner");
+reportName.push("rptUserListing");
+reportName.push("rptTraining");
+reportName.push("rptAEStatus");
+reportName.push("rptNationwideRecipients");
+reportName.push("rptNewUserListing");
+reportName.push("rptStationChangeHistory");
+reportName.push("rptMarketRevenueXRay");
+reportName.push("rptStationListing");
+reportName.push("rptMarketDelivery");
+reportName.push("rptTVBUserListing");
 // -- Parent Ownership
-ctr++;
-var rptParentOwnershipList = ctr;
-
+reportName.push("rptParentOwnershipList");
 // -- Ownership
-ctr++;
-var rptOwnershipList = ctr;
-
+reportName.push("rptOwnershipList");
 // -- Stations
-ctr++;
-var rptActiveStationList = ctr;
-ctr++;
-var rptDisabledStationList = ctr;
-ctr++;
-var rptStationChanges = ctr;
+reportName.push("rptActiveStationList");
+reportName.push("rptDisabledStationList");
+reportName.push("rptStationChanges");
+reportName.push("rptMRREstimatedStationList");
+reportName.push("rptMRRStationManagerList");
+reportName.push("rptDetailedStationSetup");
 
-ctr++;
-var rptMRREstimatedStationList = ctr;
-
-ctr++;
-var rptMRRStationManagerList = ctr;
-
-ctr++;
-var rptDetailedStationSetup = ctr;
 
 function buildReportArray()
 {
@@ -93,337 +59,43 @@ function buildReportArray()
     return reportArray;
 }
 
+buildReportObjectArray();
+console.log(reportObjectArray);
+
 //---------------------------
 // Generic Report Wrapper Routines
 //---------------------------
-function getReportObject(inReportId)
+function buildReportObjectArray()
 {
-
     var arrayObject = new Object();
 
-    //switch (inReportId)
+    for (var x = 0; x < reportName.length; x++)
+    {
+        var module = reportName[x].replace("rpt", "");
+        arrayObject = window[("getReportObject_" + module)]();
+        arrayObject.filters = window[("getReportFilterArray_" + module)]();
+        reportObjectArray.push(arrayObject);
+
+    }
+
+
+}
+function getReportObject(inReportId)
+{
+    var arrayObject = new Object();
+
+    //for (var x = 0; x < reportObjectArray.length; x++)
     //{
-    
-    if (inReportId == rptMRRMarketSummary)
-    {
-        arrayObject = getReportObject_MRRMarketSummary();
-        //
-    }
-
-    if (inReportId == rptXRAYUsage)
-    {
-        arrayObject = getReportObject_XRAYUsage();
-        //
-    }
-
-    if (inReportId ==  rptMRRUsage)
-    {
-        arrayObject = getReportObject_MRRUsage(); 
-        //
-    }
-
-    if (inReportId ==  rptTVBUsage)
-    {
-        arrayObject = getReportObject_TVBUsage(); 
-        //
-    }
-
-    if (inReportId ==  rptMarketRevenueHourlyActivity)
-    {
-        arrayObject = getReportObject_MarketRevenueHourlyActivity();
-        //
-    }
-
-    if (inReportId ==  rptUserActivity)
-    {
-        arrayObject = getReportObject_UserActivity();
-        //
-    }
-
-    if (inReportId ==  rptUserActivityDetail)
-    {
-        arrayObject = getReportObject_UserActivityDetail();
-        //
-    }
-
-    if (inReportId ==  rptUserQuerySummary)
-    {
-        arrayObject = getReportObject_UserQuerySummary();
-        //
-    }
-
-    if (inReportId ==  rptUserQuerySummaryByOwner)
-    {
-        arrayObject = getReportObject_UserQuerySummaryByOwner();
-        //
-    }
-
-    if (inReportId ==  rptUserListing)
-    {
-        arrayObject = getReportObject_UserListing();
-        //
-    }
-
-    if (inReportId ==  rptTraining)
-    {
-        arrayObject = getReportObject_Training();
-        //
-    }
-
-    if (inReportId ==  rptAEStatus)
-    {
-        arrayObject = getReportObject_AEStatus();
-        //
-    }
-
-    if (inReportId ==  rptNationwideRecipients)
-    {
-        arrayObject = getReportObject_NationwideRecipients();
-        //
-    }
-
-    if (inReportId ==  rptNewUserListing)
-    {
-        arrayObject = getReportObject_NewUserListing();
-        //
-    }
-
-    if (inReportId ==  rptStationChangeHistory)
-    {
-        arrayObject = getReportObject_StationChangeHistory();
-        //
-    }
-
-    if (inReportId ==  rptMarketRevenueXRay)
-    {
-        arrayObject = getReportObject_MarketRevenueXRay();
-        //
-    }
-
-    if (inReportId ==  rptStationListing)
-    {
-        arrayObject = getReportObject_StationListing();
-        //
-    }
-
-    if (inReportId ==  rptMarketDelivery)
-    {
-        arrayObject = getReportObject_MarketDelivery();
-        //
-    }
-
-    if (inReportId ==  rptTVBUserListing)
-    {
-        arrayObject = getReportObject_TVBUserListing();
-        //
-    }
-
-    if (inReportId == rptOwnershipList)
-    {
-        arrayObject = getReportObject_OwnershipList();
-        //
-    }
-
-    if (inReportId == rptParentOwnershipList)
-    {
-        arrayObject = getReportObject_ParentOwnershipList();
-        //
-    }
-
-    if (inReportId == rptActiveStationList) {
-        arrayObject = getReportObject_ActiveStationList();
-    }
-
-    if (inReportId == rptDisabledStationList) {
-        arrayObject = getReportObject_DisabledStationList();
-    }
-
-    if (inReportId == rptStationChanges) {
-        arrayObject = getReportObject_StationChanges();
-    }
-
-    if (inReportId == rptMRREstimatedStationList) {
-        arrayObject = getReportObject_MRREstimatedStationList();
-    }
-
-    if (inReportId == rptDetailedStationSetup) {
-        arrayObject = getReportObject_DetailedStationSetup();
-    }
-
-    if (inReportId == rptMRRStationManagerList) {
-        arrayObject = getReportObject_MRRStationManagerList();
-    }
-
-
-    // }
+    //    if (inReportId == reportObjectArray[x].id)
+    //    {
+    arrayObject = reportObjectArray[inReportId];
+    //        break;
+    //    }
+    //}
 
     return arrayObject;
 }
-function getReportFilterArray(inReportId) 
-{
 
-    var arrayFilters = new Array();
-
-    //switch (inReportId)
-    //{
-        if (inReportId ==  rptMRRMarketSummary)
-        {
-            arrayFilters = getReportFilterArray_MRRMarketSummary();
-            
-        }
-
-        if (inReportId ==   rptXRAYUsage)
-        {
-            arrayFilters = getReportFilterArray_XRAYUsage();
-            
-
-        }
-
-        if (inReportId ==   rptMRRUsage) 
-        {
-            arrayFilters = getReportFilterArray_MRRUsage();
-            
-        }
-
-        if (inReportId ==   rptTVBUsage) 
-        {
-            arrayFilters = getReportFilterArray_TVBUsage();
-            
-        }
-
-        if (inReportId ==   rptMarketRevenueHourlyActivity)
-        {
-            arrayFilters = getReportFilterArray_MarketRevenueHourlyActivity();
-            
-        }
-
-        if (inReportId ==   rptUserActivity) 
-        {
-            arrayFilters = getReportFilterArray_UserActivity();
-            
-        }
-
-        if (inReportId ==   rptUserActivityDetail)
-        {
-            arrayFilters = getReportFilterArray_UserActivityDetail();
-            
-        }
-
-        if (inReportId ==   rptUserQuerySummary)
-        {
-            arrayFilters = getReportFilterArray_UserQuerySummary();
-            
-        }
-
-
-        if (inReportId ==  rptUserQuerySummaryByOwner)
-        {
-            arrayFilters = getReportFilterArray_UserQuerySummaryByOwner();
-            
-        }
-
-        if (inReportId ==  rptUserListing)
-        {
-            arrayFilters = getReportFilterArray_UserListing();
-            
-        }
-
-        if (inReportId ==  rptTraining)
-        {
-            arrayFilters = getReportFilterArray_Training();
-            
-        }
-
-        if (inReportId ==  rptAEStatus)
-        {
-            arrayFilters = getReportFilterArray_AEStatus();
-            
-        }
-
-        if (inReportId ==  rptNationwideRecipients)
-        {
-            arrayFilters = getReportFilterArray_NationwideRecipients();
-            
-        }
-
-        if (inReportId ==  rptNewUserListing)
-        {
-            arrayFilters = getReportFilterArray_NewUserListing();
-            
-        }
-
-        if (inReportId ==  rptStationChangeHistory)
-        {
-            arrayFilters = getReportFilterArray_StationChangeHistory();
-            
-        }
-
-        if (inReportId ==  rptMarketRevenueXRay)
-        {
-            arrayFilters = getReportFilterArray_MarketRevenueXRay();
-            
-        }
-
-        if (inReportId ==  rptStationListing)
-        {
-            arrayFilters = getReportFilterArray_StationListing();
-            
-        }
-
-        if (inReportId ==  rptMarketDelivery)
-        {
-            arrayFilters = getReportFilterArray_MarketDelivery();
-            
-        }
-
-        if (inReportId ==  rptTVBUserListing)
-        {
-            arrayFilters = getReportFilterArray_TVBUserListing();
-            
-        }
-
-        if (inReportId ==  rptParentOwnershipList)
-        {
-            arrayFilters = getReportFilterArray_ParentOwnershipList();
-            
-        }
-
-        if (inReportId ==  rptOwnershipList)
-        {
-            arrayFilters = getReportFilterArray_OwnershipList();
-            
-        }
-
-        if (inReportId == rptActiveStationList)
-        {
-            arrayFilters = getReportFilterArray_ActiveStationList();
-        }
-
-        if (inReportId == rptDisabledStationList)
-        {
-            arrayFilters = getReportFilterArray_DisabledStationList();
-        }
-
-        if (inReportId == rptStationChanges) {
-            arrayFilters = getReportFilterArray_StationChanges();
-        }
-
-        if (inReportId == rptMRREstimatedStationList) {
-            arrayFilters = getReportFilterArray_MRREstimatedStationList();
-        }
-
-        if (inReportId == rptDetailedStationSetup) {
-            arrayFilters = getReportFilterArray_DetailedStationSetup();
-        }
-
-        if (inReportId == rptMRRStationManagerList) {
-            arrayFilters = getReportFilterArray_MRRStationManagerList();
-        }
-
-    //}
-
-    return arrayFilters;
-}
 
 //-------------------------
 // REPORT AREA
@@ -480,7 +152,7 @@ function getReportObject_ParentOwnershipList() {
 
     tempObject =
     {
-        id: rptParentOwnershipList,
+        // id: rptParentOwnershipList,
         reportTitle: "Parent Ownership List",
         apiControllerAction: "/api/ParentOwnershipReport/GetParentOwnershipList",
         apiType: "get",
@@ -540,7 +212,7 @@ function getReportObject_OwnershipList() {
 
     tempObject =
     {
-        id: rptOwnershipList,
+        // id: rptOwnershipList,
         reportTitle: "Ownership List",
         apiControllerAction: "/api/OwnerReport/GetOwnerList",
         apiType: "get",
@@ -602,7 +274,7 @@ function getReportObject_MRRMarketSummary()
 
     tempObject =
     {
-        id: rptMRRMarketSummary,
+        // id: rptMRRMarketSummary,
         reportTitle:  "Market Summary",
         apiControllerAction:  "/api/MRRReport/GetMarketSummary",
         apiType:  "get",
@@ -669,7 +341,7 @@ function getReportObject_XRAYUsage() {
 
     tempObject =
     {
-        id: rptXRAYUsage,
+        // id: rptXRAYUsage,
         reportTitle:  "XRay Usage Report",
         apiControllerAction:  "/api/XRAYReport/GetXRayUsage",
         apiType:  "get",
@@ -737,7 +409,7 @@ function getReportObject_MRRUsage() {
 
     tempObject =
     {
-        id: rptMRRUsage,
+        // id: rptMRRUsage,
         reportTitle:  "MRR Usage Report",
         apiControllerAction:  "/api/MRRReport/GetMRRUsage",
         apiType:  "get",
@@ -805,7 +477,7 @@ function getReportObject_TVBUsage() {
 
     tempObject =
     {
-        id: rptTVBUsage,
+        // id: rptTVBUsage,
         reportTitle:  "TVB Usage Report",
         apiControllerAction:  "/api/TVBReport/GetTVBUsage",
         apiType:  "get",
@@ -874,7 +546,7 @@ function getReportObject_MarketRevenueHourlyActivity() {
 
     tempObject =
     {
-        id: rptMarketRevenueHourlyActivity,
+        // id: rptMarketRevenueHourlyActivity,
         reportTitle:  "MRR Hourly Usage",
         apiControllerAction:  "/api/MRRReport/GetHourlyActivity",
         apiType:  "get",
@@ -943,7 +615,7 @@ function getReportObject_UserActivity() {
 
     tempObject =
     {
-        id: rptUserActivity,
+        // id: rptUserActivity,
         reportTitle:  "XRay User Activity",
         apiControllerAction:  "/api/XRAYReport/GetUserActivity",
         apiType:  "get",
@@ -1011,7 +683,7 @@ function getReportObject_UserActivityDetail() {
 
     tempObject =
     {
-        id: rptUserActivityDetail,
+        // id: rptUserActivityDetail,
         reportTitle:  "XRay User Activity - Detail",
         apiControllerAction:  "/api/XRAYReport/GetUserActivityDetail",
         apiType:  "get",
@@ -1073,7 +745,7 @@ function getReportObject_UserQuerySummary() {
 
     tempObject =
     {
-        id: rptUserQuerySummary,
+        // id: rptUserQuerySummary,
         reportTitle:  "XRay Query Summary",
         apiControllerAction:  "/api/XRAYReport/GetUserQuerySummary",
         apiType:  "get",
@@ -1141,7 +813,7 @@ function getReportObject_UserQuerySummaryByOwner() {
 
     tempObject =
     {
-        id: rptUserQuerySummaryByOwner,
+        // id: rptUserQuerySummaryByOwner,
         reportTitle:  "XRay Query Summary - By Owner",
         apiControllerAction:  "/api/XRAYReport/GetUserQuerySummaryByOwner",
         apiType:  "get",
@@ -1200,7 +872,7 @@ function getReportObject_UserListing() {
 
     tempObject =
     {
-        id: rptUserListing,
+        // id: rptUserListing,
         reportTitle:  "User Listing",
         apiControllerAction:  "/api/PersonnelReport/GetUserListing",
         apiType:  "get",
@@ -1243,7 +915,7 @@ function getReportObject_AEStatus() {
 
     tempObject =
     {
-        id: rptAEStatus,
+        // id: rptAEStatus,
         reportTitle:  "XRay Account Executive Status",
         apiControllerAction:  "/api/AccountExecutiveReport/GetAEStatus",
         apiType:  "get",
@@ -1318,7 +990,7 @@ function getReportObject_MarketDelivery() {
 
     tempObject =
     {
-        id: rptMarketDelivery,
+        // id: rptMarketDelivery,
         reportTitle:  "Market Delivery",
         apiControllerAction:  "/api/MarketReport/GetMarketDelivery",
         apiType:  "get",
@@ -1370,7 +1042,7 @@ function getReportObject_TVBUserListing() {
 
     tempObject =
     {
-        id: rptTVBUserListing,
+        // id: rptTVBUserListing,
         reportTitle:  "TVB User Listing",
         apiControllerAction:  "/api/TVBReport/GetTVBUserListing",
         apiType:  "get",
@@ -1442,7 +1114,7 @@ function getReportObject_NewUserListing() {
 
     tempObject =
     {
-        id: rptNewUserListing,
+        // id: rptNewUserListing,
         reportTitle:  "New User Listing",
         apiControllerAction:  "/api/PersonnelReport/GetNewUserListing",
         apiType:  "get",
@@ -1503,7 +1175,7 @@ function getReportObject_StationListing() {
 
     tempObject =
     {
-        id: rptStationListing,
+        // id: rptStationListing,
         reportTitle:  "Station Listing",
         apiControllerAction:  "/api/StationReport/GetStationListing",
         apiType:  "get",
@@ -1573,7 +1245,7 @@ function getReportObject_Training() {
 
     tempObject =
     {
-        id: rptTraining,
+        // id: rptTraining,
         reportTitle:  "Training",
         apiControllerAction:  "/api/Report/GetTraining",
         apiType:  "get",
@@ -1645,7 +1317,7 @@ function getReportObject_StationChangeHistory() {
 
     tempObject =
     {
-        id: rptStationChangeHistory,
+        // id: rptStationChangeHistory,
         reportTitle:  "Station Change History",
         apiControllerAction:  "/api/StationReport/GetStationChangeHistory",
         apiType:  "get",
@@ -1705,7 +1377,7 @@ function getReportObject_NationwideRecipients() {
 
     tempObject =
     {
-        id: rptNationwideRecipients,
+        // id: rptNationwideRecipients,
         reportTitle:  "XRay Nationwide Queries",
         apiControllerAction:  "/api/XRAYReport/GetNationwideRecipients",
         apiType:  "get",
@@ -1774,7 +1446,7 @@ function getReportObject_MarketRevenueXRay() {
 
     tempObject =
     {
-        id: rptMarketRevenueXRay,
+        // id: rptMarketRevenueXRay,
         reportTitle:  "MRR / XRay Revenue Comparision",
         apiControllerAction:  "/api/Report/GetMarketRevenueRevenueXRay",
         apiType:  "get",
@@ -1845,7 +1517,7 @@ function getReportObject_ActiveStationList() {
 
     tempObject =
     {
-        id: rptActiveStationList,
+        // id: rptActiveStationList,
         reportTitle: "Active Stations",
         apiControllerAction: "/api/StationReport/GetActiveStationListing",
         apiType: "get",
@@ -1914,7 +1586,7 @@ function getReportObject_DisabledStationList() {
 
     tempObject =
     {
-        id: rptDisabledStationList,
+        // id: rptDisabledStationList,
         reportTitle: "Disabled Stations",
         apiControllerAction: "/api/StationReport/GetDisabledStationListing",
         apiType: "get",
@@ -2004,7 +1676,7 @@ function getReportObject_StationChanges() {
 
     tempObject =
     {
-        id: rptStationChanges,
+        // id: rptStationChanges,
         reportTitle: "Station Changes",
         apiControllerAction: "/api/StationReport/GetStationChanges",
         apiType: "get",
@@ -2065,7 +1737,7 @@ function getReportObject_MRREstimatedStationList() {
 
     tempObject =
     {
-        id: rptMRREstimatedStationList,
+        // id: rptMRREstimatedStationList,
         reportTitle: "MRR Estimated Station List",
         apiControllerAction: "/api/MRRReport/GetMRREstimatedStationList",
         apiType: "get",
@@ -2141,7 +1813,7 @@ function getReportObject_DetailedStationSetup() {
 
     tempObject =
     {
-        id: rptDetailedStationSetup,
+        // id: rptDetailedStationSetup,
         reportTitle: "Detailed Station Setup",
         apiControllerAction: "/api/StationReport/GetDetailedStationSetup",
         apiType: "get",
@@ -2208,7 +1880,7 @@ function getReportObject_MRRStationManagerList() {
 
     tempObject =
     {
-        id: rptMRRStationManagerList,
+        // id: rptMRRStationManagerList,
         reportTitle: "MRR Station Manager List",
         apiControllerAction: "/api/MRRReport/GetMRRStationManagerList",
         apiType: "get",
