@@ -32,7 +32,12 @@ reportName.push("rptStationChanges");
 reportName.push("rptMRREstimatedStationList");
 reportName.push("rptMRRStationManagerList");
 reportName.push("rptDetailedStationSetup");
+
+// owner groups
 reportName.push("rptOwnershipGroupList");
+reportName.push("rptOwnershipGroupDistributionList");
+reportName.push("rptMarketOwnershipGroup");
+reportName.push("rptDetailedOwnerGroupSetup");
 
 function buildReportArray()
 {
@@ -1927,6 +1932,163 @@ function getReportObject_OwnershipGroupList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'ownergroup'
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_OwnershipGroupDistributionList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Personnel",
+        jsCall: null,
+        objectName: "hidPersonnel",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+
+    arrayObject = {
+        token: "OwnerGroup",
+        jsCall: "getOwnerGroupList",
+        objectName: "ddlOwnerGroup",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_OwnershipGroupDistributionList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    //columnsToDisplay.push("ownerGroupName");
+    //columnsToDisplay.push("recipientName");
+    //columnsToDisplay.push("recipientEmail");
+    //columnsToDisplay.push("recipientPhone");
+    //columnsToDisplay.push("recipientFax");
+    //columnsToDisplay.push("recipientMobile");
+
+
+    tempObject =
+    {
+
+        reportTitle: "Ownership Group Distribution List",
+        apiControllerAction: "/api/OwnerGroupReport/GetOwnershipGroupDistributionList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'ownergroup'
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_MarketOwnershipGroup() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "OwnerGroup",
+        jsCall: "getOwnerGroupList",
+        objectName: "ddlOwnerGroup",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MarketOwnershipGroup() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+ 
+
+    tempObject =
+    {
+
+        reportTitle: "Market Ownership Group",
+        apiControllerAction: "/api/OwnerGroupReport/GetMarketOwnershipGroup",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'ownergroup'
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_DetailedOwnerGroupSetup() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "OwnerGroup",
+        jsCall: "getOwnerGroupList",
+        objectName: "ddlOwnerGroup",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_DetailedOwnerGroupSetup() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("ownerGroupName");
+    columnsToDisplay.push("ownerName");
+    columnsToDisplay.push("productID");
+    columnsToDisplay.push("productActive");
+    columnsToDisplay.push("productActiveDate");
+    columnsToDisplay.push("productDisableDate");
+    columnsToDisplay.push("misc");
+
+    tempObject =
+    {
+
+        reportTitle: "Detailed Ownership Group Setup",
+        apiControllerAction: "/api/OwnerGroupReport/GetDetailedOwnerGroupSetup",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'ownergroup',
+        sortable: false
     }
 
     return tempObject;
