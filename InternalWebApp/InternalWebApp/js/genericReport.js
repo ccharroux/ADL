@@ -39,6 +39,16 @@ reportName.push("rptOwnershipGroupDistributionList");
 reportName.push("rptMarketOwnershipGroup");
 reportName.push("rptDetailedOwnerGroupSetup");
 
+// Markets
+reportName.push("rptMarketSetupMarket");
+reportName.push("rptMarketSetupMarketMRRCategories");
+reportName.push("rptMarketSetupMarketMRRReports");
+reportName.push("rptMarketSetupMarketOwnerGroups");
+reportName.push("rptMarketSetupMarketProducts");
+reportName.push("rptMarketSetupMarketStations");
+reportName.push("rptMarketSetupMarketUsers");
+reportName.push("rptMarketSetupMarketVirtualGroups");
+
 function buildReportArray()
 {
     var reportCounter = 1
@@ -77,6 +87,7 @@ function buildReportObjectArray()
     for (var x = 0; x < reportName.length; x++)
     {
         var module = reportName[x].replace("rpt", "");
+ 
         arrayObject = window[("getReportObject_" + module)]();
         arrayObject.filters = window[("getReportFilterArray_" + module)]();
         reportObjectArray.push(arrayObject);
@@ -2089,6 +2100,288 @@ function getReportObject_DetailedOwnerGroupSetup() {
         columnsToDisplay: columnsToDisplay,
         product: 'ownergroup',
         sortable: false
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_MarketSetupMarket() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MarketSetupMarket() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+ 
+    tempObject =
+    {
+
+        reportTitle: "Market Setup - Market",
+        apiControllerAction: "/api/MarketReport/GetMarketSetupMarket",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'market',
+        sortable: true
+    }
+
+    return tempObject;
+
+}
+
+
+function getReportFilterArray_MarketSetupMarketMRRCategories() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MarketSetupMarketMRRCategories() {
+
+    var columnsToDisplay = new Array();
+    var tempObject = new Object();
+
+
+    tempObject =
+    {
+
+        reportTitle: "Market Setup - MRR Categories",
+        apiControllerAction: "/api/MarketReport/GetMarketSetupMarketMRRCategories",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'market',
+        sortable: true
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_MarketSetupMarketMRRReports() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MarketSetupMarketMRRReports() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Market Setup - MRR Reports",
+        apiControllerAction: "/api/MarketReport/GetMarketSetupMarketMRRReports",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'market',
+        sortable: true
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_MarketSetupMarketOwnerGroups() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MarketSetupMarketOwnerGroups() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Market Setup - Owner Groups",
+        apiControllerAction: "/api/MarketReport/GetMarketSetupMarketOwnerGroups",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'market',
+        sortable: true
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_MarketSetupMarketProducts() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MarketSetupMarketProducts() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Market Setup - Products",
+        apiControllerAction: "/api/MarketReport/GetMarketSetupMarketProducts",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'market',
+        sortable: true
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_MarketSetupMarketStations() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MarketSetupMarketStations() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Market Setup - Stations",
+        apiControllerAction: "/api/MarketReport/GetMarketSetupMarketStations",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'market',
+        sortable: true
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_MarketSetupMarketUsers() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MarketSetupMarketUsers() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Market Setup - Users",
+        apiControllerAction: "/api/MarketReport/GetMarketSetupMarketUsers",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'market',
+        sortable: true
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_MarketSetupMarketVirtualGroups() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MarketSetupMarketVirtualGroups() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Market Setup - Market Virtual Groups",
+        apiControllerAction: "/api/MarketReport/GetMarketSetupMarketVirtualGroups",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'market',
+        sortable: true
     }
 
     return tempObject;
