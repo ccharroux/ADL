@@ -51,6 +51,7 @@ reportName.push("rptMarketSetupMarketVirtualGroups");
 
 // Personnal
 reportName.push("rptPersonnelContactList");
+reportName.push("rptPersonnelRecipientList");
 
 function buildReportArray()
 {
@@ -2429,6 +2430,14 @@ function getReportFilterArray_PersonnelContactList() {
     arrayFilters.push(arrayObject);
 
     arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
         token: "Personnel",
         jsCall: null,
         objectName: "hidPersonnel",
@@ -2447,6 +2456,81 @@ function getReportObject_PersonnelContactList() {
 
         reportTitle: "Personnel - Contact List",
         apiControllerAction: "/api/PersonnelReport/GetPersonnelContactList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'personnel',
+        sortable: true
+    }
+
+    return tempObject;
+
+}
+
+
+function getReportFilterArray_PersonnelRecipientList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationList",
+        objectName: "ddlStation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationList",
+        objectName: "ddlStation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Personnel",
+        jsCall: null,
+        objectName: "hidPersonnel",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_PersonnelRecipientList() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Personnel - Recipient List",
+        apiControllerAction: "/api/PersonnelReport/GetPersonnelRecipientList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'personnel',
