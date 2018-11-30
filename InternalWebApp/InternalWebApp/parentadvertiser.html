@@ -102,28 +102,6 @@
                     </div>
 
                     <div class="row input-row link-parent-advertiser">
-                        <div class="col-md-3">
-
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <div>
-                                <input value="Search Parent Advertiser" onclick="searchLinkParentAdvertiser();" class="default-button" type="button">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row input-row link-parent-advertiser">
-                        <div class="col-md-3">
-
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <div>
-                                <input value="Link Parent Advertiser" onclick="linkParentAdvertiserQuestion();" class="default-button" type="button">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row input-row link-parent-advertiser">
                         <div class="col-md-3 text-align-left">
                             <label for="txtLinkedParentAdvertiser">Linked Parent Advertiser</label>
                         </div>
@@ -141,7 +119,28 @@
                             <input class="field-width-325 disabled" type="text" id="txtLinkedParentAdvertiserId" disabled="disabled" />
                         </div>
                     </div>
+                    
+                    <div class="row input-row link-parent-advertiser">
+                        <div class="col-md-3">
 
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <div>
+                                <input value="Search Parent Advertiser" onclick="searchLinkParentAdvertiser();" class="default-button" type="button">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row input-row link-parent-advertiser link-parent" style="display: none">
+                        <div class="col-md-3">
+
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <div>
+                                <input value="Link Parent Advertiser" onclick="linkParentAdvertiserQuestion();" class="default-button" type="button">
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
@@ -161,7 +160,7 @@
                         </div>
                     </div>
 
-                    <div class="row input-row change-date">
+                    <div class="row input-row change-date" style="display: none;">
                         <div class="col-md-3 text-align-left">
                             <label for="txtChangeDate">Change Date</label>
                         </div>
@@ -334,6 +333,8 @@
                         $("#txtParentAdvertiserId").val(obj["parentAdvertiserId"]);
                         $("#txtParentAdvertiserName").val(obj["parentAdvertiserName"]);
 
+                        $(".link-parent-advertiser").show();
+
                         $("#ddlIndustry").val(obj["industryId"]);
 
                         if (obj["dateSetup"] !== null) {
@@ -353,6 +354,7 @@
                             $("#txtChangeDate").val(addZero(changeDate.getMonth() + 1) + '/' + addZero(changeDate.getDate()) + '/' + changeDate.getFullYear());
                         }
 
+                        $('.change-date').show();
 
                         if (obj["disableDate"] !== null) {
                             var disableDate = new Date(obj["disableDate"]);
@@ -568,6 +570,7 @@
 
     function loadSearchResults() {
         if (getLocalStorage("gSearchResults").length <= 0) {
+            turnOnLinkParentAdvertiser();
             return;
         }
 
@@ -587,6 +590,8 @@
         $('#txtChangeDate').val(searchResults["changeDate"]);
 
         setLocalStorage("gSearchResults", "");
+
+        turnOnLinkParentAdvertiser();
     }
 
     function linkParentAdvertiserQuestion() {
@@ -628,6 +633,20 @@
             errorMessage = "If you would like to link the Parent Advertiser, you need to choose a new Parent Advertiser first. \n\r" +
                 " Followed by clicking Link Parent Advertiser.";
             bootbox.alert(errorMessage, function () { });
+        }
+    }
+
+    //txtLinkedParentAdvertiserId
+
+    function turnOnLinkParentAdvertiser() {
+
+        if ($("#txtLinkedParentAdvertiserId").val().length == 0) {
+            //hide
+            $(".link-parent").hide();
+        
+        } else {
+            //show
+            $(".link-parent").show();
         }
     }
 
