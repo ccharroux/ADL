@@ -49,6 +49,9 @@ reportName.push("rptMarketSetupMarketStations");
 reportName.push("rptMarketSetupMarketUsers");
 reportName.push("rptMarketSetupMarketVirtualGroups");
 
+// Personnal
+reportName.push("rptPersonnelContactList");
+
 function buildReportArray()
 {
     var reportCounter = 1
@@ -2381,6 +2384,72 @@ function getReportObject_MarketSetupMarketVirtualGroups() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'market',
+        sortable: true
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_PersonnelContactList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationList",
+        objectName: "ddlStation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationList",
+        objectName: "ddlStation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Personnel",
+        jsCall: null,
+        objectName: "hidPersonnel",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_PersonnelContactList() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Personnel - Contact List",
+        apiControllerAction: "/api/PersonnelReport/GetPersonnelContactList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'personnel',
         sortable: true
     }
 
