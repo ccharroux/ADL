@@ -157,17 +157,7 @@
                         </div>
                     </div>
 
-
-                    <!--<div class="row input-row link-parent">
-                        <div class="col-md-3 text-align-left">
-                            <label for="chkLinkParent">Link Parent</label>
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <input type="checkbox" id="chkLinkParent" value="">
-                        </div>
-                    </div>-->
-                    
-                    <div class="row input-row link-parent">
+                    <div class="row input-row link-parent" style="display: none;">
                         <div class="col-md-3 text-align-left">
                             <!--<label for="chkLinkParent">Link Parent</label>-->
                         </div>
@@ -186,18 +176,7 @@
                         </div>
                     </div>
 
-                    <div class="row input-row link-advertiser">
-                        <div class="col-md-3">
-
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <div>
-                                <input value="Link Advertiser" onclick="searchLinkAdvertiser();" class="default-button" type="button">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row input-row link-advertiser">
+                    <div class="row input-row advertiser-link-advertiser">
                         <div class="col-md-3 text-align-left">
                             <label for="txtLinkedAdvertiser">Linked Advertiser</label>
                         </div>
@@ -206,13 +185,24 @@
                         </div>
                     </div>
 
-                    <div class="row input-row link-advertiser">
+                    <div class="row input-row advertiser-link-advertiser">
                         <div class="col-md-3 text-align-left">
                             <label for="txtLinkedAdvertiserId">Linked Advertiser ID</label>
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input type="hidden" id="oldLinkedAdvertiserId" value="" />
                             <input class="field-width-325 disabled" type="text" id="txtLinkedAdvertiserId" disabled="disabled" />
+                        </div>
+                    </div>
+                    
+                    <div class="row input-row advertiser-link-advertiser">
+                        <div class="col-md-3">
+
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <div>
+                                <input value="Link Advertiser Search" onclick="searchLinkAdvertiser();" class="default-button" type="button">
+                            </div>
                         </div>
                     </div>
 
@@ -234,7 +224,7 @@
                         </div>
                     </div>
 
-                    <div class="row input-row change-date">
+                    <div class="row input-row change-date" style="display: none;">
                         <div class="col-md-3 text-align-left">
                             <label for="txtChangeDate">Change Date</label>
                         </div>
@@ -296,23 +286,12 @@
         buildXRYMenu("Advertiser");
 
         advertiserId = (getParameterByName("AdvertiserID") == null ? 0 : getParameterByName("AdvertiserID"));
+
         $("#txtAdvertiserId").val(advertiserId);
 
         bIsNew = advertiserId <= 0;
 
         getMarketList();
-
-        //$("#chkActive").change(function () {
-        //    if (this.checked) {
-        //        $(".disable-date").hide();
-        //    } else {
-        //        if ($("#txtDisableDate").val().length <= 0) {
-        //            var todaysDate = new Date();
-        //            $("#txtDisableDate").val(addZero(todaysDate.getMonth() + 1) + '/' + addZero(todaysDate.getDate()) + '/' + todaysDate.getFullYear());
-        //        }
-        //        $(".disable-date").show();
-        //    }
-        //});
 
         //set local setting for the back button
 
@@ -510,7 +489,7 @@
         if (advertiserId <= 0) {
             initializeActiveDate();
             $('.link-parent').hide();
-            $('.link-advertiser').hide();
+            $('.advertiser-link-advertiser').hide();
             $('.change-date').hide();
             loadSearchResults();
             return;
@@ -545,11 +524,8 @@
 
                         $("#txtAdvertiserId").val(obj["advertiserId"]);
                         $("#txtAdvertiserName").val(obj["advertiserName"]);
-                        //$("#oldAdvertiserName").val(obj["advertiserName"]);
 
                         $("#ddlIndustry").val(obj["industryId"]);
-                        //$("#oldIndustryId").val(obj["industryId"]);
-                        //$("#oldSubIndustryId").val(obj["subIndustryId"]);
 
                         $("#txtParentAdvertiserId").val(obj["parentAdvertiserId"]);
                         $("#oldParentAdvertiserId").val(obj["parentAdvertiserId"]);
@@ -560,8 +536,6 @@
 
                         //need to add linked advertiser id and name
                         $("#txtLinkedAdvertiserId").val(obj["linkedToAdvertiserId"]);
-                        //$("#oldLinkedAdvertiserId").val(obj["linkedToAdvertiserId"]);
-
                         $("#txtLinkedAdvertiser").val(obj["linkedToAdvertiserName"]);
 
                         if (obj["mediaCodeId"] === null || obj["mediaCodeId"].length === 0) {
@@ -572,7 +546,6 @@
 
                         if (obj["dateSetup"] !== null) {
                             var activeDate = new Date(obj["dateSetup"]);
-                            //console.log(activeDate);
                             $("#txtActiveDate").val(addZero(activeDate.getMonth() + 1) + '/' + addZero(activeDate.getDate()) + '/' + activeDate.getFullYear());
                         }
 
@@ -580,6 +553,8 @@
                             var changeDate = new Date(obj["dateChanged"]);
                             $("#txtChangeDate").val(addZero(changeDate.getMonth() + 1) + '/' + addZero(changeDate.getDate()) + '/' + changeDate.getFullYear());
                         }
+
+                        $('.change-date').show();
 
                         if (obj["disableDate"] === null) {
                             $("#chkActive").prop('checked', true);
@@ -598,6 +573,8 @@
                         } else {
                             $(".disable-date").hide();
                         }
+
+                        $('.advertiser-link-advertiser').show();
 
                         getSubIndustryList(obj["industryId"], obj["subIndustryId"]);
                         loadSearchResults(); //may need to find a better place for this
@@ -699,53 +676,6 @@
             return;
         }
 
-        //removed this code since moving to using a button instead of a check box.
-        ////if linking parent advertisers give a warning and store value
-        //if ($('#chkLinkParent').is(':checked') && $("#txtParentAdvertiserId").val().length > 0 &&
-        //    $("#oldParentAdvertiserId").val() !== $("#txtParentAdvertiserId").val()) {
-        //    //if cancel return
-        //    //else set bLinkParentAdvertiser to true
-        //    var parentAdvertiserMessage = "You are about to move parent advertiser " + $("#oldParentAdvertiserName").val() +
-        //        "'s revenue to parent advertiser " + $("#txtParentAdvertiserName").val() +
-        //        ".  This action is irreversible.  \n\r\n\r Do you wish to proceed?";
-
-        //    bootbox.confirm(parentAdvertiserMessage,
-        //        function (result) {
-
-        //            if (result) {
-        //                bLinkParentAdvertiser = true;
-        //            } else {
-        //                return;
-        //            }
-
-        //            if ($("#txtLinkedAdvertiserId").val().length > 0 &&
-        //                $("#oldLinkedAdvertiserId").val() !== $("#txtLinkedAdvertiserId").val()) {
-        //                //if cancel return
-        //                //else set bLinkAdvertiser to true
-        //                var advertiserMessage = "You are about to move " +
-        //                    $("#txtAdvertiserName").val() +
-        //                    "'s revenue history to " +
-        //                    $("#txtLinkedAdvertiser").val() +
-        //                    ".  This action is irreversible. \n\r\n\r Do you wish to proceed?";
-
-        //                bootbox.confirm(advertiserMessage,
-        //                    function (result) {
-
-        //                        if (result) {
-        //                            bLinkAdvertiser = true;
-        //                        } else {
-        //                            return;
-        //                        }
-
-        //                        callUpdateAdvertiserApi();
-        //                    });
-        //            } else {
-        //                callUpdateAdvertiserApi();
-        //            }
-        //        });
-        //}
-        //    //if changing linked advertisers give a warning and store value
-        //else
         if ($("#txtLinkedAdvertiserId").val().length > 0 &&
             $("#oldLinkedAdvertiserId").val() !== $("#txtLinkedAdvertiserId").val()) {
             //if cancel return
@@ -1026,6 +956,7 @@
 
     function loadSearchResults() {
         if (getLocalStorage("gSearchResults").length <= 0) {
+            turnOnLinkParentAdvertiser();
             return;
         }
 
@@ -1062,6 +993,8 @@
 
 
         setLocalStorage("gSearchResults", "");
+
+        turnOnLinkParentAdvertiser();
     }
 
     function linkParentAdvertiserQuestion() {
@@ -1092,6 +1025,24 @@
             var errorMessage = "If you would like to link the Parent Advertiser, you need to choose a new Parent Advertiser first. \n\r" +
                 " Followed by clicking Link Parent Advertiser.";
             bootbox.alert(errorMessage, function () { });
+        }
+    }
+
+    function turnOnLinkParentAdvertiser() {
+        console.log($("#oldParentAdvertiserId").val().length);
+        console.log($("#oldParentAdvertiserId").val());
+        console.log($("#txtParentAdvertiserId").val());
+
+        if ($("#oldParentAdvertiserId").val().length == 0) {
+            //hide
+            $(".link-parent").hide();
+        } else if ($("#oldParentAdvertiserId").val().length != 0 &&
+            $("#oldParentAdvertiserId").val() == $("#txtParentAdvertiserId").val()) {
+            //hide
+            $(".link-parent").hide();
+        } else {
+            //show
+            $(".link-parent").show();
         }
     }
 
