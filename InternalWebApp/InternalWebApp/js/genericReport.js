@@ -2414,9 +2414,9 @@ function getReportFilterArray_PersonnelContactList() {
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Station",
-        jsCall: "getStationList",
-        objectName: "ddlStation",
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -2481,9 +2481,9 @@ function getReportFilterArray_PersonnelRecipientList() {
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Station",
-        jsCall: "getStationList",
-        objectName: "ddlStation",
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
         required: false
     }
     arrayFilters.push(arrayObject);
