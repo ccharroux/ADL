@@ -54,6 +54,8 @@ reportName.push("rptPersonnelContactList");
 reportName.push("rptPersonnelRecipientList");
 reportName.push("rptWebUserList");
 
+reportName.push("rptMRRNoPrimaryContactList");
+
 function buildReportArray()
 {
     var reportCounter = 1
@@ -80,7 +82,6 @@ function buildReportArray()
 }
 
 buildReportObjectArray();
-console.log(reportObjectArray);
 
 //---------------------------
 // Generic Report Wrapper Routines
@@ -106,6 +107,50 @@ function getReportObject(inReportId)
  
     return reportObjectArray[inReportId];
   
+}
+
+function buildQuickReports(rptType, control, container)
+{
+
+    if (!control)
+    {
+        control = 'ddlQuickReport';
+    }
+
+    if (!control) {
+        control = 'divQuickReport';
+    }
+
+    var rptHit = false;
+
+    for (var i = 0; i < reportObjectArray.length; i++)
+    {
+
+        if (reportObjectArray[i].product.toLowerCase() == rptType.toLowerCase())
+        {
+            console.log(reportObjectArray[i]);
+            rptHit = true;
+            $("#" + control).append("<option value='" + i + "'>" + reportObjectArray[i].reportTitle + "</option>");
+        }
+
+    }
+
+    if (rptHit == true) {
+        $("#" + control).prepend("<option value='-1'>  -- Select a Report --  </option>");
+        $("#" + control).val("-1");
+        $("#" + container).show();
+    }
+    else
+    {
+        $("#" + container).hide();
+    }
+
+}
+function getQuickReport(reportId)
+{
+    if (reportId > -1) {
+        window.location = "/utilities/genericReport.html?reportId=" + reportId;
+    }
 }
 
 
@@ -2611,6 +2656,75 @@ function getReportObject_WebUserList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'personnel',
+        sortable: true
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_MRRNoPrimaryContactList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "OwnerGroup",
+        jsCall: "getOwnerGroupList",
+        objectName: "ddlOwnerGroup",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationList",
+        objectName: "ddlStation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+    return arrayFilters;
+}
+function getReportObject_MRRNoPrimaryContactList() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Market Revenue - Missing Primary Contact",
+        apiControllerAction: "/api/MRRReport/GetNoPrimaryContactList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr',
         sortable: true
     }
 
