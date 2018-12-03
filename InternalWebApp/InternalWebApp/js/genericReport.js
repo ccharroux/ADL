@@ -52,6 +52,7 @@ reportName.push("rptMarketSetupMarketVirtualGroups");
 // Personnal
 reportName.push("rptPersonnelContactList");
 reportName.push("rptPersonnelRecipientList");
+reportName.push("rptWebUserList");
 
 function buildReportArray()
 {
@@ -2531,6 +2532,82 @@ function getReportObject_PersonnelRecipientList() {
 
         reportTitle: "Personnel - Recipient List",
         apiControllerAction: "/api/PersonnelReport/GetPersonnelRecipientList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'personnel',
+        sortable: true
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_WebUserList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "OwnerGroup",
+        jsCall: "getOwnerGroupList",
+        objectName: "ddlOwnerGroup",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationList",
+        objectName: "ddlStation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+    return arrayFilters;
+}
+function getReportObject_WebUserList() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Personnel - Web User List",
+        apiControllerAction: "/api/PersonnelReport/GetWebUserList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'personnel',
