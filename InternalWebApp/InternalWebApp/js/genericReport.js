@@ -48,6 +48,7 @@ reportName.push("rptMarketSetupMarketProducts");
 reportName.push("rptMarketSetupMarketStations");
 reportName.push("rptMarketSetupMarketUsers");
 reportName.push("rptMarketSetupMarketVirtualGroups");
+reportName.push("rptMarketReleaseList");
 
 // Personnal
 reportName.push("rptPersonnelContactList");
@@ -2725,6 +2726,66 @@ function getReportObject_MRRNoPrimaryContactList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'mrr',
+        sortable: true
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_MarketReleaseList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token:  "Year",
+        jsCall:  "getYearList",
+        objectName:  "ddlYear",
+        required:  true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token:  "Period",
+        objectName:  "ddlPeriod",
+        jsCall:  "getPeriodList",
+        required:  true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MarketReleaseList() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Market Release List",
+        apiControllerAction: "/api/MarketReport/GetMarketReleaseList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'market',
         sortable: true
     }
 
