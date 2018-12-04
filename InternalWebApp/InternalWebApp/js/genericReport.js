@@ -2005,21 +2005,21 @@ function getReportFilterArray_OwnershipGroupDistributionList() {
     var arrayObject = new Object();
 
 
-    arrayObject = {
-        token: "Product",
-        jsCall: "getProductList",
-        objectName: "ddlProduct",
-        required: true
-    }
-    arrayFilters.push(arrayObject);
+    //arrayObject = {
+    //    token: "Product",
+    //    jsCall: "getProductList",
+    //    objectName: "ddlProduct",
+    //    required: true
+    //}
+    //arrayFilters.push(arrayObject);
 
-    arrayObject = {
-        token: "Personnel",
-        jsCall: null,
-        objectName: "hidPersonnel",
-        required: false
-    }
-    arrayFilters.push(arrayObject);
+    //arrayObject = {
+    //    token: "Personnel",
+    //    jsCall: null,
+    //    objectName: "hidPersonnel",
+    //    required: false
+    //}
+    //arrayFilters.push(arrayObject);
 
 
 
