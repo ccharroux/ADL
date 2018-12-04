@@ -49,9 +49,8 @@
     <!--[if lt IE 9]>
     <script src="js/respond.min.js"></script>
     <![endif]-->
-   
+
     <style>
-       
     </style>
 
 </head>
@@ -99,7 +98,7 @@
                             <label for="txtStationAdvertiser">Advertiser</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input class="mkaRequired field-width-325" maxlength="120" type="text" id="txtStationAdvertiser" errorMessage="Enter an Advertiser Name."/>
+                            <input class="mkaRequired field-width-325" maxlength="120" type="text" id="txtStationAdvertiser" errorMessage="Enter an Advertiser Name." />
                         </div>
                     </div>
                     <div class="row input-row">
@@ -108,6 +107,28 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input class="field-width-325" type="text" id="txtStationAdvertiserCode" />
+                        </div>
+                    </div>
+
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtMarketAdvertiser">Market Advertiser</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="hidden" id="txtOldMarketAdvertiserId" />
+                            <input type="hidden" id="txtOldMarketAdvertiserName" />
+                            <input class="mkaRequired field-width-325 disabled margin-right-10" type="text" id="txtMarketAdvertiser" disabled="disabled" errorMessage="Please use the Search Market Advertiser to link a Market Advertiser." />
+                            <span id="advertiserMergeMessage" class="hidden to-be-linked-message">* Will be linked and revenues merged</span>
+                            <span id="advertiserLinkMessage" class="hidden to-be-linked-message" style="display: inline-block; vertical-align: top;">* Will be linked but <br/>revenues will not be merged</span>
+                        </div>
+                    </div>
+
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtMarketAdvertiserId">Market Advertiser ID</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input class="field-width-325 disabled" type="text" id="txtMarketAdvertiserId" disabled="disabled" />
                         </div>
                     </div>
 
@@ -124,21 +145,16 @@
                         </div>
                     </div>
 
-                    <div class="row input-row">
+                    <div class="row input-row link-market-advertiser">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtMarketAdvertiser">Market Advertiser</label>
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <input class="mkaRequired field-width-325 disabled" type="text" id="txtMarketAdvertiser" disabled="disabled" errorMessage="Please use the Search Market Advertiser to link a Market Advertiser."/>
-                        </div>
-                    </div>
+                            <div>
 
-                    <div class="row input-row">
-                        <div class="col-md-3 text-align-left">
-                            <label for="txtMarketAdvertiserId">Market Advertiser ID</label>
+                            </div>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input class="field-width-325 disabled" type="text" id="txtMarketAdvertiserId" disabled="disabled" />
+                            <div>
+                                <input value="Link Market Advertiser" onclick="linkMarketAdvertiser();" class="default-button" type="button">
+                            </div>
                         </div>
                     </div>
 
@@ -168,13 +184,13 @@
                             <input class="field-width-325" type="text" id="txtDisableDate" value="" maxlength="50" placeholder="MM/DD/YYYY" readonly />
                         </div>
                     </div>
-                    
+
                     <!-- Buttons -->
                     <div class="default-button-section">
                         <div class="row input-row">
                             <div class="col-md-3">
                                 <div>
-                                    
+
                                 </div>
                             </div>
                             <div class="col-md-9 text-align-left">
@@ -218,6 +234,7 @@
     //get market list list is ready only
     //get station advertiser unless is 0
     var stationAdvertiserId = 0;
+    var bLinkMarketAdvertiser = false;
 
     $(document).ready(function () {
 
@@ -417,7 +434,10 @@
 
                         var obj = data.report.rows[index];
 
+                        //add functionality for old id and name
+                        $('#txtOldMarketAdvertiserName').val(obj["advertiserName"]);
                         $('#txtMarketAdvertiser').val(obj["advertiserName"]);
+                        $('#txtOldMarketAdvertiserId').val(obj["advertiserId"]);
                         $('#txtMarketAdvertiserId').val(obj["advertiserId"]);
 
                     });
@@ -454,13 +474,16 @@
             return;
         }
 
+        //add functionality for old advertiser id and name
         var searchCriteriaObj = {
             "searchToken": "STATIONMARKET",
             "stationID": $("#ddlStations").val(),
-            "marketID" : $("#ddlMarkets").val(),
+            "marketID": $("#ddlMarkets").val(),
             "advertiserName": $("#txtStationAdvertiser").val(),
-            "advertiserCode" : $("#txtStationAdvertiserCode").val(),
+            "advertiserCode": $("#txtStationAdvertiserCode").val(),
             "searchHeading": "Market Advertiser Search",
+            "oldMarketAdvertiserId": $("#txtOldMarketAdvertiserId").val(),
+            "oldMarketAdvertiserName": $("#txtOldMarketAdvertiserName").val(),
             "marketAdvertiserName": $("#txtMarketAdvertiser").val(),
             "marketAdvertiserId": $("#txtMarketAdvertiserId").val(),
             "searchPage": window.location
@@ -475,13 +498,12 @@
 
     function loadMarketAdvertiserSearchResults() {
 
-        if(getLocalStorage("gSearchResults").length <= 0) {
+        if (getLocalStorage("gSearchResults").length <= 0) {
+            turnOnLinkMarketAdvertiser();
             return;
         }
 
         var searchResults = $.parseJSON(getLocalStorage("gSearchResults"));
-
-        //console.log(searchResults);
 
         if (stationAdvertiserId <= 0) {
             //load everthing but market advertiser and id
@@ -490,7 +512,9 @@
             $('#txtStationAdvertiserCode').val(searchResults["advertiserCode"]);
         }
 
-        
+        $("#txtOldMarketAdvertiserId").val(searchResults["oldMarketAdvertiserId"]);
+        $("#txtOldMarketAdvertiserName").val(searchResults["oldMarketAdvertiserName"]);
+
         $("#txtMarketAdvertiser").val(searchResults["marketAdvertiserName"]);
 
         if (searchResults.marketAdvertiserId !== undefined) {
@@ -498,6 +522,20 @@
         }
 
         setLocalStorage("gSearchResults", "");
+
+        turnOnLinkMarketAdvertiser();
+    }
+
+    function turnOnLinkMarketAdvertiser() {
+
+        if ($("#txtOldMarketAdvertiserId").val().length == 0) {
+            $(".link-market-advertiser").hide();
+        } else if ($("#txtOldMarketAdvertiserId").val().length != 0 &&
+            $("#txtOldMarketAdvertiserId").val() == $("#txtMarketAdvertiserId").val()) {
+            $(".link-market-advertiser").hide();
+        } else {
+            $(".link-market-advertiser").show();
+        }
     }
 
     function validationPassed() {
@@ -535,5 +573,58 @@
 
         bootbox.alert('This functionality is still under development.', function () {
         });
+    }
+
+    function linkMarketAdvertiser() {
+        var strMessage = "This action will change the market advertiser link to " + $("#txtMarketAdvertiser").val() + ".<br/><br/>";
+        strMessage += "Shall " + $("#ddlStations option:selected").text() + "'s revenue history for " +
+            $("#txtOldMarketAdvertiserName").val() + " be merged into the revenues for " + $("#txtMarketAdvertiser").val() +
+            "? <br/><br/>";
+        strMessage += "This action is irreversible.<br/><br/>";
+        strMessage += "Press Yes to link market advertiser and merge revenues.<br/>";
+        strMessage += "Press No to link market advertiser only going forward.<br/>";
+        strMessage += "Press cancel to abort.";
+
+        bootbox.dialog({
+            message: strMessage,
+            title: "Link Market Advertiser",
+            buttons:
+            {
+                btnYes: {
+                    label: "Yes",
+                    className: "btn-primary",
+                    callback: function () {
+                        $("#advertiserMergeMessage").removeClass("hidden");
+                        $("#advertiserLinkMessage").addClass("hidden");
+
+                        bLinkMarketAdvertiser = true;
+                    }
+                },
+                btnNo: {
+                    label: "No",
+                    callback: function () {
+                        $("#advertiserMergeMessage").addClass("hidden");
+                        $("#advertiserLinkMessage").removeClass("hidden");
+
+                        bLinkMarketAdvertiser = false;
+                    }
+                },
+                btnCancel: {
+                    label: "Cancel",
+                    callback: function () {
+                        $("#advertiserMergeMessage").addClass("hidden");
+                        $("#advertiserLinkMessage").addClass("hidden");
+
+                        $("#txtMarketAdvertiserId").val($("#txtOldMarketAdvertiserId").val());
+                        $("#txtMarketAdvertiser").val($("#txtOldMarketAdvertiserName").val());
+
+                        bLinkMarketAdvertiser = false;
+
+                        turnOnLinkMarketAdvertiser();
+                    }
+                }
+            }
+        });
+
     }
 </script>
