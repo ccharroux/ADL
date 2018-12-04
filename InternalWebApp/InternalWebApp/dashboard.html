@@ -22,6 +22,27 @@
             float: left;
             padding: 4px;
         }
+        .productDiv{
+            display:none;
+            margin-top:20px;
+            border-radius:15px;
+            border: silver 1px solid;
+            width: 50%;
+ 
+        }
+        .textAlignLeft{
+            text-align:left;
+            margin-left: 10px;
+        }
+        .textAlignRight{
+            text-align:right;
+            margin-right: 10px;
+        }
+        .mediaHeader
+        {
+            color:blue;
+            font-weight:800;
+        }
     </style>
 </head>
 <body>
@@ -34,7 +55,16 @@
         <div id="fh5co-contact-section" class="contact-section">
             <div class="margin-0-auto text-align-center">
                 <div class="font-36">Markets by Product</div>
-                <canvas id="piechart" width="400" height="400"></canvas>
+                <!--<canvas id="piechart" width="400" height="400"></canvas>-->
+                <center>
+                    <!--<div style="margin: 0 auto; text-align:center">-->
+                        <div id="divMRR" class="productDiv"></div>
+                        <div id="divXRY" class="productDiv"></div>
+                        <div id="divTVB" class="productDiv"></div>
+                        <div id="divMSS" class="productDiv"></div>
+                        <div id="divDMA" class="productDiv"></div>
+                    <!--</div>-->
+                </center>
             </div>
         </div>
         <!--<div id="map" data-animate-effect="fadeIn"></div>-->
@@ -69,14 +99,61 @@
 
         buildMainMenu("");
 
-        canvas = document.getElementById("piechart");
-        var context = canvas.getContext("2d");
-        for (var i = 0; i < data.length; i++) {
-            drawSegment(canvas, context, i);
-        }
+        //canvas = document.getElementById("piechart");
+        //var context = canvas.getContext("2d");
+        //for (var i = 0; i < data.length; i++) {
+        //    drawSegment(canvas, context, i);
+        //}
+        buildReport();
 
     });
 
+    function buildReport()
+    {
+        $.ajax({
+            url: ServicePrefix + '/api/MarketReport/GetMarketProductTotalsList?inApiToken=' + getLocalStorage("APIToken"),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            //data: JSON.stringify({
+            //    "inApiToken": getLocalStorage("APIToken")
+            //}),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    
+                    $.each(data.report.rows, function (index) {
+ 
+                        var productId = data.report.rows[index].productId;
+                        var mediaTypeLabel = data.report.rows[index].mediaType;
+                        var divClass = '';
+                        if (mediaTypeLabel.toString().indexOf("TOTAL") > -1)
+                        {
+                            divClass = 'mediaHeader';
+                            mediaTypeLabel = data.report.rows[index].mediaType + " " + productId;
+                        }
+                        var str = "<div class='row'>";
+                        str = str + "<div class='col-md-4 textAlignLeft " + divClass +  "'>" + mediaTypeLabel + "</div>";
+                        str = str + "<div class='col-md-3 textAlignRight " + divClass + "'>&nbsp;</div>";
+                        str = str + "<div class='col-md-4 textAlignRight " + divClass + "'>" + data.report.rows[index].totalMarkets + "</div>";
+                        str = str + "</div>"
+                        $("#div" + productId).append(str);
+                        $("#div" + productId).show();
+                    });
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
 
     function drawSegmentLabel(canvas, context, i) {
         context.save();
