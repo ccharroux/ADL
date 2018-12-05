@@ -64,6 +64,8 @@
                     <input type="hidden" id="hdnMarketId" value="" />
                     <input type="hidden" id="hdnOwnershipId" value="" />
                     <input type="hidden" id="hdnFormatId" value="" />
+                    <input type="hidden" id="hdnMediaType" value="" />
+                    <input type="hidden" id="hdnFullName" value="" />
 
 
 
@@ -291,6 +293,15 @@
                         </div>
                     </div>
 
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="chkRetainHistory">Retain History</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="checkbox" id="chkRetainHistory" />
+                        </div>
+                    </div>
+
                     <!--Products-->
                     <div id="divProductList" class="hidden default-button-section">
                         <div class="row">
@@ -369,8 +380,15 @@
     $(document).ready(function () {
         buildMainMenu("Stations");
         stationId = (getParameterByName("StationID") == null ? 0 : getParameterByName("StationID"));
+
+        removeLocalStorage("tempStationName");
+        removeLocalStorage("tempStationMedia");
+        removeLocalStorage("tempStationOwnerId");
+        removeLocalStorage("tempStationMarketId");
+
         checkForInsertOrUpdate()
         getMediaTypeList();
+
 
     });
 
@@ -659,13 +677,17 @@
                 $("#txtEmailAddress").val(obj["emailAddress"]);
                 $("#txtGeneralComment").val(obj["comment"]);
                 $("#txtBillingNotes").val(obj["billingNote"]);
+                $("#chkRetainHistory").prop("checked", (obj["keepHistory"] == true ? true : false))
 
 
-                //set marketId, formatId, and ownerId to hidden fields to be used after market/format/ownership dropdowns
-                //load with lists using mediaTypeId returned from this api
+                //set marketId, formatId, and ownerId to hidden fields to be used after market/format/ownership dropdowns load with lists using mediaTypeId returned from this api
+               
 
                 $("#hdnMarketId").val(obj["marketId"]);
                 $("#hdnOwnershipId").val(obj["ownerId"]);
+                $("#hdnFullName").val(obj["fullName"]);
+                $("#hdnMediaType").val(obj["mediaType"]);
+
 
                 if (obj["formatId"] != "" && obj["formatId"] != null) {
 
@@ -739,7 +761,6 @@
 
             if ($("#hdnMarketId").val() != "") {
                 $("#ddlMarket").val($("#hdnMarketId").val());
-                $("#hdnMarketId").val("");
             } else {
                 $("#ddlMarkt").val("-1");
             }
@@ -792,13 +813,12 @@
             str = '<option value="-1">-- Select an Ownership</option>';
             $.each(data.report.rows, function (index) {
                 str = str + '<option value="' + data.report.rows[index].OwnerID + '">' + data.report.rows[index].OwnerName + '</option>';
-            });
+            }); 
 
             $("#ddlOwnership").html(str);
 
             if ($("#hdnOwnershipId").val() != "") {
                 $("#ddlOwnership").val($("#hdnOwnershipId").val());
-                $("#hdnOwnershipId").val("");
             } else {
                 $("#ddlOwnership").val("-1");
             }
@@ -1033,12 +1053,15 @@
                 location = 'station.html?StationID=' + stationId;
                 break;
             case 'mrr':
+                setProductLocalStorage();
                 location = 'stationproductmrr.html?StationID=' + stationId;
                 break;
             case 'xry':
+                setProductLocalStorage();
                 location = 'stationproductxry.html?StationID=' + stationId;
                 break;
             case 'tvb':
+                setProductLocalStorage();
                 location = 'stationproducttvb.html?StationID=' + stationId;
                 break;
             case 'mss':
@@ -1054,6 +1077,15 @@
         }
                
         window.location = location;
+    }
+
+    function setProductLocalStorage() {
+
+        setLocalStorage("tempStationName", $("#hdnFullName").val());
+        setLocalStorage("tempStationMedia", $("#hdnMediaType").val());
+        setLocalStorage("tempStationOwnerId", $("#hdnOwnershipId").val());
+        setLocalStorage("tempStationMarketId", $("#hdnMarketId").val());
+
     }
 
    

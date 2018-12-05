@@ -161,65 +161,25 @@
         stationId = (getParameterByName("StationID") == null ? 0 : getParameterByName("StationID"));
         getRepFirmList();
 
-        getStation();
+        setStationLabel();
 
 
     });
 
 
-    function getStation() {
+    function setStationLabel() {
 
         if (stationId <= 0) {
             return;
         }
 
-        var url = ServicePrefix + '/api/Station/GetStation';
+        $("#lblStationFullName").text("Station: " + getLocalStorage("tempStationName"));
+        $("#lblMediaType").text("Media Type: " + getLocalStorage("tempStationMedia"));
+        $("#lblStationId").text("Station ID: " + stationId);
 
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inStationId": stationId
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getStationSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
+        $(".market-label").removeClass("hidden");
 
-        $.ajax(url, settings);
-
-    }
-
-    function getStationSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-        } else {
-
-            $.each(data.report.rows, function (index) {
-
-                var obj = data.report.rows[index];
-
-                $("#lblStationFullName").text("Station: " + obj.fullName);
-                $("#lblStationId").text("Station Id: " + stationId);
-                $("#lblMediaType").text("Media Type: " + obj.mediaType)
-
-                $(".market-label").removeClass("hidden");
-            })
-            
-
-        }
-
-    }
-
-
-
+    }  
 
     function getRepFirmList() {
 

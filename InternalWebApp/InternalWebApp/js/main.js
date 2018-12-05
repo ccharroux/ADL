@@ -363,7 +363,7 @@ function getLocalStorage(key)
 function removeLocalStorage(key)
 {
     try {
-        window.localStorage.removetItem(key);
+        window.localStorage.removeItem(key);
     }
     catch (err) {
         return "";
