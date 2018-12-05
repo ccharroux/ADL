@@ -98,7 +98,8 @@
                             <label for="txtStationAdvertiser">Advertiser</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input class="mkaRequired field-width-325" maxlength="120" type="text" id="txtStationAdvertiser" errorMessage="Enter an Advertiser Name." />
+                            <input type="hidden" id="txtStationAdvertiserId"/>
+                            <input class="mkaRequired field-width-325" maxlength="120" type="text" id="txtStationAdvertiser" errorMessage="Enter an Advertiser Name."/>
                         </div>
                     </div>
                     <div class="row input-row">
@@ -119,7 +120,7 @@
                             <input type="hidden" id="txtOldMarketAdvertiserName" />
                             <input class="mkaRequired field-width-325 disabled margin-right-10" type="text" id="txtMarketAdvertiser" disabled="disabled" errorMessage="Please use the Search Market Advertiser to link a Market Advertiser." />
                             <span id="advertiserMergeMessage" class="hidden to-be-linked-message">* Will be linked and revenues merged</span>
-                            <span id="advertiserLinkMessage" class="hidden to-be-linked-message" style="display: inline-block; vertical-align: top;">* Will be linked but <br/>revenues will not be merged</span>
+                            <span id="advertiserLinkMessage" class="hidden to-be-linked-message" style="display: inline-block; vertical-align: top;">* Will be linked but <br />revenues will not be merged</span>
                         </div>
                     </div>
 
@@ -153,7 +154,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <div>
-                                <input value="Link Market Advertiser" onclick="linkMarketAdvertiser();" class="default-button" type="button">
+                                <input value="Link Market Advertiser" onclick="linkMarketAdvertiserQuestion();" class="default-button" type="button">
                             </div>
                         </div>
                     </div>
@@ -173,6 +174,15 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input type="checkbox" id="chkActive" value="">
+                        </div>
+                    </div>
+                    
+                    <div class="row input-row change-date" style="display: none;">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtChangeDate">Change Date</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" class="field-width-325" id="txtChangeDate" value="" maxlength="50" disabled="disabled" />
                         </div>
                     </div>
 
@@ -235,10 +245,13 @@
     //get station advertiser unless is 0
     var stationAdvertiserId = 0;
     var bLinkMarketAdvertiser = false;
+    var bIsNew = false;
 
     $(document).ready(function () {
 
         stationAdvertiserId = (getParameterByName("StationAdvertiserID") == null ? 0 : getParameterByName("StationAdvertiserID"));
+        $("#txtStationAdvertiserId").val(stationAdvertiserId);
+        bIsNew = stationAdvertiserId <= 0;
 
         //get station list
         getStationList();
@@ -346,6 +359,7 @@
     function getStationAdvertiser() {
         if (stationAdvertiserId <= 0) {
             loadMarketAdvertiserSearchResults();
+            $('.change-date').hide();
             initializeActiveDate();
             return;
         }
@@ -372,6 +386,7 @@
                         var obj = data.report.rows[index];
 
                         $('#ddlStations').val(obj["reportEntityId"]).change();
+                        $('#txtStationAdvertiserId').val(obj["stationAdvertiserId"]);
                         $('#txtStationAdvertiser').val(obj["stationAdvertiserName"]);
                         $('#txtStationAdvertiserCode').val(obj["stationAdvertiserCode"]);
 
@@ -385,9 +400,12 @@
                             $("#chkActive").prop('checked', true);
                         }
 
-                        ////there is a last changed date that can possibly be displayed (dateChanged)
+                        if (obj["dateChanged"] !== null) {
+                            var changeDate = new Date(obj["dateChanged"]);
+                            $("#txtChangeDate").val(addZero(changeDate.getMonth() + 1) + '/' + addZero(changeDate.getDate()) + '/' + changeDate.getFullYear());
+                        }
 
-                        if (obj["disableDate"] !== null) {
+                        $('.change-date').show(); if (obj["disableDate"] !== null) {
                             var disableDate = new Date(obj["disableDate"]);
                             $("#txtDisableDate").val(addZero(disableDate.getMonth() + 1) +
                                 '/' +
@@ -479,6 +497,7 @@
             "searchToken": "STATIONMARKET",
             "stationID": $("#ddlStations").val(),
             "marketID": $("#ddlMarkets").val(),
+            "advertiserId": $("#txtStationAdvertiserId").val(),
             "advertiserName": $("#txtStationAdvertiser").val(),
             "advertiserCode": $("#txtStationAdvertiserCode").val(),
             "searchHeading": "Market Advertiser Search",
@@ -490,9 +509,7 @@
         }
 
         setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
-        //console.log(getLocalStorage("gSearchCriteria"));
 
-        //alert('doing search stuff');
         window.location = "/utilities/search.html";
     }
 
@@ -511,6 +528,8 @@
             $('#txtStationAdvertiser').val(searchResults["advertiserName"]);
             $('#txtStationAdvertiserCode').val(searchResults["advertiserCode"]);
         }
+
+        //$("#txtStationAdvertiserId").val(searchResults["advertiserId"]);
 
         $("#txtOldMarketAdvertiserId").val(searchResults["oldMarketAdvertiserId"]);
         $("#txtOldMarketAdvertiserName").val(searchResults["oldMarketAdvertiserName"]);
@@ -573,9 +592,63 @@
 
         bootbox.alert('This functionality is still under development.', function () {
         });
+
+        //call api
+        //on success and linkadvertiser is true
+        //call link advertiser api
+
+        $.ajax({
+            url: ServicePrefix + '/api/StationAdvertiser/UpdateStationAdvertiser',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": $("#ddlStations").val(),
+                "inStationAdvertiserId": $("#txtStationAdvertiserId").val(),
+                "inStationAdvertiserName": $("#txtStationAdvertiser").val(),
+                "inStationAdvertiserCode": $("#txtStationAdvertiserCode").val(),
+                "inOldMarketAdvertiserId": $("#txtOldMarketAdvertiserId").val(),
+                "inOldMarketAdvertiserName": $("#txtOldMarketAdvertiserName").val(),
+                "inMarketAdvertiserId": $("#txtMarketAdvertiserId").val(),
+                "inMarketAdvertiserName": $("#txtMarketAdvertiser").val(),
+                "inIsNew": bIsNew,
+                "inLinkAdvertiser": bLinkMarketAdvertiser,
+                "inMarketId": $("#ddlMarkets").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var obj = data.report.rows[0];
+                    //if new load new station advertiserid
+                    if (bIsNew) {
+                        $("#txtStationAdvertiserId").val(obj["_updateStatus"]);
+                    }
+                    
+                    if (bLinkMarketAdvertiser) {
+                        //call link advertiser api
+                        //this functionality still needs to be built
+                    } else {
+                        //reload the page
+                        window.location = "stationadvertiser.html?StationAdvertiserID=" + $("#txtStationAdvertiserId").val();
+                    }
+
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+
     }
 
-    function linkMarketAdvertiser() {
+    function linkMarketAdvertiserQuestion() {
         var strMessage = "This action will change the market advertiser link to " + $("#txtMarketAdvertiser").val() + ".<br/><br/>";
         strMessage += "Shall " + $("#ddlStations option:selected").text() + "'s revenue history for " +
             $("#txtOldMarketAdvertiserName").val() + " be merged into the revenues for " + $("#txtMarketAdvertiser").val() +
