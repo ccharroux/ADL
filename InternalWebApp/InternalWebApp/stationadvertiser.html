@@ -98,8 +98,8 @@
                             <label for="txtStationAdvertiser">Advertiser</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="hidden" id="txtStationAdvertiserId"/>
-                            <input class="mkaRequired field-width-325" maxlength="120" type="text" id="txtStationAdvertiser" errorMessage="Enter an Advertiser Name."/>
+                            <input type="hidden" id="txtStationAdvertiserId" />
+                            <input class="mkaRequired field-width-325" maxlength="120" type="text" id="txtStationAdvertiser" errorMessage="Enter an Advertiser Name." />
                         </div>
                     </div>
                     <div class="row input-row">
@@ -176,7 +176,7 @@
                             <input type="checkbox" id="chkActive" value="">
                         </div>
                     </div>
-                    
+
                     <div class="row input-row change-date" style="display: none;">
                         <div class="col-md-3 text-align-left">
                             <label for="txtChangeDate">Change Date</label>
@@ -244,7 +244,7 @@
     //get market list list is ready only
     //get station advertiser unless is 0
     var stationAdvertiserId = 0;
-    var bLinkMarketAdvertiser = false;
+    var bLinkMarketAdvertiserRevenues = false;
     var bIsNew = false;
 
     $(document).ready(function () {
@@ -590,13 +590,6 @@
             return;
         }
 
-        //bootbox.alert('This functionality is still under development.', function () {
-        //});
-
-        //call api
-        //on success and linkadvertiser is true
-        //call link advertiser api
-
         $.ajax({
             url: ServicePrefix + '/api/StationAdvertiser/UpdateStationAdvertiser',
             dataType: 'json',
@@ -609,11 +602,11 @@
                 "inStationAdvertiserName": $("#txtStationAdvertiser").val(),
                 "inStationAdvertiserCode": $("#txtStationAdvertiserCode").val(),
                 "inOldMarketAdvertiserId": $("#txtOldMarketAdvertiserId").val(),
-                "inOldMarketAdvertiserName": $("#txtOldMarketAdvertiserName").val(),
+                //"inOldMarketAdvertiserName": $("#txtOldMarketAdvertiserName").val(),
                 "inMarketAdvertiserId": $("#txtMarketAdvertiserId").val(),
-                "inMarketAdvertiserName": $("#txtMarketAdvertiser").val(),
+                //"inMarketAdvertiserName": $("#txtMarketAdvertiser").val(),
                 "inIsNew": bIsNew,
-                "inLinkAdvertiser": bLinkMarketAdvertiser,
+                "inLinkAdvertiserRevenues": bLinkMarketAdvertiserRevenues,
                 "inMarketId": $("#ddlMarkets").val()
             }),
             processData: false,
@@ -629,10 +622,11 @@
                     if (bIsNew) {
                         $("#txtStationAdvertiserId").val(obj["_updateStatus"]);
                     }
-                    
-                    if (bLinkMarketAdvertiser) {
+
+                    if (bLinkMarketAdvertiserRevenues) {
                         //call link advertiser api
                         //this functionality still needs to be built
+                        updateAdvertiserRevenues();
                     } else {
                         //reload the page
                         window.location = "stationadvertiser.html?StationAdvertiserID=" + $("#txtStationAdvertiserId").val();
@@ -646,6 +640,39 @@
             }
         });
 
+    }
+
+    function updateAdvertiserRevenues() {
+        $.ajax({
+            url: ServicePrefix + '/api/Advertiser/UpdateAdvertiserRevenuesByStation',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": $("#ddlStations").val(),
+                "inOldAdvertiserId": $("#txtOldMarketAdvertiserId").val(),
+                "inOldAdvertiserName": $("#txtOldMarketAdvertiserName").val(),
+                "inNewAdvertiserId": $("#txtMarketAdvertiserId").val(),
+                "inNewAdvertiserName": $("#txtMarketAdvertiser").val(),
+                "inMarketId": $("#ddlMarkets").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    //reload the page
+                    window.location = "stationadvertiser.html?StationAdvertiserID=" + $("#txtStationAdvertiserId").val();
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
     }
 
     function linkMarketAdvertiserQuestion() {
@@ -670,7 +697,7 @@
                         $("#advertiserMergeMessage").removeClass("hidden");
                         $("#advertiserLinkMessage").addClass("hidden");
 
-                        bLinkMarketAdvertiser = true;
+                        bLinkMarketAdvertiserRevenues = true;
                     }
                 },
                 btnNo: {
@@ -679,7 +706,7 @@
                         $("#advertiserMergeMessage").addClass("hidden");
                         $("#advertiserLinkMessage").removeClass("hidden");
 
-                        bLinkMarketAdvertiser = false;
+                        bLinkMarketAdvertiserRevenues = false;
                     }
                 },
                 btnCancel: {
@@ -691,7 +718,7 @@
                         $("#txtMarketAdvertiserId").val($("#txtOldMarketAdvertiserId").val());
                         $("#txtMarketAdvertiser").val($("#txtOldMarketAdvertiserName").val());
 
-                        bLinkMarketAdvertiser = false;
+                        bLinkMarketAdvertiserRevenues = false;
 
                         turnOnLinkMarketAdvertiser();
                     }
