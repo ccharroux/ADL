@@ -230,7 +230,7 @@
 //}
 
 
-
+var gDataTableDefaultRows = 50;
 
 //---------------------------------
 // Internal Admin Section
@@ -313,6 +313,7 @@ $( document ).ready(function()
 	if (environment.length > 0) {
 	    $("#fh5co-header").prepend("<div class='container' style='color:white; background:red; padding-top: 3px; font-weight:600;border-radius:15px; text-align: center;'>" + environment + "</div>");
 	}
+
 
 });
 
