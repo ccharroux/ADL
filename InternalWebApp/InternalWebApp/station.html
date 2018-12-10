@@ -664,8 +664,8 @@
                 $("#txtMKAClientNumber").val(obj["clientId"]);
                 $("#txtFullName").val(obj["fullName"]);
                 $("#txtNickname").val(obj["nickname"]);
-                $("#ddlPrimaryDemo").val(obj["primaryDemo"]);
-                $("#ddlSecondaryDemo").val(obj["secondaryDemo"]);
+                $("#ddlPrimaryDemo").val((obj["primaryDemo"] == null ? -1 : obj["primaryDemo"]));
+                $("#ddlSecondaryDemo").val((obj["secondaryDemo"] == null ? -1 : obj["secondaryDemo"]));
                 $("#txtAddress1").val(obj["address1"]);
                 $("#txtAddress2").val(obj["address2"]);
                 $("#txtCity").val(obj["city"]);
@@ -684,7 +684,7 @@
 
 
                 //set marketId, formatId, and ownerId to hidden fields to be used after market/format/ownership dropdowns load with lists using mediaTypeId returned from this api
-               
+
 
                 $("#hdnMarketId").val(obj["marketId"]);
                 $("#hdnOwnershipId").val(obj["ownerId"]);
@@ -816,7 +816,7 @@
             str = '<option value="-1">-- Select an Ownership</option>';
             $.each(data.report.rows, function (index) {
                 str = str + '<option value="' + data.report.rows[index].OwnerID + '">' + data.report.rows[index].OwnerName + '</option>';
-            }); 
+            });
 
             $("#ddlOwnership").html(str);
 
@@ -978,10 +978,12 @@
                 var obj = data.report.rows[index];
 
                 if (obj.activeDate != null & obj.active == true) {
-                    $("#productEdit" + obj.productId).removeClass("hidden");
                     $("#productDisable" + obj.productId).removeClass("hidden");
                     $("#date" + obj.productId).html(extractDateOnly(obj.activeDate));
                     $("#date" + obj.productId).css("color", "green");
+                    if (obj.productId.toUpperCase() != "MSS") {
+                        $("#productEdit" + obj.productId).removeClass("hidden");
+                    }
                 }
 
                 else if (obj.disableDate != null && obj.active == false) {
@@ -1063,16 +1065,16 @@
                 setProductLocalStorage();
                 if (isEnable == true) {
                     location = 'stationxrysubmission.html?StationID=' + stationId;
-                } else {                   
+                } else {
                     location = 'stationproductxry.html?StationID=' + stationId;
-                }                
+                }
                 break;
             case 'tvb':
                 setProductLocalStorage();
                 location = 'stationproducttvb.html?StationID=' + stationId;
                 break;
             case 'mss':
-                bootbox.alert('There is no station product page for MSS.', function () {
+                bootbox.alert('This functionality is still under development.', function () {
 
                 });
                 return;
@@ -1082,7 +1084,7 @@
                 });
                 return;
         }
-               
+
         window.location = location;
     }
 
@@ -1095,6 +1097,6 @@
 
     }
 
-   
+
 
 </script>
