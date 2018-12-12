@@ -596,7 +596,7 @@
                     if (bLinkMarketAdvertiserRevenues) {
                         //call link advertiser api
                         //this functionality still needs to be built
-                        updateAdvertiserRevenues();
+                        updateMediaAdvertiserRevenues();
                     } else {
                         //reload the page
                         window.location = "mediaadvertiser.html?MediaAdvertiserID=" + $("#txtMediaAdvertiserId").val();
@@ -610,6 +610,38 @@
             }
         });
 
+    }
+
+    function updateMediaAdvertiserRevenues() {
+        //LinkMediaAdvertiserRevenues
+        $.ajax({
+            url: ServicePrefix + '/api/MediaAdvertiser/LinkMediaAdvertiserRevenues',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": $("#ddlMarkets").val(),
+                "inMediaCode": $("#ddlMediaType").val(),
+                "inOldAdvertiserId": $("#txtOldMarketAdvertiserId").val(),
+                "inNewAdvertiserId": $("#txtMarketAdvertiserId").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    //reload the page
+                    window.location = "mediaadvertiser.html?MediaAdvertiserID=" + $("#txtMediaAdvertiserId").val();
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
     }
 
     function turnOnLinkMarketAdvertiser() {
