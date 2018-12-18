@@ -196,7 +196,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     User:
-                                    <input type="text" id="txtUnassignedNameFilter" onkeyup="showUnassignedRecipients(this);" />
+                                    <input type="text" id="txtUnassignedNameFilter" onkeyup="showUnassignedRecipients();" />
                                 </div>
                             </div>
 
@@ -457,7 +457,7 @@
 
                 str = str + '<div class="row unassignedRecipient ' + obj.firstName.toUpperCase() + '_' + obj.lastName.toUpperCase() + '" style="padding-top:3px;">';
                 str = str + '<div class="col-md-2 text-align-center">';
-                str = str + '<input type="checkbox" onchange="updateSelectedCounter();" value="' + obj.personnelId + '" / >';
+                str = str + '<input type="checkbox" onchange="updateUnassignedList();" value="' + obj.personnelId + '" / >';
                 str = str + '</div>';
                 str = str + '<div class="col-md-10 text-align-left">';
                 str = str + obj.firstName + " " + obj.lastName + " (" + obj.personnelId + ")";
@@ -495,9 +495,9 @@
         }
     }
 
-    function showUnassignedRecipients(ctl) {
+    function showUnassignedRecipients() {
 
-        if (ctl.value.length > 0) {
+        if ($("#txtUnassignedNameFilter").val().length > 0) {
 
             $(".unassignedRecipient").each(function () {
                 if ($(this).find("input[type=checkbox]").prop("checked") == true) {
@@ -508,7 +508,7 @@
                 }
             });
 
-            $("[class*=" + ctl.value.toUpperCase().trim().split(' ').join('_') + "]").each(function () {
+            $("[class*=" + $("#txtUnassignedNameFilter").val().toUpperCase().trim().split(' ').join('_') + "]").each(function () {
                 $(this).show();
             });
 
@@ -522,14 +522,14 @@
 
     function selectAllUnassigned() {
 
+        $("#txtUnassignedNameFilter").val('');
+
         if ($("#chkUnassignedSelectAll").prop("checked") == true) {
 
             $(".unassignedRecipient").each(function () {
                 $(this).find("input[type=checkbox]").prop("checked", true);
                 $(this).show();
             });
-
-
 
         } else {
 
@@ -539,11 +539,13 @@
 
         }
 
-        updateSelectedCounter();
+        updateUnassignedList();
     }
 
 
-    function updateSelectedCounter() {
+    function updateUnassignedList() {
+
+        showUnassignedRecipients();
 
         var cnt = 0;
         $(".unassignedRecipient").each(function () {

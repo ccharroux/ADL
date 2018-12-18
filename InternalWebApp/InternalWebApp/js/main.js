@@ -504,7 +504,10 @@ function buildMainMenu(selectedItem) {
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Personnel") + 'href="/personnellist.html">Personnel</a></li>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Stations") + ' href="/stationlist.html">Stations</a></li>';
+    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Stations") + ' href="/stationlist.html" role="button" aria-expended="false">Stations <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block"><a href="">MRR/X-Ray Link</a></li>';
+    menuItems += '              </ul>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Markets") + ' href="/marketlist.html" role="button" aria-expanded="false">Markets <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="">Complementary Markets</a></li>';
