@@ -84,7 +84,9 @@
                         <h2 id="pageHeading"></h2>
                     </div>
                 </div>
-
+                <div>
+                    <span id="errorMessage"></span>
+                </div>
                 <div class="row">
                     <p>Search for: <span id="previousPage"></span></p>
                 </div>
@@ -93,7 +95,7 @@
                     <table id="dtSearchResults" class="stripe"></table>
                 </div>
 
-                <div class="row generic-row stationmarket mediamarket linkadv parentadv" style="margin-top: 20px; text-align: center;">
+                <div class="row generic-row search-stationmarket search-mediamarket search-linkadv search-parentadv" style="margin-top: 20px; text-align: center;">
                     <div class="" style="display: block;">
                         <div class="col-md-2" style="float: left; text-align: left;">
                             <input type="text" id="" class="search-text" /><br />
@@ -121,7 +123,7 @@
 
                 </div>
 
-                <div class="row generic-row stationagency" style="margin-top: 20px; text-align: center;">
+                <div class="row generic-row search-stationagency search-parentagency search-linkagency" style="margin-top: 20px; text-align: center;">
                     <div class="" style="display: block;">
                         <div class="col-md-2" style="float: left; text-align: left;">
                             <input type="text" id="" class="search-text" /><br />
@@ -149,7 +151,7 @@
 
                 </div>
                 
-                <div class="row generic-row personnel" style="margin-top: 20px; text-align: center;">
+                <div class="row generic-row search-personnel" style="margin-top: 20px; text-align: center;">
                     <div class="" style="display: block;">
                         <div class="col-md-2" style="float: left; text-align: left;">
                             <input type="text" id="" class="search-text" /><br />
@@ -219,16 +221,42 @@
 
     $(document).ready(function () {
 
-        searchCriteria = $.parseJSON(getLocalStorage("gSearchCriteria"));
-        getSearchData(searchCriteria);
- 
-        $("#pageHeading").html(searchCriteria["searchHeading"]);
+        //gets the local storage
+        var searchCriteriaJson = getLocalStorage("gSearchCriteria");
 
+        //if the local storage isn't empty
+        //do the search functionality
+        if (searchCriteriaJson.length !== 0) {
+
+            //parse the search criteria json
+            searchCriteria = $.parseJSON(searchCriteriaJson);
+            //searchCriteria = $.parseJSON(getLocalStorage("gSearchCriteria"));
+
+            //setting the search token to a variable for later use
+            var searchToken = searchCriteria["searchToken"].toLowerCase();
+            $('.search-' + searchToken).css('display', 'block');
+
+            //due current functionality can't hide
+            //may need to rewrite search text functionality
+            //in the build pieces.
+            //$('.search-' + searchToken).hide();
+
+            getSearchData(searchCriteria);
+
+            //$('.search-' + searchToken).show();
+
+            $("#pageHeading").html(searchCriteria["searchHeading"]);
+
+        } else {
+            $("#errorMessage").html('<p style="color: red;">Your search has been corrupted. Please go back to your original search and start again.</p>');
+        }
+
+        //may remove this and clear out before reloading when a linking/selecting row
         setLocalStorage("gSearchCriteria", "");
 
-        $('.generic-row').hide();
-        $('.' + searchCriteria["searchToken"].toLowerCase()).show();
-
+        //$('.generic-row').hide();
+        //$('.search-' + searchCriteria["searchToken"].toLowerCase()).show();
+        //$('.search-' + searchCriteria["searchToken"].toLowerCase()).css('display','block');
 
         //leaving this coding in case bring back the link button
         $('#dtSearchResults').on('click', 'tbody tr', function () {

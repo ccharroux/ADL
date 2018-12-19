@@ -19,11 +19,18 @@ function getSearchData(searchCriteria) {
             buildAdvertiserSearch(searchCriteria);
             break;
         case "STATIONAGENCY":
+        case "LINKAGENCY":
             buildAgencySearch(searchCriteria);
             break;
         case "PARENTADV":
             buildParentAdvertiserSearch(searchCriteria);
             break;
+        case "PARENTAGENCY":
+            buildParentAgencySearch(searchCriteria);
+            break;
+        //case "LINKAGENCY":
+        //    buildLinkAgencySearch(searchCriteria);
+        //    break;
         case "LINKADV":
             buildLinkAdvertiserSearch(searchCriteria);
             break;
@@ -192,8 +199,8 @@ function linkAgency() {
         searchResults[key] = searchCriteria[key];
     }
 
-    searchResults['marketAgencyId'] = rowData[0].agencyId;
-    searchResults['marketAgencyName'] = rowData[0].agencyName;
+    searchResults['searchAgencyId'] = rowData[0].agencyId;
+    searchResults['searchAgencyName'] = rowData[0].agencyName;
 
     setLocalStorage("gSearchResults", JSON.stringify(searchResults));
 
@@ -324,6 +331,46 @@ function linkNewAdvertiser() {
     window.location = searchPage;
 }
 
+function linkParentAgencyByLink(parentAgencyId) {
+    //console.log(parentAgencyId);
+
+    var rowId = $('#dtSearchResults').dataTable().fnFindCellRowIndexes(parentAgencyId, 0);
+
+    var table = $('#dtSearchResults').DataTable();
+    table.row(rowId).select();
+
+    setTimeout(linkParentAgency(), 500);
+
+}
+
+function linkParentAgency() {
+    var searchTable = $('#dtSearchResults').DataTable();
+    if (searchTable.rows('.selected').any() === false) {
+        bootbox.alert('Select a parent agency to assign.', function () {
+        });
+        return;
+    }
+
+    var rowData = searchTable.rows('.selected').data();
+
+    console.log(rowData);
+
+    var searchResults = {};
+
+    for (var key in searchCriteria) {
+        searchResults[key] = searchCriteria[key];
+    }
+
+    searchResults["parentAgencyID"] = rowData[0].parentAgencyId;
+    searchResults["parentAgencyName"] = rowData[0].parentAgencyName;
+
+    setLocalStorage("gSearchResults", JSON.stringify(searchResults));
+
+    //sends user back to page that called the search page
+    var searchPage = searchCriteria["searchPage"]["href"];
+    window.location = searchPage;
+}
+
 function buildAdvertiserSearch(searchCriteria) {
     if ($('.search-all-markets:visible').is(':checked')) {
         bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
@@ -398,10 +445,11 @@ function buildAgencySearch(searchCriteria) {
         });
     }
 
+    //figure out change for station agency page
     if ($('.search-text:visible').val().length > 0) {
         searchText = $('.search-text:visible').val();
     } else {
-        searchText = searchCriteria["marketAgencyName"].length > 0 ? searchCriteria["marketAgencyName"] : searchCriteria["agencyName"];
+        searchText = searchCriteria["searchAgencyName"].length > 0 ? searchCriteria["searchAgencyName"] : searchCriteria["agencyName"];
     }
 
     apiParameters = {
@@ -516,6 +564,56 @@ function buildParentAdvertiserSearch(searchCriteria) {
     $("#previousPage").html(searchCriteria["advertiserName"]);
 
 }
+
+function buildParentAgencySearch(searchCriteria) {
+
+    if ($('.search-all-markets:visible').is(':checked')) {
+        bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
+        });
+    }
+
+    if ($('.search-text:visible').val().length > 0) {
+        searchText = $('.search-text:visible').val();
+    } else {
+        searchText = searchCriteria["parentAgencyName"].length > 0 ? searchCriteria["parentAgencyName"] : searchCriteria["agencyName"];
+    }
+
+    apiParameters = {
+        "inApiToken": apiToken,
+        "inParentAgencyName": searchText,
+        "inShowDisabled": false
+    }
+    api = "/api/ParentAgency/GetParentAgencyList";
+
+    columns = [];
+
+    //change these to parent agency
+    columns.push({
+        "title": "ParentAgencyID",
+        "visible": false,
+        "mData": "parentAgencyId",
+        "orderable": false
+    });
+
+    columns.push({
+        "title": "Parent Agency Name",
+        "mData": "parentAgencyName",
+        "orderable": true
+    });
+
+    columns.push({
+        "mRender": function (data, type, row) {
+            return '<a href="#" onclick="linkParentAgencyByLink(' + row.parentAgencyId + ')">Assign Parent Agency</a>';
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    //need to document this more
+    $("#previousPage").html(searchCriteria["agencyName"]);
+}
+
 function buildPersonnelSearch(searchCriteria)
 {
     //if ($('.search-all-markets:visible').is(':checked')) {
