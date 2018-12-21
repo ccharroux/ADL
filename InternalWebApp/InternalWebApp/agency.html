@@ -136,6 +136,18 @@
                         </div>
                     </div>
                     
+                    <div class="row input-row">
+                        <div class="col-md-3">
+
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <div>
+                                <input value="Rename Parent Agency" onclick="renameParentAgency()" class="default-button" type="button">
+                            </div>
+                        </div>
+                    </div>
+
+
                     <!-- end parent agency section -->
                     
                     <!-- begin link agency section -->
@@ -275,18 +287,6 @@
 
         getMarketList();
 
-        //$("#chkActive").change(function () {
-        //    if (this.checked) {
-        //        $(".disable-date").hide();
-        //    } else {
-        //        if ($("#txtDisableDate").val().length <= 0) {
-        //            var todaysDate = new Date();
-        //            $("#txtDisableDate").val(addZero(todaysDate.getMonth() + 1) + '/' + addZero(todaysDate.getDate()) + '/' + todaysDate.getFullYear());
-        //        }
-        //        $(".disable-date").show();
-        //    }
-        //});
-       
     });
 
     function getMarketList() {
@@ -379,50 +379,7 @@
         });
     }
 
-    //function getParentAgencyList() {
-
-    //    $.ajax({
-    //        url: ServicePrefix + '/api/ParentAgency/GetParentAgencyList',
-    //        dataType: 'json',
-    //        type: 'post',
-    //        contentType: 'application/json',
-    //        data: JSON.stringify({
-    //            "inApiToken": getLocalStorage("APIToken"),
-    //            "inShowDisabled": false
-    //        }),
-    //        processData: false,
-    //        success: function (data, textStatus, jQxhr) {
-
-    //            if (data.response.status != "SUCCESS") {
-    //                MKAErrorMessageRtn(data.response.errorMessage[0]);
-    //            }
-    //            else {
-
-    //                $("#ddlParentAgency").html("<option value='-1'> -- Select a Parent Agency</option>");
-    //                var str = '';
-
-    //                $.each(data.report.rows, function (index) {
-
-    //                    var obj = data.report.rows[index];
-    //                    str += "<option value='" + obj.parentAgencyId + "'>" + obj.parentAgencyName + "</option>";
-
-    //                });
-
-    //                $("#ddlParentAgency").append(str);
-
-    //                getAgency();
-
-    //            }
-    //        },
-    //        error: function (jqXhr, textStatus, errorThrown) {
-    //            MKAErrorMessageRtn(errorThrown);
-    //        }
-    //    });
-
-    //    //getAdvertiser();
-    //}
-
-    function initializeActiveDate() {
+   function initializeActiveDate() {
         var activeDate = new Date();
         console.log(activeDate);
         $("#txtActiveDate").val(addZero(activeDate.getMonth() + 1) + '/' + addZero(activeDate.getDate()) + '/' + activeDate.getFullYear());
@@ -463,6 +420,10 @@
                             $("#ddlMarket").val(-1);
                         } else {
                             $("#ddlMarket").val(obj["marketId"]);
+                        }
+
+                        if ($("#ddlMarket").val() != "-1") {
+                            $("#ddlMarket").prop('disabled', true);
                         }
 
                         $("#txtAgencyId").val(obj["agencyId"]);
@@ -560,8 +521,84 @@
             return;
         }
 
-        bootbox.alert('This functionality is still under development.', function () {
+        $.ajax({
+            url: ServicePrefix + '/api/Agency/UpdateAgency',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inAgencyId": $("#txtAgencyId").val(),
+                "inAgencyName": $("#txtAgencyName").val(),
+                "inMarketId": $("#ddlMarket").val(),
+                "inAccountTypeId": $("#ddlAccountType").val(),
+                "inParentAgencyId": $("#txtParentAgencyId").val(),
+                "inLinkAgencyId": $("#txtLinkedAgencyId").val(),
+                "inIsNew": bIsNew,
+                "inLinkParentAgency": bLinkParentAgency,
+                "inLinkAgency": bLinkAgency
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    if (bIsNew) {
+
+                        var obj = data.report.rows[0];
+
+                        $("#txtAgencyId").val(obj["_updateStatus"]);
+
+                        window.location = "agency.html?AgencyID=" + $("#txtAgencyId").val();
+                    }
+
+
+                    if (bLinkParentAgency) {
+                        //make call to update link advertiser
+                        //make call to disable old parent advertiser
+                        //write log "Parent Advertiser Name"
+
+                        //do a call if bLinkAdvertiser is true
+                        linkParentAgency();
+                    }
+                    else if (bLinkAgency) {
+                        //make call to update advertiser links
+                        //part of update get station advertiser count
+                        //part of update get media advertiser count
+                        //write log "Station Advertiser Code" if station advertiser count > 0
+                        //write log "Media Advertiser Code" if media advertiser count > 0
+                        //check for advertiser revenues
+                        //if > 0 update revenues (should be a separate api call)
+                        //write log "Advertiser ID" passing # of revenue records
+                        linkAgency();
+                    } else {
+                        window.location = "agency.html?AgencyID=" + $("#txtAgencyId").val();
+                    }
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
         });
+    }
+
+    function linkParentAgency() {
+        bootbox.alert("This functionality is under development.", function () { });
+
+        if (bLinkAgency) {
+            linkAgency();
+        } else {
+            window.location = "agency.html?AgencyID=" + $("#txtAgencyId").val();
+        }
+    }
+
+    function linkAgency() {
+        bootbox.alert("This functionality is under development.", function () { });
+
+        window.location = "agency.html?AgencyID=" + $("#txtAgencyId").val();
     }
 
     function searchParentAgency() {
@@ -774,5 +811,9 @@
             //show
             $(".link-agency").show();
         }
+    }
+
+    function renameParentAgency() {
+        bootbox.alert("This functionality&apos;s availability needs to be determined and developed.", function () { });
     }
 </script>
