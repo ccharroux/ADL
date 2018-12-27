@@ -142,7 +142,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <div>
-                                <input value="Rename Parent Agency" onclick="renameParentAgency()" class="default-button" type="button">
+                                <input value="Rename Parent Agency (TBD)" onclick="renameParentAgency()" class="default-button" type="button">
                             </div>
                         </div>
                     </div>
@@ -586,13 +586,36 @@
     }
 
     function linkParentAgency() {
-        bootbox.alert("This functionality is under development.", function () { });
+        //bootbox.alert("This functionality is under development.", function () { });
+        $.ajax({
+            url: ServicePrefix + '/api/ParentAgency/LinkParentAgency',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inAgencyId": $("#txtAgencyId").val(),
+                "inMarketId": $("#ddlMarket").val(),
+                "inOldParentAgencyId": $("#oldParentAgencyId").val(),
+                "inNewParentAgencyId": $("#txtParentAgencyId").val()
+            }),
+            processData: false,
+            success: function(data, textStatus, jQxhr) {
 
-        if (bLinkAgency) {
-            linkAgency();
-        } else {
-            window.location = "agency.html?AgencyID=" + $("#txtAgencyId").val();
-        }
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    if (bLinkAgency) {
+                        linkAgency();
+                    } else {
+                        window.location = "agency.html?AgencyID=" + $("#txtAgencyId").val();
+                    }
+                }
+            },
+                error: function (jqXhr, textStatus, errorThrown) {
+                    MKAErrorMessageRtn(errorThrown);
+                }
+            });
     }
 
     function linkAgency() {
