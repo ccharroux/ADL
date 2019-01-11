@@ -57,6 +57,16 @@ reportName.push("rptWebUserList");
 
 reportName.push("rptMRRNoPrimaryContactList");
 
+reportName.push("rptMRRMarketRelease");
+reportName.push("rptMRRMarketStationRelease");
+
+reportName.push("rptXRYMarketRelease");
+reportName.push("rptXRYMarketStationRelease");
+
+reportName.push("rptTVBMarketRelease");
+reportName.push("rptTVBMarketStationRelease");
+ 
+
 function buildReportArray()
 {
     var reportCounter = 1
@@ -94,7 +104,7 @@ function buildReportObjectArray()
     for (var x = 0; x < reportName.length; x++)
     {
         var module = reportName[x].replace("rpt", "");
- 
+        console.log(module);
         arrayObject = window[("getReportObject_" + module)]();
         arrayObject.filters = window[("getReportFilterArray_" + module)]();
         reportObjectArray.push(arrayObject);
@@ -2786,6 +2796,343 @@ function getReportObject_MarketReleaseList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'market',
+        sortable: true
+    }
+
+    return tempObject;
+
+}
+
+
+function getReportFilterArray_MRRMarketRelease() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    //arrayObject = {
+    //    token: "Product",
+    //    jsCall: "getProductList",
+    //    objectName: "ddlProduct",
+    //    required: true
+    //}
+    //arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MRRMarketRelease() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "MRR Market Release",
+        apiControllerAction: "/api/MRRReport/GetMarketRelease",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr',
+        sortable: true
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_MRRMarketStationRelease() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMRRMarketList",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MRRMarketStationRelease() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "MRR Market Station Release",
+        apiControllerAction: "/api/MRRReport/GetMarketRelease",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr',
+        sortable: true
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_XRYMarketRelease() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    //arrayObject = {
+    //    token: "Product",
+    //    jsCall: "getProductList",
+    //    objectName: "ddlProduct",
+    //    required: true
+    //}
+    //arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_XRYMarketRelease() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "XRAY Market Release",
+        apiControllerAction: "/api/XRAYReport/GetMarketRelease",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry',
+        sortable: true
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_XRYMarketStationRelease() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_XRYMarketStationRelease() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "XRAY Market Station Release",
+        apiControllerAction: "/api/XRAYReport/GetMarketRelease",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry',
+        sortable: true
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_TVBMarketRelease() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    //arrayObject = {
+    //    token: "MediaType",
+    //    jsCall: "getMediaTypeList",
+    //    objectName: "ddlMediaType",
+    //    required: false
+    //}
+    //arrayFilters.push(arrayObject);
+
+    //arrayObject = {
+    //    token: "Product",
+    //    jsCall: "getProductList",
+    //    objectName: "ddlProduct",
+    //    required: true
+    //}
+    //arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_TVBMarketRelease() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "TVB Market Release",
+        apiControllerAction: "/api/TVBReport/GetMarketRelease",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'tvb',
+        sortable: true
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_TVBMarketStationRelease() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getTVBMarketList",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_TVBMarketStationRelease() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "TVB Market Station Release",
+        apiControllerAction: "/api/TVBReport/GetMarketRelease",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'tvb',
         sortable: true
     }
 
