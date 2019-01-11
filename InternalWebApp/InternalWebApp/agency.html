@@ -619,9 +619,32 @@
     }
 
     function linkAgency() {
-        bootbox.alert("This functionality is under development.", function () { });
 
-        window.location = "agency.html?AgencyID=" + $("#txtAgencyId").val();
+        $.ajax({
+            url: ServicePrefix + '/api/Agency/LinkAgency',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOldAgencyId": $("#txtAgencyId").val(),
+                "inNewAgencyId": $("#txtLinkedAgencyId").val(),
+                "inMarketId": $("#ddlMarket").val()
+            }),
+            processData: false,
+            success: function(data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                        window.location = "agency.html?AgencyID=" + $("#txtAgencyId").val();
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
+
     }
 
     function searchParentAgency() {
