@@ -361,8 +361,8 @@ function linkParentAgency() {
         searchResults[key] = searchCriteria[key];
     }
 
-    searchResults["parentAgencyID"] = rowData[0].parentAgencyId;
-    searchResults["parentAgencyName"] = rowData[0].parentAgencyName;
+    searchResults["linkParentAgencyID"] = rowData[0].parentAgencyId;
+    searchResults["linkParentAgencyName"] = rowData[0].parentAgencyName;
 
     setLocalStorage("gSearchResults", JSON.stringify(searchResults));
 
@@ -611,7 +611,7 @@ function buildParentAgencySearch(searchCriteria) {
     });
 
     //need to document this more
-    $("#previousPage").html(searchCriteria["agencyName"]);
+    $("#previousPage").html(searchCriteria["parentAgencyName"].length > 0 ? searchCriteria["parentAgencyName"] : searchCriteria["agencyName"]);
 }
 
 function buildPersonnelSearch(searchCriteria)

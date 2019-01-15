@@ -211,7 +211,7 @@
                         </div>
                     </div>
                     
-                    <div class="row input-row">
+                    <div class="row input-row change-date">
                         <div class="col-md-3 text-align-left">
                             <label for="txtChangeDate">Change Date</label>
                         </div>
@@ -391,6 +391,7 @@
         if (agencyId <= 0) {
             initializeActiveDate();
             $(".agency-link-agency").hide();
+            $('.change-date').hide();
             loadSearchResults();
             return;
         }
@@ -457,8 +458,7 @@
                             $("#txtChangeDate").val(addZero(changeDate.getMonth() + 1) + '/' + addZero(changeDate.getDate()) + '/' + changeDate.getFullYear());
                         }
 
-
-                        //there is a last changed date that can possibly be displayed (dateChanged)
+                        $('.change-date').show();
 
                         if (obj["disableDate"] !== null) {
                             var disableDate = new Date(obj["disableDate"]);
@@ -724,26 +724,28 @@
     function loadSearchResults() {
 
         if (getLocalStorage("gSearchResults").length <= 0) {
+            turnOnLinkParentAgency();
+            turnOnLinkAgency();
             return;
         }
 
         var searchResults = $.parseJSON(getLocalStorage("gSearchResults"));
 
         //load the results
-        $("#ddlMarket").val(searchResults["marketID"]),
-        $("#txtAgencyId").val(searchResults["agencyID"]),
-        $("#txtAgencyName").val(searchResults["agencyName"]),
-        $("#ddlAccountType").val(searchResults["accountType"]),
-        $("#oldParentAgencyId").val(searchResults["oldParentAgencyID"]),
-        $("#oldParentAgencyName").val(searchResults["oldParentAgencyName"]),
-        $("#txtParentAgencyId").val(searchResults["parentAgencyID"]),
-        $("#txtParentAgencyName").val(searchResults["parentAgencyName"]),
-        $("#oldLinkedAgencyId").val(searchResults["oldLinkedAgencyID"]),
-        $("#txtLinkedAgencyId").val(searchResults["searchAgencyId"]),
-        $("#txtLinkedAgency").val(searchResults["searchAgencyName"]),
-        $("#txtActiveDate").val(searchResults["activeDate"]),
+        $("#ddlMarket").val(searchResults["marketID"]);
+        $("#txtAgencyId").val(searchResults["agencyID"]);
+        $("#txtAgencyName").val(searchResults["agencyName"]);
+        $("#ddlAccountType").val(searchResults["accountType"]);
+        $("#oldParentAgencyId").val(searchResults["oldParentAgencyID"]);
+        $("#oldParentAgencyName").val(searchResults["oldParentAgencyName"]);
+        $("#txtParentAgencyId").val(searchResults["linkParentAgencyID"]);
+        $("#txtParentAgencyName").val(searchResults["linkParentAgencyName"]);
+        $("#oldLinkedAgencyId").val(searchResults["oldLinkedAgencyID"]);
+        $("#txtLinkedAgencyId").val(searchResults["searchAgencyId"]);
+        $("#txtLinkedAgency").val(searchResults["searchAgencyName"]);
+        $("#txtActiveDate").val(searchResults["activeDate"]);
         $('#chkActive').prop("checked", searchResults["active"]);
-        $('#txtChangeDate').val(searchResults["changeDate"]),
+        $('#txtChangeDate').val(searchResults["changeDate"]);
 
         setLocalStorage("gSearchResults", "");
 
