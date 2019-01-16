@@ -372,9 +372,31 @@
     }
 
     function linkParentAgency() {
-        bootbox.alert('This functionality is still under development.', function () {
+      
+        $.ajax({
+            url: ServicePrefix + '/api/ParentAgency/LinkParentAgency',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOldParentAgencyId": $("#txtParentAgencyId").val(),
+                "inNewParentAgencyId": $("#txtLinkedParentAgencyId").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    window.location = "parentagency.html?ParentAgencyID=" + $("#txtParentAgencyId").val();
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
         });
-        //window.location = "parentagency.html?ParentAgencyID=" + $("#txtParentAgencyId").val();
+
     }
 
     function searchLinkParentAgency() {
