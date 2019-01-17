@@ -69,6 +69,7 @@
                 <div class="text-center" style="margin-top: 0">
 
                     <div class="row input-row">
+                        <input type="hidden" id="txtStationAgencyId" value=""/>
                         <div class="col-md-3 text-align-left">
                             <label for="ddlStations">Station</label>
                         </div>
@@ -104,22 +105,15 @@
                     </div>
 
                     <div class="row input-row">
-                        <div class="col-md-3">
-
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <div>
-                                <input value="Search Market Agency" onclick="searchMarketAgency();" class="default-button" type="button">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="txtMarketAgency">Market Agency</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input class="mkaRequired field-width-325 disabled" type="text" id="txtMarketAgency" disabled="disabled" errorMessage="Please use the Search Market Agency to link a Market Agency." />
+                            <input type="hidden" id="txtOldMarketAgencyId" value=""/>
+                            <input type="hidden" id="txtOldMarketAgencyName" value=""/>
+                            <input class="mkaRequired field-width-325 disabled" type="text" id="txtMarketAgency" disabled="disabled" errorMessage="Please use the Search Market Agency to link a Market Agency."/>
+                            <span id="marketAgencyMergeMessage" class="hidden to-be-linked-message">* Will be linked and revenues merged</span>
+                            <span id="marketAgencyLinkMessage" class="hidden to-be-linked-message" style="display: inline-block; vertical-align: top;">* Will be linked but <br />revenues will not be merged</span>
                         </div>
                     </div>
 
@@ -129,6 +123,28 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input class="field-width-325 disabled" type="text" id="txtMarketAgencyId" disabled="disabled" />
+                        </div>
+                    </div>
+                    
+                    <div class="row input-row">
+                        <div class="col-md-3">
+
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <div>
+                                <input value="Search Market Agency" onclick="searchMarketAgency();" class="default-button" type="button">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row input-row link-market-agency" >
+                        <div class="col-md-3">
+
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <div>
+                                <input value="Link Market Agency" onclick="linkMarketAgencyQuestion();" class="default-button" type="button">
+                            </div>
                         </div>
                     </div>
 
@@ -147,6 +163,15 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input type="checkbox" id="chkActive" value="">
+                        </div>
+                    </div>
+                    
+                    <div class="row input-row change-date" style="display: none;">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtChangeDate">Change Date</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" id="txtChangeDate" value="" maxlength="50" placeholder="MM/DD/YYYY" readonly />
                         </div>
                     </div>
 
@@ -204,10 +229,12 @@
 </html>
 <script>
     var stationAgencyId = 0;
+    var bLinkMarketAgency = false;
 
     $(document).ready(function () {
 
         stationAgencyId = (getParameterByName("StationAgencyID") == null ? 0 : getParameterByName("StationAgencyID"));
+        $("#txtStationAgencyId").val(stationAgencyId);
 
         getStationList();
 
@@ -317,6 +344,7 @@
         if (stationAgencyId <= 0) {
             loadMarketAgencySearchResults();
             initializeActiveDate();
+            $('.change-date').hide();
             return;
         }
 
@@ -355,7 +383,12 @@
                             $("#chkActive").prop('checked', true);
                         }
 
-                        ////there is a last changed date that can possibly be displayed (dateChanged)
+                        if (obj["dateChanged"] !== null) {
+                            var changeDate = new Date(obj["dateChanged"]);
+                            $("#txtChangeDate").val(addZero(changeDate.getMonth() + 1) + '/' + addZero(changeDate.getDate()) + '/' + changeDate.getFullYear());
+                        }
+
+                        $('.change-date').show();
 
                         if (obj["disableDate"] !== null) {
                             var disableDate = new Date(obj["disableDate"]);
@@ -404,6 +437,9 @@
                         var obj = data.report.rows[index];
 
                         $('#txtMarketAgency').val(obj["agencyName"]);
+                        $("#txtOldMarketAgencyName").val(obj["agencyName"]);
+
+                        $("#txtOldMarketAgencyId").val(obj["agencyId"]);
                         $('#txtMarketAgencyId').val(obj["agencyId"]);
 
                     });
@@ -429,6 +465,7 @@
     function loadMarketAgencySearchResults() {
 
         if (getLocalStorage("gSearchResults").length <= 0) {
+            turnOnLinkMarketAgency();
             return;
         }
 
@@ -451,6 +488,8 @@
         }
 
         setLocalStorage("gSearchResults", "");
+
+        turnOnLinkMarketAgency();
     }
 
     function searchMarketAgency() {
@@ -480,9 +519,7 @@
         }
 
         setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
-        //console.log(getLocalStorage("gSearchCriteria"));
-
-        //alert('doing search stuff');
+       
         window.location = "/utilities/search.html";
     }
 
@@ -522,4 +559,70 @@
         bootbox.alert('This functionality is still under development.', function () {
         });
     }
+
+    function turnOnLinkMarketAgency() {
+
+        if ($("#txtOldMarketAgencyId").val().length == 0) {
+            //hide
+            $(".link-market-agency").hide();
+        } else if ($("#txtOldMarketAgencyId").val().length != 0 &&
+            $("#txtOldMarketAgencyId").val() == $("#txtMarketAgencyId").val()) {
+            //hide
+            $(".link-market-agency").hide();
+        } else {
+            //show
+            $(".link-market-agency").show();
+        }
+    }
+
+    function linkMarketAgencyQuestion() {
+        var strMessage = "Shall " + $("#ddlStations option:selected").text() + "'s revenue history for " + $("#txtOldMarketAgencyName").val() +
+            " be merged into the revenues for " + $("#txtMarketAgency").val() +"?<br/></br/>";
+        strMessage += "This action is irreversible.<br/><br/>";
+        strMessage += "Press Yes to link market agency and merge revenues.<br/>";
+        strMessage += "Press No to link market agency only going forward.<br/>";
+        strMessage += "Press Cancel to abort.";
+
+        bootbox.dialog({
+            message: strMessage,
+            title: "Link Market Agency",
+            buttons:
+            {
+                btnYes: {
+                    label: "Yes",
+                    className: "btn-primary",
+                    callback: function () {
+                        $("#marketAgencyMergeMessage").removeClass("hidden");
+                        $("#marketAgencyLinkMessage").addClass("hidden");
+
+                        bLinkMarketAgency = true;
+                    }
+                },
+                btnNo: {
+                    label: "No",
+                    callback: function () {
+                        $("#marketAgencyMergeMessage").addClass("hidden");
+                        $("#marketAgencyLinkMessage").removeClass("hidden");
+
+                        bLinkMarketAgency = false;
+                    }
+                },
+                btnCancel: {
+                    label: "Cancel",
+                    callback: function () {
+                        $("#marketAgencyMergeMessage").addClass("hidden");
+                        $("#marketAgencyLinkMessage").addClass("hidden");
+
+                        $("#txtMarketAgencyId").val($("#txtOldMarketAgencyId").val());
+                        $("#txtMarketAgency").val($("#txtOldMarketAgencyName").val());
+
+                        bLinkMarketAgency = false;
+
+                        turnOnLinkMarketAgency();
+                    }
+                }
+            }
+        });
+    }
+
 </script>
