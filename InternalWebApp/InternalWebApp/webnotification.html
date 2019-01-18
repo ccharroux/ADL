@@ -1,0 +1,463 @@
+﻿<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>MKA Internal Media Site</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Facebook and Twitter integration -->
+    <meta property="og:title" content="" />
+    <meta property="og:image" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:site_name" content="" />
+    <meta property="og:description" content="" />
+    <meta name="twitter:title" content="" />
+    <meta name="twitter:image" content="" />
+    <meta name="twitter:url" content="" />
+    <meta name="twitter:card" content="" />
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="/css/animate.css">
+    <!-- Icomoon Icon Fonts-->
+    <link rel="stylesheet" href="/css/icomoon.css">
+    <!-- Simple Line Icons -->
+    <link rel="stylesheet" href="/css/simple-line-icons.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <!-- Theme style  -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Modernizr JS -->
+    <script src="/js/modernizr-2.6.2.min.js"></script>
+    <!-- FOR IE9 below -->
+    <!--[if lt IE 9]>
+    <script src="js/respond.min.js"></script>
+    <![endif]-->
+    <style>
+        .rptView {
+            margin-left: 5px;
+            vertical-align: top;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="fh5co-page">
+        <header id="fh5co-header" role="banner">
+            <div class="container">
+                <div class="header-inner" id="menu"></div>
+            </div>
+        </header>
+
+        <div id="fh5co-contact-section" class="contact-section">
+            <div class="container">
+                <div class="row">
+                    <div class="con-md-6 text-center fh5co-heading">
+                        <h2>Web Notifications</h2>
+                    </div>
+                </div>
+
+                <input type="hidden" id="hdnPersonnelId" value="" />
+
+
+                <!--Search Filters-->
+                <div class="row search-section">
+                    <div class="col-md-12">
+
+                        <div class="rptView">
+                            <label for="ddlStatus">Status: </label>
+                            <select id="ddlStatus" onchange="loadFilter(this.value)" class="mkaRequired">
+                                <option value="" selected>-- Select a Status</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Notified">Notified</option>
+                                <option value="Both">Both</option>
+                            </select>
+                        </div>
+                        <div class="rptView">
+                            <label for="ddlFilter">Filter By: </label>
+                            <select id="ddlFilter" onchange="loadSelectedFilter(this.value)" disabled class="mkaRequired disabled">
+                                <option value="" selected>-- Select a Filter</option>
+                            </select>
+                        </div>
+                        <div class="rptView">
+                            <label id="lblSelectedFilter"></label>
+                            <div id="divSelectedFilter" style="display:inline-block;">
+
+                            </div>
+                        </div>
+                        <input type="button" id="btnShowPersonnel" onclick="showNotifications();" class="search-button" value="Show" />
+                    </div>
+                </div>
+
+
+                <!--Notification list-->
+                <div id="divNotificationList" class="hidden margin-top-10">
+                    <div class="default-button-section silver-border-2">
+                        <div class="row margin-bottom-5">
+                            <div class="col-md-1">
+
+                            </div>
+                            <div class="col-md-3">
+                                <strong>User</strong>
+                            </div>
+                            <div class="col-md-1">
+                                <strong>Contact</strong>
+                            </div>
+                            <div class="col-md-1">
+                                <strong>Recipient</strong>
+                            </div>
+                            <div class="col-md-1">
+                                <strong>Status</strong>
+                            </div>
+                            <div class="col-md-1">
+                                <strong>Date</strong>
+                            </div>
+                            <div class="col-md-2">
+                                <strong>Action</strong>
+                            </div>
+                            <div class="col-md-2">
+                                <strong>Web User</strong>
+                            </div>
+                        </div>
+
+
+                        <div class="row margin-0-auto">
+                            <div id="notificationList" class="overflow-y-auto max-height-400">
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="default-button-section margin-top-10">
+                        <div class="row">
+                            <div class="col-md-4">
+
+                            </div>
+                            <div class="col-md-4">
+                                Users Selected:
+                                <span id="lblUsersSelected">0</span>
+                            </div>
+                            <div class="col-md-4 text-align-right">
+                                <input type="button" class="default-button" value="Send" onclick="sendEmail();" />
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+    <!-- jQuery Easing -->
+    <script src="/js/jquery.easing.1.3.js"></script>
+    <!-- Bootstrap -->
+    <script src="/js/bootstrap.min.js"></script>
+    <!-- Bootbox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+    <!-- Waypoints -->
+    <script src="/js/jquery.waypoints.min.js"></script>
+    <!-- BlockUI JS -->
+    <script src="/js/blockUI.js"></script>
+    <!-- Config JS -->
+    <script src="/js/config.js"></script>
+    <!-- MAIN JS -->
+    <script src="/js/main.js"></script>
+
+
+</body>
+</html>
+<script>
+
+    $(document).ready(function () {
+
+        buildMainMenu("Personnel");
+        loadAdvancedSearch();
+
+    });
+
+    function loadFilter(status) {
+
+        var mainFilterList = ["All Client Personnel", "Contacts Only", "Recipients Only", "---------", "Client Personnel", "Market", "Ownership"];
+
+        $("#ddlFilter").html("");
+        clearSelectedFilter();
+
+        var str = '<option value="">--Select a Filter</option>';
+
+        for (var i = 0; i < mainFilterList.length; i++) {
+            str = str + '<option value="' + mainFilterList[i] + '">' + mainFilterList[i] + '</option>';
+        }
+
+        if (status.toUpperCase() != "PENDING") {
+            str = str + '<option value="Date Range">Date Range</option>';
+        }
+
+        $("#ddlFilter").html(str);
+
+        if (status != "") {
+
+            $("#ddlFilter").prop("disabled", false);
+            $("#ddlFilter").removeClass("disabled");
+
+        }
+        else {
+            $("#ddlFilter").prop("disabled", true);
+            $("#ddlFilter").addClass("disabled");
+        }
+
+    }
+
+    function loadSelectedFilter(filter) {
+
+        destroySearchCriteria();
+        clearSelectedFilter();
+
+        switch (filter) {
+            case "Client Personnel":
+                loadClientPersonnelFilter(filter);
+                break;
+            case "Market":
+                loadMarketFilter(filter);
+                break;
+            case "Ownership":
+                loadOwnershipFilter(filter);
+                break;
+            case "Date Range":
+                loadDateRangeFilter(filter);
+                break;
+            default:
+                clearSelectedFilter();
+                break;
+
+        }
+    }
+
+    function clearSelectedFilter() {
+        $("#divSelectedFilter").html("");
+        $("#lblSelectedFilter").html("");
+    }
+
+    function loadMarketFilter(filter) {
+        $("#lblSelectedFilter").text(filter + ":");
+
+        var str = '<select id="ddlMarketFilter" class="mkaRequired"></select>';
+        $("#divSelectedFilter").html(str);
+
+        getMarketList();
+    }
+
+    function loadOwnershipFilter(filter) {
+        $("#lblSelectedFilter").text(filter + ":");
+
+        var str = '<select id="ddlOwnerFilter" class="mkaRequired"></selected>';
+        $("#divSelectedFilter").html(str);
+
+        getOwnerList();
+    }
+
+    function loadDateRangeFilter(filter) {
+        $("#lblSelectedFilter").text(filter + ":");
+
+        var str = '';
+
+        str = str + '<input type="text" id="dtRangeStart" class="text-align-center" style="max-width:100px; margin-right:5px;" />';
+        str = str + '&nbsp;<b>To</b>&nbsp;';
+        str = str + '<input type="text" id="dtRangeEnd" class="text-align-center" style="max-width:100px; margin-left:5px;" />';
+        $("#divSelectedFilter").html(str);
+
+        loadDefaultDateRange();
+
+    }
+
+    function loadDefaultDateRange() {
+
+        var d = new Date();
+        var currentMonth = d.getMonth() + 1;
+        var currentYear = d.getFullYear();
+        var lastDayOfTheMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+
+        $("#dtRangeStart").val(currentMonth + "/01/" + currentYear);
+        $("#dtRangeEnd").val(currentMonth + "/" + lastDayOfTheMonth.getDate() + "/" + currentYear);
+
+    }
+
+    function loadClientPersonnelFilter(filter) {
+        $("#lblSelectedFilter").text(filter + ":");
+
+        var str = '<input type="text" id="txtPersonnel" onclick="getPersonnel()" readonly />';
+        $("#divSelectedFilter").html(str);
+
+    }
+
+
+    function getMarketList() {
+
+        var url = ServicePrefix + '/api/Market/GetMarketList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getMarketListSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+
+        else {
+            var str = '';
+            str = '<option value="">-- Select a Market </option>';
+
+            $.each(data.report.rows, function (index) {
+                str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
+
+            });
+
+            $("#ddlMarketFilter").html(str);
+        }
+    }
+
+    function getOwnerList() {
+
+        var url = ServicePrefix + '/api/Owner/GetOwnerListUnfiltered';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerName": "",
+                "inActiveOnly": "1",
+                "inAddDetails": "0"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOwnerListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getOwnerListSuccess(data, textStauts, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0])
+        }
+
+        else {
+
+            var str = '';
+
+            str = "<option value=''> -- Select an Owner </option>";
+
+            $.each(data.report.rows, function (index) {
+                str = str + "<option value='" + data.report.rows[index].OwnerID + "'>" + data.report.rows[index].OwnerName + "</option>";
+            });
+
+            $("#ddlOwnerFilter").html(str);
+
+        }
+
+    }
+
+    function getPersonnel() {
+
+        var searchCriteriaObj = {
+            "searchToken": "PERSONNEL",
+            "txtPersonnel": $("#txtPersonnel").html(),
+            "ddlStatus": $("#ddlStatus").val(),
+            "ddlFilter": $("#ddlFilter").val(),
+            "searchPage": window.location
+        }
+
+        setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
+
+        window.location = "/utilities/search.html";
+    }
+
+    function loadAdvancedSearch() {
+
+        var searchResults = getLocalStorage("gSearchResults");
+
+
+        if (!searchResults) {
+            return;
+        }
+
+        var searchCriteria = $.parseJSON(searchResults);
+
+        if (searchCriteria["searchToken"] == "PERSONNEL") {
+
+            $("#ddlStatus").val(searchCriteria["ddlStatus"]);
+
+            loadFilter(searchCriteria["ddlStatus"]);
+
+            $("#ddlFilter").val(searchCriteria["ddlFilter"]);
+            loadClientPersonnelFilter(searchCriteria["ddlFilter"]);
+
+            $("#txtPersonnel").val(searchCriteria["txtPersonnel"]);
+            $("#hhmPersonnel").val(searchCriteria["personnelId"]);
+
+            searchCriteria["txtPersonnel"] = "";
+            searchCriteria["personnelId"] = "";
+            searchCriteria["ddlStatus"] = "";
+            searchCriteria["ddlFilter"] = "";
+
+        }
+
+    }
+
+    function destroySearchCriteria() {
+        setLocalStorage("gSearchCriteria", null);
+        setLocalStorage("gSearchResults", null);
+    }
+
+    function showNotifications() {
+
+        $("#divNotificationList").removeClass("hidden");
+    }
+
+    function sendEmail() {
+        bootbox.alert("This functionality is currently in development.");
+    }
+
+    
+
+</script>
