@@ -66,6 +66,7 @@ reportName.push("rptXRYMarketStationRelease");
 reportName.push("rptTVBMarketRelease");
 reportName.push("rptTVBMarketStationRelease");
  
+reportName.push("rptFeatureImplementationList");
 
 function buildReportArray()
 {
@@ -104,7 +105,7 @@ function buildReportObjectArray()
     for (var x = 0; x < reportName.length; x++)
     {
         var module = reportName[x].replace("rpt", "");
-        console.log(module);
+       // console.log(module);
         arrayObject = window[("getReportObject_" + module)]();
         arrayObject.filters = window[("getReportFilterArray_" + module)]();
         reportObjectArray.push(arrayObject);
@@ -3138,4 +3139,39 @@ function getReportObject_TVBMarketStationRelease() {
 
     return tempObject;
 
+}
+
+
+ 
+function getReportFilterArray_FeatureImplementationList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    //arrayObject = {
+    //    token:  "Owner",
+    //    jsCall:  "getOwnerList",
+    //    objectName:  "ddlOwner",
+    //    required:  true
+    //}
+    //arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_FeatureImplementationList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Media Feature Implementation List",
+        apiControllerAction: "/api/Feature/GetFeatureImplementationList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'misc'
+    }
+
+    return tempObject;
 }

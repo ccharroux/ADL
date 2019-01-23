@@ -17,7 +17,7 @@ else if (window.location.toString().toLowerCase().indexOf("mediainternal.millerk
 
 var currentPage = window.location.toString().toLocaleLowerCase();
  
-    if (currentPage.indexOf("http:") > -1)
+if (currentPage.indexOf("http:") > -1)
 {
     // not secure...
     // and not prod

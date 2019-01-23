@@ -229,6 +229,7 @@
 //    }
 //}
 
+var bLongQuery = false;
 
 var gDataTableDefaultRows = 50;
 
@@ -250,11 +251,15 @@ $( document ).ready(function()
 	$.blockUI.defaults.message ='<h4>Just a moment...</h4>';
 	
 
-    // Force unblock after 10 seconds
-	setInterval("$.unblockUI();", 10000);
+	if (bLongQuery == false) {
+	    // Force unblock after 10 seconds
+	    //console.log("force stop of block ui");
+	    setInterval("$.unblockUI();", 10000);
+	}
 
     // Set Ajax
 	$(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
+	//$(document).ajaxStart($.blockUI);//.ajaxStop(console.log('testing this'));
 
 	var apiToken = "";
 	var bDoLoginCheck = true;
