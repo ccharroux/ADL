@@ -67,9 +67,8 @@
                     </div>
                 </div>
                 <div class="text-center" style="margin-top: 0">
-
+                    <!-- Need to make this read only on update -->
                     <div class="row input-row">
-                        <input type="hidden" id="txtStationAgencyId" value=""/>
                         <div class="col-md-3 text-align-left">
                             <label for="ddlStations">Station</label>
                         </div>
@@ -88,11 +87,12 @@
                     </div>
 
                     <div class="row input-row">
+                        <input type="hidden" id="txtStationAgencyId" value=""/>
                         <div class="col-md-3 text-align-left">
-                            <label for="txtStationAgency">Agency</label>
+                            <label for="txtStationAgencyName">Agency</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input class="mkaRequired field-width-325" maxlength="120" type="text" id="txtStationAgency" errorMessage="Enter an Agency Name." />
+                            <input class="mkaRequired field-width-325" maxlength="120" type="text" id="txtStationAgencyName" errorMessage="Enter an Agency Name."/>
                         </div>
                     </div>
                     <div class="row input-row">
@@ -230,28 +230,30 @@
 <script>
     var stationAgencyId = 0;
     var bLinkMarketAgency = false;
+    var bIsNew = false;
 
     $(document).ready(function () {
 
         stationAgencyId = (getParameterByName("StationAgencyID") == null ? 0 : getParameterByName("StationAgencyID"));
         $("#txtStationAgencyId").val(stationAgencyId);
+        bIsNew = stationAgencyId <= 0;
 
         getStationList();
 
 
         buildXRYMenu("Agency");
 
-        $("#chkActive").change(function () {
-            if (this.checked) {
-                $(".disable-date").hide();
-            } else {
-                if ($("#txtDisableDate").val().length <= 0) {
-                    var todaysDate = new Date();
-                    $("#txtDisableDate").val(addZero(todaysDate.getMonth() + 1) + '/' + addZero(todaysDate.getDate()) + '/' + todaysDate.getFullYear());
-                }
-                $(".disable-date").show();
-            }
-        });
+        //$("#chkActive").change(function () {
+        //    if (this.checked) {
+        //        $(".disable-date").hide();
+        //    } else {
+        //        if ($("#txtDisableDate").val().length <= 0) {
+        //            var todaysDate = new Date();
+        //            $("#txtDisableDate").val(addZero(todaysDate.getMonth() + 1) + '/' + addZero(todaysDate.getDate()) + '/' + todaysDate.getFullYear());
+        //        }
+        //        $(".disable-date").show();
+        //    }
+        //});
 
         $("#ddlStations").on('change',
             function () {
@@ -370,7 +372,9 @@
                         var obj = data.report.rows[index];
 
                         $('#ddlStations').val(obj["reportEntityId"]).change();
-                        $('#txtStationAgency').val(obj["stationAgencyName"]);
+                        $('#ddlStations').prop('disabled', true);
+
+                        $('#txtStationAgencyName').val(obj["stationAgencyName"]);
                         $('#txtStationAgencyCode').val(obj["stationAgencyCode"]);
 
                         if (obj["dateSetup"] !== null) {
@@ -476,7 +480,7 @@
         if (stationAgencyId <= 0) {
             //load everthing but market advertiser and id
             $('#ddlStations').val(searchResults["stationID"]).change();
-            $('#txtStationAgency').val(searchResults["agencyName"]);
+            $('#txtStationAgencyName').val(searchResults["agencyName"]);
             $('#txtStationAgencyCode').val(searchResults["agencyCode"]);
         }
 
@@ -500,7 +504,7 @@
             return;
         }
 
-        if ($("#txtStationAgency").val().length === 0) {
+        if ($("#txtStationAgencyName").val().length === 0) {
             bootbox.alert('Enter an Agency Name.', function () {
             });
             return;
@@ -510,7 +514,7 @@
             "searchToken": "STATIONAGENCY",
             "stationID": $("#ddlStations").val(),
             "marketID": $("#ddlMarkets").val(),
-            "agencyName": $("#txtStationAgency").val(),
+            "agencyName": $("#txtStationAgencyName").val(),
             "agencyCode": $("#txtStationAgencyCode").val(),
             "searchHeading": "Market Agency Search",
             "searchAgencyName": $("#txtMarketAgency").val(),
@@ -556,8 +560,61 @@
             return;
         }
 
+        //bootbox.alert('This functionality is still under development.', function () {
+        //});
+
+        $.ajax({
+            url: ServicePrefix + '/api/StationAgency/UpdateStationAgency',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationAgencyId": $("#txtStationAgencyId").val(),
+                "inStationAgencyName": $("#txtStationAgencyName").val(),
+                "inStationAgencyCode": $("#txtStationAgencyCode").val(),
+                "inStationId": $("#ddlStations").val(),
+                "inOldMarketAgencyId": $("#txtOldMarketAgencyId").val(),
+                "inMarketAgencyId": $("#txtMarketAgencyId").val(),
+                "inIsNew": bIsNew
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    if (bIsNew) {
+
+                        var obj = data.report.rows[0];
+
+                        $("#txtStationAgencyId").val(obj["_updateStatus"]);
+
+                        window.location = "stationagency.html?StationAgencyID=" + $("#txtStationAgencyId").val();
+                    }
+
+
+                    if (bLinkMarketAgency) {
+                        linkMarketAgency();
+                    }
+                    else {
+                        window.location = "stationagency.html?StationAgencyID=" + $("#txtStationAgencyId").val();
+                    }
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
+    }
+
+    function linkMarketAgency() {
+
         bootbox.alert('This functionality is still under development.', function () {
         });
+
     }
 
     function turnOnLinkMarketAgency() {
