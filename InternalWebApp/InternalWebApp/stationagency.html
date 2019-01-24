@@ -87,12 +87,12 @@
                     </div>
 
                     <div class="row input-row">
-                        <input type="hidden" id="txtStationAgencyId" value=""/>
+                        <input type="hidden" id="txtStationAgencyId" value="" />
                         <div class="col-md-3 text-align-left">
                             <label for="txtStationAgencyName">Agency</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input class="mkaRequired field-width-325" maxlength="120" type="text" id="txtStationAgencyName" errorMessage="Enter an Agency Name."/>
+                            <input class="mkaRequired field-width-325" maxlength="120" type="text" id="txtStationAgencyName" errorMessage="Enter an Agency Name." />
                         </div>
                     </div>
                     <div class="row input-row">
@@ -109,9 +109,9 @@
                             <label for="txtMarketAgency">Market Agency</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="hidden" id="txtOldMarketAgencyId" value=""/>
-                            <input type="hidden" id="txtOldMarketAgencyName" value=""/>
-                            <input class="mkaRequired field-width-325 disabled" type="text" id="txtMarketAgency" disabled="disabled" errorMessage="Please use the Search Market Agency to link a Market Agency."/>
+                            <input type="hidden" id="txtOldMarketAgencyId" value="" />
+                            <input type="hidden" id="txtOldMarketAgencyName" value="" />
+                            <input class="mkaRequired field-width-325 disabled" type="text" id="txtMarketAgency" disabled="disabled" errorMessage="Please use the Search Market Agency to link a Market Agency." />
                             <span id="marketAgencyMergeMessage" class="hidden to-be-linked-message">* Will be linked and revenues merged</span>
                             <span id="marketAgencyLinkMessage" class="hidden to-be-linked-message" style="display: inline-block; vertical-align: top;">* Will be linked but <br />revenues will not be merged</span>
                         </div>
@@ -125,7 +125,7 @@
                             <input class="field-width-325 disabled" type="text" id="txtMarketAgencyId" disabled="disabled" />
                         </div>
                     </div>
-                    
+
                     <div class="row input-row">
                         <div class="col-md-3">
 
@@ -136,14 +136,14 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="row input-row link-market-agency" >
+
+                    <div class="row input-row link-market-agency">
                         <div class="col-md-3">
 
                         </div>
                         <div class="col-md-9 text-align-left">
                             <div>
-                                <input value="Link Market Agency" onclick="linkMarketAgencyQuestion();" class="default-button" type="button">
+                                <input value="Link Market Agency" onclick="linkMarketAgencyRevenueQuestion();" class="default-button" type="button">
                             </div>
                         </div>
                     </div>
@@ -165,7 +165,7 @@
                             <input type="checkbox" id="chkActive" value="">
                         </div>
                     </div>
-                    
+
                     <div class="row input-row change-date" style="display: none;">
                         <div class="col-md-3 text-align-left">
                             <label for="txtChangeDate">Change Date</label>
@@ -229,7 +229,7 @@
 </html>
 <script>
     var stationAgencyId = 0;
-    var bLinkMarketAgency = false;
+    var bLinkStationAgencyRevenues = false;
     var bIsNew = false;
 
     $(document).ready(function () {
@@ -523,7 +523,7 @@
         }
 
         setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
-       
+
         window.location = "/utilities/search.html";
     }
 
@@ -560,9 +560,6 @@
             return;
         }
 
-        //bootbox.alert('This functionality is still under development.', function () {
-        //});
-
         $.ajax({
             url: ServicePrefix + '/api/StationAgency/UpdateStationAgency',
             dataType: 'json',
@@ -595,9 +592,8 @@
                         window.location = "stationagency.html?StationAgencyID=" + $("#txtStationAgencyId").val();
                     }
 
-
-                    if (bLinkMarketAgency) {
-                        linkMarketAgency();
+                    if (bLinkStationAgencyRevenues) {
+                        linkStationAgencyRevenues();
                     }
                     else {
                         window.location = "stationagency.html?StationAgencyID=" + $("#txtStationAgencyId").val();
@@ -610,11 +606,33 @@
         });
     }
 
-    function linkMarketAgency() {
+    function linkStationAgencyRevenues() {
 
-        bootbox.alert('This functionality is still under development.', function () {
+        $.ajax({
+            url: ServicePrefix + '/api/StationAgency/LinkStationAgencyRevenues',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": $("#ddlStations").val(),
+                "inOldAgencyId": $("#txtOldMarketAgencyId").val(),
+                "inNewAgencyId": $("#txtMarketAgencyId").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    window.location = "stationagency.html?StationAgencyID=" + $("#txtStationAgencyId").val();
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
         });
-
     }
 
     function turnOnLinkMarketAgency() {
@@ -632,9 +650,9 @@
         }
     }
 
-    function linkMarketAgencyQuestion() {
+    function linkMarketAgencyRevenueQuestion() {
         var strMessage = "Shall " + $("#ddlStations option:selected").text() + "'s revenue history for " + $("#txtOldMarketAgencyName").val() +
-            " be merged into the revenues for " + $("#txtMarketAgency").val() +"?<br/></br/>";
+            " be merged into the revenues for " + $("#txtMarketAgency").val() + "?<br/></br/>";
         strMessage += "This action is irreversible.<br/><br/>";
         strMessage += "Press Yes to link market agency and merge revenues.<br/>";
         strMessage += "Press No to link market agency only going forward.<br/>";
@@ -652,7 +670,7 @@
                         $("#marketAgencyMergeMessage").removeClass("hidden");
                         $("#marketAgencyLinkMessage").addClass("hidden");
 
-                        bLinkMarketAgency = true;
+                        bLinkStationAgencyRevenues = true;
                     }
                 },
                 btnNo: {
@@ -661,7 +679,7 @@
                         $("#marketAgencyMergeMessage").addClass("hidden");
                         $("#marketAgencyLinkMessage").removeClass("hidden");
 
-                        bLinkMarketAgency = false;
+                        bLinkStationAgencyRevenues = false;
                     }
                 },
                 btnCancel: {
@@ -673,7 +691,7 @@
                         $("#txtMarketAgencyId").val($("#txtOldMarketAgencyId").val());
                         $("#txtMarketAgency").val($("#txtOldMarketAgencyName").val());
 
-                        bLinkMarketAgency = false;
+                        bLinkStationAgencyRevenues = false;
 
                         turnOnLinkMarketAgency();
                     }
