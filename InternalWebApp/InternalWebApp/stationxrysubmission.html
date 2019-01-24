@@ -60,6 +60,8 @@
                     </div>
                 </div>
 
+                <input type="hidden" id="hdnSubmissionId" value="" />
+
                 <div class="text-center margin-top-0">
 
                     <div class="entity-label hidden">
@@ -86,7 +88,7 @@
                             <label for="txtSubmissionDesc">Submission Description</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="txtSubmissionDesc" class="mkaRequired field-width-325" errorMessage="You must enter a Submision Description." />
+                            <input type="text" id="txtSubmissionDesc" maxlength="50" class="mkaRequired field-width-325" errorMessage="You must enter a Submision Description." />
                         </div>
                     </div>
 
@@ -96,7 +98,7 @@
                             <label for="txtAltCallLetters">Alternate Call Letters</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="txtAltCallLetters" class="field-with-325" />
+                            <input type="text" maxlenth="15" id="txtAltCallLetters" class="field-with-325" />
                         </div>
                     </div>
 
@@ -121,9 +123,7 @@
                     </div>
 
 
-
                     <!--Months-->
-
                     <div id="divMonths" class="hidden">
                         <div class="row input-row">
 
@@ -157,6 +157,8 @@
             </div>
         </div>
     </div>
+
+
         <!-- jQuery -->
         <script src="/js/jquery.min.js"></script>
         <!-- jQuery Easing -->
@@ -174,20 +176,20 @@
         <!-- MAIN JS -->
         <script src="/js/main.js"></script>
 
-
-
 </body>
 </html>
 <script>
 
     var stationId = 0;
     var submissionId = 0;
+    var bReloadPage = false;
 
     $(document).ready(function () {
 
         buildMainMenu("Stations");
         stationId = (getParameterByName("StationID") == null ? 0 : getParameterByName("StationID"));
         submissionId = (getParameterByName("SubmissionID") == null ? 0 : getParameterByName("SubmissionID"));
+        $("#hdnSubmissionId").val(submissionId);
         getInputScriptList();
         setStationLabel();
         loadMonths();
@@ -207,7 +209,6 @@
             str = str + '<label for="chkMonth_' + month + '">' + monthsArray[i] + '</label>';
             str = str + '</div>';
         }
-        console.log(str);
         $("#divSelectMonths").append(str);
 
     }
@@ -263,7 +264,7 @@
 
             var str = '';
 
-            str = '<option value="-">-- Select an Input Script</option>';
+            str = '<option value="-1">-- Select an Input Script</option>';
 
             $.each(data.report.rows, function (index) {
                 str = str + '<option value="' + data.report.rows[index].dataInputId + '">' + data.report.rows[index].inputSystem + '</option>';
@@ -398,7 +399,167 @@
     }
 
     function updateXRYSubmission() {
-        bootbox.alert("This functionality is still under development");
+
+        if (validationPassed() == false) {
+            return;
+        }
+
+        if (submissionId < 0) {
+            return;
+        }
+
+        var url = ServicePrefix + '/api/ReInput/UpdateReInput';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId,
+                "inSubmissionId": submissionId,
+                "inDescription": $("#txtSubmissionDesc").val(),
+                "inSeasonal": ($("#chkRecieveAllPeriods").prop("checked") == true ? false : true),
+                "inAltCallLetters": $("#txtAltCallLetters").val(),
+                "inDataInputId": $("#ddlInputScript").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                updateXRYSubmissionSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+
+    function updateXRYSubmissionSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0])
+        }
+        else {
+
+            $.each(data.report.rows, function (index) {
+
+                var obj = data.report.rows[index];
+
+                if ($("#hdnSubmissionId").val() === "0") {
+                    bReloadPage = true;
+                    $("#hdnSubmissionId").val(obj["submissionId"]);
+                }
+
+            });
+
+            updateXRYSubmissionSeason();
+
+        }
+
+    }
+
+    function updateXRYSubmissionSeason() {
+
+        var seasonalList = [];
+        var splitValue = [];
+
+        $("#divSelectMonths input[type=checkbox]").each(function () {
+
+            if ($(this).prop('checked') == true) {
+                splitValue = $(this).attr('id').split('_');
+                seasonalList.push(splitValue[1]);
+            }
+
+        });
+
+        var url = ServicePrefix + '/api/ReInputSeason/UpdateReInputSeason';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId,
+                "inSubmissionId": $("#hdnSubmissionId").val(),
+                "inSeasonal": ($("#chkRecieveAllPeriods").prop("checked") == true ? false : true),
+                "inSeasonalPeriodList": seasonalList
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                updateXRYSubmissionSeasonSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function updateXRYSubmissionSeasonSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+            bootbox.alert('Submission update successful.', function () {
+                if (bReloadPage) {
+                    window.location = "stationxrysubmission.html?StationID=" + stationId + "&SubmissionID=" + $("#hdnSubmissionId").val();
+                }
+            });
+        }
+    }
+
+
+    function validationPassed() {
+
+        if ($("#chkRecieveAllPeriods").prop("checked") == false) {
+
+            var periodCheck = false;
+
+            $("#divSelectMonths input[type=checkbox]").each(function () {
+                if ($(this).prop('checked') == true) {
+                    periodCheck = true;
+                }
+            });
+
+            if (periodCheck == false) {
+                bootbox.alert("If the Recieve All Periods checkbox is not checked, you must select at least one Month in the Select Month(s) area.", function () { });
+                return false;
+            }
+        }
+
+
+        var loopBreak = true;
+        $(".mkaRequired").each(function (index, el) {
+
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+
+            }
+
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == "-1") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+        });
+
+        return loopBreak;
     }
 
 
