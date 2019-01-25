@@ -304,7 +304,7 @@ $( document ).ready(function()
 	}
 
 	if (loc.indexOf("localhost") > -1) {
-	    environment = "&nbsp;DEV";
+	    environment = "&nbsp;LOCAL";
 	}
 
 	if (loc.indexOf("stagingmediainternal.millerkaplan.com") > -1)

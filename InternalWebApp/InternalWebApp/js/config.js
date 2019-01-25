@@ -15,6 +15,7 @@ else if (window.location.toString().toLowerCase().indexOf("mediainternal.millerk
     bNonProd = false;
 }
 
+
 var currentPage = window.location.toString().toLocaleLowerCase();
  
 if (currentPage.indexOf("http:") > -1)
@@ -26,6 +27,4 @@ if (currentPage.indexOf("http:") > -1)
           ServicePrefix = ServicePrefix.replace("https:", "http:");
     }
 }
-
-
 
