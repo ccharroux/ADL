@@ -1203,7 +1203,7 @@ function getReportFilterArray_StationListing() {
         token:  "Product",
         jsCall:  "getProductList",
         objectName:  "ddlProduct",
-        required:  true
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
@@ -1220,6 +1220,14 @@ function getReportFilterArray_StationListing() {
         jsCall:  "getOwnerList",
         objectName:  "ddlOwner",
         required:  false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
     }
     arrayFilters.push(arrayObject);
 
