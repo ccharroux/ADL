@@ -3195,7 +3195,7 @@ function getReportFilterArray_TVBMRRCompare() {
         token:  "Owner",
         jsCall:  "getOwnerList",
         objectName:  "ddlOwner",
-        required:  true
+        required:  false
     }
     arrayFilters.push(arrayObject);
 
@@ -3203,7 +3203,7 @@ function getReportFilterArray_TVBMRRCompare() {
         token: "Market",
         jsCall: "getMRRMarketList",
         objectName: "ddlMarket",
-        required: true
+        required: false
     }
     arrayFilters.push(arrayObject);
 
@@ -3235,8 +3235,7 @@ function getReportObject_TVBMRRCompare() {
     columnsToDisplay.push("AffiliationName");
     columnsToDisplay.push("MarketName");
     columnsToDisplay.push("OwnerName");
-    columnsToDisplay.push("RevenueYear");
-    columnsToDisplay.push("RevenueQuarter");
+    columnsToDisplay.push("RevenuePeriod");
     columnsToDisplay.push("Revenue_LocalNonPolitical_MRR");
     columnsToDisplay.push("Revenue_LocalNonPolitical_TVB");
     columnsToDisplay.push("Revenue_LocalNonPolitical_Difference");
