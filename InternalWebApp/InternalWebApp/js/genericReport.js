@@ -68,6 +68,8 @@ reportName.push("rptTVBMarketStationRelease");
  
 reportName.push("rptFeatureImplementationList");
 
+reportName.push("rptTVBMRRCompare");
+
 function buildReportArray()
 {
     var reportCounter = 1
@@ -3179,6 +3181,88 @@ function getReportObject_FeatureImplementationList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'misc'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_TVBMRRCompare() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token:  "Owner",
+        jsCall:  "getOwnerList",
+        objectName:  "ddlOwner",
+        required:  true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMRRMarketList",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodListQuarters",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_TVBMRRCompare() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("StationName");
+    columnsToDisplay.push("AffiliationName");
+    columnsToDisplay.push("MarketName");
+    columnsToDisplay.push("OwnerName");
+    columnsToDisplay.push("RevenueYear");
+    columnsToDisplay.push("RevenueQuarter");
+    columnsToDisplay.push("Revenue_LocalNonPolitical_MRR");
+    columnsToDisplay.push("Revenue_LocalNonPolitical_TVB");
+    columnsToDisplay.push("Revenue_LocalNonPolitical_Difference");
+    columnsToDisplay.push("Revenue_NationalNonPolitical_MRR");
+    columnsToDisplay.push("Revenue_NationalNonPolitical_TVB");
+    columnsToDisplay.push("Revenue_NationalNonPolitical_Difference");
+    columnsToDisplay.push("Revenue_TotalNonPolitical_MRR");
+    columnsToDisplay.push("Revenue_TotalNonPolitical_TVB");
+    columnsToDisplay.push("Revenue_TotalNonPolitical_Difference");
+    columnsToDisplay.push("Revenue_LocalPolitical_MRR");
+    columnsToDisplay.push("Revenue_LocalPolitical_TVB");
+    columnsToDisplay.push("Revenue_LocalPolitical_Difference");
+    columnsToDisplay.push("Revenue_NationalPolitical_MRR");
+    columnsToDisplay.push("Revenue_NationalPolitical_TVB");
+    columnsToDisplay.push("Revenue_NationalPolitical_Difference");
+    columnsToDisplay.push("Revenue_TotalPolitical_MRR");
+    columnsToDisplay.push("Revenue_TotalPolitical_TVB");
+    columnsToDisplay.push("Revenue_TotalPolitical_Difference");
+
+    tempObject =
+    {
+        reportTitle: "TVB / MRR Comparison",
+        apiControllerAction: "/api/TVB/GetMRRTVBCompare",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'tvb'
     }
 
     return tempObject;
