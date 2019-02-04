@@ -3231,34 +3231,34 @@ function getReportObject_TVBMRRCompare() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("StationName");
-    columnsToDisplay.push("AffiliationName");
-    columnsToDisplay.push("MarketName");
-    columnsToDisplay.push("OwnerName");
-    columnsToDisplay.push("RevenuePeriod");
-    columnsToDisplay.push("Revenue_LocalNonPolitical_MRR");
-    columnsToDisplay.push("Revenue_LocalNonPolitical_TVB");
-    columnsToDisplay.push("Revenue_LocalNonPolitical_Difference");
-    columnsToDisplay.push("Revenue_NationalNonPolitical_MRR");
-    columnsToDisplay.push("Revenue_NationalNonPolitical_TVB");
-    columnsToDisplay.push("Revenue_NationalNonPolitical_Difference");
-    columnsToDisplay.push("Revenue_TotalNonPolitical_MRR");
-    columnsToDisplay.push("Revenue_TotalNonPolitical_TVB");
-    columnsToDisplay.push("Revenue_TotalNonPolitical_Difference");
-    columnsToDisplay.push("Revenue_LocalPolitical_MRR");
-    columnsToDisplay.push("Revenue_LocalPolitical_TVB");
-    columnsToDisplay.push("Revenue_LocalPolitical_Difference");
-    columnsToDisplay.push("Revenue_NationalPolitical_MRR");
-    columnsToDisplay.push("Revenue_NationalPolitical_TVB");
-    columnsToDisplay.push("Revenue_NationalPolitical_Difference");
-    columnsToDisplay.push("Revenue_TotalPolitical_MRR");
-    columnsToDisplay.push("Revenue_TotalPolitical_TVB");
-    columnsToDisplay.push("Revenue_TotalPolitical_Difference");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Affiliation");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Period");
+    columnsToDisplay.push("Local Non Political MRR");
+    columnsToDisplay.push("Local Non Political TVB");
+    columnsToDisplay.push("Local Non Political Difference");
+    columnsToDisplay.push("National Non Political MRR");
+    columnsToDisplay.push("National Non Political TVB");
+    columnsToDisplay.push("National Non Political Difference");
+    columnsToDisplay.push("Total Non Political MRR");
+    columnsToDisplay.push("Total Non Political TVB");
+    columnsToDisplay.push("Total Non Political Difference");
+    columnsToDisplay.push("Local Political MRR");
+    columnsToDisplay.push("Local Political TVB");
+    columnsToDisplay.push("Local Political Difference");
+    columnsToDisplay.push("National Political MRR");
+    columnsToDisplay.push("National Political TVB");
+    columnsToDisplay.push("National Political Difference");
+    columnsToDisplay.push("Total Political MRR");
+    columnsToDisplay.push("Total Political TVB");
+    columnsToDisplay.push("Total Political Difference");
 
     tempObject =
     {
         reportTitle: "TVB / MRR Comparison",
-        apiControllerAction: "/api/TVB/GetMRRTVBCompare",
+        apiControllerAction: "/api/TVBReport/GetMRRTVBCompare",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'tvb'
