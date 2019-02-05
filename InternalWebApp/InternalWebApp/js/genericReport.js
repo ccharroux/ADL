@@ -74,8 +74,9 @@ reportName.push("rptMRRReportList");
 reportName.push("rptMRRMarketReportList");
 reportName.push("rptMRROwnerReportList");
 
-
-
+reportName.push("rptTVBRepBillingStationList");
+reportName.push("rptTVBTimeSalesStationList");
+reportName.push("rptTVBMarketNielsenRankingList");
 
 function buildReportArray()
 {
@@ -3351,6 +3352,84 @@ function getReportObject_MRROwnerReportList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'mrr'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_TVBRepBillingStationList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    return arrayFilters;
+}
+function getReportObject_TVBRepBillingStationList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "TVB Rep Billing Station List",
+        apiControllerAction: "/api/TVBReport/GetTVBRepBillingStationList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'tvb'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_TVBTimeSalesStationList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    return arrayFilters;
+}
+function getReportObject_TVBTimeSalesStationList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "TVB Time Sales Station List",
+        apiControllerAction: "/api/TVBReport/GetTVBTimeSalesStationList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'tvb'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_TVBMarketNielsenRankingList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    return arrayFilters;
+}
+function getReportObject_TVBMarketNielsenRankingList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "TVB Market Nielsen Ranking List",
+        apiControllerAction: "/api/TVBReport/GetTVBTimeSalesStationList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'tvb'
     }
 
     return tempObject;
