@@ -78,6 +78,9 @@ reportName.push("rptTVBRepBillingStationList");
 reportName.push("rptTVBTimeSalesStationList");
 reportName.push("rptTVBMarketNielsenRankingList");
 
+reportName.push("rptOwnerStationGrid");
+reportName.push("rptGeneralStationData");
+
 function buildReportArray()
 {
     var reportCounter = 1
@@ -3430,6 +3433,58 @@ function getReportObject_TVBMarketNielsenRankingList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'tvb'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_GeneralStationData() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    return arrayFilters;
+}
+function getReportObject_GeneralStationData() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "General Station Data",
+        apiControllerAction: "/api/Report/GetGeneralStationData",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'station'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_OwnerStationGrid() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    return arrayFilters;
+}
+function getReportObject_OwnerStationGrid() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "Owner Station Grid",
+        apiControllerAction: "/api/Report/GetOwnerStationGrid",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'station'
     }
 
     return tempObject;
