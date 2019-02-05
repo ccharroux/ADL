@@ -3426,7 +3426,7 @@ function getReportObject_TVBMarketNielsenRankingList() {
     tempObject =
     {
         reportTitle: "TVB Market Nielsen Ranking List",
-        apiControllerAction: "/api/TVBReport/GetTVBTimeSalesStationList",
+        apiControllerAction: "/api/TVBReport/GetTVBMarketNielsenRankingList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'tvb'
