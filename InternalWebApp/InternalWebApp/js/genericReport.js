@@ -70,6 +70,13 @@ reportName.push("rptFeatureImplementationList");
 
 reportName.push("rptTVBMRRCompare");
 
+reportName.push("rptMRRReportList");
+reportName.push("rptMRRMarketReportList");
+reportName.push("rptMRROwnerReportList");
+
+
+
+
 function buildReportArray()
 {
     var reportCounter = 1
@@ -3262,6 +3269,88 @@ function getReportObject_TVBMRRCompare() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'tvb'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRReportList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+ 
+
+    return arrayFilters;
+}
+function getReportObject_MRRReportList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "MRR Report List",
+        apiControllerAction: "/api/MRRReport/GetMRRReports",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRMarketReportList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+
+    return arrayFilters;
+}
+function getReportObject_MRRMarketReportList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "MRR Market Report List",
+        apiControllerAction: "/api/MRRReport/GetMRRReportsByMarket",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRROwnerReportList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    return arrayFilters;
+}
+function getReportObject_MRROwnerReportList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "MRR Owner Report List",
+        apiControllerAction: "/api/MRRReport/GetMRROwnerGroupReport",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr'
     }
 
     return tempObject;
