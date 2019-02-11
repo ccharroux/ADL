@@ -3561,7 +3561,7 @@ function getReportFilterArray_DMAMRRCategoryMappingList() {
 
     arrayObject = {
         token: "ParentMarket",
-        jsCall: GetParentMarket,
+        jsCall: getParentMarketList,
         objectName: "ddlParentMarket",
         required: false
     }
