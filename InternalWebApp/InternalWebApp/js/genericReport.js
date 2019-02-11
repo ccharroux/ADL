@@ -3561,7 +3561,7 @@ function getReportFilterArray_DMAMRRCategoryMappingList() {
 
     arrayObject = {
         token: "ParentMarket",
-        jsCall: getParentMarketList,
+        jsCall: 'getParentMarketList',
         objectName: "ddlParentMarket",
         required: false
     }
@@ -3574,12 +3574,15 @@ function getReportObject_DMAMRRCategoryMappingList() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-
+    columnsToDisplay.push("primary Market");
+    columnsToDisplay.push("DMA Category");
+    columnsToDisplay.push("market");
+    columnsToDisplay.push("MRR Cagetory");
 
     tempObject =
     {
-        reportTitle: "API Activity List",
-        apiControllerAction: "/api/DMA/GetDMAMRRCategoryMappingList",
+        reportTitle: "DMA / MRR Category Mapping List",
+        apiControllerAction: "/api/DMAReport/GetDMAMRRCategoryMappingList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'dma'
