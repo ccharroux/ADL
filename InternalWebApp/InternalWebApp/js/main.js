@@ -516,7 +516,6 @@ function buildMainMenu(selectedItem) {
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Markets") + ' href="/marketlist.html" role="button" aria-expanded="false">Markets <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="">Complementary Markets</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="">Internal Reports</a></li>';
     menuItems += '                  <li style="display:block;"><a href="">Parent Market</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
