@@ -112,6 +112,10 @@
                             <label for="ddlMarket" class="dropdown-label rptView rptMarket">Market</label>
                             <select id="ddlMarket" apiInput="inMarketId" class="dropdown-select rptView rptMarket"></select>
                         </div>
+                        <div class="form-group rptView rptParentMarket">
+                            <label for="ddlParentMarket" class="dropdown-label rptView rptParentMarket">Market</label>
+                            <select id="ddlParentMarket" apiInput="inParentMarketId" class="dropdown-select rptView rptParentMarket"></select>
+                        </div>
                         <div class="form-group rptView rptStation" >
                             <label for="ddlStation" class="dropdown-label rptView rptStation">Station</label>
                             <select id="ddlStation" apiInput="inStationId" class="dropdown-select rptView rptStation"></select>
@@ -484,7 +488,43 @@
         getPeriodList("months");
     }
 
+    function getParentMarketList() {
+        $.ajax({
+            url: ServicePrefix + '/api/ParentMarket/GetParentMarketList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
 
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Parent Market --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].parentMarketId + '">' + data.report.rows[index].parentMarketName + '</option>';
+
+                    });
+
+                    $("#ddlParentMarket").html(str);
+                    saveLoadedControlSelection("ddlParentMarket");
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
     function getPeriodList(typesToLoad)
     {
 

@@ -83,6 +83,7 @@ reportName.push("rptGeneralStationData");
 
 reportName.push("rptAPIActivityList");
 reportName.push("rptAPIAccessList");
+reportName.push("rptDMAMRRCategoryMappingList");
 
 function buildReportArray()
 {
@@ -3548,6 +3549,40 @@ function getReportObject_APIActivityList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'misc'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_DMAMRRCategoryMappingList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: GetParentMarket,
+        objectName: "ddlParentMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_DMAMRRCategoryMappingList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "API Activity List",
+        apiControllerAction: "/api/DMA/GetDMAMRRCategoryMappingList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'dma'
     }
 
     return tempObject;
