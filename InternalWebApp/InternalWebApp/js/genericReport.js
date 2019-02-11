@@ -81,6 +81,9 @@ reportName.push("rptTVBMarketNielsenRankingList");
 reportName.push("rptOwnerStationGrid");
 reportName.push("rptGeneralStationData");
 
+reportName.push("rptAPIActivityList");
+reportName.push("rptAPIAccessList");
+
 function buildReportArray()
 {
     var reportCounter = 1
@@ -3485,6 +3488,66 @@ function getReportObject_OwnerStationGrid() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'station'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_APIAccessList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    return arrayFilters;
+}
+function getReportObject_APIAccessList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "API Access List",
+        apiControllerAction: "/api/APIAccess/GetAPIAccessList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'misc'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_APIActivityList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Personnel",
+        jsCall: null,
+        objectName: "hidPersonnel",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_APIActivityList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "API Activity List",
+        apiControllerAction: "/api/APIAccess/GetAPIActivityList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'misc'
     }
 
     return tempObject;
