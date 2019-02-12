@@ -73,7 +73,7 @@
                             <label for="txtEncryptDecryptValue">Encrypted/Decrypted Value</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" class="field-width-325" id="txtEncryptDecryptValue" />
+                            <input type="text" class="mkaRequired field-width-325" id="txtEncryptDecryptValue" errorMessage="Please enter a value to be encrypted or decrypted." />
                         </div>
                     </div>
 
@@ -88,10 +88,10 @@
                     <div class="row input-row">
                         <input type="hidden" id="txtStationAgencyId" value="" />
                         <div class="col-md-3 text-align-left">
-                            <label for="txtReturnValue">Return Value</label>
+                            <label for="lblReturnValue">Return Value</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" class="field-width-325"  id="txtReturnValue" readonly />
+                            <label class="" id="lblReturnValue"></label>
                         </div>
                     </div>
 
@@ -135,12 +135,20 @@
 </body>
 </html>
 <script>
-    $(document).ready(function () {
+    //$(document).ready(function () {
 
 
-    });
+    //});
 
     function GetEncryptedDecryptedValue() {
+
+        if (validationPassed() === false) {
+            return;
+        }
+
+        //$("#txtReturnValue").val("");
+        $("#lblReturnValue").html("");
+
         $.ajax({
             url: ServicePrefix + '/api/EncryptDecrypt/EncryptDecrypt',
             dataType: 'json',
@@ -154,12 +162,40 @@
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
-                $("#txtReturnValue").val(data);
+                $("#lblReturnValue").html(data);
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 MKAErrorMessageRtn(errorThrown);
             }
         });
+    }
+
+    function validationPassed() {
+        var loopBreak = true;
+        $(".mkaRequired").each(function (index, el) {
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            // Text
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+            // Select
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == "-1") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+        });
+
+        return loopBreak;
     }
 </script>
