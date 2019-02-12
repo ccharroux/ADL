@@ -3577,7 +3577,7 @@ function getReportObject_DMAMRRCategoryMappingList() {
     columnsToDisplay.push("primary Market");
     columnsToDisplay.push("DMA Category");
     columnsToDisplay.push("market");
-    columnsToDisplay.push("MRR Cagetory");
+    columnsToDisplay.push("MRR Category");
 
     tempObject =
     {
