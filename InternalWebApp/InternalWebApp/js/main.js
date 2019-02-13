@@ -532,6 +532,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/positionlist.html">Positions</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/regionlist.html">Regions</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/revenuecategorieslist.html">Revenue Categories</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/dashboardtech.html">Tech Tools</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
@@ -815,4 +816,26 @@ function genericAjaxError(jqXhr, textStatus, errorThrown) {
 
 function addZero(n) {
     return n < 10 ? '0' + n : '' + n;
+}
+
+function buildTechMenu(selectedItem) {
+
+    var menuItems = '';
+
+    menuItems += '<h1><a href="/dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<nav role="navigation" style="margin-top:20px">';
+    menuItems += '<ul>';
+    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "TechTools") + ' role="button" aria-expanded="false">Tools <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="/dashboardtech.html">Tech Tools</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/encryptdecrypt.html">Encryption/Decryption Tool</a></li>';
+    menuItems += '              </ul>';
+    menuItems += '        </li>';
+    menuItems += productDashboard('');
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
+    menuItems += '    </ul>';
+    menuItems += '</nav>';
+
+    $("#menu").html(menuItems);
+
 }
