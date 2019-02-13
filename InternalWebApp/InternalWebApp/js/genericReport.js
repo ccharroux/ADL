@@ -84,6 +84,7 @@ reportName.push("rptGeneralStationData");
 reportName.push("rptAPIActivityList");
 reportName.push("rptAPIAccessList");
 reportName.push("rptDMAMRRCategoryMappingList");
+reportName.push("rptCorporateGroupUserList");
 
 function buildReportArray()
 {
@@ -3586,6 +3587,40 @@ function getReportObject_DMAMRRCategoryMappingList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'dma'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_CorporateGroupUserList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: 'getOwnerList',
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_CorporateGroupUserList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+ 
+
+    tempObject =
+    {
+        reportTitle: "Corporate / Group User List",
+        apiControllerAction: "/api/Report/GetCorporateAndGroupUserList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'misc'
     }
 
     return tempObject;
