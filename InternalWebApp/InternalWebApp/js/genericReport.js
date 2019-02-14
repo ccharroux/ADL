@@ -91,6 +91,9 @@ reportName.push("rptAdminDeviceList");
 
 reportName.push("rptParentMarketCategoryTemplateList");
 
+reportName.push("rptSAMLOwnerList");
+reportName.push("rptSAMLUserExceptionList");
+
 function buildReportArray()
 {
     var reportCounter = 1
@@ -3711,6 +3714,62 @@ function getReportObject_ParentMarketCategoryTemplateList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'dma'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_SAMLOwnerList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+
+    return arrayFilters;
+}
+function getReportObject_SAMLOwnerList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "SAML Owner List",
+        apiControllerAction: "/api/Report/GetSAMLOwnerList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'tech'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_SAMLUserExceptionList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+
+    return arrayFilters;
+}
+function getReportObject_SAMLUserExceptionList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "SAML User Exception List",
+        apiControllerAction: "/api/Report/GetSAMLUserExceptionList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'tech'
     }
 
     return tempObject;
