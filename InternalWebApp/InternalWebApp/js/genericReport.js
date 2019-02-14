@@ -89,6 +89,8 @@ reportName.push("rptCorporateGroupUserList");
 reportName.push("rptKeywordIndustryList");
 reportName.push("rptAdminDeviceList");
 
+reportName.push("rptParentMarketCategoryTemplateList");
+
 function buildReportArray()
 {
     var reportCounter = 1
@@ -3578,7 +3580,7 @@ function getReportObject_DMAMRRCategoryMappingList() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("primary Market");
+    columnsToDisplay.push("parent Market");
     columnsToDisplay.push("DMA Category");
     columnsToDisplay.push("market");
     columnsToDisplay.push("MRR Category");
@@ -3681,6 +3683,34 @@ function getReportObject_AdminDeviceList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'tech'
+    }
+
+    return tempObject;
+}
+
+
+function getReportFilterArray_ParentMarketCategoryTemplateList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+ 
+
+    return arrayFilters;
+}
+function getReportObject_ParentMarketCategoryTemplateList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+ 
+
+    tempObject =
+    {
+        reportTitle: "DMA Market Category Template List",
+        apiControllerAction: "/api/DMAReport/GetParentMarketCategoryTemplateList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'dma'
     }
 
     return tempObject;
