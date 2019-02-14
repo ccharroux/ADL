@@ -86,6 +86,9 @@ reportName.push("rptAPIAccessList");
 reportName.push("rptDMAMRRCategoryMappingList");
 reportName.push("rptCorporateGroupUserList");
 
+reportName.push("rptKeywordIndustryList");
+reportName.push("rptAdminDeviceList");
+
 function buildReportArray()
 {
     var reportCounter = 1
@@ -3515,7 +3518,7 @@ function getReportObject_APIAccessList() {
         apiControllerAction: "/api/APIAccess/GetAPIAccessList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'misc'
+        product: 'tech'
     }
 
     return tempObject;
@@ -3549,7 +3552,7 @@ function getReportObject_APIActivityList() {
         apiControllerAction: "/api/APIAccess/GetAPIActivityList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'misc'
+        product: 'tech'
     }
 
     return tempObject;
@@ -3621,6 +3624,63 @@ function getReportObject_CorporateGroupUserList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'misc'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_KeywordIndustryList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+ 
+
+    return arrayFilters;
+}
+function getReportObject_KeywordIndustryList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "Industry / Sub-Industry Keyword List",
+        apiControllerAction: "/api/XRAYReport/GetKeywordList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry'
+    }
+
+    return tempObject;
+}
+
+
+function getReportFilterArray_AdminDeviceList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+
+    return arrayFilters;
+}
+function getReportObject_AdminDeviceList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "Admin Device List",
+        apiControllerAction: "/api/XRAYReport/GetAdminDeviceList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'tech'
     }
 
     return tempObject;
