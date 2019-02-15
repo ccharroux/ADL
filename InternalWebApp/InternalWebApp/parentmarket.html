@@ -95,6 +95,26 @@
                         <input type="text" class="field-width-325" id="txtTimeZone" value="" maxlength="20" disabled="disabled" />
                     </div>
                 </div>
+                
+                <!-- Buttons -->
+                <div class="default-button-section">
+                    <div class="row input-row">
+                        <div class="col-md-3">
+                            <div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <div>
+                                <input value="Update" onclick="updateParentMarket()" class="default-button" type="button">
+                            </div>
+                            <div style="padding-top: 10px">
+                                <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Buttons-->
 
             </div>
         </div>
@@ -122,8 +142,13 @@
 <script>
 
     var parentMarketId = 0;
+    var bIsNew = false;
 
     $(document).ready(function() {
+
+        parentMarketId = (getParameterByName("ParentMarketID") == null ? 0 : getParameterByName("ParentMarketID"));
+        $("#txtParentMarketId").val(parentMarketId);
+        bIsNew = parentMarketId <= 0;
 
         //get states
         getStates();
@@ -162,11 +187,11 @@
                         function () {
                             var element = $('<option></option>');
                             element.val(this.stateAbbr).html(this.stateName);
-                            element.attr("data-timezone", this.stateAbbr);
-                            //element.attr("data-timezone", this.primaryMarketId);
+                            element.attr("data-timezone", this.stateTimeZone);
                             $stateList.append(element);
                         });
 
+                    getParentMarket();
                 }
 
             },
@@ -177,6 +202,55 @@
         });
 
 
+    }
+
+    function getParentMarket() {
+
+        if (parentMarketId <= 0) {
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/ParentMarket/GetParentMarket',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inParentMarketId": $("#txtParentMarketId").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    $.each(data.report.rows, function(index) {
+
+                        var obj = data.report.rows[index];
+
+                        $("#txtParentMarketId").val(obj["parentMarketId"]);
+                        $("#txtParentMarketName").val(obj["parentMarketName"]);
+                        $("#ddlState").val(obj["parentMarketStateAbbr"]);
+                        $("#txtTimeZone").val(obj["parentMarketTimeZone"]);
+
+                    });
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+
+    }
+
+    function updateParentMarket() {
+        bootbox.alert('This functionality is still under development.', function () {
+        });
     }
 
     function setTimeZone() {
