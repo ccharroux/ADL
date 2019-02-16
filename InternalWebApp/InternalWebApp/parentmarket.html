@@ -83,7 +83,7 @@
                         <label for="ddlState">State</label>
                     </div>
                     <div class="col-md-9 text-align-left">
-                        <select id="ddlState" class="field-width-325"></select>
+                        <select id="ddlState" class="mkaRequired field-width-325" errorMessage="You must select a Parent Market State."></select>
                     </div>
                 </div>
                 
@@ -200,8 +200,6 @@
 
             }
         });
-
-
     }
 
     function getParentMarket() {
@@ -248,10 +246,79 @@
 
     }
 
-    function updateParentMarket() {
-        bootbox.alert('This functionality is still under development.', function () {
+    function validationPassed() {
+        var loopBreak = true;
+        $(".mkaRequired").each(function (index, el) {
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            // Text
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+            // Select
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == "-1") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
         });
+
+        return loopBreak;
     }
+
+    function updateParentMarket() {
+        if (validationPassed() === false) {
+            return;
+        }
+        
+        $.ajax({
+            url: ServicePrefix + '/api/ParentMarket/UpdateParentMarket',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inParentMarketId": $("#txtParentMarketId").val(),
+                "inParentMarketName": $("#txtParentMarketName").val(),
+                "inParentMarketStateAbbr": $("#ddlState").val(),
+                "inParentMarketTimeZone": $("#txtTimeZone").val(),
+                "inIsNew": bIsNew
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var obj = data.report.rows[0];
+                    //if new load new parent market id
+                    if (bIsNew) {
+                        $("#txtParentMarketId").val(obj["_updateStatus"]);
+                    }
+
+                    //reload the page
+                    window.location = "parentmarket.html?ParentMarketID=" + $("#txtParentMarketId").val();
+
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+
+    }
+    
 
     function setTimeZone() {
         var sTimeZone = $("#ddlState").find(':selected').data('timezone');
