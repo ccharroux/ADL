@@ -115,6 +115,33 @@
                     </div>
                 </div>
                 <!-- End Buttons-->
+                
+                <!-- Products -->
+                <div id="divProductList" class="hidden default-button-section">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row product-list-header width-100">
+
+                                <div class="col-md-4 text-align-left">
+                                    <strong>
+                                        Product
+                                    </strong>
+                                </div>
+                                <div class="col-md-2 text-align-left">
+                                    <strong>
+                                        Dates
+                                    </strong>
+                                </div>
+                                <div class="col-md-6">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row margin-0-auto width-100">
+                        <div id="productList"></div>
+                    </div>
+                </div>
 
             </div>
         </div>
@@ -235,6 +262,163 @@
                         $("#txtTimeZone").val(obj["parentMarketTimeZone"]);
 
                     });
+
+                    //get products list
+                    getProductList();
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+
+    }
+
+    function getProductList() {
+        var url = ServicePrefix + '/api/Product/GetProductList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+
+                    var str = '';
+
+                    $("#productList").html("");
+
+                    var holdOwnerID = "0";
+                    var productList = "";
+                    var holdObject = new Object();
+
+
+                    $.each(data.report.rows,
+                        function(index) {
+
+                            var obj = data.report.rows[index];
+                            var productId = "" + obj.P_ProductID;
+
+                            str = str +
+                                '<div class="row row_' +
+                                obj.P_ProductID +
+                                '" style="display:none;padding-top:3px;">';
+                            str = str + '<div class="col-md-4" style="text-align:left">';
+                            str = str + obj.P_ProductID + " - " + obj.P_ProductName;
+                            str = str + '</div>';
+                            str = str + '<div class="col-md-2" style="text-align:left">';
+                            str = str + '<div id="date' + obj.P_ProductID + '" />';
+                            str = str + '</div>';
+                            str = str +
+                                '<div id="productButtons' +
+                                obj.P_ProductID +
+                                '" class="col-md-6" style="text-align:left;">';
+                            str = str +
+                                '<input type="button"  id="productAdd' +
+                                obj.P_ProductID +
+                                '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="enableProduct(' +
+                                '\'' +
+                                obj.P_ProductID +
+                                '\')" Value="Enable" />';
+                            str = str +
+                                '<input type="button" id="productEdit' +
+                                obj.P_ProductID +
+                                '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="editProduct(' +
+                                '\'' +
+                                obj.P_ProductID +
+                                '\')" Value="Edit" />';
+                            str = str +
+                                '<input type="button"  id="productDisable' +
+                                obj.P_ProductID +
+                                '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="disableProduct(' +
+                                '\'' +
+                                obj.P_ProductID +
+                                '\')" Value="Disable" />';
+                            str = str + '</div>';
+                            str = str + '</div>';
+
+
+                        });
+
+                    $("#productList").append(str);
+
+                    //$("#productAddDMA").removeClass('hidden');
+                    //$("#productAddMRR").removeClass('hidden');
+                    //$("#productAddXRY").removeClass('hidden');
+                    //$("#productAddTVB").removeClass('hidden');
+                    //$("#productAddMSS").removeClass('hidden');
+
+                    //get products by parent market and product
+                    getParentMarketProducts();
+
+                }
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+
+        $.ajax(url, settings);
+    }
+
+    function getParentMarketProducts() {
+        //call new api
+        //loop through in theory should only be one record at this point
+        $.ajax({
+            url: ServicePrefix + '/api/ParentMarket/GetParentMarketProductList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inParentMarketId": $("#txtParentMarketId").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    $("#divProductList").removeClass("hidden");
+
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+
+                        console.log(obj);
+
+                        $(".row_" + obj.product).show();
+
+                        if (obj.activeDate != null && obj.active == true) {
+                            $("#productEdit" + obj.product).removeClass('hidden');
+                            $("#productDisable" + obj.product).removeClass('hidden');
+                            $("#date" + obj.product).html(extractDateOnly(obj.activeDate));
+                            $("#date" + obj.product).css("color", "green");
+                        }
+                        else if (obj.disableDate != null && obj.active == false) {
+                            $("#productAdd" + obj.product).removeClass('hidden');
+                            $("#date" + obj.product).html(extractDateOnly(obj.disableDate));
+                            $("#date" + obj.product).css("color", "red");
+                        }
+                        else if (obj.disableDate == null && obj.activeDate == null) {
+                            $("#productAdd" + obj.product).removeClass('hidden');
+
+                        }
+
+                    });
+
+                    //check count and turn on section
+                    
                 }
 
             },
@@ -319,6 +503,21 @@
 
     }
     
+    function enableProduct(productId) {
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+    }
+
+    function editProduct(productId) {
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+    }
+
+    function disableProduct(productId) {
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+    }
+
 
     function setTimeZone() {
         var sTimeZone = $("#ddlState").find(':selected').data('timezone');
