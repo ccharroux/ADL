@@ -182,7 +182,7 @@ function buildQuickReports(rptType, control, container)
 
         if (reportObjectArray[i].product.toLowerCase() == rptType.toLowerCase())
         {
-            console.log(reportObjectArray[i]);
+             
             rptHit = true;
             $("#" + control).append("<option value='" + i + "'>" + reportObjectArray[i].reportTitle + "</option>");
         }
