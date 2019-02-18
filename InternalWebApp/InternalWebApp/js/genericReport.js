@@ -94,6 +94,22 @@ reportName.push("rptParentMarketCategoryTemplateList");
 reportName.push("rptSAMLOwnerList");
 reportName.push("rptSAMLUserExceptionList");
 
+reportName.push("rptAdvertiserRevenueInWrongMarket");
+reportName.push("rptAgencyRevenueInWrongMarket");
+reportName.push("rptDisabledUserAccountExecutive");
+reportName.push("rptDuplicateUser");
+reportName.push("rptMRRWithoutManager");
+reportName.push("rptMRRUserMissing");
+reportName.push("rptMultipleOwnersPerUser");
+reportName.push("rptOwnerGroupReportingEntityIssues");
+reportName.push("rptUserMissingGroup");
+reportName.push("rptUsersAssignedReportsInvalidOwner");
+reportName.push("rptUsersAssingedInvalidMarket");
+reportName.push("rptUsersWithDisabledStationAssinged");
+reportName.push("rptXRAYImportScript");
+reportName.push("rptXRYAccountAndRevenueAssignment");
+
+
 function buildReportArray()
 {
     var reportCounter = 1
@@ -3770,6 +3786,419 @@ function getReportObject_SAMLUserExceptionList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'tech'
+    }
+
+    return tempObject;
+}
+
+
+function getReportFilterArray_AdvertiserRevenueInWrongMarket() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+
+    return arrayFilters;
+}
+function getReportObject_AdvertiserRevenueInWrongMarket() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "Advertiser Revenue in Wrong Market",
+        apiControllerAction: "/api/XRAYReport/GetAdvertiserRevenueInWrongMarketList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry'
+    }
+
+    return tempObject;
+}
+ 
+
+function getReportFilterArray_AgencyRevenueInWrongMarket() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+
+    return arrayFilters;
+}
+function getReportObject_AgencyRevenueInWrongMarket() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "Agency Revenue in Wrong Market",
+        apiControllerAction: "/api/XRAYReport/GetAgencyRevenueInWrongMarketList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_DisabledUserAccountExecutive() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+
+    return arrayFilters;
+}
+function getReportObject_DisabledUserAccountExecutive() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "Disabled User AE List",
+        apiControllerAction: "/api/XRAYReport/GetDisabledUserAccountExecutiveList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry'
+    }
+
+    return tempObject;
+}
+ 
+function getReportFilterArray_DuplicateUser() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+
+    return arrayFilters;
+}
+function getReportObject_DuplicateUser() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "Duplicate User List",
+        apiControllerAction: "/api/PersonnelReport/GetDuplicateUserList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'personnel'
+    }
+
+    return tempObject;
+}
+
+ 
+function getReportFilterArray_MRRWithoutManager() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMRRMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+    return arrayFilters;
+}
+function getReportObject_MRRWithoutManager() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "MRR Missing Manager List",
+        apiControllerAction: "/api/MRRReport/GetMRRWithoutManagerList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr'
+    }
+
+    return tempObject;
+}
+ 
+function getReportFilterArray_MRRUserMissing() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+
+    return arrayFilters;
+}
+function getReportObject_MRRUserMissing() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "MRR User Missing Report List",
+        apiControllerAction: "/api/MRRReport/GetMRRUserMissingReportList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_OwnerGroupReportingEntityIssues() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+
+    return arrayFilters;
+}
+function getReportObject_OwnerGroupReportingEntityIssues() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "Owner Group Station Issue List",
+        apiControllerAction: "/api/OwnerGroupReport/GetOwnerGroupReportingEntityIssuesList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'ownergroup'
+    }
+
+    return tempObject;
+}
+
+/*
+reportName.push("rptOwnerGroupReportingEntityIssues");*/
+
+function getReportFilterArray_MultipleOwnersPerUser() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+
+    return arrayFilters;
+}
+function getReportObject_MultipleOwnersPerUser() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "Multiple Owners Per User List",
+        apiControllerAction: "/api/PersonnelReport/GetMultipleOwnersPerUserList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'personnel'
+    }
+
+    return tempObject;
+}
+ 
+function getReportFilterArray_UserMissingGroup() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+
+    return arrayFilters;
+}
+function getReportObject_UserMissingGroup()
+{
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "User Missing Group Report List",
+        apiControllerAction: "/api/PersonnelReport/GetUserMissingGroupReportList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'personnel'
+    }
+
+    return tempObject;
+} 
+
+function getReportFilterArray_UsersAssignedReportsInvalidOwner() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+
+    return arrayFilters;
+}
+function getReportObject_UsersAssignedReportsInvalidOwner() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "User Assinged Invalid Owner Report List",
+        apiControllerAction: "/api/PersonnelReport/GetUsersAssignedReportsInvalidOwnerList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'personnel'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_UsersAssingedInvalidMarket() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+
+    return arrayFilters;
+}
+function getReportObject_UsersAssingedInvalidMarket() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "User Assinged Invalid Market Report List",
+        apiControllerAction: "/api/PersonnelReport/GetUsersAssingedInvalidMarketReportList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'personnel'
+    }
+
+    return tempObject;
+} 
+
+function getReportFilterArray_UsersWithDisabledStationAssinged() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+
+    return arrayFilters;
+}
+function getReportObject_UsersWithDisabledStationAssinged() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "Users Assigned to Disabled Station List",
+        apiControllerAction: "/api/PersonnelReport/GetUsersWithDisabledStationAssingedList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'personnel'
+    }
+
+    return tempObject;
+}
+
+
+function getReportFilterArray_XRAYImportScript() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+
+    return arrayFilters;
+}
+function getReportObject_XRAYImportScript() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "XRAY Import User Script List",
+        apiControllerAction: "/api/XRAYReport/GetXRAYImportScriptList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry'
+    }
+
+    return tempObject;
+}
+ 
+function getReportFilterArray_XRYAccountAndRevenueAssignment() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+
+    return arrayFilters;
+}
+function getReportObject_XRYAccountAndRevenueAssignment() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "Account + Revenue Assignment List",
+        apiControllerAction: "/api/XRAYReport/GetXRYAccountAndRevenueAssignmentList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry'
     }
 
     return tempObject;
