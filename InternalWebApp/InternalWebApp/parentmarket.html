@@ -373,6 +373,8 @@
     function getParentMarketProducts() {
         //call new api
         //loop through in theory should only be one record at this point
+        //probably should hide everything and let the code below display it
+
         $.ajax({
             url: ServicePrefix + '/api/ParentMarket/GetParentMarketProductList',
             dataType: 'json',
@@ -504,7 +506,55 @@
     }
     
     function enableProduct(productId) {
-        bootbox.alert('This functionality is still under development.', function () {
+        //bootbox.alert('This functionality is still under development.', function () {
+        //});
+
+        //call api to enable product for the parent market
+        //after enabling product, call api to initialize categories
+        //currently setting to true when enabling. may add other code in the future.
+        var activate = true;
+
+        $.ajax({
+            url: ServicePrefix + '/api/ParentMarket/UpdateParentMarketProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inParentMarketId": $("#txtParentMarketId").val(),
+                "inProductId": productId,
+                "inActivate": activate
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    //call to initialize the parent market categories
+                    $.each(data.report.rows, function(index) {
+
+                        var obj = data.report.rows[index];
+                        console.log(obj);
+                        var enabledProduct = parseInt(obj["_updateStatus"], 10);
+
+                        if (enabledProduct >= 1 && productId == 'DMA') {
+                            //setup the initial templates
+                            insertParentMarketDmaCategories();
+                        } else {
+                            window.location = "parentmarket.html?ParentMarketID=" + $("#txtParentMarketId").val();
+                        }
+                        
+                    });
+
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
         });
     }
 
@@ -515,6 +565,34 @@
 
     function disableProduct(productId) {
         bootbox.alert('This functionality is still under development.', function () {
+        });
+    }
+
+    function insertParentMarketDmaCategories() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/ParentMarketCategory/InsertParentMarketCategoryList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inParentMarketId": $("#txtParentMarketId").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    window.location = "parentmarket.html?ParentMarketID=" + $("#txtParentMarketId").val();
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
         });
     }
 
