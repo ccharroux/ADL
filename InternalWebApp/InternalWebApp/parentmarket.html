@@ -309,24 +309,25 @@
 
                             str = str +
                                 '<div class="row row_' +
-                                obj.P_ProductID +
+                                productId +
+                                '" data-product="' + productId +
                                 '" style="display:none;padding-top:3px;">';
                             str = str + '<div class="col-md-4" style="text-align:left">';
-                            str = str + obj.P_ProductID + " - " + obj.P_ProductName;
+                            str = str + productId + " - " + obj.P_ProductName;
                             str = str + '</div>';
                             str = str + '<div class="col-md-2" style="text-align:left">';
-                            str = str + '<div id="date' + obj.P_ProductID + '" />';
+                            str = str + '<div id="date' + productId + '" />';
                             str = str + '</div>';
                             str = str +
                                 '<div id="productButtons' +
-                                obj.P_ProductID +
+                                productId +
                                 '" class="col-md-6" style="text-align:left;">';
                             str = str +
                                 '<input type="button"  id="productAdd' +
-                                obj.P_ProductID +
+                                productId +
                                 '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="enableProduct(' +
                                 '\'' +
-                                obj.P_ProductID +
+                                productId +
                                 '\')" Value="Enable" />';
                             //str = str +
                             //    '<input type="button" id="productEdit' +
@@ -337,14 +338,13 @@
                             //    '\')" Value="Edit" />';
                             str = str +
                                 '<input type="button"  id="productDisable' +
-                                obj.P_ProductID +
+                                productId +
                                 '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="disableProduct(' +
                                 '\'' +
-                                obj.P_ProductID +
+                                productId +
                                 '\')" Value="Disable" />';
                             str = str + '</div>';
                             str = str + '</div>';
-
 
                         });
 
@@ -371,9 +371,6 @@
     }
 
     function getParentMarketProducts() {
-        //call new api
-        //loop through in theory should only be one record at this point
-        //probably should hide everything and let the code below display it
 
         $.ajax({
             url: ServicePrefix + '/api/ParentMarket/GetParentMarketProductList',
@@ -391,13 +388,10 @@
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
                 else {
-                    $("#divProductList").removeClass("hidden");
 
                     $.each(data.report.rows, function (index) {
 
                         var obj = data.report.rows[index];
-
-                        console.log(obj);
 
                         $(".row_" + obj.product).show();
 
@@ -419,8 +413,12 @@
 
                     });
 
-                    //check count and turn on section
-                    
+                    if (data.report.rows.length > 0) {
+                        $("#divProductList").removeClass("hidden");
+                        ////commenting out for future use
+                        ////getMarketProductMarketList();
+                    }
+
                 }
 
             },
@@ -431,6 +429,21 @@
         });
 
     }
+
+    //commenting out for future use
+    ////function getMarketProductMarketList() {
+
+    ////    $('[class*="row_"]:visible').each(function () {
+
+    ////        console.log($(this).data('product'));
+
+    ////        //go get the market list and build table
+    ////        //call api ParentMarket/GetMarketProductListByParentMarket
+    ////        //build the table of markets for each product
+
+    ////    });
+
+    ////}
 
     function validationPassed() {
         var loopBreak = true;
@@ -506,9 +519,6 @@
     }
     
     function enableProduct(productId) {
-        //bootbox.alert('This functionality is still under development.', function () {
-        //});
-
         //call api to enable product for the parent market
         //after enabling product, call api to initialize categories
         //currently setting to true when enabling. may add other code in the future.
