@@ -57,7 +57,27 @@
 
 
     <style>
-           .rptView
+        .tableColHeader
+        {
+            display: table-cell;
+            padding: 3px 3px 3px 3px;
+            border: solid black 1px;
+            background-color: silver;
+            font-weight:400;
+            font-size: 14px;
+            color:black;
+        }
+        .tableCol
+        {
+            display: table-cell;
+            padding: 3px 3px 3px 3px;
+            border: solid silver 1px;
+            background-color: white;
+            font-weight: 400;
+            font-size: 14px;
+            color:#7f7f7f;
+        }
+        .rptView
         {
             margin-left: 5px;
             vertical-align: top;
@@ -134,6 +154,9 @@
                         </div>
                     </div>
                 </div>
+                <center>
+                    <div class="dataTable-top-margin" id="parentMarketHistory" style="display:table"></div>
+                </center>
                 <!-- data table html -->
                 <div class="dataTable-top-margin">
                     <table id="dtResults" class="stripe"></table>
@@ -517,7 +540,7 @@
                     "className": className
                 });
 
-
+                getParentMarketHistory();
             }
         });
 
@@ -692,5 +715,78 @@
         });
 
     }
+    function getParentMarketHistory()
+    {
+        $("#parentMarketHistory").html("");
+        if ($("#ddlParentMarket").val() == "") {
+            $(".rptMarket").hide();
+            return;
+        }
 
+        $.ajax({
+            url: ServicePrefix + '/api/dmareport/GetDMAParentMarketHistory?inApiToken=' + 
+                    getLocalStorage("APIToken") + 
+                    '&inYear=' + $("#ddlYear").val() + 
+                    "&inPeriod=" + $("#ddlPeriod").val() + 
+                    "&inParentMarketId=" + $("#ddlParentMarket").val(),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            data: null,  
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+  
+                    var ignoreCols = 'ParentMarketID,RevenuePeriod,RevenueYear,'
+                    var arrIgnoreCols = ignoreCols.split(',');
+                    var iRowCtr = 0;
+                    var str = '';
+                    $.each(data.report.rows, function (index)
+                    {
+
+                        iRowCtr++;
+                        // header info
+                        if (iRowCtr == 1)
+                        {
+                            str = str + '<div style="display:table-row">';
+                            $.each(data.report.rows[index], function (key, value)
+                            {
+                                if (ignoreCols.includes(key) == false) {
+                                    str = str + '<div class="tableColHeader">';
+                                    str = str + key;
+                                    str = str + '</div>';
+                                }
+                            });
+                            str = str + '</div>';
+                        }
+
+                        // data starts here
+                        str = str + '<div style="display:table-row">';
+                        $.each(data.report.rows[index], function (key, value) {
+                            if (ignoreCols.includes(key) == false) {
+                                str = str + '<div class="tableCol">';
+                                str = str + value;
+                                str = str + '</div>';
+                            }
+                        });
+                        str = str + '</div>';
+                    });
+
+                    $("#parentMarketHistory").html(str);
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
 </script>
