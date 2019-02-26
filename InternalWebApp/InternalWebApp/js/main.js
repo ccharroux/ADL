@@ -232,7 +232,62 @@
 var bLongQuery = false;
 
 var gDataTableDefaultRows = 50;
+var navTool = {
+    buildNavComponent: function(parentContainer, parentElement, functionToRun, bAllowAllSelection) { 
+        
+        var para = document.createElement("div");
+        para.setAttribute("style", "text-align:center");
+        var node = document.createElement("a");
+        node.setAttribute("href", "javascript:navTool.goWhere('" + parentElement + "', -1, '" + functionToRun + "'," + bAllowAllSelection + ")");
+        node.innerHTML = "<<";
+        para.appendChild(node);
 
+        node = document.createElement("span");
+        node.innerHTML = "&nbsp;Navigation&nbsp;";
+        para.appendChild(node);
+
+
+        node = document.createElement("a");
+        node.setAttribute("href", "javascript:navTool.goWhere('" + parentElement + "', 1, '" + functionToRun + "'," + bAllowAllSelection + ")");
+        node.innerHTML = ">>";
+        para.appendChild(node);
+
+        var newElement = para;
+        var oldElement = document.getElementById(parentElement);
+        document.getElementById(parentContainer).appendChild(newElement);
+        
+    },
+    goWhere: function (obj, direction, functionToRun, allowAllSelection)
+    {
+        var e = document.getElementById(obj);
+
+        if (direction == -1) {
+
+            if (e.selectedIndex == 1)
+            {
+                e.selectedIndex = (allowAllSelection ? 0 : e.length - 1);
+            }
+            else {
+                e.selectedIndex = e.selectedIndex + direction;
+            }
+
+        }
+        else {
+            if (e.selectedIndex == e.length - 1) {
+                e.selectedIndex = (allowAllSelection ? 0 : 1);
+            }
+            else {
+                e.selectedIndex = e.selectedIndex + direction;
+
+            }
+        }
+ 
+        // Create a new 'change' event
+        var event = new Event('change');
+        e.dispatchEvent(event);
+        window[functionToRun]();
+    }
+}
 //---------------------------------
 // Internal Admin Section
 //---------------------------------

@@ -135,21 +135,21 @@
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-12">
-                        <div class="form-group rptView rptMarket">
+                        <div class="form-group rptView rptMarket" id="rptMarket">
                             <label for="ddlMarket" class="dropdown-label rptView rptMarket">Market</label>
-                            <select id="ddlMarket" apiInput="inMarketId" class="dropdown-select rptView rptMarket"></select>
+                            <select id="ddlMarket" apiInput="inMarketId" class="dropdown-select rptView rptMarket" onchange="getStationListByMarketMRR()"></select>
                         </div>
-                        <div class="form-group rptView rptStation">
-                            <label for="ddlStation" class="dropdown-label rptView rptStation">Parent Market</label>
-                            <select id="ddlStation" apiInput="inStationId" class="dropdown-select rptView rptStation" onchange="getMarketListByParentDMA()"></select>
+                        <div class="form-group rptView rptStation" id="rptStation">
+                            <label for="ddlStation" class="dropdown-label rptView rptStation">Station</label>
+                            <select id="ddlStation" apiInput="inStationId" class="dropdown-select rptView rptStation" ></select>
                         </div>
 
 
-                        <div class="form-group rptView rptYear">
+                        <div class="form-group rptView rptYear" id="rptYear">
                             <label for="ddlYear" class="dropdown-label rptView rptYear">Year</label>
                             <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView rptYear"></select>
                         </div>
-                        <div class="form-group rptView rptPeriod">
+                        <div class="form-group rptView rptPeriod" id="rptPeriod">
                             <label for="ddlPeriod" class="dropdown-label rptView rptPeriod">Period</label>
                             <select id="ddlPeriod" apiInput="inPeriod" class="dropdown-select rptView rptPeriod"></select>
                         </div>
@@ -160,7 +160,7 @@
                     </div>
                 </div>
                 <center>
-                    <div class="dataTable-top-margin" id="parentMarketHistory" style="display:table"></div>
+                    <div class="dataTable-top-margin" id="marketHistory" style="display:table"></div>
                 </center>
                 <!-- data table html -->
                 <div class="dataTable-top-margin">
@@ -220,7 +220,8 @@
     var columnsToExport = new Array();
 
     $(document).ready(function () {        
-        buildDMAMenu("Release");
+
+        buildMRRMenu("Release");
         buildQuickReports('mrr');
 
 
@@ -228,6 +229,13 @@
         reportFilterArray = getReportFilterArray();
         displayFilters(reportFilterArray);
         getYearList();
+ 
+        navTool.buildNavComponent("rptMarket", "ddlMarket", "getReport", true);
+        navTool.buildNavComponent("rptStation", "ddlStation", "getReport", true);
+
+        navTool.buildNavComponent("rptYear", "ddlYear", "getReport", false);
+        navTool.buildNavComponent("rptPeriod", "ddlPeriod", "getReport", false);
+
         $(".rptStation").hide();
     });
 
@@ -309,7 +317,7 @@
 
         $("#ddlYear").html(str);
 
-        getPeriodList('quarters');
+        getPeriodList();
 
     }
     function getPeriodList(inType) {
@@ -480,7 +488,7 @@
         if (!dataObj["report"]["rows"]) {
             destroyDataTable();
             $("#noDataFound").show();
-            $("#parentMarketHistory").hide();
+            $("#marketHistory").hide();
 
             return;
         }
@@ -488,7 +496,7 @@
         if (dataObj["report"]["rows"].length == 0) {
             destroyDataTable();
             $("#noDataFound").show();
-            $("#parentMarketHistory").hide();
+            $("#marketHistory").hide();
             return;
         }
         $('#dtResults').show();
@@ -549,10 +557,10 @@
                     "className": className
                 });
 
-                getParentMarketHistory();
+
             }
         });
-
+        getMarketHistory();
         loadResults(dataObj, columns);
     }
 
@@ -674,24 +682,24 @@
         });
 
     }
-
+ 
     function getStationListByMarketMRR() {
 
-        if ($("#ddlParentMarket").val() == "")
+        if ($("#ddlMarket").val() == "")
         {
             $(".rptStation").hide();
             return;
         }
 
         $.ajax({
-            url: ServicePrefix + '/api/ParentMarket/GetMarketProductListByParentMarket',
+            url: ServicePrefix + '/api/Station/GetStationListByMarket',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inProductId": 'dma',
-                "inParentMarketId" : $("#ddlParentMarket").val()
+                "inProductId": 'mrr',
+                "inMarketId" : $("#ddlMarket").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -704,16 +712,16 @@
                     $(".rptStation").show();
 
                     var str = '';
-                    str = '<option value="">-- Parent Level --</option>';
+                    str = '<option value="">-- Market Level --</option>';
                     $.each(data.report.rows, function (index) {
 
                         str = str + '<option ';
 
-                        str = str + ' value="' + data.report.rows[index].marketId + '">' + data.report.rows[index]["market Name"] + '</option>';
+                        str = str + ' value="' + data.report.rows[index].reid + '">' + data.report.rows[index]["fullName"] + '</option>';
 
                     });
 
-                    $("#ddlMarket").html(str);
+                    $("#ddlStation").html(str);
 
                 }
 
@@ -725,20 +733,24 @@
         });
 
     }
-    function getParentMarketHistory()
+    function getMarketHistory()
     {
-        $("#parentMarketHistory").html("");
-        if ($("#ddlParentMarket").val() == "") {
+ 
+
+        $("#marketHistory").html("");
+
+        if ($("#ddlMarket").val() == "")
+        {
             $(".rptStation").hide();
             return;
         }
         
         $.ajax({
-            url: ServicePrefix + '/api/dmareport/GetDMAParentMarketHistory?inApiToken=' + 
+            url: ServicePrefix + '/api/mrrreport/GetMRRMarketHistory?inApiToken=' + 
                     getLocalStorage("APIToken") + 
                     '&inYear=' + $("#ddlYear").val() + 
                     "&inPeriod=" + $("#ddlPeriod").val() + 
-                    "&inParentMarketId=" + $("#ddlParentMarket").val(),
+                    "&inMarketId=" + $("#ddlMarket").val(),
             dataType: 'json',
             type: 'get',
             contentType: 'application/json',
@@ -751,8 +763,8 @@
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
                 else {
-                    $("#parentMarketHistory").show();
-                    var ignoreCols = 'ParentMarketID,RevenuePeriod,RevenueYear,'
+                    $("#marketHistory").show();
+                    var ignoreCols = 'Market Id,MH_Period,MH_Year,'
                     var arrIgnoreCols = ignoreCols.split(',');
                     var iRowCtr = 0;
                     var str = '';
@@ -787,7 +799,7 @@
                         str = str + '</div>';
                     });
 
-                    $("#parentMarketHistory").html(str);
+                    $("#marketHistory").html(str);
 
                 }
 
