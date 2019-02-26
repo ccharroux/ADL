@@ -268,7 +268,12 @@ var navTool = {
                 e.selectedIndex = (allowAllSelection ? 0 : e.length - 1);
             }
             else {
-                e.selectedIndex = e.selectedIndex + direction;
+                if (e.selectedIndex == 0) {
+                    e.selectedIndex = e.length - 1;
+                }
+                else {
+                    e.selectedIndex = e.selectedIndex + direction;
+                }
             }
 
         }
