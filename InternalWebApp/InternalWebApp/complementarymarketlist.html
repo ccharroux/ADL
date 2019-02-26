@@ -72,16 +72,34 @@
                 </div>
             </div>
 
-            <!-- search / filter area -->
-            <div class="row search-section">
-                <div class="col-md-10 ">
-                    <!--<label for="searchText">Parent Market Name</label>
-                    <input type="text" id="searchText" />-->
-                </div>
-                <div class="col-md-2 ">
-                    <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editComplementaryMarket(0)" />
-                </div>
+            <div id="divQuickReport" style="float:right;padding-right:25px;padding-bottom:10px">
+                <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
             </div>
+            
+            <!-- start datatable-->
+            <div class="dataTable-top-margin">
+                <table id="dtCompMarketList" class="stripe">
+                    <thead>
+                    <tr>
+                        <th class="exportColumn">Complementary Market</th>
+                        <th class="exportColumn">Media Type</th>
+                        <th class="exportColumn">Products</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr>
+                        <th>Complementary Market</th>
+                        <th>Media Type</th>
+                        <th>Products</th>
+                        <th></th>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <!-- end datatable -->
+
         </div>
     </div>
     </div>
@@ -118,11 +136,145 @@
 </html>
 <script>
     $(document).ready(function() {
+
+        var reportTitle = "Complementary Markets List";
+        var exportColumns = returnTableColumnsByClass("dtMarketList", "exportColumn");
+
+        $("#dtCompMarketList").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                { "data": 'marketName' },
+                {
+                    mRender: function (data, type, row) {
+                        return '<a href="#" onclick="editMediaType(' + row.mediaTypeId + ')">' + row.mediaType + '</a>';
+
+                    },
+                    "orderable": true,
+                    "searchable": true
+                },
+                {
+                    mRender: function (data, type, row) {
+
+                        return returnProductListLinks(row);
+
+                    }
+                },
+
+                {
+                    mRender: function (data, type, row) {
+
+                        return '<a href="#" onclick="editComplementaryMarket(' + row.marketId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteComplementaryMarket(' + row.marketId + ')">Delete</a>';
+
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": "text-align-right"
+                }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [
+               {
+                   extend: 'csv',
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtCompMarketList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'excel',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtCompMarketList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'pdf',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtCompMarketList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtCompMarketList", data, columnIdx);
+                           }
+                       }
+                   }
+               }
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            initComplete: function () {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+
         buildMainMenu("Markets");
+
+        buildQuickReports('market');
 
         setLocalStorage("search", "");
         setLocalStorage("searchPage", window.location);
+
+        getComplementaryMarketList();
+
     });
+
+    function getComplementaryMarketList() {
+        //do ajax call here
+
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketComplementaryList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inActiveOnly": "1"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                populateDataTable("dtCompMarketList", data);
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
 
     function editComplementaryMarket(complementaryMarketId) {
         window.location = "complementarymarket.html?ComplementaryMarketID=" + complementaryMarketId;
