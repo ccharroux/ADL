@@ -91,10 +91,10 @@
                     <!--Primary Market/ID-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="ddlMarket">Primary Market</label>
+                            <label for="ddlPrimaryMarket">Primary Market</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlMarket" class="field-width-325"></select>
+                            <select id="ddlPrimaryMarket" class="field-width-325"></select>
                         </div>
                     </div>
 
@@ -103,10 +103,10 @@
 
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="ddlNonSelectedStations">Unassigned Stations</label>
+                            <label for="ddlPrimaryMarketStations">Primary Market Stations</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlNonSelectedStations" class="font-14 field-width-325" multiple size="13"></select>
+                            <select id="ddlPrimaryMarketStations" class="font-14 field-width-325" multiple size="13"></select>
                         </div>
                     </div>
                     <div class="row input-row">
@@ -116,7 +116,6 @@
                             <input value="Add" onclick="addToMarket();" class="default-button background-green" type="button">
                         </div>
                     </div>
-                    <hr />
 
                     <!-- Buttons -->
                     <div class="default-button-section">
@@ -124,9 +123,9 @@
                             <div class="col-md-3 text-align-left">
                             </div>
                             <div class="col-md-9 text-align-left">
-                                <div>
+                                <!--<div>
                                     <input value="Update" onclick="updateComplementaryMarket()" class="default-button" type="button">
-                                </div>
+                                </div>-->
                                 <div style="padding-top: 10px">
                                     <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button">
                                 </div>
@@ -183,6 +182,20 @@
         //load primary markets that equal media type for the complementary market
 
         //on click of primary market, reload the unassigned stations list
+
+        $("#ddlPrimaryMarket").change(function() {
+            $("#ddlPrimaryMarketStations").empty();
+
+            if ($(this).val() != "-1") {
+                //alert($(this).val());
+                //go get stations for this market
+                getPrimaryMarketStations();
+            }
+            //else {
+            //    //clear station list
+            //    $("#ddlPrimaryMarketStations").empty();
+            //}
+        });
 
         getMediaTypeList();
     });
@@ -260,8 +273,83 @@
     }
 
     function getPrimaryMarketList() {
-        bootbox.alert('This functionality is still under development.', function () {
-        });
+        //bootbox.alert('This functionality is still under development.', function () {
+        //});
         //this would be my media type and possibly parent market
+        //get back a primary market list by media type
+
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMediaTypeId": $("#ddlMediaType").val(),
+                "inPrimaryMarketOnly": 1
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                var str = '';
+                str = '<option value="-1">-- Select a Primary Market</option>';
+
+                $.each(data.report.rows,
+                    function (index) {
+
+                        var obj = data.report.rows[index];
+                        str = str + '<option value="' + obj.marketId + '">' + obj.marketName + '</option>';
+
+                    });
+
+                $("#ddlPrimaryMarket").html(str);
+                
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+    }
+
+    function getPrimaryMarketStations() {
+        $.ajax({
+            url: ServicePrefix + '/api/Station/GetStationListByMarket',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": $("#ddlPrimaryMarket").val(),
+                "inProductId": 'MRR', //need to figure out a better way to handle product. without product, duplicate stations are returned.
+                "inActiveOnly": 1
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                var str = '';
+                //str = '<option value="-1">-- Select a Primary Market</option>';
+
+                $.each(data.report.rows,
+                    function (index) {
+
+                        var obj = data.report.rows[index];
+                        str = str + '<option value="' + obj.reid + '">' + obj.fullName + '</option>';
+
+                    });
+
+                $("#ddlPrimaryMarketStations").html(str);
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+    }
+
+    function getSecondaryMarketStations() {
+        //need new api that will pull complementary station list
+
     }
 </script>
