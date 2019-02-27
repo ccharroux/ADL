@@ -71,21 +71,22 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input type="hidden" id="txtComplementaryMarketID" value="" />
-                            <input type="text" maxlength="50" class="mkaRequired field-width-325" id="txtComplementaryMarketName" errorMessage="You must enter a Complementary Market Name." />
+                            <input type="hidden" id="txtParentMarketId" value=""/>
+                            <input type="text" maxlength="50" class="field-width-325" id="txtComplementaryMarketName" disabled="disabled"/>
                         </div>
                     </div>
                     
+                    <!--
+                    media type    
+                    -->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            
+                            <label for="ddlMediaType">Media Type</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="checkbox" class="" id="chkTVOnly" />
-                            <label for="chkTVOnly">Television Complementary Markets</label>
+                            <select id="ddlMediaType" class="field-width-325" disabled="disabled"></select>
                         </div>
                     </div>
-
-
 
                     <!--Primary Market/ID-->
                     <div class="row input-row">
@@ -93,7 +94,7 @@
                             <label for="ddlMarket">Primary Market</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlMarket" class="mkaRequired field-width-325" errorMessage="You must enter a Primary Market."></select>
+                            <select id="ddlMarket" class="field-width-325"></select>
                         </div>
                     </div>
 
@@ -101,24 +102,17 @@
                     </div>
 
                     <div class="row input-row">
-
-                        <div class="col-md-6 text-align-center">
-                            <label for="ddlSelectedReports">Current Stations</label>
-                            <select id="ddlSelectedReports" class="font-14 field-width-325" multiple size="13"></select>
+                        <div class="col-md-3 text-align-left">
+                            <label for="ddlNonSelectedStations">Unassigned Stations</label>
                         </div>
-
-                        <div class="col-md-6 text-align-center">
-                            <label for="ddlNonSelectedReports">Unassigned Stations</label>
-                            <select id="ddlNonSelectedReports" class="font-14 field-width-325" multiple size="13"></select>
+                        <div class="col-md-9 text-align-left">
+                            <select id="ddlNonSelectedStations" class="font-14 field-width-325" multiple size="13"></select>
                         </div>
-
                     </div>
                     <div class="row input-row">
-                        <div class="col-md-6 text-align-center">
-                            <input value="Remove" onclick="removeFromMarket();" class="default-button background-red" type="button">
+                        <div class="col-md-3 text-align-left">
                         </div>
-
-                        <div class="col-md-6 text-align-center">
+                        <div class="col-md-9 text-align-left">
                             <input value="Add" onclick="addToMarket();" class="default-button background-green" type="button">
                         </div>
                     </div>
@@ -167,11 +161,107 @@
 </body>
 </html>
 <script>
+
+    var compMarketId = 0;
+
     $(document).ready(function () {
+
+        compMarketId = (getParameterByName("ComplementaryMarketID") == null ? 0 : getParameterByName("ComplementaryMarketID"));
+
+        if (compMarketId <= 0) {
+            window.location = "complementarymarketlist.html";
+        }
+
+        $("#txtComplementaryMarketID").val(compMarketId);
+
         buildMainMenu("Markets");
 
+        //notes of things that need to happen in load. 
+        //media types - done
+        //get complementary market
+        //get assigned stations
+        //load primary markets that equal media type for the complementary market
+
+        //on click of primary market, reload the unassigned stations list
+
+        getMediaTypeList();
     });
 
+    function getMediaTypeList() {
 
+        $.ajax({
+            url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
 
+                    var str = '';
+                    str = '<option value="-1">-- Select a Media Type</option>';
+
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+
+                    });
+
+                    $("#ddlMediaType").html(str);
+
+                    getComplementaryMarket();
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+        
+    }
+
+    function getComplementaryMarket() {
+        //will probably swap out with a lighter API
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarket',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketID": compMarketId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                $.each(data.report.rows,
+                    function(index) {
+
+                        var obj = data.report.rows[index];
+
+                        $("#ddlMediaType").val(obj["mediaTypeId"]);
+                        $("#txtComplementaryMarketName").val(obj["marketName"]);
+                        $("#txtParentMarketId").val(obj["parentMarketId"]);
+                    });
+
+                getPrimaryMarketList();
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+
+    }
+
+    function getPrimaryMarketList() {
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+        //this would be my media type and possibly parent market
+    }
 </script>
