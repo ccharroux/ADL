@@ -35,6 +35,12 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
+    
+    <!-- datatable css -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
+
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
     <!-- FOR IE9 below -->
@@ -116,6 +122,26 @@
                             <input value="Add" onclick="addToMarket();" class="default-button background-green" type="button">
                         </div>
                     </div>
+                    
+                    <!-- adding data table for assigned stations -->
+                    <div class="dataTable-top-margin">
+                        <table id="dtStationList" class="stripe">
+                            <thead>
+                            <tr>
+                                <th class="">Station</th>
+                                <th class="">Market</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tfoot>
+                            <tr>
+                                <th>Station</th>
+                                <th>Market</th>
+                                <th></th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
 
                     <!-- Buttons -->
                     <div class="default-button-section">
@@ -157,6 +183,16 @@
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
 
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+
+
 </body>
 </html>
 <script>
@@ -181,20 +217,40 @@
         //get assigned stations
         //load primary markets that equal media type for the complementary market
 
+        $("#dtStationList").DataTable({
+            "dom": "lfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "pagingType": "full_numbers",
+            initComplete: function () {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+
+        $("body").on("click",
+            "#clear_search_button",
+            function () {
+                var table = $("#dtStationList").DataTable();
+                table.search('').draw();
+            });
+
         //on click of primary market, reload the unassigned stations list
 
         $("#ddlPrimaryMarket").change(function() {
             $("#ddlPrimaryMarketStations").empty();
 
             if ($(this).val() != "-1") {
-                //alert($(this).val());
                 //go get stations for this market
                 getPrimaryMarketStations();
             }
-            //else {
-            //    //clear station list
-            //    $("#ddlPrimaryMarketStations").empty();
-            //}
         });
 
         getMediaTypeList();
@@ -328,8 +384,11 @@
             success: function (data, textStatus, jQxhr) {
 
                 var str = '';
-                //str = '<option value="-1">-- Select a Primary Market</option>';
 
+                if (data.report.rows.length <= 0) {
+                    str = '<option value="-1" disabled>-- No stations available</option>';
+                }
+                
                 $.each(data.report.rows,
                     function (index) {
 
