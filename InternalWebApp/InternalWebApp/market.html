@@ -202,7 +202,7 @@
                             <div class="col-md-12">
                                 <div class="row product-list-header width-100">
 
-                                    <div class="col-md-4 text-align-left">
+                                    <div class="col-md-3 text-align-left">
                                         <strong>
                                             Product
                                         </strong>
@@ -212,7 +212,7 @@
                                             Dates
                                         </strong>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-7">
 
                                     </div>
                                 </div>
@@ -341,10 +341,10 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getRegionListSuccess(data, textStatus, jQxhr)
+                getRegionListSuccess(data, textStatus, jQxhr);
             },
             error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown)
+                genericAjaxError(jQxhr, textStatus, errorThrown);
             }
         }
 
@@ -506,17 +506,44 @@
                 var productId = "" + obj.P_ProductID;
 
                 str = str + '<div class="row row_' + obj.P_ProductID + '" style="display:none;padding-top:3px;">';
-                str = str + '<div class="col-md-4" style="text-align:left">';
+                str = str + '<div class="col-md-3" style="text-align:left">';
                 str = str + obj.P_ProductID + " - " + obj.P_ProductName;
                 str = str + '</div>';
                 str = str + '<div class="col-md-2" style="text-align:left">';
                 str = str + '<div id="date' + obj.P_ProductID + '" />';
                 str = str + '</div>';
-                str = str + '<div id="productButtons' + obj.P_ProductID + '" class="col-md-6" style="text-align:left;">'
-                str = str + '<input type="button"  id="productAdd' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="enableProduct(' + '\'' + obj.P_ProductID + '\')" Value="Enable" />'
-                str = str + '<input type="button" id="productEdit' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="editProduct(' + '\'' + obj.P_ProductID + '\')" Value="Edit" />'
-                str = str + '<input type="button"  id="productDisable' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="disableProduct(' + '\'' + obj.P_ProductID + '\')" Value="Disable" />'
-                str = str + '</div>'
+                str = str +
+                    '<div id="productButtons' +
+                    obj.P_ProductID +
+                    '" class="col-md-7" style="text-align:left;">';
+                str = str +
+                    '<input type="button"  id="productAdd' +
+                    obj.P_ProductID +
+                    '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="enableProduct(' +
+                    '\'' +
+                    obj.P_ProductID +
+                    '\')" Value="Enable" />';
+                str = str +
+                    '<input type="button" id="productEdit' +
+                    obj.P_ProductID +
+                    '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="editProduct(' +
+                    '\'' +
+                    obj.P_ProductID +
+                    '\')" Value="Edit" />';
+                str = str +
+                    '<input type="button"  id="productDisable' +
+                    obj.P_ProductID +
+                    '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="disableProduct(' +
+                    '\'' +
+                    obj.P_ProductID +
+                    '\')" Value="Disable" />';
+                str = str + '<input type="button"  id="productAddStations' +
+                    obj.P_ProductID +
+                    '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="assignStations(' +
+                    '\'' +
+                    obj.P_ProductID +
+                    '\')" Value="Assign Stations" />';
+                str = str + '</div>';
                 str = str + '</div>';
 
 
@@ -525,7 +552,8 @@
             $("#productList").append(str);
 
             if (marketId > 0) {
-                getMarketProducts();
+                //getMarketProducts();
+                getMarket();
             } else {
                 $("#productAddDMA").removeClass('hidden');
                 $("#productAddMRR").removeClass('hidden');
@@ -594,6 +622,14 @@
                     $("#productDisable" + obj.productId).removeClass('hidden');
                     $("#date" + obj.productId).html(extractDateOnly(obj.activeDate));
                     $("#date" + obj.productId).css("color", "green");
+
+                    //chkPrimaryMarket
+                    console.log($('#chkPrimaryMarket').is(':checked'));
+                    if ($('#chkPrimaryMarket').is(':checked') == false) {
+                        $("#productAddStations" + obj.productId).removeClass('hidden');
+                    } else {
+                        $("#productAddStations" + obj.productId).addClass('hidden');
+                    }
                 }
                 else if (obj.disableDate != null && obj.activeFlag == false) {
                     $("#productAdd" + obj.productId).removeClass('hidden');
@@ -614,9 +650,9 @@
 
             });
         }
-        if (marketId > 0) {
-            getMarket();
-        }
+        //if (marketId > 0) {
+        //    getMarket();
+        //}
 
 
     }
@@ -641,7 +677,7 @@
                 getMarketSuccess(data, textStatus, jQxhr);
             },
             error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown)
+                genericAjaxError(jQxhr, textStatus, errorThrown);
             }
         };
 
@@ -682,7 +718,7 @@
 
                 getMarketLocationInfoByParentMarket(obj["parentMarketId"]);
 
-
+                getMarketProducts();
             });
         }
 
@@ -944,6 +980,8 @@
 
     }
 
- 
+    function assignStations(productId) {
+        window.location = 'complementarymarket.html?MarketID=' + $("#txtMarketId").val() + '&ProductID=' + productId;
+    }
 
 </script>
