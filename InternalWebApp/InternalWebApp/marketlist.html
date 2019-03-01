@@ -159,10 +159,11 @@
 <script>
 
 
-
-
+    var secondaryMarketsOnly;
 
     $(document).ready(function () {
+
+        secondaryMarketsOnly = (getParameterByName("OnlySecondaryMarkets") == null ? false : (getParameterByName("OnlySecondaryMarkets")==='true'));
 
         getMediaTypes();
 
@@ -205,7 +206,9 @@
                     "orderable": true,
                     "searchable": true
                 },
-                { "data": 'primaryMarket' },
+                {
+                    "data": 'primaryMarket'
+                },
                 {
                     mRender: function (data, type, row) {
 
@@ -285,6 +288,12 @@
             createdRow: function (row, data, index) {
                 //this adds the class to every row
                 $(row).addClass('single-line-height');
+
+                if (data.primaryMarket == true) {
+                    $(row).addClass('primary-market');
+                } else {
+                    $(row).addClass('secondary-market');
+                }
             },
             language: {
                 //this changes search box label from Search: to Filter Results:
@@ -406,6 +415,12 @@
                     }
                 }
                 populateDataTable("dtMarketList", data);
+
+                if (secondaryMarketsOnly) {
+                    //console.log("secondary only");
+                    $("#dtMarketList").DataTable().rows('.primary-market').remove().draw();
+                }
+
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
