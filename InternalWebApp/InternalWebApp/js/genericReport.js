@@ -416,6 +416,7 @@ function getReportFilterArray_XRAYUsage() {
         objectName:  "dtEndDate",
         required:  true
     }
+    arrayFilters.push(arrayObject);
 
     arrayObject = {
         token:  "Market",
