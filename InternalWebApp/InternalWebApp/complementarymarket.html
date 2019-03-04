@@ -35,6 +35,12 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
+    
+    <!-- datatable css -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
+
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
     <!-- FOR IE9 below -->
@@ -67,7 +73,7 @@
                     <!--Complementary Market Name/ID-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtComplementaryMarketName">Complementary Market Name</label>
+                            <label for="txtComplementaryMarketName">Market Name</label>
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input type="hidden" id="txtComplementaryMarketID" value="" />
@@ -91,10 +97,10 @@
                     <!--Primary Market/ID-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="ddlMarket">Primary Market</label>
+                            <label for="ddlPrimaryMarket">Primary Market</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlMarket" class="field-width-325"></select>
+                            <select id="ddlPrimaryMarket" class="field-width-325"></select>
                         </div>
                     </div>
 
@@ -103,10 +109,10 @@
 
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="ddlNonSelectedStations">Unassigned Stations</label>
+                            <label for="ddlPrimaryMarketStations">Primary Market Stations</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlNonSelectedStations" class="font-14 field-width-325" multiple size="13"></select>
+                            <select id="ddlPrimaryMarketStations" class="font-14 field-width-325" size="13"></select>
                         </div>
                     </div>
                     <div class="row input-row">
@@ -116,7 +122,26 @@
                             <input value="Add" onclick="addToMarket();" class="default-button background-green" type="button">
                         </div>
                     </div>
-                    <hr />
+                    
+                    <!-- adding data table for assigned stations -->
+                    <div class="dataTable-top-margin">
+                        <table id="dtStationList" class="stripe" style="text-align: left;">
+                            <thead>
+                            <tr>
+                                <th>Station</th>
+                                <th>Market</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tfoot>
+                            <tr>
+                                <th>Station</th>
+                                <th>Market</th>
+                                <th></th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
 
                     <!-- Buttons -->
                     <div class="default-button-section">
@@ -124,9 +149,9 @@
                             <div class="col-md-3 text-align-left">
                             </div>
                             <div class="col-md-9 text-align-left">
-                                <div>
+                                <!--<div>
                                     <input value="Update" onclick="updateComplementaryMarket()" class="default-button" type="button">
-                                </div>
+                                </div>-->
                                 <div style="padding-top: 10px">
                                     <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button">
                                 </div>
@@ -158,19 +183,32 @@
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
 
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+
+
 </body>
 </html>
 <script>
 
     var compMarketId = 0;
+    var productId = '';
 
     $(document).ready(function () {
 
-        compMarketId = (getParameterByName("ComplementaryMarketID") == null ? 0 : getParameterByName("ComplementaryMarketID"));
+        compMarketId = (getParameterByName("MarketID") == null ? 0 : getParameterByName("MarketID"));
 
         if (compMarketId <= 0) {
-            window.location = "complementarymarketlist.html";
+            window.location = "complementarymarketlist.html"; //will change this to marketlist at some point once code is done
         }
+
+        productId = (getParameterByName("ProductID") == null ? 'MRR' : getParameterByName("ProductID"));
 
         $("#txtComplementaryMarketID").val(compMarketId);
 
@@ -182,7 +220,55 @@
         //get assigned stations
         //load primary markets that equal media type for the complementary market
 
+        $("#dtStationList").DataTable({
+            "dom": "lfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "pagingType": "full_numbers",
+            "columns": [
+                { "data": 'stationFullName' },
+                { "data": 'marketName' },
+                {
+                    mRender: function (data, type, row) {
+
+                        return '<a href="#" onclick="deleteStation(' + row.stationId + ')">Delete</a>';
+
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": "text-align-right"
+                }
+                ],
+            initComplete: function () {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+
+        $("body").on("click",
+            "#clear_search_button",
+            function () {
+                var table = $("#dtStationList").DataTable();
+                table.search('').draw();
+            });
+
         //on click of primary market, reload the unassigned stations list
+
+        $("#ddlPrimaryMarket").change(function() {
+            $("#ddlPrimaryMarketStations").empty();
+
+            if ($(this).val() != "-1") {
+                //go get stations for this market
+                getPrimaryMarketStations();
+            }
+        });
 
         getMediaTypeList();
     });
@@ -239,17 +325,22 @@
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
-                $.each(data.report.rows,
-                    function(index) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    $.each(data.report.rows,
+                        function(index) {
 
-                        var obj = data.report.rows[index];
+                            var obj = data.report.rows[index];
 
-                        $("#ddlMediaType").val(obj["mediaTypeId"]);
-                        $("#txtComplementaryMarketName").val(obj["marketName"]);
-                        $("#txtParentMarketId").val(obj["parentMarketId"]);
-                    });
+                            $("#ddlMediaType").val(obj["mediaTypeId"]);
+                            $("#txtComplementaryMarketName").val(obj["marketName"]);
+                            $("#txtParentMarketId").val(obj["parentMarketId"]);
+                        });
 
-                getPrimaryMarketList();
+                    getPrimaryMarketList();
+                    getSecondaryMarketStations();
+                }
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 MKAErrorMessageRtn(errorThrown);
@@ -260,8 +351,140 @@
     }
 
     function getPrimaryMarketList() {
+        //bootbox.alert('This functionality is still under development.', function () {
+        //});
+        //this would be my media type and possibly parent market
+        //get back a primary market list by media type
+
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMediaTypeId": $("#ddlMediaType").val(),
+                "inPrimaryMarketOnly": 1
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    var str = '';
+                    str = '<option value="-1">-- Select a Primary Market</option>';
+
+                    $.each(data.report.rows,
+                        function(index) {
+
+                            var obj = data.report.rows[index];
+                            str = str + '<option value="' + obj.marketId + '">' + obj.marketName + '</option>';
+
+                        });
+
+                    $("#ddlPrimaryMarket").html(str);
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+    }
+
+    function getPrimaryMarketStations() {
+        $.ajax({
+            url: ServicePrefix + '/api/Station/GetStationListByMarket',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": $("#ddlPrimaryMarket").val(),
+                "inProductId": productId, //this page will be called from the market crud page and will pass the product
+                "inActiveOnly": 1
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+
+                    var str = '';
+
+                    if (data.report.rows.length <= 0) {
+                        str = '<option value="-1" disabled>-- No stations available</option>';
+                    }
+
+                    $.each(data.report.rows,
+                        function(index) {
+
+                            var obj = data.report.rows[index];
+                            str = str + '<option value="' + obj.reid + '">' + obj.fullName + '</option>';
+
+                        });
+
+                    $("#ddlPrimaryMarketStations").html(str);
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+    }
+
+    function getSecondaryMarketStations() {
+        //need new api that will pull complementary station list
+        $.ajax({
+            url: ServicePrefix + '/api/Station/GetStationListByNonPrimaryMarket',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": compMarketId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    populateDataTable("dtStationList", data);
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+    }
+
+    function addToMarket() {
+        
         bootbox.alert('This functionality is still under development.', function () {
         });
-        //this would be my media type and possibly parent market
+        //console.log($("#ddlPrimaryMarketStations").val());
+        //need to research this more
+        //ask about definitions
+        //update them
+        //with multiple primary markets who would win
+        //this needs to be determined
+
+        //call api to insert into the stations
+        //reload the page after the insert is successful
+        
+    }
+
+    function deleteStation(stationId) {
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+
+        //call the api to remove the station from the secondary market
+        //reload page after update is successful
     }
 </script>

@@ -159,10 +159,15 @@
 <script>
 
 
-
-
+    var secondaryMarketsOnly;
 
     $(document).ready(function () {
+
+        secondaryMarketsOnly = (getParameterByName("NonPrimaryOnly") == null ? false : (getParameterByName("NonPrimaryOnly").toLowerCase() === 'true'));
+
+        //if (secondaryMarketsOnly) {
+        //    //change the page heading
+        //}
 
         getMediaTypes();
 
@@ -205,7 +210,9 @@
                     "orderable": true,
                     "searchable": true
                 },
-                { "data": 'primaryMarket' },
+                {
+                    "data": 'primaryMarket'
+                },
                 {
                     mRender: function (data, type, row) {
 
@@ -285,6 +292,13 @@
             createdRow: function (row, data, index) {
                 //this adds the class to every row
                 $(row).addClass('single-line-height');
+
+                //adding this class so can filter table later on if only wanting secondary markets
+                if (data.primaryMarket == true || data.primaryMarket == 'true') {
+                    $(row).addClass('primary-market');
+                } else {
+                    $(row).addClass('secondary-market');
+                }
             },
             language: {
                 //this changes search box label from Search: to Filter Results:
@@ -406,6 +420,14 @@
                     }
                 }
                 populateDataTable("dtMarketList", data);
+
+                //if we are wanting secondary markets only, this code will remove all rows with
+                //the primary-market class and redraw the datatable.
+                if (secondaryMarketsOnly) {
+                    //console.log("secondary only");
+                    $("#dtMarketList").DataTable().rows('.primary-market').remove().draw();
+                }
+
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
