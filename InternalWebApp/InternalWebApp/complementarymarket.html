@@ -35,7 +35,7 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
-    
+
     <!-- datatable css -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
@@ -77,13 +77,13 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input type="hidden" id="txtComplementaryMarketID" value="" />
-                            <input type="hidden" id="txtParentMarketId" value=""/>
-                            <input type="text" maxlength="50" class="field-width-325" id="txtComplementaryMarketName" disabled="disabled"/>
+                            <input type="hidden" id="txtParentMarketId" value="" />
+                            <input type="text" maxlength="50" class="field-width-325" id="txtComplementaryMarketName" disabled="disabled" />
                         </div>
                     </div>
-                    
+
                     <!--
-                    media type    
+                    media type
                     -->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
@@ -122,23 +122,23 @@
                             <input value="Add" onclick="addToMarket();" class="default-button background-green" type="button">
                         </div>
                     </div>
-                    
+
                     <!-- adding data table for assigned stations -->
                     <div class="dataTable-top-margin">
                         <table id="dtStationList" class="stripe" style="text-align: left;">
                             <thead>
-                            <tr>
-                                <th>Station</th>
-                                <th>Market</th>
-                                <th></th>
-                            </tr>
+                                <tr>
+                                    <th>Station</th>
+                                    <th>Market</th>
+                                    <th></th>
+                                </tr>
                             </thead>
                             <tfoot>
-                            <tr>
-                                <th>Station</th>
-                                <th>Market</th>
-                                <th></th>
-                            </tr>
+                                <tr>
+                                    <th>Station</th>
+                                    <th>Market</th>
+                                    <th></th>
+                                </tr>
                             </tfoot>
                         </table>
                     </div>
@@ -214,7 +214,7 @@
 
         buildMainMenu("Markets");
 
-        //notes of things that need to happen in load. 
+        //notes of things that need to happen in load.
         //media types - done
         //get complementary market
         //get assigned stations
@@ -238,7 +238,7 @@
                     "searchable": false,
                     "className": "text-align-right"
                 }
-                ],
+            ],
             initComplete: function () {
                 $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
             },
@@ -261,7 +261,7 @@
 
         //on click of primary market, reload the unassigned stations list
 
-        $("#ddlPrimaryMarket").change(function() {
+        $("#ddlPrimaryMarket").change(function () {
             $("#ddlPrimaryMarketStations").empty();
 
             if ($(this).val() != "-1") {
@@ -308,7 +308,7 @@
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
-        
+
     }
 
     function getComplementaryMarket() {
@@ -329,7 +329,7 @@
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 } else {
                     $.each(data.report.rows,
-                        function(index) {
+                        function (index) {
 
                             var obj = data.report.rows[index];
 
@@ -375,7 +375,7 @@
                     str = '<option value="-1">-- Select a Primary Market</option>';
 
                     $.each(data.report.rows,
-                        function(index) {
+                        function (index) {
 
                             var obj = data.report.rows[index];
                             str = str + '<option value="' + obj.marketId + '">' + obj.marketName + '</option>';
@@ -418,7 +418,7 @@
                     }
 
                     $.each(data.report.rows,
-                        function(index) {
+                        function (index) {
 
                             var obj = data.report.rows[index];
                             str = str + '<option value="' + obj.reid + '">' + obj.fullName + '</option>';
@@ -465,10 +465,7 @@
     }
 
     function addToMarket() {
-        
-        bootbox.alert('This functionality is still under development.', function () {
-        });
-        //console.log($("#ddlPrimaryMarketStations").val());
+
         //need to research this more
         //ask about definitions
         //update them
@@ -477,7 +474,33 @@
 
         //call api to insert into the stations
         //reload the page after the insert is successful
-        
+
+        $.ajax({
+            url: ServicePrefix + '/api/Station/AddStationToNonPrimaryMarket',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": compMarketId,
+                "inStationId": $("#ddlPrimaryMarketStations").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    window.location = "complementarymarket.html?MarketID=" + compMarketId;
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+
     }
 
     function deleteStation(stationId) {
