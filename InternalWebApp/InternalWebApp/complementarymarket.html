@@ -504,10 +504,39 @@
     }
 
     function deleteStation(stationId) {
-        bootbox.alert('This functionality is still under development.', function () {
-        });
+        //bootbox.alert('This functionality is still under development.', function () {
+        //});
 
         //call the api to remove the station from the secondary market
         //reload page after update is successful
+        //on delete is removing records from recipientreports and rerecipients not sure how assigned in first place
+        //eventually removes from mktreids
+
+        $.ajax({
+            url: ServicePrefix + '/api/Station/DeleteStationFromNonPrimaryMarket',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": compMarketId,
+                "inStationId": stationId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    window.location = "complementarymarket.html?MarketID=" + compMarketId;
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+
     }
 </script>
