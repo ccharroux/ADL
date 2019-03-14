@@ -58,11 +58,17 @@
         </header>
         <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
-                <div class="row">
+                <div id="divQuickReport" style="float:right;padding-right:25px;padding-bottom:10px">
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>
+                                <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
                         <h2>Market</h2>
                     </div>
                 </div>
+
+
                 <div class="text-center margin-top-0">
 
                     <!-- Market Media Type for Insert-->
@@ -246,18 +252,29 @@
     <script src="/js/config.js"></script>
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
+    <!-- genericReport JS -->
+    <script src="/js/genericReport.js"></script>
 </body>
 </html>
 <script>
 
     var marketId = 0;
 
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
+
         buildMainMenu("Markets");
         marketId = (getParameterByName("MarketID") == null ? 0 : getParameterByName("MarketID"));
+
+        // local storage for quick reports
+        if (marketId > 0)
+        {
+            setLocalStorage("quickReportQS", "ddlMarket|" + marketId);
+        }
+
+        buildQuickReports('market');
         checkForInsertOrUpdate();
         getMediaTypes();
-
 
         //load of data
         //getMediaTypes();
@@ -271,7 +288,8 @@
 
     });
 
-    function checkForInsertOrUpdate() {
+    function checkForInsertOrUpdate()
+    {
         if (marketId == 0 || marketId == null) {
 
         } else {

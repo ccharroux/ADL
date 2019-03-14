@@ -69,7 +69,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Markets</h2>
+                        <h2 id="pageTitle">Markets</h2>
                     </div>
                 </div>
 
@@ -159,42 +159,49 @@
 <script>
 
 
-    var secondaryMarketsOnly;
+    var bSecondaryMarketsOnly = false;
 
     $(document).ready(function () {
 
-        secondaryMarketsOnly = (getParameterByName("NonPrimaryOnly") == null ? false : (getParameterByName("NonPrimaryOnly").toLowerCase() === 'true'));
-
-        //if (secondaryMarketsOnly) {
-        //    //change the page heading
-        //}
+        bSecondaryMarketsOnly = (getParameterByName("NonPrimaryOnly") == null ? false : (getParameterByName("NonPrimaryOnly").toLowerCase() === 'true'));
+ 
+        setTitle();
 
         getMediaTypes();
 
-        var input = document.getElementById("searchTextNumber");
-        input.addEventListener("keyup", function (event) {
-            // Cancel the default action, if needed
-            event.preventDefault();
-            // Number 13 is the "Enter" key on the keyboard
-            if (event.keyCode === 13) {
-                setLocalStorage("search", "");
-                editMarket(document.getElementById("searchTextNumber").value);
-            }
-        });
+        setEventListeners();
 
-        var input = document.getElementById("searchText");
-        input.addEventListener("keyup", function (event) {
-            // Cancel the default action, if needed
-            event.preventDefault();
-            // Number 13 is the "Enter" key on the keyboard
-            if (event.keyCode === 13) {
+        setDataTable();
 
-                getMarketList();
-            }
-        });
+        clearSearchButtonSetup();
 
+        buildMainMenu("Markets");
+
+        buildQuickReports('market');
+
+        // Reset this variable
+        setLocalStorage("quickReportQS", null);
+
+        setTimeout(loadLastSearch, 1000);
+
+        setLocalStorage("search", $("#searchText").val().trim() + '|' + $("#searchTextNumber").val().trim() + '|' + $("#ddlMediaType").val()  );
+        setLocalStorage("searchPage", window.location);
+
+    });
+
+    function clearSearchButtonSetup()
+    {
+        $("body").on("click", "#clear_search_button", function () {
+                                                        var table = $("#dtMarketList").DataTable();
+                                                        table.search('').draw();
+            });
+
+    }
+    function setDataTable()
+    {
         var reportTitle = "Markets List";
         var exportColumns = returnTableColumnsByClass("dtMarketList", "exportColumn");
+
 
         $("#dtMarketList").DataTable({
             "dom": "Blfrtip",
@@ -217,7 +224,7 @@
                     mRender: function (data, type, row) {
 
                         return returnProductListLinks(row);
-                        
+
                     }
                 },
 
@@ -306,22 +313,43 @@
             }
         });
 
+    }
 
-        $("body").on("click",
-            "#clear_search_button",
-            function () {
-                var table = $("#dtMarketList").DataTable();
-                table.search('').draw();
-            });
+    function setEventListeners()
+    {
+        var input = document.getElementById("searchTextNumber");
+        input.addEventListener("keyup", function (event) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Number 13 is the "Enter" key on the keyboard
+            if (event.keyCode === 13) {
+                setLocalStorage("search", "");
+                editMarket(document.getElementById("searchTextNumber").value);
+            }
+        });
 
-        buildMainMenu("Markets");
+        var input = document.getElementById("searchText");
+        input.addEventListener("keyup", function (event) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Number 13 is the "Enter" key on the keyboard
+            if (event.keyCode === 13) {
 
-        buildQuickReports('market');
+                getMarketList();
+            }
+        });
+    }
 
-        setTimeout(loadLastSearch, 1000);
-        setLocalStorage("search", $("#searchText").val().trim() + '|' + $("#searchTextNumber").val().trim() + '|' + $("#ddlMediaType").val()  );
-        setLocalStorage("searchPage", window.location);
-    });
+    function setTitle()
+    {
+        if (bSecondaryMarketsOnly == true) {
+            $("#pageTitle").text("Complimentary Markets");
+        }
+        else {
+            $("#pageTitle").text("Markets");
+        }
+    }
+
     function getMediaTypes() {
         var url = ServicePrefix + '/api/MediaType/GetMediaTypeList';
 
@@ -423,7 +451,7 @@
 
                 //if we are wanting secondary markets only, this code will remove all rows with
                 //the primary-market class and redraw the datatable.
-                if (secondaryMarketsOnly) {
+                if (bSecondaryMarketsOnly) {
                     //console.log("secondary only");
                     $("#dtMarketList").DataTable().rows('.primary-market').remove().draw();
                 }

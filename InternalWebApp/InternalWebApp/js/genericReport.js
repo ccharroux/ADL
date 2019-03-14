@@ -163,7 +163,7 @@ function getReportObject(inReportId)
   
 }
 
-function buildQuickReports(rptType, control, container)
+function buildQuickReports(rptType, control, container, postfix)
 {
 
     if (!control)
@@ -202,7 +202,8 @@ function buildQuickReports(rptType, control, container)
 }
 function getQuickReport(reportId)
 {
-    if (reportId > -1) {
+    if (reportId > -1)
+    {
         window.location = "/utilities/genericReport.html?reportId=" + reportId;
     }
 }
