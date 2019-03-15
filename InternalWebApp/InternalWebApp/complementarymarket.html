@@ -231,7 +231,7 @@
                 {
                     mRender: function (data, type, row) {
 
-                        return '<a href="#" onclick="deleteStation(' + row.stationId + ')">Delete</a>';
+                        return '<a href="#" onclick="deleteStation(' + row.stationId + ',\'' + row.stationFullName + '\')">Delete</a>';
 
                     },
                     "orderable": false,
@@ -492,7 +492,10 @@
                 if (data.response.status != "SUCCESS") {
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 } else {
-                    window.location = "complementarymarket.html?MarketID=" + compMarketId;
+                    var sMessage = $("#ddlPrimaryMarketStations option:selected").text() + ' - Station Added';
+                    bootbox.alert(sMessage, function() {
+                        window.location = "complementarymarket.html?MarketID=" + $("#txtComplementaryMarketID").val();
+                    });
                 }
 
             },
@@ -595,7 +598,7 @@
     //    });
     //}
 
-    function deleteStation(stationId) {
+    function deleteStation(stationId, stationName) {
 
         //call the api to remove the station from the secondary market
         //reload page after update is successful
@@ -618,7 +621,11 @@
                 if (data.response.status != "SUCCESS") {
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 } else {
-                    window.location = "complementarymarket.html?MarketID=" + compMarketId;
+                    var sMessage = stationName + ' - Station Deleted';
+                    bootbox.alert(sMessage, function() {
+                        window.location = "complementarymarket.html?MarketID=" +  $("#txtComplementaryMarketID").val();
+                    });
+                    
                 }
 
             },
