@@ -109,6 +109,9 @@ reportName.push("rptUsersWithDisabledStationAssinged");
 reportName.push("rptXRAYImportScript");
 reportName.push("rptXRYAccountAndRevenueAssignment");
 
+reportName.push("rptMRRReportMatrix");
+
+
 
 function buildReportArray()
 {
@@ -4201,6 +4204,83 @@ function getReportObject_XRYAccountAndRevenueAssignment() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'xry'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRReportMatrix() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMRRMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MrrReport",
+        jsCall: "getMRRReportList",
+        objectName: "ddlMrrReport",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "MrrCanConsolidatePeriods",
+        objectName: "chkMrrCanConsolidatePeriods",
+        jsCall: null,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "MrrCanConsolidateStations",
+        objectName: "chkMrrCanConsolidateStations",
+        jsCall: null,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "MrrGroupwide",
+        objectName: "chkMrrGroupwide",
+        jsCall: null,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "MrrMarketwide",
+        objectName: "chkMrrMarketwide",
+        jsCall: null,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_MRRReportMatrix() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "MRR Report Matrix",
+        apiControllerAction: "/api/MRRReport/GetMRRReportMatrixList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr'
     }
 
     return tempObject;

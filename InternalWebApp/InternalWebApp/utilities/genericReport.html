@@ -132,6 +132,26 @@
                             <label for="ddlOwnerGroup" class="dropdown-label rptView rptOwnerGroup">Owner</label>
                             <select id="ddlOwnerGroup" apiInput="inOwnerGroupId" class="dropdown-select rptView rptOwnerGroup"></select>
                         </div>
+                        <div class="form-group rptView rptMrrReport">
+                            <label for="ddlMrrReport" class="dropdown-label rptView rptMrrReport">Report</label>
+                            <select id="ddlMrrReport" apiInput="inReportId" class="dropdown-select rptView rptMrrReport"></select>
+                        </div>
+                        <div class="form-group rptView rptMrrCanConsolidateStations">
+                            <label for="chkMrrCanConsolidateStations" class="dropdown-label rptView rptMrrCanConsolidateStations">Can Consolidate Stations</label>
+                            <input type="checkbox" id="chkMrrCanConsolidateStations" apiInput="inCanConsolidateStations" class="dropdown-select rptView rptMrrCanConsolidateStations" />
+                        </div>
+                        <div class="form-group rptView rptMrrCanConsolidatePeriods">
+                            <label for="chkMrrCanConsolidatePeriods" class="dropdown-label rptView rptMrrCanConsolidatePeriods">Can Consolidate Periods</label>
+                            <input type="checkbox" id="chkMrrCanConsolidatePeriods" apiInput="inCanConsolidatePeriods" class="dropdown-select rptView rptMrrCanConsolidatePeriods" />
+                        </div>
+                        <div class="form-group rptView rptMrrGroupwide">
+                            <label for="chkMrrGroupwide" class="dropdown-label rptView rptMrrGroupwide">Groupwide</label>
+                            <input type="checkbox" id="chkMrrGroupwide" apiInput="inGroupwide" class="dropdown-select rptView rptMrrGroupwide" />
+                        </div>
+                        <div class="form-group rptView rptMrrMarketwide">
+                            <label for="chkMrrMarketwide" class="dropdown-label rptView rptMrrMarketwide">Marketwide</label>
+                            <input type="checkbox" id="chkMrrMarketwide" apiInput="inMarketwide" class="dropdown-select rptView rptMrrMarketwide" />
+                        </div>
                         <div class="form-group rptView rptPersonnel" >
                             <div class="form-group" style="display:table-cell;">
                                 <label for="hidPersonnel" class="dropdown-label rptView rptPersonnel">Personnel</label>
@@ -809,6 +829,48 @@
         });
 
     }
+    function getMRRReportList() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/MRR/GetReportNoMarketList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken") 
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    var str = '';
+
+                    $("#ddlMrrReport").html("<option value=''> -- Select an Report --</option>");
+
+ 
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = str + "<option value='" + obj.reportId + "'>" + obj.reportTitle + "</option>";
+
+                    });
+
+                    $("#ddlMrrReport").append(str);
+                    saveLoadedControlSelection("ddlMrrReport");
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
 
     function getOwnerGroupList() {
 
@@ -904,20 +966,30 @@
             var nameOfParm = $("#" + control).attr("apiInput");
             var item = "#" + control;
             var isRequired = objectValue.required;
+            var val = $(item).val();
+            console.log(control);
+            if (control.toString().toLowerCase().indexOf("chk") > -1)
+            {
+                val = $(item).is(':checked');
+                console.log(val);
+ 
+            }
+ 
+            if (val != "") {
 
-            //if ($(item).prop("tagName") == "SELECT") {
 
-            if ($(item).val() != "") {
-                if (reportObject.apiType.toLowerCase() == "post") {
-                    apiParameters[nameOfParm] = $(item).val();
+                if (reportObject.apiType.toLowerCase() == "post")
+                {
+                    apiParameters[nameOfParm] = val;
                 }
                 else {
-                    api = api + "&" + nameOfParm + "=" + $(item).val();
+                    api = api + "&" + nameOfParm + "=" + val;
                 }
 
             }
             else {
-                if (isRequired) {
+                if (isRequired)
+                {
                     var msg = "Please select a " + nameOfParm.toLowerCase().replace("in", "").replace("id", "");
                     bootbox.alert(msg, function () { });
                     return false;
@@ -934,109 +1006,6 @@
         });
 
 
-
-
-
-    }
-    function getReportOld() {
-
-        $("#noDataFound").hide();
-
-        api = reportObject.apiControllerAction;
-        apiParameters = new Object();
-        apiToken = getLocalStorage("APIToken");
-        searchText = "";
-        columns = [];
-
-        //------------------------
-        //setup the parameters for the API
-        //------------------------
-
-        if (reportObject.apiType.toLowerCase() == "post") {
-            apiParameters["inApiToken"] = apiToken;
-        }
-        else {
-            api = api + "?inApiToken=" + apiToken;
-        }
-
-        //------------------------
-        // loop thru filters
-        //------------------------
-        var itemsToCheck = $('.rptView');
-        var itemsToCheckLength = itemsToCheck.length;
-
-        $('.rptView').each(function (index, item)
-        {
-            if ($(item).is(":visible"))
-            {
-                console.log($(item).prop("tagName"));
-
-                if ($(item).prop("tagName") != "LABEL" && 
-                    $(item).prop("tagName") != "DIV")
-                {
-                    var nameOfParm = $(item).attr("apiInput");
-
-                    if (nameOfParm != undefined)
-                    {
-                        var control = $(item).attr("Id");
-
-                        var isRequired = false;
-
-                        $.each(reportFilterArray, function (objectName, objectValue) {
-                            if (control.toString().toLowerCase() == objectValue.objectName.toString().toLowerCase()) {
-                                isRequired = objectValue.required;
-                            }
-                        });
-
-
-                        if ($(item).prop("tagName") == "SELECT") {
-                            if ($(item).val() != "") {
-                                if (reportObject.apiType.toLowerCase() == "post") {
-                                    apiParameters[nameOfParm] = $(item).val();
-                                }
-                                else {
-                                    api = api + "&" + nameOfParm + "=" + $(item).val();
-                                }
-
-                            }
-                            else {
-                                if (isRequired) {
-                                    var msg = "Please select a " + nameOfParm.toLowerCase().replace("in", "").replace("id", "");
-                                    bootbox.alert(msg, function () { });
-                                    return false;
-                                }
-                            }
-                        }
-
-                        if ($(item).prop("tagName") == "INPUT") {
-                            if ($(item).val() != "") {
-                                if (reportObject.apiType.toLowerCase() == "post") {
-                                    apiParameters[nameOfParm] = $(item).val();
-                                }
-                                else {
-                                    api = api + "&" + nameOfParm + "=" + $(item).val();
-                                }
-
-                            }
-                            else {
-                                if (isRequired) {
-                                    var msg = "Please select a " + nameOfParm.toLowerCase().replace("in", "").replace("id", "");
-                                    bootbox.alert(msg, function () { });
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-  
-                }
-            }
-
-            // when done with the loop
-            // get the report
-            if (index == (itemsToCheckLength - 1)) {
-                getTheReportAJAX();
-            }
-        });
 
 
 
