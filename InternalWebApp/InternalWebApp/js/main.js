@@ -610,7 +610,7 @@ function buildXRYMenu(selectedItem) {
     var menuItems = '';
 
     menuItems += '<h1><a href="/dashboard.html">MKA Internal Media Site</a></h1>';
-    menuItems += '<nav role="navigation" style="margin-top:20px">'
+    menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="releasexry.html">Release</a></li>';
@@ -636,6 +636,12 @@ function buildXRYMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/stationagencylist.html">Station Agency</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/parentagencylist.html">Parent Agency</a></li>';
     menuItems += '              </ul>';
+    menuItems += '        </li>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Audits") + ' href="/genericAuditList.html" role="button" aria-expanded="false">Audits </span></a>';
+    //menuItems += '              <ul class="dropdown-menu" role="menu">';
+    //menuItems += '                  <li style="display:block;"><a href="/stationagencylist.html">Station Agency</a></li>';
+    //menuItems += '                  <li style="display:block;"><a href="/parentagencylist.html">Parent Agency</a></li>';
+    //menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';

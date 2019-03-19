@@ -1,127 +1,28 @@
-var reportObjectArray = new Array();
-var reportFilterObjectArray = new Array();
+var auditObjectArray = new Array();
+var auditFilterObjectArray = new Array();
 
-var reportName = new Array();
-reportName.push("rptMRRMarketSummary");
-reportName.push("rptXRAYUsage");
-reportName.push("rptMRRUsage");
-reportName.push("rptTVBUsage");
-reportName.push("rptMarketRevenueHourlyActivity");
-reportName.push("rptUserActivity");
-reportName.push("rptUserActivityDetail");
-reportName.push("rptUserQuerySummary");
-reportName.push("rptUserQuerySummaryByOwner");
-reportName.push("rptUserListing");
-reportName.push("rptTraining");
-reportName.push("rptAEStatus");
-reportName.push("rptNationwideRecipients");
-reportName.push("rptNewUserListing");
-reportName.push("rptStationChangeHistory");
-reportName.push("rptMarketRevenueXRay");
-reportName.push("rptStationListing");
-reportName.push("rptMarketDelivery");
-reportName.push("rptTVBUserListing");
-// -- Parent Ownership
-reportName.push("rptParentOwnershipList");
-// -- Ownership
-reportName.push("rptOwnershipList");
-// -- Stations
-reportName.push("rptActiveStationList");
-reportName.push("rptDisabledStationList");
-reportName.push("rptStationChanges");
-reportName.push("rptMRREstimatedStationList");
-reportName.push("rptMRRStationManagerList");
-reportName.push("rptDetailedStationSetup");
-
-// owner groups
-reportName.push("rptOwnershipGroupList");
-reportName.push("rptOwnershipGroupDistributionList");
-reportName.push("rptMarketOwnershipGroup");
-reportName.push("rptDetailedOwnerGroupSetup");
-
-// Markets
-reportName.push("rptMarketSetupMarket");
-reportName.push("rptMarketSetupMarketMRRCategories");
-reportName.push("rptMarketSetupMarketMRRReports");
-reportName.push("rptMarketSetupMarketOwnerGroups");
-reportName.push("rptMarketSetupMarketProducts");
-reportName.push("rptMarketSetupMarketStations");
-reportName.push("rptMarketSetupMarketUsers");
-reportName.push("rptMarketSetupMarketVirtualGroups");
-reportName.push("rptMarketReleaseList");
-
-// Personnal
-reportName.push("rptPersonnelContactList");
-reportName.push("rptPersonnelRecipientList");
-reportName.push("rptWebUserList");
-
-reportName.push("rptMRRNoPrimaryContactList");
-
-reportName.push("rptMRRMarketRelease");
-reportName.push("rptMRRMarketStationRelease");
-
-reportName.push("rptXRYMarketRelease");
-reportName.push("rptXRYMarketStationRelease");
-
-reportName.push("rptTVBMarketRelease");
-reportName.push("rptTVBMarketStationRelease");
- 
-reportName.push("rptFeatureImplementationList");
-
-reportName.push("rptTVBMRRCompare");
-
-reportName.push("rptMRRReportList");
-reportName.push("rptMRRMarketReportList");
-reportName.push("rptMRROwnerReportList");
-
-reportName.push("rptTVBRepBillingStationList");
-reportName.push("rptTVBTimeSalesStationList");
-reportName.push("rptTVBMarketNielsenRankingList");
-
-reportName.push("rptOwnerStationGrid");
-reportName.push("rptGeneralStationData");
-
-reportName.push("rptAPIActivityList");
-reportName.push("rptAPIAccessList");
-reportName.push("rptDMAMRRCategoryMappingList");
-reportName.push("rptCorporateGroupUserList");
-
-reportName.push("rptKeywordIndustryList");
-reportName.push("rptAdminDeviceList");
-
-reportName.push("rptParentMarketCategoryTemplateList");
-
-reportName.push("rptSAMLOwnerList");
-reportName.push("rptSAMLUserExceptionList");
-
-reportName.push("rptAdvertiserRevenueInWrongMarket");
-reportName.push("rptAgencyRevenueInWrongMarket");
-reportName.push("rptDisabledUserAccountExecutive");
-reportName.push("rptDuplicateUser");
-reportName.push("rptMRRWithoutManager");
-reportName.push("rptMRRUserMissing");
-reportName.push("rptMultipleOwnersPerUser");
-reportName.push("rptOwnerGroupReportingEntityIssues");
-reportName.push("rptUserMissingGroup");
-reportName.push("rptUsersAssignedReportsInvalidOwner");
-reportName.push("rptUsersAssingedInvalidMarket");
-reportName.push("rptUsersWithDisabledStationAssinged");
-reportName.push("rptXRAYImportScript");
-reportName.push("rptXRYAccountAndRevenueAssignment");
-
-reportName.push("rptMRRReportMatrix");
+var auditName = new Array();
+//advertisers
+auditName.push("auditAdvertisers");
+auditName.push("auditMediaAdvertisers");
+auditName.push("auditStationAdvertisers");
+//agencies
+auditName.push("auditAgencies");
+auditName.push("auditStationAgencies");
+//revenue research
+auditName.push("auditAdvertisersRevenueResearch");
+auditName.push("auditMediaRevenueResearch");
 
 
 
-function buildReportArray()
-{
-    var reportCounter = 1;
+function buildAuditArray() {
+    var auditCounter = 1;
     var success = true;
-    var reportArray = new Array();
+    var auditArray = new Array();
 
     do 
     {
-        var outObject = getReportObject(reportCounter);
+        var outObject = getReportObject(auditCounter);
 
         if (outObject.apiControllerAction == null)
         {
@@ -129,42 +30,44 @@ function buildReportArray()
         }
         else
         {
-            reportArray.push(outObject);
-            reportCounter++;
+            auditArray.push(outObject);
+            auditCounter++;
         }
     }
     while (success == true);
 
-    return reportArray;
+    return auditArray;
 }
 
-buildReportObjectArray();
+buildAuditObjectArray();
 
 //---------------------------
 // Generic Report Wrapper Routines
 //---------------------------
-function buildReportObjectArray()
+function buildAuditObjectArray()
 {
     var arrayObject = new Object();
 
-    for (var x = 0; x < reportName.length; x++)
+    for (var x = 0; x < auditName.length; x++)
     {
-        var module = reportName[x].replace("rpt", "");
-       // console.log(module);
-        arrayObject = window[("getReportObject_" + module)]();
-        arrayObject.filters = window[("getReportFilterArray_" + module)]();
-        reportObjectArray.push(arrayObject);
+        var module = auditName[x].replace("audit", "");
+        console.log(module);
+        arrayObject = window[("getAuditObject_" + module)]();
+        arrayObject.filters = window[("getAuditFilterArray_" + module)]();
+        auditObjectArray.push(arrayObject);
 
     }
 
 
 }
-function getReportObject(inReportId)
+function getAuditObject(inAuditId)
 {
  
-    return reportObjectArray[inReportId];
+    return auditObjectArray[inAuditId];
   
 }
+
+
 
 function buildQuickReports(rptType, control, container, postfix)
 {
@@ -180,14 +83,14 @@ function buildQuickReports(rptType, control, container, postfix)
 
     var rptHit = false;
 
-    for (var i = 0; i < reportObjectArray.length; i++)
+    for (var i = 0; i < auditObjectArray.length; i++)
     {
 
-        if (reportObjectArray[i].product.toLowerCase() == rptType.toLowerCase())
+        if (auditObjectArray[i].product.toLowerCase() == rptType.toLowerCase())
         {
              
             rptHit = true;
-            $("#" + control).append("<option value='" + i + "'>" + reportObjectArray[i].reportTitle + "</option>");
+            $("#" + control).append("<option value='" + i + "'>" + auditObjectArray[i].reportTitle + "</option>");
         }
 
     }
@@ -215,6 +118,232 @@ function getQuickReport(reportId)
 //-------------------------
 // REPORT AREA
 //-------------------------
+
+function getAuditObject_Advertisers() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("parentOwnerID");
+    columnsToDisplay.push("parentOwnerName");
+    columnsToDisplay.push("parentOwnerActive");
+    columnsToDisplay.push("ownerID");
+    columnsToDisplay.push("ownerName");
+    columnsToDisplay.push("ownerAbbreviation");
+    columnsToDisplay.push("productID");
+    columnsToDisplay.push("productActiveDate");
+    columnsToDisplay.push("productDisableDate");
+
+    tempObject =
+    {
+        // id: rptParentOwnershipList,
+        auditTitle: "Advertisers Audit",
+        apiControllerAction: "/api/ParentOwnershipReport/GetParentOwnershipList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advertisers'
+    }
+
+    return tempObject;
+}
+
+
+function getAuditFilterArray_Advertisers() {
+    var arrayFilters = new Array();
+    return arrayFilters;
+}
+
+function getAuditObject_StationAdvertisers() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("parentOwnerID");
+    columnsToDisplay.push("parentOwnerName");
+    columnsToDisplay.push("parentOwnerActive");
+    columnsToDisplay.push("ownerID");
+    columnsToDisplay.push("ownerName");
+    columnsToDisplay.push("ownerAbbreviation");
+    columnsToDisplay.push("productID");
+    columnsToDisplay.push("productActiveDate");
+    columnsToDisplay.push("productDisableDate");
+
+    tempObject =
+    {
+        // id: rptParentOwnershipList,
+        auditTitle: "Station Advertisers Audit",
+        apiControllerAction: "/api/ParentOwnershipReport/GetParentOwnershipList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advertisers'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_StationAdvertisers() {
+    var arrayFilters = new Array();
+    return arrayFilters;
+}
+
+function getAuditObject_MediaAdvertisers() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("parentOwnerID");
+    columnsToDisplay.push("parentOwnerName");
+    columnsToDisplay.push("parentOwnerActive");
+    columnsToDisplay.push("ownerID");
+    columnsToDisplay.push("ownerName");
+    columnsToDisplay.push("ownerAbbreviation");
+    columnsToDisplay.push("productID");
+    columnsToDisplay.push("productActiveDate");
+    columnsToDisplay.push("productDisableDate");
+
+    tempObject =
+    {
+        // id: rptParentOwnershipList,
+        auditTitle: "Media Advertisers Audit",
+        apiControllerAction: "/api/ParentOwnershipReport/GetParentOwnershipList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advertisers'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_MediaAdvertisers() {
+    var arrayFilters = new Array();
+    return arrayFilters;
+}
+
+function getAuditObject_Agencies() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("parentOwnerID");
+    columnsToDisplay.push("parentOwnerName");
+    columnsToDisplay.push("parentOwnerActive");
+    columnsToDisplay.push("ownerID");
+    columnsToDisplay.push("ownerName");
+    columnsToDisplay.push("ownerAbbreviation");
+    columnsToDisplay.push("productID");
+    columnsToDisplay.push("productActiveDate");
+    columnsToDisplay.push("productDisableDate");
+
+    tempObject =
+    {
+        // id: rptParentOwnershipList,
+        auditTitle: "Agencies Audit",
+        apiControllerAction: "/api/ParentOwnershipReport/GetParentOwnershipList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'agencies'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_Agencies() {
+    var arrayFilters = new Array();
+    return arrayFilters;
+}
+
+function getAuditObject_StationAgencies() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("parentOwnerID");
+    columnsToDisplay.push("parentOwnerName");
+    columnsToDisplay.push("parentOwnerActive");
+    columnsToDisplay.push("ownerID");
+    columnsToDisplay.push("ownerName");
+    columnsToDisplay.push("ownerAbbreviation");
+    columnsToDisplay.push("productID");
+    columnsToDisplay.push("productActiveDate");
+    columnsToDisplay.push("productDisableDate");
+
+    tempObject =
+    {
+        // id: rptParentOwnershipList,
+        auditTitle: "Station Agencies Audit",
+        apiControllerAction: "/api/ParentOwnershipReport/GetParentOwnershipList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'agencies'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_StationAgencies() {
+    var arrayFilters = new Array();
+    return arrayFilters;
+}
+
+function getAuditObject_AdvertisersRevenueResearch() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("parentOwnerID");
+    columnsToDisplay.push("parentOwnerName");
+    columnsToDisplay.push("parentOwnerActive");
+    columnsToDisplay.push("ownerID");
+    columnsToDisplay.push("ownerName");
+    columnsToDisplay.push("ownerAbbreviation");
+    columnsToDisplay.push("productID");
+    columnsToDisplay.push("productActiveDate");
+    columnsToDisplay.push("productDisableDate");
+
+    tempObject =
+    {
+        // id: rptParentOwnershipList,
+        auditTitle: "Advertiser Revenue Research",
+        apiControllerAction: "/api/ParentOwnershipReport/GetParentOwnershipList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'revresearch'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_AdvertisersRevenueResearch() {
+    var arrayFilters = new Array();
+    return arrayFilters;
+}
+
+
+function getAuditObject_MediaRevenueResearch() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("parentOwnerID");
+    columnsToDisplay.push("parentOwnerName");
+    columnsToDisplay.push("parentOwnerActive");
+    columnsToDisplay.push("ownerID");
+    columnsToDisplay.push("ownerName");
+    columnsToDisplay.push("ownerAbbreviation");
+    columnsToDisplay.push("productID");
+    columnsToDisplay.push("productActiveDate");
+    columnsToDisplay.push("productDisableDate");
+
+    tempObject =
+    {
+        // id: rptParentOwnershipList,
+        auditTitle: "Media Revenue Research",
+        apiControllerAction: "/api/ParentOwnershipReport/GetParentOwnershipList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'revresearch'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_MediaRevenueResearch() {
+    var arrayFilters = new Array();
+    return arrayFilters;
+}
 
 // Parent Ownership
 function getReportFilterArray_ParentOwnershipList() {
@@ -4010,7 +4139,7 @@ function getReportObject_OwnerGroupReportingEntityIssues() {
 }
 
 /*
-reportName.push("rptOwnerGroupReportingEntityIssues");*/
+auditName.push("rptOwnerGroupReportingEntityIssues");*/
 
 function getReportFilterArray_MultipleOwnersPerUser() {
 
