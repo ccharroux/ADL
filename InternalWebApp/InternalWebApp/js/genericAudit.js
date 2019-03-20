@@ -506,6 +506,56 @@ function getAuditObject_AdvertisersRevenueResearch() {
 
 function getAuditFilterArray_AdvertisersRevenueResearch() {
     var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "AdvertiserName",
+        objectName: "txtAdvertiserName",
+        jsCall: null,
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "AgencyName",
+        jsCall: null,
+        objectName: "txtAgencyName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: null,
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
     return arrayFilters;
 }
 
@@ -539,6 +589,40 @@ function getAuditObject_MediaRevenueResearch() {
 
 function getAuditFilterArray_MediaRevenueResearch() {
     var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "AdvertiserName",
+        objectName: "txtAdvertiserName",
+        jsCall: null,
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
     return arrayFilters;
 }
 
