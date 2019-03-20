@@ -201,15 +201,6 @@ function getAuditFilterArray_Advertisers() {
     }
     arrayFilters.push(arrayObject);
 
-
-    //arrayObject = {
-    //    token: "EndDate",
-    //    jsCall: null,
-    //    objectName: "dtEndDate",
-    //    required: true
-    //}
-    //arrayFilters.push(arrayObject);
-
     return arrayFilters;
 }
 
@@ -242,6 +233,48 @@ function getAuditObject_StationAdvertisers() {
 
 function getAuditFilterArray_StationAdvertisers() {
     var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "StationAdvertiserName",
+        jsCall: null,
+        objectName: "txtStationAdvertiserName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MarketAdvertiserName",
+        jsCall: null,
+        objectName: "txtMarketAdvertiserName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Industry",
+        jsCall: "getIndustryList",
+        objectName: "ddlIndustry",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "SubIndustry",
+        jsCall: null,
+        objectName: "ddlSubIndustry",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
     return arrayFilters;
 }
 
@@ -274,6 +307,41 @@ function getAuditObject_MediaAdvertisers() {
 
 function getAuditFilterArray_MediaAdvertisers() {
     var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaAdvertiserName",
+        jsCall: null,
+        objectName: "txtMediaAdvertiserName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MarketAdvertiserName",
+        jsCall: null,
+        objectName: "txtMarketAdvertiserName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
     return arrayFilters;
 }
 
@@ -306,6 +374,32 @@ function getAuditObject_Agencies() {
 
 function getAuditFilterArray_Agencies() {
     var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "AgencyName",
+        jsCall: null,
+        objectName: "txtAgencyName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "ParentAgency",
+        jsCall: "getParentAgencyList",
+        objectName: "ddlParentAgency",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
     return arrayFilters;
 }
 
@@ -338,6 +432,48 @@ function getAuditObject_StationAgencies() {
 
 function getAuditFilterArray_StationAgencies() {
     var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "StationAgencyName",
+        jsCall: null,
+        objectName: "txtStationAgencyName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MarketAgencyName",
+        jsCall: null,
+        objectName: "txtMarketAgencyName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: null,
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "AccountType",
+        jsCall: "getAccountTypeList",
+        objectName: "ddlAcountType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
     return arrayFilters;
 }
 
