@@ -608,6 +608,15 @@ function getAuditFilterArray_MediaRevenueResearch() {
     arrayFilters.push(arrayObject);
 
     arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+    arrayObject = {
         token: "StartDate",
         jsCall: null,
         objectName: "dtStartDate",
