@@ -51,7 +51,7 @@ function buildAuditObjectArray()
     for (var x = 0; x < auditName.length; x++)
     {
         var module = auditName[x].replace("audit", "");
-        console.log(module);
+        //console.log(module);
         arrayObject = window[("getAuditObject_" + module)]();
         arrayObject.filters = window[("getAuditFilterArray_" + module)]();
         auditObjectArray.push(arrayObject);
@@ -149,6 +149,67 @@ function getAuditObject_Advertisers() {
 
 function getAuditFilterArray_Advertisers() {
     var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "MediaCode",
+        jsCall: "getXRYMediaCodeList",
+        objectName: "ddlMediaCode",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "AdvertiserName",
+        objectName: "txtAdvertiserName",
+        jsCall: null,
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Industry",
+        jsCall: "getIndustryList",
+        objectName: "ddlIndustry",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "SubIndustry",
+        jsCall: null,
+        objectName: "ddlSubIndustry",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "ParentAdvertiser",
+        jsCall: "getParentAdvertiserList",
+        objectName: "ddlParentAdvertiser",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+    //arrayObject = {
+    //    token: "EndDate",
+    //    jsCall: null,
+    //    objectName: "dtEndDate",
+    //    required: true
+    //}
+    //arrayFilters.push(arrayObject);
+
     return arrayFilters;
 }
 
