@@ -1,6 +1,10 @@
 var auditObjectArray = new Array();
 var auditFilterObjectArray = new Array();
 
+//this array contains the list of actions available for an audit item
+var auditActionsArray = new Array();
+auditActionsArray.push("edit");
+
 var auditName = new Array();
 //advertisers
 auditName.push("auditAdvertisers");
@@ -121,19 +125,34 @@ function getAuditObject_Advertisers() {
      * parentAdvertiserName
      */
 
-    columnsToDisplay.push("parentOwnerID");
-    columnsToDisplay.push("parentOwnerName");
-    columnsToDisplay.push("parentOwnerActive");
-    columnsToDisplay.push("ownerID");
-    columnsToDisplay.push("ownerName");
-    columnsToDisplay.push("ownerAbbreviation");
-    columnsToDisplay.push("productID");
-    columnsToDisplay.push("productActiveDate");
-    columnsToDisplay.push("productDisableDate");
+    columnsToDisplay.push("marketId");
+    columnsToDisplay.push("marketName");
+    columnsToDisplay.push("advertiserId");
+    columnsToDisplay.push("advertiserName");
+    columnsToDisplay.push("industryId");
+    columnsToDisplay.push("industryDescription");
+    columnsToDisplay.push("subIndustryId");
+    columnsToDisplay.push("subIndustryDescription");
+    columnsToDisplay.push("parentAdvertiserId");
+    columnsToDisplay.push("parentAdvertiserName");
+
+    //this column is used to create the edit link
+    //for each result row
+    columnsToDisplay.push({
+        "action":"edit",
+        "mRender": function (data, type, row) {
+            var action = "/advertiser.html?AdvertiserID=";
+            return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.advertiserId + ')\'>Edit</a>';
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    
 
     tempObject =
     {
-        // id: rptParentOwnershipList,
         auditTitle: "Advertisers Audit",
         apiControllerAction: "/api/AdvertiserAudit/GetAdvertiserAuditList",
         apiType: "get",
