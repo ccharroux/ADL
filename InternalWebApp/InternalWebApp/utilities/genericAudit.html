@@ -172,7 +172,7 @@
                         </div>
                         <div class="form-group rptView auditMarketAgencyName">
                             <label for="txtMarketAgencyName" class="dropdown-label rptView auditMarketAgencyName">Market Agency Name </label>
-                            <input type="text" id="txtMarketAgencyName" apiInput="inMarketAge4ncyName" class="dropdown-label rptView auditMarketAgencyName" />
+                            <input type="text" id="txtMarketAgencyName" apiInput="inMarketAgencyName" class="dropdown-label rptView auditMarketAgencyName" />
                         </div>
                         <div class="form-group rptView auditIndustry"><!-- industry -->
                             <label for="ddlIndustry" class="dropdown-select rptView auditIndustry">Industry</label>
@@ -194,23 +194,23 @@
                             <label for="ddlParentAgency" class="dropdown-label rptView auditParentAgency">Parent Agency</label>
                             <select id="ddlParentAgency" apiInput="inParentAgencyId" class="dropdown-select rptView auditParentAgency"></select>
                         </div>
-                        <div class="form-group rptView auditStation">
+                        <!--<div class="form-group rptView auditStation">
                             <label for="ddlStation" class="dropdown-label rptView auditStation">Station</label>
                             <select id="ddlStation" apiInput="inStationId" class="dropdown-select rptView auditStation"></select>
-                        </div>
+                        </div>-->
                         <div class="form-group rptView auditOwner">
                             <label for="ddlOwner" class="dropdown-label rptView auditOwner">Owner</label>
                             <select id="ddlOwner" apiInput="inOwnerId" class="dropdown-select rptView auditOwner"></select>
                         </div>
-                        <div class="form-group rptView auditOwnerGroup">
+                        <!--<div class="form-group rptView auditOwnerGroup">
                             <label for="ddlOwnerGroup" class="dropdown-label rptView auditOwnerGroup">Owner</label>
                             <select id="ddlOwnerGroup" apiInput="inOwnerGroupId" class="dropdown-select rptView auditOwnerGroup"></select>
-                        </div>
+                        </div>-->
                         <div class="form-group rptView auditAccountType">
                             <label for="ddlAccountType" class="dropdown-label rptView auditAccountType">Account Type</label>
-                            <select id="ddlAccountType" apiInput="inOwnerId" class="dropdown-select rptView auditAccountType"></select>
+                            <select id="ddlAccountType" apiInput="inAccountType" class="dropdown-select rptView auditAccountType"></select>
                         </div>
-                        <div class="form-group rptView auditPersonnel">
+                        <!--<div class="form-group rptView auditPersonnel">
                             <div class="form-group" style="display: table-cell;">
                                 <label for="hidPersonnel" class="dropdown-label rptView auditPersonnel">Personnel</label>
                                 <input type="text" id="txtPersonnel" onclick="getPersonnel()" readonly class="dropdown-select rptView auditPersonnel"/>
@@ -218,15 +218,15 @@
                                 <input type="hidden" id="hidPersonnel" apiInput="inPersonnelId" class="dropdown-select rptView auditPersonnel"/>
                             </div>
 
-                        </div>
-                        <div class="form-group rptView auditYear">
+                        </div>-->
+                        <!--<div class="form-group rptView auditYear">
                             <label for="ddlYear" class="dropdown-label rptView auditYear">Year</label>
                             <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView auditYear"></select>
                         </div>
                         <div class="form-group rptView auditPeriod">
                             <label for="ddlPeriod" class="dropdown-label rptView auditPeriod">Period</label>
                             <select id="ddlPeriod" apiInput="inPeriod" class="dropdown-select rptView auditPeriod"></select>
-                        </div>
+                        </div>-->
                         <div class="form-group auditStartDate rptView">
                             <label for="dtStartDate" class="dropdown-label auditStartDate rptView">Start Date</label>
                             <input type="text" id="dtStartDate" class="auditStartDate rptView" style="max-width: 100px;" apiInput="inStartDate">
@@ -359,7 +359,7 @@
 
         // build menu
         buildXRYMenu("Audits");
-        ////buildQuickReports(auditObject.product);
+        buildQuickReports(auditObject.product);
 
         // display filters
         displayFilters(reportFilterArray);
@@ -556,6 +556,46 @@
     }
 
     function getMediaTypeList() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Media Type --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+
+                    });
+
+                    $("#ddlMediaType").html(str);
+                    saveLoadedControlSelection("ddlMediaType");
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function getMediaAdvertiserMediaTypeList() {
 
         $.ajax({
             url: ServicePrefix + '/api/MediaAdvertiser/GetMediaAdvertiserMediaTypeList',
@@ -1186,6 +1226,8 @@
 
         $("#noDataFound").hide();
 
+        console.log(auditObject);
+
         api = auditObject.apiControllerAction;
         apiParameters = new Object();
         apiToken = getLocalStorage("APIToken");
@@ -1391,6 +1433,7 @@
             }
         });
     }
+
     function destroyDataTable()
     {
         if ($.fn.DataTable.isDataTable('#dtResults')) {
@@ -1400,6 +1443,7 @@
         }
 
     }
+
     function buildColumnsArray(dataObj)
     {
         columnsToExport = new Array();
@@ -1486,6 +1530,7 @@
  
         loadResults(dataObj, columns);
     }
+
     function IsInArray(arrayToSearch, valToFind)
     {
         for (var i=0; i < arrayToSearch.length; i++)
@@ -1497,6 +1542,7 @@
         }
         return false;
     }
+
     function loadResults(data, columns) {
         //data is the data from the ajax call
         //columns is the array that was built previously
