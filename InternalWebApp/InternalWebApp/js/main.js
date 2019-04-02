@@ -552,7 +552,7 @@ function buildMainMenu(selectedItem) {
 
     menuItems += '<ul>';
     menuItems += buildGenericReportsLink(selectedItem);
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' role="button" aria-expanded="false">Products<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += productDashboard('mrr');
     //menuItems += '                  <li style="display:block;"><a href="/dashboardmrr.html">MRR</a></li>';
@@ -568,12 +568,18 @@ function buildMainMenu(selectedItem) {
 
     menuItems += '              </ul>';
     menuItems += '        </li>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Personnel") + 'href="/personnellist.html">Personnel</a></li>';
-    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Stations") + ' role="button" aria-expended="false">Station Menu <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Personnel") + '">Personnel <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block"><a href="/personnellist.html">Personnel</a></li>';
+    menuItems += '                  <li style="display:block"><a href="/webnotification.html">Web Notifications</a></li>';
+    menuItems += '              </ul>';
+    menuItems += '        </li>';
+    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Stations") + ' role="button" aria-expended="false">Station Menu<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block"><a href="/stationlist.html">Stations</a></li>';
     menuItems += '                  <li style="display:block"><a href="">MRR/X-Ray Link</a></li>';
     menuItems += '              </ul>';
+    menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Markets") + '">Market Menu<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block"><a href="/marketlist.html" role="button" aria-expanded="false">Markets </a></li>';
@@ -581,7 +587,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/parentmarketlist.html">Parent</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
-    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Ownerships") + '">Ownership Menu <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Ownerships") + '">Ownership Menu<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="/ownershiplist.html" role="button" aria-expanded="false">Ownerships </a>';
     menuItems += '                  <li style="display:block;"><a href="/ownershipgrouplist.html">Groups</a></li>';
