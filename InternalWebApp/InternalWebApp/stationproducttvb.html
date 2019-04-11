@@ -155,15 +155,18 @@
 <script>
 
     var stationId = 0;
+    var isNewProduct = 0;
 
     $(document).ready(function () {
         buildMainMenu("Stations");
         stationId = (getParameterByName("StationID") == null ? 0 : getParameterByName("StationID"));
+        isNewProduct = (getParameterByName("ProductNew") == null ? 0 : getParameterByName("ProductNew"));
         getRepFirmList();
-
+        checkIfInsertOrUpdate();
         setStationLabel();
 
     });
+
 
 
     function setStationLabel() {
@@ -216,6 +219,15 @@
 
             $("#divRepOfficeList").html(str);
 
+            checkIfInsertOrUpdate()
+        }
+    }
+
+    function checkIfInsertOrUpdate(){
+
+        if(isNewProduct > 0) {
+            return;
+        } else {
             getRepFirmListByStation();
             getTVBStationProperties();
         }
@@ -343,7 +355,59 @@
     function updateTVBProduct() {
         bootbox.alert('This functionality is still under development.', function () {
         });
+
+        //check for validation for internal app
+
+        //var repFirmList = [];
+        //var repFirmID = "";
+
+        //$(".repFirmList").each(function(){
+
+        //    if($(this).prop('checked') == true){
+        //        repFirmID = $(this).data("repfirmid");
+        //        repFirmList.push(repFirmID);
+
+        //    }
+        //});
+
+        //var url = ServicePrefix + '/api/TVBStation/UpdateTVBStationPropertes';
+
+        //var settings = {
+        //    dataType: 'json',
+        //    type: 'post',
+        //    contentType: 'application/json',
+        //    data: JSON.stringify({
+        //        "inApiToken": getLocalStorage("APIToken"),
+        //        "inStationId": stationId,
+        //        "inIsTimeSales": $("#chkTimeSales").prop("checked"),
+        //        "inIsNew": isNewProduct,
+        //        "inIsRepFirm": $("#chkRepOfficeParticipant").prop("checked"),
+        //        "inRepFirmList": repFirmList
+        //    }),
+        //    processData: false,
+        //    success: function (data, textStatus, jQxhr) {
+        //        updateTVBProductSuccess(data, textStatus, jQxhr);
+        //    },
+        //    error: function (jQxhr, textStatus, errorThrown) {
+        //        genericAjaxError(jQxhr, textStatus, errorThrown);
+        //    }
+        //};
+
+        //$.ajax(url, settings);
     }
+
+    function updateTVBProductSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            bootbox.alert('Station TVB product update successful.', function () {
+                window.location = "stationproducttvb.html?StationID=" + stationId + "&ProductNew=0";
+
+            });
+        }
+    }
+
+
 
     function goBackToStationPage() {
         window.location = "station.html?stationId=" + stationId;
