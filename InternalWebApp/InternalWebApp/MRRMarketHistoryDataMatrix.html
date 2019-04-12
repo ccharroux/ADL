@@ -67,8 +67,9 @@
         <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
                 <div class="row">
-                    <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Market History Data Matrix</h2>
+                    <div class="col-md-12 text-center fh5co-heading">
+                        <h2>MRR Market History Maintenance </h2>
+                        <h4>Markets that are active for MRR and have Stations active for MRR</h4>
                     </div>
                 </div>
  
@@ -80,10 +81,10 @@
                         <thead>
                             <tr>
                                 <th class="exportColumn">Market</th>
-                                <th class="exportColumn">Active Period</th>
-                                <th class="exportColumn">Released Period</th>
-                                <th class="exportColumn">Reviewed Period</th>
-                                <th class="exportColumn">Revenue Enterd</th>
+                                <th class="exportColumn">Active<br />Period</th>
+                                <th class="exportColumn">Released<br />Period</th>
+                                <th class="exportColumn">Reviewed<br />Period</th>
+                                <th class="exportColumn">Revenue<br />Enterd</th>
                                 <th></th>
                                 <th></th>
                             </tr>
@@ -91,10 +92,10 @@
                         <tfoot>
                             <tr>
                                 <th>Market</th>
-                                <th>Active Period</th>
-                                <th>Released Period</th>
-                                <th>Reviewed Period</th>
-                                <th>Revenue Enterd</th>
+                                <th>Active<br />Period</th>
+                                <th>Released<br />Period</th>
+                                <th>Reviewed<br />Period</th>
+                                <th>Revenue<br />Enterd</th>
                                 <th></th>
                                 <th></th>
                             </tr>
@@ -140,7 +141,9 @@
 <script>
     var exportColumns;
     var reportTitle;
-    $(document).ready(function () {
+
+    $(document).ready(function ()
+    {
 
         reportTitle = "MRR Market History Matrix";
         exportColumns = returnTableColumnsByClass("dt", "exportColumn");
@@ -154,6 +157,7 @@
         setLocalStorage("searchPage", window.location);
 
     });
+
 
     function loadInitalData()
     {
@@ -169,8 +173,14 @@
                 { "data": 'Revenue Entered' },
                 {
                     mRender: function (data, type, row) {
+                        var yearToStart = '2001';
+                        if (!row['Revenue Entered'] == false) {
+                            yearToStart = row['Revenue Entered'];
+                            yearToStart = yearToStart.substring(0, 4);
 
-                        return '<a href="#" onclick="addData(' + row.marketId + ');">Data Update</a>';
+                        }
+
+                        return '<a href="#" onclick="addData(' + row.marketId + ',\'' + row.market + '\',' + yearToStart + ');">Data Update</a>';
                     },
                     "orderable": false,
                     "searchable": false,
@@ -179,7 +189,8 @@
                 {
                 mRender: function (data, type, row) {
  
-                    return '<a href="#" onclick="openData(' + row.marketId + ');">Open for Submission</a>';
+
+                    return '<a href="#" onclick="openData(' + row.marketId + ',\'' + row.market + '\',' + ');">Open for Submission</a>';
                     },
                     "orderable": false,
                     "searchable": false,
@@ -253,49 +264,7 @@
             }
         });
     }
-    //function getMarketList() {
-
-    //    $.ajax({
-    //        url: ServicePrefix + '/api/Market/GetMarketListByProduct',
-    //        dataType: 'json',
-    //        type: 'post',
-    //        contentType: 'application/json',
-    //        data: JSON.stringify({
-    //            "inApiToken": getLocalStorage("APIToken"),
-    //            "inProductId": 'XRY',
-    //            "inActiveOnly ": true
-    //        }),
-    //        processData: false,
-    //        success: function (data, textStatus, jQxhr) {
-
-    //            if (data.response.status != "SUCCESS") {
-    //                MKAErrorMessageRtn(data.response.errorMessage[0]);
-    //            }
-    //            else {
-
-    //                var str = '';
-    //                //console.log(JSON.stringify(data));
-    //                str = '<option value="">-- Select a Market</option>';
-    //                $.each(data.report.rows, function (index) {
-
-    //                    str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
-
-    //                });
-
-    //                $("#ddlMarket").html(str);
-
-    //                loadLastSearch();
-
-    //            }
-
-
-    //        },
-    //        error: function (jqXhr, textStatus, errorThrown) {
-    //            genericAjaxError(jqXhr, textStatus, errorThrown);
-    //        }
-    //    });
-
-    //}
+ 
 
 
 
@@ -329,14 +298,116 @@
 
     }
 
-    function openData(marketId)
+    function openData(marketId, market)
     {
-        alert(marketId);
-        window.location = "MRRMarketHistoryDataMatrix.html";
+        if (isThisProduction() == true)
+        {
+            bootbox.alert("Sorry! This functionality is not allowed in " + environment);
+            return;
+        }
+
+
+        bootbox.confirm('Are you sure you want to open up submissions for market ' + marketId + '-' + market, function (result)
+        {
+
+            if (result)
+            {
+               doOpenData(marketId, market);
+            }
+
+        });
     }
-    function addData(marketId) {
-        alert(marketId);
-        window.location = "MRRMarketHistoryDataMatrix.html";
+    
+    function doOpenData(marketId, market)
+    {
+        //filling out url for ajax call
+        var url = ServicePrefix + '/api/MRR/OpenMRRCurrentMarketForSubmission';
+        var message = "Open for Submission for " + market;
+        clearTimeout(unblockHandle);
+
+        //filling out settings for ajax call
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId 
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                ajaxUpdateSuccess(data, textStatus, jQxhr, message);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown, message);
+            }
+        };
+        //ajax call
+        $.ajax(url, settings);
+
     }
 
+    function addData(marketId, market, yearToStart)
+    {
+        if (isThisProduction() == true) {
+            bootbox.alert("Sorry! This functionality is not allowed in " + environment);
+            return;
+        }
+
+        bootbox.confirm('Are you sure you want to update data for market ' + marketId + '-' + market, function (result)
+        {
+
+            if (result) {
+                doaddData(marketId, yearToStart, market);
+            }
+            
+        });
+    }
+    function doaddData(marketId, yearToStart, market)
+    {
+
+        //filling out url for ajax call
+        var url = ServicePrefix + '/api/MRR/BulkUpdateMRRRevenueMarket';
+        var message = "Data Updated for " + market;
+        clearTimeout(unblockHandle);
+ 
+
+        //filling out settings for ajax call
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId,
+                "inFromYear" : yearToStart
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                ajaxUpdateSuccess(data, textStatus, jQxhr, message);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown, message);
+            }
+        };
+        //ajax call
+        $.ajax(url, settings);
+    }
+
+ 
+    function ajaxUpdateSuccess(data, textStatus, jQxhr, message)
+    {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+            bootbox.alert(message + ' has been successfully been completed.', function () { window.location = 'mrrMarketHistoryDataMatrix.html'; });
+                
+            }   
+    }
+
+    function genericAjaxError(jqXhr, textStatus, errorThrown) {
+        MKAErrorMessageRtn(errorThrown);
+    }
 </script>

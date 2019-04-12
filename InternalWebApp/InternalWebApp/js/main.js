@@ -188,7 +188,7 @@
 
 
 }());
-
+var unblockHandle;
 
 //function processSuccessResult(data, successMessage)
 //{
@@ -230,7 +230,7 @@
 //}
 
 var bLongQuery = false;
-
+var environment = "";
 var gDataTableDefaultRows = 50;
 var navTool = {
     buildNavComponent: function(parentContainer, parentElement, functionToRun, bAllowAllSelection) { 
@@ -314,7 +314,7 @@ $( document ).ready(function()
 	if (bLongQuery == false) {
 	    // Force unblock after 10 seconds
 	    //console.log("force stop of block ui");
-	    setInterval("$.unblockUI();", 10000);
+	    unblockHandle = setInterval("$.unblockUI();", 10000);
 	}
 
     // Set Ajax
@@ -356,7 +356,7 @@ $( document ).ready(function()
 	}
 
 	var loc = window.location.toString().toLocaleLowerCase();
-	var environment = "";
+
 
 	if (loc.indexOf("devmediainternal.millerkaplan.com") > -1)
 	{
@@ -382,6 +382,18 @@ $( document ).ready(function()
 
 });
 
+function isThisProduction() {
+
+    var bRet = true;
+
+    if ((environment.indexOf("DEV") > -1) ||
+       (environment.indexOf("LOCAL") > -1) ||
+       (environment.indexOf("STAGING") > -1)) {
+        bRet = false
+    }
+
+    return bRet;
+}
 function checkTokenTime()
 {
 
