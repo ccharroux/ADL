@@ -111,7 +111,7 @@ reportName.push("rptXRYAccountAndRevenueAssignment");
 
 reportName.push("rptMRRReportMatrix");
 
-
+reportName.push("rptMarketProductStationSummary");
 
 function buildReportArray()
 {
@@ -4281,6 +4281,36 @@ function getReportObject_MRRReportMatrix() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'mrr'
+    }
+
+    return tempObject;
+}
+// Market Product Station Summary
+function getReportFilterArray_MarketProductStationSummary() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    return arrayFilters;
+}
+function getReportObject_MarketProductStationSummary() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("market");
+    columnsToDisplay.push("primary market");
+    columnsToDisplay.push("product");
+    columnsToDisplay.push("active stations");
+ 
+
+    tempObject =
+    {
+        reportTitle: "Market Product Station Summary",
+        apiControllerAction: "/api/MarketReport/GetMarketProductStationSummary",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'market'
     }
 
     return tempObject;
