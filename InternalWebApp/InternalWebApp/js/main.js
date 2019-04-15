@@ -228,7 +228,7 @@ var unblockHandle;
 //        }
 //    }
 //}
-
+var maxHoldEntries = 10;
 var bLongQuery = false;
 var environment = "";
 var gDataTableDefaultRows = 50;
@@ -299,6 +299,9 @@ var navTool = {
 
 $( document ).ready(function() 
 {
+
+
+
     var nonLoggedInPages = new Array();
     nonLoggedInPages.push('login.html');
     nonLoggedInPages.push('splash.html');
@@ -379,9 +382,79 @@ $( document ).ready(function()
 	    $("#fh5co-header").prepend("<div class='container' style='color:white; background:red; padding-top: 3px; font-weight:600;border-radius:15px; text-align: center;'>" + environment + "</div>");
 	}
 
-
+	setTimeout(getLastPage, 2000);
 });
 
+function getLastPage()
+{
+    var lastPage = new Object();
+    
+
+    var bFoundTitle = false;
+
+    lastPage.url = window.location.href;
+
+    $('h2').each(function ()
+    {
+        if (bFoundTitle == false) {
+            lastPage.PageTitle =  $(this).text();
+            bFoundTitle = true;
+        }
+    });
+
+    if (bFoundTitle)
+    {
+
+        var lastPageList = getLocalStorage("latestRequestArray");
+        //console.log(lastPageList);
+
+        if (lastPageList.length > 0)
+        {
+
+            var lastPageArray = JSON.parse(lastPageList);
+            if (duplicateURL(lastPageArray, lastPage.url) == true)
+            {
+                console.log('already in the list');
+                return;
+            }
+
+            if (!lastPageArray.length == false) {
+
+                if (lastPageArray.length >= maxHoldEntries) {
+                    lastPageArray.shift();
+                 }
+
+                lastPageArray.push(lastPage);
+
+                setLocalStorage("latestRequestArray", JSON.stringify(lastPageArray));
+
+                lastPageArray = JSON.parse(getLocalStorage("latestRequestArray"));
+
+            }
+        }
+        else {
+            lastPageArray = new Array();
+            lastPageArray.push(lastPage);
+            setLocalStorage("latestRequestArray", JSON.stringify(lastPageArray));
+            lastPageArray = JSON.parse(getLocalStorage("latestRequestArray"));
+        }
+    }
+
+}
+function duplicateURL(lastPageArray, url)
+{
+    var bRet = false;
+
+    for (var i = 0; i < lastPageArray.length; i++)
+    {
+        if (lastPageArray[i].url == url)
+        {
+            return true;
+        }
+    }
+
+
+}
 function isThisProduction() {
 
     var bRet = true;
@@ -406,7 +479,7 @@ function checkTokenTime()
     var n = d.getTime();
     var timeWithoutAction = parseInt((n / 1000) - (parseInt(getLocalStorage("APITokenTime") / 1000)));
 
-    console.log(timeWithoutAction);
+    //console.log(timeWithoutAction);
 
     if (timeWithoutAction > gTimeToExpire)
     {
@@ -450,8 +523,23 @@ function removeLocalStorage(key)
 
 function logout() {
 
+    var bSaveLinks = false;
+    var lastPageList = getLocalStorage("latestRequestArray");
+ 
+    if (lastPageList.length > 0) {
+        var lastPageArray = JSON.parse(lastPageList);
+        if (!lastPageArray.length == false) {
+            bSaveLinks = true;
+        }
+    }
+
     window.localStorage.clear();
 
+    if (bSaveLinks)
+    {
+        setLocalStorage("latestRequestArray", JSON.stringify(lastPageArray));
+
+    }
     var whereAreYou = window.location.toString();
 
    // var counter = whereAreYou.replace("//", "/").split('/').length - 1;
@@ -731,7 +819,7 @@ function buildTVBMenu(selectedItem) {
     menuItems += '</nav>';
 
     $("#menu").html(menuItems);
-    console.log(menuItems);
+    //console.log(menuItems);
 }
 
 function buildMSSMenu(selectedItem) {
@@ -921,6 +1009,7 @@ function buildTechMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/dashboardtech.html">Tech Tools</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/encryptdecrypt.html">Encryption/Decryption Tool</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/mrrMarketHistoryDataMatrix.html">MRR Market History Maintenance</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/xrayMarketHistoryDataMatrix.html">XRAY Market History Maintenance</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += productDashboard('');

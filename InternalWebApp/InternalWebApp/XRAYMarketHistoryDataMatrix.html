@@ -68,8 +68,8 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-12 text-center fh5co-heading">
-                        <h2>MRR Market History Maintenance </h2>
-                        <h4>Markets that are active for MRR and have Stations active for MRR</h4>
+                        <h2>XRAY Market History Maintenance </h2>
+                        <h4>Markets that are active for XRAY and have Stations active for XRAY</h4>
                     </div>
                 </div>
  
@@ -83,7 +83,6 @@
                                 <th class="exportColumn">Market</th>
                                 <th class="exportColumn">Active<br />Period</th>
                                 <th class="exportColumn">Released<br />Period</th>
-                                <th class="exportColumn">Reviewed<br />Period</th>
                                 <th class="exportColumn">Revenue<br />Entered</th>
                                 <th></th>
                                 <th></th>
@@ -94,7 +93,6 @@
                                 <th>Market</th>
                                 <th>Active<br />Period</th>
                                 <th>Released<br />Period</th>
-                                <th>Reviewed<br />Period</th>
                                 <th>Revenue<br />Entered</th>
                                 <th></th>
                                 <th></th>
@@ -144,8 +142,10 @@
 
     $(document).ready(function ()
     {
+        // longer running queries here...
+        clearTimeout(unblockHandle);
 
-        reportTitle = "MRR Market History Matrix";
+        reportTitle = "XRAY Market History Matrix";
         exportColumns = returnTableColumnsByClass("dt", "exportColumn");
 
         loadInitalData();
@@ -169,7 +169,6 @@
                 { "data": 'market' },
                 { "data": 'Active Period' },
                 { "data": 'Released Period' },
-                { "data": 'Reviewed Period' },
                 { "data": 'Revenue Entered' },
                 {
                     mRender: function (data, type, row) {
@@ -274,7 +273,7 @@
   
 
         //filling out url for ajax
-        var url = ServicePrefix + '/api/MRRReport/GetMRRMarketHistoryDataMatrixList?inApiToken=' + getLocalStorage("APIToken");
+        var url = ServicePrefix + '/api/XRAYReport/GetXRAYMarketHistoryDataMatrixList?inApiToken=' + getLocalStorage("APIToken");
 
 
         //filling out settings for ajax call
@@ -321,7 +320,7 @@
     function doOpenData(marketId, market)
     {
         //filling out url for ajax call
-        var url = ServicePrefix + '/api/MRR/OpenMRRCurrentMarketForSubmission';
+        var url = ServicePrefix + '/api/XRAY/OpenXRAYCurrentMarketForSubmission';
         var message = "Open for Submission for " + market;
         clearTimeout(unblockHandle);
 
@@ -367,9 +366,8 @@
     {
 
         //filling out url for ajax call
-        var url = ServicePrefix + '/api/MRR/BulkUpdateMRRRevenueMarket';
-        var message = "Data Updated for " + market;
-        clearTimeout(unblockHandle);
+        var url = ServicePrefix + '/api/XRAY/BulkUpdateXRAYRevenueMarket';
+        var message = "Data Update request is partially complete for " + market + '. The Ranking process has been added to the queue. You will receive and email when it completes. '
  
 
         //filling out settings for ajax call
@@ -402,7 +400,13 @@
             MKAErrorMessageRtn(data.response.errorMessage[0]);
         }
         else {
-            bootbox.alert(message + ' has been successfully been completed.', function () { window.location = 'mrrMarketHistoryDataMatrix.html'; });
+            var combinedMessage = message;
+            if (message.indexOf('partially') == 0)
+            {
+                combinedMessage = message + ' has been successfully completed.'
+            }
+            
+            bootbox.alert(combinedMessage, function () { window.location = 'xrayMarketHistoryDataMatrix.html'; });
                 
             }   
     }

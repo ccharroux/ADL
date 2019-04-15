@@ -104,6 +104,18 @@
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-12 ">
+                        <div class="form-group rptView rptAsyncJobStatus">
+                            <label for="ddlAsyncJobStatus" class="dropdown-label rptView rptAsyncJobStatus">Async Job<br />Status</label>
+                            <select id="ddlAsyncJobStatus" apiInput="inStatusId" class="dropdown-select rptView rptAsyncJobStatus"></select>
+                        </div>
+                        <div class="form-group rptView rptAsyncJobType">
+                            <label for="ddlAsyncJobType" class="dropdown-label rptView rptAsyncJobType">Async Job<br />Type</label>
+                            <select id="ddlAsyncJobType" apiInput="inJobTypeId" class="dropdown-select rptView rptAsyncJobType"></select>
+                        </div>
+                        <div class="form-group rptView rptAsyncJobDaysBack">
+                            <label for="ddlAsyncJobDaysBack" class="dropdown-label rptView rptAsyncJobDaysBack">Send Date<br />Days Back</label>
+                            <select id="ddlAsyncJobDaysBack" apiInput="inDaysBack" class="dropdown-select rptView rptAsyncJobDaysBack"></select>
+                        </div>
                         <div class="form-group rptView rptProduct" >
                             <label for="ddlProduct" class="dropdown-label rptView rptProduct">Product</label>
                             <select id="ddlProduct" apiInput="inProductId" class="dropdown-select rptView rptProduct"></select>
@@ -185,7 +197,7 @@
 
                     </div>
                 </div>
-
+                <div class="row" style="display:none" id="autoRerun"></div>
                 <!-- start datatable coding-->
 
                 <div class="dataTable-top-margin">
@@ -234,6 +246,7 @@
 </html>
 <script>
 
+    var autoRerunHandle = null;
     var reportObject = new Object();
     var reportFilterArray = new Array();
 
@@ -315,10 +328,31 @@
         {
             $("#btnReport").show();
             loadAdvancedSearch();
+            if (getRequiredFiltersCount() == 0)
+            {
+                getReport();
+            }
+ 
         }
         
     });
 
+    function getRequiredFiltersCount()
+    {
+        var ctr = 0;
+ 
+        $.each(reportFilterArray, function (objectName, objectValue) {
+
+            var isRequired = objectValue.required;
+
+            if (isRequired) {
+                ctr = ctr + 1
+            }
+
+        });
+
+        return ctr;
+    }
     function clearSelection(control) {
         $("#txt" + control).val("");
         $("#hid" + control).val("");
@@ -871,7 +905,6 @@
         });
 
     }
-
     function getOwnerGroupList() {
 
         $.ajax({
@@ -915,6 +948,105 @@
         });
 
     }
+
+    
+    function getAsyncJobTypeList() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/Async/GetAsyncJobTypeList?inApiToken=' + getLocalStorage("APIToken"),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textType, jQxhr) {
+ 
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    var str = '';
+
+                    $("#ddlAsyncJobType").html("<option value=''> -- Select an Type --</option>");
+
+                    
+
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+
+                        str = str + "<option value='" + obj['Job Type Id'] + "'>" + obj.Description + "</option>";
+ 
+                    });
+
+                    $("#ddlAsyncJobType").append(str);
+                    saveLoadedControlSelection("ddlAsyncJobType");
+                }
+
+            },
+            error: function (jqXhr, textType, errorThrown) {
+                genericAjaxError(jqXhr, textType, errorThrown);
+            }
+        });
+
+    }
+    function getAsyncJobStatusList() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/Async/GetAsyncJobStatusList?inApiToken=' + getLocalStorage("APIToken"),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    var str = '';
+
+                    $("#ddlAsyncJobStatus").html("<option value=''> -- Select an Status --</option>");
+
+ 
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = str + "<option value='" + obj['Job Status Id'] + "'>" + obj.status + "</option>";
+
+                    });
+
+                    $("#ddlAsyncJobStatus").append(str);
+                    saveLoadedControlSelection("ddlAsyncJobStatus");
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+    function getAsyncJobDaysBackList()
+    {
+ 
+
+            var str = '';
+
+            $("#ddlAsyncJobDaysBack").html("<option value='0'> -- Select All --</option>");
+
+            str = str + "<option value='-1'>One Day</option>";
+            str = str + "<option value='-7'>One Week</option>";
+            str = str + "<option value='-30'>One Month</option>";
+
+            $("#ddlAsyncJobDaysBack").append(str);
+            saveLoadedControlSelection("ddlAsyncJobDaysBack");
+ 
+
+    }
     //--------------------------------
     // Filters get loaded end here
     //--------------------------------
@@ -949,6 +1081,23 @@
         //------------------------
         var itemsToCheckLength = reportFilterArray.length;
 
+
+
+        // auto rerun???
+        if (!reportObject.autoUpdate == false)
+        {
+            if (reportObject.autoUpdate == true)
+            {
+                if (autoRerunHandle == null)
+                {
+                    autoRerunHandle = setInterval(getReport, autoRerunInterval);
+                    $("#autoRerun").html("<center><font color='green'>NOTE: Report will auto run every " + (autoRerunInterval / 1000) / 60 + " minutes.</font></center>");
+                    $("#autoRerun").show();
+                }
+            }
+        }
+
+
         //-------------------------------
         // This is the no filter use case
         //-------------------------------
@@ -958,20 +1107,28 @@
             return;
         }
 
+        var anyRequiredFilters = false;
+
         $.each(reportFilterArray, function (objectName, objectValue)
         {
             var control = objectValue.objectName;
 
-
+            
             var nameOfParm = $("#" + control).attr("apiInput");
             var item = "#" + control;
             var isRequired = objectValue.required;
+
+            if (isRequired)
+            {
+                anyRequiredFilters = true;
+            }
+
             var val = $(item).val();
-            console.log(control);
+ 
             if (control.toString().toLowerCase().indexOf("chk") > -1)
             {
                 val = $(item).is(':checked');
-                console.log(val);
+ 
  
             }
  
@@ -1001,7 +1158,10 @@
             if (objectName == (itemsToCheckLength - 1)) {
 
                 getTheReportAJAX();
+                
             }
+
+  
 
         });
 

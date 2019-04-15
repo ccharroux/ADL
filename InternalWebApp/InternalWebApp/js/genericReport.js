@@ -1,3 +1,5 @@
+var autoRerunInterval = 120 * 1000; // 
+
 var reportObjectArray = new Array();
 var reportFilterObjectArray = new Array();
 
@@ -112,6 +114,8 @@ reportName.push("rptXRYAccountAndRevenueAssignment");
 reportName.push("rptMRRReportMatrix");
 
 reportName.push("rptMarketProductStationSummary");
+
+reportName.push("rptAsyncJobQueueStatus");
 
 function buildReportArray()
 {
@@ -4311,6 +4315,59 @@ function getReportObject_MarketProductStationSummary() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'market'
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_AsyncJobQueueStatus() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "AsyncJobStatus",
+        objectName: "ddlAsyncJobStatus",
+        jsCall: "getAsyncJobStatusList",
+        required:  false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "AsyncJobType",
+        objectName: "ddlAsyncJobType",
+        jsCall: "getAsyncJobTypeList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "AsyncJobDaysBack",
+        objectName: "ddlAsyncJobDaysBack",
+        jsCall: "getAsyncJobDaysBackList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_AsyncJobQueueStatus() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "Async Queue Status",
+        apiControllerAction: "/api/Async/GetAsyncJobQueueStatusList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'misc',
+        autoUpdate: true
     }
 
     return tempObject;
