@@ -228,6 +228,7 @@ var unblockHandle;
 //        }
 //    }
 //}
+var delayForLastPage = 1 * 1000;
 var maxHoldEntries = 10;
 var bLongQuery = false;
 var environment = "";
@@ -382,7 +383,7 @@ $( document ).ready(function()
 	    $("#fh5co-header").prepend("<div class='container' style='color:white; background:red; padding-top: 3px; font-weight:600;border-radius:15px; text-align: center;'>" + environment + "</div>");
 	}
 
-	setTimeout(getLastPage, 2000);
+	setTimeout(getLastPage, delayForLastPage);
 });
 
 function getLastPage()
