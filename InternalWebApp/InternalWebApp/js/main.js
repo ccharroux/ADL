@@ -1011,6 +1011,7 @@ function buildTechMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/encryptdecrypt.html">Encryption/Decryption Tool</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/mrrMarketHistoryDataMatrix.html">MRR Market History Maintenance</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/xrayMarketHistoryDataMatrix.html">XRAY Market History Maintenance</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/tvbMarketHistoryDataMatrix.html">TVB Market History Maintenance</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += productDashboard('');
