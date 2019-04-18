@@ -314,22 +314,43 @@ function getAuditFilterArray_StationAdvertisers() {
 function getAuditObject_MediaAdvertisers() {
     var tempObject = new Object();
 
+    //market id,
+    //    market name,
+    //    media advertiser id,
+    //    media advertiser name,
+    //    media advertiser code,
+    //    advertiser id,
+    //    market advertiser name,
+    //    media type
+
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("parentOwnerID");
-    columnsToDisplay.push("parentOwnerName");
-    columnsToDisplay.push("parentOwnerActive");
-    columnsToDisplay.push("ownerID");
-    columnsToDisplay.push("ownerName");
-    columnsToDisplay.push("ownerAbbreviation");
-    columnsToDisplay.push("productID");
-    columnsToDisplay.push("productActiveDate");
-    columnsToDisplay.push("productDisableDate");
+    columnsToDisplay.push("marketId");
+    columnsToDisplay.push("marketName");
+    columnsToDisplay.push("mediaAdvertiserId");
+    columnsToDisplay.push("mediaAdvertiserName");
+    columnsToDisplay.push("mediaAdvertiserCode");
+    columnsToDisplay.push("marketAdvertiserId");
+    columnsToDisplay.push("marketAdvertiserName");
+    columnsToDisplay.push("mediaType");
+
+    //this column is used to create the edit link
+    //for each result row
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+            var action = "/mediaadvertiser.html?MediaAdvertiserID=";
+            return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.mediaAdvertiserId + ')\'>Edit</a>';
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
 
     tempObject =
     {
         // id: rptParentOwnershipList,
         auditTitle: "Media Advertisers Audit",
-        apiControllerAction: "/api/ParentOwnershipReport/GetParentOwnershipList",
+        apiControllerAction: "/api/MediaAdvertiserAudit/GetMediaAdvertiserAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'advertisers'
