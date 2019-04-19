@@ -198,6 +198,50 @@ function getAuditFilterArray_Advertisers() {
         token: "Industry",
         jsCall: "getIndustryList",
         objectName: "ddlIndustry",
+        onchange: function() {
+            if ($("#ddlIndustry").val() == "-1") {
+
+                $("#ddlSubIndustry").empty();
+                return;
+            }
+
+            $.ajax({
+                url: ServicePrefix + '/api/SubIndustry/GetSubIndustryList',
+                dataType: 'json',
+                type: 'post',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    "inApiToken": getLocalStorage("APIToken"),
+                    "inIndustryId": $("#ddlIndustry").val()
+                }),
+                processData: false,
+                success: function (data, textStatus, jQxhr) {
+
+                    if (data.response.status != "SUCCESS") {
+                        MKAErrorMessageRtn(data.response.errorMessage[0]);
+                    }
+                    else {
+
+                        var str = '';
+                        str = '<option value="-1">-- Select a Sub Industry --</option>';
+                        $.each(data.report.rows, function (index) {
+
+                            str = str + '<option value="' + data.report.rows[index].subIndustryId + '">' + data.report.rows[index].subIndustryName + '</option>';
+
+                        });
+
+                        $("#ddlSubIndustry").html(str);
+                        saveLoadedControlSelection("ddlSubIndustry");
+
+                    }
+
+
+                },
+                error: function (jqXhr, textStatus, errorThrown) {
+                    genericAjaxError(jqXhr, textStatus, errorThrown);
+                }
+            });
+        },
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -222,88 +266,6 @@ function getAuditFilterArray_Advertisers() {
         token: "MediaType",
         jsCall: "getMediaTypeList",
         objectName: "ddlMediaType",
-        required: false
-    }
-    arrayFilters.push(arrayObject);
-
-    return arrayFilters;
-}
-
-function getAuditObject_StationAdvertisers() {
-    var tempObject = new Object();
-
-    var columnsToDisplay = new Array();
-    columnsToDisplay.push("parentOwnerID");
-    columnsToDisplay.push("parentOwnerName");
-    columnsToDisplay.push("parentOwnerActive");
-    columnsToDisplay.push("ownerID");
-    columnsToDisplay.push("ownerName");
-    columnsToDisplay.push("ownerAbbreviation");
-    columnsToDisplay.push("productID");
-    columnsToDisplay.push("productActiveDate");
-    columnsToDisplay.push("productDisableDate");
-
-    tempObject =
-    {
-        // id: rptParentOwnershipList,
-        auditTitle: "Station Advertisers Audit",
-        apiControllerAction: "/api/ParentOwnershipReport/GetParentOwnershipList",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: 'advertisers'
-    }
-
-    return tempObject;
-}
-
-function getAuditFilterArray_StationAdvertisers() {
-    var arrayFilters = new Array();
-    var arrayObject = new Array();
-
-    arrayObject = {
-        token: "Market",
-        jsCall: "getXRYMarketList",
-        objectName: "ddlMarket",
-        required: true
-    }
-    arrayFilters.push(arrayObject);
-
-    arrayObject = {
-        token: "Owner",
-        jsCall: null,
-        objectName: "ddlOwner",
-        required: false
-    }
-    arrayFilters.push(arrayObject);
-
-    arrayObject = {
-        token: "StationAdvertiserName",
-        jsCall: null,
-        objectName: "txtStationAdvertiserName",
-        required: true
-    }
-    arrayFilters.push(arrayObject);
-
-    arrayObject = {
-        token: "MarketAdvertiserName",
-        jsCall: null,
-        objectName: "txtMarketAdvertiserName",
-        required: true
-    }
-    arrayFilters.push(arrayObject);
-
-    arrayObject = {
-        token: "Industry",
-        jsCall: "getIndustryList",
-        objectName: "ddlIndustry",
-        required: false
-    }
-    arrayFilters.push(arrayObject);
-
-    arrayObject = {
-        token: "SubIndustry",
-        jsCall: null,
-        objectName: "ddlSubIndustry",
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -395,6 +357,198 @@ function getAuditFilterArray_MediaAdvertisers() {
     }
     arrayFilters.push(arrayObject);
 
+
+    return arrayFilters;
+}
+
+function getAuditObject_StationAdvertisers() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("marketId");
+    columnsToDisplay.push("marketName");
+    columnsToDisplay.push("stationId");
+    columnsToDisplay.push("stationName");
+    columnsToDisplay.push("stationAdvertiserId");
+    columnsToDisplay.push("stationAdvertiserName");
+    columnsToDisplay.push("stationCode");
+    columnsToDisplay.push("marketAdvertiserId");
+    columnsToDisplay.push("marketAdvertiserName");
+    columnsToDisplay.push("industryId");
+    columnsToDisplay.push("industryName");
+    columnsToDisplay.push("subIndustryId");
+    columnsToDisplay.push("subIndustryName");
+
+    //this column is used to create the edit link
+    //for each result row
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+            var action = "/stationadvertiser.html?StationAdvertiserID=";
+            return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.stationAdvertiserId + ')\'>Edit</a>';
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject =
+    {
+        // id: rptParentOwnershipList,
+        auditTitle: "Station Advertisers Audit",
+        apiControllerAction: "/api/StationAdvertiserAudit/GetStationAdvertiserAuditList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advertisers'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_StationAdvertisers() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        onchange: function () {
+
+            if ($("#ddlMarket").val() == "") {
+
+                $("#ddlOwner").empty();
+                return;
+            }
+
+            $.ajax({
+                url: ServicePrefix + '/api/Owner/GetOwnerListByProductMarket',
+                dataType: 'json',
+                type: 'post',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    "inApiToken": getLocalStorage("APIToken"),
+                    "inProductId": "XRY",
+                    "inMarketId": $("#ddlMarket").val()
+                }),
+                processData: false,
+                success: function (data, textStatus, jQxhr) {
+
+                    if (data.response.status != "SUCCESS") {
+                        MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                    }
+                    else {
+
+                        var str = '';
+
+                        $("#ddlOwner").html("<option value='-1'> -- Select an Owner --</option>");
+
+                        var holdOwnerID = "0";
+
+                        $.each(data.report.rows, function (index) {
+                            var obj = data.report.rows[index];
+                            str = str + "<option value='" + obj.ownerid + "'>" + obj.ownername + "</option>";
+
+                        });
+
+                        $("#ddlOwner").append(str);
+                        saveLoadedControlSelection("ddlOwner");
+                    }
+
+                },
+                error: function (jqXhr, textStatus, errorThrown) {
+                    genericAjaxError(jqXhr, textStatus, errorThrown);
+                }
+            });
+        },
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: null,
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "StationAdvertiserName",
+        jsCall: null,
+        objectName: "txtStationAdvertiserName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MarketAdvertiserName",
+        jsCall: null,
+        objectName: "txtMarketAdvertiserName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Industry",
+        jsCall: "getIndustryList",
+        objectName: "ddlIndustry",
+        onchange: function() {
+            if ($("#ddlIndustry").val() == "-1") {
+
+                $("#ddlSubIndustry").empty();
+                return;
+            }
+
+            $.ajax({
+                url: ServicePrefix + '/api/SubIndustry/GetSubIndustryList',
+                dataType: 'json',
+                type: 'post',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    "inApiToken": getLocalStorage("APIToken"),
+                    "inIndustryId": $("#ddlIndustry").val()
+                }),
+                processData: false,
+                success: function (data, textStatus, jQxhr) {
+
+                    if (data.response.status != "SUCCESS") {
+                        MKAErrorMessageRtn(data.response.errorMessage[0]);
+                    }
+                    else {
+
+                        var str = '';
+                        str = '<option value="-1">-- Select a Sub Industry --</option>';
+                        $.each(data.report.rows, function (index) {
+
+                            str = str + '<option value="' + data.report.rows[index].subIndustryId + '">' + data.report.rows[index].subIndustryName + '</option>';
+
+                        });
+
+                        $("#ddlSubIndustry").html(str);
+                        saveLoadedControlSelection("ddlSubIndustry");
+
+                    }
+
+
+                },
+                error: function (jqXhr, textStatus, errorThrown) {
+                    genericAjaxError(jqXhr, textStatus, errorThrown);
+                }
+            });
+        },
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "SubIndustry",
+        jsCall: null,
+        objectName: "ddlSubIndustry",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
 
     return arrayFilters;
 }

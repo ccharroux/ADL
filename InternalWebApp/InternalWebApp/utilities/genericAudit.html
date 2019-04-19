@@ -135,7 +135,7 @@
                         </div>
                         <div class="form-group rptView auditMarket">
                             <label for="ddlMarket" class="dropdown-label rptView auditMarket">Market</label>
-                            <select id="ddlMarket" apiInput="inMarketId" onchange="getOwnerListByProductMarket()" class="dropdown-select rptView auditMarket"></select>
+                            <select id="ddlMarket" apiInput="inMarketId" class="dropdown-select rptView auditMarket"></select>
                         </div>
                         <div class="form-group rptView auditMediaCode">
                             <label for="ddlMediaCode" class="dropdown-label rptView auditMediaCode">Media Code</label>
@@ -176,7 +176,7 @@
                         <div class="form-group rptView auditIndustry">
                             <!-- industry -->
                             <label for="ddlIndustry" class="dropdown-select rptView auditIndustry">Industry</label>
-                            <select id="ddlIndustry" apiInput="inIndustryId" class="dropdown-select rptView auditIndustry" onchange="getSubIndustryList()"></select>
+                            <select id="ddlIndustry" apiInput="inIndustryId" class="dropdown-select rptView auditIndustry"></select>
                         </div>
                         <div class="form-group rptView auditSubIndustry">
                             <!-- subindustry -->
@@ -335,8 +335,7 @@
         // get report objects
         auditObject = getAuditObject(reportId);
         reportFilterArray = auditObject.filters;
-
-
+       
         if (auditObject.apiControllerAction == null) {
             var msg = "Invalid report requested. (2)";
 
@@ -363,6 +362,8 @@
 
         // display filters
         displayFilters(reportFilterArray);
+
+        loadOnChangeEvents(reportFilterArray);
 
         // Auto Run
         if (reportFilterArray.length == 0) {
@@ -639,7 +640,7 @@
                 else {
 
                     var str = '';
-                    str = '<option value="">-- Select an Industry --</option>';
+                    str = '<option value="-1">-- Select an Industry --</option>';
                     $.each(data.report.rows, function (index) {
 
                         str = str + '<option value="' + data.report.rows[index].industryId + '">' + data.report.rows[index].industryName + '</option>';
@@ -659,50 +660,54 @@
         });
     }
 
-    function getSubIndustryList() {
+    ////function getSubIndustryList() {
 
-        if ($("#ddlIndustry").val() == "") {
-            $("#ddlSubIndustry").empty();
-            return;
-        }
+    ////    var loadSubIndustryForIndustry = getPropertyObjectByToken("industry");
 
-        $.ajax({
-            url: ServicePrefix + '/api/SubIndustry/GetSubIndustryList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inIndustryId": $("#ddlIndustry").val()
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
+    ////    if (loadSubIndustryForIndustry.loadSubIndustry === false ||
+    ////        $("#ddlIndustry").val() == "-1") {
 
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
+    ////        $("#ddlSubIndustry").empty();
+    ////        return;
+    ////    }
 
-                    var str = '';
-                    str = '<option value="-1">-- Select a Sub Industry --</option>';
-                    $.each(data.report.rows, function (index) {
+    ////    $.ajax({
+    ////        url: ServicePrefix + '/api/SubIndustry/GetSubIndustryList',
+    ////        dataType: 'json',
+    ////        type: 'post',
+    ////        contentType: 'application/json',
+    ////        data: JSON.stringify({
+    ////            "inApiToken": getLocalStorage("APIToken"),
+    ////            "inIndustryId": $("#ddlIndustry").val()
+    ////        }),
+    ////        processData: false,
+    ////        success: function (data, textStatus, jQxhr) {
 
-                        str = str + '<option value="' + data.report.rows[index].subIndustryId + '">' + data.report.rows[index].subIndustryName + '</option>';
+    ////            if (data.response.status != "SUCCESS") {
+    ////                MKAErrorMessageRtn(data.response.errorMessage[0]);
+    ////            }
+    ////            else {
 
-                    });
+    ////                var str = '';
+    ////                str = '<option value="-1">-- Select a Sub Industry --</option>';
+    ////                $.each(data.report.rows, function (index) {
 
-                    $("#ddlSubIndustry").html(str);
-                    saveLoadedControlSelection("ddlSubIndustry");
+    ////                    str = str + '<option value="' + data.report.rows[index].subIndustryId + '">' + data.report.rows[index].subIndustryName + '</option>';
 
-                }
+    ////                });
+
+    ////                $("#ddlSubIndustry").html(str);
+    ////                saveLoadedControlSelection("ddlSubIndustry");
+
+    ////            }
 
 
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
+    ////        },
+    ////        error: function (jqXhr, textStatus, errorThrown) {
+    ////            genericAjaxError(jqXhr, textStatus, errorThrown);
+    ////        }
+    ////    });
+    ////}
 
     function getParentAdvertiserList() {
         $.ajax({
@@ -1099,55 +1104,63 @@
 
     }
 
-    function getOwnerListByProductMarket() {
+    ////function getOwnerListByProductMarket() {
 
-        //need to build another api to get by marketid
-        if ($("#ddlOwner").is(":visible") == false) {
-            return;
-        }
+    ////    //need to build another api to get by marketid
+    ////    //look at using property from reportFilterArray
+    ////    //do the same thing for subindustry on the industry ddl
 
-        $.ajax({
-            url: ServicePrefix + '/api/Owner/GetOwnerListByProductMarket',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inProductId": "XRY",
-                "inMarketId": $("#ddlMarket").val()
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
+    ////    var loadOwnerForMarket = getPropertyObjectByToken("market");
 
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+    ////    if (loadOwnerForMarket.loadOwnerList === false ||
+    ////        $("#ddlMarket").val() == "") {
 
-                }
-                else {
+    ////        $("#ddlOwner").empty();
+    ////        return;
+    ////    }
 
-                    var str = '';
+    ////    $.ajax({
+    ////        url: ServicePrefix + '/api/Owner/GetOwnerListByProductMarket',
+    ////        dataType: 'json',
+    ////        type: 'post',
+    ////        contentType: 'application/json',
+    ////        data: JSON.stringify({
+    ////            "inApiToken": getLocalStorage("APIToken"),
+    ////            "inProductId": "XRY",
+    ////            "inMarketId": $("#ddlMarket").val()
+    ////        }),
+    ////        processData: false,
+    ////        success: function (data, textStatus, jQxhr) {
 
-                    $("#ddlOwner").html("<option value=''> -- Select an Owner --</option>");
+    ////            if (data.response.status != "SUCCESS") {
+    ////                MKAErrorMessageRtn(data.response.errorMessage[0]);
 
-                    var holdOwnerID = "0";
+    ////            }
+    ////            else {
 
-                    $.each(data.report.rows, function (index) {
-                        var obj = data.report.rows[index];
-                        str = str + "<option value='" + obj.ownerid + "'>" + obj.ownername + "</option>";
+    ////                var str = '';
 
-                    });
+    ////                $("#ddlOwner").html("<option value='-1'> -- Select an Owner --</option>");
 
-                    $("#ddlOwner").append(str);
-                    saveLoadedControlSelection("ddlOwner");
-                }
+    ////                var holdOwnerID = "0";
 
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
+    ////                $.each(data.report.rows, function (index) {
+    ////                    var obj = data.report.rows[index];
+    ////                    str = str + "<option value='" + obj.ownerid + "'>" + obj.ownername + "</option>";
 
-    }
+    ////                });
+
+    ////                $("#ddlOwner").append(str);
+    ////                saveLoadedControlSelection("ddlOwner");
+    ////            }
+
+    ////        },
+    ////        error: function (jqXhr, textStatus, errorThrown) {
+    ////            genericAjaxError(jqXhr, textStatus, errorThrown);
+    ////        }
+    ////    });
+
+    ////}
 
     function getOwnerGroupList() {
 
@@ -1511,6 +1524,26 @@
     //this will direct to the proper page and id for editing, etc.
     function loadActionPage(pageLocation, itemId) {
         window.location = pageLocation + itemId;
+    }
+
+    function getPropertyObjectByToken(token) {
+        for (var i = 0; i < reportFilterArray.length - 1; i++) {
+            if (reportFilterArray[i].token.toLowerCase() == token.toLowerCase()) {
+                return reportFilterArray[i];
+            }
+        }
+    }
+
+    function loadOnChangeEvents(reportFilterArray) {
+
+        for (var i = 0; i < reportFilterArray.length - 1; i++) {
+
+            if (reportFilterArray[i].onchange != "undefined") {
+
+                $("#" + reportFilterArray[i].objectName).change(reportFilterArray[i].onchange);
+
+            }
+        }
     }
 
 </script>
