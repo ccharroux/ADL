@@ -245,7 +245,7 @@
 
                     </div>
                     <div class="col-md-12 multi-field-message-area" style="display: none;">
-                        <p class="multi-field-message">** One of the following fields needs to be completed: </p>
+                        <p class="multi-field-message">** At least one of the following fields needs to be completed: </p>
                     </div>
                 </div>
 
@@ -1265,6 +1265,18 @@
             return;
         }
 
+        var hasMultiField = false;
+        var oneMultiFieldCompleted = false;
+
+        for (var i = 0; i < reportFilterArray.length; i++) {
+            var filterObject = reportFilterArray[i];
+
+            if (filterObject.multiFieldOption !== undefined) {
+                hasMultiField = true;
+            }
+        }
+
+
         $.each(reportFilterArray, function (objectName, objectValue) {
             var control = objectValue.objectName;
 
@@ -1272,6 +1284,8 @@
             var nameOfParm = $("#" + control).attr("apiInput");
             var item = "#" + control;
             var isRequired = objectValue.required;
+
+            var isMultiField = objectValue.multiFieldOption !== undefined ? objectValue.multiFieldOption : false;
 
             //if ($(item).prop("tagName") == "SELECT") {
 
@@ -1281,6 +1295,10 @@
                 }
                 else {
                     api = api + "&" + nameOfParm + "=" + $(item).val();
+                }
+
+                if (isMultiField) {
+                    oneMultiFieldCompleted = true;
                 }
 
             }
@@ -1295,6 +1313,13 @@
             // when done with the loop
             // get the report
             if (objectName == (itemsToCheckLength - 1)) {
+
+                if (hasMultiField && oneMultiFieldCompleted == false) {
+                    var msg = "Please complete at least one field with **.";
+                    bootbox.alert(msg, function () { });
+                    return false;
+                }
+
 
                 getTheReportAJAX();
             }
