@@ -222,13 +222,10 @@
         buildDMAMenu("Release");
         buildQuickReports('dma');
 
-
         reportObject = getReportObject();
         reportFilterArray = getReportFilterArray();
         displayFilters(reportFilterArray);
         getYearList();
-        
-
 
         navTool.buildNavComponent("rptParentMarket", "ddlParentMarket", "getReportQuiet", false);
         navTool.buildNavComponent("rptMarket", "ddlMarket", "getReportQuiet", true);
@@ -236,11 +233,41 @@
         navTool.buildNavComponent("rptYear", "ddlYear", "getReportQuiet", false);
         navTool.buildNavComponent("rptPeriod", "ddlPeriod", "getReportQuiet", false);
 
-
         $(".rptMarket").hide();
+
+        setTimeout(canWePreBuildIt, 1000);
+
+
     });
 
+    function canWePreBuildIt()
+    {
+        console.log('trying');
+        var parentMarketId = getParameterByName("ParentMarketID");
+        var period = getParameterByName("Period");
+        var year = getParameterByName("Year");
 
+        var paramCtr = 0;
+
+
+        if ((!parentMarketId == false) && (parentMarketId.length > 0)) {
+            $("#ddlParentMarket").val(parentMarketId);
+            paramCtr++;
+        }
+        if ((!year == false) && (year.length > 0)) {
+            $("#ddlYear").val(year);
+            paramCtr++;
+        }
+        if ((!period == false) && (period.length > 0)) {
+ 
+            $("#ddlPeriod").val(period.toUpperCase());
+            paramCtr++;
+
+            if (paramCtr == 3) {
+                getReport();
+            }
+        }
+    }
 
     //----------------
     // Local Calls
@@ -776,6 +803,7 @@
                 }
                 else {
                     $("#parentMarketHistory").show();
+                    $("#parentMarketHistory").html("");
                     var ignoreCols = 'ParentMarketID,RevenuePeriod,RevenueYear,'
                     var arrIgnoreCols = ignoreCols.split(',');
                     var iRowCtr = 0;
@@ -800,18 +828,73 @@
                         }
 
                         // data starts here
+                        var bHasBeenReviewed = false;
+                        var bHasBeenReleased = false;
+                        var bHasBeenRanked = false;
+                        var revision = '';
+
                         str = str + '<div style="display:table-row">';
-                        $.each(data.report.rows[index], function (key, value) {
-                            if (ignoreCols.includes(key) == false) {
-                                str = str + '<div class="tableCol">';
+                        $.each(data.report.rows[index], function (key, value)
+                        {
+                            if (key.toLowerCase() == "revision") {
+
+                                if (value.toString().length > 0) {
+                                    revision = value;
+                                }
+                            }
+
+                            if (key.toLowerCase() == "review date")
+                            {
+                                if (value.length > 0)
+                                {
+                                    bHasBeenReviewed = true;
+                                }
+                            }
+                            if (key.toLowerCase() == "release date") {
+                                if (value.length > 0) {
+                                    bHasBeenReleased = true;
+                                }
+                            }
+                            if (key.toLowerCase() == "rank date") {
+                                if (value.length > 0) {
+                                    bHasBeenRanked = true;
+                                }
+                            }
+                            if (ignoreCols.includes(key) == false)
+                            {
+                                str = str + '<div class="tableCol" id="fld' + key.replace(' ', '') + revision + '">';
                                 str = str + value;
                                 str = str + '</div>';
                             }
                         });
                         str = str + '</div>';
+                        $("#parentMarketHistory").append(str);
+                        str = "";
+
+                        // The row is complete...
+                        // What can we do???
+                        if (bHasBeenRanked == false) {
+
+                            var msg = '<input type="button" id="btnRank"    value="Rank" onclick="rankIt(\'' + revision + '\')" \>';
+                            $("#fldRankDate" + revision.toString()).html(msg);
+
+                        }
+                        else if (bHasBeenRanked == true && bHasBeenReviewed == false) {
+ 
+                            var msg = '<input type="button" id="btnReview"   value="Review" onclick="reviewIt(\'' + revision + '\')" \>';
+                            $("#fldReviewDate" + revision.toString()).html(msg);
+                        }
+                        else if (bHasBeenRanked == true && bHasBeenReviewed == true && bHasBeenReleased == false) {
+                            var msg = '<input type="button" id="btnRelease"  value="Release" onclick="releaseIt(\'' + revision + '\')" \>';
+                            $("#fldReleaseDate" + revision.toString()).html(msg);
+                        }
+
+
+
+
                     });
 
-                    $("#parentMarketHistory").html(str);
+
 
                 }
 
@@ -829,6 +912,68 @@
             searchTable.destroy();
             $('#dtResults').hide();
         }
+
+    }
+
+    function rankIt(revision) {
+        updateParentMarketHistory("rank");
+
+    }
+
+    function releaseIt(revision) {
+        updateParentMarketHistory("release");
+
+    }
+
+    function reviewIt(revision)
+    {
+ 
+        updateParentMarketHistory("review");
+    }
+
+    function updateParentMarketHistory(inTypeOfUpdate)
+    {
+        //if (validationPassed() === false) {
+        //    return;
+        //}
+
+        $.ajax({
+            url: ServicePrefix + '/api/ParentMarketHistory/UpdateParentMarketHistory',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inParentMarketId": $("#ddlParentMarket").val(),
+                "inRevenuePeriod": $("#ddlPeriod").val(),
+                "inRevenueYear": $("#ddlYear").val(),
+                "inTypeOfUpdate": inTypeOfUpdate,
+                "inDescription": 'Testing This...?'
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var obj = data.report.rows[0];
+                    //if new load new parent market id
+                    bootbox.alert("Your request to " + inTypeOfUpdate + ' data has completed!', function () { //reload the page
+
+                        window.location.href = "releasedma.html?ParentMarketID=" + $("#ddlParentMarket").val() + "&Period=" + $("#ddlPeriod").val() + "&Year=" + $("#ddlYear").val();
+
+                    });
+                   
+
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
 
     }
 </script>
