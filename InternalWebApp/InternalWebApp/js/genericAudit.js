@@ -561,21 +561,33 @@ function getAuditObject_Agencies() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("parentOwnerID");
-    columnsToDisplay.push("parentOwnerName");
-    columnsToDisplay.push("parentOwnerActive");
-    columnsToDisplay.push("ownerID");
-    columnsToDisplay.push("ownerName");
-    columnsToDisplay.push("ownerAbbreviation");
-    columnsToDisplay.push("productID");
-    columnsToDisplay.push("productActiveDate");
-    columnsToDisplay.push("productDisableDate");
+    columnsToDisplay.push("marketId");
+    columnsToDisplay.push("marketName");
+    columnsToDisplay.push("agencyId");
+    columnsToDisplay.push("agencyName");
+    columnsToDisplay.push("parentAgencyId");
+    columnsToDisplay.push("parentAgencyName");
+    columnsToDisplay.push("accountTypeId");
+    columnsToDisplay.push("accountTypeName");
+    
+    //this column is used to create the edit link
+    //for each result row
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+            var action = "/agency.html?AgencyID=";
+            return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.agencyId + ')\'>Edit</a>';
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
 
     tempObject =
     {
         // id: rptParentOwnershipList,
         auditTitle: "Agencies Audit",
-        apiControllerAction: "/api/ParentOwnershipReport/GetParentOwnershipList",
+        apiControllerAction: "/api/AgencyAudit/GetAgencyAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'agencies'
@@ -608,7 +620,7 @@ function getAuditFilterArray_Agencies() {
         token: "MediaType",
         jsCall: "getMediaTypeList",
         objectName: "ddlMediaType",
-        required: false
+        required: true
     }
     arrayFilters.push(arrayObject);
 
