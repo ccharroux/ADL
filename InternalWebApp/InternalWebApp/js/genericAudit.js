@@ -337,7 +337,8 @@ function getAuditFilterArray_MediaAdvertisers() {
         token: "MediaAdvertiserName",
         jsCall: null,
         objectName: "txtMediaAdvertiserName",
-        required: true
+        required: false,
+        multiFieldOption: true
     }
     arrayFilters.push(arrayObject);
 
@@ -345,7 +346,8 @@ function getAuditFilterArray_MediaAdvertisers() {
         token: "MarketAdvertiserName",
         jsCall: null,
         objectName: "txtMarketAdvertiserName",
-        required: true
+        required: false,
+        multiFieldOption: true
     }
     arrayFilters.push(arrayObject);
 
@@ -478,7 +480,7 @@ function getAuditFilterArray_StationAdvertisers() {
         token: "StationAdvertiserName",
         jsCall: null,
         objectName: "txtStationAdvertiserName",
-        required: true
+        required: false
     }
     arrayFilters.push(arrayObject);
 
@@ -486,7 +488,7 @@ function getAuditFilterArray_StationAdvertisers() {
         token: "MarketAdvertiserName",
         jsCall: null,
         objectName: "txtMarketAdvertiserName",
-        required: true
+        required: false
     }
     arrayFilters.push(arrayObject);
 
