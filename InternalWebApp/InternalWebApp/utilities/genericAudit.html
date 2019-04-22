@@ -244,9 +244,9 @@
                         </div>
 
                     </div>
-                    <!--<div class="col-md-12">
-                        <p>This requires either of the following fields to be completed: </p>
-                    </div>-->
+                    <div class="col-md-12 multi-field-message-area" style="display: none;">
+                        <p class="multi-field-message">** One of the following fields needs to be completed: </p>
+                    </div>
                 </div>
 
                 <!-- start datatable coding-->
@@ -466,11 +466,25 @@
         for (var i = 0; i < arrayFilters.length; i++) {
 
             activateFilter(arrayFilters[i]);
+            var input = $("#" + arrayFilters[i].objectName);
+
             if (arrayFilters[i].required == true) {
 
-                var input = $("#" + arrayFilters[i].objectName);
+                //var input = $("#" + arrayFilters[i].objectName);
                 $("label[for=" + input.attr("id") + "]").css("color", "red");
                 $("label[for=" + input.attr("id") + "]").prepend(" * ");
+
+            }
+
+            if (arrayFilters[i].multiFieldOption !== "undefined" && arrayFilters[i].multiFieldOption == true) {
+                $("label[for=" + input.attr("id") + "]").prepend(" ** ");
+
+                if ($(".multi-field-message-area").is(":visible")) {
+                    $(".multi-field-message").append(" or " + $("label[for=" + input.attr("id") + "]").text().replace(/\*/g, ''));
+                } else {
+                    $(".multi-field-message").append(" " + $("label[for=" + input.attr("id") + "]").text().replace(/\*/g, ''));
+                    $(".multi-field-message-area").show();
+                }
 
             }
         }

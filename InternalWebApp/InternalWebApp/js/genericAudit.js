@@ -480,7 +480,8 @@ function getAuditFilterArray_StationAdvertisers() {
         token: "StationAdvertiserName",
         jsCall: null,
         objectName: "txtStationAdvertiserName",
-        required: false
+        required: false,
+        multiFieldOption: true
     }
     arrayFilters.push(arrayObject);
 
@@ -488,7 +489,8 @@ function getAuditFilterArray_StationAdvertisers() {
         token: "MarketAdvertiserName",
         jsCall: null,
         objectName: "txtMarketAdvertiserName",
-        required: false
+        required: false,
+        multiFieldOption: true
     }
     arrayFilters.push(arrayObject);
 
