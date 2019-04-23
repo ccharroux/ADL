@@ -639,21 +639,35 @@ function getAuditObject_StationAgencies() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("parentOwnerID");
-    columnsToDisplay.push("parentOwnerName");
-    columnsToDisplay.push("parentOwnerActive");
-    columnsToDisplay.push("ownerID");
-    columnsToDisplay.push("ownerName");
-    columnsToDisplay.push("ownerAbbreviation");
-    columnsToDisplay.push("productID");
-    columnsToDisplay.push("productActiveDate");
-    columnsToDisplay.push("productDisableDate");
+    columnsToDisplay.push("marketId");
+    columnsToDisplay.push("marketName");
+    columnsToDisplay.push("stationId");
+    columnsToDisplay.push("stationName");
+    columnsToDisplay.push("stationAgencyId");
+    columnsToDisplay.push("stationAgencyName");
+    columnsToDisplay.push("stationAgencyCode");
+    columnsToDisplay.push("marketAgencyId");
+    columnsToDisplay.push("marketAgencyName");
+    columnsToDisplay.push("accountTypeId");
+    columnsToDisplay.push("accountTypeName");
+    //this column is used to create the edit link
+    //for each result row
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+            var action = "/stationagency.html?StationAgencyID=";
+            return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.stationAgencyId + ')\'>Edit</a>';
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
 
     tempObject =
     {
         // id: rptParentOwnershipList,
         auditTitle: "Station Agencies Audit",
-        apiControllerAction: "/api/ParentOwnershipReport/GetParentOwnershipList",
+        apiControllerAction: "/api/StationAgencyAudit/GetStationAgencyAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'agencies'
@@ -670,6 +684,55 @@ function getAuditFilterArray_StationAgencies() {
         token: "Market",
         jsCall: "getXRYMarketList",
         objectName: "ddlMarket",
+        onchange: function () {
+
+            if ($("#ddlMarket").val() == "") {
+
+                $("#ddlOwner").empty();
+                return;
+            }
+
+            $.ajax({
+                url: ServicePrefix + '/api/Owner/GetOwnerListByProductMarket',
+                dataType: 'json',
+                type: 'post',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    "inApiToken": getLocalStorage("APIToken"),
+                    "inProductId": "XRY",
+                    "inMarketId": $("#ddlMarket").val()
+                }),
+                processData: false,
+                success: function (data, textStatus, jQxhr) {
+
+                    if (data.response.status != "SUCCESS") {
+                        MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                    }
+                    else {
+
+                        var str = '';
+
+                        $("#ddlOwner").html("<option value='-1'> -- Select an Owner --</option>");
+
+                        var holdOwnerID = "0";
+
+                        $.each(data.report.rows, function (index) {
+                            var obj = data.report.rows[index];
+                            str = str + "<option value='" + obj.ownerid + "'>" + obj.ownername + "</option>";
+
+                        });
+
+                        $("#ddlOwner").append(str);
+                        saveLoadedControlSelection("ddlOwner");
+                    }
+
+                },
+                error: function (jqXhr, textStatus, errorThrown) {
+                    genericAjaxError(jqXhr, textStatus, errorThrown);
+                }
+            });
+        },
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -678,7 +741,8 @@ function getAuditFilterArray_StationAgencies() {
         token: "StationAgencyName",
         jsCall: null,
         objectName: "txtStationAgencyName",
-        required: true
+        required: false,
+        multiFieldOption: true
     }
     arrayFilters.push(arrayObject);
 
@@ -686,7 +750,8 @@ function getAuditFilterArray_StationAgencies() {
         token: "MarketAgencyName",
         jsCall: null,
         objectName: "txtMarketAgencyName",
-        required: true
+        required: false,
+        multiFieldOption: true
     }
     arrayFilters.push(arrayObject);
 
@@ -701,7 +766,7 @@ function getAuditFilterArray_StationAgencies() {
     arrayObject = {
         token: "AccountType",
         jsCall: "getAccountTypeList",
-        objectName: "ddlAcountType",
+        objectName: "ddlAccountType",
         required: false
     }
     arrayFilters.push(arrayObject);
