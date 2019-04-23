@@ -70,6 +70,7 @@
             font-weight:400;
             font-size: 14px;
             color:black;
+            max-width:240px!important;
         }
         .tableCol
         {
@@ -80,6 +81,7 @@
             font-weight: 400;
             font-size: 14px;
             color:#7f7f7f;
+            max-width:240px!important;
         }
         .rptView
         {
@@ -171,7 +173,19 @@
         </div>
  
     </div>
-
+    <div id="dialog-1"
+         title="">
+         <div style="margin-top:5px;margin-bottom:5px" id="areYouSure">Are you sure you want to...</div>
+        <center>
+            <textArea id="comments" placeholder="Enter comments here..."></textArea><hr />
+            <div style="margin-top:5px;margin-bottom:5px">
+                <input type="button" id="btnProcess" value="Process" onclick="updateParentMarketHistory()" \>
+            </div>
+            <div style="margin-top:5px;margin-bottom:5px">
+                <input type="button" id="btnCancel" value="Cancel" onclick="cancelIt()" \>
+            </div>
+        </center>
+    </div>
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
     <!-- jQuery Easing -->
@@ -205,6 +219,7 @@
 </html>
 <script>
 
+    var action = '';
     var reportObject = new Object();
     var reportFilterArray = new Object();
 
@@ -218,7 +233,11 @@
     var columnsToDisplay = new Array();
     var columnsToExport = new Array();
 
-    $(document).ready(function () {        
+    $(document).ready(function ()
+    {
+
+        buildDialog();
+
         buildDMAMenu("Release");
         buildQuickReports('dma');
 
@@ -239,7 +258,18 @@
 
 
     });
-
+    function buildDialog()
+    {
+        $(function () {
+            $("#dialog-1").dialog({
+                autoOpen: false,
+                resizable: false,
+                width: 600,
+                height: 300,
+                modal: true
+            });
+        });
+    }
     function canWePreBuildIt()
     {
         console.log('trying');
@@ -832,6 +862,7 @@
                         var bHasBeenReleased = false;
                         var bHasBeenRanked = false;
                         var revision = '';
+                        var comment = '';
 
                         str = str + '<div style="display:table-row">';
                         $.each(data.report.rows[index], function (key, value)
@@ -840,6 +871,13 @@
 
                                 if (value.toString().length > 0) {
                                     revision = value;
+                                }
+                            }
+
+                            if (key.toLowerCase() == "description") {
+
+                                if (value.toString().length > 0) {
+                                    comment = value;
                                 }
                             }
 
@@ -875,17 +913,17 @@
                         // What can we do???
                         if (bHasBeenRanked == false) {
 
-                            var msg = '<input type="button" id="btnRank"    value="Rank" onclick="rankIt(\'' + revision + '\')" \>';
+                            var msg = '<input type="button" id="btnRank"    value="Rank" onclick="rankIt(\'' + revision + '\', \'' + comment + '\')" \>';
                             $("#fldRankDate" + revision.toString()).html(msg);
 
                         }
                         else if (bHasBeenRanked == true && bHasBeenReviewed == false) {
  
-                            var msg = '<input type="button" id="btnReview"   value="Review" onclick="reviewIt(\'' + revision + '\')" \>';
+                            var msg = '<input type="button" id="btnReview"   value="Review" onclick="reviewIt(\'' + revision + '\', \'' + comment + '\')" \>';
                             $("#fldReviewDate" + revision.toString()).html(msg);
                         }
                         else if (bHasBeenRanked == true && bHasBeenReviewed == true && bHasBeenReleased == false) {
-                            var msg = '<input type="button" id="btnRelease"  value="Release" onclick="releaseIt(\'' + revision + '\')" \>';
+                            var msg = '<input type="button" id="btnRelease"  value="Release" onclick="releaseIt(\'' + revision + '\', \'' + comment + '\')" \>';
                             $("#fldReleaseDate" + revision.toString()).html(msg);
                         }
 
@@ -915,24 +953,41 @@
 
     }
 
-    function rankIt(revision) {
-        updateParentMarketHistory("rank");
+    function rankIt(revision, comment) {
+        action = "rank";
+        $("#areYouSure").html("Are you sure you want to proceed with the Rank process?");
+        $("#dialog-1").dialog({ title: 'Rank' });
+        $("#comments").text(comment)
+        $("#dialog-1").dialog("open");
 
     }
 
-    function releaseIt(revision) {
-        updateParentMarketHistory("release");
+    function releaseIt(revision, comment) {
+        action = "release";
+        $("#areYouSure").html("Are you sure you want to proceed with the Release process?");
+        $("#dialog-1").dialog({ title: 'Release' });
+        $("#comments").text(comment)
+        $("#dialog-1").dialog("open");
 
     }
 
-    function reviewIt(revision)
+    function reviewIt(revision, comment)
     {
- 
-        updateParentMarketHistory("review");
-    }
+        action = "review";
+        $("#areYouSure").html("Are you sure you want to proceed with the Review process?");
+        $("#dialog-1").dialog({ title: 'Review' });
+        $("#comments").text(comment)
+        $("#dialog-1").dialog("open");
+     }
 
-    function updateParentMarketHistory(inTypeOfUpdate)
+    function cancelIt()
     {
+        $("#dialog-1").dialog("close");
+    }
+    function updateParentMarketHistory()
+    {
+        var inTypeOfUpdate = action;
+
         //if (validationPassed() === false) {
         //    return;
         //}
@@ -948,7 +1003,7 @@
                 "inRevenuePeriod": $("#ddlPeriod").val(),
                 "inRevenueYear": $("#ddlYear").val(),
                 "inTypeOfUpdate": inTypeOfUpdate,
-                "inDescription": 'Testing This...?'
+                "inDescription": $("#comments").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -961,7 +1016,7 @@
                     var obj = data.report.rows[0];
                     //if new load new parent market id
                     bootbox.alert("Your request to " + inTypeOfUpdate + ' data has completed!', function () { //reload the page
-
+ 
                         window.location.href = "releasedma.html?ParentMarketID=" + $("#ddlParentMarket").val() + "&Period=" + $("#ddlPeriod").val() + "&Year=" + $("#ddlYear").val();
 
                     });
