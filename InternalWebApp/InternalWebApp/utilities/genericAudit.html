@@ -252,7 +252,14 @@
                 <!-- start datatable coding-->
 
                 <div class="dataTable-top-margin">
-                    <table id="dtResults" class="stripe"></table>
+                    <table id="dtResults" class="stripe">
+                        <tfoot class="adv-rev-research-footer" style="display: none;">
+                        <tr>
+                            <th colspan="8" style="">&nbsp;</th>
+                            <th colspan="4" style="">&nbsp;</th>
+                        </tr>
+                        </tfoot>
+                    </table>
                     <div id="noDataFound" style="display:none; color: red">No data found</div>
                 </div>
 
@@ -281,8 +288,9 @@
     <script src="/js/main.js"></script>
     <!-- genericReport JS -->
     <script src="/js/genericAudit.js"></script>
+    
 
-    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
@@ -311,6 +319,8 @@
 
     var startDate = "";
     var endDate = "";
+
+    var tableFooterCallback = new Object();
 
     $(document).ready(function () {
 
@@ -346,6 +356,14 @@
 
             return false;
         }
+
+        if (auditObject.footerCallback !== undefined) {
+            tableFooterCallback = auditObject.footerCallback;
+        } else {
+            tableFooterCallback = function(){}
+        }
+
+        //console.log(tableFooterCallback);
 
         // report title
         //console.log(auditObject);
@@ -676,55 +694,6 @@
             }
         });
     }
-
-    ////function getSubIndustryList() {
-
-    ////    var loadSubIndustryForIndustry = getPropertyObjectByToken("industry");
-
-    ////    if (loadSubIndustryForIndustry.loadSubIndustry === false ||
-    ////        $("#ddlIndustry").val() == "-1") {
-
-    ////        $("#ddlSubIndustry").empty();
-    ////        return;
-    ////    }
-
-    ////    $.ajax({
-    ////        url: ServicePrefix + '/api/SubIndustry/GetSubIndustryList',
-    ////        dataType: 'json',
-    ////        type: 'post',
-    ////        contentType: 'application/json',
-    ////        data: JSON.stringify({
-    ////            "inApiToken": getLocalStorage("APIToken"),
-    ////            "inIndustryId": $("#ddlIndustry").val()
-    ////        }),
-    ////        processData: false,
-    ////        success: function (data, textStatus, jQxhr) {
-
-    ////            if (data.response.status != "SUCCESS") {
-    ////                MKAErrorMessageRtn(data.response.errorMessage[0]);
-    ////            }
-    ////            else {
-
-    ////                var str = '';
-    ////                str = '<option value="-1">-- Select a Sub Industry --</option>';
-    ////                $.each(data.report.rows, function (index) {
-
-    ////                    str = str + '<option value="' + data.report.rows[index].subIndustryId + '">' + data.report.rows[index].subIndustryName + '</option>';
-
-    ////                });
-
-    ////                $("#ddlSubIndustry").html(str);
-    ////                saveLoadedControlSelection("ddlSubIndustry");
-
-    ////            }
-
-
-    ////        },
-    ////        error: function (jqXhr, textStatus, errorThrown) {
-    ////            genericAjaxError(jqXhr, textStatus, errorThrown);
-    ////        }
-    ////    });
-    ////}
 
     function getParentAdvertiserList() {
         $.ajax({
@@ -1121,64 +1090,6 @@
 
     }
 
-    ////function getOwnerListByProductMarket() {
-
-    ////    //need to build another api to get by marketid
-    ////    //look at using property from reportFilterArray
-    ////    //do the same thing for subindustry on the industry ddl
-
-    ////    var loadOwnerForMarket = getPropertyObjectByToken("market");
-
-    ////    if (loadOwnerForMarket.loadOwnerList === false ||
-    ////        $("#ddlMarket").val() == "") {
-
-    ////        $("#ddlOwner").empty();
-    ////        return;
-    ////    }
-
-    ////    $.ajax({
-    ////        url: ServicePrefix + '/api/Owner/GetOwnerListByProductMarket',
-    ////        dataType: 'json',
-    ////        type: 'post',
-    ////        contentType: 'application/json',
-    ////        data: JSON.stringify({
-    ////            "inApiToken": getLocalStorage("APIToken"),
-    ////            "inProductId": "XRY",
-    ////            "inMarketId": $("#ddlMarket").val()
-    ////        }),
-    ////        processData: false,
-    ////        success: function (data, textStatus, jQxhr) {
-
-    ////            if (data.response.status != "SUCCESS") {
-    ////                MKAErrorMessageRtn(data.response.errorMessage[0]);
-
-    ////            }
-    ////            else {
-
-    ////                var str = '';
-
-    ////                $("#ddlOwner").html("<option value='-1'> -- Select an Owner --</option>");
-
-    ////                var holdOwnerID = "0";
-
-    ////                $.each(data.report.rows, function (index) {
-    ////                    var obj = data.report.rows[index];
-    ////                    str = str + "<option value='" + obj.ownerid + "'>" + obj.ownername + "</option>";
-
-    ////                });
-
-    ////                $("#ddlOwner").append(str);
-    ////                saveLoadedControlSelection("ddlOwner");
-    ////            }
-
-    ////        },
-    ////        error: function (jqXhr, textStatus, errorThrown) {
-    ////            genericAjaxError(jqXhr, textStatus, errorThrown);
-    ////        }
-    ////    });
-
-    ////}
-
     function getOwnerGroupList() {
 
         $.ajax({
@@ -1531,7 +1442,8 @@
 
                    }
                }
-            ]
+            ],
+            "footerCallback": tableFooterCallback
         });
 
     }

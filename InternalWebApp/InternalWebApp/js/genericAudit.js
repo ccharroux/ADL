@@ -778,24 +778,60 @@ function getAuditObject_AdvertisersRevenueResearch() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("parentOwnerID");
-    columnsToDisplay.push("parentOwnerName");
-    columnsToDisplay.push("parentOwnerActive");
-    columnsToDisplay.push("ownerID");
-    columnsToDisplay.push("ownerName");
-    columnsToDisplay.push("ownerAbbreviation");
-    columnsToDisplay.push("productID");
-    columnsToDisplay.push("productActiveDate");
-    columnsToDisplay.push("productDisableDate");
+    columnsToDisplay.push("marketId");
+    columnsToDisplay.push("marketName");
+    columnsToDisplay.push("advertiserId");
+    columnsToDisplay.push("advertiserName");
+    columnsToDisplay.push("stationName");
+    columnsToDisplay.push("period");
+    columnsToDisplay.push("revenue");
+    columnsToDisplay.push("agencyId");
+    columnsToDisplay.push("agencyName");
+    columnsToDisplay.push("accountTypeName");
+    columnsToDisplay.push("postedBy");
+    columnsToDisplay.push("datePosted");
 
     tempObject =
     {
         // id: rptParentOwnershipList,
         auditTitle: "Advertiser Revenue Research",
-        apiControllerAction: "/api/ParentOwnershipReport/GetParentOwnershipList",
+        apiControllerAction: "/api/AdvertiserAudit/GetAdvertiserRevenueResearch",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'revresearch'
+        product: 'revresearch',
+        footerCallback: function(row, data, start, end, display) {
+            $(".adv-rev-research-footer").show();
+            var api = this.api(), data;
+
+            // Remove the formatting to get integer data for summation
+            var intVal = function (i) {
+                return typeof i === 'string' ?
+                    i.replace(/[\$,]/g, '') * 1 :
+                    typeof i === 'number' ?
+                    i : 0;
+            };
+
+            // Total over all pages
+            var total = api
+                .column(6)
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+
+            // Total over this page
+            var pageTotal = api
+                .column(6, { page: 'current' })
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+
+            // Update footer
+            $(api.column(6).footer()).html(
+                '$' + pageTotal + ' ( $' + total + ' total)'
+            );
+        }
     }
 
     return tempObject;
@@ -809,6 +845,55 @@ function getAuditFilterArray_AdvertisersRevenueResearch() {
         token: "Market",
         jsCall: "getXRYMarketList",
         objectName: "ddlMarket",
+        onchange: function () {
+
+            if ($("#ddlMarket").val() == "") {
+
+                $("#ddlOwner").empty();
+                return;
+            }
+
+            $.ajax({
+                url: ServicePrefix + '/api/Owner/GetOwnerListByProductMarket',
+                dataType: 'json',
+                type: 'post',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    "inApiToken": getLocalStorage("APIToken"),
+                    "inProductId": "XRY",
+                    "inMarketId": $("#ddlMarket").val()
+                }),
+                processData: false,
+                success: function (data, textStatus, jQxhr) {
+
+                    if (data.response.status != "SUCCESS") {
+                        MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                    }
+                    else {
+
+                        var str = '';
+
+                        $("#ddlOwner").html("<option value='-1'> -- Select an Owner --</option>");
+
+                        var holdOwnerID = "0";
+
+                        $.each(data.report.rows, function (index) {
+                            var obj = data.report.rows[index];
+                            str = str + "<option value='" + obj.ownerid + "'>" + obj.ownername + "</option>";
+
+                        });
+
+                        $("#ddlOwner").append(str);
+                        saveLoadedControlSelection("ddlOwner");
+                    }
+
+                },
+                error: function (jqXhr, textStatus, errorThrown) {
+                    genericAjaxError(jqXhr, textStatus, errorThrown);
+                }
+            });
+        },
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -817,7 +902,8 @@ function getAuditFilterArray_AdvertisersRevenueResearch() {
         token: "AdvertiserName",
         objectName: "txtAdvertiserName",
         jsCall: null,
-        required: true
+        required: false,
+        multiFieldOption: true
     }
     arrayFilters.push(arrayObject);
 
@@ -825,7 +911,8 @@ function getAuditFilterArray_AdvertisersRevenueResearch() {
         token: "AgencyName",
         jsCall: null,
         objectName: "txtAgencyName",
-        required: true
+        required: false,
+        multiFieldOption: true
     }
     arrayFilters.push(arrayObject);
 
