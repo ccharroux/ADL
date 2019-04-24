@@ -830,7 +830,15 @@ function getAuditObject_AdvertisersRevenueResearch() {
 
             // Update footer
             $(api.column(6).footer()).html(
-                '$' + pageTotal + ' ( $' + total + ' total)'
+                pageTotal.toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0
+                }) + ' ( ' + total.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 0
+                }) + ' total)'
             );
         }
     }
