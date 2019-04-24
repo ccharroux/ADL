@@ -800,6 +800,7 @@ function getAuditObject_AdvertisersRevenueResearch() {
         columnsToDisplay: columnsToDisplay,
         product: 'revresearch',
         footerCallback: function(row, data, start, end, display) {
+
             $(".adv-rev-research-footer").show();
             var api = this.api(), data;
 
