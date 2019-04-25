@@ -957,24 +957,66 @@ function getAuditObject_MediaRevenueResearch() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("parentOwnerID");
-    columnsToDisplay.push("parentOwnerName");
-    columnsToDisplay.push("parentOwnerActive");
-    columnsToDisplay.push("ownerID");
-    columnsToDisplay.push("ownerName");
-    columnsToDisplay.push("ownerAbbreviation");
-    columnsToDisplay.push("productID");
-    columnsToDisplay.push("productActiveDate");
-    columnsToDisplay.push("productDisableDate");
+    columnsToDisplay.push("marketId");
+    columnsToDisplay.push("marketName");
+    columnsToDisplay.push("advertiserId");
+    columnsToDisplay.push("advertiserName");
+    columnsToDisplay.push("mediaCodeName");
+    columnsToDisplay.push("period");
+    columnsToDisplay.push("revenue");
+    columnsToDisplay.push("postedBy");
+    columnsToDisplay.push("datePosted");
 
     tempObject =
     {
         // id: rptParentOwnershipList,
         auditTitle: "Media Revenue Research",
-        apiControllerAction: "/api/ParentOwnershipReport/GetParentOwnershipList",
+        apiControllerAction: "/api/MediaAdvertiserAudit/GetMediaRevenueResearch",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'revresearch'
+        product: 'revresearch',
+        footerCallback: function(row, data, start, end, display) {
+
+            $(".media-rev-research-footer").show();
+            var api = this.api(), data;
+
+            // Remove the formatting to get integer data for summation
+            var intVal = function (i) {
+                return typeof i === 'string' ?
+                    i.replace(/[\$,]/g, '') * 1 :
+                    typeof i === 'number' ?
+                    i : 0;
+            };
+
+            // Total over all pages
+            var total = api
+                .column(6)
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+
+            // Total over this page
+            var pageTotal = api
+                .column(6, { page: 'current' })
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+
+            // Update footer
+            $(api.column(6).footer()).html(
+                pageTotal.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 0
+                }) + ' ( ' + total.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 0
+                }) + ' total)'
+            );
+        }
     }
 
     return tempObject;
