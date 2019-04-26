@@ -144,7 +144,7 @@ function getAuditObject_Advertisers() {
 
     tempObject =
     {
-        auditTitle: "Advertisers Audit",
+        auditTitle: "Advertisers",
         apiControllerAction: "/api/AdvertiserAudit/GetAdvertiserAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -195,6 +195,7 @@ function getAuditFilterArray_Advertisers() {
             if ($("#ddlIndustry").val() == "-1") {
 
                 $("#ddlSubIndustry").empty();
+                getDefaultSubIndustry();
                 return;
             }
 
@@ -241,7 +242,7 @@ function getAuditFilterArray_Advertisers() {
 
     arrayObject = {
         token: "SubIndustry",
-        jsCall: null,
+        jsCall: "getDefaultSubIndustry",
         objectName: "ddlSubIndustry",
         required: false
     }
@@ -294,7 +295,7 @@ function getAuditObject_MediaAdvertisers() {
 
     tempObject =
     {
-        auditTitle: "Media Advertisers Audit",
+        auditTitle: "Media Advertisers",
         apiControllerAction: "/api/MediaAdvertiserAudit/GetMediaAdvertiserAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -379,7 +380,7 @@ function getAuditObject_StationAdvertisers() {
 
     tempObject =
     {
-        auditTitle: "Station Advertisers Audit",
+        auditTitle: "Station Advertisers",
         apiControllerAction: "/api/StationAdvertiserAudit/GetStationAdvertiserAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -402,6 +403,7 @@ function getAuditFilterArray_StationAdvertisers() {
             if ($("#ddlMarket").val() == "") {
 
                 $("#ddlOwner").empty();
+                getDefaultOwner();
                 return;
             }
 
@@ -452,7 +454,7 @@ function getAuditFilterArray_StationAdvertisers() {
 
     arrayObject = {
         token: "Owner",
-        jsCall: null,
+        jsCall: "getDefaultOwner",
         objectName: "ddlOwner",
         required: false
     }
@@ -484,6 +486,7 @@ function getAuditFilterArray_StationAdvertisers() {
             if ($("#ddlIndustry").val() == "-1") {
 
                 $("#ddlSubIndustry").empty();
+                getDefaultSubIndustry();
                 return;
             }
 
@@ -529,7 +532,7 @@ function getAuditFilterArray_StationAdvertisers() {
 
     arrayObject = {
         token: "SubIndustry",
-        jsCall: null,
+        jsCall: "getDefaultSubIndustry",
         objectName: "ddlSubIndustry",
         required: false
     }
@@ -566,7 +569,7 @@ function getAuditObject_Agencies() {
 
     tempObject =
     {
-        auditTitle: "Agencies Audit",
+        auditTitle: "Agencies",
         apiControllerAction: "/api/AgencyAudit/GetAgencyAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -646,7 +649,7 @@ function getAuditObject_StationAgencies() {
 
     tempObject =
     {
-        auditTitle: "Station Agencies Audit",
+        auditTitle: "Station Agencies",
         apiControllerAction: "/api/StationAgencyAudit/GetStationAgencyAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -669,6 +672,7 @@ function getAuditFilterArray_StationAgencies() {
             if ($("#ddlMarket").val() == "") {
 
                 $("#ddlOwner").empty();
+                getDefaultOwner();
                 return;
             }
 
@@ -737,7 +741,7 @@ function getAuditFilterArray_StationAgencies() {
 
     arrayObject = {
         token: "Owner",
-        jsCall: null,
+        jsCall: "getDefaultOwner",
         objectName: "ddlOwner",
         required: false
     }
@@ -845,6 +849,7 @@ function getAuditFilterArray_AdvertisersRevenueResearch() {
             if ($("#ddlMarket").val() == "") {
 
                 $("#ddlOwner").empty();
+                getDefaultOwner();
                 return;
             }
 
@@ -913,7 +918,7 @@ function getAuditFilterArray_AdvertisersRevenueResearch() {
 
     arrayObject = {
         token: "Owner",
-        jsCall: null,
+        jsCall: "getDefaultOwner",
         objectName: "ddlOwner",
         required: false
     }
