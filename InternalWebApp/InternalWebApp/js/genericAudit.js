@@ -799,9 +799,11 @@ function getAuditObject_AdvertisersRevenueResearch() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'revresearch',
+        footerFormat: '<tfoot class="rev-research-footer" style="display: none;"><tr><th class="" colspan="8" style=""></th><th class="" colspan="4" style=""></th></tr></tfoot>',
         footerCallback: function(row, data, start, end, display) {
 
-            $(".adv-rev-research-footer").show();
+            $(".rev-research-footer").show();
+
             var api = this.api(), data;
 
             // Remove the formatting to get integer data for summation
@@ -975,9 +977,11 @@ function getAuditObject_MediaRevenueResearch() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'revresearch',
+        footerFormat: '<tfoot class="rev-research-footer" style="display: none;"><tr><th class="" colspan="8" style=""></th><th class="" colspan="1" style=""></th></tr></tfoot>',
         footerCallback: function(row, data, start, end, display) {
 
-            $(".media-rev-research-footer").show();
+            $(".rev-research-footer").show();
+
             var api = this.api(), data;
 
             // Remove the formatting to get integer data for summation
