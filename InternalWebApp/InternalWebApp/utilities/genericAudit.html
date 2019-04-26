@@ -409,23 +409,23 @@
 
         var searchCriteria = $.parseJSON(searchResults);
 
-        if (searchCriteria["searchToken"] == "PERSONNEL") {
+        ////if (searchCriteria["searchToken"] == "PERSONNEL") {
 
-            // load newly found data
-            $("#txtPersonnel").val(searchCriteria["txtPersonnel"]);
-            $("#hidPersonnel").val(searchCriteria["personnelId"]);
+        ////    // load newly found data
+        ////    $("#txtPersonnel").val(searchCriteria["txtPersonnel"]);
+        ////    $("#hidPersonnel").val(searchCriteria["personnelId"]);
 
-            // clear out the storage
-            searchCriteria["txtPersonnel"] = "";
-            searchCriteria["personnelId"] = "";
+        ////    // clear out the storage
+        ////    searchCriteria["txtPersonnel"] = "";
+        ////    searchCriteria["personnelId"] = "";
 
-            // save it
-            setLocalStorage("gSearchResults", JSON.stringify(searchCriteria));
+        ////    // save it
+        ////    setLocalStorage("gSearchResults", JSON.stringify(searchCriteria));
 
 
-            $("#ddlMarket").val(searchCriteria["ddlMarket"]);
-            $("#ddlOwner").val(searchCriteria["ddlOwner"]);
-        }
+        ////    $("#ddlMarket").val(searchCriteria["ddlMarket"]);
+        ////    $("#ddlOwner").val(searchCriteria["ddlOwner"]);
+        ////}
 
     }
 
@@ -519,20 +519,6 @@
     //--------------------------------
     // Filters get loaded here
     //--------------------------------
-    function getYearList() {
-        var str = '';
-        str = '<option value="">-- Select a Year --</option>';
-
-        var thisYear = (new Date()).getFullYear();
-
-        for (var i = thisYear; i > (thisYear - 10) ; i--) {
-
-            str = str + '<option value="' + i + '">' + i + '</option>';
-        }
-
-        $("#ddlYear").html(str);
-        saveLoadedControlSelection("ddlYear");
-    }
 
     function getXRYMediaCodeList() {
         $.ajax({
@@ -804,28 +790,6 @@
         });
     }
 
-    function getPersonnel() {
-
-
-        var searchCriteriaObj = {
-            "searchToken": "PERSONNEL",
-            "ddlProduct": $("#ddlProduct").val(),
-            "ddlMarket": $("#ddlMarket").val(),
-            "ddlStation": $("#ddlStation").val(),
-            "ddlOwner": $("#ddlOwner").val(),
-            "ddlYear": $("#ddlYear").val(),
-            "ddlPeriod": $("#ddlPeriod").val(),
-            "dtStartDate": $("#dtStartDate").val(),
-            "dtEndDate": $("#dtEndDate").val(),
-            "txtPersonnel": $("#txtPersonnel").html(),
-            "searchPage": window.location
-        }
-
-        setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
-
-        window.location = "/utilities/search.html";
-    }
-
     function getPeriodListQuarters() {
         getPeriodList("quarters");
     }
@@ -834,212 +798,8 @@
         getPeriodList("months");
     }
 
-    function getParentMarketList() {
-        $.ajax({
-            url: ServicePrefix + '/api/ParentMarket/GetParentMarketList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-
-                    var str = '';
-                    str = '<option value="">-- Select a Parent Market --</option>';
-                    $.each(data.report.rows, function (index) {
-
-                        str = str + '<option value="' + data.report.rows[index].parentMarketId + '">' + data.report.rows[index].parentMarketName + '</option>';
-
-                    });
-
-                    $("#ddlParentMarket").html(str);
-                    saveLoadedControlSelection("ddlParentMarket");
-
-                }
-
-
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function getPeriodList(typesToLoad) {
-
-        if (!typesToLoad) {
-            typesToLoad = "all";
-        }
-
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-        var str = '';
-        str = '<option value="">-- Select a Period --</option>';
-
-        if (typesToLoad.toLowerCase() == "all" || typesToLoad.toLowerCase() == "months") {
-
-            for (var i = 1; i <= 12; i++) {
-
-                str = str + '<option value="' + (i < 10 ? '0' + i.toString() : i.toString()) + '">' + monthNames[i - 1] + '</option>';
-            }
-        }
-
-        if (typesToLoad.toLowerCase() == "all") {
-            str = str + '<option value="">-----------</option>';
-        }
-
-        if (typesToLoad.toLowerCase() == "all" || typesToLoad.toLowerCase() == "quarters") {
-            for (var i = 1; i <= 4; i++) {
-
-                str = str + '<option value="Q' + i.toString() + '">Quarter - ' + i.toString() + '</option>';
-            }
-        }
-
-
-        $("#ddlPeriod").html(str);
-        saveLoadedControlSelection("ddlPeriod");
-    }
-
-    function getProductList() {
-
-        $.ajax({
-            url: ServicePrefix + '/api/Product/GetProductList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-
-                    var str = '';
-                    str = '<option value="">-- Select a Product --</option>';
-                    $.each(data.report.rows, function (index) {
-
-                        str = str + '<option value="' + data.report.rows[index].P_ProductID + '">' + data.report.rows[index].P_ProductName + '</option>';
-
-                    });
-
-                    $("#ddlProduct").html(str);
-                    saveLoadedControlSelection("ddlProduct");
-                }
-
-
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-
-    }
-
-    function getStationList() {
-
-        $.ajax({
-            url: ServicePrefix + '/api/Station/GetStationList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inActiveOnly": "1"
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-
-                    var str = '';
-                    str = '<option value="">-- Select a Station --</option>';
-                    $.each(data.report.rows, function (index) {
-
-                        str = str + '<option value="' + data.report.rows[index].stationId + '">' + data.report.rows[index].stationName + '</option>';
-
-                    });
-
-                    $("#ddlStation").html(str);
-                    saveLoadedControlSelection("ddlStation");
-
-                }
-
-
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-
-    }
-
     function getXRYMarketList() {
         getMarketList('XRY');
-    }
-    function getMRRMarketList() {
-        getMarketList('MRR');
-    }
-    function getMSSMarketList() {
-        getMarketList('MSS');
-    }
-    function getTVBMarketList() {
-        getMarketList('TVB');
-    }
-    function getDMAMarketList() {
-        getMarketList('DMA');
-    }
-
-    function getMarketListAll() {
-        $.ajax({
-            url: ServicePrefix + '/api/Market/GetMarketList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-
-                    var str = '';
-                    str = '<option value="">-- Select a Market --</option>';
-                    $.each(data.report.rows, function (index) {
-
-                        str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
-
-                    });
-
-                    $("#ddlMarket").html(str);
-                    saveLoadedControlSelection("ddlMarket");
-                    preSelectItem('quickReportQS');
-
-                }
-
-
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
     }
 
     function getMarketList(inProduct) {
@@ -1085,49 +845,6 @@
 
     }
 
-    function getOwnerGroupList() {
-
-        $.ajax({
-            url: ServicePrefix + '/api/OwnerGroup/GetOwnerGroupList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inIncludeNationwide": true
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-
-                }
-                else {
-
-                    var str = '';
-
-                    $("#ddlOwnerGroup").html("<option value=''> -- Select an Owner Group --</option>");
-
-                    var holdOwnerID = "0";
-
-                    $.each(data.report.rows, function (index) {
-                        var obj = data.report.rows[index];
-                        str = str + "<option value='" + obj.OG_OwnerGroupID + "'>" + obj.OG_OwnerGroupName + "</option>";
-
-                    });
-
-                    $("#ddlOwnerGroup").append(str);
-                    saveLoadedControlSelection("ddlOwnerGroup");
-                }
-
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-
-    }
     //--------------------------------
     // Filters get loaded end here
     //--------------------------------
@@ -1139,7 +856,7 @@
 
         $("#noDataFound").hide();
 
-        console.log(auditObject);
+        //console.log(auditObject);
 
         api = auditObject.apiControllerAction;
         apiParameters = new Object();
