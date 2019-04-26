@@ -783,7 +783,7 @@ function getAuditObject_AdvertisersRevenueResearch() {
     tempObject =
     {
         auditTitle: "Advertiser Revenue Research",
-        apiControllerAction: "/api/AdvertiserAudit/GetAdvertiserRevenueResearch",
+        apiControllerAction: "/api/AdvertiserAudit/GetAdvertiserRevenueResearchList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'revresearch',
@@ -961,7 +961,7 @@ function getAuditObject_MediaRevenueResearch() {
     tempObject =
     {
         auditTitle: "Media Revenue Research",
-        apiControllerAction: "/api/MediaAdvertiserAudit/GetMediaRevenueResearch",
+        apiControllerAction: "/api/MediaAdvertiserAudit/GetMediaRevenueResearchList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'revresearch',
