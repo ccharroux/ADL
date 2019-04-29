@@ -239,7 +239,7 @@ function assignParentAdvertiserAuditByLink(parentAdvertiserId) {
     var table = $('#dtSearchResults').DataTable();
     table.row(rowId).select();
 
-    setTimeout(assignParentAdvertiserAudit(), 500);
+    setTimeout(assignParentAdvertiserAudit(), 300);
 
 }
 
