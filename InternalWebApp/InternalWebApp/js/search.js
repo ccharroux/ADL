@@ -239,7 +239,7 @@ function assignParentAdvertiserAuditByLink(parentAdvertiserId) {
     var table = $('#dtSearchResults').DataTable();
     table.row(rowId).select();
 
-    setTimeout(assignParentAdvertiserAudit(), 300);
+    setTimeout(assignParentAdvertiserAudit(), 500);
 
 }
 
@@ -622,7 +622,7 @@ function buildParentAdvertiserAuditSearch(searchCriteria) {
         "inParentAdvertiserName": searchText,
         "inShowDisabled": false
     }
-    api = "/api/ParentAdvertiser/GetParentAdvertiserList";
+    api = "/api/ParentAdvertiser/GetParentAdvertiserAuditList";
 
     columns = [];
 
@@ -639,18 +639,18 @@ function buildParentAdvertiserAuditSearch(searchCriteria) {
         "orderable": true
     });
 
-    //columns.push({
-    //    "title": "Industry",
-    //    "visible": true,
-    //    "mData": "IN_ShortDescription",
-    //    "orderable": true
-    //});
+    columns.push({
+        "title": "Industry",
+        "visible": true,
+        "mData": "industryDescription",
+        "orderable": true
+    });
 
-    //columns.push({
-    //    "title": "SubIndustry Name",
-    //    "mData": "SI_Description",
-    //    "orderable": true
-    //});
+    columns.push({
+        "title": "SubIndustry Name",
+        "mData": "subIndustryDescription",
+        "orderable": true
+    });
 
     columns.push({
         "mRender": function (data, type, row) {
@@ -780,6 +780,7 @@ function buildPersonnelSearch(searchCriteria) {
     $("#previousPage").html(searchText.length == 0 ? "Person" : searchText);
 
 }
+
 function buildLinkAdvertiserSearch(searchCriteria) {
     if ($('.search-all-markets:visible').is(':checked')) {
         bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
