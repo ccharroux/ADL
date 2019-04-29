@@ -315,7 +315,7 @@
 
             $("#ddlProductList").append(str);
 
-            //load personnel assignments 
+            //load personnel assignments
             getPersonnelAssignmentList();
         }
     }
@@ -463,7 +463,7 @@
         var accessAll = true;
         var transferConfirm = false;
         var confirmMessage = '';
-        var cancelRemovalMessage = '';
+        //var cancelRemovalMessage = '';
 
         var productId = $("#ddlProductList").val();
 
@@ -481,8 +481,8 @@
             gFromPersonnelId = $("#ddlOtherPersonnel").val();
             gToPersonnelId = personnelId;
 
-           gToPersonnelName = nameOfSelectedUser.toUpperCase();
-           gFromPersonnelName = $("#ddlOtherPersonnel option:selected").text().toUpperCase();
+            gToPersonnelName = nameOfSelectedUser.toUpperCase();
+            gFromPersonnelName = $("#ddlOtherPersonnel option:selected").text().toUpperCase();
 
         }
 
@@ -514,7 +514,7 @@
         if ($("#rdTransfer").prop("checked") == true) {
             transferConfirm = true;
             confirmMessage = "Are you sure you want to remove " + productId + " assignments from " + gFromPersonnelName + " for Access Level(s): " + accessLevelList.join(", ");
-            cancelRemovalMessage = 'Assignments from ' + gFromPersonnelName + ' will not be removed. Copying process will continue.';
+            //cancelRemovalMessage = 'Assignments from ' + gFromPersonnelName + ' will not be removed. Copying process will continue.';
         }
 
 
@@ -526,31 +526,32 @@
                     btnCancel: {
                         label: "Cancel",
                         callback: function () {
+                            transferIsConfirmed = false;
                             bootbox.alert("Copy/move has been canceled. No assignments have been changed.");
                         }
                     },
+                    //btnNo: {
+                    //    label: "No",
+                    //    callback: function () {
+                    //        transferIsConfirmed = false;
+                    //        bootbox.alert(cancelRemovalMessage);
+                    //        askIfAddOrReplaceAssignments();
+                    //    }
+                    //},
                     btnYes: {
                         label: "Yes",
                         className: "btn-primary",
                         callback: function () {
-                            transferIsConfimed = true;
-                            askIfAddOrReplaceAssignments();
-                        }
-                    },
-                    btnNo: {
-                        label: "No",
-                        callback: function () {
-                            transferIsConfirmed = false;
-                            bootbox.alert(cancelRemovalMessage);
+                            transferIsConfirmed = true;
                             askIfAddOrReplaceAssignments();
                         }
                     }
-                  
+
                 }
             });
 
         } else {
-            bootbox.confirm("Assignments from " + gFromPersonnelName + " will be copied over to " + gToPersonnelName + " for Access Level(s): "  + accessLevelList.join(", ") + ", continue? ", function (result) {
+            bootbox.confirm("Assignments from " + gFromPersonnelName + " will be copied over to " + gToPersonnelName + " for Access Level(s): " + accessLevelList.join(", ") + ", continue? ", function (result) {
 
                 if (result) {
                     askIfAddOrReplaceAssignments();
@@ -572,18 +573,7 @@
 
         bootbox.dialog({
             message: strMessage,
-            title: "Add/Replace",
             buttons: {
-                btnExisting: {
-                    label: "Add to Existing",
-                    className: "btn-primary",
-                    callback: function () {
-                        //copy over new assignments 
-                        accessLevelList.forEach(function (accessLevel) {
-                            copyPersonnelAssignments(accessLevel);
-                        });
-                    }
-                },
                 btnReplace: {
                     label: "Replace Existing",
                     callback: function () {
@@ -598,11 +588,21 @@
                         });
 
                     }
+                },
+                btnExisting: {
+                    label: "Add to Existing",
+                    className: "btn-primary",
+                    callback: function () {
+                        //copy over new assignments
+                        accessLevelList.forEach(function (accessLevel) {
+                            copyPersonnelAssignments(accessLevel);
+                        });
+                    }
                 }
-            },
+            }
         });
     }
-   
+
     function copyPersonnelAssignments(accessLevel) {
 
         var url = ServicePrefix + '/api/personnel/CopyPersonnelAssignmentByProductAndLevel';
