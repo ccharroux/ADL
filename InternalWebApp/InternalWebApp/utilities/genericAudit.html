@@ -185,8 +185,14 @@
                         </div>
                         <div class="form-group rptView auditParentAdvertiser">
                             <!-- parent advertiser -->
-                            <label for="ddlParentAdvertiser" class="dropdown-select rptView auditParentAdvertiser">Parent Advertiser</label>
-                            <select id="ddlParentAdvertiser" apiInput="inParentAdvertiserId" class="dropdown-select rptView auditParentAdvertiser"></select>
+                            <div class="form-group" style="display:table-cell;">
+                                <label for="hidParentAdvertiser" class="dropdown-label rptView auditParentAdvertiser">Parent Advertiser</label>
+                                <input type="text" id="txtParentAdvertiser" onclick="getParentAdvertiser()" readonly class="dropdown-select rptView auditParentAdvertiser" />
+                                <a class="rptView auditParentAdvertiser" href="#" onclick="clearSelection('ParentAdvertiser')">X</a>
+                                <input type="hidden" id="hidParentAdvertiser" apiInput="inParentAdvertiserId" class="dropdown-select rptView auditParentAdvertiser" />
+                            </div>
+                            <!--<label for="ddlParentAdvertiser" class="dropdown-select rptView auditParentAdvertiser">Parent Advertiser</label>
+                            <select id="ddlParentAdvertiser" apiInput="inParentAdvertiserId" class="dropdown-select rptView auditParentAdvertiser"></select>-->
                         </div>
                         <div class="form-group rptView auditParentMarket">
                             <label for="ddlParentMarket" class="dropdown-label rptView auditParentMarket">Parent Market</label>
@@ -252,9 +258,7 @@
                 <!-- start datatable coding-->
 
                 <div class="dataTable-top-margin">
-                    <table id="dtResults" class="stripe">
-                       
-                    </table>
+                    <table id="dtResults" class="stripe"></table>
                     <div id="noDataFound" style="display:none; color: red">No data found</div>
                 </div>
 
@@ -408,6 +412,35 @@
         }
 
         var searchCriteria = $.parseJSON(searchResults);
+
+        //will need to load for parent advertiser or parent agency
+        //parent advertiser
+        if (searchCriteria["searchToken"] == "PARENTADVAUDIT") {
+
+            //market,
+            $("#ddlMarket").val(searchCriteria["ddlMarket"]);
+            //media code,
+            $("#ddlMediaCode").val(searchCriteria["ddlMediaCode"]);
+            //media type,
+            $("#ddlMediaType").val(searchCriteria["ddlMediaType"]);
+            //advertiser name
+            $("#txtAdvertiserName").val(searchCriteria["txtAdvertiserName"]);
+            //industry
+            $("#ddlIndustry").val(searchCriteria["ddlIndustry"]);
+            //subindustry
+            $("#ddlSubIndustry").val(searchCriteria["ddlSubIndustry"]);
+            //parentadvertiser
+            $("#hidParentAdvertiser").val(searchCriteria["hidParentAdvertiser"]);
+            $("#txtParentAdvertiser").val(searchCriteria["txtParentAdvertiser"]);
+
+
+            setLocalStorage("gSearchResults", JSON.stringify(searchCriteria));
+
+        }
+        //    //parent agency
+        //else if (searchCriteria["searchToken"] == "") {
+
+        //}
 
         ////if (searchCriteria["searchToken"] == "PERSONNEL") {
 
@@ -1109,7 +1142,7 @@
         //data is the data from the ajax call
         //columns is the array that was built previously
 
-        //Since some of the audit have footer with calculations, 
+        //Since some of the audit have footer with calculations,
         //the footer needs to be added to the table html before the
         //datatable is initialized. Otherwise the footer can't be added later.
         if (auditObject.footerFormat !== "undefined" && $(".rev-research-footer").length === 0) {
@@ -1231,4 +1264,48 @@
         }
     }
 
+    function getParentAdvertiser() {
+
+        //var searchCriteriaObj = {
+        //    "searchToken": "PERSONNEL",
+        //    "ddlProduct": $("#ddlProduct").val(),
+        //    "ddlMarket": $("#ddlMarket").val(),
+        //    "ddlStation": $("#ddlStation").val(),
+        //    "ddlOwner": $("#ddlOwner").val(),
+        //    "ddlYear": $("#ddlYear").val(),
+        //    "ddlPeriod": $("#ddlPeriod").val(),
+        //    "dtStartDate": $("#dtStartDate").val(),
+        //    "dtEndDate": $("#dtEndDate").val(),
+        //    "txtPersonnel": $("#txtPersonnel").html(),
+        //    "searchPage": window.location
+        //}
+
+        var searchCriteriaObj = {
+            "searchToken": "PARENTADVAUDIT",
+            //market,
+            "ddlMarket": $("#ddlMarket").val(),
+            //media code,
+            "ddlMediaCode": $("#ddlMediaCode").val(),
+            //media type,
+            "ddlMediaType": $("#ddlMediaType").val(),
+            //advertiser name
+            "txtAdvertiserName": $("#txtAdvertiserName").val(),
+            //industry
+            "ddlIndustry": $("#ddlIndustry").val(),
+            //subindustry
+            "ddlSubIndustry": $("#ddlSubIndustry").val(),
+            //parentadvertiser
+            "txtParentAdvertiser": $("#txtParentAdvertiser").val(),
+            "searchPage": window.location
+        }
+        setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
+
+        window.location = "/utilities/search.html";
+
+    }
+
+    function clearSelection(control) {
+        $("#txt" + control).val("");
+        $("#hid" + control).val("");
+    }
 </script>

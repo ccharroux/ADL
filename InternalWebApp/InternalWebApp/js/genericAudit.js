@@ -250,8 +250,8 @@ function getAuditFilterArray_Advertisers() {
 
     arrayObject = {
         token: "ParentAdvertiser",
-        jsCall: "getParentAdvertiserList",
-        objectName: "ddlParentAdvertiser",
+        jsCall: null,
+        objectName: "hidParentAdvertiser",
         required: false
     }
     arrayFilters.push(arrayObject);
