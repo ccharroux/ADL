@@ -116,15 +116,15 @@ function getAuditObject_Advertisers() {
 
     var columnsToDisplay = new Array();
 
-    columnsToDisplay.push("marketId");
+    //columnsToDisplay.push("marketId");
     columnsToDisplay.push("marketName");
-    columnsToDisplay.push("advertiserId");
+    //columnsToDisplay.push("advertiserId");
     columnsToDisplay.push("advertiserName");
-    columnsToDisplay.push("industryId");
+    //columnsToDisplay.push("industryId");
     columnsToDisplay.push("industryDescription");
-    columnsToDisplay.push("subIndustryId");
+    //columnsToDisplay.push("subIndustryId");
     columnsToDisplay.push("subIndustryDescription");
-    columnsToDisplay.push("parentAdvertiserId");
+    //columnsToDisplay.push("parentAdvertiserId");
     columnsToDisplay.push("parentAdvertiserName");
 
     //this column is used to create the edit link
