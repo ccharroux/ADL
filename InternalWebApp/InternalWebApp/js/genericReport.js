@@ -3480,6 +3480,37 @@ function getReportFilterArray_GeneralStationData() {
 
     var arrayFilters = new Array();
     var arrayObject = new Object();
+    //arrayObject = {
+    //    token: "Product",
+    //    jsCall: "getProductList",
+    //    objectName: "ddlProduct",
+    //    required: false
+    //}
+    //arrayFilters.push(arrayObject);
+
+    //arrayObject = {
+    //    token: "Market",
+    //    jsCall: "getMarketListAll",
+    //    objectName: "ddlMarket",
+    //    required: false
+    //}
+    //arrayFilters.push(arrayObject);
+
+    //arrayObject = {
+    //    token: "Owner",
+    //    jsCall: "getOwnerList",
+    //    objectName: "ddlOwner",
+    //    required: false
+    //}
+    //arrayFilters.push(arrayObject);
+
+    //arrayObject = {
+    //    token: "MediaType",
+    //    jsCall: "getMediaTypeList",
+    //    objectName: "ddlMediaType",
+    //    required: false
+    //}
+    //arrayFilters.push(arrayObject);
 
     return arrayFilters;
 }
