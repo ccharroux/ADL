@@ -626,17 +626,18 @@ function buildParentAdvertiserAuditSearch(searchCriteria) {
 
     columns = [];
 
+   
+    columns.push({
+        "title": "Parent Advertiser Name",
+        "mData": "parentAdvertiserName",
+        "orderable": true
+    });
+
     columns.push({
         "title": "ParentAdvertiserID",
         "visible": false,
         "mData": "parentAdvertiserId",
         "orderable": false
-    });
-
-    columns.push({
-        "title": "Parent Advertiser Name",
-        "mData": "parentAdvertiserName",
-        "orderable": true
     });
 
     columns.push({
@@ -662,7 +663,7 @@ function buildParentAdvertiserAuditSearch(searchCriteria) {
     });
 
     //need to document this more
-    //$("#previousPage").html(searchCriteria["advertiserName"]);
+    $("#previousPage").html(searchText.length == 0 ? "Parent Advertiser" : searchText);
 }
 
 function buildParentAgencySearch(searchCriteria) {
