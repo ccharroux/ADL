@@ -234,7 +234,8 @@ function linkParentAdvertiserByLink(parentAdvertiserId) {
 
 function assignParentAdvertiserAuditByLink(parentAdvertiserId) {
 
-    var rowId = $('#dtSearchResults').dataTable().fnFindCellRowIndexes(parentAdvertiserId, 0);
+    //added the column holding the parentadvertiserid finding the row. 
+    var rowId = $('#dtSearchResults').dataTable().fnFindCellRowIndexes(parentAdvertiserId, 1);
 
     var table = $('#dtSearchResults').DataTable();
     table.row(rowId).select();
