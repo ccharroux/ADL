@@ -117,6 +117,8 @@ reportName.push("rptMarketProductStationSummary");
 
 reportName.push("rptAsyncJobQueueStatus");
 
+reportName.push("rptDisabledAEList");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -4399,6 +4401,45 @@ function getReportObject_AsyncJobQueueStatus() {
         columnsToDisplay: columnsToDisplay,
         product: 'misc',
         autoUpdate: true
+    }
+
+    return tempObject;
+}
+
+//rptDisabledAEList
+
+function getReportFilterArray_DisabledAEList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+ 
+    arrayObject = new Object();
+    arrayObject = {
+        token: "AsyncJobDaysBack",
+        objectName: "ddlAsyncJobDaysBack",
+        jsCall: "getDaysBackList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_DisabledAEList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "AE Disabled List",
+        apiControllerAction: "/api/AccountExecutiveReport/GetDisabledAEList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry',
+        autoUpdate: false
     }
 
     return tempObject;
