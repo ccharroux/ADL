@@ -57,15 +57,13 @@ function buildAuditObjectArray() {
 
     }
 
-
 }
+
 function getAuditObject(inAuditId) {
 
     return auditObjectArray[inAuditId];
 
 }
-
-
 
 function buildQuickReports(rptType, control, container, postfix) {
 
@@ -102,6 +100,7 @@ function buildQuickReports(rptType, control, container, postfix) {
 
 function getQuickReport(reportId) {
     if (reportId > -1) {
+        setLocalStorage("gSearchResults", "");
         window.location = "/utilities/genericAudit.html?reportId=" + reportId;
     }
 }
@@ -116,16 +115,11 @@ function getAuditObject_Advertisers() {
 
     var columnsToDisplay = new Array();
 
-    //columnsToDisplay.push("marketId");
-    columnsToDisplay.push("marketName");
-    //columnsToDisplay.push("advertiserId");
-    columnsToDisplay.push("advertiserName");
-    //columnsToDisplay.push("industryId");
-    columnsToDisplay.push("industryDescription");
-    //columnsToDisplay.push("subIndustryId");
-    columnsToDisplay.push("subIndustryDescription");
-    //columnsToDisplay.push("parentAdvertiserId");
-    columnsToDisplay.push("parentAdvertiserName");
+    columnsToDisplay.push("market");
+    columnsToDisplay.push("advertiser");
+    columnsToDisplay.push("industry Name");
+    columnsToDisplay.push("sub Industry");
+    columnsToDisplay.push("parent Advertiser");
 
     //this column is used to create the edit link
     //for each result row
@@ -140,8 +134,6 @@ function getAuditObject_Advertisers() {
         "className": "text-align-right"
     });
 
-    
-
     tempObject =
     {
         auditTitle: "Advertisers",
@@ -153,7 +145,6 @@ function getAuditObject_Advertisers() {
 
     return tempObject;
 }
-
 
 function getAuditFilterArray_Advertisers() {
     var arrayFilters = new Array();
@@ -192,49 +183,9 @@ function getAuditFilterArray_Advertisers() {
         jsCall: "getIndustryList",
         objectName: "ddlIndustry",
         onchange: function() {
-            if ($("#ddlIndustry").val() == "-1") {
 
-                $("#ddlSubIndustry").empty();
-                getDefaultSubIndustry();
-                return;
-            }
+            getSubIndustryList($("#ddlIndustry").val(), '');
 
-            $.ajax({
-                url: ServicePrefix + '/api/SubIndustry/GetSubIndustryList',
-                dataType: 'json',
-                type: 'post',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    "inApiToken": getLocalStorage("APIToken"),
-                    "inIndustryId": $("#ddlIndustry").val()
-                }),
-                processData: false,
-                success: function (data, textStatus, jQxhr) {
-
-                    if (data.response.status != "SUCCESS") {
-                        MKAErrorMessageRtn(data.response.errorMessage[0]);
-                    }
-                    else {
-
-                        var str = '';
-                        str = '<option value="-1">-- Select a Sub Industry --</option>';
-                        $.each(data.report.rows, function (index) {
-
-                            str = str + '<option value="' + data.report.rows[index].subIndustryId + '">' + data.report.rows[index].subIndustryName + '</option>';
-
-                        });
-
-                        $("#ddlSubIndustry").html(str);
-                        saveLoadedControlSelection("ddlSubIndustry");
-
-                    }
-
-
-                },
-                error: function (jqXhr, textStatus, errorThrown) {
-                    genericAjaxError(jqXhr, textStatus, errorThrown);
-                }
-            });
         },
         required: false
     }
@@ -271,13 +222,10 @@ function getAuditObject_MediaAdvertisers() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("marketId");
-    columnsToDisplay.push("marketName");
-    columnsToDisplay.push("mediaAdvertiserId");
-    columnsToDisplay.push("mediaAdvertiserName");
+    columnsToDisplay.push("market");
+    columnsToDisplay.push("media Advertiser");
     columnsToDisplay.push("mediaAdvertiserCode");
-    columnsToDisplay.push("marketAdvertiserId");
-    columnsToDisplay.push("marketAdvertiserName");
+    columnsToDisplay.push("market Advertiser");
     columnsToDisplay.push("mediaType");
 
     //this column is used to create the edit link
@@ -351,19 +299,13 @@ function getAuditObject_StationAdvertisers() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("marketId");
-    columnsToDisplay.push("marketName");
-    columnsToDisplay.push("stationId");
-    columnsToDisplay.push("stationName");
-    columnsToDisplay.push("stationAdvertiserId");
-    columnsToDisplay.push("stationAdvertiserName");
+    columnsToDisplay.push("market");
+    columnsToDisplay.push("station");
+    columnsToDisplay.push("station Advertiser");
     columnsToDisplay.push("stationCode");
-    columnsToDisplay.push("marketAdvertiserId");
-    columnsToDisplay.push("marketAdvertiserName");
-    columnsToDisplay.push("industryId");
-    columnsToDisplay.push("industryName");
-    columnsToDisplay.push("subIndustryId");
-    columnsToDisplay.push("subIndustryName");
+    columnsToDisplay.push("market Advertiser");
+    columnsToDisplay.push("industry Name");
+    columnsToDisplay.push("sub Industry");
 
     //this column is used to create the edit link
     //for each result row
@@ -400,53 +342,8 @@ function getAuditFilterArray_StationAdvertisers() {
         objectName: "ddlMarket",
         onchange: function () {
 
-            if ($("#ddlMarket").val() == "") {
+            getOwnerList($("#ddlMarket").val());
 
-                $("#ddlOwner").empty();
-                getDefaultOwner();
-                return;
-            }
-
-            $.ajax({
-                url: ServicePrefix + '/api/Owner/GetOwnerListByProductMarket',
-                dataType: 'json',
-                type: 'post',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    "inApiToken": getLocalStorage("APIToken"),
-                    "inProductId": "XRY",
-                    "inMarketId": $("#ddlMarket").val()
-                }),
-                processData: false,
-                success: function (data, textStatus, jQxhr) {
-
-                    if (data.response.status != "SUCCESS") {
-                        MKAErrorMessageRtn(data.response.errorMessage[0]);
-
-                    }
-                    else {
-
-                        var str = '';
-
-                        $("#ddlOwner").html("<option value='-1'> -- Select an Owner --</option>");
-
-                        var holdOwnerID = "0";
-
-                        $.each(data.report.rows, function (index) {
-                            var obj = data.report.rows[index];
-                            str = str + "<option value='" + obj.ownerid + "'>" + obj.ownername + "</option>";
-
-                        });
-
-                        $("#ddlOwner").append(str);
-                        saveLoadedControlSelection("ddlOwner");
-                    }
-
-                },
-                error: function (jqXhr, textStatus, errorThrown) {
-                    genericAjaxError(jqXhr, textStatus, errorThrown);
-                }
-            });
         },
         required: true
     }
@@ -482,49 +379,10 @@ function getAuditFilterArray_StationAdvertisers() {
         token: "Industry",
         jsCall: "getIndustryList",
         objectName: "ddlIndustry",
-        onchange: function() {
-            if ($("#ddlIndustry").val() == "-1") {
+        onchange: function () {
 
-                $("#ddlSubIndustry").empty();
-                getDefaultSubIndustry();
-                return;
-            }
+            getSubIndustryList($("#ddlIndustry").val(), '');
 
-            $.ajax({
-                url: ServicePrefix + '/api/SubIndustry/GetSubIndustryList',
-                dataType: 'json',
-                type: 'post',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    "inApiToken": getLocalStorage("APIToken"),
-                    "inIndustryId": $("#ddlIndustry").val()
-                }),
-                processData: false,
-                success: function (data, textStatus, jQxhr) {
-
-                    if (data.response.status != "SUCCESS") {
-                        MKAErrorMessageRtn(data.response.errorMessage[0]);
-                    }
-                    else {
-
-                        var str = '';
-                        str = '<option value="-1">-- Select a Sub Industry --</option>';
-                        $.each(data.report.rows, function (index) {
-
-                            str = str + '<option value="' + data.report.rows[index].subIndustryId + '">' + data.report.rows[index].subIndustryName + '</option>';
-
-                        });
-
-                        $("#ddlSubIndustry").html(str);
-                        saveLoadedControlSelection("ddlSubIndustry");
-
-                    }
-
-                },
-                error: function (jqXhr, textStatus, errorThrown) {
-                    genericAjaxError(jqXhr, textStatus, errorThrown);
-                }
-            });
         },
         required: false
     }
@@ -545,14 +403,10 @@ function getAuditObject_Agencies() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("marketId");
-    columnsToDisplay.push("marketName");
-    columnsToDisplay.push("agencyId");
-    columnsToDisplay.push("agencyName");
-    columnsToDisplay.push("parentAgencyId");
-    columnsToDisplay.push("parentAgencyName");
-    columnsToDisplay.push("accountTypeId");
-    columnsToDisplay.push("accountTypeName");
+    columnsToDisplay.push("market");
+    columnsToDisplay.push("agency");
+    columnsToDisplay.push("parent Agency");
+    columnsToDisplay.push("account Type");
     
     //this column is used to create the edit link
     //for each result row
@@ -609,8 +463,8 @@ function getAuditFilterArray_Agencies() {
 
     arrayObject = {
         token: "ParentAgency",
-        jsCall: "getParentAgencyList",
-        objectName: "ddlParentAgency",
+        jsCall: null,
+        objectName: "hidParentAgency",
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -622,17 +476,12 @@ function getAuditObject_StationAgencies() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("marketId");
-    columnsToDisplay.push("marketName");
-    columnsToDisplay.push("stationId");
-    columnsToDisplay.push("stationName");
-    columnsToDisplay.push("stationAgencyId");
-    columnsToDisplay.push("stationAgencyName");
+    columnsToDisplay.push("market");
+    columnsToDisplay.push("station");
+    columnsToDisplay.push("station Agency");
     columnsToDisplay.push("stationAgencyCode");
-    columnsToDisplay.push("marketAgencyId");
-    columnsToDisplay.push("marketAgencyName");
-    columnsToDisplay.push("accountTypeId");
-    columnsToDisplay.push("accountTypeName");
+    columnsToDisplay.push("market Agency");
+    columnsToDisplay.push("account Type");
 
     //this column is used to create the edit link
     //for each result row
@@ -669,53 +518,8 @@ function getAuditFilterArray_StationAgencies() {
         objectName: "ddlMarket",
         onchange: function () {
 
-            if ($("#ddlMarket").val() == "") {
+            getOwnerList($("#ddlMarket").val());
 
-                $("#ddlOwner").empty();
-                getDefaultOwner();
-                return;
-            }
-
-            $.ajax({
-                url: ServicePrefix + '/api/Owner/GetOwnerListByProductMarket',
-                dataType: 'json',
-                type: 'post',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    "inApiToken": getLocalStorage("APIToken"),
-                    "inProductId": "XRY",
-                    "inMarketId": $("#ddlMarket").val()
-                }),
-                processData: false,
-                success: function (data, textStatus, jQxhr) {
-
-                    if (data.response.status != "SUCCESS") {
-                        MKAErrorMessageRtn(data.response.errorMessage[0]);
-
-                    }
-                    else {
-
-                        var str = '';
-
-                        $("#ddlOwner").html("<option value='-1'> -- Select an Owner --</option>");
-
-                        var holdOwnerID = "0";
-
-                        $.each(data.report.rows, function (index) {
-                            var obj = data.report.rows[index];
-                            str = str + "<option value='" + obj.ownerid + "'>" + obj.ownername + "</option>";
-
-                        });
-
-                        $("#ddlOwner").append(str);
-                        saveLoadedControlSelection("ddlOwner");
-                    }
-
-                },
-                error: function (jqXhr, textStatus, errorThrown) {
-                    genericAjaxError(jqXhr, textStatus, errorThrown);
-                }
-            });
         },
         required: true
     }
@@ -762,18 +566,15 @@ function getAuditObject_AdvertisersRevenueResearch() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("marketId");
-    columnsToDisplay.push("marketName");
-    columnsToDisplay.push("advertiserId");
-    columnsToDisplay.push("advertiserName");
-    columnsToDisplay.push("stationName");
+    columnsToDisplay.push("market");
+    columnsToDisplay.push("advertiser");
+    columnsToDisplay.push("station");
     columnsToDisplay.push("period");
     columnsToDisplay.push("revenue");
-    columnsToDisplay.push("agencyId");
-    columnsToDisplay.push("agencyName");
-    columnsToDisplay.push("accountTypeName");
-    columnsToDisplay.push("postedBy");
-    columnsToDisplay.push("datePosted");
+    columnsToDisplay.push("agency");
+    columnsToDisplay.push("account Type");
+    columnsToDisplay.push("posted By");
+    columnsToDisplay.push("date Posted");
 
     //For the Revenue Research audits,
     //need to add a footerFormat property to allow for 
@@ -787,7 +588,7 @@ function getAuditObject_AdvertisersRevenueResearch() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'revresearch',
-        footerFormat: '<tfoot class="rev-research-footer" style="display: none;"><tr><th class="" colspan="8" style=""></th><th class="" colspan="4" style=""></th></tr></tfoot>',
+        footerFormat: '<tfoot class="rev-research-footer" style="display: none;"><tr><th class="" colspan="5" style=""></th><th class="" colspan="4" style=""></th></tr></tfoot>',
         footerCallback: function(row, data, start, end, display) {
 
             $(".rev-research-footer").show();
@@ -804,7 +605,7 @@ function getAuditObject_AdvertisersRevenueResearch() {
 
             // Total over all pages
             var total = api
-                .column(6)
+                .column(4)
                 .data()
                 .reduce(function (a, b) {
                     return intVal(a) + intVal(b);
@@ -812,14 +613,14 @@ function getAuditObject_AdvertisersRevenueResearch() {
 
             // Total over this page
             var pageTotal = api
-                .column(6, { page: 'current' })
+                .column(4, { page: 'current' })
                 .data()
                 .reduce(function (a, b) {
                     return intVal(a) + intVal(b);
                 }, 0);
 
             // Update footer
-            $(api.column(6).footer()).html(
+            $(api.column(4).footer()).html(
                 pageTotal.toLocaleString('en-US', {
                 style: 'currency',
                 currency: 'USD',
@@ -846,53 +647,8 @@ function getAuditFilterArray_AdvertisersRevenueResearch() {
         objectName: "ddlMarket",
         onchange: function () {
 
-            if ($("#ddlMarket").val() == "") {
+            getOwnerList($("#ddlMarket").val());
 
-                $("#ddlOwner").empty();
-                getDefaultOwner();
-                return;
-            }
-
-            $.ajax({
-                url: ServicePrefix + '/api/Owner/GetOwnerListByProductMarket',
-                dataType: 'json',
-                type: 'post',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    "inApiToken": getLocalStorage("APIToken"),
-                    "inProductId": "XRY",
-                    "inMarketId": $("#ddlMarket").val()
-                }),
-                processData: false,
-                success: function (data, textStatus, jQxhr) {
-
-                    if (data.response.status != "SUCCESS") {
-                        MKAErrorMessageRtn(data.response.errorMessage[0]);
-
-                    }
-                    else {
-
-                        var str = '';
-
-                        $("#ddlOwner").html("<option value='-1'> -- Select an Owner --</option>");
-
-                        var holdOwnerID = "0";
-
-                        $.each(data.report.rows, function (index) {
-                            var obj = data.report.rows[index];
-                            str = str + "<option value='" + obj.ownerid + "'>" + obj.ownername + "</option>";
-
-                        });
-
-                        $("#ddlOwner").append(str);
-                        saveLoadedControlSelection("ddlOwner");
-                    }
-
-                },
-                error: function (jqXhr, textStatus, errorThrown) {
-                    genericAjaxError(jqXhr, textStatus, errorThrown);
-                }
-            });
         },
         required: true
     }
@@ -948,15 +704,13 @@ function getAuditObject_MediaRevenueResearch() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("marketId");
-    columnsToDisplay.push("marketName");
-    columnsToDisplay.push("advertiserId");
-    columnsToDisplay.push("advertiserName");
-    columnsToDisplay.push("mediaCodeName");
+    columnsToDisplay.push("market");
+    columnsToDisplay.push("advertiser");
+    columnsToDisplay.push("media Code");
     columnsToDisplay.push("period");
     columnsToDisplay.push("revenue");
-    columnsToDisplay.push("postedBy");
-    columnsToDisplay.push("datePosted");
+    columnsToDisplay.push("posted By");
+    columnsToDisplay.push("date Posted");
 
     tempObject =
     {
@@ -965,7 +719,7 @@ function getAuditObject_MediaRevenueResearch() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'revresearch',
-        footerFormat: '<tfoot class="rev-research-footer" style="display: none;"><tr><th class="" colspan="8" style=""></th><th class="" colspan="1" style=""></th></tr></tfoot>',
+        footerFormat: '<tfoot class="rev-research-footer" style="display: none;"><tr><th class="" colspan="5" style=""></th><th class="" colspan="2" style=""></th></tr></tfoot>',
         footerCallback: function(row, data, start, end, display) {
 
             $(".rev-research-footer").show();
@@ -982,7 +736,7 @@ function getAuditObject_MediaRevenueResearch() {
 
             // Total over all pages
             var total = api
-                .column(6)
+                .column(4)
                 .data()
                 .reduce(function (a, b) {
                     return intVal(a) + intVal(b);
@@ -990,14 +744,14 @@ function getAuditObject_MediaRevenueResearch() {
 
             // Total over this page
             var pageTotal = api
-                .column(6, { page: 'current' })
+                .column(4, { page: 'current' })
                 .data()
                 .reduce(function (a, b) {
                     return intVal(a) + intVal(b);
                 }, 0);
 
             // Update footer
-            $(api.column(6).footer()).html(
+            $(api.column(4).footer()).html(
                 pageTotal.toLocaleString('en-US', {
                     style: 'currency',
                     currency: 'USD',
@@ -1041,7 +795,6 @@ function getAuditFilterArray_MediaRevenueResearch() {
         required: false
     }
     arrayFilters.push(arrayObject);
-
 
     arrayObject = {
         token: "StartDate",
