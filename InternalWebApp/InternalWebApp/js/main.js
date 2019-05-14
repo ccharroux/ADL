@@ -1022,3 +1022,17 @@ function buildTechMenu(selectedItem) {
     $("#menu").html(menuItems);
 
 }
+
+function replaceCharacter(object, charToChange) {
+
+    RegExp.escape = function (s) {
+        return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    };
+
+    var reg = new RegExp(RegExp.escape(charToChange), "g");
+
+    var sValue = object.replace(reg, "");
+
+    return sValue;
+
+}
