@@ -855,11 +855,11 @@ function getAuditObject_AEStatusList() {
     columnsToDisplay.push({
         "action": "edit",
         "mRender": function (data, type, row) {
-            var action = "/accountexecutive.html?AccountExecutiveID=" + row.AEId + "&AEName=" + row.AE;
-            //add in the other fields to the query string
-            //return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.AEId + ')\'>Edit</a>';
-            return '<a href="' + action +'" >Details</a>';
-            //return action;
+            var action = "/accountexecutive.html?AccountExecutiveID=" + row.AEId +
+                "&AEName=" +row.AE + "&Owner=" + row.Owner +
+                "&Market=" + row.Market + "&LinkedUser=" +row["Linked User"] +
+                "&ActiveDate=" + row["Active Date"] + "&DisableDate=" + row["Disable Date"];
+            return '<a href="' + encodeURI(action) + '" >Details</a>';
         },
         "orderable": false,
         "searchable": false,
