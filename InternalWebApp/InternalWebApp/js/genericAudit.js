@@ -16,7 +16,8 @@ auditName.push("auditStationAgencies");
 //revenue research
 auditName.push("auditAdvertisersRevenueResearch");
 auditName.push("auditMediaRevenueResearch");
-
+//account executive
+auditName.push("auditAEStatusList");
 
 
 function buildAuditArray() {
@@ -814,4 +815,67 @@ function getAuditFilterArray_MediaRevenueResearch() {
 
     return arrayFilters;
 }
+
+function getAuditFilterArray_AEStatusList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "FirstName",
+        jsCall: null,
+        objectName: "txtFirstName",
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "LastName",
+        jsCall: null,
+        objectName: "txtLastName",
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getAuditObject_AEStatusList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("ae");
+    columnsToDisplay.push("owner");
+    columnsToDisplay.push("market");
+    columnsToDisplay.push("active date");
+    columnsToDisplay.push("disable date");
+    columnsToDisplay.push("linked user");
+
+    //this column is used to create the edit link
+    //for each result row
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+            var action = "/accountexecutive.html?AccountExecutiveID=" + row.AEId + "&AEName=" + row.AE;
+            //add in the other fields to the query string
+            //return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.AEId + ')\'>Edit</a>';
+            return '<a href="' + action +'" >Details</a>';
+            //return action;
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject =
+    {
+        auditTitle: "Account Executive Status List",
+        apiControllerAction: "/api/AccountExecutiveReport/GetAEStatusList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'ae'
+    }
+
+    return tempObject;
+}
+
 

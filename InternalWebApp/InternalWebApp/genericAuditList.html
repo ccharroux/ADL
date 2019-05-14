@@ -51,6 +51,15 @@
         .fh5co-heading{
             margin-bottom: 0!important;
         }
+
+        #fh5co-contact-section {
+            padding-bottom: 0;
+        }
+
+        .contact-section {
+            padding-bottom: 6em;
+        }
+
     </style>
 </head>
 <body>
@@ -63,6 +72,26 @@
             </div>
         </header>
         <div id="fh5co-contact-section" class="contact-section">
+            <!-- dtReports -->
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
+                        <h2 id="reportTitle">XRay Reports</h2>
+                    </div>
+                </div>
+                <!-- start datatable coding-->
+                <!-- change to dtAudits -->
+                <div class="dataTable-top-margin">
+                    <div class="col-md-4 stripe" id="dtReport"></div>
+                    <div class="col-md-4 stripe" id="dtReportCol2"></div>
+                    <div class="col-md-4 stripe" id="dtReportCol3"></div>
+                </div>
+
+                <!-- end datatable coding-->
+
+            </div>
+        </div>
+        <div id="fh5co-contact-section2" class="contact-section">
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
@@ -70,11 +99,12 @@
                     </div>
                 </div>
                 <!-- start datatable coding-->
-
+                
+                <!-- change to dtAudits -->
                 <div class="dataTable-top-margin">
-                    <div class="col-md-4 stripe" id="dtResults"></div>
-                    <div class="col-md-4 stripe" id="dtResultsCol2"></div>
-                    <div class="col-md-4 stripe" id="dtResultsCol3"></div>
+                    <div class="col-md-4 stripe" id="dtAudit"></div>
+                    <div class="col-md-4 stripe" id="dtAuditCol2"></div>
+                    <div class="col-md-4 stripe" id="dtAuditCol3"></div>
                 </div>
 
                 <!-- end datatable coding-->
@@ -100,7 +130,9 @@
     <script src="/js/config.js"></script>
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
-    <!-- genericReport JS -->
+    <!-- genericReport JS-->
+    <script src="/js/genericReport.js"></script>
+    <!-- genericAudit JS -->
     <script src="/js/genericAudit.js"></script>
 
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
@@ -120,15 +152,18 @@
 
 
     var outAuditArray = new Array();
+    var outReportArray = new Array();
 
     $(document).ready(function () {
 
         outAuditArray = auditObjectArray;
-
-        //console.log(outAuditArray);
+        outReportArray = reportObjectArray;
 
         // build menu
         buildXRYMenu("Audits");
+
+        buildReportList("xry", "dtReport", "Reports", outReportArray);
+        buildAuditList("ae", "dtReportCol2", "Account Executives", outAuditArray);
 
         buildAuditLists();
 
@@ -144,9 +179,10 @@
 
     function buildAuditLists() {
         //build the functionality here similar to below
-        buildAuditList("advertisers", "dtResults", "Advertiser Audits", outAuditArray);
-        buildAuditList("agencies", "dtResults", "Agency Audits", outAuditArray);
-        buildAuditList("revresearch", "dtResults", "Revenue Research Audits", outAuditArray);
+        buildAuditList("advertisers", "dtAudit", "Advertiser Audits", outAuditArray);
+        buildAuditList("agencies", "dtAuditCol2", "Agency Audits", outAuditArray);
+        buildAuditList("revresearch", "dtAuditCol3", "Revenue Research Audits", outAuditArray);
+        
     }
 
     function buildAuditList(productId, control, title, auditArray) {
@@ -163,5 +199,19 @@
         }
     }
 
+    function buildReportList(productId, control, title, reportArray) {
+
+        $("#" + control).append("<h3 style='padding-top: 10px;padding-bottom: 10px; margin-bottom: 0px; margin-top: 15px;'>" + title + "</h3>");
+
+        for (var i = 0; i < reportArray.length; i++) {
+
+            if (reportArray[i].product.toLowerCase() == productId.toLowerCase()) {
+                $("#" + control).append("<div>");
+                $("#" + control).append("<a href='/utilities/genericReport.html?reportId=" + i + "'>" + reportArray[i].reportTitle + "</a>");
+                $("#" + control).append("</div>");
+            }
+
+        }
+    }
 
 </script>
