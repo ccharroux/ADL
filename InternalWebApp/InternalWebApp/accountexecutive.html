@@ -247,11 +247,28 @@
     var conversionExportColumns = returnTableColumnsByClass("dtConversionList", "exportColumn");
     var conversionReportTitle = "Account Executive Conversion List";
 
-    var revenueExportColumns = returnTableColumnsByClass("dtConversionList", "exportColumn");
+    var revenueExportColumns = returnTableColumnsByClass("dtRevenueList", "exportColumn");
     var revenueReportTitle = "Account Executive Revenue List";
 
 
     $(document).ready(function () {
+
+        loadFields();
+
+        //get assignment list
+        getAssignmentList();
+
+        //get conversion list
+        getConversionList();
+
+        //get revenue list
+        getRevenueList();
+
+        buildXRYMenu("Audits");
+
+    });
+
+    function loadFields() {
 
         iAccountExecutiveId = (getParameterByName("AccountExecutiveID") == null ? 0 : getParameterByName("AccountExecutiveID"));
         sAccountExecutive = (getParameterByName("AEName") == null ? "" : getParameterByName("AEName"));
@@ -266,7 +283,7 @@
         $("#txtMarket").val(sMarket);
         $("#txtLinkedUser").val(sLinkedUser);
 
-        if (sActiveDate != "null") {
+        if (sActiveDate !== "null") {
 
             var dtActiveDate = new Date(sActiveDate.toUpperCase());
             var sActiveDateFormatted = addZero(dtActiveDate.getMonth() + 1) + "/" + addZero(dtActiveDate.getDate()) + "/" + dtActiveDate.getFullYear();
@@ -276,7 +293,7 @@
             $("#txtActiveDate").val("");
         }
 
-        if (sDisableDate != "null") {
+        if (sDisableDate !== "null") {
 
             var dtDisableDate = new Date(sDisableDate.toUpperCase());
             var sDisableDateFormatted = addZero(dtDisableDate.getMonth() + 1) + "/" + addZero(dtDisableDate.getDate()) + "/" + dtDisableDate.getFullYear();
@@ -286,16 +303,8 @@
             $("#txtDisableDate").val("");
         }
 
-        //get assignment list
-        getAssignmentList();
+    }
 
-        //get conversion list
-        getConversionList();
-
-        //get revenue list
-        getRevenueList();
-
-    });
 
     function getAssignmentList() {
 
@@ -411,14 +420,8 @@
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
-                //if(!data["report"]["rows"]) {
-                //    destroyDataTable("dtAssignmentList");
-                //    $("#noAssignmentDataFound").show();
-
-                //    return;
-                //}
-
                 populateDataTable("dtAssignmentList", data);
+
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -541,16 +544,8 @@
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
-                //if (data["report"]["rows"].length == 0) {
-                //    console.log("no data");
-
-                //    destroyDataTable("dtConversionList");
-                //    $("#noConversionDataFound").show();
-
-                //    return;
-                //}
-
                 populateDataTable("dtConversionList", data);
+
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -618,7 +613,8 @@
                                return returnExportColumnHeadingTitle("dtRevenueList", data, columnIdx);
                            }
                        }
-                   }
+                   },
+                   footer: true
                },
                {
                    extend: 'print',
@@ -630,7 +626,8 @@
                                return returnExportColumnHeadingTitle("dtRevenueList", data, columnIdx);
                            }
                        }
-                   }
+                   },
+                   footer: true
                }
                //,
                //this button is supposed to handle column visibility
@@ -649,8 +646,6 @@
                 search: "Filter Results:"
             },
             footerCallback: function (row, data, start, end, display) {
-
-                //$(".rev-research-footer").show();
 
                 var api = this.api(), data;
 
@@ -711,16 +706,8 @@
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
-                //if (data["report"]["rows"].length == 0) {
-                //    console.log("no data");
-
-                //    destroyDataTable("dtConversionList");
-                //    $("#noConversionDataFound").show();
-
-                //    return;
-                //}
-
                 populateDataTable("dtRevenueList", data);
+
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
