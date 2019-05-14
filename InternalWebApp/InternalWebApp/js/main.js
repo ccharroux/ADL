@@ -1023,13 +1023,13 @@ function buildTechMenu(selectedItem) {
 
 }
 
-function replaceCharacter(object, charToChange) {
+function removeCharacter(object, charToRemove) {
 
     RegExp.escape = function (s) {
         return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
     };
 
-    var reg = new RegExp(RegExp.escape(charToChange), "g");
+    var reg = new RegExp(RegExp.escape(charToRemove), "g");
 
     var sValue = object.replace(reg, "");
 
