@@ -480,7 +480,7 @@ function getAuditObject_StationAgencies() {
     columnsToDisplay.push("market");
     columnsToDisplay.push("station");
     columnsToDisplay.push("station Agency");
-    columnsToDisplay.push("stationAgencyCode");
+    columnsToDisplay.push("station Agency Code");
     columnsToDisplay.push("market Agency");
     columnsToDisplay.push("account Type");
 
