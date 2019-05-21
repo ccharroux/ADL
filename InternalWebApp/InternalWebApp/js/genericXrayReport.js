@@ -873,7 +873,7 @@ function getAuditObject_AEStatusList() {
     columnsToDisplay.push({
         "action": "edit",
         "mRender": function (data, type, row) {
-            var action = "/accountexecutive.html?AccountExecutiveID=" + row.AEId +
+            var action = "/accountexecutivedetails.html?AccountExecutiveID=" + row.AEId +
                 "&AEName=" +row.AE + "&Owner=" + row.Owner +
                 "&Market=" + row.Market + "&LinkedUser=" +row["Linked User"] +
                 "&ActiveDate=" + row["Active Date"] + "&DisableDate=" + row["Disable Date"];
