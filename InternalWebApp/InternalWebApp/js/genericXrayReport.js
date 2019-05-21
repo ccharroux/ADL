@@ -303,7 +303,7 @@ function getAuditObject_StationAdvertisers() {
     columnsToDisplay.push("market");
     columnsToDisplay.push("station");
     columnsToDisplay.push("station Advertiser");
-    columnsToDisplay.push("stationCode");
+    columnsToDisplay.push("station Code");
     columnsToDisplay.push("market Advertiser");
     columnsToDisplay.push("industry Name");
     columnsToDisplay.push("sub Industry");
