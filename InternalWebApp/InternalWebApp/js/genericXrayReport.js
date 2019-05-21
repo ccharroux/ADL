@@ -225,7 +225,7 @@ function getAuditObject_MediaAdvertisers() {
     var columnsToDisplay = new Array();
     columnsToDisplay.push("market");
     columnsToDisplay.push("media Advertiser");
-    columnsToDisplay.push("mediaAdvertiserCode");
+    columnsToDisplay.push("media Advertiser Code");
     columnsToDisplay.push("market Advertiser");
     columnsToDisplay.push("mediaType");
 
