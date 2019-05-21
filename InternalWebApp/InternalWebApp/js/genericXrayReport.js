@@ -102,7 +102,7 @@ function buildQuickReports(rptType, control, container, postfix) {
 function getQuickReport(reportId) {
     if (reportId > -1) {
         setLocalStorage("gSearchResults", "");
-        window.location = "/utilities/genericAudit.html?reportId=" + reportId;
+        window.location = "/utilities/genericXrayReport.html?reportId=" + reportId;
     }
 }
 
@@ -589,7 +589,17 @@ function getAuditObject_AdvertisersRevenueResearch() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'revresearch',
-        footerFormat: '<tfoot class="rev-research-footer" style="display: none;"><tr><th class="" colspan="5" style=""></th><th class="" colspan="4" style=""></th></tr></tfoot>',
+        footerFormat: '<tfoot class="rev-research-footer" style="display: none;"><tr>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '</tr></tfoot>',
         footerCallback: function(row, data, start, end, display) {
 
             $(".rev-research-footer").show();
@@ -720,7 +730,15 @@ function getAuditObject_MediaRevenueResearch() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'revresearch',
-        footerFormat: '<tfoot class="rev-research-footer" style="display: none;"><tr><th class="" colspan="5" style=""></th><th class="" colspan="2" style=""></th></tr></tfoot>',
+        footerFormat: '<tfoot class="rev-research-footer" style="display: none;"><tr>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '</tr></tfoot>',
         footerCallback: function(row, data, start, end, display) {
 
             $(".rev-research-footer").show();
