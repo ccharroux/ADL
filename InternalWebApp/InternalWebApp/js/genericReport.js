@@ -117,6 +117,12 @@ reportName.push("rptMarketProductStationSummary");
 
 reportName.push("rptAsyncJobQueueStatus");
 
+reportName.push("rptDisabledAEList");
+
+reportName.push("rptMRRRevenueWithoutSubmitterList");
+reportName.push("rptMRRRevenueOutOfBalanceList");
+reportName.push("rptMRRRevenueEntryMissingList");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -3480,6 +3486,37 @@ function getReportFilterArray_GeneralStationData() {
 
     var arrayFilters = new Array();
     var arrayObject = new Object();
+    //arrayObject = {
+    //    token: "Product",
+    //    jsCall: "getProductList",
+    //    objectName: "ddlProduct",
+    //    required: false
+    //}
+    //arrayFilters.push(arrayObject);
+
+    //arrayObject = {
+    //    token: "Market",
+    //    jsCall: "getMarketListAll",
+    //    objectName: "ddlMarket",
+    //    required: false
+    //}
+    //arrayFilters.push(arrayObject);
+
+    //arrayObject = {
+    //    token: "Owner",
+    //    jsCall: "getOwnerList",
+    //    objectName: "ddlOwner",
+    //    required: false
+    //}
+    //arrayFilters.push(arrayObject);
+
+    //arrayObject = {
+    //    token: "MediaType",
+    //    jsCall: "getMediaTypeList",
+    //    objectName: "ddlMediaType",
+    //    required: false
+    //}
+    //arrayFilters.push(arrayObject);
 
     return arrayFilters;
 }
@@ -4372,3 +4409,170 @@ function getReportObject_AsyncJobQueueStatus() {
 
     return tempObject;
 }
+
+//rptDisabledAEList
+
+function getReportFilterArray_DisabledAEList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+ 
+    arrayObject = new Object();
+    arrayObject = {
+        token: "AsyncJobDaysBack",
+        objectName: "ddlAsyncJobDaysBack",
+        jsCall: "getDaysBackList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_DisabledAEList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "AE Disabled List",
+        apiControllerAction: "/api/AccountExecutiveReport/GetDisabledAEList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRRevenueWithoutSubmitterList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "AsyncJobDaysBack",
+        objectName: "ddlAsyncJobDaysBack",
+        jsCall: "getDaysBackList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MRRRevenueWithoutSubmitterList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "MRR Revenue without Submitter",
+        apiControllerAction: "/api/MRRReport/GetMRRRevenueWithoutSubmitterList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRRevenueOutOfBalanceList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token:  "Year",
+        jsCall:  "getYearList",
+        objectName:  "ddlYear",
+        required:  true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token:  "Period",
+        objectName:  "ddlPeriod",
+        jsCall:  "getPeriodList",
+        required:  true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MRRRevenueOutOfBalanceList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "MRR Revenue Out of Balance",
+        apiControllerAction: "/api/MRRReport/GetMRRRevenueOutOfBalanceList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRRevenueEntryMissingList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MRRRevenueEntryMissingList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "MRR Revenue Missing",
+        apiControllerAction: "/api/MRRReport/GetMRRRevenueEntryMissingList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+ 

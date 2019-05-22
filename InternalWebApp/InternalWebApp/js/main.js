@@ -721,7 +721,7 @@ function buildXRYMenu(selectedItem) {
 
     menuItems += '<ul>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="releasexry.html">Release</a></li>';
-    menuItems += buildGenericReportsLink(selectedItem);
+    menuItems += buildGenericReportsLink2(selectedItem);
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += productDashboard('mrr');
@@ -744,7 +744,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/parentagencylist.html">Parent Agency</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Audits") + ' href="/genericAuditList.html" role="button" aria-expanded="false">Audits </span></a>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "XRay Reports") + ' href="/genericXrayReportList.html" role="button" aria-expanded="false">XRay Reports </span></a>';
     //menuItems += '              <ul class="dropdown-menu" role="menu">';
     //menuItems += '                  <li style="display:block;"><a href="/stationagencylist.html">Station Agency</a></li>';
     //menuItems += '                  <li style="display:block;"><a href="/parentagencylist.html">Parent Agency</a></li>';
@@ -827,7 +827,7 @@ function buildMSSMenu(selectedItem) {
     var menuItems = '';
 
     menuItems += '<h1><a href="/dashboard.html">MKA Internal Media Site</a></h1>';
-    menuItems += '<nav role="navigation" style="margin-top:20px">'
+    menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
     menuItems += buildGenericReportsLink(selectedItem);
@@ -854,11 +854,11 @@ function buildDMAMenu(selectedItem) {
     var menuItems = '';
 
     menuItems += '<h1><a href="dashboard.html">MKA Internal Media Site</a></h1>';
-    menuItems += '<nav role="navigation" style="margin-top:20px">'
+    menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="releasedma.html">Release</a></li>';
-    menuItems += buildGenericReportsLink(selectedItem);
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="/Products/DMA/releasedma.html">Release</a></li>';
+    menuItems += buildGenericReportsLink2(selectedItem);
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += productDashboard('mrr');
@@ -868,7 +868,8 @@ function buildDMAMenu(selectedItem) {
     menuItems += productDashboard('dma');
     menuItems += '              </ul>';
     menuItems += '        </li>';
-
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "DMA Reports") + ' href="/Products/DMA/genericDmaReportList.html" role="button" aria-expanded="false">DMA Reports </span></a>';
+    menuItems += '       </li>';
     menuItems += productDashboard('');
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
     menuItems += '    </ul>';
@@ -907,7 +908,7 @@ function productDashboard(productId)
             break;
         case 'dma':
             style = 'display:block;';
-            strOut = '<a href="/dashboarddma.html">DMA</a>';
+            strOut = '<a href="/Products/DMA/dashboarddma.html">DMA</a>';
             break;
     }
 
@@ -919,6 +920,14 @@ function buildGenericReportsLink(selectedItem)
     var style = '';
 
     strOut = '<a ' + getSelectedItemClass(selectedItem, "Reports") +' href="/genericReportList.html">Reports</a>';
+
+    return '<li style="' + style + '">' + strOut + '</li>';
+}
+function buildGenericReportsLink2(selectedItem) {
+    var strOut = '';
+    var style = '';
+
+    strOut = '<a ' + getSelectedItemClass(selectedItem, "Reports") + ' href="/genericReportList.html">All Reports</a>';
 
     return '<li style="' + style + '">' + strOut + '</li>';
 }
@@ -1011,6 +1020,7 @@ function buildTechMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/encryptdecrypt.html">Encryption/Decryption Tool</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/mrrMarketHistoryDataMatrix.html">MRR Market History Maintenance</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/xrayMarketHistoryDataMatrix.html">XRAY Market History Maintenance</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/tvbMarketHistoryDataMatrix.html">TVB Market History Maintenance</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += productDashboard('');
@@ -1019,5 +1029,19 @@ function buildTechMenu(selectedItem) {
     menuItems += '</nav>';
 
     $("#menu").html(menuItems);
+
+}
+
+function removeCharacter(object, charToRemove) {
+
+    RegExp.escape = function (s) {
+        return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    };
+
+    var reg = new RegExp(RegExp.escape(charToRemove), "g");
+
+    var sValue = object.replace(reg, "");
+
+    return sValue;
 
 }

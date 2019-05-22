@@ -70,6 +70,7 @@
             font-weight:400;
             font-size: 14px;
             color:black;
+            max-width:240px!important;
         }
         .tableCol
         {
@@ -80,6 +81,7 @@
             font-weight: 400;
             font-size: 14px;
             color:#7f7f7f;
+            max-width:240px!important;
         }
         .rptView
         {
@@ -171,7 +173,19 @@
         </div>
  
     </div>
-
+    <div id="dialog-1"
+         title="">
+         <div style="margin-top:5px;margin-bottom:5px" id="areYouSure">Are you sure you want to...</div>
+        <center>
+            <textArea id="comments" placeholder="Enter comments here..."></textArea><hr />
+            <div style="margin-top:5px;margin-bottom:5px">
+                <input type="button" id="btnProcess" value="Process" onclick="updateParentMarketHistory()" \>
+            </div>
+            <div style="margin-top:5px;margin-bottom:5px">
+                <input type="button" id="btnCancel" value="Cancel" onclick="cancelIt()" \>
+            </div>
+        </center>
+    </div>
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
     <!-- jQuery Easing -->
@@ -205,6 +219,7 @@
 </html>
 <script>
 
+    var action = '';
     var reportObject = new Object();
     var reportFilterArray = new Object();
 
@@ -218,17 +233,18 @@
     var columnsToDisplay = new Array();
     var columnsToExport = new Array();
 
-    $(document).ready(function () {        
+    $(document).ready(function ()
+    {
+
+        buildDialog();
+
         buildDMAMenu("Release");
         buildQuickReports('dma');
-
 
         reportObject = getReportObject();
         reportFilterArray = getReportFilterArray();
         displayFilters(reportFilterArray);
         getYearList();
-        
-
 
         navTool.buildNavComponent("rptParentMarket", "ddlParentMarket", "getReportQuiet", false);
         navTool.buildNavComponent("rptMarket", "ddlMarket", "getReportQuiet", true);
@@ -236,11 +252,52 @@
         navTool.buildNavComponent("rptYear", "ddlYear", "getReportQuiet", false);
         navTool.buildNavComponent("rptPeriod", "ddlPeriod", "getReportQuiet", false);
 
-
         $(".rptMarket").hide();
+
+        setTimeout(canWePreBuildIt, 1000);
+
+
     });
+    function buildDialog()
+    {
+        $(function () {
+            $("#dialog-1").dialog({
+                autoOpen: false,
+                resizable: false,
+                width: 600,
+                height: 300,
+                modal: true
+            });
+        });
+    }
+    function canWePreBuildIt()
+    {
+        console.log('trying');
+        var parentMarketId = getParameterByName("ParentMarketID");
+        var period = getParameterByName("Period");
+        var year = getParameterByName("Year");
+
+        var paramCtr = 0;
 
 
+        if ((!parentMarketId == false) && (parentMarketId.length > 0)) {
+            $("#ddlParentMarket").val(parentMarketId);
+            paramCtr++;
+        }
+        if ((!year == false) && (year.length > 0)) {
+            $("#ddlYear").val(year);
+            paramCtr++;
+        }
+        if ((!period == false) && (period.length > 0)) {
+ 
+            $("#ddlPeriod").val(period.toUpperCase());
+            paramCtr++;
+
+            if (paramCtr == 3) {
+                getReport();
+            }
+        }
+    }
 
     //----------------
     // Local Calls
@@ -458,7 +515,7 @@
             // when done with the loop
             // get the report
             if (objectName == (itemsToCheckLength - 1)) {
-
+                getParentMarketHistory();
                 getTheReportAJAX();
             }
 
@@ -504,7 +561,7 @@
         if (!dataObj["report"]["rows"]) {
             destroyDataTable();
             $("#noDataFound").show();
-            $("#parentMarketHistory").hide();
+            //$("#parentMarketHistory").hide();
 
             return;
         }
@@ -512,7 +569,7 @@
         if (dataObj["report"]["rows"].length == 0) {
             destroyDataTable();
             $("#noDataFound").show();
-            $("#parentMarketHistory").hide();
+            //$("#parentMarketHistory").hide();
             return;
         }
         $('#dtResults').show();
@@ -576,7 +633,7 @@
 
             }
         });
-        getParentMarketHistory();
+
         loadResults(dataObj, columns);
     }
 
@@ -751,6 +808,7 @@
     }
     function getParentMarketHistory()
     {
+ 
         $("#parentMarketHistory").html("");
         if ($("#ddlParentMarket").val() == "") {
             $(".rptMarket").hide();
@@ -776,6 +834,7 @@
                 }
                 else {
                     $("#parentMarketHistory").show();
+                    $("#parentMarketHistory").html("");
                     var ignoreCols = 'ParentMarketID,RevenuePeriod,RevenueYear,'
                     var arrIgnoreCols = ignoreCols.split(',');
                     var iRowCtr = 0;
@@ -800,18 +859,82 @@
                         }
 
                         // data starts here
+                        var bHasBeenReviewed = false;
+                        var bHasBeenReleased = false;
+                        var bHasBeenRanked = false;
+                        var revision = '';
+                        var comment = '';
+
                         str = str + '<div style="display:table-row">';
-                        $.each(data.report.rows[index], function (key, value) {
-                            if (ignoreCols.includes(key) == false) {
-                                str = str + '<div class="tableCol">';
+                        $.each(data.report.rows[index], function (key, value)
+                        {
+                            if (key.toLowerCase() == "revision") {
+
+                                if (value.toString().length > 0) {
+                                    revision = value;
+                                }
+                            }
+
+                            if (key.toLowerCase() == "description") {
+
+                                if (value.toString().length > 0) {
+                                    comment = value;
+                                }
+                            }
+
+                            if (key.toLowerCase() == "review date")
+                            {
+                                if (value.length > 0)
+                                {
+                                    bHasBeenReviewed = true;
+                                }
+                            }
+                            if (key.toLowerCase() == "release date") {
+                                if (value.length > 0) {
+                                    bHasBeenReleased = true;
+                                }
+                            }
+                            if (key.toLowerCase() == "rank date") {
+                                if (value.length > 0) {
+                                    bHasBeenRanked = true;
+                                }
+                            }
+                            if (ignoreCols.includes(key) == false)
+                            {
+                                str = str + '<div class="tableCol" id="fld' + key.replace(' ', '') + revision + '">';
                                 str = str + value;
                                 str = str + '</div>';
                             }
                         });
                         str = str + '</div>';
+                        $("#parentMarketHistory").append(str);
+                        str = "";
+
+                        // The row is complete...
+                        // What can we do???
+                        if (bHasBeenRanked == false)
+                        {
+
+                            var msg = '<input type="button" id="btnRank"    value="Rank" onclick="rankIt(\'' + revision + '\', \'' + comment + '\')" \>';
+                            $("#fldRankDate" + revision.toString()).html(msg);
+
+                        }
+                        else if (bHasBeenRanked == true && bHasBeenReviewed == false) {
+ 
+                            var msg = '<input type="button" id="btnReview"   value="Review" onclick="reviewIt(\'' + revision + '\', \'' + comment + '\')" \>';
+                            $("#fldReviewDate" + revision.toString()).html(msg);
+                        }
+                        else if (bHasBeenRanked == true && bHasBeenReviewed == true && bHasBeenReleased == false) {
+                            var msg = '<input type="button" id="btnRelease"  value="Release" onclick="releaseIt(\'' + revision + '\', \'' + comment + '\')" \>';
+                            $("#fldReleaseDate" + revision.toString()).html(msg);
+                        }
+
+
+
+
                     });
 
-                    $("#parentMarketHistory").html(str);
+
 
                 }
 
@@ -829,6 +952,85 @@
             searchTable.destroy();
             $('#dtResults').hide();
         }
+
+    }
+
+    function rankIt(revision, comment) {
+        action = "rank";
+        $("#areYouSure").html("Are you sure you want to proceed with the Rank process?");
+        $("#dialog-1").dialog({ title: 'Rank' });
+        $("#comments").text(comment)
+        $("#dialog-1").dialog("open");
+
+    }
+
+    function releaseIt(revision, comment) {
+        action = "release";
+        $("#areYouSure").html("Are you sure you want to proceed with the Release process?");
+        $("#dialog-1").dialog({ title: 'Release' });
+        $("#comments").text(comment)
+        $("#dialog-1").dialog("open");
+
+    }
+
+    function reviewIt(revision, comment)
+    {
+        action = "review";
+        $("#areYouSure").html("Are you sure you want to proceed with the Review process?");
+        $("#dialog-1").dialog({ title: 'Review' });
+        $("#comments").text(comment)
+        $("#dialog-1").dialog("open");
+     }
+
+    function cancelIt()
+    {
+        $("#dialog-1").dialog("close");
+    }
+    function updateParentMarketHistory()
+    {
+        var inTypeOfUpdate = action;
+
+        //if (validationPassed() === false) {
+        //    return;
+        //}
+
+        $.ajax({
+            url: ServicePrefix + '/api/ParentMarketHistory/UpdateParentMarketHistory',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inParentMarketId": $("#ddlParentMarket").val(),
+                "inRevenuePeriod": $("#ddlPeriod").val(),
+                "inRevenueYear": $("#ddlYear").val(),
+                "inTypeOfUpdate": inTypeOfUpdate,
+                "inDescription": $("#comments").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var obj = data.report.rows[0];
+                    //if new load new parent market id
+                    bootbox.alert("Your request to " + inTypeOfUpdate + ' data has completed!', function () { //reload the page
+ 
+                        window.location.href = "releasedma.html?ParentMarketID=" + $("#ddlParentMarket").val() + "&Period=" + $("#ddlPeriod").val() + "&Year=" + $("#ddlYear").val();
+
+                    });
+                   
+
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
 
     }
 </script>
