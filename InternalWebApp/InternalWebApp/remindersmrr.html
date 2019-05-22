@@ -47,6 +47,10 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
 
+    <style type="text/css">
+        .dropdown-select { max-width: 200px; }
+    </style>
+
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
 
@@ -75,18 +79,18 @@
 
                 <!-- search / filter area -->
                 <div class="row search-section">
-                    <div class="col-md-10 ">
+                    <div class="col-md-12 ">
                         <label for="ddlMediaType" class="dropdown-label">Media Type</label>
-                        <select id="ddlMediaType" class="dropdown-select" onchange="getMarketList();"></select>
+                        <select id="ddlMediaType" class="dropdown-select" onchange="getMarkets();"></select>
 
-                        <label for="ddlSubmissionSchedule" class="dropdown-label">Submission Schedule</label>
-                        <select id="ddlSubmissionSchedule" class="dropdown-select" onchange="getMarketList();"></select>
+                        <label for="ddlSchedule" class="dropdown-label">Schedule</label>
+                        <select id="ddlSchedule" class="dropdown-select" onchange="getMarkets();"></select>
 
                         <label for="ddlMarket" class="dropdown-label">Market</label>
-                        <select id="ddlMarket" class="dropdown-select" onchange="getReminderList();"></select>
+                        <select id="ddlMarket" class="dropdown-select" onchange="getReminders();"></select>
 
                         <label for="ddlYearPeriod" class="dropdown-label">Year-Period</label>
-                        <select id="ddlYearPeriod" class="dropdown-select" onchange="getReminderList();"></select>
+                        <select id="ddlYearPeriod" class="dropdown-select" onchange="getReminders();"></select>
                     </div>
                 </div>
                 <div id="divQuickReport" style="float:right;padding-right:25px;padding-bottom:10px">
@@ -96,31 +100,31 @@
 
                 <!-- start datatable-->
                 <div class="dataTable-top-margin">
-                    <table id="dtReminderList" class="stripe">
+                    <table id="dtReminders" class="stripe">
                         <thead>
                             <tr>
                                 <th class="exportColumn">Market Name</th>
-                                <th class="exportColumn">Year-Period</th>
-                                <th class="exportColumn">Sent By</th>
-                                <th class="exportColumn">Sent On</th>
+                                <th class="exportColumn">Period</th>
+                                <th class="exportColumn">Reminder Sent By</th>
+                                <th class="exportColumn">Reminder Sent On</th>
                                 <th class="exportColumn">Stations Pending</th>
                                 <th class="exportColumn">Contacts Pending</th>
                                 <!--<th class="exportColumn">Media Type</th>-->
                                 <th class="exportColumn">On Hold</th>
-                                <!--<th class="exportColumn">Send</th>-->
+                                <th class="exportColumn">Send</th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
                                 <th>Market Name</th>
-                                <th>Year-Period</th>
-                                <th>Sent By</th>
-                                <th>Sent On</th>
+                                <th>Period</th>
+                                <th>Reminder Sent By</th>
+                                <th>Reminder Sent On</th>
                                 <th>Stations Pending</th>
                                 <th>Contacts Pending</th>
                                 <!--<th>Media Type</th>-->
                                 <th>On Hold</th>
-                                <!--<th>Send</th>-->
+                                <th>Send</th>
                             </tr>
                         </tfoot>
                     </table>
@@ -167,21 +171,20 @@
 
 
     var gotMediaTypes = false;
-    var gotSubmissionSchedules = false;
+    var gotSchedules = false;
     var gotMarkets = false;
     var gotYearsPeriods = false;
+    var initializedReminders = false;
 
     $(document).ready(function () {
 
         getMediaTypes();
 
-        getSubmissionSchedules();
+        getSchedules();
 
         getYearsPeriods();
 
         setEventListeners();
-
-        setDataTable();
 
         clearSearchButtonSetup();
 
@@ -210,30 +213,29 @@
     function setDataTable()
     {
         var reportTitle = "Reminders List";
-        var exportColumns = returnTableColumnsByClass("dtReminderList", "exportColumn");
+        var exportColumns = returnTableColumnsByClass("dtReminders", "exportColumn");
 
 
-        $("#dtReminderList").DataTable({
+        $("#dtReminders").DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
-            "data": [],
             "columns": [
-                { "data": 'Market Name' },
-                { "data": 'Period' },
-                { "data": 'Reminder Sent By' },
-                { "data": 'Reminder Sent On' },
-                { "data": 'Stations Pending' },
-                { "data": 'Contacts Pending' },
+                { "data": 'marketName' },
+                { "data": 'period' },
+                { "data": 'reminderSentBy' },
+                { "data": 'reminderSentOn' },
+                { "data": 'stationsPending' },
+                { "data": 'contactsPending' },
                 //{ "data": 'Media Type' },
-                { "data": 'On Hold' },
-                //{
-                //    mRender: function (data, type, row) {
-                //        return '<a href="#" onclick="sendReminder(' + row.marketId + ')">Send</a>';
+                { "data": 'onHold' },
+                {
+                    mRender: function (data, type, row) {
+                        return '<a href="#" onclick="sendReminder(' + row.marketId + ')">Send</a>';
 
-                //    },
-                //    "orderable": false,
-                //    "searchable": false
-                //},
+                    },
+                    "orderable": false,
+                    "searchable": false
+                },
             ],
             "pagingType": "full_numbers",
             "buttons": [
@@ -243,7 +245,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtReminderList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtReminders", data, columnIdx);
                            }
                        }
                    }
@@ -255,7 +257,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtReminderList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtReminders", data, columnIdx);
                            }
                        }
                    }
@@ -267,7 +269,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtReminderList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtReminders", data, columnIdx);
                            }
                        }
                    }
@@ -279,7 +281,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtReminderList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtReminders", data, columnIdx);
                            }
                        }
                    }
@@ -324,7 +326,7 @@
             // Number 13 is the "Enter" key on the keyboard
             if (event.keyCode === 13) {
 
-                getMarketList();
+                getMarkets();
             }
         });
     }
@@ -376,8 +378,8 @@
         }
     }
 
-    function getSubmissionSchedules() {
-        var url = ServicePrefix + '/api/ReportingPeriod/GetSubmissionScheduleList';
+    function getSchedules() {
+        var url = ServicePrefix + '/api/ReportingPeriod/GetScheduleList';
 
         var settings = {
             dataType: 'json',
@@ -388,7 +390,7 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getSubmissionSchedulesSuccess(data, textStatus, jQxhr);
+                getSchedulesSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -399,7 +401,7 @@
 
     }
 
-    function getSubmissionSchedulesSuccess(data, textStatus, jQxhr) {
+    function getSchedulesSuccess(data, textStatus, jQxhr) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
@@ -408,27 +410,27 @@
 
             var str = '';
             //console.log(JSON.stringify(data));
-            str = '<option selected value="-1">-- All Submission Schedules</option>';
+            str = '<option selected value="">-- All Schedules</option>';
             $.each(data.report.rows, function (index) {
 
-                str = str + '<option value="' + data.report.rows[index]["Submission Schedule ID"] + '">' + data.report.rows[index]["Submission Schedule Description"] + '</option>';
+                str = str + '<option value="' + data.report.rows[index]["Schedule ID"] + '">' + data.report.rows[index]["Schedule Description"] + '</option>';
 
             });
 
-            $("#ddlSubmissionSchedule").html(str);
+            $("#ddlSchedule").html(str);
 
-            gotSubmissionSchedules = true;
+            gotSchedules = true;
             getMarkets();
 
         }
     }
 
     function getMarkets() {
-        if (!gotMediaTypes || !gotSubmissionSchedules) {
+        if (!gotMediaTypes || !gotSchedules) {
             return;
         }
 
-        var url = ServicePrefix + '/api/Market/GetMarketListByProduct';
+        var url = ServicePrefix + '/api/Market/GetMarketListByProductMediaTypeSchedule';
 
         var settings = {
             dataType: 'json',
@@ -437,7 +439,9 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inProductId": "MRR",
-                "inActiveOnly": true
+                "inActiveOnly": true,
+                "inMediaTypeId": $("#ddlMediaType").val(),
+                "inScheduleId": $("#ddlSchedule").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -471,7 +475,7 @@
             $("#ddlMarket").html(str);
 
             gotMarkets = true;
-            getReminderList();
+            getReminders();
 
         }
     }
@@ -505,7 +509,7 @@
         $("#ddlYearPeriod").html(str);
 
         gotYearsPeriods = true;
-        getReminderList();
+        getReminders();
     }
 
     function loadLastSearch() {
@@ -521,13 +525,13 @@
                 $("#searchTextNumber").val(sArray[1].toString());
                 $("#ddlMediaType").val(sArray[2].toString());
 
-                getMarketList();
+                getMarkets();
             }
         }
 
     }
 
-    function getReminderList() {
+    function getReminders() {
         if (!gotMarkets || !gotYearsPeriods) {
             return;
         }
@@ -550,8 +554,11 @@
             if (mediaTypeId != -1) {
                 url += '&inMediaTypeId=' + mediaTypeId;
             }
+            var scheduleId = $("#ddlSchedule").val();
+            if (scheduleId != "") {
+                url += '&inScheduleId=' + scheduleId;
+            }
         }
-        alert('Debug ' + url);
 
         $.ajax({
             url: url,
@@ -570,7 +577,11 @@
                         return;
                     }
                 }
-                populateDataTable("dtReminderList", data);
+                if (!initializedReminders) {
+                    setDataTable();
+                    initializedReminders = true;
+                }
+                populateDataTable("dtReminders", data);
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -578,6 +589,10 @@
             }
         });
 
+    }
+
+    function sendReminder(marketId) {
+        bootbox.alert('Send functionality is still under development. MarketID = ' + marketId);
     }
 
 </script>
