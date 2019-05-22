@@ -139,7 +139,7 @@
                             <h3>Assignment List</h3>
                         </div>
                         <table id="dtAssignmentList" class="stripe text-align-left"></table>
-                        <div id="noAssignmentDataFound" style="display: none; color: red">No data found</div>
+                        <div id="dtAssignmentListNoDataFound" style="display: none; color: red">No data found</div>
                     </div>
 
                     <!-- conversion list -->
@@ -148,7 +148,7 @@
                             <h3>Conversion List</h3>
                         </div>
                         <table id="dtConversionList" class="stripe text-align-left"></table>
-                        <div id="noConversionDataFound" style="display: none; color: red">No data found</div>
+                        <div id="dtConversionListNoDataFound" style="display: none; color: red">No data found</div>
                     </div>
 
                     <!-- Revenue List-->
@@ -290,11 +290,11 @@
     function getAssignmentList() {
 
         if (iAccountExecutiveId <= 0) {
-            $("#noAssignmentDataFound").show();
+            $("#dtAssignmentListNoDataFound").show();
             return;
         }
 
-        $("#noAssignmentDataFound").hide();
+        $("#dtAssignmentListNoDataFound").hide();
 
         //replaced with dynamic building of table
         //initializeAssignmentTable();
@@ -418,11 +418,11 @@
     function getConversionList() {
 
         if (iAccountExecutiveId <= 0) {
-            $("#noConversionDataFound").show();
+            $("#dtConversionListNoDataFound").show();
             return;
         }
 
-        $("#noConversionDataFound").hide();
+        $("#dtConversionListNoDataFound").hide();
 
         //replaced with dynamic building of table
         //initializeConversionTable();
@@ -720,6 +720,18 @@
     function buildColumnsArray(tableObject, dataObj, reportTitle) {
         columnsToExport = new Array();
         columns = new Array();
+
+        if (!dataObj["report"]["rows"]) {
+            destroyDataTable(tableObject);
+            $("#" + tableObject + "NoDataFound").show();
+            return;
+        }
+
+        if (dataObj["report"]["rows"].length == 0) {
+            destroyDataTable(tableObject);
+            $("#" + tableObject + "NoDataFound").show();
+            return;
+        }
 
         $('#' + tableObject).show();
 
