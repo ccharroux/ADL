@@ -87,10 +87,19 @@
                         <select id="ddlSchedule" class="dropdown-select" onchange="getMarkets();"></select>
 
                         <label for="ddlMarket" class="dropdown-label">Market</label>
-                        <select id="ddlMarket" class="dropdown-select" onchange="getReminders();"></select>
+                        <select id="ddlMarket" class="dropdown-select" onchange="getContacts();"></select>
 
                         <label for="ddlYearPeriod" class="dropdown-label">Year-Period</label>
                         <select id="ddlYearPeriod" class="dropdown-select" onchange="getReminders();"></select>
+
+                        <label for="ddlContact" class="dropdown-label">Contact</label>
+                        <select id="ddlContact" class="dropdown-select" onchange="contactChanged();"></select>
+
+                        <label for="chkOnlyPendingMarkets">Only show status of pending markets</label>
+                        <input type="checkbox" id="chkOnlyPendingMarkets" value="" onclick="getReminders();" />
+
+                        <label for="chkOnlyMarketsForCurrentContact">Only allow selection of current contact's markets</label>
+                        <input type="checkbox" id="chkOnlyMarketsForCurrentContact" value="" onclick="getMarkets();" />
                     </div>
                 </div>
                 <div id="divQuickReport" style="float:right;padding-right:25px;padding-bottom:10px">
@@ -103,27 +112,39 @@
                     <table id="dtReminders" class="stripe">
                         <thead>
                             <tr>
-                                <th class="exportColumn">Market Name</th>
+                                <th class="exportColumn singleMarketOrContactColumn">Contact</th>
+                                <th class="exportColumn singleMarketOrContactColumn">Primary</th>
+                                <th class="exportColumn allMarketsColumn">Market</th>
+                                <th class="exportColumn singleMarketOrContactColumn">Station</th>
+                                <th class="exportColumn singleMarketOrContactColumn"># Reminders</th>
                                 <th class="exportColumn">Period</th>
-                                <th class="exportColumn">Reminder Sent By</th>
-                                <th class="exportColumn">Reminder Sent On</th>
-                                <th class="exportColumn">Stations Pending</th>
-                                <th class="exportColumn">Contacts Pending</th>
-                                <!--<th class="exportColumn">Media Type</th>-->
-                                <th class="exportColumn">On Hold</th>
+                                <th class="exportColumn singleMarketOrContactColumn">Input On</th>
+                                <th class="exportColumn">Sent By</th>
+                                <th class="exportColumn">Sent On</th>
+                                <th class="exportColumn allMarketsAndContactsColumn">Stations Pending</th>
+                                <th class="exportColumn allMarketsAndContactsColumn">Contacts Pending</th>
+                                <th class="exportColumn allMarketsAndContactsColumn">Media</th>
+                                <th class="exportColumn allMarketsAndContactsColumn">Schedule</th>
+                                <th class="exportColumn allMarketsAndContactsColumn">On Hold</th>
                                 <th class="exportColumn">Send</th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <th>Market Name</th>
+                                <th class="singleMarketOrContactColumn">Contact</th>
+                                <th class="singleMarketOrContactColumn">Primary</th>
+                                <th class="allMarketsColumn">Market</th>
+                                <th class="singleMarketOrContactColumn">Station</th>
+                                <th class="singleMarketOrContactColumn"># Reminders</th>
                                 <th>Period</th>
-                                <th>Reminder Sent By</th>
-                                <th>Reminder Sent On</th>
-                                <th>Stations Pending</th>
-                                <th>Contacts Pending</th>
-                                <!--<th>Media Type</th>-->
-                                <th>On Hold</th>
+                                <th class="singleMarketOrContactColumn">Input On</th>
+                                <th>Sent By</th>
+                                <th>Sent On</th>
+                                <th class="allMarketsAndContactsColumn">Stations Pending</th>
+                                <th class="allMarketsAndContactsColumn">Contacts Pending</th>
+                                <th class="allMarketsAndContactsColumn">Media</th>
+                                <th class="allMarketsAndContactsColumn">Schedule</th>
+                                <th class="allMarketsAndContactsColumn">On Hold</th>
                                 <th>Send</th>
                             </tr>
                         </tfoot>
@@ -164,6 +185,7 @@
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
 
 </body>
 </html>
@@ -172,17 +194,26 @@
 
     var gotMediaTypes = false;
     var gotSchedules = false;
-    var gotMarkets = false;
+    var gotMarkets = false; // unused as of 5-23-2019, but include it for consistency in case that changes later
     var gotYearsPeriods = false;
+    var gotContacts = false;
     var initializedReminders = false;
+    
+    // load/change of ddlMarket triggers load/reload of ddlContact, but change of ddlContact also triggers reload of ddlMarket if "only markets for current contact" is checked
+    // in this case, when ddlMarket triggers getContacts() in turn, getContacts() should leave ddlContact unchanged and just do ddlContact's side effects
+    var skipPopulatingContacts = false;
+
+    var previousMarketId = null;
+    var previousContactId = null;
 
     $(document).ready(function () {
 
         getMediaTypes();
-
         getSchedules();
-
+        // markets will be loaded once media types and schedules are both loaded
         getYearsPeriods();
+        // contacts will be loaded once markets are loaded
+        // grid will be loaded once contacts are loaded
 
         setEventListeners();
 
@@ -220,23 +251,80 @@
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
             "columns": [
+                { "data": 'contact' },
+                { "data": 'primary' },
                 { "data": 'marketName' },
+                { "data": 'stationName' },
+                { "data": 'numberReminders' },
                 { "data": 'period' },
+                { "data": 'inputOn' },
                 { "data": 'reminderSentBy' },
                 { "data": 'reminderSentOn' },
                 { "data": 'stationsPending' },
                 { "data": 'contactsPending' },
-                //{ "data": 'Media Type' },
+                { "data": 'mediaType' },
+                { "data": 'schedule' },
                 { "data": 'onHold' },
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="#" onclick="sendReminder(' + row.marketId + ')">Send</a>';
+                        return '<a href="#" onclick="sendReminder(' + row.marketId + ',' + row.stationId + ',' + row.personnelId + ')">Send</a>';
 
                     },
                     "orderable": false,
                     "searchable": false
                 },
             ],
+            "columnDefs": [
+                {
+                    "targets": [
+                        0, // Contact
+                        1, // Primary
+                        3, // Station Name
+                        4 // Number of Reminders
+                    ],
+                    "className": "singleMarketOrContactColumn"
+                },
+                {
+                    "targets": [
+                        2 // Market Name
+                    ],
+                    "className": "allMarketsColumn"
+                },
+                {
+                    "targets": [
+                        6 // Input On
+                    ],
+                    "className": "singleMarketOrContactColumn",
+                    //"render": $.fn.dataTable.render.moment('MM/DD/YYYY h:mm a') // returns "Invalid data" even on non-null input
+                    "render": function (data) {
+                        var m = moment(data);
+                        return m.isValid() ? m.format('MM/DD/YY h:mm a') : data;
+                    }
+                },
+                {
+                    "targets": [
+                        8 // Reminder Sent On
+                    ],
+                    "render": function (data) {
+                        var m = moment(data);
+                        return m.isValid() ? m.format('MM/DD/YY h:mm a') : data;
+                    }
+                },
+                {
+                    "targets": [
+                        9, // Stations Pending
+                        10, // Contacts Pending
+                        11, // Media Type
+                        12, // Schedule
+                        13 // On Hold
+                    ],
+                    "className": "allMarketsAndContactsColumn"
+                },
+
+            ],
+            "fnDrawCallback": function (oSettings) {
+                showHideColumns();
+            },
             "pagingType": "full_numbers",
             "buttons": [
                {
@@ -430,7 +518,7 @@
             return;
         }
 
-        var url = ServicePrefix + '/api/Market/GetMarketListByProductMediaTypeSchedule';
+        var url = ServicePrefix + '/api/Market/GetMarketListForReminders';
 
         var settings = {
             dataType: 'json',
@@ -441,7 +529,8 @@
                 "inProductId": "MRR",
                 "inActiveOnly": true,
                 "inMediaTypeId": $("#ddlMediaType").val(),
-                "inScheduleId": $("#ddlSchedule").val()
+                "inScheduleId": $("#ddlSchedule").val(),
+                "inPersonnelId": $("#chkOnlyMarketsForCurrentContact").prop('checked') ? $("#ddlContact").val() : -1
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -463,19 +552,29 @@
         }
         else {
 
+            previousMarketId = $("#ddlMarket").val();
             var str = '';
             //console.log(JSON.stringify(data));
-            str = '<option selected value="-1">-- All Markets</option>';
+            if (previousMarketId == null) {
+                str = '<option selected value="-1">-- All Markets</option>';
+            } else {
+                str = '<option value="-1">-- All Markets</option>';
+            }
             $.each(data.report.rows, function (index) {
 
-                str = str + '<option value="' + data.report.rows[index].marketID + '">' + data.report.rows[index].marketName + '</option>';
+                if (data.report.rows[index].marketId == previousMarketId) {
+                    str = str + '<option selected';
+                } else {
+                    str = str + '<option';
+                }
+                str = str + ' value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
 
             });
 
             $("#ddlMarket").html(str);
 
             gotMarkets = true;
-            getReminders();
+            getContacts();
 
         }
     }
@@ -494,7 +593,6 @@
         }
 
         var str = '';
-        str = '<option value="">-- Select a Year-Period --</option>';
 
         for (var y = thisYear - 1; y <= thisYear; y++) {
             for (var m = 1; m <= 12; m++) {
@@ -510,6 +608,94 @@
 
         gotYearsPeriods = true;
         getReminders();
+    }
+
+    function getContacts() {
+        if (skipPopulatingContacts) {
+            skipPopulatingContacts = false;
+            previousContactId = $("#ddlContact").val();
+            postGetContacts(previousContactId);
+            return;
+        }
+
+        var url = ServicePrefix + '/api/PersonnelReport/GetPersonnelUniqueContactList?inApiToken=' + getLocalStorage("APIToken")
+            + '&inProductId=MRR&inMarketId=' + $("#ddlMarket").val()
+            + '&inMediaType=' + $("#ddlMediaType").val()
+            + '&inAccessLevel=' + $("#ddlSchedule").val(); // attribute used as arbitrary string bucket, may want to move to dedicated attribute
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getContactsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getContactsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+
+            previousContactId = $("#ddlContact").val();
+            var str = '';
+            //console.log(JSON.stringify(data));
+            if (previousContactId == null) {
+                str = '<option selected value="-1">-- All Contacts</option>';
+            } else {
+                str = '<option value="-1">-- All Contacts</option>';
+            }
+            $.each(data.report.rows, function (index) {
+
+                if (data.report.rows[index].userId == previousContactId) {
+                    str = str + '<option selected';
+                } else {
+                    str = str + '<option';
+                }
+                str = str + ' value="' + data.report.rows[index].userId + '">' + data.report.rows[index].userName + '</option>';
+
+            });
+
+            $("#ddlContact").html(str);
+
+            gotContacts = true;
+            postGetContacts(previousContactId);
+
+        }
+    }
+
+    function postGetContacts(previousContactId) {
+        if ((previousContactId != null) && (previousContactId != -1) && ($("#ddlContact").val() == -1)) {
+            skipPopulatingContacts = true;
+            // leave this checkbox unchanged, it's just a no-op while Contact = All, but if user picks another contact then it will come back into effect
+            // $("#chkOnlyMarketsForCurrentContact").prop('checked', false);
+            getMarkets();
+        } else {
+            getReminders();
+        }
+    }
+
+    function contactChanged() {
+        if ($("#chkOnlyMarketsForCurrentContact").prop('checked')) {
+            skipPopulatingContacts = true;
+            // see above
+            //if ($("#ddlContact").val() == -1) {
+            //    $("#chkOnlyMarketsForCurrentContact").prop('checked', false);
+            //}
+            getMarkets();
+        } else {
+            getReminders();
+        }
     }
 
     function loadLastSearch() {
@@ -532,7 +718,7 @@
     }
 
     function getReminders() {
-        if (!gotMarkets || !gotYearsPeriods) {
+        if (!gotContacts || !gotYearsPeriods) {
             return;
         }
 
@@ -559,6 +745,13 @@
                 url += '&inScheduleId=' + scheduleId;
             }
         }
+        var contactId = $("#ddlContact").val();
+        if (contactId != -1) {
+            url += '&inPersonnelId=' + contactId;
+        }
+        if ($("#chkOnlyPendingMarkets").prop('checked')) {
+            url += '&inAccessLevel=OnlyPendingMarkets'; // using this attribute as an arbitrary string bucket, may want to move to a dedicated attribute
+        }
 
         $.ajax({
             url: url,
@@ -582,6 +775,7 @@
                     initializedReminders = true;
                 }
                 populateDataTable("dtReminders", data);
+                showHideColumns();
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -591,8 +785,27 @@
 
     }
 
-    function sendReminder(marketId) {
-        bootbox.alert('Send functionality is still under development. MarketID = ' + marketId);
+    function showHideColumns() {
+        var marketId = $("#ddlMarket").val();
+        var contactId = $("#ddlContact").val();
+
+        if (marketId == -1 && contactId == -1) {
+            $(".allMarketsAndContactsColumn").show();
+            $(".singleMarketOrContactColumn").hide();
+        } else {
+            $(".allMarketsAndContactsColumn").hide();
+            $(".singleMarketOrContactColumn").show();
+        }
+
+        if (marketId == -1) {
+            $(".allMarketsColumn").show();
+        } else {
+            $(".allMarketsColumn").hide();
+        }
+    }
+
+    function sendReminder(marketId, stationId, personnelId) {
+        bootbox.alert('Send functionality is still under development. MarketID = ' + marketId + ' / StationID = ' + stationId + ' / PersonnelID = ' + personnelId);
     }
 
 </script>
