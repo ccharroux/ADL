@@ -48,7 +48,9 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
 
     <style type="text/css">
-        .dropdown-select { max-width: 200px; }
+        .dropdown-select {
+            max-width: 200px;
+        }
     </style>
 
     <!-- Modernizr JS -->
@@ -73,7 +75,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2 id="pageTitle">Reminders - Market Revenue</h2>
+                        <h2 id="pageTitle">Reminders - X-Ray</h2>
                     </div>
                 </div>
 
@@ -82,9 +84,6 @@
                     <div class="col-md-12 ">
                         <label for="ddlMediaType" class="dropdown-label">Media Type</label>
                         <select id="ddlMediaType" class="dropdown-select" onchange="getMarkets();"></select>
-
-                        <label for="ddlSchedule" class="dropdown-label">Schedule</label>
-                        <select id="ddlSchedule" class="dropdown-select" onchange="getMarkets();"></select>
 
                         <label for="ddlMarket" class="dropdown-label">Market</label>
                         <select id="ddlMarket" class="dropdown-select" onchange="getContacts();"></select>
@@ -132,7 +131,6 @@
                                 <th class="exportColumn allMarketsAndContactsColumn">Stations Pending</th>
                                 <th class="exportColumn allMarketsAndContactsColumn">Contacts Pending</th>
                                 <th class="exportColumn allMarketsAndContactsColumn">Media</th>
-                                <th class="exportColumn allMarketsAndContactsColumn">Schedule</th>
                                 <th class="exportColumn allMarketsAndContactsColumn">On Hold</th>
                                 <th class="exportColumn">Send</th>
                             </tr>
@@ -151,7 +149,6 @@
                                 <th class="allMarketsAndContactsColumn">Stations Pending</th>
                                 <th class="allMarketsAndContactsColumn">Contacts Pending</th>
                                 <th class="allMarketsAndContactsColumn">Media</th>
-                                <th class="allMarketsAndContactsColumn">Schedule</th>
                                 <th class="allMarketsAndContactsColumn">On Hold</th>
                                 <th>Send</th>
                             </tr>
@@ -201,12 +198,11 @@
 
 
     var gotMediaTypes = false;
-    var gotSchedules = false;
-    var gotMarkets = false; // unused as of 5-23-2019, but include it for consistency in case that changes later
+    var gotMarkets = false;
     var gotYearsPeriods = false;
     var gotContacts = false;
     var initializedReminders = false;
-    
+
     // load/change of ddlMarket triggers load/reload of ddlContact, but change of ddlContact also triggers reload of ddlMarket if "only markets for current contact" is checked
     // in this case, when ddlMarket triggers getContacts() in turn, getContacts() should leave ddlContact unchanged and just do ddlContact's side effects
     var skipPopulatingContacts = false;
@@ -217,8 +213,7 @@
     $(document).ready(function () {
 
         getMediaTypes();
-        getSchedules();
-        // markets will be loaded once media types and schedules are both loaded
+        // markets will be loaded once media types are loaded
         getYearsPeriods();
         // contacts will be loaded once markets are loaded
         // grid will be loaded once contacts are loaded
@@ -271,7 +266,6 @@
                 { "data": 'stationsPending' },
                 { "data": 'contactsPending' },
                 { "data": 'mediaType' },
-                { "data": 'schedule' },
                 { "data": 'onHold' },
                 {
                     mRender: function (data, type, row) {
@@ -323,8 +317,7 @@
                         9, // Stations Pending
                         10, // Contacts Pending
                         11, // Media Type
-                        12, // Schedule
-                        13 // On Hold
+                        12, // On Hold
                     ],
                     "className": "allMarketsAndContactsColumn"
                 },
@@ -502,58 +495,7 @@
         }
     }
 
-    function getSchedules() {
-        var url = ServicePrefix + '/api/ReportingPeriod/GetScheduleList';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getSchedulesSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
-
-    }
-
-    function getSchedulesSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-        }
-        else {
-
-            var str = '';
-            //console.log(JSON.stringify(data));
-            str = '<option selected value="">-- All Schedules</option>';
-            $.each(data.report.rows, function (index) {
-
-                str = str + '<option value="' + data.report.rows[index]["Schedule ID"] + '">' + data.report.rows[index]["Schedule Description"] + '</option>';
-
-            });
-
-            $("#ddlSchedule").html(str);
-
-            gotSchedules = true;
-            getMarkets();
-
-        }
-    }
-
     function getMarkets() {
-        if (!gotMediaTypes || !gotSchedules) {
-            return;
-        }
-
         var url = ServicePrefix + '/api/Market/GetMarketListForReminders';
 
         var settings = {
@@ -562,10 +504,9 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inProductId": "MRR",
+                "inProductId": "XRY",
                 "inActiveOnly": true,
                 "inMediaTypeId": $("#ddlMediaType").val(),
-                "inScheduleId": $("#ddlSchedule").val(),
                 "inPersonnelId": $("#chkOnlyMarketsForCurrentContact").prop('checked') ? $("#ddlContact").val() : -1
             }),
             processData: false,
@@ -655,9 +596,8 @@
         }
 
         var url = ServicePrefix + '/api/PersonnelReport/GetPersonnelUniqueContactList?inApiToken=' + getLocalStorage("APIToken")
-            + '&inProductId=MRR&inMarketId=' + $("#ddlMarket").val()
-            + '&inMediaType=' + $("#ddlMediaType").val()
-            + '&inAccessLevel=' + $("#ddlSchedule").val(); // attribute used as arbitrary string bucket, may want to move to dedicated attribute
+            + '&inProductId=XRY&inMarketId=' + $("#ddlMarket").val()
+            + '&inMediaType=' + $("#ddlMediaType").val();
 
         var settings = {
             dataType: 'json',
@@ -764,7 +704,7 @@
         var yp = $("#ddlYearPeriod").val().toString();
         var y = yp.substring(0, 4);
         var p = yp.substring(4, 6); // second argument is also index, not length like .NET
-        var url = ServicePrefix + '/api/MRRReport/GetMarketRelease'
+        var url = ServicePrefix + '/api/XRAYReport/GetMarketRelease'
                 + '?inApiToken=' + getLocalStorage("APIToken")
                 + '&inYear=' + y
                 + '&inPeriod=' + p;
@@ -781,17 +721,8 @@
         if (contactId != -1) {
             url += '&inPersonnelId=' + contactId;
         }
-
-        // using this attribute as an arbitrary string bucket, may want to move to dedicated attributes
-        var additionalOptions = "~";
         if ($("#chkOnlyPendingMarkets").prop('checked')) {
-            additionalOptions += "OnlyPendingMarkets~";
-        }
-        if ($("#ddlSchedule").val() != "") {
-            additionalOptions += "Schedule=" + $("#ddlSchedule").val() + "~";
-        }
-        if (additionalOptions != "~") {
-            url += '&inAccessLevel=' + additionalOptions;
+            url += '&inAccessLevel=OnlyPendingMarkets'; // using this attribute as an arbitrary string bucket, may want to move to a dedicated attribute
         }
 
         $.ajax({
