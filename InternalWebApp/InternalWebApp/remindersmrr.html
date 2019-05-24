@@ -100,6 +100,14 @@
 
                         <label for="chkOnlyMarketsForCurrentContact">Only allow selection of current contact's markets</label>
                         <input type="checkbox" id="chkOnlyMarketsForCurrentContact" value="" onclick="getMarkets();" />
+
+                        <div class="allMarketsAndContactsTotal">
+                            Total Stations Pending:
+                            <span id="spanTotalStationsPending"></span>
+
+                            Total Contacts Pending:
+                            <span id="spanTotalContactsPending"></span>
+                        </div>
                     </div>
                 </div>
                 <div id="divQuickReport" style="float:right;padding-right:25px;padding-bottom:10px">
@@ -325,6 +333,34 @@
             "fnDrawCallback": function (oSettings) {
                 showHideColumns();
             },
+            "footerCallback": function (row, data, start, end, display) {
+                var columnTotalStationsPending = 9;
+                var columnTotalContactsPending = 10;
+
+                var api = this.api();
+
+                var numVal = function (n) {
+                    return typeof n === 'string' ? n.replace(/[\$,]/g, '') * 1.00 :
+                           typeof n === 'number' ? n :
+                           0;
+                };
+
+                var TotalStationsPending = api
+                    .column(columnTotalStationsPending)
+                    .data()
+                    .reduce(function (a, b) {
+                        return numVal(a) + numVal(b);
+                    }, 0);
+                $("#spanTotalStationsPending").html(TotalStationsPending);
+
+                var TotalContactsPending = api
+                    .column(columnTotalContactsPending)
+                    .data()
+                    .reduce(function (a, b) {
+                        return numVal(a) + numVal(b);
+                    }, 0);
+                $("#spanTotalContactsPending").html(TotalContactsPending);
+            },
             "pagingType": "full_numbers",
             "buttons": [
                {
@@ -381,7 +417,7 @@
             ],
             initComplete: function () {
                 $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
-            },
+           },
             createdRow: function (row, data, index) {
                 //this adds the class to every row
                 $(row).addClass('single-line-height');
@@ -792,9 +828,11 @@
         if (marketId == -1 && contactId == -1) {
             $(".allMarketsAndContactsColumn").show();
             $(".singleMarketOrContactColumn").hide();
+            $(".allMarketsAndContactsTotal").show();
         } else {
             $(".allMarketsAndContactsColumn").hide();
             $(".singleMarketOrContactColumn").show();
+            $(".allMarketsAndContactsTotal").hide();
         }
 
         if (marketId == -1) {
