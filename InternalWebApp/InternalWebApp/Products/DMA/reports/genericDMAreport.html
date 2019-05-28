@@ -186,11 +186,12 @@
     var reportFilterArray = new Array();
     var reportId = 0;
 
-    var parentMarketId = 0;
-    var marketId = 0;
-    var revenuePeriod = "";
-    var revenueYear = "";
-    var stationId = 0;
+    //URL parameters
+    var paramParentMarketId = 0;
+    var paramMarketId = 0;
+    var paramRevenuePeriod = "";
+    var paramRevenueYear = "";
+    var paramStationId = 0;
 
     var bDirectPageLink = false;
 
@@ -216,11 +217,11 @@
             //    //need to deal with cascade of drop downs like parent market to market load
             //    //assign all the drop downs
             //    //load the report
-            parentMarketId = getParameterByName("parentmarketid") !== null ? getParameterByName("parentmarketid") : 0;
-            marketId = getParameterByName("marketid") !== null ? getParameterByName("marketid") : "";
-            revenuePeriod = getParameterByName("revenueperiod") !== null ? getParameterByName("revenueperiod").toUpperCase() : "";
-            revenueYear = getParameterByName("revenueyear") !== null ? getParameterByName("revenueyear") : "";
-            stationId = getParameterByName("stationid") !== null ? getParameterByName("stationid") : "";
+            paramParentMarketId = getParameterByName("parentmarketid") !== null ? getParameterByName("parentmarketid") : 0;
+            paramMarketId = getParameterByName("marketid") !== null ? getParameterByName("marketid") : "";
+            paramRevenuePeriod = getParameterByName("revenueperiod") !== null ? getParameterByName("revenueperiod").toUpperCase() : "";
+            paramRevenueYear = getParameterByName("revenueyear") !== null ? getParameterByName("revenueyear") : "";
+            paramStationId = getParameterByName("stationid") !== null ? getParameterByName("stationid") : "";
 
         }
 
@@ -282,8 +283,8 @@
                     $("#ddlParentMarket").html(str);
                     saveLoadedControlSelection("ddlParentMarket");
 
-                    if (parentMarketId !== 0) {
-                        $("#ddlParentMarket").val(parentMarketId);
+                    if (paramParentMarketId !== 0) {
+                        $("#ddlParentMarket").val(paramParentMarketId);
                     } else {
                         $("#ddlParentMarket").selectedIndex = 0;
                     }
@@ -293,7 +294,6 @@
                     try {
 
                         if ($("#ddlMarket").is(":visible")) {
-                            console.log('trying to load market');
                             $("#ddlParentMarket").change();
                         }
 
@@ -310,12 +310,21 @@
     }
 
     function getMarketList(parentMarketId) {
+
         if (parentMarketId == "") {
 
             $("#ddlMarket").html('');
             getDefaultMarket();
             return;
         }
+
+        if (parentMarketId !== paramParentMarketId) {
+            paramMarketId = 0;
+            paramStationId = 0;
+            paramRevenuePeriod = "";
+            paramRevenueYear = "";
+        }
+
 
         $.ajax({
             url: ServicePrefix + '/api/Market/GetMarketListByParentMarket',
@@ -348,8 +357,8 @@
                     saveLoadedControlSelection("ddlMarket");
                     //preSelectItem('quickReportQS');
 
-                    if (marketId !== 0) {
-                        $("#ddlMarket").val(marketId);
+                    if (paramMarketId !== 0) {
+                        $("#ddlMarket").val(paramMarketId);
                     } else {
                         $("#ddlMarket").selectedIndex = 0;
                     }
@@ -359,7 +368,6 @@
                     try {
 
                         if ($("#ddlStation").is(":visible")) {
-                            console.log('trying to load station');
                             $("#ddlMarket").change();
                         }
 
@@ -415,8 +423,8 @@
                     saveLoadedControlSelection("ddlStation");
                     //preSelectItem('quickReportQS');
 
-                    if (stationId !== 0) {
-                        $("#ddlStation").val(stationId);
+                    if (paramStationId !== 0) {
+                        $("#ddlStation").val(paramStationId);
                     } else {
                         $("#ddlStation").selectedIndex = 0;
                     }
@@ -507,8 +515,8 @@
 
         $("#ddlYear").html(str);
 
-        if (revenueYear.length > 0) {
-            $("#ddlYear").val(revenueYear);
+        if (paramRevenueYear.length > 0) {
+            $("#ddlYear").val(paramRevenueYear);
         }
 
     }
@@ -551,8 +559,8 @@
 
         $("#ddlPeriod").html(str);
 
-        if (revenuePeriod.length > 0) {
-            $("#ddlPeriod").val(revenuePeriod);
+        if (paramRevenuePeriod.length > 0) {
+            $("#ddlPeriod").val(paramRevenuePeriod);
         }
 
     }
