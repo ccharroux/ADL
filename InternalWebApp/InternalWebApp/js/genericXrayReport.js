@@ -14,6 +14,7 @@ auditName.push("auditNewAdvertisers");
 //agencies
 auditName.push("auditAgencies");
 auditName.push("auditStationAgencies");
+auditName.push("auditNewAgencies");
 //revenue research
 auditName.push("auditAdvertisersRevenueResearch");
 auditName.push("auditMediaRevenueResearch");
@@ -668,6 +669,99 @@ function getAuditFilterArray_StationAgencies() {
         token: "AccountType",
         jsCall: "getAccountTypeList",
         objectName: "ddlAccountType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getAuditObject_NewAgencies() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("stationAgencyName");
+    columnsToDisplay.push("agencyName");
+    columnsToDisplay.push("stationName");
+    columnsToDisplay.push("stationAgencyID");
+    columnsToDisplay.push("agencyID");
+    columnsToDisplay.push("actionCode");
+    columnsToDisplay.push("comment");
+    columnsToDisplay.push("releaseDate");
+
+    //this column is used to create the edit links
+    //for each result row
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+            var action = '<a href="#" onclick=\'loadActionPage("/agency.html?AgencyID=",' + row.agencyId + ')\'>Edit&nbsp;Agency</a>';
+            var action2 = '<a href="#" onclick=\'loadActionPage("/stationagency.html?StationAgencyID=",' + row.stationAgencyId + ')\'>Edit&nbsp;Station&nbsp;Agency</a>';
+            return action + '<br />' + action2;
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject =
+    {
+        auditTitle: "New Agencies",
+        apiControllerAction: "/api/AgencyAudit/GetNewAgencyAuditList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'agencies',
+        // reuse rev-research-footer because genericXrayReport.html is hardcoded to it at one point
+        footerFormat: '<tfoot class="rev-research-footer" style="display: none;"><tr>'
+            + '<th></th>'
+            + '<th></th>'
+            + '<th></th>'
+            + '<th></th>'
+            + '<th></th>'
+            + '<th></th>'
+            + '<th></th>'
+            + '<th></th>'
+            + '</tr></tfoot>',
+        footerCallback: function (row, data, start, end, display) {
+
+            $(".rev-research-footer").show();
+
+            var api = this.api(), data;
+
+            var releaseDateDetailColumn = 7;
+            var releaseDateSummaryColumn = 1; // under Agency Name
+
+            // value is repeated on each row
+            var releaseDate = api
+                .column(releaseDateDetailColumn, { page: 'current' })
+                .data()
+                .reduce(function (a, b) {
+                    return (a == null) ? b : a;
+                }, null);
+
+            // Update footer
+            $(api.column(releaseDateSummaryColumn).footer()).html(
+                'Market last released ' + new Date(releaseDate).toLocaleString('en-US')
+            );
+
+            // Hide detail columns
+            api.columns([
+                releaseDateDetailColumn
+            ]).visible(false);
+        }
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_NewAgencies() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
         required: false
     }
     arrayFilters.push(arrayObject);
