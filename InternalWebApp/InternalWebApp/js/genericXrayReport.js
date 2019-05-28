@@ -10,6 +10,7 @@ var auditName = new Array();
 auditName.push("auditAdvertisers");
 auditName.push("auditMediaAdvertisers");
 auditName.push("auditStationAdvertisers");
+auditName.push("auditNewAdvertisers");
 //agencies
 auditName.push("auditAgencies");
 auditName.push("auditStationAgencies");
@@ -393,6 +394,117 @@ function getAuditFilterArray_StationAdvertisers() {
         token: "SubIndustry",
         jsCall: "getDefaultSubIndustry",
         objectName: "ddlSubIndustry",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getAuditObject_NewAdvertisers() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("stationAdvertiserName");
+    columnsToDisplay.push("advertiserName");
+    columnsToDisplay.push("subIndustryName");
+    columnsToDisplay.push("industryID");
+    columnsToDisplay.push("subIndustryID");
+    columnsToDisplay.push("mediaCodeID");
+    columnsToDisplay.push("stationName");
+    columnsToDisplay.push("stationOrMediaAdvertiserID");
+    columnsToDisplay.push("advertiserID");
+    columnsToDisplay.push("actionCode");
+    columnsToDisplay.push("comment");
+    columnsToDisplay.push("stationAdvertiserID");
+    columnsToDisplay.push("mediaAdvertiserID");
+    columnsToDisplay.push("releaseDate");
+
+    //this column is used to create the edit links
+    //for each result row
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+            var action = '<a href="#" onclick=\'loadActionPage("/advertiser.html?AdvertiserID=",' + row.advertiserId + ')\'>Edit&nbsp;Advertiser</a>';
+            var action2 = '';
+            if (row.stationAdvertiserId != null) {
+                action2 = '<a href="#" onclick=\'loadActionPage("/stationadvertiser.html?StationAdvertiserID=",' + row.stationAdvertiserId + ')\'>Edit&nbsp;Station&nbsp;Advertiser</a>';
+            } else {
+                action2 = '<a href="#" onclick=\'loadActionPage("/mediaadvertiser.html?MediaAdvertiserID=",' + row.mediaAdvertiserId + ')\'>Edit&nbsp;Media&nbsp;Advertiser</a>';
+            }
+            return action + '<br />' + action2;
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject =
+    {
+        auditTitle: "New Advertisers",
+        apiControllerAction: "/api/AdvertiserAudit/GetNewAdvertiserAuditList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advertisers',
+        // reuse rev-research-footer because genericXrayReport.html is hardcoded to it at one point
+        footerFormat: '<tfoot class="rev-research-footer" style="display: none;"><tr>'
+            + '<th></th>'
+            + '<th></th>'
+            + '<th></th>'
+            + '<th></th>'
+            + '<th></th>'
+            + '<th></th>'
+            + '<th></th>'
+            + '<th></th>'
+            + '<th></th>'
+            + '<th></th>'
+            + '<th></th>'
+            + '</tr></tfoot>',
+        footerCallback: function (row, data, start, end, display) {
+
+            $(".rev-research-footer").show();
+
+            var api = this.api(), data;
+
+            var stationAdvertiserColumn = 11;
+            var mediaAdvertiserColumn = 12;
+            var releaseDateDetailColumn = 13;
+            var releaseDateSummaryColumn = 1; // under Advertiser Name
+
+            // value is repeated on each row
+            var releaseDate = api
+                .column(releaseDateDetailColumn, { page: 'current' })
+                .data()
+                .reduce(function (a, b) {
+                    return (a == null) ? b : a;
+                }, null);
+
+            // Update footer
+            $(api.column(releaseDateSummaryColumn).footer()).html(
+                'Market last released ' + new Date(releaseDate).toLocaleString('en-US')
+            );
+
+            // Hide detail columns
+            api.columns([
+                stationAdvertiserColumn,
+                mediaAdvertiserColumn,
+                releaseDateDetailColumn
+            ]).visible(false);
+        }
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_NewAdvertisers() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
         required: false
     }
     arrayFilters.push(arrayObject);
