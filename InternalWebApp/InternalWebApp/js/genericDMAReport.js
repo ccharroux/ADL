@@ -3,6 +3,9 @@
 var dmaReportObjectArray = new Array();
 var dmaReportFilterObjectArray = new Array();
 
+var reportActionsArray = new Array();
+reportActionsArray.push("edit");
+
 var dmaReportName = new Array();
 dmaReportName.push("dmaRevenueComparisonMarket");
 dmaReportName.push("dmaRevenueComparisonStation");
@@ -56,8 +59,217 @@ function getDMAReportObject(inReportId) {
 
 function getDMAReportObject_RevenueComparisonMarket() {
 
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Parent Market");
+    columnsToDisplay.push("Revenue Year");
+    columnsToDisplay.push("Revenue Period");
+    columnsToDisplay.push("DMA Cat Id");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("DMA Revenue");
+    columnsToDisplay.push("MRR Revenue");
+    columnsToDisplay.push("Revenue Diff");
+
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+            var reportIndex = dmaReportName.indexOf("dmaRevenueComparisonStation");
+            var action = "";
+
+            if (reportIndex > -1) {
+                action = "/Products/DMA/reports/genericDMAreport.html?reportid=" + reportIndex +
+                        "&parentmarketid=" + row["Parent Market ID"] +
+                        "&marketid=" + row["Market Id"] +
+                        "&revenueperiod=" + row["Revenue Period"] +
+                        "&revenueyear=" + row["Revenue Year"] +
+                        "&direct=false";
+            }
+
+            //need to figure out if possible to do a generic report page
+            //var action = "/advertiser.html?AdvertiserID=";
+            //pass parent market id, market id, period, year
+            //also add flag for direct = false to turn back button on/off
+            return '<a href="' + action + '">Stations</a>';
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+
+    tempObject = {
+        reportTitle: "DMA/MRR Data Comparison - Market Level",
+        apiControllerAction: "/api/DMAReport/GetDMARevenueReviewByMarket",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        reportPath: "/Products/DMA/reports/genericDMAreport.html",
+        product: 'dmarevenue'
+    }
+
+    return tempObject;
 }
 
 function getDMAReportFilterArray_RevenueComparisonMarket() {
 
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        objectName: "ddlParentMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Period",
+        jsCall: "getPeriodList quarters",
+        objectName: "ddlPeriod",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+
+}
+
+function getDMAReportObject_RevenueComparisonStation() {
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Revenue Year");
+    columnsToDisplay.push("Revenue Period");
+    columnsToDisplay.push("DMA Cat Id");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("DMA Revenue");
+    columnsToDisplay.push("MRR Revenue");
+    columnsToDisplay.push("Revenue Diff");
+
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+            //need to figure out if possible to do a generic report page
+            var action = "/advertiser.html?AdvertiserID=";
+            //pass parent market id, market id, period, year, station id
+            //also add flag for direct = false to turn back button on/off
+            return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.advertiserId + ')\'>Details</a>';
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+
+    tempObject = {
+        reportTitle: "DMA/MRR Data Comparison - Station Level",
+        apiControllerAction: "/api/DMAReport/GetDMARevenueReviewByStation",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        reportPath: "/Products/DMA/reports/genericDMAreport.html",
+        product: 'dmarevenue'
+    }
+
+    return tempObject;
+}
+
+function getDMAReportFilterArray_RevenueComparisonStation() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        objectName: "ddlParentMarket",
+        required: true,
+        onchange: function () {
+
+            getMarketList($("#ddlParentMarket").val());
+
+        }
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getDefaultMarket",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Period",
+        jsCall: "getPeriodList quarters",
+        objectName: "ddlPeriod",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+
+
+    //parent market
+    //market
+    //revenue period
+    //revenue year
+
+    return arrayFilters;
+}
+
+function getDMAReportObject_RevenueComparisonStationDetail() {
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    //need to figure out how to make them non-sortable
+    columnsToDisplay.push("Desc");
+    columnsToDisplay.push("Revenue Year");
+    columnsToDisplay.push("Revenue Period");
+    columnsToDisplay.push("DMA Cat Id");
+    columnsToDisplay.push("MRR Cat Id");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("DMA Revenue");
+
+    tempObject = {
+        reportTitle: "DMA/MRR Data Comparison - MRR Level",
+        apiControllerAction: "/api/DMAReport/GetDMARevenueReviewByStationDetails",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        reportPath: "/Products/DMA/reports/genericDMAreport.html",
+        product: 'dmarevenue',
+        sortable: false
+    }
+
+    return tempObject;
+}
+
+function getDMAReportFilterArray_RevenueComparisonStationDetail() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    //parent market
+    //market
+    //station
+    //revenue period
+    //revenue year
+
+    return arrayFilters;
 }
