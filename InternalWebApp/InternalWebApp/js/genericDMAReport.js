@@ -159,11 +159,24 @@ function getDMAReportObject_RevenueComparisonStation() {
     columnsToDisplay.push({
         "action": "edit",
         "mRender": function (data, type, row) {
+            var reportIndex = dmaReportName.indexOf("dmaRevenueComparisonStationDetail");
+            var action = "";
+
+            if (reportIndex > -1) {
+                action = "/Products/DMA/reports/genericDMAreport.html?reportid=" + reportIndex +
+                    "&parentmarketid=" + $("#ddlParentMarket").val() +
+                    "&marketid=" + row["Market ID"] +
+                    "&revenueperiod=" + row["Revenue Period"] +
+                    "&revenueyear=" + row["Revenue Year"] +
+                    "&stationid=" + row["Station Id"] +
+                    "&direct=false";
+            }
+
             //need to figure out if possible to do a generic report page
-            var action = "/advertiser.html?AdvertiserID=";
-            //pass parent market id, market id, period, year, station id
+            //var action = "/advertiser.html?AdvertiserID=";
+            //pass parent market id, market id, period, year
             //also add flag for direct = false to turn back button on/off
-            return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.advertiserId + ')\'>Details</a>';
+            return '<a href="' + action + '">Details</a>';
         },
         "orderable": false,
         "searchable": false,
@@ -266,10 +279,59 @@ function getDMAReportFilterArray_RevenueComparisonStationDetail() {
     var arrayObject = new Array();
 
     //parent market
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        objectName: "ddlParentMarket",
+        required: true,
+        onchange: function () {
+
+            getMarketList($("#ddlParentMarket").val());
+
+        }
+    }
+    arrayFilters.push(arrayObject);
+
     //market
+    arrayObject = {
+        token: "Market",
+        jsCall: "getDefaultMarket",
+        objectName: "ddlMarket",
+        required: true,
+        onchange: function () {
+
+            getStationList($("#ddlMarket").val());
+
+        }
+    }
+    arrayFilters.push(arrayObject);
+
     //station
+    arrayObject = {
+        token: "Station",
+        jsCall: "getDefaultStation",
+        objectName: "ddlStation",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
     //revenue period
+    arrayObject = {
+        token: "Period",
+        jsCall: "getPeriodList quarters",
+        objectName: "ddlPeriod",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
     //revenue year
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
 
     return arrayFilters;
 }

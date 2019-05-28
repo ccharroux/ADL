@@ -118,7 +118,7 @@
                         </div>
                         <div class="form-group rptView rptStation">
                             <label for="ddlStation" class="dropdown-label rptView rptStation">Station</label>
-                            <select id="ddlStation" apiInput="inMarketId" class="dropdown-select rptView rptStation"></select>
+                            <select id="ddlStation" apiInput="inStationId" class="dropdown-select rptView rptStation"></select>
                         </div>
                         <div class="form-group rptView rptPeriod">
                             <label for="ddlPeriod" class="dropdown-label rptView rptPeriod">Period</label>
@@ -128,7 +128,7 @@
                             <label for="ddlYear" class="dropdown-label rptView rptYear">Year</label>
                             <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView rptYear"></select>
                         </div>
-                        <div class="form-group col-md-3 rptButton" style="text-align: right">
+                        <div class="form-group col-md-2 rptButton" style="text-align: right">
                             <label for="btnReport" class="dropdown-label">&nbsp;</label>
                             <input type="button" id="btnReport" class="search-button" value="Show" onclick="getReport()" />
                             <label for="btnBack" class="dropdown-label back-button">&nbsp;</label>
@@ -366,6 +366,61 @@
                     } catch (e) {
 
                     }
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function getStationList(marketId) {
+
+        if (marketId == "") {
+
+            $("#ddlStation").html('');
+            getDefaultStation();
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Station/GetStationListByMarketProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId,
+                "inProductId": "dma"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Station --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index]["Station Id"] + '">' + data.report.rows[index]["Station Name"] + '</option>';
+
+                    });
+
+                    $("#ddlStation").html(str);
+                    saveLoadedControlSelection("ddlStation");
+                    //preSelectItem('quickReportQS');
+
+                    if (stationId !== 0) {
+                        $("#ddlStation").val(stationId);
+                    } else {
+                        $("#ddlStation").selectedIndex = 0;
+                    }
+
                 }
 
             },
@@ -831,6 +886,14 @@
         var str = '';
         str = '<option value="">-- Select a Market --</option>';
         $("#ddlMarket").html(str);
+    }
+
+    function getDefaultStation() {
+        $("#ddlStation").html('');
+
+        var str = '';
+        str = '<option value="">-- Select a Station --</option>';
+        $("#ddlStation").html(str);
     }
 
     function loadOnChangeEvents(reportFilterArray) {
