@@ -791,6 +791,7 @@ function buildMRRMenu(selectedItem) {
     menuItems += '<ul>';
     menuItems += buildGenericReportsLink(selectedItem);
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="releasemrr.html">Release</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Reminders") + 'href="remindersmrr.html">Reminders</a></li>';
 
 
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
