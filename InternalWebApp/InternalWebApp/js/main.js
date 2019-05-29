@@ -720,7 +720,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="releasexry.html">Release</a></li>';
+
     menuItems += buildGenericReportsLink2(selectedItem);
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
@@ -731,27 +731,42 @@ function buildXRYMenu(selectedItem) {
     menuItems += productDashboard('dma');
     menuItems += '              </ul>';
     menuItems += '        </li>';
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Advertiser") + ' href="/advertiserlist.html" role="button" aria-expanded="false">Advertiser <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/stationadvertiserlist.html">Station Advertiser</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/mediaadvertiserlist.html">Media Advertiser</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/parentadvertiserlist.html">Parent Advertiser</a></li>';
-    menuItems += '              </ul>';
-    menuItems += '        </li>';
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Agency") + ' href="/agencylist.html" role="button" aria-expanded="false">Agency <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/stationagencylist.html">Station Agency</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/parentagencylist.html">Parent Agency</a></li>';
-    menuItems += '              </ul>';
-    menuItems += '        </li>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "XRay Reports") + ' href="/genericXrayReportList.html" role="button" aria-expanded="false">XRay Reports </span></a>';
     //menuItems += '              <ul class="dropdown-menu" role="menu">';
     //menuItems += '                  <li style="display:block;"><a href="/stationagencylist.html">Station Agency</a></li>';
     //menuItems += '                  <li style="display:block;"><a href="/parentagencylist.html">Parent Agency</a></li>';
     //menuItems += '              </ul>';
     menuItems += '        </li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="releasexry.html">Release</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Reminders") + 'href="remindersxry.html">Reminders</a></li>';
+    //menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Advertiser") + ' href="/advertiserlist.html" role="button" aria-expanded="false">Advertiser <span style="margin-right:10px;" class="caret"></span></a>';
+    //menuItems += '              <ul class="dropdown-menu" role="menu">';
+    //menuItems += '                  <li style="display:block;"><a href="/stationadvertiserlist.html">Station Advertiser</a></li>';
+    //menuItems += '                  <li style="display:block;"><a href="/mediaadvertiserlist.html">Media Advertiser</a></li>';
+    //menuItems += '                  <li style="display:block;"><a href="/parentadvertiserlist.html">Parent Advertiser</a></li>';
+    //menuItems += '              </ul>';
+    //menuItems += '        </li>';
+    //menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Agency") + ' href="/agencylist.html" role="button" aria-expanded="false">Agency <span style="margin-right:10px;" class="caret"></span></a>';
+    //menuItems += '              <ul class="dropdown-menu" role="menu">';
+    //menuItems += '                  <li style="display:block;"><a href="/stationagencylist.html">Station Agency</a></li>';
+    //menuItems += '                  <li style="display:block;"><a href="/parentagencylist.html">Parent Agency</a></li>';
+    //menuItems += '              </ul>';
+    //menuItems += '        </li>';
+
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="/advertiserlist.html" role="button" aria-expanded="false">Advertiser</a></li>'; 
+    menuItems += '                  <li style="display:block;"><a href="/stationadvertiserlist.html">&nbsp;Station Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/mediaadvertiserlist.html">&nbsp;Media Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/parentadvertiserlist.html">&nbsp;Parent Advertiser</a></li>';
+
+    menuItems += '                  <li style="display:block;"><a href="/agencylist.html" role="button" aria-expanded="false">Agency</a></li>';
+ 
+    menuItems += '                  <li style="display:block;"><a href="/stationagencylist.html">&nbsp;Station Agency</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/parentagencylist.html">&nbsp;Parent Agency</a></li>';
+ 
+    
+
     menuItems += '                  <li style="display:block;"><a href="/industrylist.html">Industry</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/subindustrylist.html">Sub Industry</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/nielsenmarketnamelist.html">Nielson Market</a></li>';
@@ -774,9 +789,11 @@ function buildMRRMenu(selectedItem) {
     menuItems += '<nav role="navigation" style="margin-top:20px">'
 
     menuItems += '<ul>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="releasemrr.html">Release</a></li>';
-
     menuItems += buildGenericReportsLink(selectedItem);
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="releasemrr.html">Release</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Reminders") + 'href="remindersmrr.html">Reminders</a></li>';
+
+
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += productDashboard('mrr');
@@ -805,6 +822,8 @@ function buildTVBMenu(selectedItem) {
 
     menuItems += '<ul>';
     menuItems += buildGenericReportsLink(selectedItem);
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Reminders") + 'href="reminderstvb.html">Reminders</a></li>';
+
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += productDashboard('mrr');

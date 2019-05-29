@@ -83,7 +83,8 @@ function getDMAReportObject_RevenueComparisonMarket() {
                         "&marketid=" + row["Market Id"] +
                         "&revenueperiod=" + row["Revenue Period"] +
                         "&revenueyear=" + row["Revenue Year"] +
-                        "&direct=false";
+                        "&direct=false" +
+                        "&showbackbutton=true";
             }
 
             //need to figure out if possible to do a generic report page
@@ -169,7 +170,8 @@ function getDMAReportObject_RevenueComparisonStation() {
                     "&revenueperiod=" + row["Revenue Period"] +
                     "&revenueyear=" + row["Revenue Year"] +
                     "&stationid=" + row["Station Id"] +
-                    "&direct=false";
+                    "&direct=false" +
+                    "&showbackbutton=true";
             }
 
             //need to figure out if possible to do a generic report page
