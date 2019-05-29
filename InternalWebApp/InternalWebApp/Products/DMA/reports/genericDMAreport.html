@@ -194,6 +194,7 @@
     var paramStationId = 0;
 
     var bDirectPageLink = false;
+    var bShowBackButton = false;
 
     var referrer = "";
     var urlParams = "";
@@ -210,27 +211,34 @@
 
     $(document).ready(function () {
 
+        //get report it
         reportId = getParameterByName("reportId");
+
+        //get whether page was a direct link or not
         bDirectPageLink = getParameterByName("direct") == "true" ? true : false;
 
+        //if not a direct link, get the query string parameters
         if (bDirectPageLink == false) {
-            //    //need to deal with cascade of drop downs like parent market to market load
-            //    //assign all the drop downs
-            //    //load the report
-            paramParentMarketId = getParameterByName("parentmarketid") !== null ? getParameterByName("parentmarketid") : 0;
+            paramParentMarketId =
+                getParameterByName("parentmarketid") !== null ? getParameterByName("parentmarketid") : 0;
             paramMarketId = getParameterByName("marketid") !== null ? getParameterByName("marketid") : "";
-            paramRevenuePeriod = getParameterByName("revenueperiod") !== null ? getParameterByName("revenueperiod").toUpperCase() : "";
+            paramRevenuePeriod = getParameterByName("revenueperiod") !== null
+                ? getParameterByName("revenueperiod").toUpperCase()
+                : "";
             paramRevenueYear = getParameterByName("revenueyear") !== null ? getParameterByName("revenueyear") : "";
             paramStationId = getParameterByName("stationid") !== null ? getParameterByName("stationid") : "";
+        }
 
+        bShowBackButton = getParameterByName("showbackbutton") === "true" ? true : false;
+
+        if (bShowBackButton) {
+            $(".back-button").show();
+        } else {
+            $(".back-button").hide();
         }
 
         reportObject = getDMAReportObject(reportId);
         reportFilterArray = reportObject.filters;
-
-        referrer = document.referrer;
-        //urlParams = window.location.search;
-        console.log(referrer);
 
         displayFilters(reportFilterArray);
         loadOnChangeEvents(reportFilterArray);
@@ -247,13 +255,8 @@
 
     });
 
-
-
     function getParentMarketList() {
-        //call api /api/parentmarket/GetParentMarketListByProduct
-        //params
-        //token
-        //inProductId in this case dma
+
         $.ajax({
             url: ServicePrefix + '/api/parentmarket/GetParentMarketListByProduct',
             dataType: 'json',
@@ -323,8 +326,8 @@
             paramStationId = 0;
             paramRevenuePeriod = "";
             paramRevenueYear = "";
+            $(".back-button").hide();
         }
-
 
         $.ajax({
             url: ServicePrefix + '/api/Market/GetMarketListByParentMarket',
@@ -479,10 +482,40 @@
 
     function goBack() {
 
-        //do something if going back to prevent that page from showing the back button
-        //won't have access as to what sent it from there.
-        //need to set direct to true before the redirect
-        window.location = referrer + urlParams;
+        var params = {};
+
+        referrer = document.referrer;
+        var referrerArray = referrer.split('?');
+
+        var referrUrl = referrerArray[0];
+        var referrerParams = referrerArray[1].split('&');
+
+        for (var i = 0; i < referrerParams.length; i++) {
+            var pair = referrerParams[i].split('=');
+            params[pair[0]] = decodeURIComponent(pair[1]);
+        }
+
+        params["direct"] = false;
+        params["showbackbutton"] = false;
+        params["parentmarketid"] = paramParentMarketId;
+        params["marketid"] = paramMarketId;
+        params["stationid"] = paramStationId;
+        params["revenueperiod"] = paramRevenuePeriod;
+        params["revenueyear"] = paramRevenueYear;
+
+        var redirectParamsString = "";
+
+        Object.keys(params).forEach(function (key, index) {
+            // key: the name of the object key
+            // index: the ordinal position of the key within the object 
+            if (index === 0) {
+                redirectParamsString += key + "=" + encodeURIComponent(params[key]);
+            } else {
+                redirectParamsString += "&" + key + "=" + encodeURIComponent(params[key]);
+            }
+        });
+
+        window.location = referrUrl + "?" + redirectParamsString;
 
     }
 
