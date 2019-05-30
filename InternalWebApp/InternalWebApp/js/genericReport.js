@@ -122,6 +122,8 @@ reportName.push("rptDisabledAEList");
 reportName.push("rptMRRRevenueWithoutSubmitterList");
 reportName.push("rptMRRRevenueOutOfBalanceList");
 reportName.push("rptMRRRevenueEntryMissingList");
+reportName.push("rptAdvertiserAgencyRevenueList");
+
 
 function buildReportArray()
 {
@@ -4575,4 +4577,57 @@ function getReportObject_MRRRevenueEntryMissingList() {
 
     return tempObject;
 }
- 
+function getReportFilterArray_AdvertiserAgencyRevenueList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "FromYear",
+        jsCall: "getYearList",
+        objectName: "ddlFromYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "ToYear",
+        jsCall: "getYearList",
+        objectName: "ddlToYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        objectName: "ddlMarket",
+        jsCall: "getXRYMarketList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_AdvertiserAgencyRevenueList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "XRay Advertiser / Agency Revenue",
+        apiControllerAction: "/api/XRAYReport/GetAdvertiserAgencyRevenueList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+reportName.push("rptAdvertiserAgencyRevenueList");
