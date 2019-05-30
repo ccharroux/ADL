@@ -273,6 +273,7 @@
 
     var startDate = "";
     var endDate = "";
+    var init_marketId = "";
 
     $(document).ready(function () {
 
@@ -282,6 +283,7 @@
 
         LoadDefaultDates();
 
+        init_marketId = getParameterByName("marketid");
         reportId = getParameterByName("reportId");
 
         if (!reportId)
@@ -343,6 +345,10 @@
             if (getRequiredFiltersCount() == 0)
             {
                 getReport();
+            }
+            else
+            {
+                setTimeout('getReport(true)', 1000);
             }
  
         }
@@ -834,9 +840,11 @@
                     });
 
                     $("#ddlMarket").html(str);
+
                     saveLoadedControlSelection("ddlMarket");
                     preSelectItem('quickReportQS');
-
+     
+                    $("#ddlMarket").val(init_marketId);
                 }
 
 
@@ -1144,8 +1152,13 @@
     //----------------------
     // BEGIN: load of the reports and supporting routines
     //---------------------
-    function getReport()
+    function getReport(bSilent)
     {
+
+        if (!bSilent)
+        {
+            bSilent = false;
+        }
 
         $("#noDataFound").hide();
 
@@ -1238,7 +1251,9 @@
                 if (isRequired)
                 {
                     var msg = "Please select a " + nameOfParm.toLowerCase().replace("in", "").replace("id", "");
-                    bootbox.alert(msg, function () { });
+                    if (bSilent == false) {
+                        bootbox.alert(msg, function () { });
+                    }
                     return false;
                 }
             }

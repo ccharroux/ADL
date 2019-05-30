@@ -219,7 +219,16 @@ function getQuickReport(reportId)
 {
     if (reportId > -1)
     {
-        window.location = "/utilities/genericReport.html?reportId=" + reportId;
+        var url = "/utilities/genericReport.html?reportId=" + reportId;
+
+        var i = parseInt($("#ddlMarket").val());
+
+        if (i > 0)
+        {
+            url = url + "&marketid=" + $("#ddlMarket").val();
+        }
+
+        window.location = url;
     }
 }
 
