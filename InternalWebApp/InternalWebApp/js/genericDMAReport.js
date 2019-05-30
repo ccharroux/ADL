@@ -63,7 +63,7 @@ function getDMAReportObject_RevenueComparisonMarket() {
     var columnsToDisplay = new Array();
 
     columnsToDisplay.push("Parent Market");
-    columnsToDisplay.push("Revenue Year");
+    //columnsToDisplay.push("Revenue Year");
     columnsToDisplay.push("Revenue Period");
     columnsToDisplay.push("DMA Cat Id");
     columnsToDisplay.push("Market");
@@ -77,12 +77,14 @@ function getDMAReportObject_RevenueComparisonMarket() {
             var reportIndex = dmaReportName.indexOf("dmaRevenueComparisonStation");
             var action = "";
 
+            var revenuePeriodParts = row["Revenue Period"].split("/");
+
             if (reportIndex > -1) {
                 action = "/Products/DMA/reports/genericDMAreport.html?reportid=" + reportIndex +
                         "&parentmarketid=" + row["Parent Market ID"] +
                         "&marketid=" + row["Market Id"] +
-                        "&revenueperiod=" + row["Revenue Period"] +
-                        "&revenueyear=" + row["Revenue Year"] +
+                        "&revenueperiod=" + revenuePeriodParts[1] +
+                        "&revenueyear=" + revenuePeriodParts[0] +
                         "&direct=false" +
                         "&showbackbutton=true";
             }
@@ -149,7 +151,7 @@ function getDMAReportObject_RevenueComparisonStation() {
     var columnsToDisplay = new Array();
 
     columnsToDisplay.push("Market");
-    columnsToDisplay.push("Revenue Year");
+    //columnsToDisplay.push("Revenue Year");
     columnsToDisplay.push("Revenue Period");
     columnsToDisplay.push("DMA Cat Id");
     columnsToDisplay.push("Station");
@@ -163,12 +165,14 @@ function getDMAReportObject_RevenueComparisonStation() {
             var reportIndex = dmaReportName.indexOf("dmaRevenueComparisonStationDetail");
             var action = "";
 
+            var revenuePeriodParts = row["Revenue Period"].split("/");
+
             if (reportIndex > -1) {
                 action = "/Products/DMA/reports/genericDMAreport.html?reportid=" + reportIndex +
                     "&parentmarketid=" + $("#ddlParentMarket").val() +
                     "&marketid=" + row["Market ID"] +
-                    "&revenueperiod=" + row["Revenue Period"] +
-                    "&revenueyear=" + row["Revenue Year"] +
+                    "&revenueperiod=" + revenuePeriodParts[1] +
+                    "&revenueyear=" + revenuePeriodParts[0] +
                     "&stationid=" + row["Station Id"] +
                     "&direct=false" +
                     "&showbackbutton=true";
@@ -255,7 +259,7 @@ function getDMAReportObject_RevenueComparisonStationDetail() {
 
     //need to figure out how to make them non-sortable
     columnsToDisplay.push("Desc");
-    columnsToDisplay.push("Revenue Year");
+    //columnsToDisplay.push("Revenue Year");
     columnsToDisplay.push("Revenue Period");
     columnsToDisplay.push("DMA Cat Id");
     columnsToDisplay.push("MRR Cat Id");

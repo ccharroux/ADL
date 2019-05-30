@@ -110,30 +110,34 @@
                         -->
                         <div class="form-group rptView rptParentMarket">
                             <label for="ddlParentMarket" class="dropdown-label rptView rptParentMarket">Parent Market</label>
-                            <select id="ddlParentMarket" apiInput="inParentMarketId" class="dropdown-select rptView rptParentMarket"></select>
+                            <select id="ddlParentMarket" apiInput="inParentMarketId" class="dropdown-select rptView rptParentMarket field-width-210"></select>
                         </div>
                         <div class="form-group rptView rptMarket">
                             <label for="ddlMarket" class="dropdown-label rptView rptMarket">Market</label>
-                            <select id="ddlMarket" apiInput="inMarketId" class="dropdown-select rptView rptMarket"></select>
+                            <select id="ddlMarket" apiInput="inMarketId" class="dropdown-select rptView rptMarket field-width-210"></select>
                         </div>
                         <div class="form-group rptView rptStation">
                             <label for="ddlStation" class="dropdown-label rptView rptStation">Station</label>
-                            <select id="ddlStation" apiInput="inStationId" class="dropdown-select rptView rptStation"></select>
+                            <select id="ddlStation" apiInput="inStationId" class="dropdown-select rptView rptStation field-width-210"></select>
                         </div>
                         <div class="form-group rptView rptPeriod">
                             <label for="ddlPeriod" class="dropdown-label rptView rptPeriod">Period</label>
-                            <select id="ddlPeriod" apiInput="inPeriod" class="dropdown-select rptView rptPeriod"></select>
+                            <select id="ddlPeriod" apiInput="inPeriod" class="dropdown-select rptView rptPeriod field-width-100"></select>
                         </div>
                         <div class="form-group rptView rptYear">
                             <label for="ddlYear" class="dropdown-label rptView rptYear">Year</label>
-                            <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView rptYear"></select>
+                            <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView rptYear field-width-100"></select>
                         </div>
                         <div class="form-group col-md-2 rptButton" style="text-align: right">
                             <label for="btnReport" class="dropdown-label">&nbsp;</label>
                             <input type="button" id="btnReport" class="search-button" value="Show" onclick="getReport()" />
-                            <label for="btnBack" class="dropdown-label back-button">&nbsp;</label>
-                            <input type="button" id="btnBack" class="search-button back-button" value="Back" onclick="goBack()" />
                         </div>
+                    </div>
+                </div>
+
+                <div class="row back-button" style="margin-top: 20px;">
+                    <div class="col-md-12 text-center">
+                        <input type="button" id="btnBack" class="search-button" value="Back" onclick="goBack()" />
                     </div>
                 </div>
 
@@ -215,27 +219,23 @@
         reportId = getParameterByName("reportId");
 
         //get whether page was a direct link or not
-        bDirectPageLink = getParameterByName("direct") == "true" ? true : false;
+        bDirectPageLink = getParameterByName("direct") === "true" ? true : false;
 
         //if not a direct link, get the query string parameters
-        if (bDirectPageLink == false) {
-            paramParentMarketId =
-                getParameterByName("parentmarketid") !== null ? getParameterByName("parentmarketid") : 0;
-            paramMarketId = getParameterByName("marketid") !== null ? getParameterByName("marketid") : "";
-            paramRevenuePeriod = getParameterByName("revenueperiod") !== null
-                ? getParameterByName("revenueperiod").toUpperCase()
-                : "";
-            paramRevenueYear = getParameterByName("revenueyear") !== null ? getParameterByName("revenueyear") : "";
-            paramStationId = getParameterByName("stationid") !== null ? getParameterByName("stationid") : "";
+        if (bDirectPageLink === false) {
+
+            getUrlParameters();
+
         }
 
+        //get the referring url
+        referrer = document.referrer;
+
+        //get whether the back button should be visible
         bShowBackButton = getParameterByName("showbackbutton") === "true" ? true : false;
 
-        if (bShowBackButton) {
-            $(".back-button").show();
-        } else {
-            $(".back-button").hide();
-        }
+        //will set the status of the back button along with value
+        determineBackButtonStatus();
 
         reportObject = getDMAReportObject(reportId);
         reportFilterArray = reportObject.filters;
@@ -247,6 +247,8 @@
 
         buildDMAMenu("DMA Reports");
 
+        //determines when all ajax calls are completed
+        //if flags are set the report will load
         $(document).ajaxStop(function () {
             if (bRunReport && bDirectPageLink == false) {
                 getReport();
@@ -254,6 +256,40 @@
         });
 
     });
+
+    function getUrlParameters() {
+
+        paramParentMarketId =
+            getParameterByName("parentmarketid") !== null ? getParameterByName("parentmarketid") : 0;
+
+        paramMarketId = getParameterByName("marketid") !== null ? getParameterByName("marketid") : "";
+
+        paramRevenuePeriod = getParameterByName("revenueperiod") !== null
+            ? getParameterByName("revenueperiod").toUpperCase()
+            : "";
+
+        paramRevenueYear = getParameterByName("revenueyear") !== null ? getParameterByName("revenueyear") : "";
+
+        paramStationId = getParameterByName("stationid") !== null ? getParameterByName("stationid") : "";
+
+    }
+
+    function determineBackButtonStatus() {
+
+        if (bShowBackButton) {
+
+            var referrerReportId = getParameterByName("reportid", referrer);
+            var referrerReportObject = getDMAReportObject(referrerReportId);
+            $("#btnBack").val("Back to " + referrerReportObject.reportTitle + " Report");
+            $(".back-button").show();
+
+        } else {
+
+            $(".back-button").hide();
+
+        }
+
+    }
 
     function getParentMarketList() {
 
@@ -310,6 +346,7 @@
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+
     }
 
     function getMarketList(parentMarketId) {
@@ -394,6 +431,10 @@
             $("#ddlStation").html('');
             getDefaultStation();
             return;
+        }
+
+        if (marketId !== paramMarketId) {
+            paramStationId = 0;
         }
 
         $.ajax({
@@ -484,7 +525,6 @@
 
         var params = {};
 
-        referrer = document.referrer;
         var referrerArray = referrer.split('?');
 
         var referrUrl = referrerArray[0];
@@ -503,23 +543,32 @@
         params["revenueperiod"] = paramRevenuePeriod;
         params["revenueyear"] = paramRevenueYear;
 
-        var redirectParamsString = "";
-
-        Object.keys(params).forEach(function (key, index) {
-            // key: the name of the object key
-            // index: the ordinal position of the key within the object 
-            if (index === 0) {
-                redirectParamsString += key + "=" + encodeURIComponent(params[key]);
-            } else {
-                redirectParamsString += "&" + key + "=" + encodeURIComponent(params[key]);
-            }
-        });
+        var redirectParamsString = buildRedirectQueryString(params);
 
         window.location = referrUrl + "?" + redirectParamsString;
 
     }
 
+    function buildRedirectQueryString(parameters) {
+
+        var sParamString = "";
+
+        Object.keys(parameters).forEach(function (key, index) {
+            // key: the name of the object key
+            // index: the ordinal position of the key within the object
+            if (index === 0) {
+                sParamString += key + "=" + encodeURIComponent(parameters[key]);
+            } else {
+                sParamString += "&" + key + "=" + encodeURIComponent(parameters[key]);
+            }
+        });
+
+        return sParamString;
+
+    }
+
     function saveLoadedControlSelection(control) {
+
         var searchResults = getLocalStorage("gSearchResults");
 
         if (!searchResults) {
@@ -532,6 +581,7 @@
     }
 
     function getYearList() {
+
         var str = '';
         str = '<option value="">-- Select a Year --</option>';
 
@@ -772,12 +822,18 @@
 
                     if ((isNaN(objectValue) == false)) {
 
-
                         if (objectValue.toString().length > 0) {
+
                             className = "text-align-right";
 
                         }
-                    } else {
+                    }
+                    else if (objectName.indexOf('Revenue') > -1 && objectValue.indexOf('$') > -1) {
+
+                        className = "text-align-right";
+
+                    }
+                    else {
                         className = "";
                     }
                 }
