@@ -123,7 +123,7 @@ reportName.push("rptMRRRevenueWithoutSubmitterList");
 reportName.push("rptMRRRevenueOutOfBalanceList");
 reportName.push("rptMRRRevenueEntryMissingList");
 reportName.push("rptAdvertiserAgencyRevenueList");
-
+reportName.push("rptMRRMarketDistributionList");
 
 function buildReportArray()
 {
@@ -4630,4 +4630,66 @@ function getReportObject_AdvertiserAgencyRevenueList() {
 
     return tempObject;
 }
-reportName.push("rptAdvertiserAgencyRevenueList");
+ 
+function getReportFilterArray_MRRMarketDistributionList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        objectName: "ddlMarket",
+        jsCall: "getMRRMarketList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        objectName: "ddlOwner",
+        jsCall: "getOwnerList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Station",
+        objectName: "ddlStation",
+        jsCall: "getMRRStationList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "MediaType",
+        objectName: "ddlMediaType",
+        jsCall: "getMediaTypeList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_MRRMarketDistributionList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "MRR - Market Distribution List",
+        apiControllerAction: "/api/MRRReport/GetMRRMarketDistributionList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
