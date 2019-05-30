@@ -122,6 +122,8 @@ reportName.push("rptDisabledAEList");
 reportName.push("rptMRRRevenueWithoutSubmitterList");
 reportName.push("rptMRRRevenueOutOfBalanceList");
 reportName.push("rptMRRRevenueEntryMissingList");
+reportName.push("rptAdvertiserAgencyRevenueList");
+reportName.push("rptMRRMarketDistributionList");
 
 function buildReportArray()
 {
@@ -217,7 +219,16 @@ function getQuickReport(reportId)
 {
     if (reportId > -1)
     {
-        window.location = "/utilities/genericReport.html?reportId=" + reportId;
+        var url = "/utilities/genericReport.html?reportId=" + reportId;
+
+        var i = parseInt($("#ddlMarket").val());
+
+        if (i > 0)
+        {
+            url = url + "&marketid=" + $("#ddlMarket").val();
+        }
+
+        window.location = url;
     }
 }
 
@@ -4575,4 +4586,119 @@ function getReportObject_MRRRevenueEntryMissingList() {
 
     return tempObject;
 }
+function getReportFilterArray_AdvertiserAgencyRevenueList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "FromYear",
+        jsCall: "getYearList",
+        objectName: "ddlFromYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "ToYear",
+        jsCall: "getYearList",
+        objectName: "ddlToYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        objectName: "ddlMarket",
+        jsCall: "getXRYMarketList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_AdvertiserAgencyRevenueList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "XRay Advertiser / Agency Revenue",
+        apiControllerAction: "/api/XRAYReport/GetAdvertiserAgencyRevenueList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
  
+function getReportFilterArray_MRRMarketDistributionList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        objectName: "ddlMarket",
+        jsCall: "getMRRMarketList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        objectName: "ddlOwner",
+        jsCall: "getOwnerList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Station",
+        objectName: "ddlStation",
+        jsCall: "getMRRStationList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "MediaType",
+        objectName: "ddlMediaType",
+        jsCall: "getMediaTypeList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_MRRMarketDistributionList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "MRR - Market Distribution List",
+        apiControllerAction: "/api/MRRReport/GetMRRMarketDistributionList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
