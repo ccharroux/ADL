@@ -140,6 +140,10 @@
                             <label for="ddlStation" class="dropdown-label rptView rptStation">Station</label>
                             <select id="ddlStation" apiInput="inStationId" class="dropdown-select rptView rptStation"></select>
                         </div>
+                        <div class="form-group rptView rptParentOwner">
+                            <label for="ddlParentOwner" class="dropdown-label rptView rptParentOwner">Parent Owner</label>
+                            <select id="ddlParentOwner" apiInput="inParentOwnerId" class="dropdown-select rptView rptParentOwner"></select>
+                        </div>
                         <div class="form-group rptView rptOwner" >
                             <label for="ddlOwner" class="dropdown-label rptView rptOwner">Owner</label>
                             <select id="ddlOwner" apiInput="inOwnerId" class="dropdown-select rptView rptOwner"></select>
@@ -897,7 +901,52 @@
         });
 
     }
+    function getParentOwnerList() {
 
+        $.ajax({
+            url: ServicePrefix + '/api/ParentOwnership/GetParentOwnershipList',
+            dataType: 'json',
+
+            processData: false,
+
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+ 
+                "inAddDetails": "0"
+            }),
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    var str = '';
+
+                    $("#ddlParentOwner").html("<option value=''> -- Select a Parent Owner --</option>");
+
+                    var holdOwnerID = "0";
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = str + "<option value='" + obj.po_parentownerid + "'>" + obj.po_parentownername + "</option>";
+
+                    });
+
+                    $("#ddlParentOwner").append(str);
+                    saveLoadedControlSelection("ddlParentOwner");
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
     function getOwnerList() {
 
         $.ajax({
