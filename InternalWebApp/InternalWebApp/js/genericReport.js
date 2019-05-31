@@ -125,6 +125,9 @@ reportName.push("rptMRRRevenueEntryMissingList");
 reportName.push("rptAdvertiserAgencyRevenueList");
 reportName.push("rptMRRMarketDistributionList");
 
+
+reportName.push("rptOwnershipProductList");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -4697,6 +4700,53 @@ function getReportObject_MRRMarketDistributionList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'mrr',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+
+//reportName.push("rptOwnershipProductList");
+function getReportFilterArray_OwnershipProductList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "ParentOwner",
+        objectName: "ddlParentOwner",
+        jsCall: "getParentOwnerList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        objectName: "ddlOwner",
+        jsCall: "getOwnerList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+   
+    return arrayFilters;
+}
+function getReportObject_OwnershipProductList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "Owner Product List",
+        apiControllerAction: "/api/OwnerReport/GetOwnerProductList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'owner',
         autoUpdate: false
     }
 
