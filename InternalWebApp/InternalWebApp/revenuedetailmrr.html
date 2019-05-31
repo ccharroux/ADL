@@ -112,6 +112,8 @@
 
                         <label for="ddlYearPeriod" class="dropdown-label">Year-Period</label>
                         <select id="ddlYearPeriod" class="dropdown-select" onchange="getRevenueDetail();"></select>
+
+                        <a href="#" onclick="scanCategories();">Click to scan categories</a> <!-- manually test logic that will eventually recalculate totals after something is changed -->
                     </div>
                 </div>
 
@@ -251,15 +253,26 @@
             "columnDefs": [
                 {
                     "targets": [
-                        1, // Current
-                        2 // Prior
+                        1 // Current
                     ],
                     "className": "text-align-right",
                     "render": function (data, type, row) {
                         return '$<input type="text" class="revenue-detail text-align-right"'
-                            + 'id="revenue-detail-' + row['marketCategoryId'] + '"'
+                            + ' id="revenue-detail-' + row['marketCategoryId'] + '"'
+                            + ' data-category-id="' + row['marketCategoryId'] + '"'
+                            + ' data-contributes-to-category-id="' + row['contributesToMarketCategoryId'] + '"'
+                            + ' data-adds-or-subtracts="' + row['addsOrSubtractsRevenue'] + '"'
                             + (row['isTotal'] ? ' disabled' : '')
                             + ' value="' + data + '"></input><span class="implicit-thousands">,000</span>';
+                    }
+                },
+                {
+                    "targets": [
+                        2 // Prior,
+                    ],
+                    "className": "text-align-right",
+                    "render": function (data, type, row) {
+                        return '$' + data + '<span class="implicit-thousands">,000</span>';
                     }
                 },
                 {
@@ -693,6 +706,30 @@
             }
         });
 
+    }
+
+    function scanCategories() {
+        var categoryId = '';
+        var revenueAmount = 0;
+        var contributesToCategoryId = '';
+        var addsOrSubtracts = 0;
+        var categoryTotals = {};
+        $(".revenue-detail").each(function (a, b) {
+            categoryId = $(this).attr("data-category-id");
+            revenueAmount = $(this).attr("value"); // TODO picks up original value, not altered
+            alert('Category ' + categoryId + ' amount = ' + revenueAmount);
+            if (categoryId in categoryTotals) {
+                alert('Calculated value = ' + categoryTotals[categoryId]);
+            }
+            contributesToCategoryId = $(this).attr("data-contributes-to-category-id");
+            addsOrSubtracts = $(this).attr("data-adds-or-subtracts");
+            if (contributesToCategoryId != null) {
+                if (!(contributesToCategoryId in categoryTotals)) {
+                    categoryTotals[contributesToCategoryId] = 0;
+                }
+                categoryTotals[contributesToCategoryId] += revenueAmount * addsOrSubtracts;
+            }
+        });
     }
 
 </script>
