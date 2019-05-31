@@ -112,8 +112,6 @@
 
                         <label for="ddlYearPeriod" class="dropdown-label">Year-Period</label>
                         <select id="ddlYearPeriod" class="dropdown-select" onchange="getRevenueDetail();"></select>
-
-                        <a href="#" onclick="scanCategories();">Click to scan categories</a> <!-- manually test logic that will eventually recalculate totals after something is changed -->
                     </div>
                 </div>
 
@@ -214,6 +212,18 @@
 
     });
 
+    function getChangeRatio(revenueAmount, priorRevenueAmount) {
+        var changeRatio = 0;
+        if (revenueAmount == 0 && priorRevenueAmount == 0) {
+            changeRatio = 0;
+        } else if (priorRevenueAmount == 0) {
+            changeRatio = 1;
+        } else {
+            changeRatio = (revenueAmount - priorRevenueAmount) / priorRevenueAmount;
+        }
+        return (changeRatio * 100).toFixed(1);
+    }
+
     function clearSearchButtonSetup()
     {
         $("body").on("click", "#clear_search_button", function () {
@@ -236,15 +246,8 @@
                 { "data": 'priorRevenueAmount' },
                 {
                     mRender: function (data, type, row) {
-                        var changeRatio = 0;
-                        if (row.revenueAmount == 0 && row.priorRevenueAmount == 0) {
-                            changeRatio = 0;
-                        } else if (row.priorRevenueAmount == 0) {
-                            changeRatio = 1;
-                        } else {
-                            changeRatio = (row.revenueAmount - row.priorRevenueAmount) / row.priorRevenueAmount;
-                        }
-                        return (changeRatio * 100).toFixed(1) + "%";
+                        var changeRatio = getChangeRatio(row.revenueAmount, row.priorRevenueAmount);
+                        return '<span id="change-' + row.marketCategoryId + '">' + changeRatio + "</span>%";
                     },
                     "orderable": false,
                     "searchable": false
@@ -263,6 +266,7 @@
                             + ' data-contributes-to-category-id="' + row['contributesToMarketCategoryId'] + '"'
                             + ' data-adds-or-subtracts="' + row['addsOrSubtractsRevenue'] + '"'
                             + (row['isTotal'] ? ' disabled' : '')
+                            + ' onchange="recalculateTotals();"'
                             + ' value="' + data + '"></input><span class="implicit-thousands">,000</span>';
                     }
                 },
@@ -272,7 +276,8 @@
                     ],
                     "className": "text-align-right",
                     "render": function (data, type, row) {
-                        return '$' + data + '<span class="implicit-thousands">,000</span>';
+                        return '$<span id="prior-revenue-detail-' + row['marketCategoryId'] + '">' + data
+                            + '</span><span class="implicit-thousands">,000</span>';
                     }
                 },
                 {
@@ -708,19 +713,26 @@
 
     }
 
-    function scanCategories() {
+    function recalculateTotals() {
         var categoryId = '';
         var revenueAmount = 0;
+        var priorRevenueAmount = 0;
         var contributesToCategoryId = '';
         var addsOrSubtracts = 0;
         var categoryTotals = {};
+        var changeRatio = 0;
+
         $(".revenue-detail").each(function (a, b) {
             categoryId = $(this).attr("data-category-id");
-            revenueAmount = $(this).attr("value"); // TODO picks up original value, not altered
-            alert('Category ' + categoryId + ' amount = ' + revenueAmount);
+
+            // if we calculated a new total, then copy the result back into the form
             if (categoryId in categoryTotals) {
-                alert('Calculated value = ' + categoryTotals[categoryId]);
+                $(this).val(categoryTotals[categoryId]);
             }
+
+            revenueAmount = $(this).val(); // not $(this).attr("value") as it's not updated by user input
+
+            // calculate the total (if any) that is directly affected by this category
             contributesToCategoryId = $(this).attr("data-contributes-to-category-id");
             addsOrSubtracts = $(this).attr("data-adds-or-subtracts");
             if (contributesToCategoryId != null) {
@@ -729,6 +741,11 @@
                 }
                 categoryTotals[contributesToCategoryId] += revenueAmount * addsOrSubtracts;
             }
+
+            // recalculate the change % in case the current amount changed
+            priorRevenueAmount = $("#prior-revenue-detail-" + categoryId).text();
+            changeRatio = getChangeRatio(revenueAmount, priorRevenueAmount);
+            $("#change-" + categoryId).text(changeRatio);
         });
     }
 
