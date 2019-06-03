@@ -228,11 +228,11 @@
         bDirectPageLink = getParameterByName("direct") === "true" ? true : false;
 
         //if not a direct link, get the query string parameters
-        if (bDirectPageLink === false) {
+        //if (bDirectPageLink === false) {
 
-            getUrlParameters();
+        getUrlParameters();
 
-        }
+        //}
 
         //get the referring url
         referrer = document.referrer;
@@ -266,7 +266,7 @@
     function getUrlParameters() {
 
         paramParentMarketId =
-            getParameterByName("parentmarketid") !== null ? getParameterByName("parentmarketid") : 0;
+            getParameterByName("parentmarketid") !== null ? getParameterByName("parentmarketid") : "";
 
         paramMarketId = getParameterByName("marketid") !== null ? getParameterByName("marketid") : "";
 
@@ -282,8 +282,8 @@
 
     function determineBackButtonStatus() {
 
-        if (bDirectPageLink === false && reportObject.showBackNav === true) {
-    
+        //if (bDirectPageLink === false && reportObject.showBackNav === true) {
+        if (reportObject.showBackNav === true) {
             $(".back-button").show();
 
             for (var i = 0; i < reportObject.backNavButtons.length; i++) {
@@ -547,6 +547,7 @@
     function goBack(reportToken) {
 
         var backButtonObject = getDMAReportObjectByKeyValue("reportToken", reportToken);
+        var bIsDirect = false;
 
         var sProtocol = window.location.protocol;
         var sHostName = window.location.hostname;
@@ -560,10 +561,18 @@
         
         if ($("#ddlParentMarket").is(":visible")) {
             sParameters += "&parentmarketid=" + $("#ddlParentMarket").val();
+
+            if ($("#ddlParentMarket").val() == "") {
+                bIsDirect = true;
+            }
         }
 
         if ($("#ddlMarket").is(":visible")) {
             sParameters += "&marketid=" + $("#ddlMarket").val();
+
+            if (reportToken == "dmaStation" && $("#ddlMarket").val() == "") {
+                bIsDirect = true;
+            }
         }
 
         if ($("#ddlStation").is(":visible")) {
@@ -572,13 +581,21 @@
 
         if ($("#ddlPeriod").is(":visible")) {
             sParameters += "&revenueperiod=" + $("#ddlPeriod").val();
+
+            if ($("#ddlPeriod").val() == "") {
+                bIsDirect = true;
+            }
         }
 
         if ($("#ddlYear").is(":visible")) {
             sParameters += "&revenueyear=" + $("#ddlYear").val();
+
+            if ($("#ddlYear").val() == "") {
+                bIsDirect = true;
+            }
         }
 
-        sParameters += "&direct=false";
+        sParameters += "&direct=" + bIsDirect;
 
         window.location = sBackUrl + sParameters;
 
