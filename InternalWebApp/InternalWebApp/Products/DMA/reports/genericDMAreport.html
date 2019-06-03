@@ -95,10 +95,12 @@
                         <h2 id="reportTitle"></h2>
                     </div>
                 </div>
+                <!-- Removing for now since using buttons for navigation
                 <div id="divQuickReport" style="float:right;padding-right:0px;padding-bottom:0px;margin-top:-100px">
                     <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
                     <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
                 </div>
+                -->
                 <div class="row search-section">
                     <div class="col-md-12 ">
                         <!--
@@ -136,8 +138,12 @@
                 </div>
 
                 <div class="row back-button" style="margin-top: 20px;">
-                    <div class="col-md-12 text-center">
+                    <!--<div class="col-md-12 text-center">
                         <input type="button" id="btnBack" class="search-button" value="Back" onclick="goBack()" />
+                    </div>-->
+                    <div class="col-md-12 text-center">
+                        <input type="button" id="btnBackMarket" class="search-button" style="display: none;" value="Back to Market Level" onclick="goBack('dmaMarket')" />
+                        <input type="button" id="btnBackStation" class="search-button" style="display: none;" value="Back to Station Level" onclick="goBack('dmaStation')" />
                     </div>
                 </div>
 
@@ -219,29 +225,20 @@
         reportId = getParameterByName("reportId");
 
         //get whether page was a direct link or not
+        //direct page is being using to determine whether to auto run the report or not.
+        //no longer being used to get parameter or whether to show the back buttons.
         bDirectPageLink = getParameterByName("direct") === "true" ? true : false;
 
-        //if not a direct link, get the query string parameters
-        if (bDirectPageLink === false) {
-
-            getUrlParameters();
-
-        }
-
-        //get the referring url
-        referrer = document.referrer;
-
-        //get whether the back button should be visible
-        bShowBackButton = getParameterByName("showbackbutton") === "true" ? true : false;
-
-        //will set the status of the back button along with value
-        determineBackButtonStatus();
+        getUrlParameters();
 
         reportObject = getDMAReportObject(reportId);
         reportFilterArray = reportObject.filters;
 
         displayFilters(reportFilterArray);
         loadOnChangeEvents(reportFilterArray);
+
+        //will set the status of the back buttons
+        determineBackButtonStatus();
 
         $("#reportTitle").html(reportObject.reportTitle);
 
@@ -260,7 +257,7 @@
     function getUrlParameters() {
 
         paramParentMarketId =
-            getParameterByName("parentmarketid") !== null ? getParameterByName("parentmarketid") : 0;
+            getParameterByName("parentmarketid") !== null ? getParameterByName("parentmarketid") : "";
 
         paramMarketId = getParameterByName("marketid") !== null ? getParameterByName("marketid") : "";
 
@@ -276,17 +273,21 @@
 
     function determineBackButtonStatus() {
 
-        if (bShowBackButton) {
-
-            var referrerReportId = getParameterByName("reportid", referrer);
-            var referrerReportObject = getDMAReportObject(referrerReportId);
-            $("#btnBack").val("Back to " + referrerReportObject.reportTitle.replace('DMA/MRR Data Comparison - ', ''));
+        //the buttons will show based on the showBackNav properties
+        if (reportObject.showBackNav === true) {
             $(".back-button").show();
 
+            for (var i = 0; i < reportObject.backNavButtons.length; i++) {
+
+                var backButton = reportObject.backNavButtons[i];
+                var buttonObject = "#btnBack" + backButton.name;
+                $(buttonObject).val(backButton.title);
+                $(buttonObject).show();
+
+            }
+
         } else {
-
             $(".back-button").hide();
-
         }
 
     }
@@ -363,7 +364,6 @@
             paramStationId = 0;
             paramRevenuePeriod = "";
             paramRevenueYear = "";
-            $(".back-button").hide();
         }
 
         $.ajax({
@@ -465,7 +465,6 @@
 
                     $("#ddlStation").html(str);
                     saveLoadedControlSelection("ddlStation");
-                    //preSelectItem('quickReportQS');
 
                     if (paramStationId !== 0) {
                         $("#ddlStation").val(paramStationId);
@@ -521,31 +520,60 @@
 
     }
 
-    function goBack() {
+    function goBack(reportToken) {
 
-        var params = {};
+        var backButtonObject = getDMAReportObjectByKeyValue("reportToken", reportToken);
+        var bIsDirect = false;
 
-        var referrerArray = referrer.split('?');
+        var sProtocol = window.location.protocol;
+        var sHostName = window.location.hostname;
+        var sPort = window.location.port;
 
-        var referrUrl = referrerArray[0];
-        var referrerParams = referrerArray[1].split('&');
+        var sBackUrl = sProtocol + "//" + sHostName;
+        sBackUrl += sPort.length > 0 ? ":" + sPort : "";
+        sBackUrl += backButtonObject.reportPath;
 
-        for (var i = 0; i < referrerParams.length; i++) {
-            var pair = referrerParams[i].split('=');
-            params[pair[0]] = decodeURIComponent(pair[1]);
+        var sParameters = "?reportid=" + backButtonObject.reportIndex;
+        
+        if ($("#ddlParentMarket").is(":visible")) {
+            sParameters += "&parentmarketid=" + $("#ddlParentMarket").val();
+
+            if ($("#ddlParentMarket").val() == "") {
+                bIsDirect = true;
+            }
         }
 
-        params["direct"] = false;
-        params["showbackbutton"] = false;
-        params["parentmarketid"] = paramParentMarketId;
-        params["marketid"] = paramMarketId;
-        params["stationid"] = paramStationId;
-        params["revenueperiod"] = paramRevenuePeriod;
-        params["revenueyear"] = paramRevenueYear;
+        if ($("#ddlMarket").is(":visible")) {
+            sParameters += "&marketid=" + $("#ddlMarket").val();
 
-        var redirectParamsString = buildRedirectQueryString(params);
+            if (reportToken == "dmaStation" && $("#ddlMarket").val() == "") {
+                bIsDirect = true;
+            }
+        }
 
-        window.location = referrUrl + "?" + redirectParamsString;
+        if ($("#ddlStation").is(":visible")) {
+            sParameters += "&stationid=" + $("#ddlStation").val();
+        }
+
+        if ($("#ddlPeriod").is(":visible")) {
+            sParameters += "&revenueperiod=" + $("#ddlPeriod").val();
+
+            if ($("#ddlPeriod").val() == "") {
+                bIsDirect = true;
+            }
+        }
+
+        if ($("#ddlYear").is(":visible")) {
+            sParameters += "&revenueyear=" + $("#ddlYear").val();
+
+            if ($("#ddlYear").val() == "") {
+                bIsDirect = true;
+            }
+        }
+
+        sParameters += "&direct=" + bIsDirect;
+
+        window.location = sBackUrl + sParameters;
 
     }
 
