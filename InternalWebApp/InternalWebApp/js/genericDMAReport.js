@@ -41,7 +41,7 @@ function buildDMAReportObjectArray() {
     for (var x = 0; x < dmaReportName.length; x++) {
 
         var module = dmaReportName[x].replace("dma", "");
-        // console.log(module);
+
         arrayObject = window[("getDMAReportObject_" + module)]();
         arrayObject.filters = window[("getDMAReportFilterArray_" + module)]();
 
@@ -54,6 +54,19 @@ function buildDMAReportObjectArray() {
 function getDMAReportObject(inReportId) {
 
     return dmaReportObjectArray[inReportId];
+
+}
+
+function getDMAReportObjectByKeyValue(inKey, inValue) {
+    //get the item by the key with a value
+
+    for (var i = 0; i < dmaReportObjectArray.length; i++) {
+        if (dmaReportObjectArray[i][inKey] === inValue) {
+            dmaReportObjectArray[i].reportIndex = i;
+            return dmaReportObjectArray[i];
+        }
+    }
+    return null;
 
 }
 
@@ -85,14 +98,9 @@ function getDMAReportObject_RevenueComparisonMarket() {
                         "&marketid=" + row["Market Id"] +
                         "&revenueperiod=" + revenuePeriodParts[1] +
                         "&revenueyear=" + revenuePeriodParts[0] +
-                        "&direct=false" +
-                        "&showbackbutton=true";
+                        "&direct=false";
             }
 
-            //need to figure out if possible to do a generic report page
-            //var action = "/advertiser.html?AdvertiserID=";
-            //pass parent market id, market id, period, year
-            //also add flag for direct = false to turn back button on/off
             return '<a href="' + action + '">Stations</a>';
         },
         "orderable": false,
@@ -100,14 +108,16 @@ function getDMAReportObject_RevenueComparisonMarket() {
         "className": "text-align-right"
     });
 
-
     tempObject = {
         reportTitle: "DMA/MRR Data Comparison - Market Level",
         apiControllerAction: "/api/DMAReport/GetDMARevenueReviewByMarket",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         reportPath: "/Products/DMA/reports/genericDMAreport.html",
-        product: 'dmarevenue'
+        product: 'dmarevenue',
+        showBackNav: false,
+        reportToken: "dmaMarket",
+        reportIndex: ""
     }
 
     return tempObject;
@@ -174,14 +184,9 @@ function getDMAReportObject_RevenueComparisonStation() {
                     "&revenueperiod=" + revenuePeriodParts[1] +
                     "&revenueyear=" + revenuePeriodParts[0] +
                     "&stationid=" + row["Station Id"] +
-                    "&direct=false" +
-                    "&showbackbutton=true";
+                    "&direct=false";
             }
 
-            //need to figure out if possible to do a generic report page
-            //var action = "/advertiser.html?AdvertiserID=";
-            //pass parent market id, market id, period, year
-            //also add flag for direct = false to turn back button on/off
             return '<a href="' + action + '">Details</a>';
         },
         "orderable": false,
@@ -189,6 +194,8 @@ function getDMAReportObject_RevenueComparisonStation() {
         "className": "text-align-right"
     });
 
+    var arrButtons = new Array();
+    arrButtons.push({ name: "Market", title: "Back to Market Level" });
 
     tempObject = {
         reportTitle: "DMA/MRR Data Comparison - Station Level",
@@ -196,7 +203,11 @@ function getDMAReportObject_RevenueComparisonStation() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         reportPath: "/Products/DMA/reports/genericDMAreport.html",
-        product: 'dmarevenue'
+        product: 'dmarevenue',
+        showBackNav: true,
+        backNavButtons: arrButtons,
+        reportToken: "dmaStation",
+        reportIndex: ""
     }
 
     return tempObject;
@@ -243,13 +254,6 @@ function getDMAReportFilterArray_RevenueComparisonStation() {
     }
     arrayFilters.push(arrayObject);
 
-
-
-    //parent market
-    //market
-    //revenue period
-    //revenue year
-
     return arrayFilters;
 }
 
@@ -267,6 +271,11 @@ function getDMAReportObject_RevenueComparisonStationDetail() {
     columnsToDisplay.push("Market");
     columnsToDisplay.push("DMA Revenue");
 
+    var arrButtons = new Array();
+
+    arrButtons.push({ name: "Market", title: "Back to Market Level" });
+    arrButtons.push({ name: "Station", title: "Back to Station Level" });
+
     tempObject = {
         reportTitle: "DMA/MRR Data Comparison - MRR Level",
         apiControllerAction: "/api/DMAReport/GetDMARevenueReviewByStationDetails",
@@ -274,8 +283,18 @@ function getDMAReportObject_RevenueComparisonStationDetail() {
         columnsToDisplay: columnsToDisplay,
         reportPath: "/Products/DMA/reports/genericDMAreport.html",
         product: 'dmarevenue',
-        sortable: false
+        sortable: false,
+        showBackNav: true,
+        backNavButtons: arrButtons,
+        reportToken: "dmaStationDetail",
+        reportIndex: ""
     }
+
+    //back to market
+    //back to station
+    //include button title
+
+
 
     return tempObject;
 }
