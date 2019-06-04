@@ -321,6 +321,16 @@
         reportId = getParameterByName("reportId");
 
         if (!reportId) {
+            //if we got here from js/main.js goBackToDashboard(), then extract reportId and redirect
+            var searchParams = getParameterByName("search").toLowerCase().split('|');
+            if (searchParams.length > 0) {
+                if (searchParams[0].indexOf('reportid=') >= 0) {
+                    reportId = searchParams[0].substring(9, searchParams[0].length);
+                    getQuickReport(reportId);
+                    return false;
+                }
+            }
+            //else punt
             var msg = "Invalid page request, no report passed.";
             bootbox.alert(msg, function () { window.location = "/dashboard.html"; });
             return false;

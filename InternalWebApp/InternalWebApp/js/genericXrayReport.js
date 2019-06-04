@@ -108,6 +108,12 @@ function getQuickReport(reportId) {
     }
 }
 
+function setUpBackButton() {
+    setLocalStorage("search", "reportId=" + getParameterByName("reportId"));
+    setLocalStorage("searchPage", window.location);
+    setLocalStorage("quickReportQS", "ddlMarket|" + $("#ddlMarket").val());
+}
+
 
 //-------------------------
 // REPORT AREA
@@ -428,12 +434,12 @@ function getAuditObject_NewAdvertisers() {
                 );
             }
 
-            var action = '<a href="#" onclick=\'loadActionPage("/advertiser.html?AdvertiserID=",' + row.advertiserId + ')\'>Edit&nbsp;Advertiser</a>';
+            var action = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/advertiser.html?AdvertiserID=",' + row.advertiserId + ')\'>Edit&nbsp;Advertiser</a>';
             var action2 = '';
             if (row.stationAdvertiserId != null) {
-                action2 = '<a href="#" onclick=\'loadActionPage("/stationadvertiser.html?StationAdvertiserID=",' + row.stationAdvertiserId + ')\'>Edit&nbsp;Station&nbsp;Advertiser</a>';
+                action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/stationadvertiser.html?StationAdvertiserID=",' + row.stationAdvertiserId + ')\'>Edit&nbsp;Station&nbsp;Advertiser</a>';
             } else {
-                action2 = '<a href="#" onclick=\'loadActionPage("/mediaadvertiser.html?MediaAdvertiserID=",' + row.mediaAdvertiserId + ')\'>Edit&nbsp;Media&nbsp;Advertiser</a>';
+                action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/mediaadvertiser.html?MediaAdvertiserID=",' + row.mediaAdvertiserId + ')\'>Edit&nbsp;Media&nbsp;Advertiser</a>';
             }
             return action + '<br />' + action2;
         },
@@ -655,8 +661,8 @@ function getAuditObject_NewAgencies() {
                 );
             }
 
-            var action = '<a href="#" onclick=\'loadActionPage("/agency.html?AgencyID=",' + row.agencyId + ')\'>Edit&nbsp;Agency</a>';
-            var action2 = '<a href="#" onclick=\'loadActionPage("/stationagency.html?StationAgencyID=",' + row.stationAgencyId + ')\'>Edit&nbsp;Station&nbsp;Agency</a>';
+            var action = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/agency.html?AgencyID=",' + row.agencyId + ')\'>Edit&nbsp;Agency</a>';
+            var action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/stationagency.html?StationAgencyID=",' + row.stationAgencyId + ')\'>Edit&nbsp;Station&nbsp;Agency</a>';
             return action + '<br />' + action2;
         },
         "orderable": false,
