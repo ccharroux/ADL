@@ -106,8 +106,8 @@ reportName.push("rptMultipleOwnersPerUser");
 reportName.push("rptOwnerGroupReportingEntityIssues");
 reportName.push("rptUserMissingGroup");
 reportName.push("rptUsersAssignedReportsInvalidOwner");
-reportName.push("rptUsersAssingedInvalidMarket");
-reportName.push("rptUsersWithDisabledStationAssinged");
+reportName.push("rptUsersAssignedInvalidMarket");
+reportName.push("rptUsersWithDisabledStationAssigned");
 reportName.push("rptXRAYImportScript");
 reportName.push("rptXRYAccountAndRevenueAssignment");
 
@@ -4142,7 +4142,7 @@ function getReportObject_UsersAssignedReportsInvalidOwner() {
 
     tempObject =
     {
-        reportTitle: "User Assinged Invalid Owner Report List",
+        reportTitle: "User Assigned Invalid Owner Report List",
         apiControllerAction: "/api/PersonnelReport/GetUsersAssignedReportsInvalidOwnerList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -4152,7 +4152,7 @@ function getReportObject_UsersAssignedReportsInvalidOwner() {
     return tempObject;
 }
 
-function getReportFilterArray_UsersAssingedInvalidMarket() {
+function getReportFilterArray_UsersAssignedInvalidMarket() {
 
     var arrayFilters = new Array();
     var arrayObject = new Object();
@@ -4161,7 +4161,7 @@ function getReportFilterArray_UsersAssingedInvalidMarket() {
 
     return arrayFilters;
 }
-function getReportObject_UsersAssingedInvalidMarket() {
+function getReportObject_UsersAssignedInvalidMarket() {
 
     var tempObject = new Object();
 
@@ -4169,8 +4169,8 @@ function getReportObject_UsersAssingedInvalidMarket() {
 
     tempObject =
     {
-        reportTitle: "User Assinged Invalid Market Report List",
-        apiControllerAction: "/api/PersonnelReport/GetUsersAssingedInvalidMarketReportList",
+        reportTitle: "User Assigned Invalid Market Report List",
+        apiControllerAction: "/api/PersonnelReport/GetUsersAssignedInvalidMarketReportList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'personnel'
@@ -4179,7 +4179,7 @@ function getReportObject_UsersAssingedInvalidMarket() {
     return tempObject;
 } 
 
-function getReportFilterArray_UsersWithDisabledStationAssinged() {
+function getReportFilterArray_UsersWithDisabledStationAssigned() {
 
     var arrayFilters = new Array();
     var arrayObject = new Object();
@@ -4188,7 +4188,7 @@ function getReportFilterArray_UsersWithDisabledStationAssinged() {
 
     return arrayFilters;
 }
-function getReportObject_UsersWithDisabledStationAssinged() {
+function getReportObject_UsersWithDisabledStationAssigned() {
 
     var tempObject = new Object();
 
@@ -4198,7 +4198,7 @@ function getReportObject_UsersWithDisabledStationAssinged() {
     tempObject =
     {
         reportTitle: "Users Assigned to Disabled Station List",
-        apiControllerAction: "/api/PersonnelReport/GetUsersWithDisabledStationAssingedList",
+        apiControllerAction: "/api/PersonnelReport/GetUsersWithDisabledStationAssignedList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'personnel'
