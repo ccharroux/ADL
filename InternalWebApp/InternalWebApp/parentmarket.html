@@ -115,16 +115,43 @@
                     </div>
                 </div>
                 <!-- End Buttons-->
-                
+                <!-- Sub Markets -->
+                <div id="divMarketList" class="default-button-section" style="margin-top:25px">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row product-list-header width-100">
+                                <div class="col-md-6 text-align-left">
+                                    <strong>
+                                        Market(s)
+                                    </strong>
+                                </div>
+                                <div class="col-md-2 text-align-left">
+                                    <strong>
+                                        Product
+                                    </strong>
+                                </div>
+ 
+                                <div class="col-md-2 text-align-left">
+                                    <strong>
+                                        Active
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row margin-0-auto width-100">
+                        <div id="marketList"></div>
+                    </div>
+                </div>
                 <!-- Products -->
-                <div id="divProductList" class="hidden default-button-section">
+                <div id="divProductList" class="hidden default-button-section"style="margin-top:25px">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="row product-list-header width-100">
 
                                 <div class="col-md-4 text-align-left">
                                     <strong>
-                                        Product
+                                        Product(s)
                                     </strong>
                                 </div>
                                 <div class="col-md-2 text-align-left">
@@ -265,6 +292,7 @@
 
                     //get products list
                     getProductList();
+                    getMarketList();
                 }
 
             },
@@ -275,7 +303,70 @@
         });
 
     }
+    function getMarketList()
+    {
+        $("#divMarketList").hide();
 
+        var url = ServicePrefix + '/api/Market/GetMarketListByParentMarket';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inParentMarketId": parentMarketId,
+                "inActiveOnly" : false
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+
+                    var str = '';
+
+                    $("#marketList").html("");
+
+  
+                    var holdMarket = "";
+                    $.each(data.report.rows, function (index) {
+
+                        $("#divMarketList").show();
+                        var obj = data.report.rows[index];
+                             
+
+                            str = str +
+                                '<div class="row" style="padding-top:3px;">';
+
+                            str = str + '<div class="col-md-6" style="text-align:left">';
+                            str = str + (holdMarket != "" && obj.marketName==holdMarket ? "" : obj.marketName + ' (' + obj.mediaName + ')');
+                            str = str + '</div>';
+                            str = str + '<div class="col-md-2" style="text-align:left">';
+                            str = str + obj.productId;
+                            str = str + '</div>';
+ 
+                            str = str + '<div class="col-md-2" style="text-align:left">';
+                            str = str + (obj.active=="1" ? "true" : "false");
+                            str = str + '</div>';
+
+                            str = str + '</div>';
+                            holdMarket = obj.marketName;
+
+                    });
+
+                    $("#marketList").append(str);
+
+                }
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+
+        $.ajax(url, settings);
+    }
     function getProductList() {
         var url = ServicePrefix + '/api/Product/GetProductList';
 
