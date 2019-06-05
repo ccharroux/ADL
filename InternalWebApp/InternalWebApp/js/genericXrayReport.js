@@ -10,17 +10,18 @@ var auditName = new Array();
 auditName.push("auditAdvertisers");
 auditName.push("auditMediaAdvertisers");
 auditName.push("auditStationAdvertisers");
-auditName.push("auditNewAdvertisers");
 //agencies
 auditName.push("auditAgencies");
 auditName.push("auditStationAgencies");
-auditName.push("auditNewAgencies");
 //revenue research
 auditName.push("auditAdvertisersRevenueResearch");
 auditName.push("auditMediaRevenueResearch");
 //account executive
 auditName.push("auditAEStatusList");
-
+//month-end close out
+//auditName.push("auditMarketStationSummary");
+auditName.push("auditNewAdvertisers");
+auditName.push("auditNewAgencies");
 
 function buildAuditArray() {
     var auditCounter = 1;
@@ -454,7 +455,7 @@ function getAuditObject_NewAdvertisers() {
         apiControllerAction: "/api/AdvertiserAudit/GetNewAdvertiserAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'advertisers'
+        product: 'xraymonthend'
     }
 
     return tempObject;
@@ -676,7 +677,7 @@ function getAuditObject_NewAgencies() {
         apiControllerAction: "/api/AgencyAudit/GetNewAgencyAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'agencies'
+        product: 'xraymonthend'
     }
 
     return tempObject;
@@ -693,6 +694,37 @@ function getAuditFilterArray_NewAgencies() {
         required: true
     }
     arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getAuditObject_MarketStationSummary() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        auditTitle: "Market Station Summary",
+        apiControllerAction: "",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xraymonthend'
+    }
+
+    return tempObject;
+
+}
+
+function getAuditFilterArray_MarketStationSummary() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    //media type
+    //load markets
+    //period
+    //years
 
     return arrayFilters;
 }
