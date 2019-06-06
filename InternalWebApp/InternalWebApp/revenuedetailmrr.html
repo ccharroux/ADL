@@ -114,6 +114,43 @@
                         <select id="ddlYearPeriod" class="dropdown-select" onchange="getRevenueDetail();"></select>
                     </div>
                 </div>
+                <div class="row search-section">
+                    <div class="col-md-6">
+                        <label for="StationComment">Station comment</label>
+                        <input type="text" id="txtStationComment" maxlength="250" />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="InternalRevisionComment">Internal revision comment</label>
+                        <input type="text" id="txtInternalRevisionComment" maxlength="500" />
+                        <br />
+                        &nbsp; <input type="checkbox" id="chkInternalRevisionCommentIntentionallyLeftBlank" /> Intentionally left blank
+                        <br />
+
+                        <label for="ClientRevisionComment">Client revision comment</label>
+                        <input type="text" id="txtClientRevisionComment" maxlength="500" />
+                        <br />
+                        &nbsp; <input type="checkbox" id="chkClientRevisionCommentIntentionallyLeftBlank" /> Intentionally left blank
+                        <br />
+                    </div>
+                </div>
+                <div class="row search-section">
+                    <div class="col-md-6">
+                        <a href="#" onclick="moveToPreviousStation();">Previous Station</a>
+                        |
+                        <a href="#" onclick="postSaveCallback = null; saveChanges();">Save changes</a>
+                        |
+                        <a href="#" onclick="moveToNextStation();">Next Station</a>
+                        <br />
+                        <a href="#" onclick="moveToPreviousPeriod();">Previous Period</a>
+                        |
+                        <a href="#" onclick="moveToNextPeriod();">Next Period</a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="#" onclick="rankMarket();">Rank market</a>
+                        |
+                        <a href="#" onclick="unrankMarket();">Un-rank market</a>
+                    </div>
+                </div>
 
                 <!-- start datatable-->
                 <div class="dataTable-top-margin">
@@ -185,6 +222,9 @@
     var gotYearsPeriods = false;
     var gotStations = false;
     var initializedRevenueDetail = false;
+    var revenueDetailChanged = false;
+    var warningMessage = null;
+    var postSaveCallback = null;
 
     $(document).ready(function () {
 
@@ -519,7 +559,7 @@
         }
         else {
 
-            // TODO preserve-old-value logic
+            var previousMarketId = gotMarkets ? $("#ddlMarket").val() : -1;
             var str = '';
             //console.log(JSON.stringify(data));
             str = '<option value="-1">-- Select a Market</option>';
@@ -531,7 +571,14 @@
 
             $("#ddlMarket").html(str);
 
-            // TODO preserve-old-value logic
+            var previousMarketIdStillInList = false;
+            $("#ddlMarket option").each(function () {
+                if (this.value == previousMarketId) {
+                    previousMarketIdStillInList = true;
+                    return false;
+                }
+            });
+            $("#ddlMarket").val(previousMarketIdStillInList ? previousMarketId : -1);
 
             gotMarkets = true;
             getStations();
@@ -611,7 +658,7 @@
         }
         else {
 
-            // TODO preserve-old-value logic
+            var previousStationId = gotStations ? $("#ddlStation").val() : -1;
             var str = '';
             str = '<option value="-1">-- Select a Station</option>';
             $.each(data.report.rows, function (index) {
@@ -622,7 +669,14 @@
 
             $("#ddlStation").html(str);
 
-            // TODO preserve-old-value logic
+            var previousStationIdStillInList = false;
+            $("#ddlStation option").each(function () {
+                if (this.value == previousStationId) {
+                    previousStationIdStillInList = true;
+                    return false;
+                }
+            });
+            $("#ddlStation").val(previousStationIdStillInList ? previousStationId : -1);
 
             gotStations = true;
             getRevenueDetail();
@@ -667,6 +721,7 @@
 
         var stationId = $("#ddlStation").val();
         if (stationId == -1) {
+            // TODO clear grid
             return;
         }
 
@@ -691,19 +746,12 @@
             success: function (data, textStatus, jQxhr) {
                 if (data.response.status.toUpperCase() === "SUCCESS")
                 {
-                    //if (data.report.rows.length == 1)
-                    //{
-                    //    var id = data.report.rows[0].marketId;
-                    //    setLocalStorage("search", "");
-                    //    editMarket(id);
-                    //    return;
-                    //}
+                    populateDataTable("dtRevenueDetail", data);
+                    if (revenueDetailChanged) {
+                        bootbox.alert("Changes were not saved");
+                    }
+                    revenueDetailChanged = false;
                 }
-                //if (!initializedRevenueDetail) {
-                //    setDataTable();
-                //    initializedRevenueDetail = true;
-                //}
-                populateDataTable("dtRevenueDetail", data);
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -722,7 +770,7 @@
         var categoryTotals = {};
         var changeRatio = 0;
 
-        $(".revenue-detail").each(function (a, b) {
+        $(".revenue-detail").each(function (index, value) {
             categoryId = $(this).attr("data-category-id");
 
             // if we calculated a new total, then copy the result back into the form
@@ -747,6 +795,256 @@
             changeRatio = getChangeRatio(revenueAmount, priorRevenueAmount);
             $("#change-" + categoryId).text(changeRatio);
         });
+
+        revenueDetailChanged = true;
+    }
+
+    function getRevenueDetailFromPage() {
+        var categoryId = null;
+        var revenueAmount = null;
+        var revenueDetailFromPage = {};
+        $(".revenue-detail").each(function (index, value) {
+            categoryId = $(this).attr("data-category-id");
+            revenueAmount = $(this).val();
+            revenueDetailFromPage[categoryId] = revenueAmount;
+        });
+        return revenueDetailFromPage;
+    }
+
+    function confirmIfNeeded(isNeeded, confirmMessage, nextFunction) {
+        if (!isNeeded) {
+            nextFunction();
+            return;
+        }
+
+        bootbox.confirm({
+            message: confirmMessage,
+            buttons: {
+                confirm: {
+                    label: "Proceed"
+                },
+                cancel: {
+                    label: "Cancel"
+                }
+            },
+            callback: function (result) {
+                if (result) {
+                    nextFunction();
+                }
+            }
+        });
+    }
+
+    function saveChanges() {
+        if (!revenueDetailChanged) {
+            bootbox.alert("No changes to save");
+            return;
+        }
+
+        var url = ServicePrefix + '/api/???/???'; // TODO build appropriate API - return booleans marketRankingInProgress, marketRanked
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": $("#ddlMarket").val(),
+                "inRevenueYearPeriod": $("#ddlYearPeriod").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                saveChanges_getMarketRankStatusSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function saveChanges_getMarketRankStatusSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+        
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get market rank status");
+            return;
+        }
+
+        if (data.report.rows[0].marketRankingInProgress) {
+            bootbox.alert("Market ranking is still in progress");
+            return;
+        }
+
+        confirmIfNeeded(
+            data.report.rows[0].marketRanked,
+            "Market will be flagged as unranked",
+            saveChanges_getMarketWarnings
+        );
+    }
+
+    function saveChanges_getMarketWarnings() {
+        var url = ServicePrefix + '/api/???/???'; // TODO build appropriate API - insert amounts somewhere, then exec MarketRevenueWeb.dbo.GetMarketWarnings or something like it
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inRevenueDetail": getRevenueDetailFromPage()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                saveChanges_getMarketWarningsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function saveChanges_getMarketWarningsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        warningMessage = null;
+        if (data.report.rows.length == 1) {
+            warningMessage = data.report.row[0].WarningMessage;
+        }
+        if (data.report.rows.length > 1) {
+            warningMessage = "Large changes in revenue";
+        }
+        confirmIfNeeded(
+            warningMessage != null,
+            warningMessage,
+            saveChanges_confirmImplicitSave
+        );
+    }
+
+    function saveChanges_confirmImplicitSave() {
+        confirmIfNeeded(
+            postSaveCallback != null,
+            "Save revenues?",
+            saveChanges_saveRevenueDetail
+        );
+    }
+
+    function saveChanges_saveRevenueDetail() {
+        var url = ServicePrefix + '/api/???/???'; // TODO build appropriate API
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStation": $("#ddlStation").val(),
+                "inRevenueYearPeriod": $("#ddlYearPeriod").val(),
+                "inRevenueDetail": getRevenueDetailFromPage(),
+                "inWarningMessage": warningMessage,
+                "inStationComment": $("#txtStationComment").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                saveChanges_saveRevenueDetailSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function saveChanges_saveRevenueDetailSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        revenueDetailChanged = false;
+
+        if (postSaveCallback != null) {
+            postSaveCallback();
+        }
+    }
+
+    function moveToPreviousStation() {
+        if ($("#ddlStation option:selected").index() == 0) {
+            bootbox.alert("Already on first station");
+            return;
+        }
+        postSaveCallback = moveToPreviousStationSuccess;
+        saveChanges();
+    }
+
+    function moveToPreviousStationSuccess() {
+        var previousIndex = $("#ddlStation option:selected").index() - 1;
+        var previousValue = $("#ddlStation")[previousIndex];
+        $("#ddlStation").val(previousValue);
+    }
+
+    function moveToNextStation() {
+        if ($("#ddlStation option:selected").index() == $("#ddlStation").length - 1) {
+            bootbox.alert("Already on last station");
+            return;
+        }
+        postSaveCallback = moveToNextStationSuccess;
+        saveChanges();
+    }
+
+    function moveToNextStationSuccess() {
+        var nextIndex = $("#ddlStation option:selected").index() + 1;
+        var nextValue = $("#ddlStation")[nextIndex];
+        $("#ddlStation").val(nextValue);
+    }
+
+    function moveToPreviousPeriod() {
+        if ($("#ddlYearPeriod option:selected").index() == 0) {
+            bootbox.alert("Already on first period");
+            return;
+        }
+        postSaveCallback = moveToPreviousPeriodSuccess;
+        saveChanges();
+    }
+
+    function moveToPreviousPeriodSuccess() {
+        var previousIndex = $("#ddlYearPeriod option:selected").index() - 1;
+        var previousValue = $("#ddlYearPeriod")[previousIndex];
+        $("#ddlYearPeriod").val(previousValue);
+    }
+
+    function moveToNextPeriod() {
+        if ($("#ddlYearPeriod option:selected").index() == $("#ddlYearPeriod").length - 1) {
+            bootbox.alert("Already on last period");
+            return;
+        }
+        postSaveCallback = moveToNextPeriodSuccess;
+        saveChanges();
+    }
+
+    function moveToNextPeriodSuccess() {
+        var nextIndex = $("#ddlYearPeriod option:selected").index() + 1;
+        var nextValue = $("#ddlYearPeriod")[nextIndex];
+        $("#ddlYearPeriod").val(nextValue);
+    }
+
+    function rankMarket() {
+        // TODO
+    }
+
+    function unrankMarket() {
+        // TODO
     }
 
 </script>
