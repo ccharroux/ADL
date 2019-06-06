@@ -10,11 +10,14 @@ else if (window.location.toString().toLowerCase().indexOf("stagingmediainternal.
     ServicePrefix = "https://stagingservices.millerkaplan.com/";
     bNonProd = true;
 }
+else if (window.location.toString().toLowerCase().indexOf("demomediainternal.millerkaplan.com") > -1) {
+    ServicePrefix = "https://demoservices.millerkaplan.com/";
+    bNonProd = false;
+}
 else if (window.location.toString().toLowerCase().indexOf("mediainternal.millerkaplan.com") > -1) {
     ServicePrefix = "https://services.millerkaplan.com/";
     bNonProd = false;
 }
-
 
 var currentPage = window.location.toString().toLocaleLowerCase();
  
