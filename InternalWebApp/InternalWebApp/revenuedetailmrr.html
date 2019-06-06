@@ -123,13 +123,9 @@
                         <label for="InternalRevisionComment">Internal revision comment</label>
                         <input type="text" id="txtInternalRevisionComment" maxlength="500" />
                         <br />
-                        &nbsp; <input type="checkbox" id="chkInternalRevisionCommentIntentionallyLeftBlank" /> Intentionally left blank
-                        <br />
 
                         <label for="ClientRevisionComment">Client revision comment</label>
                         <input type="text" id="txtClientRevisionComment" maxlength="500" />
-                        <br />
-                        &nbsp; <input type="checkbox" id="chkClientRevisionCommentIntentionallyLeftBlank" /> Intentionally left blank
                         <br />
                     </div>
                 </div>
@@ -148,7 +144,9 @@
                     <div class="col-md-6">
                         <a href="#" onclick="rankMarket();">Rank market</a>
                         |
-                        <a href="#" onclick="unrankMarket();">Un-rank market</a>
+                        <a href="#" onclick="unrankMarket();">Un-rank market (revision)</a>
+                        |
+                        <a href="#" onclick="generateSnapshotReport();">Generate snapshot report</a>
                     </div>
                 </div>
 
@@ -751,6 +749,21 @@
                         bootbox.alert("Changes were not saved");
                     }
                     revenueDetailChanged = false;
+                    /*
+                    TODO update other stuff:
+	                if stationEntered() {
+		                checkMarkToRightOfStation.Visible = true
+		                btnSave.Text = "Update"
+	                } else {
+		                checkMarkToRightOfStation.Visible = false
+		                btnSave.Text = "Save"
+	                }
+	                revision, rankUser, rankDateTime = from getPeriodRanked()
+	                txtByUserOnDateTime = rankUser, rankDateTime
+	                txtContactInfo = (contactName, contactPhone, contactEmail from first row of exec MarketRevenue.dbo.get_StationContactList @inStationId)
+	                txtStationComment = (comment from exec Central.dbo.get_Station @inStationId)
+	                modeRank = (revision = null) ? "New" : "Revision"
+                    */
                 }
 
             },
@@ -837,7 +850,11 @@
 
     function saveChanges() {
         if (!revenueDetailChanged) {
-            bootbox.alert("No changes to save");
+            if (postSaveCallback != null) {
+                postSaveCallback();
+            } else {
+                bootbox.alert("No changes to save");
+            }
             return;
         }
 
@@ -976,6 +993,10 @@
 
         if (postSaveCallback != null) {
             postSaveCallback();
+        } else {
+            if ($("#ddlStation option:selected").index() < $("#ddlStation").length - 1) {
+                moveToNextStation();
+            }
         }
     }
 
@@ -990,8 +1011,8 @@
 
     function moveToPreviousStationSuccess() {
         var previousIndex = $("#ddlStation option:selected").index() - 1;
-        var previousValue = $("#ddlStation")[previousIndex];
-        $("#ddlStation").val(previousValue);
+        $("#ddlStation").get(0).selectedIndex = previousIndex;
+        $("#ddlStation").trigger("change");
     }
 
     function moveToNextStation() {
@@ -1005,8 +1026,8 @@
 
     function moveToNextStationSuccess() {
         var nextIndex = $("#ddlStation option:selected").index() + 1;
-        var nextValue = $("#ddlStation")[nextIndex];
-        $("#ddlStation").val(nextValue);
+        $("#ddlStation").get(0).selectedIndex = nextIndex;
+        $("#ddlStation").trigger("change");
     }
 
     function moveToPreviousPeriod() {
@@ -1020,8 +1041,8 @@
 
     function moveToPreviousPeriodSuccess() {
         var previousIndex = $("#ddlYearPeriod option:selected").index() - 1;
-        var previousValue = $("#ddlYearPeriod")[previousIndex];
-        $("#ddlYearPeriod").val(previousValue);
+        $("#ddlYearPeriod").get(0).selectedIndex = previousIndex;
+        $("#ddlYearPeriod").trigger("change");
     }
 
     function moveToNextPeriod() {
@@ -1035,16 +1056,224 @@
 
     function moveToNextPeriodSuccess() {
         var nextIndex = $("#ddlYearPeriod option:selected").index() + 1;
-        var nextValue = $("#ddlYearPeriod")[nextIndex];
-        $("#ddlYearPeriod").val(nextValue);
+        $("#ddlYearPeriod").get(0).selectedIndex = nextIndex;
+        $("#ddlYearPeriod").trigger("change");
+    }
+    
+    function rankMarket() {
+        var url = ServicePrefix + '/api/???/???'; // TODO build appropriate API - okayToRank = true or reasonNotOkayToRank = "Previous period was not ranked" or "Not all stations' revenues are entered"
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarket": $("#ddlMarket").val(),
+                "inRevenueYearPeriod": $("#ddlYearPeriod").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                rankMarket_okayToRankSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
     }
 
-    function rankMarket() {
-        // TODO
+    function rankMarket_okayToRankSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get okay-to-rank status");
+            return;
+        }
+
+        if (data.report.rows[0].okayToRank) {
+            bootbox.alert(data.report.rows[0].reasonNotOkayToRank);
+            return;
+        }
+
+        var url = ServicePrefix + '/api/???/???'; // TODO build appropriate API
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarket": $("#ddlMarket").val(),
+                "inRevenueYearPeriod": $("#ddlYearPeriod").val(),
+                "inInternalRevisionMessage": $("#txtInternalRevisionMessage").val(),
+                "inClientRevisionMessage": $("#txtClientRevisionMessage").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                rankMarket_queueRankingSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function rankMarket_queueRankingSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert("Market scheduled for ranking - you should receive an e-mail when it is complete")
     }
 
     function unrankMarket() {
-        // TODO
+        var url = ServicePrefix + '/api/???/???'; // TODO build appropriate API
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarket": $("#ddlMarket").val(),
+                "inRevenueYearPeriod": $("#ddlYearPeriod").val(),
+                "inInternalRevisionMessage": $("#txtInternalRevisionMessage").val(),
+                "inClientRevisionMessage": $("#txtClientRevisionMessage").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                unrankMarket_resetReviewAndApprovalSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function unrankMarket_resetReviewAndApprovalSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get reset-review-and-approval status");
+            return;
+        }
+
+        if (data.report.rows[0].wouldBeRevision) {
+            bootbox.dialog({
+                message: "This will initiate a revision",
+                buttons: {
+                    cancel: {
+                        label: "Cancel",
+                        callback: function() { }
+                    },
+                    initiateRevision_Available: {
+                        label: "Leave old data available",
+                        callback: function () {
+                            unrankMarket_initiateRevision(true);
+                        }
+                    },
+                    initiateRevision_Unavailable: {
+                        label: "Make old data unavailable",
+                        callback: function () {
+                            unrankMarket_initiateRevision(false);
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    function unrankMarket_initiateRevision(leaveOldDataAvailableDuringRevision) {
+        var url = ServicePrefix + '/api/???/???'; // TODO build appropriate API
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarket": $("#ddlMarket").val(),
+                "inRevenueYearPeriod": $("#ddlYearPeriod").val(),
+                "inLeaveOldDataAvailableDuringRevision": leaveOldDataAvailableDuringRevision
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                unrankMarket_initiateRevisionSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function unrankMarket_initiateRevisionSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert("Market has been un-ranked");
+    }
+
+    function generateSnapshotReport() {
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": $("#ddlMarket").val(),
+                "inRevenueYearPeriod": $("#ddlYearPeriod").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                generateSnapshotReport_getMarketRankStatusSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function generateSnapshotReport_getMarketRankStatusSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get market rank status");
+            return;
+        }
+
+        if (data.report.rows[0].marketRankingInProgress) {
+            bootbox.alert("Market ranking is still in progress");
+            return;
+        }
+
+        if (!data.report.rows[0].marketRanked) {
+            bootbox.alert("Market is not yet ranked");
+            return;
+        }
+
+        bootbox.alert("Snapshot report is not yet implemented"); // TODO
     }
 
 </script>
