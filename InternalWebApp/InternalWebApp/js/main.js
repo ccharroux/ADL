@@ -1064,3 +1064,78 @@ function removeCharacter(object, charToRemove) {
     return sValue;
 
 }
+function getYearList() {
+
+    var str = '';
+    str = '<option value="">-- Select a Year --</option>';
+
+    var thisYear = (new Date()).getFullYear();
+
+    for (var i = thisYear; i > (thisYear - 10) ; i--) {
+
+        str = str + '<option ';
+        if (i == thisYear) {
+            str = str + " selected ";
+        }
+        str = str + ' value="' + i + '">' + i + '</option>';
+    }
+
+    $("#ddlYear").html(str);
+
+    if (typeof paramRevenueYear == 'undefined')
+    {
+        return;
+    }
+    else
+        {
+            if (paramRevenueYear.length > 0) {
+                $("#ddlYear").val(paramRevenueYear);
+            }
+    }
+
+}
+function getPeriodList(inType) {
+
+  
+
+    if (!inType) {
+        inType = 'all';
+    }
+
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var thisMonth = (new Date()).getMonth();
+
+    var str = '';
+    str = '<option value="">-- Select a Period --</option>';
+
+    if (inType == 'months' || inType == 'all') {
+        for (var i = 1; i <= 12; i++) {
+
+            str = str + '<option ';
+
+            if (i - 1 == thisMonth) {
+                str = str + " selected ";
+            }
+
+            str = str + ' value="' + (i < 10 ? '0' + i.toString() : i.toString()) + '">' + monthNames[i - 1] + '</option>';
+        }
+    }
+
+    if (inType == 'all') {
+        str = str + '<option value="">-----------</option>';
+    }
+
+    if (inType == 'quarters' || inType == 'all') {
+        for (var i = 1; i <= 4; i++) {
+
+            str = str + '<option value="Q' + i.toString() + '">Quarter - ' + i.toString() + '</option>';
+        }
+    }
+
+    $("#ddlPeriod").html(str);
+
+    if (paramRevenuePeriod.length > 0) {
+        $("#ddlPeriod").val(paramRevenuePeriod);
+    }
+
+}
