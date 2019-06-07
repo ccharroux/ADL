@@ -61,6 +61,9 @@
             background-color: #eef;
             font-weight: bold;
         }
+        .primary-contact {
+            font-weight: bold;
+        }
     </style>
 
     <!-- Modernizr JS -->
@@ -116,10 +119,23 @@
                 </div>
                 <div class="row search-section">
                     <div class="col-md-6">
-                        <label for="StationComment">Station comment</label>
+                        <label for="StationEntered">Station entered?</label>
+                        <span id="StationEntered"></span>
+                        <br />
+
+                        <label for="StationContact">Station contact</label>
+                        <span id="StationContact"></span>
+                        <br />
+
+                        <label for="txtStationComment">Station comment</label>
                         <input type="text" id="txtStationComment" maxlength="250" />
+                        <br />
                     </div>
                     <div class="col-md-6">
+                        <label for="MarketRanked">Market ranked?</label>
+                        <span id="MarketRanked"></span>
+                        <br />
+
                         <label for="InternalRevisionComment">Internal revision comment</label>
                         <input type="text" id="txtInternalRevisionComment" maxlength="500" />
                         <br />
@@ -221,7 +237,6 @@
     var gotStations = false;
     var initializedRevenueDetail = false;
     var revenueDetailChanged = false;
-    var warningMessage = null;
     var postSaveCallback = null;
 
     $(document).ready(function () {
@@ -452,24 +467,23 @@
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
         }
-        else {
 
-            var str = '';
-            //console.log(JSON.stringify(data));
-            str = '<option selected value="-1">-- All Media Types</option>';
-            $.each(data.report.rows, function (index) {
+        var str = '';
+        //console.log(JSON.stringify(data));
+        str = '<option selected value="-1">-- All Media Types</option>';
+        $.each(data.report.rows, function (index) {
 
-                str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+            str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
 
-            });
+        });
 
-            $("#ddlMediaType").html(str);
+        $("#ddlMediaType").html(str);
 
-            gotMediaTypes = true;
-            getMarkets();
+        gotMediaTypes = true;
+        getMarkets();
 
-        }
     }
 
     function getSchedules() {
@@ -499,24 +513,23 @@
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
         }
-        else {
 
-            var str = '';
-            //console.log(JSON.stringify(data));
-            str = '<option selected value="">-- All Schedules</option>';
-            $.each(data.report.rows, function (index) {
+        var str = '';
+        //console.log(JSON.stringify(data));
+        str = '<option selected value="">-- All Schedules</option>';
+        $.each(data.report.rows, function (index) {
 
-                str = str + '<option value="' + data.report.rows[index]["Schedule ID"] + '">' + data.report.rows[index]["Schedule Description"] + '</option>';
+            str = str + '<option value="' + data.report.rows[index]["Schedule ID"] + '">' + data.report.rows[index]["Schedule Description"] + '</option>';
 
-            });
+        });
 
-            $("#ddlSchedule").html(str);
+        $("#ddlSchedule").html(str);
 
-            gotSchedules = true;
-            getMarkets();
+        gotSchedules = true;
+        getMarkets();
 
-        }
     }
 
     function getMarkets() {
@@ -554,34 +567,33 @@
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
         }
-        else {
 
-            var previousMarketId = gotMarkets ? $("#ddlMarket").val() : -1;
-            var str = '';
-            //console.log(JSON.stringify(data));
-            str = '<option value="-1">-- Select a Market</option>';
-            $.each(data.report.rows, function (index) {
+        var previousMarketId = gotMarkets ? $("#ddlMarket").val() : -1;
+        var str = '';
+        //console.log(JSON.stringify(data));
+        str = '<option value="-1">-- Select a Market</option>';
+        $.each(data.report.rows, function (index) {
 
-                str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
+            str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
 
-            });
+        });
 
-            $("#ddlMarket").html(str);
+        $("#ddlMarket").html(str);
 
-            var previousMarketIdStillInList = false;
-            $("#ddlMarket option").each(function () {
-                if (this.value == previousMarketId) {
-                    previousMarketIdStillInList = true;
-                    return false;
-                }
-            });
-            $("#ddlMarket").val(previousMarketIdStillInList ? previousMarketId : -1);
+        var previousMarketIdStillInList = false;
+        $("#ddlMarket option").each(function () {
+            if (this.value == previousMarketId) {
+                previousMarketIdStillInList = true;
+                return false;
+            }
+        });
+        $("#ddlMarket").val(previousMarketIdStillInList ? previousMarketId : -1);
 
-            gotMarkets = true;
-            getStations();
+        gotMarkets = true;
+        getStations();
 
-        }
     }
 
     function getYearsPeriods() {
@@ -653,33 +665,32 @@
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
         }
-        else {
 
-            var previousStationId = gotStations ? $("#ddlStation").val() : -1;
-            var str = '';
-            str = '<option value="-1">-- Select a Station</option>';
-            $.each(data.report.rows, function (index) {
+        var previousStationId = gotStations ? $("#ddlStation").val() : -1;
+        var str = '';
+        str = '<option value="-1">-- Select a Station</option>';
+        $.each(data.report.rows, function (index) {
 
-                str = str + '<option value="' + data.report.rows[index].reid + '">' + data.report.rows[index].fullName + '</option>';
+            str = str + '<option value="' + data.report.rows[index].reid + '">' + data.report.rows[index].fullName + '</option>';
 
-            });
+        });
 
-            $("#ddlStation").html(str);
+        $("#ddlStation").html(str);
 
-            var previousStationIdStillInList = false;
-            $("#ddlStation option").each(function () {
-                if (this.value == previousStationId) {
-                    previousStationIdStillInList = true;
-                    return false;
-                }
-            });
-            $("#ddlStation").val(previousStationIdStillInList ? previousStationId : -1);
+        var previousStationIdStillInList = false;
+        $("#ddlStation option").each(function () {
+            if (this.value == previousStationId) {
+                previousStationIdStillInList = true;
+                return false;
+            }
+        });
+        $("#ddlStation").val(previousStationIdStillInList ? previousStationId : -1);
 
-            gotStations = true;
-            getRevenueDetail();
+        gotStations = true;
+        getRevenueDetail();
 
-        }
     }
 
     function loadLastSearch() {
@@ -727,14 +738,14 @@
 
         var stationId = $("#ddlStation").val();
         if (stationId == -1) {
-            // TODO clear grid
+            $("#dtRevenueDetail").DataTable().clear().draw();
             return;
         }
 
         //setLocalStorage("search", $("#searchText").val().trim() + '|' + $("#searchTextNumber").val().trim() + '|' + $("#ddlMediaType").val());
         //setLocalStorage("searchPage", window.location);
 
-        var url = ServicePrefix + '/api/MRRReport/GetRevenueDetail'
+        var url = ServicePrefix + '/api/MRR/GetRevenueDetail'
                 + '?inApiToken=' + getLocalStorage("APIToken")
                 + '&inYear=' + currentRevenueYear()
                 + '&inPeriod=' + currentRevenuePeriod()
@@ -747,36 +758,206 @@
             contentType: 'application/json',
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                if (data.response.status.toUpperCase() === "SUCCESS")
-                {
-                    populateDataTable("dtRevenueDetail", data);
-                    if (revenueDetailChanged) {
-                        bootbox.alert("Changes were not saved");
-                    }
-                    revenueDetailChanged = false;
-                    /*
-                    TODO update other stuff:
-	                if stationEntered() {
-		                checkMarkToRightOfStation.Visible = true
-		                btnSave.Text = "Update"
-	                } else {
-		                checkMarkToRightOfStation.Visible = false
-		                btnSave.Text = "Save"
-	                }
-	                revision, rankUser, rankDateTime = from getPeriodRanked()
-	                txtByUserOnDateTime = rankUser, rankDateTime
-	                txtContactInfo = (contactName, contactPhone, contactEmail from first row of exec MarketRevenue.dbo.get_StationContactList @inStationId)
-	                txtStationComment = (comment from exec Central.dbo.get_Station @inStationId)
-	                modeRank = (revision = null) ? "New" : "Revision"
-                    */
-                }
-
+                getRevenueDetailSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
 
+    }
+
+    function getRevenueDetailSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        populateDataTable("dtRevenueDetail", data);
+
+        if (revenueDetailChanged) {
+            bootbox.alert("Changes were not saved");
+        }
+        revenueDetailChanged = false;
+
+        showStationEnteredStatus();
+        showStationContactInfo();
+        showStationComment();
+        showMarketRankedStatus();
+    }
+
+    function showStationEnteredStatus() {
+        var url = ServicePrefix + '/api/MRR/GetStationYearPeriodEntered';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": $("#ddlStation").val(),
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                showStationEnteredStatusSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function showStationEnteredStatusSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get station entered status");
+            return;
+        }
+
+        $("#StationEntered").text(
+            data.report.rows[0].isEntered
+                ? "Entered by " + data.report.rows[0].enteredUser + " on " + data.report.rows[0].enteredDateTime
+                : "Not entered"
+        );
+    }
+
+    function showStationContactInfo() {
+        var url = ServicePrefix + '/api/PersonnelReport/GetPersonnelContactList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": $("#ddlStation").val(),
+                "inProductId": "MRR"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                showStationContactInfoSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function showStationContactInfoSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get station contact info");
+            return;
+        }
+
+        var str = '<table><tr><th>Name</th><th>Phone</th><th>E-mail</th></tr>';
+        $.each(data.report.rows, function (index) {
+            str = str
+                + '<tr' + (data.report.rows[index].isPrimaryContact ? ' class="primary-contact"' : '')
+                + '><td>' + data.report.rows[index].userName
+                + '</td><td>' + data.report.rows[index].userPhone
+                + '</td><td>' + data.report.rows[index].email
+                + '</td></tr>';
+        });
+        str = str + '</table>';
+        $("#StationContact").text(str);
+    }
+
+    function showStationComment() {
+        var url = ServicePrefix + '/api/Station/GetStation';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": $("#ddlStation").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                showStationCommentSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function showStationCommentSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get station comment");
+            return;
+        }
+
+        $("#StationComment").text(data.report.rows[0].comment);
+    }
+
+    function showMarketRankedStatus() {
+        var url = ServicePrefix + '/api/MRR/GetMarketYearPeriodRanked';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": $("#ddlMarket").val(),
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                showMarketRankedStatusSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function showMarketRankedStatusSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get market ranked status");
+            return;
+        }
+
+        $("#MarketRanked").text(
+            'Revision ' + data.report.rows[0].revision + (
+                data.report.rows[0].isRanked
+                    ? "ranked by " + data.report.rows[0].rankUser + " on " + data.report.rows[0].rankDateTime
+                    : "not ranked"
+            )
+        );
     }
 
     function recalculateTotals() {
@@ -863,7 +1044,7 @@
             return;
         }
 
-        var url = ServicePrefix + '/api/???/???'; // TODO build appropriate API - SP MarketRevenue.dbo.get_MarketRankStatus
+        var url = ServicePrefix + '/api/MRR/GetMarketRankStatus';
 
         var settings = {
             dataType: 'json',
@@ -911,7 +1092,7 @@
     }
 
     function saveChanges_getMarketWarnings() {
-        var url = ServicePrefix + '/api/???/???'; // TODO build appropriate API - insert amounts somewhere, then exec MarketRevenueWeb.dbo.GetMarketWarnings or something like it
+        var url = ServicePrefix + '/api/MRR/UpdateRevenueDetailWarnings'; // TODO build API, delete/insert MarketRevenue.dbo.RevenueEntryInternalEdit then do something similar to MarketRevenueWeb.dbo.GetMarketWarnings
 
         var settings = {
             dataType: 'json',
@@ -919,6 +1100,9 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": $("#ddlStation").val(),
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod(),
                 "inRevenueDetail": getRevenueDetailFromPage()
             }),
             processData: false,
@@ -940,7 +1124,7 @@
             return;
         }
 
-        warningMessage = null;
+        var warningMessage = null;
         if (data.report.rows.length == 1) {
             warningMessage = data.report.row[0].WarningMessage;
         }
@@ -963,7 +1147,7 @@
     }
 
     function saveChanges_saveRevenueDetail() {
-        var url = ServicePrefix + '/api/???/???'; // TODO build appropriate API - SP MarketRevenue.dbo.update_RevenueDetail
+        var url = ServicePrefix + '/api/MRR/UpdateRevenueDetail';
 
         var settings = {
             dataType: 'json',
@@ -974,7 +1158,6 @@
                 "inStation": $("#ddlStation").val(),
                 "inYear": currentRevenueYear(),
                 "inPeriod": currentRevenuePeriod(),
-                "inWarningMessage": warningMessage,
                 "inStationComment": $("#txtStationComment").val()
             }),
             processData: false,
@@ -1067,7 +1250,7 @@
     }
     
     function rankMarket() {
-        var url = ServicePrefix + '/api/???/???'; // TODO build appropriate API - SP MarketRevenue.dbo.get_MarketOkayToRank
+        var url = ServicePrefix + '/api/MRR/GetMarketOkayToRank';
 
         var settings = {
             dataType: 'json',
@@ -1107,7 +1290,7 @@
             return;
         }
 
-        var url = ServicePrefix + '/api/???/???'; // TODO build appropriate API - SP MarketRevenue.dbo.update_QueueMarketRank
+        var url = ServicePrefix + '/api/MRR/QueueMarketRank';
 
         var settings = {
             dataType: 'json',
@@ -1143,7 +1326,7 @@
     }
 
     function unrankMarket() {
-        var url = ServicePrefix + '/api/???/???'; // TODO build appropriate API - SP MarketRevenue.dbo.update_MarketResetReviewAndApproval
+        var url = ServicePrefix + '/api/MRR/MarketResetReviewAndApproval';
 
         var settings = {
             dataType: 'json',
@@ -1203,8 +1386,8 @@
         }
     }
 
-    function unrankMarket_initiateRevision(leaveOldDataAvailableDuringRevision) {
-        var url = ServicePrefix + '/api/???/???'; // TODO build appropriate API - SP MarketRevenue.dbo.update_MarketInitiateRevision
+    function unrankMarket_initiateRevision(leaveOldDataAvailable) {
+        var url = ServicePrefix + '/api/MRR/MarketInitiateRevision';
 
         var settings = {
             dataType: 'json',
@@ -1215,7 +1398,7 @@
                 "inMarketId": $("#ddlMarket").val(),
                 "inYear": currentRevenueYear(),
                 "inPeriod": currentRevenuePeriod(),
-                "inLeaveOldDataAvailableDuringRevision": leaveOldDataAvailableDuringRevision
+                "inLeaveOldDataAvailable": leaveOldDataAvailable
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
