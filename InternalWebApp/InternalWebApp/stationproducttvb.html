@@ -162,11 +162,9 @@
         stationId = (getParameterByName("StationID") == null ? 0 : getParameterByName("StationID"));
         isNewProduct = (getParameterByName("ProductNew") == null ? 0 : getParameterByName("ProductNew"));
         getRepFirmList();
-        checkIfInsertOrUpdate();
         setStationLabel();
 
     });
-
 
 
     function setStationLabel() {
@@ -334,7 +332,7 @@
 
                     }
                 }
-            })
+            });
         }
     }
 
@@ -353,47 +351,46 @@
     }
 
     function updateTVBProduct() {
-        bootbox.alert('This functionality is still under development.', function () {
+
+        var repFirmList = [];
+        var repFirmID = "";
+
+        $(".repFirmList").each(function(){
+
+            if($(this).prop('checked') == true){
+                repFirmID = $(this).data("repfirmid");
+                repFirmList.push(repFirmID);
+
+            }
         });
 
-        //check for validation for internal app
+        if (updateTVBProductValidationPassed(repFirmList) == false) {
+            return;
+        }
 
-        //var repFirmList = [];
-        //var repFirmID = "";
+        var url = ServicePrefix + '/api/TVBStation/UpdateTVBStationProperties'; 
 
-        //$(".repFirmList").each(function(){
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId,
+                "inIsTimeSales": $("#chkTimeSales").prop("checked"),
+                "inIsRepFirm": $("#chkRepOfficeParticipant").prop("checked"),
+                "inRepFirmList": repFirmList
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                updateTVBProductSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
 
-        //    if($(this).prop('checked') == true){
-        //        repFirmID = $(this).data("repfirmid");
-        //        repFirmList.push(repFirmID);
-
-        //    }
-        //});
-
-        //var url = ServicePrefix + '/api/TVBStation/UpdateTVBStationPropertes';
-
-        //var settings = {
-        //    dataType: 'json',
-        //    type: 'post',
-        //    contentType: 'application/json',
-        //    data: JSON.stringify({
-        //        "inApiToken": getLocalStorage("APIToken"),
-        //        "inStationId": stationId,
-        //        "inIsTimeSales": $("#chkTimeSales").prop("checked"),
-        //        "inIsNew": isNewProduct,
-        //        "inIsRepFirm": $("#chkRepOfficeParticipant").prop("checked"),
-        //        "inRepFirmList": repFirmList
-        //    }),
-        //    processData: false,
-        //    success: function (data, textStatus, jQxhr) {
-        //        updateTVBProductSuccess(data, textStatus, jQxhr);
-        //    },
-        //    error: function (jQxhr, textStatus, errorThrown) {
-        //        genericAjaxError(jQxhr, textStatus, errorThrown);
-        //    }
-        //};
-
-        //$.ajax(url, settings);
+        $.ajax(url, settings);
     }
 
     function updateTVBProductSuccess(data, textStatus, jQxhr) {
@@ -407,6 +404,20 @@
         }
     }
 
+    function updateTVBProductValidationPassed(repFirmList) {
+
+        if ($("#chkTimeSales").prop("checked") == false && $("#chkRepOfficeParticipant").prop("checked") == false) {
+
+            bootbox.alert("You must select either Time Sales Participant or Rep Office Participant.");
+            return false;
+        }
+
+        if ($("#chkRepOfficeParticipant").prop("checked") && repFirmList.length <= 0) {
+            bootbox.alert("If you have selected Rep Office Participant, you must also select at least one Rep Office.");
+            return false;
+        }
+
+    }
 
 
     function goBackToStationPage() {
