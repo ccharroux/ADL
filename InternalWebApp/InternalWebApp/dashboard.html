@@ -54,18 +54,8 @@
         </header>
         <div id="fh5co-contact-section" class="contact-section">
             <div class="margin-0-auto text-align-center">
-                <div id="myPages" style="display:none"></div>
-                <!--<div class="font-36">Markets by Product</div>-->
-                <!--<canvas id="piechart" width="400" height="400"></canvas>-->
                 <center>
-                    <!--<div style="margin: 0 auto; text-align:center">-->
-                    
-                    <!--<div id="divMRR" class="productDiv"></div>
-                    <div id="divXRY" class="productDiv"></div>
-                    <div id="divTVB" class="productDiv"></div>
-                    <div id="divMSS" class="productDiv"></div>
-                    <div id="divDMA" class="productDiv"></div>-->
-                    <!--</div>-->
+                    <div id="divFavoriteList" style="display:none"></div>
                 </center>
             </div>
         </div>
@@ -92,59 +82,50 @@
 </html>
 <script>
 
-    var data = [120, 100, 140];
-    var labels = ["MRR-120", "X-RAY-110", "TVB-140"];
-    var colors = ["#FFDAB9", "#E6E6FA", "#E0FFFF"];
 
     $( document ).ready(function()
     {
         var lastPageList = getLocalStorage("latestRequestArray");
 
 
-        $("#myPages").html("");
-        $("#myPages").append('<h3>My Recent Pages</h3><hr>');
-        $("#myPages").show();
+        //$("#myPages").html("");
+        //$("#myPages").append('<h3>My Recent Pages</h3><hr>');
+        //$("#myPages").show();
 
-        if (lastPageList.length > 0) {
-            var lastPageArray = JSON.parse(lastPageList);
-            if (lastPageArray.length > 0) {
+        //if (lastPageList.length > 0) {
+        //    var lastPageArray = JSON.parse(lastPageList);
+        //    if (lastPageArray.length > 0) {
 
 
-                for (var i = lastPageArray.length - 1; i >= 0; i--) {
-                    $("#myPages").append('<a href="' + lastPageArray[i].url + '">' + lastPageArray[i].PageTitle + '</a><br>');
-                }
+        //        for (var i = lastPageArray.length - 1; i >= 0; i--) {
+        //            $("#myPages").append('<a href="' + lastPageArray[i].url + '">' + lastPageArray[i].PageTitle + '</a><br>');
+        //        }
 
-                $("#myPages").append('<hr>');
-                $("#myPages").show();
-            }
-        }
-        else
-        {
-            $("#myPages").append('No entries.<hr>');
-            $("#myPages").show();
-        }
-
+        //        $("#myPages").append('<hr>');
+        //        $("#myPages").show();
+        //    }
+        //}
+        //else
+        //{
+        //    $("#myPages").append('No entries.<hr>');
+        //    $("#myPages").show();
+        //}
+        buildFavoriteList();
         buildMainMenu("");
 
-        //canvas = document.getElementById("piechart");
-        //var context = canvas.getContext("2d");
-        //for (var i = 0; i < data.length; i++) {
-        //    drawSegment(canvas, context, i);
-        //}
-       // buildReport();
 
     });
 
-    function buildReport()
+    function buildFavoriteList()
     {
         $.ajax({
-            url: ServicePrefix + '/api/MarketReport/GetMarketProductTotalsList?inApiToken=' + getLocalStorage("APIToken"),
+            url: ServicePrefix + '/api/InternalFavorite/GetInternalFavoriteList',
             dataType: 'json',
-            type: 'get',
+            type: 'post',
             contentType: 'application/json',
-            //data: JSON.stringify({
-            //    "inApiToken": getLocalStorage("APIToken")
-            //}),
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
@@ -155,21 +136,18 @@
                     
                     $.each(data.report.rows, function (index) {
  
-                        var productId = data.report.rows[index].productId;
-                        var mediaTypeLabel = data.report.rows[index].mediaType;
-                        var divClass = '';
-                        if (mediaTypeLabel.toString().indexOf("TOTAL") > -1)
-                        {
-                            divClass = 'mediaHeader';
-                            mediaTypeLabel = data.report.rows[index].mediaType + " " + productId;
-                        }
+                        var id = data.report.rows[index]["Internal Favorite Id"];
+                        var title = data.report.rows[index].Title;
+                        var url = data.report.rows[index].URL;
                         var str = "<div class='row'>";
-                        str = str + "<div class='col-md-4 textAlignLeft " + divClass +  "'>" + mediaTypeLabel + "</div>";
-                        str = str + "<div class='col-md-3 textAlignRight " + divClass + "'>&nbsp;</div>";
-                        str = str + "<div class='col-md-4 textAlignRight " + divClass + "'>" + data.report.rows[index].totalMarkets + "</div>";
+                        str = str + "<div class='col-md-3 textAlignLeft'>" + title + "</div>";
+                        str = str + "<div class='col-md-5 textAlignLeft'>" + url + "</div>";
+                        str = str + "<div class='col-md-1 textAlignLeft'><a href='" + url + "'>GO</a></div>";
+                        str = str + "<div class='col-md-1 textAlignLeft'>edit</div>";
+
                         str = str + "</div>"
-                        $("#div" + productId).append(str);
-                        $("#div" + productId).show();
+                        $("#divFavoriteList").append(str);
+                        $("#divFavoriteList").show();
                     });
 
                 }
