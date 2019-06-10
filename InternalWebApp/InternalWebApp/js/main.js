@@ -372,13 +372,13 @@ $( document ).ready(function()
 
 
 });
+
 function showFavoriteDialog()
 {
+
+    $("#favId").val("0");
     $("#favURL").val(window.location.toString());
     $("#favTitle").val($("h2:first").html());
-
-    console.log($("h2:first").html());
-
     $("#favoritesDialog").dialog("open");
 
 }
@@ -411,7 +411,9 @@ function addDialogComponents()
 
     var d = '<div id="favoritesDialog" style="display:none" title="Favorite">';
     d = d + '<div style="margin-top:5px;margin-bottom:5px">Add this page as one of your favorites</div>';
-    d = d + '   <label>Title</label> <input type="text" class="favText" id="favTitle" placeholder="Enter Name..." /><br>';
+    d = d + '<input type="hidden" id="favId" value="">';
+
+    d = d + '   <label>Title</label><input type="text" class="favText" id="favTitle" placeholder="Enter Name..." /><br>';
     d = d + '   <label>URL</label> <input type="text" class="favText" readonly="readonly" id="favURL" /><hr />';
     d = d + '<center>';
     d = d + '   <div style="margin-top:5px;margin-bottom:5px">';
@@ -423,8 +425,8 @@ function addDialogComponents()
     d = d + '</center>';
     d = d + '</div>';
 
-    d = d + '<div style="position:absolute;top:20px; right:10px;z-index:1000"><input type="button"  value="Add as Favorite" onclick="showFavoriteDialog();"/>';
-    d = d + '&nbsp;<input type="button" value="Favorite List" onclick="window.location=\'dashboard.html\'"/></div>';
+    d = d + '<div style="position:absolute;top:5px; right:10px;z-index:1000"><input type="button"  value="Add as Favorite" onclick="showFavoriteDialog();"/>';
+    d = d + '&nbsp;<input type="button" value="My Favorites" onclick="window.location=\'dashboard.html\'"/></div>';
 
     $("body").append(d)
 
@@ -438,20 +440,125 @@ function cancelFavorite()
 function saveFavorite()
 {
 
+    var bPassedTest = true;
+
+    if ($("#favURL").val().trim() == "") {
+        bPassedTest = false;
+        bootbox.alert('You must enter a url for your Favorite', function () { });
+        return;
+    }
+
     if ($("#favTitle").val().trim() == "") {
+        bPassedTest = false;
         bootbox.alert('You must enter a title for your Favorite', function () { });
         return;
     }
-    else {
-        bootbox.alert('Functionality coming soon!', function () { });
-        $("#favoritesDialog").dialog("close");
+
+
+    if (bPassedTest == true)
+    {
+        updateFavorite($("#favId").val());
     }
 
 }
+function updateFavorite(id)
+{
+    //filling out url for ajax call
+    var url = ServicePrefix + '/api/InternalFavorite/InsertInternalFavorite';
+
+    if (id > 0)
+    {
+        url = ServicePrefix + '/api/InternalFavorite/UpdateInternalFavorite';
+    }
+
+    //filling out settings for ajax call
+    var settings = {
+        dataType: 'json',
+        type: 'post',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inInternalFavoriteId": id,
+            "inTitle": $("#favTitle").val().trim(),
+            "inURL": $("#favURL").val().trim().replace("localhost:51116", "devmediainternal.millerkaplan.com")
+        }),
+        processData: false,
+        success: function (data, textStatus, jQxhr)
+        {
+            $("#favoritesDialog").dialog("close");
+            bootbox.alert('Favorite has been ' + (id == 0 ? 'saved' : 'updated') + '.', function () {
+                if ((id > 0) || ($("#favURL").val().trim().toLowerCase().indexOf('dashboard.html') > -1)) {
+                    window.location = "dashboard.html";
+                }
+            });
+
+
+
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    };
+
+ 
+    //ajax call
+    $.ajax(url, settings);
+}
+function editFavorite(title, url, id)
+{
+
+    $("#favId").val(id);
+    $("#favURL").val(url);
+    $("#favTitle").val(title);
+    $("#favoritesDialog").dialog("open");
+
+}
+function deleteFavorite(id) {
+
+
+    bootbox.confirm("Are you sure you want to delete this Favorite ?", function (result) {
+
+        if (result == true) {
+
+            //filling out url for ajax call
+            var url = ServicePrefix + '/api/InternalFavorite/DeleteInternalFavorite';
+
+
+            //filling out settings for ajax call
+            var settings = {
+                dataType: 'json',
+                type: 'post',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    "inApiToken": getLocalStorage("APIToken"),
+                    "inInternalFavoriteId": id
+                }),
+                processData: false,
+                success: function (data, textStatus, jQxhr) {
+                    $("#favoritesDialog").dialog("close");
+                    bootbox.alert('Favorite has been deleted.', function () {window.location = "dashboard.html"; });
+                    
+
+                },
+                error: function (jqXhr, textStatus, errorThrown) {
+                    genericAjaxError(jqXhr, textStatus, errorThrown);
+                }
+            };
+
+
+            //ajax call
+            $.ajax(url, settings);
+
+        } else {
+            return;
+        }
+    });
+
+}
+
 function buildDialog()
 {
-    console.log('Dialog Built');
- 
+
         $("#favoritesDialog").dialog({
             autoOpen: false,
             resizable: false,
@@ -461,6 +568,7 @@ function buildDialog()
         });
  
 }
+
 function getEnvironment()
 {
     var environment = "";
