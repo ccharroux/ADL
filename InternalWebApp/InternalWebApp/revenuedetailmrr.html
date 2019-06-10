@@ -123,7 +123,7 @@
                         <span id="StationEntered"></span>
                         <br />
 
-                        <label for="StationContact">Station contact</label>
+                        <label for="StationContact">Station contact(s)</label>
                         <span id="StationContact"></span>
                         <br />
 
@@ -831,17 +831,15 @@
     }
 
     function showStationContactInfo() {
-        var url = ServicePrefix + '/api/PersonnelReport/GetPersonnelContactList';
+        var url = ServicePrefix + '/api/PersonnelReport/GetPersonnelContactList'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inStationId=' + $("#ddlStation").val()
+            + '&inProductId=MRR';
 
         var settings = {
             dataType: 'json',
-            type: 'post',
+            type: 'get',
             contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inStationId": $("#ddlStation").val(),
-                "inProductId": "MRR"
-            }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 showStationContactInfoSuccess(data, textStatus, jQxhr);
@@ -875,7 +873,7 @@
                 + '</td></tr>';
         });
         str = str + '</table>';
-        $("#StationContact").text(str);
+        $("#StationContact").html(str);
     }
 
     function showStationComment() {
@@ -952,10 +950,10 @@
         }
 
         $("#MarketRanked").text(
-            'Revision ' + data.report.rows[0].revision + (
+            "Revision " + (data.report.rows[0].revision || 0) + (
                 data.report.rows[0].isRanked
-                    ? "ranked by " + data.report.rows[0].rankUser + " on " + data.report.rows[0].rankDateTime
-                    : "not ranked"
+                    ? " ranked by " + data.report.rows[0].rankUser + " on " + data.report.rows[0].rankDateTime
+                    : " not ranked"
             )
         );
     }
@@ -1001,11 +999,11 @@
     function getRevenueDetailFromPage() {
         var categoryId = null;
         var revenueAmount = null;
-        var revenueDetailFromPage = {};
+        var revenueDetailFromPage = [];
         $(".revenue-detail").each(function (index, value) {
             categoryId = $(this).attr("data-category-id");
             revenueAmount = $(this).val();
-            revenueDetailFromPage[categoryId] = revenueAmount;
+            revenueDetailFromPage.push(categoryId + "\t" + revenueAmount);
         });
         return revenueDetailFromPage;
     }
@@ -1073,7 +1071,7 @@
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
-        
+
         if (data.report.rows.length == 0) {
             MKAErrorMessageRtn("Failed to get market rank status");
             return;
@@ -1092,7 +1090,7 @@
     }
 
     function saveChanges_getMarketWarnings() {
-        var url = ServicePrefix + '/api/MRR/UpdateRevenueDetailWarnings'; // TODO build API, delete/insert MarketRevenue.dbo.RevenueEntryInternalEdit then do something similar to MarketRevenueWeb.dbo.GetMarketWarnings
+        var url = ServicePrefix + '/api/MRR/UpdateRevenueDetailWarnings';
 
         var settings = {
             dataType: 'json',
@@ -1155,7 +1153,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inStation": $("#ddlStation").val(),
+                "inStationId": $("#ddlStation").val(),
                 "inYear": currentRevenueYear(),
                 "inPeriod": currentRevenuePeriod(),
                 "inStationComment": $("#txtStationComment").val()
@@ -1183,8 +1181,10 @@
         if (postSaveCallback != null) {
             postSaveCallback();
         } else {
-            if ($("#ddlStation option:selected").index() < $("#ddlStation").length - 1) {
+            if ($("#ddlStation option:selected").index() < $("#ddlStation option").length - 1) {
                 moveToNextStation();
+            } else {
+                showStationEnteredStatus();
             }
         }
     }
@@ -1205,7 +1205,7 @@
     }
 
     function moveToNextStation() {
-        if ($("#ddlStation option:selected").index() == $("#ddlStation").length - 1) {
+        if ($("#ddlStation option:selected").index() == $("#ddlStation option").length - 1) {
             bootbox.alert("Already on last station");
             return;
         }
@@ -1235,7 +1235,7 @@
     }
 
     function moveToNextPeriod() {
-        if ($("#ddlYearPeriod option:selected").index() == $("#ddlYearPeriod").length - 1) {
+        if ($("#ddlYearPeriod option:selected").index() == $("#ddlYearPeriod option").length - 1) {
             bootbox.alert("Already on last period");
             return;
         }
