@@ -301,8 +301,6 @@ var navTool = {
 $( document ).ready(function() 
 {
 
-
-
     var nonLoggedInPages = new Array();
     nonLoggedInPages.push('login.html');
     nonLoggedInPages.push('splash.html');
@@ -323,7 +321,6 @@ $( document ).ready(function()
 
     // Set Ajax
 	$(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
-	//$(document).ajaxStart($.blockUI);//.ajaxStop(console.log('testing this'));
 
 	var apiToken = "";
 	var bDoLoginCheck = true;
@@ -359,33 +356,135 @@ $( document ).ready(function()
 		
 	}
 
-	var loc = window.location.toString().toLocaleLowerCase();
-
-
-	if (loc.indexOf("devmediainternal.millerkaplan.com") > -1)
-	{
-	    environment = "&nbsp;DEV";
-	}
-
-	if (loc.indexOf("localhost") > -1) {
-	    environment = "&nbsp;LOCAL";
-	}
-
-	if (loc.indexOf("stagingmediainternal.millerkaplan.com") > -1)
-	{
-	    environment = "&nbsp;STAGING";
-	}
-	if (loc.indexOf("demomediainternal.millerkaplan.com") > -1) {
-	    environment = "&nbsp;DEMO";
-	}
+	var environment = getEnvironment();
 
 	if (environment.length > 0) {
 	    $("#fh5co-header").prepend("<div class='container' style='color:white; background:red; padding-top: 3px; font-weight:600;border-radius:15px; text-align: center;'>" + environment + "</div>");
 	}
 
-	setTimeout(getLastPage, delayForLastPage);
-});
+	if (bDoLoginCheck == true)
+	{
+	    // add favorites
+	    addDialogComponents();
+	}
 
+	setTimeout(getLastPage, delayForLastPage);
+
+
+});
+function showFavoriteDialog()
+{
+    $("#favURL").val(window.location.toString());
+    $("#favTitle").val($("h2:first").html());
+
+    console.log($("h2:first").html());
+
+    $("#favoritesDialog").dialog("open");
+
+}
+function addDialogComponents()
+{
+    //    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    //    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    // JAVASCRIPT FIRST
+    var imported = document.createElement('script');
+    imported.src = 'https://code.jquery.com/ui/1.12.1/jquery-ui.js';
+    document.head.appendChild(imported);
+
+    // NOW THE CSS
+    // Get HTML head element 
+    var head = document.getElementsByTagName('HEAD')[0];
+
+    // Create new link Element 
+    var link = document.createElement('link');
+
+    // set the attributes for link element  
+    link.rel = 'stylesheet';
+
+    link.type = 'text/css';
+
+    link.href = '//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css';
+
+    // Append link element to HTML head 
+    head.appendChild(link);
+
+    var d = '<div id="favoritesDialog" title="Favorite">';
+    d = d + '<div style="margin-top:5px;margin-bottom:5px">Add this page as one of your favorites</div>';
+    d = d + '   <label>Title</label> <input type="text" class="favText" id="favTitle" placeholder="Enter Name..." /><br>';
+    d = d + '   <label>URL</label> <input type="text" class="favText" readonly="readonly" id="favURL" /><hr />';
+    d = d + '<center>';
+    d = d + '   <div style="margin-top:5px;margin-bottom:5px">';
+    d = d + '       <input type="button" id="btnProcess" value="Save" onclick="saveFavorite()" \>';
+    d = d + '   </div>';
+    d = d + '<div style="margin-top:5px;margin-bottom:5px">';
+    d = d + '    <input type="button" id="btnCancel" value="Cancel" onclick="cancelFavorite()" \>';
+    d = d + '        </div>';
+    d = d + '</center>';
+    d = d + '</div>';
+
+    d = d + '<input type="button" style="position:absolute;top:20px; right:10px;z-index:1000" value="Favorite" onclick="showFavoriteDialog();"/>';
+
+    $("body").append(d)
+
+    setTimeout(buildDialog, 250);
+
+}
+function cancelFavorite()
+{
+    $("#favoritesDialog").dialog("close");
+}
+function saveFavorite()
+{
+
+    if ($("#favTitle").val().trim() == "") {
+        bootbox.alert('You must enter a title for your Favorite', function () { });
+        return;
+    }
+    else {
+        bootbox.alert('Functionality coming soon!', function () { });
+        $("#favoritesDialog").dialog("close");
+    }
+
+}
+function buildDialog()
+{
+    console.log('Dialog Built');
+ 
+        $("#favoritesDialog").dialog({
+            autoOpen: false,
+            resizable: false,
+            width: 600,
+            height: 300,
+            modal: true
+        });
+ 
+}
+function getEnvironment()
+{
+    var environment = "";
+
+    var loc = window.location.toString().toLocaleLowerCase();
+
+
+    if (loc.indexOf("devmediainternal.millerkaplan.com") > -1) {
+        environment = "&nbsp;DEV";
+    }
+
+    if (loc.indexOf("localhost") > -1) {
+        environment = "&nbsp;LOCAL";
+    }
+
+    if (loc.indexOf("stagingmediainternal.millerkaplan.com") > -1) {
+        environment = "&nbsp;STAGING";
+    }
+    if (loc.indexOf("demomediainternal.millerkaplan.com") > -1) {
+        environment = "&nbsp;DEMO";
+    }
+
+    return environment;
+
+}
 function getLastPage()
 {
     var lastPage = new Object();
@@ -1086,12 +1185,11 @@ function getYearList() {
     {
         return;
     }
-    else
-        {
-            if (paramRevenueYear.length > 0) {
-                $("#ddlYear").val(paramRevenueYear);
-            }
+ 
+    if (paramRevenueYear.length > 0) {
+        $("#ddlYear").val(paramRevenueYear);
     }
+ 
 
 }
 function getPeriodList(inType) {
@@ -1133,6 +1231,11 @@ function getPeriodList(inType) {
     }
 
     $("#ddlPeriod").html(str);
+
+    if (typeof paramRevenuePeriod == "undefined")
+    {
+        return;
+    }
 
     if (paramRevenuePeriod.length > 0) {
         $("#ddlPeriod").val(paramRevenuePeriod);
