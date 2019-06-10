@@ -409,7 +409,7 @@ function addDialogComponents()
     // Append link element to HTML head 
     head.appendChild(link);
 
-    var d = '<div id="favoritesDialog" title="Favorite">';
+    var d = '<div id="favoritesDialog" style="display:none" title="Favorite">';
     d = d + '<div style="margin-top:5px;margin-bottom:5px">Add this page as one of your favorites</div>';
     d = d + '   <label>Title</label> <input type="text" class="favText" id="favTitle" placeholder="Enter Name..." /><br>';
     d = d + '   <label>URL</label> <input type="text" class="favText" readonly="readonly" id="favURL" /><hr />';
