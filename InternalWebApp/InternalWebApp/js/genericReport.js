@@ -1642,17 +1642,7 @@ function getReportObject_ActiveStationList() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("stationID");
-    columnsToDisplay.push("stationName");
-    columnsToDisplay.push("stationFullName");
-    columnsToDisplay.push("formatName");
-    columnsToDisplay.push("affiliationName");
-    columnsToDisplay.push("ownerName");
-    columnsToDisplay.push("marketName");
-    columnsToDisplay.push("stationClientNumber");
-    columnsToDisplay.push("stationNickname");
-    columnsToDisplay.push("productID");
-    columnsToDisplay.push("mrrManagerName");
+ 
 
 
     tempObject =
@@ -1712,17 +1702,7 @@ function getReportObject_DisabledStationList() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("stationID");
-    columnsToDisplay.push("stationName");
-    columnsToDisplay.push("stationFullName");
-    columnsToDisplay.push("formatName");
-    columnsToDisplay.push("affiliationName");
-    columnsToDisplay.push("ownerName");
-    columnsToDisplay.push("marketName");
-    columnsToDisplay.push("stationClientNumber");
-    columnsToDisplay.push("stationNickname");
-    columnsToDisplay.push("productID");
-    columnsToDisplay.push("productDisableDate");
+  
 
     tempObject =
     {
