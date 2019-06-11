@@ -1250,7 +1250,12 @@
     }
     
     function rankMarket() {
-        var url = ServicePrefix + '/api/MRR/GetMarketOkayToRank';
+        if ($("#ddlMarket").val() == -1) {
+            bootbox.alert("Must select a market first");
+            return;
+        }
+
+        var url = ServicePrefix + '/api/MRR/GetMarketYearPeriodOkayToRank';
 
         var settings = {
             dataType: 'json',
@@ -1285,7 +1290,7 @@
             return;
         }
 
-        if (data.report.rows[0].okayToRank) {
+        if (!data.report.rows[0].okayToRank) {
             bootbox.alert(data.report.rows[0].reasonNotOkayToRank);
             return;
         }
@@ -1326,7 +1331,12 @@
     }
 
     function unrankMarket() {
-        var url = ServicePrefix + '/api/MRR/MarketResetReviewAndApproval';
+        if ($("#ddlMarket").val() == -1) {
+            bootbox.alert("Must select a market first");
+            return;
+        }
+
+        var url = ServicePrefix + '/api/MRR/MarketYearPeriodResetReviewAndApproval';
 
         var settings = {
             dataType: 'json',
@@ -1361,33 +1371,36 @@
             return;
         }
 
-        if (data.report.rows[0].wouldBeRevision) {
-            bootbox.dialog({
-                message: "This will initiate a revision",
-                buttons: {
-                    cancel: {
-                        label: "Cancel",
-                        callback: function() { }
-                    },
-                    initiateRevision_Available: {
-                        label: "Leave old data available",
-                        callback: function () {
-                            unrankMarket_initiateRevision(true);
-                        }
-                    },
-                    initiateRevision_Unavailable: {
-                        label: "Make old data unavailable",
-                        callback: function () {
-                            unrankMarket_initiateRevision(false);
-                        }
+        if (!data.report.rows[0].wouldBeRevision) {
+            unrankMarket_indicateOverallSuccess();
+            return;
+        }
+
+        bootbox.dialog({
+            message: "This will initiate a revision",
+            buttons: {
+                cancel: {
+                    label: "Cancel",
+                    callback: function() { }
+                },
+                initiateRevision_Available: {
+                    label: "Leave old data available",
+                    callback: function () {
+                        unrankMarket_initiateRevision(true);
+                    }
+                },
+                initiateRevision_Unavailable: {
+                    label: "Make old data unavailable",
+                    callback: function () {
+                        unrankMarket_initiateRevision(false);
                     }
                 }
-            });
-        }
+            }
+        });
     }
 
     function unrankMarket_initiateRevision(leaveOldDataAvailable) {
-        var url = ServicePrefix + '/api/MRR/MarketInitiateRevision';
+        var url = ServicePrefix + '/api/MRR/MarketYearPeriodInitiateRevision';
 
         var settings = {
             dataType: 'json',
@@ -1418,6 +1431,10 @@
             return;
         }
 
+        unrankMarket_indicateOverallSuccess();
+    }
+
+    function unrankMarket_indicateOverallSuccess() {
         bootbox.alert("Market has been un-ranked");
     }
 
@@ -1465,7 +1482,7 @@
             return;
         }
 
-        bootbox.alert("Snapshot report is not yet implemented"); // TODO
+        bootbox.alert("Snapshot report is not yet implemented");
     }
 
 </script>
