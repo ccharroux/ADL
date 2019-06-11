@@ -279,24 +279,24 @@ function getReportObject_ParentOwnershipList() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("parentOwnerID");
-    columnsToDisplay.push("parentOwnerName");
-    columnsToDisplay.push("parentOwnerActive");
-    columnsToDisplay.push("ownerID");
-    columnsToDisplay.push("ownerName");
-    columnsToDisplay.push("ownerAbbreviation");
-    columnsToDisplay.push("productID");
-    columnsToDisplay.push("productActiveDate");
-    columnsToDisplay.push("productDisableDate");
+    //columnsToDisplay.push("parentOwnerID");
+    //columnsToDisplay.push("parentOwnerName");
+    //columnsToDisplay.push("parentOwnerActive");
+    //columnsToDisplay.push("ownerID");
+    //columnsToDisplay.push("ownerName");
+    //columnsToDisplay.push("ownerAbbreviation");
+    //columnsToDisplay.push("productID");
+    //columnsToDisplay.push("productActiveDate");
+    //columnsToDisplay.push("productDisableDate");
 
     tempObject =
     {
         // id: rptParentOwnershipList,
         reportTitle: "Parent Ownership List",
-        apiControllerAction: "/api/ParentOwnershipReport/GetParentOwnershipList",
+        apiControllerAction: "/api/ParentOwnershipReport/GetParentOwnershipReportList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'misc'
+        product: 'owner'
     }
 
     return tempObject;
@@ -341,13 +341,13 @@ function getReportObject_OwnershipList() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("ownerName");
-    columnsToDisplay.push("ownerID");
-    columnsToDisplay.push("ownerAbbreviation");
-    columnsToDisplay.push("parentOwnerName");
-    columnsToDisplay.push("productID");
-    columnsToDisplay.push("productActiveDate");
-    columnsToDisplay.push("productDisableDate");
+    //columnsToDisplay.push("ownerName");
+    //columnsToDisplay.push("ownerID");
+    //columnsToDisplay.push("ownerAbbreviation");
+    //columnsToDisplay.push("parentOwnerName");
+    //columnsToDisplay.push("productID");
+    //columnsToDisplay.push("productActiveDate");
+    //columnsToDisplay.push("productDisableDate");
 
     tempObject =
     {
@@ -356,7 +356,7 @@ function getReportObject_OwnershipList() {
         apiControllerAction: "/api/OwnerReport/GetOwnerList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'misc'
+        product: 'owner'
     }
 
     return tempObject;
@@ -1093,7 +1093,7 @@ function getReportFilterArray_MarketDelivery() {
         token:  "Market",
         jsCall:  "getMarketListAll",
         objectName:  "ddlMarket",
-        required:  false
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
@@ -1118,15 +1118,7 @@ function getReportObject_MarketDelivery() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    ////columnsToDisplay.push("MarketID");
-    ////columnsToDisplay.push("OwnerID");
-    //columnsToDisplay.push("Period");
-    columnsToDisplay.push("Revision");
-    columnsToDisplay.push("MRRReleased");
-    columnsToDisplay.push("XRYReleased");
-    columnsToDisplay.push("MarketName");
-    columnsToDisplay.push("OwnerName");
-    columnsToDisplay.push("PeriodDisplay");
+ 
 
     tempObject =
     {
@@ -1135,7 +1127,7 @@ function getReportObject_MarketDelivery() {
         apiControllerAction:  "/api/MarketReport/GetMarketDelivery",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product:  ''
+        product:  'market'
     }
 
     return tempObject;
@@ -1650,17 +1642,7 @@ function getReportObject_ActiveStationList() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("stationID");
-    columnsToDisplay.push("stationName");
-    columnsToDisplay.push("stationFullName");
-    columnsToDisplay.push("formatName");
-    columnsToDisplay.push("affiliationName");
-    columnsToDisplay.push("ownerName");
-    columnsToDisplay.push("marketName");
-    columnsToDisplay.push("stationClientNumber");
-    columnsToDisplay.push("stationNickname");
-    columnsToDisplay.push("productID");
-    columnsToDisplay.push("mrrManagerName");
+ 
 
 
     tempObject =
@@ -1720,17 +1702,7 @@ function getReportObject_DisabledStationList() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("stationID");
-    columnsToDisplay.push("stationName");
-    columnsToDisplay.push("stationFullName");
-    columnsToDisplay.push("formatName");
-    columnsToDisplay.push("affiliationName");
-    columnsToDisplay.push("ownerName");
-    columnsToDisplay.push("marketName");
-    columnsToDisplay.push("stationClientNumber");
-    columnsToDisplay.push("stationNickname");
-    columnsToDisplay.push("productID");
-    columnsToDisplay.push("productDisableDate");
+  
 
     tempObject =
     {

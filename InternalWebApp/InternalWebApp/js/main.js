@@ -426,7 +426,7 @@ function addDialogComponents()
     d = d + '</div>';
 
     d = d + '<div style="position:absolute;top:5px; right:10px;z-index:1000"><input type="button"  value="Add as Favorite" onclick="showFavoriteDialog();"/>';
-    d = d + '&nbsp;<input type="button" value="My Favorites" onclick="window.location=\'dashboard.html\'"/></div>';
+    d = d + '&nbsp;<input type="button" value="My Favorites" onclick="window.location=\'/dashboard.html\'"/></div>';
 
     $("body").append(d)
 
