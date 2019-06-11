@@ -1080,7 +1080,7 @@ function buildDMAMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/dashboard.html">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
