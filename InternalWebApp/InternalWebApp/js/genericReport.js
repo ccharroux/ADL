@@ -1118,15 +1118,7 @@ function getReportObject_MarketDelivery() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    ////columnsToDisplay.push("MarketID");
-    ////columnsToDisplay.push("OwnerID");
-    //columnsToDisplay.push("Period");
-    columnsToDisplay.push("Revision");
-    columnsToDisplay.push("MRRReleased");
-    columnsToDisplay.push("XRYReleased");
-    columnsToDisplay.push("MarketName");
-    columnsToDisplay.push("OwnerName");
-    columnsToDisplay.push("PeriodDisplay");
+ 
 
     tempObject =
     {
