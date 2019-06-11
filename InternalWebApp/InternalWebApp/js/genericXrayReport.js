@@ -112,7 +112,7 @@ function getQuickReport(reportId) {
 function setUpBackButton() {
     setLocalStorage("search", "reportId=" + getParameterByName("reportId"));
     setLocalStorage("searchPage", window.location);
-    setLocalStorage("quickReportQS", "ddlMarket|" + $("#ddlMarket").val());
+    //setLocalStorage("quickReportQS", "ddlMarket|" + $("#ddlMarket").val());
 }
 
 
