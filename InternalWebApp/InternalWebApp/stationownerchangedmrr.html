@@ -106,14 +106,14 @@
                             <label for="ddlStation1">Station(s)</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlStation1" class="mkaRequired field-width-325" errorMessage="You must select one or more stations."></select> <br />
-                            <select id="ddlStation2" class="field-width-325"></select> <br />
-                            <select id="ddlStation3" class="field-width-325"></select> <br />
-                            <select id="ddlStation4" class="field-width-325"></select> <br />
-                            <select id="ddlStation5" class="field-width-325"></select> <br />
-                            <select id="ddlStation6" class="field-width-325"></select> <br />
-                            <select id="ddlStation7" class="field-width-325"></select> <br />
-                            <select id="ddlStation8" class="field-width-325"></select> <br />
+                            <select id="ddlStation1" class="ddlStation mkaRequired field-width-325" errorMessage="You must select one or more stations."></select> <br />
+                            <select id="ddlStation2" class="ddlStation field-width-325"></select> <br />
+                            <select id="ddlStation3" class="ddlStation field-width-325"></select> <br />
+                            <select id="ddlStation4" class="ddlStation field-width-325"></select> <br />
+                            <select id="ddlStation5" class="ddlStation field-width-325"></select> <br />
+                            <select id="ddlStation6" class="ddlStation field-width-325"></select> <br />
+                            <select id="ddlStation7" class="ddlStation field-width-325"></select> <br />
+                            <select id="ddlStation8" class="ddlStation field-width-325"></select> <br />
                         </div>
                     </div>
                     <!--Buttons-->
@@ -163,6 +163,8 @@
     var marketsRefreshed = false;
     var ownersRefreshed = false;
 
+    var stationList = [];
+
     $(document).ready(function () {
         buildMainMenu("Stations");
         getMediaTypeList();
@@ -195,15 +197,16 @@
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
-        } else {
-            var str = '';
-            str = '<option value="-1">-- Select a Media Type</option>';
-            $.each(data.report.rows, function (index) {
-                str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
-
-            });
-            $("#ddlMediaType").html(str);
+            return;
         }
+
+        var str = '';
+        str = '<option value="-1">-- Select a Media Type</option>';
+        $.each(data.report.rows, function (index) {
+            str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+
+        });
+        $("#ddlMediaType").html(str);
 
         getMarketList();
         getOwnerList();
@@ -250,32 +253,31 @@
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
-        } else {
-
-            var previousMarketId = gotMarkets ? $("#ddlMarket").val() : -1;
-
-            var str = '';
-            str = '<option value="-1">-- Select a Market</option>';
-            $.each(data.report.rows, function (index) {
-                str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
-
-            });
-            $("#ddlMarket").html(str);
-
-            var previousMarketIdStillInList = false;
-            $("#ddlMarket option").each(function () {
-                if (this.value == previousMarketId) {
-                    previousMarketIdStillInList = true;
-                    return false;
-                }
-            });
-            $("#ddlMarket").val(previousMarketIdStillInList ? previousMarketId : -1);
-
-            marketsRefreshed = true;
-            gotMarkets = true;
-            getStationList();
-
+            return;
         }
+
+        var previousMarketId = gotMarkets ? $("#ddlMarket").val() : -1;
+
+        var str = '';
+        str = '<option value="-1">-- Select a Market</option>';
+        $.each(data.report.rows, function (index) {
+            str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
+
+        });
+        $("#ddlMarket").html(str);
+
+        var previousMarketIdStillInList = false;
+        $("#ddlMarket option").each(function () {
+            if (this.value == previousMarketId) {
+                previousMarketIdStillInList = true;
+                return false;
+            }
+        });
+        $("#ddlMarket").val(previousMarketIdStillInList ? previousMarketId : -1);
+
+        marketsRefreshed = true;
+        gotMarkets = true;
+        getStationList();
 
     }
 
@@ -319,32 +321,31 @@
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
-        } else {
-
-            var previousOwnerId = gotOwners ? $("#ddlNewOwnership").val() : -1;
-
-            var str = '';
-            str = '<option value="-1">-- Select an Ownership</option>';
-            $.each(data.report.rows, function (index) {
-                str = str + '<option value="' + data.report.rows[index].ownerId + '">' + data.report.rows[index].ownerName + '</option>';
-            });
-
-            $("#ddlNewOwnership").html(str);
-
-            var previousOwnerIdStillInList = false;
-            $("#ddlNewOwnership option").each(function () {
-                if (this.value == previousOwnerId) {
-                    previousOwnerIdStillInList = true;
-                    return false;
-                }
-            });
-            $("#ddlNewOwnership").val(previousOwnerIdStillInList ? previousOwnerId : -1);
-
-            gotOwners = true;
-            ownersRefreshed = true;
-            getStationList();
-
+            return;
         }
+
+        var previousOwnerId = gotOwners ? $("#ddlNewOwnership").val() : -1;
+
+        var str = '';
+        str = '<option value="-1">-- Select an Ownership</option>';
+        $.each(data.report.rows, function (index) {
+            str = str + '<option value="' + data.report.rows[index].ownerId + '">' + data.report.rows[index].ownerName + '</option>';
+        });
+
+        $("#ddlNewOwnership").html(str);
+
+        var previousOwnerIdStillInList = false;
+        $("#ddlNewOwnership option").each(function () {
+            if (this.value == previousOwnerId) {
+                previousOwnerIdStillInList = true;
+                return false;
+            }
+        });
+        $("#ddlNewOwnership").val(previousOwnerIdStillInList ? previousOwnerId : -1);
+
+        gotOwners = true;
+        ownersRefreshed = true;
+        getStationList();
 
     }
 
@@ -390,54 +391,161 @@
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
-        } else {
+            return;
+        }
 
-            var stationControl = '';
-            var previousStationId = -1;
+        var stationControl = '';
+        var previousStationId = -1;
 
-            for (var i = 1; i <= 8; ++i) {
-                ddlStation = '#ddlStation' + i;
+        for (var i = 1; i <= 8; ++i) {
+            ddlStation = '#ddlStation' + i;
 
-                previousStationId = gotStations ? $(ddlStation).val() : -1;
+            previousStationId = gotStations ? $(ddlStation).val() : -1;
 
-                var str = '';
-                str = '<option value="-1">-- Select a Station</option>';
-                $.each(data.report.rows, function (index) {
-                    str = str + '<option value="' + data.report.rows[index].stationID + '">' + data.report.rows[index].stationName;
-                    if (data.report.rows[index].oldOwnerName != null) {
-                        str = str + ' (old owner: ' + data.report.rows[index].oldOwnerName + ')';
-                    } else {
-                        str = str + ' (invalid: must have at least one different owner in archives)';
-                    }
-                    str = str + '</option>';
-                });
+            var str = '';
+            str = '<option value="-1">-- Select a Station</option>';
+            $.each(data.report.rows, function (index) {
+                str = str + '<option value="' + data.report.rows[index].stationId + '">' + data.report.rows[index].stationName;
+                if (data.report.rows[index].oldOwnerName != null) {
+                    str = str + ' (old owner: ' + data.report.rows[index].oldOwnerName + ')';
+                } else {
+                    str = str + ' (invalid: must have at least one different owner in archives)';
+                }
+                str = str + '</option>';
+            });
 
-                $(ddlStation).html(str);
+            $(ddlStation).html(str);
 
-                var previousStationIdStillInList = false;
-                $(ddlStation + ' option').each(function () {
-                    if (this.value == previousStationId) {
-                        previousStationIdStillInList = true;
-                        return false;
-                    }
-                });
-                $(ddlStation).val(previousStationIdStillInList ? previousStationId : -1);
-
-            }
-
-            gotStations = true;
+            var previousStationIdStillInList = false;
+            $(ddlStation + ' option').each(function () {
+                if (this.value == previousStationId) {
+                    previousStationIdStillInList = true;
+                    return false;
+                }
+            });
+            $(ddlStation).val(previousStationIdStillInList ? previousStationId : -1);
 
         }
+
+        gotStations = true;
 
     }
 
     function updatePastYears() {
-        bootbox.alert('Update functionality is still under development.');
-        // TODO if any station duplicates another, or they're not all consistently owned by one different owner throughout archived specs, then {
-        //   complain
-        // } else {
-        //   exec SP
-        // }
+        if ($("#ddlMarket").val() == -1) {
+            bootbox.alert("Must select a market first");
+            return;
+        }
+
+        if ($("#ddlNewOwnership").val() == -1) {
+            bootbox.alert("Must select a new owner first");
+            return;
+        }
+
+        stationList = [];
+        var foundProblem = false;
+        $(".ddlStation option:selected").each(function (index, value) {
+            if (foundProblem) {
+                return;
+            }
+            stationId = $(this).val();
+            if (stationId == -1) {
+                return;
+            }
+            if (stationList.includes(stationId)) {
+                bootbox.alert('Station ' + $(this).text() + ' is selected multiple times');
+                foundProblem = true;
+                return;
+            }
+            stationList.push(stationId);
+        });
+        if (foundProblem) {
+            return;
+        }
+        if (stationList.length == 0) {
+            bootbox.alert("Must select one or more stations first");
+            return;
+        }
+
+        // in this context we only care whether market is currently being ranked, which is independent of year/period, so just pass some placeholder values
+        var d = new Date();
+        var thisYear = d.getFullYear();
+        var thisMonth = d.getMonth() + 1; // getMonth() returns 0 to 11
+        var thisPeriod = (thisMonth < 10) ? "0" + thisMonth.toString() : thisMonth.toString();
+
+        var url = ServicePrefix + '/api/MRR/GetMarketRankStatus';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": $("#ddlMarket").val(),
+                "inYear": thisYear,
+                "inPeriod": thisPeriod
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                updatePastYears_getMarketRankStatusSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function updatePastYears_getMarketRankStatusSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get market rank status");
+            return;
+        }
+
+        if (data.report.rows[0].marketRankingInProgress) {
+            bootbox.alert("Market ranking is still in progress");
+            return;
+        }
+
+        var url = ServicePrefix + '/api/MRR/UpdateStationOwnershipRetroactively';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": $("#ddlMarket").val(),
+                "inNewOwnerId": $("#ddlNewOwnership").val(),
+                "inStationList": stationList
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                updatePastYearsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function updatePastYearsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert("Archived specs updated, market scheduled for re-ranking of past years - you should receive an e-mail when it is complete")
+
     }
 
 </script>
