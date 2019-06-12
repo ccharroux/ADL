@@ -998,19 +998,24 @@ function buildMRRMenu(selectedItem) {
 
     menuItems += '<ul>';
     menuItems += buildGenericReportsLink(selectedItem);
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="releasemrr.html">Release</a></li>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Reminders") + 'href="remindersmrr.html">Reminders</a></li>';
+    menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '<ul class="dropdown-menu" role="menu">';
+    menuItems += '        <li style="display:block"><a href="releasemrr.html">Release</a></li>';
+    menuItems += '        <li style="display:block"><a href="remindersmrr.html">Reminders</a></li>';
+    menuItems += '        <li style="display:block"><a href="revenuedetailmrr.html">Data Entry/Rank</a></li>';
+    menuItems += '</ul>';
+    menuItems += '</li>';
 
-
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '<ul class="dropdown-menu" role="menu">';
     menuItems += productDashboard('mrr');
     menuItems += productDashboard('xry');
     menuItems += productDashboard('tvb');
     menuItems += productDashboard('mss');
     menuItems += productDashboard('dma');
-    menuItems += '              </ul>';
-    menuItems += '        </li>';
+    menuItems += '</ul>';
+    menuItems += '</li>';
+
     menuItems += productDashboard('');
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
     menuItems += '    </ul>';
