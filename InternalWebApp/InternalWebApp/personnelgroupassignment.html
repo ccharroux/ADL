@@ -110,7 +110,7 @@
                 <div class="row">
                     <div class="col-md-12" style="width:100%;text-align:center">
                         <hr />
-                        <input value="Assign" id="btnAssign" class="default-button" type="button" style="display:none" />
+                        <input value="Assign" id="btnAssign" class="default-button" type="button" style="display:none" onclick="updateAssignments();" />
                     </div>
                 </div>
             </div>
@@ -670,6 +670,102 @@
 
                 getPersonnelList();
             }
+        }
+
+    }
+
+    function getGroupList() {
+        var groupList = [];
+        $("#ddlGroup option").each(function (index, value) {
+            groupId = $(this).val();
+            groupSelected = $(this).prop("selected");
+            groupList.push(groupId + "\t" + groupSelected);
+        });
+        return groupList;
+    }
+
+    function getReportList() {
+        var reportList = [];
+        $("#ddlReport option").each(function (index, value) {
+            reportId = $(this).val();
+            reportSelected = $(this).prop("selected");
+            reportList.push(reportId + "\t" + reportSelected);
+        });
+        return reportList;
+    }
+
+    function updateAssignments() {
+
+        switch ($("#ddlProduct").val()) {
+
+            case "MRR":
+
+                $.ajax({
+                    url: ServicePrefix + '/api/MRR/UpdateRecipientGroupReports',
+                    dataType: 'json',
+                    type: 'post',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        "inApiToken": getLocalStorage("APIToken"),
+                        "inPersonnelId": personnelId,
+                        "inIsRecipient": $("#chkMRRGroupRecipient").prop("checked"),
+                        "inGroupList": getGroupList(),
+                        "inReportList": getReportList()
+                    }),
+                    processData: false,
+                    success: function (data, textStatus, jQxhr) {
+
+                        if (data.response.status != "SUCCESS") {
+                            MKAErrorMessageRtn(data.response.errorMessage[0]);
+                            return;
+                        }
+
+                        bootbox.alert("Group report assignments updated");
+
+                    },
+                    error: function (jqXhr, textStatus, errorThrown) {
+                        MKAErrorMessageRtn(errorThrown);
+
+                    }
+                });
+                loadPersonnelGroupAssignmentList("dtPersonnelGroupAssignmentList");
+                break;
+
+            case "XRY":
+
+                $.ajax({
+                    url: ServicePrefix + '/api/XRAY/UpdateRecipientNationwideQueries',
+                    dataType: 'json',
+                    type: 'post',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        "inApiToken": getLocalStorage("APIToken"),
+                        "inPersonnelId": personnelId,
+                        "inIsRecipient": $("#chkXRYGroupRecipient").prop("checked"),
+                        "inGroupList": getGroupList()
+                    }),
+                    processData: false,
+                    success: function (data, textStatus, jQxhr) {
+
+                        if (data.response.status != "SUCCESS") {
+                            MKAErrorMessageRtn(data.response.errorMessage[0]);
+                            return;
+                        }
+
+                        bootbox.alert("Nationwide query assignments updated");
+
+                    },
+                    error: function (jqXhr, textStatus, errorThrown) {
+                        MKAErrorMessageRtn(errorThrown);
+
+                    }
+                });
+                loadPersonnelGroupAssignmentList("dtPersonnelGroupAssignmentList");
+                break;
+
+            default:
+                bootbox.alert("This product has no group reports/queries");
+
         }
 
     }
