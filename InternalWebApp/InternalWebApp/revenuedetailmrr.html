@@ -315,6 +315,7 @@
     var gotStations = false;
     var initializedRevenueDetail = false;
     var revenueDetailChanged = false;
+    var revenueAmountsAllValid = false;
     var postSaveCallback = null;
 
     $(document).ready(function () {
@@ -1135,24 +1136,58 @@
         }
     }
 
+    function validRevenueAmount(revenueAmount) {
+        if (isNaN(revenueAmount)) {
+            bootbox.alert("Invalid amount (not a number): " + revenueAmount);
+            return false;
+        }
+
+        iRevenueAmount = parseInt(revenueAmount);
+        fRevenueAmount = parseFloat(revenueAmount);
+        if (fRevenueAmount != iRevenueAmount) {
+            bootbox.alert("Invalid amount (fractions not allowed): " + revenueAmount);
+            return false;
+        }
+
+        if (iRevenueAmount < 0) {
+            bootbox.alert("Invalid amount (negative numbers not allowed): " + revenueAmount);
+            return false;
+        }
+
+        if (iRevenueAmount > 99999) { // same limit imposed by Submit Revenue on public site (totals are allowed to be larger)
+            bootbox.alert("Invalid amount (too large): " + revenueAmount);
+            return false;
+        }
+
+        return true;
+    }
+
     function recalculateTotals() {
         var categoryId = '';
+        var isTotal = false;
         var revenueAmount = 0;
+        var foundInvalidRevenueAmount = false;
         var priorRevenueAmount = 0;
         var contributesToCategoryId = '';
         var addsOrSubtracts = 0;
         var categoryTotals = {};
         var changeRatio = 0;
 
+        revenueAmountsAllValid = false;
         $(".revenue-detail").each(function (index, value) {
             categoryId = $(this).attr("data-category-id");
 
             // if we calculated a new total, then copy the result back into the form
-            if (categoryId in categoryTotals) {
+            isTotal = (categoryId in categoryTotals);
+            if (isTotal) {
                 $(this).val(categoryTotals[categoryId]);
             }
 
             revenueAmount = $(this).val(); // not $(this).attr("value") as it's not updated by user input
+            if (!isTotal && !validRevenueAmount(revenueAmount)) {
+                foundInvalidRevenueAmount = true;
+                return; // doesn't exit the outer function, just this specific .each() call, hence shared variable for signaling
+            }
 
             // calculate the total (if any) that is directly affected by this category
             contributesToCategoryId = $(this).attr("data-contributes-to-category-id");
@@ -1170,7 +1205,12 @@
             $("#change-" + categoryId).text(changeRatio);
         });
 
+        if (foundInvalidRevenueAmount) {
+            return;
+        }
+
         revenueDetailChanged = true;
+        revenueAmountsAllValid = true;
     }
 
     function getRevenueDetailFromPage() {
@@ -1212,12 +1252,17 @@
     function saveChanges()
     {
 
+        if (!revenueAmountsAllValid) {
+            bootbox.alert("Can't save an invalid amount");
+            return;
+        }
+
         if (!revenueDetailChanged)
         {
             if (postSaveCallback != null) {
                 postSaveCallback();
             } else {
-                    bootbox.alert("No changes to save");
+                bootbox.alert("No changes to save");
             }
             return;
         }
