@@ -623,7 +623,7 @@ function getLastPage()
             var lastPageArray = JSON.parse(lastPageList);
             if (duplicateURL(lastPageArray, lastPage.url) == true)
             {
-                console.log('already in the list');
+ 
                 return;
             }
 
