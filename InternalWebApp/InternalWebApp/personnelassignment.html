@@ -676,12 +676,13 @@
         $("#ddlProduct").append(str);
 
         $.ajax({
-            url: ServicePrefix + '/api/Product/GetProductList',
+            url: ServicePrefix + '/api/Personnel/GetPersonnelProductList',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelId
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -696,17 +697,17 @@
 
                         str = '';
                         var obj = data.report.rows[index];
-
-                        str = str + '<option value="' + obj.P_ProductID + '">';
-                        str = str + obj.P_ProductID;
-                        str = str + '</option>';
-
+                        if (obj.active == true) {
+                            str = str + '<option value="' + obj.productId.toUpperCase() + '">';
+                            str = str + obj.productId.toUpperCase();
+                            str = str + '</option>';
+                        }
                         $("#ddlProduct").append(str);
 
                     });
 
 
- 
+
                 }
 
             },
@@ -715,6 +716,7 @@
 
             }
         });
+
 
     }
 
