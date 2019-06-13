@@ -233,6 +233,7 @@ var maxHoldEntries = 10;
 var bLongQuery = false;
 var environment = "";
 var gDataTableDefaultRows = 50;
+var gSearchTextPlaceholder = "Enter search text here...";
 var navTool = {
     buildNavComponent: function(parentContainer, parentElement, functionToRun, bAllowAllSelection) { 
         
@@ -1356,3 +1357,16 @@ function getPeriodList(inType) {
     }
 
 }
+
+function convertToSumoSelect(selectName) {
+
+    $("#" + selectName).SumoSelect({
+         search: true
+        ,searchText: gSearchTextPlaceholder
+    });
+
+    //reloading the select so it will pick up the items in the list
+    var selectSumo = $("#" + selectName).SumoSelect();
+    selectSumo.sumo.reload();
+}
+
