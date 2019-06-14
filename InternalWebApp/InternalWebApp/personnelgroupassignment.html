@@ -46,8 +46,11 @@
     <script src="js/respond.min.js"></script>
     <![endif]-->
     <style>
-
+        .noWrap
+        {
+            white-space: nowrap;
  
+        }
         .search-ddl-select-rpt
         {
             width:360px!important;
@@ -180,20 +183,6 @@
 
     $(document).ready(function () {
 
-     //   var input = document.getElementById("searchText");
-    //    var input2 = document.getElementById("searchText2");
-
-        // Execute a function when the user releases a key on the keyboard
-//        input.addEventListener("keyup", function (event) {
-//            // Cancel the default action, if needed
-//            event.preventDefault();
-//            // Number 13 is the "Enter" key on the keyboard
-//           if (event.keyCode === 13) {
-//
-//               getPersonnelByEmail();
-//            }
-//        });
-
         personnelId = getParameterByName("PersonnelId");
         if (personnelId == null)
         {
@@ -203,9 +192,7 @@
 
         $("#nameOfPersonnel").html(nameOfUser.toUpperCase());
 
- 
-
-        $("body").on("click",
+         $("body").on("click",
             "#clear_search_button",
             function () {
                 var table = $("#dtPersonnelList").DataTable();
@@ -378,16 +365,98 @@
                     className = "text-align-right";
                 }
 
-                ctr++;
-                columnsToExport.push(ctr);
+                switch(objectName)
+                {
+                    case "Group Name":
+                        {
+                            // This is the exportable column
+                            columns.push({
+                                "title": objectName,
+                                "visible": false,
+                                "mData": objectName,
+                                "orderable": false,
+                                "className": className
+                            });
+                            ctr++;
+                            columnsToExport.push(ctr);
 
-                columns.push({
-                    "title": objectName,
-                    "visible": true,
-                    "mData": objectName,
-                    "orderable": true,
-                    "className": className
-                });
+                            // This is the displayable column
+                            columns.push({
+                                "title": objectName,
+                                "visible": true,
+                                "mRender": function (data, type, row) {
+
+                                    if (row.Product.toString().toUpperCase() == "XRY") {
+
+                                        return row["Group Name"] + '&nbsp;<a href="#" onclick="buildGroupNameRemove(\'' + row.Product + '\', ' + row.OwnerGroupId + ');"><img src="/images/red-x.png" width="20" height="20" title="remove group assignment" alt="remove group assignment"></a>';
+                                    }
+                                    else {
+                                        return row["Group Name"];
+                                    }
+
+                                },
+                                "orderable": true,
+                                "className": className + " noWrap"
+                            });
+                            ctr++;
+
+                        }
+                        break;
+                    case "Report or Access":
+ 
+
+                            var bCreateSpecialExportCol = false;
+                            // This is the displayable column
+                            columns.push({
+                                "title": objectName,
+                                "visible": true,
+                                "mRender": function (data, type, row) {
+
+                                    if (row.Product.toString().toUpperCase() == "MRR")
+                                    {
+                                        bCreateSpecialExportCol = true;
+                                        return row["Report or Access"] + '&nbsp;<a href="#" onclick="buildGroupReportRemove(\'' + row.Product + '\', ' + row.OwnerGroupId + '\', ' + row["ReportId"] + ');"><img src="/images/red-x.png" width="20" height="20" alt="remove report assignment" title="remove report assignment"></a>';
+                                    }
+                                    else {
+                                        bCreateSpecialExportCol = false;
+                                        return row["Report or Access"];
+                                    }
+                                },
+                                "orderable": true,
+                                "className": className + " noWrap"
+                            });
+                            ctr++;
+
+                            // This is the exportable column
+                            if (bCreateSpecialExportCol == true) {
+
+                                columns.push({
+                                    "title": objectName,
+                                    "visible": false,
+                                    "mData": objectName,
+                                    "orderable": false,
+                                    "className": className
+                                });
+                                ctr++;
+                            }
+                            columnsToExport.push(ctr);
+ 
+                            break;
+
+                    default:
+                        ctr++;
+                        columnsToExport.push(ctr);
+                        columns.push({
+                            "title": objectName,
+                            "visible": true,
+                            "mData": objectName,
+                            "orderable": true,
+                            "className": className
+                        });
+
+                }
+
+
             }
         });
 
@@ -462,7 +531,35 @@
 
 
     }
+    function buildGroupNameRemove(product, groupId)
+    {
+        alert(product + ' ' + groupId);
 
+        if (product.toLowerCase() == "mrr")
+        {
+
+        }
+
+
+        if (product.toLowerCase() == "xry") {
+
+        }
+
+    }
+    function buildGroupReportRemove(product, groupId, reportId)
+    {
+        alert(product + ' ' + groupId);
+
+        if (product.toLowerCase() == "mrr") {
+
+        }
+
+
+        if (product.toLowerCase() == "xry") {
+
+        }
+
+    }
     function loadGroupList()
     {
         var str = '';
@@ -733,7 +830,7 @@
 
             groupObj = new Object();
             groupObj = {
-                id: groupId,
+                groupId: groupId,
                 selected: groupSelected
             }
             groupList.push(groupObj);
@@ -750,7 +847,57 @@
         });
         return reportList;
     }
+    function executeAssignmentAjax(product, input, successMessage)
+    {
+        //alt = "remove group assignment"
+        var url = "";
 
+        if (product.toUpperCase() == 'MRR')
+        {
+            url = ServicePrefix + '/api/MRR/UpdateRecipientGroupReports';
+        }
+
+        if (product.toUpperCase() == 'XRY')
+        {
+            url = '/api/XRAY/UpdateRecipientNationwideQueries'
+        }
+
+        if (url.length > 0)
+        {
+            $.ajax({
+                url: url,
+                dataType: 'json',
+                type: 'post',
+                contentType: 'application/json',
+                data: input,
+                processData: false,
+                success: function (data, textStatus, jQxhr) {
+
+                    if (data.response.status != "SUCCESS") {
+                        MKAErrorMessageRtn(data.response.errorMessage[0]);
+                        return;
+                    }
+
+                    bootbox.alert(successMessage);
+                    loadPersonnelGroupAssignmentList("dtPersonnelGroupAssignmentList");
+
+                },
+                error: function (jqXhr, textStatus, errorThrown) {
+                    MKAErrorMessageRtn(errorThrown);
+
+                }
+                });
+        }
+        else
+        {
+            bootbox.alert("Bad call to executeAssignmentAjax - no url");
+        }
+
+    }
+    function removeAssignments()
+    {
+
+    }
     function updateAssignments() {
 
         switch ($("#ddlProduct").val().toString().toUpperCase())
@@ -768,36 +915,46 @@
                     return;
                 }
 
-
-                $.ajax({
-                    url: ServicePrefix + '/api/MRR/UpdateRecipientGroupReports',
-                    dataType: 'json',
-                    type: 'post',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        "inApiToken": getLocalStorage("APIToken"),
-                        "inPersonnelId": personnelId,
-                        "inIsRecipient": $("#chkMRRGroupRecipient").prop("checked"),
-                        "inGroupList": getGroupList(),
-                        "inReportList": getReportList()
-                    }),
-                    processData: false,
-                    success: function (data, textStatus, jQxhr) {
-
-                        if (data.response.status != "SUCCESS") {
-                            MKAErrorMessageRtn(data.response.errorMessage[0]);
-                            return;
-                        }
-
-                        bootbox.alert("Group report assignments updated. <hr>Total Groups Updated: " + totalGroups + '<br>Total Reports Added: ' + selectedReports + '<br>Total Reports Removed: ' + (parseInt(totalReports) - parseInt(selectedReports)).toString());
-                        loadPersonnelGroupAssignmentList("dtPersonnelGroupAssignmentList");
-
-                    },
-                    error: function (jqXhr, textStatus, errorThrown) {
-                        MKAErrorMessageRtn(errorThrown);
-
-                    }
+                var inputObject = JSON.stringify({
+                    "inApiToken": getLocalStorage("APIToken"),
+                    "inPersonnelId": personnelId,
+                    "inIsRecipient": $("#chkMRRGroupRecipient").prop("checked"),
+                    "inGroupList": getGroupList(),
+                    "inReportList": getReportList()
                 });
+                alert(inputObject);
+                var successMessage = "Group report assignments updated. <hr>Total Groups Updated: " + totalGroups + '<br>Total Reports Added: ' + selectedReports + '<br>Total Reports Removed: ' + (parseInt(totalReports) - parseInt(selectedReports)).toString();
+
+                executeAssignmentAjax($("#ddlProduct").val().toString().toUpperCase(), inputObject, successMessage);
+                //$.ajax({
+                //    url: ServicePrefix + '/api/MRR/UpdateRecipientGroupReports',
+                //    dataType: 'json',
+                //    type: 'post',
+                //    contentType: 'application/json',
+                //    data: JSON.stringify({
+                //        "inApiToken": getLocalStorage("APIToken"),
+                //        "inPersonnelId": personnelId,
+                //        "inIsRecipient": $("#chkMRRGroupRecipient").prop("checked"),
+                //        "inGroupList": getGroupList(),
+                //        "inReportList": getReportList()
+                //    }),
+                //    processData: false,
+                //    success: function (data, textStatus, jQxhr) {
+
+                //        if (data.response.status != "SUCCESS") {
+                //            MKAErrorMessageRtn(data.response.errorMessage[0]);
+                //            return;
+                //        }
+
+                //        bootbox.alert("Group report assignments updated. <hr>Total Groups Updated: " + totalGroups + '<br>Total Reports Added: ' + selectedReports + '<br>Total Reports Removed: ' + (parseInt(totalReports) - parseInt(selectedReports)).toString());
+                //        loadPersonnelGroupAssignmentList("dtPersonnelGroupAssignmentList");
+
+                //    },
+                //    error: function (jqXhr, textStatus, errorThrown) {
+                //        MKAErrorMessageRtn(errorThrown);
+
+                //    }
+                //});
 
 
                 break;
@@ -812,33 +969,43 @@
                     return;
                 }
 
-                $.ajax({
-                    url: ServicePrefix + '/api/XRAY/UpdateRecipientNationwideQueries',
-                    dataType: 'json',
-                    type: 'post',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        "inApiToken": getLocalStorage("APIToken"),
-                        "inPersonnelId": personnelId,
-                        "inIsRecipient": $("#chkXRYGroupRecipient").prop("checked"),
-                        "inGroupList": getGroupList()
-                    }),
-                    processData: false,
-                    success: function (data, textStatus, jQxhr) {
+                var inputObject = JSON.stringify({
+                    "inApiToken": getLocalStorage("APIToken"),
+                    "inPersonnelId": personnelId,
+                    "inIsRecipient": $("#chkXRYGroupRecipient").prop("checked"),
+                    "inGroupList": getGroupList()
+                })
 
-                        if (data.response.status != "SUCCESS") {
-                            MKAErrorMessageRtn(data.response.errorMessage[0]);
-                            return;
-                        }
+                var successMessage = "Nationwide query assignments updated.<hr>Total Groups Updated: " + totalGroups
 
-                        bootbox.alert("Nationwide query assignments updated.<hr>Total Groups Updated: " + totalGroups);
-                        loadPersonnelGroupAssignmentList("dtPersonnelGroupAssignmentList");
-                    },
-                    error: function (jqXhr, textStatus, errorThrown) {
-                        MKAErrorMessageRtn(errorThrown);
+                executeAssignmentAjax($("#ddlProduct").val().toString().toUpperCase(), inputObject, successMessage);
+                //$.ajax({
+                //    url: ServicePrefix + '/api/XRAY/UpdateRecipientNationwideQueries',
+                //    dataType: 'json',
+                //    type: 'post',
+                //    contentType: 'application/json',
+                //    data: JSON.stringify({
+                //        "inApiToken": getLocalStorage("APIToken"),
+                //        "inPersonnelId": personnelId,
+                //        "inIsRecipient": $("#chkXRYGroupRecipient").prop("checked"),
+                //        "inGroupList": getGroupList()
+                //    }),
+                //    processData: false,
+                //    success: function (data, textStatus, jQxhr) {
 
-                    }
-                });
+                //        if (data.response.status != "SUCCESS") {
+                //            MKAErrorMessageRtn(data.response.errorMessage[0]);
+                //            return;
+                //        }
+
+                //        bootbox.alert("Nationwide query assignments updated.<hr>Total Groups Updated: " + totalGroups);
+                //        loadPersonnelGroupAssignmentList("dtPersonnelGroupAssignmentList");
+                //    },
+                //    error: function (jqXhr, textStatus, errorThrown) {
+                //        MKAErrorMessageRtn(errorThrown);
+
+                //    }
+                //});
 
     
                 break;
