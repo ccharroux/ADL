@@ -385,15 +385,7 @@
                                 "title": objectName,
                                 "visible": true,
                                 "mRender": function (data, type, row) {
-
-                                    if (row.Product.toString().toUpperCase() == "XRY") {
-
                                         return row["Group Name"] + '&nbsp;<a href="#" onclick="buildGroupNameRemove(\'' + row.Product + '\', ' + row.OwnerGroupId + ');"><img src="/images/red-x.png" width="20" height="20" title="remove group assignment" alt="remove group assignment"></a>';
-                                    }
-                                    else {
-                                        return row["Group Name"];
-                                    }
-
                                 },
                                 "orderable": true,
                                 "className": className + " noWrap"
@@ -415,7 +407,7 @@
                                     if (row.Product.toString().toUpperCase() == "MRR")
                                     {
                                         bCreateSpecialExportCol = true;
-                                        return row["Report or Access"] + '&nbsp;<a href="#" onclick="buildGroupReportRemove(\'' + row.Product + '\', ' + row.OwnerGroupId + '\', ' + row["ReportId"] + ');"><img src="/images/red-x.png" width="20" height="20" alt="remove report assignment" title="remove report assignment"></a>';
+                                        return row["Report or Access"] + '&nbsp;<a href="#" onclick="buildGroupReportRemove(\'' + row.Product + '\', ' + row.OwnerGroupId + ', ' + row["ReportId"] + ');"><img src="/images/red-x.png" width="20" height="20" alt="remove report assignment" title="remove report assignment"></a>';
                                     }
                                     else {
                                         bCreateSpecialExportCol = false;
@@ -533,31 +525,80 @@
     }
     function buildGroupNameRemove(product, groupId)
     {
-        alert(product + ' ' + groupId);
-
-        if (product.toLowerCase() == "mrr")
-        {
-
-        }
 
 
-        if (product.toLowerCase() == "xry") {
+        bootbox.confirm("Are you sure you want to remove this group assignment from " + product +  "?", function (result) {
 
-        }
+            if (result == true)
+            {
+                if (product.toLowerCase() == "xry") {
+
+                    var inputObject = JSON.stringify({
+                        "inApiToken": getLocalStorage("APIToken"),
+                        "inPersonnelId": personnelId,
+                        "inIsRecipient": false,
+                        "inGroupList": [{ "groupId": groupId, "selected": false }]
+                    })
+
+                    var successMessage = "Nationwide query assignments updated.<hr>Total Groups Removed: " + 1;
+
+                    executeAssignmentAjax(product, inputObject, successMessage);
+
+                }
+
+                if (product.toLowerCase() == "mrr") {
+                    var inputObject = JSON.stringify({
+                        "inApiToken": getLocalStorage("APIToken"),
+                        "inPersonnelId": personnelId,
+                        "inIsRecipient": false,
+                        "inGroupList": [{ "groupId": groupId, "selected": false }]
+                    })
+
+                    var successMessage = "Group assignments updated.<hr>Total Groups Removed: " + 1;
+
+                    executeAssignmentAjax(product, inputObject, successMessage);
+                }
+
+
+
+            } else
+            {
+                return;
+            }
+        });
+
+
+
+
 
     }
     function buildGroupReportRemove(product, groupId, reportId)
     {
-        alert(product + ' ' + groupId);
+        bootbox.confirm("Are you sure you want to remove this group assignment from " + product + "?", function (result) {
 
-        if (product.toLowerCase() == "mrr") {
+            if (result == true) {
 
-        }
+                if (product.toLowerCase() == "mrr") {
+                    var inputObject = JSON.stringify({
+                        "inApiToken": getLocalStorage("APIToken"),
+                        "inPersonnelId": personnelId,
+                        "inIsRecipient": false,
+                        "inGroupList": [{ "groupId": groupId, "selected": false }],
+                        "inReportList": [{ "reportId": reportId, "selected": false }],
+
+                    })
+
+                    var successMessage = "Group Report assignments updated.<hr>Total Reports Removed: " + 1;
+
+                    executeAssignmentAjax(product, inputObject, successMessage);
+                }
 
 
-        if (product.toLowerCase() == "xry") {
 
-        }
+            } else {
+                return;
+            }
+        });
 
     }
     function loadGroupList()
@@ -835,16 +876,28 @@
             }
             groupList.push(groupObj);
         });
+
         return groupList;
     }
 
     function getReportList() {
+
         var reportList = [];
-        $("#ddlReport option").each(function (index, value) {
+        var reportObj = new Object();
+ 
+
+        $("#ddlReport option").each(function (index, value)
+        {
             reportId = $(this).val();
             reportSelected = $(this).prop("selected");
-            reportList.push(reportId + "\t" + reportSelected);
+            var reportObj = new Object();
+            reportObj = {
+                reportId: reportId,
+                selected: reportSelected
+            }
+            reportList.push(reportObj);
         });
+
         return reportList;
     }
     function executeAssignmentAjax(product, input, successMessage)
@@ -859,7 +912,7 @@
 
         if (product.toUpperCase() == 'XRY')
         {
-            url = '/api/XRAY/UpdateRecipientNationwideQueries'
+            url = ServicePrefix + '/api/XRAY/UpdateRecipientNationwideQueries'
         }
 
         if (url.length > 0)
@@ -922,7 +975,7 @@
                     "inGroupList": getGroupList(),
                     "inReportList": getReportList()
                 });
-                alert(inputObject);
+ 
                 var successMessage = "Group report assignments updated. <hr>Total Groups Updated: " + totalGroups + '<br>Total Reports Added: ' + selectedReports + '<br>Total Reports Removed: ' + (parseInt(totalReports) - parseInt(selectedReports)).toString();
 
                 executeAssignmentAjax($("#ddlProduct").val().toString().toUpperCase(), inputObject, successMessage);
@@ -976,7 +1029,7 @@
                     "inGroupList": getGroupList()
                 })
 
-                var successMessage = "Nationwide query assignments updated.<hr>Total Groups Updated: " + totalGroups
+                var successMessage = "Nationwide query assignments updated.<hr>Total Groups Updated: " + totalGroups;
 
                 executeAssignmentAjax($("#ddlProduct").val().toString().toUpperCase(), inputObject, successMessage);
                 //$.ajax({
