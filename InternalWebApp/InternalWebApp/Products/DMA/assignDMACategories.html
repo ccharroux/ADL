@@ -104,10 +104,10 @@
                             </div>
                             <div class="col-md-9 text-align-left">
                                 <div>
-                                    <input value="Assign" onclick="updateParentMarket()" class="default-button" type="button">
+                                    <input value="Assign" onclick="assignCategoriesToParentMarket()" class="default-button" type="button">
                                 </div>
                                 <div style="padding-top: 10px">
-                                    <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button">
+                                    <input value="Back" onclick="goBackToParentMarket();" class="default-button" type="button">
                                 </div>
                             </div>
                         </div>
@@ -158,7 +158,7 @@
         getCategoryTemplates();
 
         $("#ddlCategoryTemplates").click(function() {
-            //console.log($(this).val());
+
             var templateId = $(this).val();
             getTemplateCategories(templateId);
 
@@ -167,6 +167,7 @@
     });
 
     function getCategoryTemplates() {
+
         $.ajax({
             url: ServicePrefix + '/api/ParentMarketCategoryTemplate/GetParentMarketCategoryTemplateHeaderList?inApiToken=' + getLocalStorage("APIToken"),
             dataType: 'json',
@@ -192,7 +193,6 @@
                     });
 
                     $("#ddlCategoryTemplates").append(str);
-                    //saveLoadedControlSelection("ddlAsyncJobType");
 
                     if (data.report.rows.length == 1) {
                         //automatically load the categories or should automatically load the first one
@@ -206,6 +206,7 @@
                 genericAjaxError(jqXhr, textType, errorThrown);
             }
         });
+
     }
 
     function getTemplateCategories(categoryTemplateId) {
@@ -237,7 +238,6 @@
                     });
 
                     $("#ddlCategories").append(str);
-                    //saveLoadedControlSelection("ddlAsyncJobType");
                    
                 }
 
@@ -249,4 +249,78 @@
 
     }
 
+    function assignCategoriesToParentMarket() {
+        //assign the categories from the template to the parent market
+        //on success enable the product for the parent market
+
+        $.ajax({
+            url: ServicePrefix + '/api/ParentMarketCategory/InsertParentMarketCategoryList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inParentMarketId": $("#txtParentMarketId").val(),
+                "inParentMarketCategoryTemplateId": $("#ddlCategoryTemplates").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+                    //if the categories are assigned, enable the product for the parent market
+                    enableProductForParentMarket();
+
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+    }
+
+    function enableProductForParentMarket() {
+        //enable the product for the parent market
+        var activate = true;
+
+        $.ajax({
+            url: ServicePrefix + '/api/ParentMarket/UpdateParentMarketProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inParentMarketId": $("#txtParentMarketId").val(),
+                "inProductId": "DMA",
+                "inActivate": activate
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    window.location = "/parentmarket.html?ParentMarketID=" + $("#txtParentMarketId").val();
+
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+    }
+
+    function goBackToParentMarket() {
+        //if the user clicks the cancel button, sending them back to the parent market page
+        window.location = "/parentmarket.html?ParentMarketID=" + $("#txtParentMarketId").val();
+
+    }
 </script>
