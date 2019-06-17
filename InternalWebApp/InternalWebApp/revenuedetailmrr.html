@@ -166,13 +166,13 @@
                             <label for="MarketRanked"><u>Market Status</u> </label><br />
                             <div id="MarketRanked"></div>
                         </div>
-                        <div>
+                        <div class="divInternalComment" style="display:none">
                             <label for="InternalRevisionComment"><u>Internal Revision Comment</u></label>
-                            <div id="divInternalRevisionComment"> this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this  this </div>
+                            <div id="divInternalRevisionComment"></div>
                         </div>
-                        <div>
+                        <div class="divExternalComment" style="display:none">
                             <label for="ClientRevisionComment"><u>Client Revision Comment</u></label>
-                            <div id="divClientRevisionComment"> this  this  this  this  this  this  this  this  this  this  this</div>
+                            <div id="divClientRevisionComment"></div>
                         </div>
                         <div style="text-align:center">
                             <hr style="margin-top:0;margin-bottom:10px" />
@@ -260,7 +260,7 @@
                             </div>
 
                             <label for="txtStationComment">Station comment</label><br />
-                            <input type="text" id="txtStationComment" style="width:100%" maxlength="250" />
+                            <textarea type="text" id="txtStationComment" style="width:100%" maxlength="250" ></textarea>
                             <div style="text-align:center">
                                 <hr style="margin-top:0;margin-bottom:10px" />
                                 <input type="button" id="stationCommentButton" value="Update Comments" />
@@ -862,7 +862,7 @@
     {
         $("#dtRevenueDetail").hide();
         setStationLabels();
-        $("#txtStationComment").val("");
+        $("#txtStationComment").html("");
 
         if (!initializedRevenueDetail)
         {
@@ -985,6 +985,7 @@
 
         $("#StationEntered").text(stationText);
 
+
     }
 
     function showStationContactInfo() {
@@ -1056,7 +1057,9 @@
         $.ajax(url, settings);
     }
 
-    function showStationCommentSuccess(data, textStatus, jQxhr) {
+    function showStationCommentSuccess(data, textStatus, jQxhr)
+    {
+
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -1066,13 +1069,19 @@
             MKAErrorMessageRtn("Failed to get station comment");
             return;
         }
-        else {
-            $("#StationComment").text(data.report.rows[0].comment);
+        else
+        {
+            console.log(data.report.rows[0].comment);
+            $("#txtStationComment").html(data.report.rows[0].comment);
         }
+
+
     }
 
     function showMarketRankedStatus()
     {
+        $(".divInternalComment").hide();
+        $(".divExternalComment").hide();
 
  
         var url = ServicePrefix + '/api/MRR/GetMarketYearPeriodRanked';
@@ -1120,7 +1129,22 @@
                     : " NOT RANKED"
             );
             
+        $(".divInternalComment").hide();
+        $(".divExternalComment").hide();
+
  
+
+        if (data.report.rows[0].internalMessage.length > 0)
+        {
+            $("#divInternalRevisionComment").html(data.report.rows[0].internalMessage);
+            $(".divInternalComment").show();
+        }
+
+        if (data.report.rows[0].externalMessage.length > 0) {
+            $("#divExternalRevisionComment").html(data.report.rows[0].externalMessage);
+            $(".divExternalComment").show();
+        }
+
         $("#MarketRanked").html( "<div>" +message+ "</div>");
  
   
