@@ -315,7 +315,7 @@
     var gotStations = false;
     var initializedRevenueDetail = false;
     var revenueDetailChanged = false;
-    var revenueAmountsAllValid = false;
+    var revenueAmountsAllValid = true;
     var postSaveCallback = null;
 
     $(document).ready(function () {
@@ -1187,6 +1187,8 @@
     }
 
     function recalculateTotals() {
+        revenueDetailChanged = true;
+
         var categoryId = '';
         var isTotal = false;
         var revenueAmount = 0;
@@ -1233,7 +1235,6 @@
             return;
         }
 
-        revenueDetailChanged = true;
         revenueAmountsAllValid = true;
     }
 
@@ -1285,19 +1286,44 @@
 
     function saveChanges()
     {
-
-        if (!revenueAmountsAllValid) {
-            bootbox.alert("Can't save an invalid amount");
-            return;
-        }
-
-        if (!revenueDetailChanged)
-        {
+        if (!revenueDetailChanged) {
             if (postSaveCallback != null) {
                 postSaveCallback();
             } else {
                 bootbox.alert("No changes to save");
             }
+            return;
+        }
+
+        if (postSaveCallback == null) {
+            saveChanges_tryToSaveChanges();
+            return;
+        }
+
+        bootbox.dialog({
+            message: "Save revenues?",
+            buttons: {
+                saveAndProceed: {
+                    label: "Save and proceed",
+                    callback: saveChanges_tryToSaveChanges
+                },
+                proceedWithoutSaving: {
+                    label: "Proceed without saving",
+                    callback: saveChanges_postSaveChanges
+                },
+                cancel: {
+                    label: "Cancel",
+                    callback: function () {
+                        // do nothing further
+                    }
+                }
+            }
+        });
+    }
+
+    function saveChanges_tryToSaveChanges() {
+        if (!revenueAmountsAllValid) {
+            bootbox.alert("Can't save an invalid amount");
             return;
         }
 
@@ -1391,14 +1417,6 @@
         confirmIfNeeded(
             warningMessage != null,
             warningMessage,
-            saveChanges_confirmImplicitSave
-        );
-    }
-
-    function saveChanges_confirmImplicitSave() {
-        confirmIfNeeded(
-            postSaveCallback != null,
-            "Save revenues?",
             saveChanges_saveRevenueDetail
         );
     }
@@ -1435,6 +1453,10 @@
             return;
         }
 
+        saveChanges_postSaveChanges();
+    }
+
+    function saveChanges_postSaveChanges() {
         revenueDetailChanged = false;
 
         if (postSaveCallback != null) {
