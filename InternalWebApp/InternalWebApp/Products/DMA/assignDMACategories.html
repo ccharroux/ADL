@@ -88,7 +88,7 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <select id="ddlCategories" class="field-width-325" size="10">
+                            <select id="ddlCategories" class="field-width-325" size="10" disabled>
 
                             </select>
                         </div>
@@ -157,8 +157,8 @@
         //get list of templates
         getCategoryTemplates();
 
-        $("#ddlCategoryTemplates").change(function() {
-
+        $("#ddlCategoryTemplates").click(function() {
+            //console.log($(this).val());
             var templateId = $(this).val();
             getTemplateCategories(templateId);
 
@@ -167,10 +167,85 @@
     });
 
     function getCategoryTemplates() {
+        $.ajax({
+            url: ServicePrefix + '/api/ParentMarketCategoryTemplate/GetParentMarketCategoryTemplateHeaderList?inApiToken=' + getLocalStorage("APIToken"),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textType, jQxhr) {
 
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    var str = '';
+
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+
+                        str = str + "<option value='" + obj.templateId + "'>" + obj['template Description'] + "</option>";
+
+                    });
+
+                    $("#ddlCategoryTemplates").append(str);
+                    //saveLoadedControlSelection("ddlAsyncJobType");
+
+                    if (data.report.rows.length == 1) {
+                        //automatically load the categories or should automatically load the first one
+                        $("#ddlCategoryTemplates option:first").attr('selected', 'selected');
+                        $("#ddlCategoryTemplates").click();
+                    }
+                }
+
+            },
+            error: function (jqXhr, textType, errorThrown) {
+                genericAjaxError(jqXhr, textType, errorThrown);
+            }
+        });
     }
 
     function getTemplateCategories(categoryTemplateId) {
+
+        $("#ddlCategories").empty();
+
+        $.ajax({
+            url: ServicePrefix + '/api/ParentMarketCategoryTemplate/GetParentMarketCategoryTemplateList?inApiToken=' + getLocalStorage("APIToken") + '&inParentMarketCategoryTemplateId=' + categoryTemplateId,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textType, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    var str = '';
+
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+
+                        str = str + "<option value='" + obj.categoryId + "'>" + obj.description + "</option>";
+
+                    });
+
+                    $("#ddlCategories").append(str);
+                    //saveLoadedControlSelection("ddlAsyncJobType");
+                   
+                }
+
+            },
+            error: function (jqXhr, textType, errorThrown) {
+                genericAjaxError(jqXhr, textType, errorThrown);
+            }
+        });
 
     }
 
