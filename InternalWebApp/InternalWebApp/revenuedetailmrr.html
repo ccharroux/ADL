@@ -196,7 +196,8 @@
  
 
                     <!-- start datatable-->
-                    <div class="dataTable-top-margin">
+                    
+                    <div class="dataTable-top-margin" id="topOfStations">
                         <div class="col-md-8  ">
                             <div class="stationNavigation">
                                 <div class="col-md-6 " >
@@ -255,15 +256,15 @@
                             <span id="StationEntered"></span>
                             <hr style="margin: 0;" />
                             <strong>Contact(s)</strong><hr style="margin: 0;"/>
-                            <div style="max-height:300px; overflow:auto">
+                            <div style="max-height:600px; overflow:auto">
                                 <span id="StationContact"></span>
                             </div>
 
                             <label for="txtStationComment">Station comment</label><br />
-                            <textarea type="text" id="txtStationComment" style="width:100%" maxlength="250" ></textarea>
+                            <textarea type="text" id="txtStationComment" style="width:100%;overflow:auto" maxlength="250" ></textarea>
                             <div style="text-align:center">
                                 <hr style="margin-top:0;margin-bottom:10px" />
-                                <input type="button" id="stationCommentButton" value="Update Comments" />
+                                <input type="button" id="stationCommentButton" onclick="updateStationComment()" value="Update Comments" />
                             </div>
                         </div>
                     </div>
@@ -307,6 +308,8 @@
 </html>
 
 <script>
+
+    var bInvalidDataFound = false;
 
     var gotMediaTypes = false;
     var gotSchedules = false;
@@ -981,6 +984,8 @@
         }
 
         var stationEnteredWho = (data.report.rows[0].enteredUser == null ? "" : "Entered by " + data.report.rows[0].enteredUser);
+        stationEnteredWho = stationEnteredWho.toString().toLowerCase().replace("@millerkaplan.com", "");
+ 
         var stationText = (data.report.rows[0].isEntered ? stationEnteredWho + " on " + data.report.rows[0].enteredDateTime : "Not entered");
  
 
@@ -1072,7 +1077,6 @@
         }
         else
         {
-            console.log(data.report.rows[0].comment);
             $("#txtStationComment").html(data.report.rows[0].comment);
         }
 
@@ -1161,33 +1165,51 @@
         }
     }
 
-    function validRevenueAmount(revenueAmount) {
-        if (isNaN(revenueAmount)) {
-            bootbox.alert("Invalid amount (not a number): " + revenueAmount);
+
+    function validRevenueAmount(revenueAmount)
+    {
+        if (bInvalidDataFound  == true)
+        {
+            return;
+        }
+
+        if (isNaN(revenueAmount))
+        {
+            bInvalidDataFound = true;
+            bootbox.alert("Invalid amount (not a number): " + revenueAmount, function () { bInvalidDataFound = false });
             return false;
         }
 
         iRevenueAmount = parseInt(revenueAmount);
         fRevenueAmount = parseFloat(revenueAmount);
-        if (fRevenueAmount != iRevenueAmount) {
-            bootbox.alert("Invalid amount (fractions not allowed): " + revenueAmount);
+
+        if (fRevenueAmount != iRevenueAmount)
+        {
+            bInvalidDataFound = true;
+            bootbox.alert("Invalid amount (fractions not allowed): " + revenueAmount, function () { bInvalidDataFound = false });
             return false;
         }
 
-        if (iRevenueAmount < 0) {
-            bootbox.alert("Invalid amount (negative numbers not allowed): " + revenueAmount);
+        if (iRevenueAmount < 0)
+        {
+            bInvalidDataFound = true;
+            bootbox.alert("Invalid amount (negative numbers not allowed): " + revenueAmount, function () { bInvalidDataFound = false });
             return false;
         }
 
-        if (iRevenueAmount > 99999) { // same limit imposed by Submit Revenue on public site (totals are allowed to be larger)
-            bootbox.alert("Invalid amount (too large): " + revenueAmount);
+        if (iRevenueAmount > 99999)
+        { // same limit imposed by Submit Revenue on public site (totals are allowed to be larger)
+            bInvalidDataFound = true;
+            bootbox.alert("Invalid amount (too large): " + revenueAmount, function () { bInvalidDataFound = false });
             return false;
         }
 
         return true;
     }
 
-    function recalculateTotals() {
+    function recalculateTotals()
+    {
+
         revenueDetailChanged = true;
 
         var categoryId = '';
@@ -1201,17 +1223,24 @@
         var changeRatio = 0;
 
         revenueAmountsAllValid = false;
-        $(".revenue-detail").each(function (index, value) {
+
+        $(".revenue-detail").each(function (index, value)
+        {
+
             categoryId = $(this).attr("data-category-id");
 
             // if we calculated a new total, then copy the result back into the form
             isTotal = (categoryId in categoryTotals);
-            if (isTotal) {
+
+            if (isTotal == true)
+            {
                 $(this).val(categoryTotals[categoryId]);
             }
 
             revenueAmount = $(this).val(); // not $(this).attr("value") as it's not updated by user input
-            if (!isTotal && !validRevenueAmount(revenueAmount)) {
+
+            if (isTotal==false && validRevenueAmount(revenueAmount)==false)
+            {
                 foundInvalidRevenueAmount = true;
                 return; // doesn't exit the outer function, just this specific .each() call, hence shared variable for signaling
             }
@@ -1219,8 +1248,11 @@
             // calculate the total (if any) that is directly affected by this category
             contributesToCategoryId = $(this).attr("data-contributes-to-category-id");
             addsOrSubtracts = $(this).attr("data-adds-or-subtracts");
-            if (contributesToCategoryId != null) {
-                if (!(contributesToCategoryId in categoryTotals)) {
+
+            if (contributesToCategoryId != null)
+            {
+                if ((contributesToCategoryId in categoryTotals) == false)
+                {
                     categoryTotals[contributesToCategoryId] = 0;
                 }
                 categoryTotals[contributesToCategoryId] += revenueAmount * addsOrSubtracts;
@@ -1230,9 +1262,11 @@
             priorRevenueAmount = $("#prior-revenue-detail-" + categoryId).text();
             changeRatio = getChangeRatio(revenueAmount, priorRevenueAmount);
             $("#change-" + categoryId).text(changeRatio);
+
         });
 
-        if (foundInvalidRevenueAmount) {
+        if (foundInvalidRevenueAmount == true)
+        {
             return;
         }
 
@@ -1287,22 +1321,28 @@
 
     function saveChanges()
     {
-        if (!revenueDetailChanged) {
-            if (postSaveCallback != null) {
+        if (revenueDetailChanged==false)
+        {
+            if (postSaveCallback != null)
+            {
                 postSaveCallback();
-            } else {
+            }
+            else
+            {
                 bootbox.alert("No changes to save");
             }
+
             return;
         }
 
-        if (postSaveCallback == null) {
+        if (postSaveCallback == null)
+        {
             saveChanges_tryToSaveChanges();
             return;
         }
 
         bootbox.dialog({
-            message: "Save revenues?",
+            message: "Save Revenues",
             buttons: {
                 saveAndProceed: {
                     label: "Save and proceed",
@@ -1322,8 +1362,10 @@
         });
     }
 
-    function saveChanges_tryToSaveChanges() {
-        if (!revenueAmountsAllValid) {
+    function saveChanges_tryToSaveChanges()
+    {
+        if (revenueAmountsAllValid == false)
+        {
             bootbox.alert("Can't save an invalid amount");
             return;
         }
@@ -1352,7 +1394,8 @@
         $.ajax(url, settings);
     }
 
-    function saveChanges_getMarketRankStatusSuccess(data, textStatus, jQxhr) {
+    function saveChanges_getMarketRankStatusSuccess(data, textStatus, jQxhr)
+    {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -1457,15 +1500,21 @@
         saveChanges_postSaveChanges();
     }
 
-    function saveChanges_postSaveChanges() {
+    function saveChanges_postSaveChanges()
+    {
         revenueDetailChanged = false;
 
-        if (postSaveCallback != null) {
+        if (postSaveCallback != null)
+        {
             postSaveCallback();
-        } else {
+        }
+        else
+        {
             if ($("#ddlStation option:selected").index() < $("#ddlStation option").length - 1) {
                 moveToNextStation();
-            } else {
+            }
+            else
+            {
                 showStationEnteredStatus();
             }
         }
@@ -1486,13 +1535,17 @@
         $("#ddlStation").trigger("change");
     }
 
-    function moveToNextStation() {
+    function moveToNextStation()
+    {
         if ($("#ddlStation option:selected").index() == $("#ddlStation option").length - 1) {
             bootbox.alert("Already on last station");
             return;
         }
+
         postSaveCallback = moveToNextStationSuccess;
+
         saveChanges();
+
     }
 
     function moveToNextStationSuccess() {
@@ -1720,6 +1773,55 @@
         bootbox.alert("Market has been un-ranked");
     }
 
+    function updateStationComment()
+    {
+
+        if ($("#ddlStation").val() == "-1" || 
+            $("#ddlStation").val() == "")
+        {
+            bootbox.alert("A station must be selected to save a comment.");
+            return;
+        }
+
+        if ($("#txtStationComment").val().trim() == "")
+        {
+            bootbox.alert("An empty station comment is not allowed.");
+            return;
+        }
+
+        var url = ServicePrefix + '/api/Station/UpdateStationComment';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": $("#ddlStation").val(),
+                "inComment": $("#txtStationComment").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                UpdateStationComment_Success(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+    function UpdateStationComment_Success(data, textStatus, jQxhr)
+    {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+        else {
+            bootbox.alert("Station Comment Updated");
+        }
+    }
     function generateSnapshotReport() {
         var settings = {
             dataType: 'json',
