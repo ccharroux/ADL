@@ -67,6 +67,7 @@
                     <input type="hidden" id="hdnFormatId" value="" />
                     <input type="hidden" id="hdnMediaType" value="" />
                     <input type="hidden" id="hdnFullName" value="" />
+                    <input type="hidden" id="hdnStationId" />
 
 
 
@@ -76,7 +77,7 @@
                             <label for="ddlMediaType">Media Type</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlMediaType" class="mkaRequired field-width-325" onchange="onChangeMediaType(this.value);" errorMessage="You must select a Media Type."></select>
+                            <select id="ddlMediaType" class="mkaRequired field-width-325" onchange="onChangeMediaType();" errorMessage="You must select a Media Type."></select>
                         </div>
                     </div>
 
@@ -116,7 +117,7 @@
                             <label for="ddlMarket">Primary Market</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlMarket" class="field-width-325"></select>
+                            <select id="ddlMarket" class="mkaRequired field-width-325" errorMessage="You must select a Primary Market."></select>
                         </div>
                     </div>
 
@@ -136,7 +137,7 @@
                             <label for="ddlFormat">Format</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlFormat" class="field-width-325"></select>
+                            <select id="ddlFormat" class="field-width-325" errorMessage="You must select a Format."></select>
                         </div>
                     </div>
 
@@ -146,7 +147,7 @@
                             <label for="ddlAffiliation">Affiliation</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlAffiliation" class="field-width-325"></select>
+                            <select id="ddlAffiliation" class="field-width-325" errorMessage="You must select an Affiliation."></select>
                         </div>
                     </div>
 
@@ -236,7 +237,7 @@
                             <label for="txtZipcode">Zipcode</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="txtZipcode" size="5" maxlength="5" class="mkaRequired" errorMessage="You must enter a Zipcode" />&nbsp;-&nbsp;
+                            <input type="text" id="txtZipcode" size="5" maxlength="5" class="mkaRequired" errorMessage="You must enter a Zipcode." />&nbsp;-&nbsp;
                             <input type="text" id="txtZip4" maxlength="4" size="4" />
                         </div>
                     </div>
@@ -294,12 +295,12 @@
                         </div>
                     </div>
 
-                    <div class="row input-row">
+                    <div id="divRetainHistory" class="hidden row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="chkRetainHistory">Retain History</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="checkbox" id="chkRetainHistory" />
+                            <input type="checkbox" onchange="updateRetainHistory()" id="chkRetainHistory" />
                         </div>
                     </div>
                     <!--Buttons-->
@@ -378,6 +379,9 @@
 <script>
 
     var stationId = 0;
+    var editingProduct = '';
+    var isProductEnable = false;
+    var stationHasActiveProducts = false;
 
     $(document).ready(function () {
         buildMainMenu("Stations");
@@ -399,18 +403,28 @@
 
         if (stationId == 0 || stationId == null) {
 
+            //When creating a new station, the user cannot choose a market or ownership
+            //until you have choosen a media type first.
             $("#ddlMarket").prop("disabled", true);
-            $("#ddlOwnership").prop("disabled", true);
             $("#ddlMarket").addClass("disabled");
+
+            $("#ddlOwnership").prop("disabled", true);
             $("#ddlOwnership").addClass("disabled");
 
         } else {
 
+            //The user cannot update a station's market, media type, or ownership
             $("#ddlMarket").prop("disabled", true);
-            $("#ddlMediaType").prop("disabled", true);
             $("#ddlMarket").addClass("disabled");
+
+            $("#ddlMediaType").prop("disabled", true);
             $("#ddlMediaType").addClass("disabled");
+
+            $("#ddlOwnership").prop("disabled", true);
+            $("#ddlOwnership").addClass("disabled");
+
             $("#aTagProductList").removeClass("hidden");
+
         }
     }
 
@@ -611,7 +625,7 @@
             MKAErrorMessageRtn(data.response.errorMessage[0]);
         } else {
             var str = '';
-            str = '<option value="1">-- Select a Suffix</option>';
+            str = '<option value="-1">-- Select a Suffix</option>';
 
             $.each(data.report.rows, function (index) {
                 str = str + '<option value="' + data.report.rows[index].marketBand + '">' + data.report.rows[index].marketBand + '</option>';
@@ -681,31 +695,27 @@
                 $("#txtEmailAddress").val(obj["emailAddress"]);
                 $("#txtGeneralComment").val(obj["comment"]);
                 $("#txtBillingNotes").val(obj["billingNote"]);
-                $("#chkRetainHistory").prop("checked", (obj["keepHistory"] == true ? true : false))
+                $("#chkRetainHistory").prop("checked", obj["keepHistory"])
 
-
-                //set marketId, formatId, and ownerId to hidden fields to be used after market/format/ownership dropdowns load with lists using mediaTypeId returned from this api
-
+                //set marketId, formatId, and ownerId to hidden fields to be used after
+                //market/format/ownership dropdowns load with lists filtered by station's media type Id returned from this api
 
                 $("#hdnMarketId").val(obj["marketId"]);
                 $("#hdnOwnershipId").val(obj["ownerId"]);
                 $("#hdnFullName").val(obj["fullName"]);
                 $("#hdnMediaType").val(obj["mediaType"]);
 
-
-                if (obj["formatId"] != "" && obj["formatId"] != null) {
-
-                    $("#ddlFormat").val(obj["formatId"]);
-                    $("#divFormat").removeClass("hidden");
-                    $("#hdnFormatId").val(obj["formatId"]);
-                }
-
-                if (obj["affiliationId"] != "" && obj["affiliationId"] != null) {
-
+                //If media type equals global variable const television, then show affiliation.
+                if (obj["mediaType"].toUpperCase() == gMediaTypeTelevision.toUpperCase()) {
                     $("#ddlAffiliation").val(obj["affiliationId"]);
                     $("#divAffiliation").removeClass("hidden");
 
+                } else {
+                    $("#ddlFormat").val(obj["formatId"]);
+                    $("#hdnFormatId").val(obj["formatId"]);
+                    $("#divFormat").removeClass("hidden");
                 }
+
 
             });
         }
@@ -928,8 +938,8 @@
                 str = str + '<div id="date' + obj.P_ProductID + '" />';
                 str = str + '</div>';
                 str = str + '<div id="productButtons' + obj.P_ProductID + '" class="col-md-6" style="text-align:left;">';
-                str = str + '<input type="button" id="productAdd' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="enableEditProduct(\'' + obj.P_ProductID + '\',' + 1 + ')" Value="Enable" />';
-                str = str + '<input type="button" id="productEdit' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="enableEditProduct(\'' + obj.P_ProductID + '\',' + 0 + ')" Value="Edit" />';
+                str = str + '<input type="button" id="productAdd' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="setVariablesAndDupCheck(\'' + obj.P_ProductID + '\',' + 1 + ')" Value="Enable" />';
+                str = str + '<input type="button" id="productEdit' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="setVariablesAndDupCheck(\'' + obj.P_ProductID + '\',' + 0 + ')" Value="Edit" />';
                 str = str + '<input type="button" id="productDisable' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="disableProduct(' + '\'' + obj.P_ProductID + '\')" Value="Disable" />';
                 str = str + '</div>';
                 str = str + '</div>';
@@ -977,8 +987,9 @@
             $.each(data.report.rows, function (index) {
 
                 var obj = data.report.rows[index];
+                var showRetainHistory = false
 
-                // This code is added to restrict 
+                // This code is added to restrict
                 // visibility of products that are NOT allowed
                 // to be set up for a station
                 // default is set to hidden in getProductListSuccess routine...
@@ -986,15 +997,18 @@
                 $(".row_" + obj.productId).show();
 
                 if (obj.activeDate != null & obj.active == true) {
+                    stationHasActiveProducts = true;
+                    showRetainHistory = true;
                     $("#productDisable" + obj.productId).removeClass("hidden");
                     $("#date" + obj.productId).html(extractDateOnly(obj.activeDate));
                     $("#date" + obj.productId).css("color", "green");
-                    if (obj.productId.toUpperCase() != "MSS") {
+                    if (obj.productId.toUpperCase() != "MSS" && obj.productId.toUpperCase() != "DMA") {
                         $("#productEdit" + obj.productId).removeClass("hidden");
                     }
                 }
 
                 else if (obj.disableDate != null && obj.active == false) {
+                    showRetainHistory = true;
                     $("#productAdd" + obj.productId).removeClass("hidden");
                     $("#date" + obj.productId).html(extractDateOnly(obj.disableDate));
                     $("#date" + obj.productId).css("color", "red");
@@ -1003,33 +1017,40 @@
                     $("#productAdd" + obj.productId).removeClass("hidden");
                 }
 
-            })
+                //If returning product is not active in the station's market, inform the user
+                if (obj.marketProductId.trim() == "") {
+                    $("#productButtons" + obj.productId).html("");
+                    $("#productButtons" + obj.productId).html("This product is not active in this station's Market.");
+                }
+
+                //if station has any products, disbled or enabled, show Retain History checkbox.
+                if (showRetainHistory == true) {
+                    $("#divRetainHistory").removeClass("hidden");
+                }
+
+
+            });
 
         }
     }
 
 
-    function onChangeMediaType(mediaTypeId) {
+    function onChangeMediaType() {
+
+        var mediaTypeId = $("#ddlMediaType").val();
+        var mediaType = $("#ddlMediaType option:selected").text();
 
         if (mediaTypeId == -1) {
-            $("#ddlMarket").prop("disabled", true);
-            $("#ddlOwnership").prop("disabled", true);
-            $("#ddlMarket").addClass("disabled");
-            $("#ddlOwnership").addClass("disabled");
-            $("#ddlMarket").html("");
-            $("#ddlOwnership").html("");
+
+            mediaTypeIsNotValid();
+
         } else {
+            mediaTypeIsValid();
 
-            $("#ddlMarket").prop("disabled", false);
-            $("#ddlOwnership").prop("disabled", false);
-            $("#ddlMarket").removeClass("disabled");
-            $("#ddlOwnership").removeClass("disabled");
-
-
-            getMarketList(mediaTypeId);
         }
 
-        if (mediaTypeId == 2) {
+        //If Media Type is Television then the Station has an Affiliation. All other media types have a Format instead.
+        if (mediaType.toUpperCase() == gMediaTypeTelevision.toUpperCase()) {
             $("#divAffiliation").removeClass("hidden");
 
             if ($("#divFormat").hasClass("hidden") == false) {
@@ -1046,9 +1067,165 @@
 
     }
 
+    function mediaTypeIsNotValid() {
+
+        $("#ddlMarket").prop("disabled", true);
+        $("#ddlMarket").addClass("disabled");
+        $("#ddlMarket").html("");
+
+        $("#ddlOwnership").prop("disabled", true);
+        $("#ddlOwnership").addClass("disabled");
+        $("#ddlOwnership").html("");
+
+        $("#ddlAffiliation").prop("disabled", true);
+        $("#ddlAffiliation").addClass("disabled");
+        $("#ddlAffiliation").html("");
+
+        $("#ddlFormat").prop("disabled", true);
+        $("#ddlFormat").addClass("disabled");
+        $("#ddlFormat").html("");
+
+    }
+
+    function mediaTypeIsValid() {
+
+        $("#ddlMarket").prop("disabled", false);
+        $("#ddlMarket").removeClass("disabled");
+
+        $("#ddlOwnership").prop("disabled", false);
+        $("#ddlOwnership").removeClass("disabled");
+
+        $("#ddlAffiliation").prop("disabled", false);
+        $("#ddlAffiliation").removeClass("disabled");
+
+        $("#ddlFormat").prop("disabled", false);
+        $("#ddlFormat").removeClass("disabled");
+
+        //Reload the market list everytime the user changes the media type ID to a valid ID
+        var mediaTypeId = $("#ddlMediaType").val();
+        getMarketList(mediaTypeId);
+
+    }
+
     function updateStation() {
-        bootbox.alert('This functionality is still under development.', function () {
-        });
+
+        if (validationPassed() == false) {
+            return;
+        }
+
+        if (stationId <= 0) {
+            $("#hdnStationId").val(stationId);
+        }
+
+
+
+        var url = ServicePrefix + '/api/Station/UpdateStation';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId,
+                "inMediaTypeID": $("#ddlMediaType").val(),
+                "inFullName": $("#txtFullName").val().trim(),
+                "inPrimaryMarketID": $("#ddlMarket").val(),
+                "inAddress1": $("#txtAddress1").val().trim(),
+                "inAddress2": $("#txtAddress2").val().trim(),
+                "inCity": $("#txtCity").val().trim(),
+                "inStateAbbreviation": $("#ddlState").val(),
+                "inZipCode": $("#txtZipcode").val().trim(),
+                "inZip4": $("#txtZip4").val().trim(),
+                "inAreaCode": $("#txtPhoneAreaCode").val().trim(),
+                "inPhone": $("#txtPhoneNumber").val().trim(),
+                "inExtension": $("#txtPhoneNumberExt").val().trim(),
+                "inFaxAreaCode": $("#txtFaxAreaCode").val().trim(),
+                "inFaxPhone": $("#txtFaxNumber").val().trim(),
+                "inEmail": $("#txtEmailAddress").val().trim(),
+                "inClientID": $("#txtMKAClientNumber").val().trim(),
+                "inCallLetters": $("#txtCallLetter").val().trim(),
+                "inSuffix": $("#ddlSuffix").val(),
+                "inNickname": $("#txtNickname").val().trim(),
+                "inFormatID": $("#ddlFormat").val(),
+                "inAffiliation": $("#ddlAffiliation").val(),
+                "inPrimaryDemo": $("#ddlPrimaryDemo").val(),
+                "inSecondaryDemo": $("#ddlSecondaryDemo").val(),
+                "inOwnerID": $("#ddlOwnership").val(),
+                "inComment": $("#txtGeneralComment").val().trim(),
+                "inBillingNote": $("#txtBillingNotes").val().trim()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                updateStationSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function updateStationSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+
+            var bReloadPage = false;
+
+            $.each(data.report.rows, function (index) {
+                var obj = data.report.rows[index];
+
+                if ($("#hdnStationId").val() === '0') {
+                    bReloadPage = true;
+                    $("#hdnStationId").val(obj["stationId"]);
+                }
+
+                bootbox.alert('Station update successful.', function () {
+                    if (bReloadPage) {
+                        window.location = "station.html?stationID=" + $("#hdnStationId").val();
+                    }
+                });
+
+            });
+        }
+
+    }
+
+    function updateRetainHistory() {
+
+        var url = ServicePrefix + '/api/Station/UpdateAllStationHistory';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId,
+                "inHistory": $("#chkRetainHistory").prop("checked")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                updateRetainHistorySuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+        $.ajax(url, settings);
+    }
+
+    function updateRetainHistorySuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.repsponse.errorMessage[0]);
+        } else {
+            bootbox.alert('Retain History updated successfully.', function () {
+            });
+        }
     }
 
     function disableProduct(productId) {
@@ -1057,54 +1234,237 @@
         });
     }
 
-    function enableEditProduct(productId, isEnable) {
+    function setVariablesAndDupCheck(productId, isEnable) {
 
-        var location = '';
+        //set variables for enabling or editing product
+        editingProduct = productId;
+        isProductEnable = isEnable;
 
-        switch (productId.toLowerCase()) {
-            case '':
-                location = 'station.html?StationID=' + stationId;
-                break;
+        //if station does not have any active products, check for duplicate stations.
+        //before allowing the station to have products
+        if (stationHasActiveProducts == false) {
+            checkForDuplicateStations();
+        } else {
+            editEnableProduct();
+        }
+
+    }
+
+    function checkForDuplicateStations() {
+
+        var url = ServicePrefix + '/api/Station/GetStationActiveCallLetterSuffixCount';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId,
+                "inCallLetters": $("#txtCallLetter").val().trim(),
+                "inSuffix": $("#ddlSuffix").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                checkForDuplicateStationsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function checkForDuplicateStationsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+
+            if (data.report.rows[0]["Active CallLetter Suffix Count"] > 0) {
+                bootbox.alert("Request failed, an active station already exists with Call Letters: " + $("#txtCallLetter").val() + " and Suffix: " + $("#ddlSuffix").val(), function () {
+
+                });
+            } else {
+                //if there are no duplicates, continue with the edit/enable process
+                editEnableProduct();
+            }
+
+        }
+    }
+
+    function editEnableProduct() {
+
+        switch (editingProduct.toLowerCase()) {
             case 'mrr':
                 setProductLocalStorage();
-                location = 'stationproductmrr.html?StationID=' + stationId + '&ProductNew=' + isEnable;
+                window.location = 'stationproductmrr.html?StationID=' + stationId + '&ProductNew=' + isProductEnable;
                 break;
             case 'xry':
-                setProductLocalStorage(isEnable);
-                if (isEnable == true) {
-                    location = 'stationxrysubmission.html?StationID=' + stationId;
+                setProductLocalStorage();
+                if (isProductEnable) {
+
+                    //Checking if station has existing xry submissions. If they do, they will be directed to stationproductxry.html
+                    //If the station does not have any submissions, then they will be directed to stationxrysubmission.html
+                    //to be forced to make at least one submission before they can activate XRY
+                    checkIfStationHasXRYSubmissions();
+
                 } else {
-                    location = 'stationproductxry.html?StationID=' + stationId;
+                    window.location = 'stationproductxry.html?StationID=' + stationId;
                 }
                 break;
             case 'tvb':
                 setProductLocalStorage();
-                location = 'stationproducttvb.html?StationID=' + stationId + '&ProductNew=' + isEnable;
+                window.location = 'stationproducttvb.html?StationID=' + stationId + '&ProductNew=' + isProductEnable;
                 break;
             case 'mss':
-                bootbox.alert('This functionality is still under development.', function () {
-
-                });
-                return;
+                enableDisableProductForStation(1, "MSS");
+                break;
             case 'dma':
-                bootbox.alert('This functionality is still under development.', function () {
-
-                });
-                return;
+                enableDisableProductForStation(1, "DMA");
+                break;
+            default:
+                window.location = 'station.html?StationID=' + stationId;
+                break;
         }
-
-        window.location = location;
     }
 
-    function setProductLocalStorage(isEnable) {
+
+    function checkIfStationHasXRYSubmissions() {
+
+        var url = ServicePrefix + '/api/ReInput/GetReInputList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                checkIfStationHasXRYSubmissionsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+        $.ajax(url, settings);
+    }
+
+    function checkIfStationHasXRYSubmissionsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+
+            if (data.report.rows.length > 0) {
+                window.location = 'stationproductxry.html?StationID=' + stationId + '&ProductNew=1';
+
+            } else {
+                window.location = 'stationxrysubmission.html?StationID=' + stationId + '&ProductNew=1';
+            }
+
+        }
+
+    }
+
+    function enableDisableProductForStation(isActive, productId) {
+
+        var url = ServicePrefix + '/api/Station/UpdateStationProduct';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId,
+                "inProductId": productId,
+                "inActive": isActive
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                enableDisableProductForStationSuccess(data, textStatus, jQxhr, isActive, productId);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function enableDisableProductForStationSuccess(data, textStatus, jQxhr, isActive, productId) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+
+            var status = '';
+            if (isActive == 1) {
+                status = 'enabled';
+            } else {
+                status = 'disabled';
+            }
+
+            bootbox.alert(productId + ' has been ' + status + ' successfully.', function () {
+                window.location = "station.html?stationID=" + stationId;
+
+            });
+
+        }
+    }
+
+
+    function setProductLocalStorage() {
 
         setLocalStorage("tempStationName", $("#hdnFullName").val());
         setLocalStorage("tempStationMedia", $("#hdnMediaType").val());
         setLocalStorage("tempStationOwnerId", $("#hdnOwnershipId").val());
         setLocalStorage("tempStationMarketId", $("#hdnMarketId").val());
-        //setLocalStorage("tempProductNew", isEnable);
 
     }
+
+    function validationPassed() {
+
+        if ($("#divFormat").hasClass("hidden") == false) {
+            $("#ddlFormat").addClass("mkaRequired");
+        }
+
+        if ($("#divAffiliation").hasClass("hidden") == false) {
+            $("#ddlAffiliation").addClass("mkaRequired");
+        }
+
+
+        var loopBreak = true;
+        $(".mkaRequired").each(function (index, el) {
+
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+
+            }
+
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == "-1") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+        });
+
+        return loopBreak;
+    }
+
+
 
 
 

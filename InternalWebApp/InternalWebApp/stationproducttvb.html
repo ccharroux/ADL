@@ -116,7 +116,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div>
-                                    <input value="Update" onclick="updateTVBProduct();" class="default-button" type="button" />
+                                    <input id="btnUpdateTVB" value="Update" onclick="updateTVBProduct();" class="default-button" type="button" />
                                 </div>
                                 <div class="back-button-div">
                                     <input value="Back" onclick="goBackToStationPage();" class="default-button" type="button" />
@@ -230,7 +230,8 @@
 
     function checkIfInsertOrUpdate(){
 
-        if(isNewProduct > 0) {
+        if (isNewProduct > 0) {
+            $("#btnUpdateTVB").val("Enable");
             return;
         } else {
             getRepFirmListByStation();
@@ -402,7 +403,51 @@
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
         } else {
-            bootbox.alert('Station TVB product update successful.', function () {
+
+            //If product is new, enable it
+            if (isNewProduct == 1) {
+                enableProductForStation();
+
+            } else {
+                bootbox.alert('Station TVB product update successful.', function () {
+                    window.location = "stationproducttvb.html?StationID=" + stationId + "&ProductNew=0";
+
+                });
+            }
+          
+        }
+    }
+
+    function enableProductForStation() {
+        
+        var url = ServicePrefix + '/api/Station/UpdateStationProduct';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId,
+                "inProductId": "TVB",
+                "inActive": 1
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                enableProductForStationSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+        $.ajax(url, settings);
+    }
+
+    function enableProductForStationSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            bootbox.alert('TVB has been enabled successfully.', function () {
                 window.location = "stationproducttvb.html?StationID=" + stationId + "&ProductNew=0";
 
             });

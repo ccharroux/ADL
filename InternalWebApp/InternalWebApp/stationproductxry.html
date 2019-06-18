@@ -117,7 +117,7 @@
 
                     </div>
 
-                    <div class="default-button-section margin-top-10">
+                    <div id="divAddSubmission" class="default-button-section margin-top-10">
                         <div class="row">
                             <div class="col-md-12 text-align-right">
                                 <input type="button" class="default-button" id="btnAddSubmission" value="Add Submission" onclick="addSubmission();" />
@@ -166,7 +166,7 @@
                         </div>
                     </div>
 
-                    <div class="default-button-section margin-top-10">
+                    <div id="divMassAssign" class="default-button-section margin-top-10">
                         <div class="row">
                             <div class="col-md-3 text-align-left background-yellow">
                                 Assigned Recipients:
@@ -246,7 +246,13 @@
 
                     <div class="default-button-section margin-top-50">
                         <div class="row">
-                            <div class="col-md-12 text-align-center">
+                            <div id="divEnableProduct">
+                                <div class="col-md-12 text-align-center">
+                                    <input value="Enable" onclick="enableProductForStation();" class="default-button" type="button" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 text-align-center back-button-div">
                                 <input value="Back" onclick="goBackToStationPage();" class="default-button" type="button">
                             </div>
                         </div>
@@ -288,15 +294,32 @@
 <script>
 
     var stationId = 0;
+    var isNewProduct = 0;
 
     $(document).ready(function () {
         buildMainMenu("Stations");
         stationId = (getParameterByName("StationID") == null ? 0 : getParameterByName("StationID"));
+        isNewProduct = (getParameterByName("ProductNew") == null ? 0 : getParameterByName("ProductNew"));
+
+        checkIfNewProduct();
         getSubmissionList();
         setStationLabel();
 
     });
 
+    function checkIfNewProduct(){
+        if (isNewProduct == 1) {
+
+            $("#divAddSubmission").addClass("hidden");
+            $("#divAssignedRecipientList").addClass("hidden");
+            $("#divMassAssign").addClass("hidden");
+            //add button that enables product
+            //hide other buttons and functionality until enable button is clicked
+        } else {
+            $("#divEnableProduct").addClass("hidden");
+        }
+
+    }
 
     function setStationLabel() {
 
@@ -582,6 +605,42 @@
             }
         });
 
+    }
+
+    function enableProductForStation() {
+        
+        var url = ServicePrefix + '/api/Station/UpdateStationProduct';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId,
+                "inProductId": "XRY",
+                "inActive": 1
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                enableProductForStationSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function enableProductForStationSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            bootbox.alert("XRY has been enabled successfully.", function () {
+                window.location = "stationproductxry.html?StationID=" + stationId + "&ProductNew=0";
+            });
+        }
     }
 
     function addSubmission() {

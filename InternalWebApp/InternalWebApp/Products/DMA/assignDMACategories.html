@@ -104,7 +104,7 @@
                             </div>
                             <div class="col-md-9 text-align-left">
                                 <div>
-                                    <input value="Assign" onclick="assignCategoriesToParentMarket()" class="default-button" type="button">
+                                    <input value="Assign Category Template" onclick="assignCategoriesToParentMarket()" class="default-button" type="button">
                                 </div>
                                 <div style="padding-top: 10px">
                                     <input value="Back" onclick="goBackToParentMarket();" class="default-button" type="button">
@@ -118,8 +118,6 @@
             </div>
         </div>
     </div>
-
-
 
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
@@ -146,17 +144,16 @@
 
     $(document).ready(function () {
 
-        parentMarketId = (getParameterByName("parentmarketid") == null ? 0 : getParameterByName("parentmarketid"));
-        parentMarketName =
-            (getParameterByName("parentmarketname") == null ? '' : getParameterByName("parentmarketname"));
+        getPageParameters();
 
-        //set the parent information
-        $("#txtParentMarketId").val(parentMarketId);
-        $("#txtParentMarketName").val(parentMarketName);
+        setPageValues();
 
         //get list of templates
         getCategoryTemplates();
 
+        buildMainMenu("Markets");
+
+        //loads the click functionality for the category templates
         $("#ddlCategoryTemplates").click(function() {
 
             var templateId = $(this).val();
@@ -165,6 +162,22 @@
         });
 
     });
+
+    function getPageParameters() {
+
+        parentMarketId = (getParameterByName("parentmarketid") == null ? 0 : getParameterByName("parentmarketid"));
+        parentMarketName =
+            (getParameterByName("parentmarketname") == null ? '' : getParameterByName("parentmarketname"));
+
+    }
+
+    function setPageValues() {
+
+        //set the parent information
+        $("#txtParentMarketId").val(parentMarketId);
+        $("#txtParentMarketName").val(parentMarketName);
+
+    }
 
     function getCategoryTemplates() {
 
@@ -184,6 +197,8 @@
 
                     var str = '';
 
+                    str = "<option value='-1'>-- Select a Template --</option>";
+
                     $.each(data.report.rows, function (index) {
 
                         var obj = data.report.rows[index];
@@ -194,11 +209,11 @@
 
                     $("#ddlCategoryTemplates").append(str);
 
-                    if (data.report.rows.length == 1) {
-                        //automatically load the categories or should automatically load the first one
-                        $("#ddlCategoryTemplates option:first").attr('selected', 'selected');
-                        $("#ddlCategoryTemplates").click();
-                    }
+                    //if (data.report.rows.length == 1) {
+                    //    //automatically load the categories or should automatically load the first one
+                    //    $("#ddlCategoryTemplates option:first").attr('selected', 'selected');
+                    //    $("#ddlCategoryTemplates").click();
+                    //}
                 }
 
             },
@@ -213,8 +228,13 @@
 
         $("#ddlCategories").empty();
 
+        if ($("#ddlCategoryTemplates").val() == "-1") {
+            return;
+        }
+
+
         $.ajax({
-            url: ServicePrefix + '/api/ParentMarketCategoryTemplate/GetParentMarketCategoryTemplateList?inApiToken=' + getLocalStorage("APIToken") + '&inParentMarketCategoryTemplateId=' + categoryTemplateId,
+            url: ServicePrefix + '/api/ParentMarketCategoryTemplate/GetParentMarketCategoryTemplateByTemplateId?inApiToken=' + getLocalStorage("APIToken") + '&inParentMarketCategoryTemplateId=' + categoryTemplateId,
             dataType: 'json',
             type: 'get',
             contentType: 'application/json',
@@ -250,6 +270,12 @@
     }
 
     function assignCategoriesToParentMarket() {
+
+        //need to do validation to make sure something is clicked
+        if (validationPassed() === false) {
+            return;
+        }
+
         //assign the categories from the template to the parent market
         //on success enable the product for the parent market
 
@@ -323,4 +349,20 @@
         window.location = "/parentmarket.html?ParentMarketID=" + $("#txtParentMarketId").val();
 
     }
+
+    function validationPassed() {
+
+        if (parentMarketId <= 0) {
+            bootbox.alert("The parent market wasn't passed properly. Please go back to the parent market page and try to assign the product again.", function () { });
+            return false;
+        }
+
+        if ($("#ddlCategoryTemplates option:selected").length == 0 || $("#ddlCategoryTemplates").val() == "-1" ) {
+            bootbox.alert("Please select a template to be assigned.", function () { });
+            return false;
+        }
+        
+        return true;
+    }
+
 </script>
