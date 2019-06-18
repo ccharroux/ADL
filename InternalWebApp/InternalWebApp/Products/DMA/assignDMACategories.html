@@ -197,6 +197,8 @@
 
                     var str = '';
 
+                    str = "<option value='-1'>-- Select a Template --</option>";
+
                     $.each(data.report.rows, function (index) {
 
                         var obj = data.report.rows[index];
@@ -207,11 +209,11 @@
 
                     $("#ddlCategoryTemplates").append(str);
 
-                    if (data.report.rows.length == 1) {
-                        //automatically load the categories or should automatically load the first one
-                        $("#ddlCategoryTemplates option:first").attr('selected', 'selected');
-                        $("#ddlCategoryTemplates").click();
-                    }
+                    //if (data.report.rows.length == 1) {
+                    //    //automatically load the categories or should automatically load the first one
+                    //    $("#ddlCategoryTemplates option:first").attr('selected', 'selected');
+                    //    $("#ddlCategoryTemplates").click();
+                    //}
                 }
 
             },
@@ -226,8 +228,13 @@
 
         $("#ddlCategories").empty();
 
+        if ($("#ddlCategoryTemplates").val() == "-1") {
+            return;
+        }
+
+
         $.ajax({
-            url: ServicePrefix + '/api/ParentMarketCategoryTemplate/GetParentMarketCategoryTemplateList?inApiToken=' + getLocalStorage("APIToken") + '&inParentMarketCategoryTemplateId=' + categoryTemplateId,
+            url: ServicePrefix + '/api/ParentMarketCategoryTemplate/GetParentMarketCategoryTemplateByTemplateId?inApiToken=' + getLocalStorage("APIToken") + '&inParentMarketCategoryTemplateId=' + categoryTemplateId,
             dataType: 'json',
             type: 'get',
             contentType: 'application/json',
@@ -350,7 +357,7 @@
             return false;
         }
 
-        if ($("#ddlCategoryTemplates option:selected").length == 0) {
+        if ($("#ddlCategoryTemplates option:selected").length == 0 || $("#ddlCategoryTemplates").val() == "-1" ) {
             bootbox.alert("Please select a template to be assigned.", function () { });
             return false;
         }
