@@ -940,14 +940,22 @@ function buildXRYMenu(selectedItem) {
     menuItems += productDashboard('dma');
     menuItems += '              </ul>';
     menuItems += '        </li>';
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "XRay Reports") + ' href="/genericXrayReportList.html" role="button" aria-expanded="false">XRay Reports </span></a>';
     //menuItems += '              <ul class="dropdown-menu" role="menu">';
     //menuItems += '                  <li style="display:block;"><a href="/stationagencylist.html">Station Agency</a></li>';
     //menuItems += '                  <li style="display:block;"><a href="/parentagencylist.html">Parent Agency</a></li>';
     //menuItems += '              </ul>';
     menuItems += '        </li>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="releasexry.html">Release</a></li>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Reminders") + 'href="remindersxry.html">Reminders</a></li>';
+
+    menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '<ul class="dropdown-menu" role="menu">';
+    menuItems += '        <li style="display:block"><a href="releasexry.html">Release</a></li>';
+    menuItems += '        <li style="display:block"><a href="remindersxry.html">Reminders</a></li>';
+    menuItems += '</ul>';
+    menuItems += '</li>';
+
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "XRay Reports") + ' href="/genericXrayReportList.html" role="button" aria-expanded="false">XRay Reports </span></a>';
+
+
     //menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Advertiser") + ' href="/advertiserlist.html" role="button" aria-expanded="false">Advertiser <span style="margin-right:10px;" class="caret"></span></a>';
     //menuItems += '              <ul class="dropdown-menu" role="menu">';
     //menuItems += '                  <li style="display:block;"><a href="/stationadvertiserlist.html">Station Advertiser</a></li>';
@@ -999,13 +1007,6 @@ function buildMRRMenu(selectedItem) {
 
     menuItems += '<ul>';
     menuItems += buildGenericReportsLink(selectedItem);
-    menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '<ul class="dropdown-menu" role="menu">';
-    menuItems += '        <li style="display:block"><a href="releasemrr.html">Release</a></li>';
-    menuItems += '        <li style="display:block"><a href="remindersmrr.html">Reminders</a></li>';
-    menuItems += '        <li style="display:block"><a href="revenuedetailmrr.html">Data Entry/Rank</a></li>';
-    menuItems += '</ul>';
-    menuItems += '</li>';
 
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
@@ -1014,6 +1015,13 @@ function buildMRRMenu(selectedItem) {
     menuItems += productDashboard('tvb');
     menuItems += productDashboard('mss');
     menuItems += productDashboard('dma');
+    menuItems += '</ul>';
+    menuItems += '</li>';
+    menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '<ul class="dropdown-menu" role="menu">';
+    menuItems += '        <li style="display:block"><a href="releasemrr.html">Release</a></li>';
+    menuItems += '        <li style="display:block"><a href="remindersmrr.html">Reminders</a></li>';
+    menuItems += '        <li style="display:block"><a href="revenuedetailmrr.html">Data Entry/Rank</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
 
@@ -1036,8 +1044,6 @@ function buildTVBMenu(selectedItem) {
 
     menuItems += '<ul>';
     menuItems += buildGenericReportsLink(selectedItem);
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Reminders") + 'href="reminderstvb.html">Reminders</a></li>';
-
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += productDashboard('mrr');
@@ -1047,6 +1053,12 @@ function buildTVBMenu(selectedItem) {
     menuItems += productDashboard('dma');
     menuItems += '              </ul>';
     menuItems += '        </li>';
+    menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '<ul class="dropdown-menu" role="menu">';
+
+    menuItems += '        <li style="display:block"><a href="reminderstvb.html">Reminders</a></li>';
+    menuItems += '</ul>';
+    menuItems += '</li>';
     menuItems += productDashboard('');
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
     menuItems += '    </ul>';
@@ -1090,7 +1102,8 @@ function buildDMAMenu(selectedItem) {
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="/Products/DMA/releasedma.html">Release</a></li>';
+
+//    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="/Products/DMA/releasedma.html">Release</a></li>';
     menuItems += buildGenericReportsLink2(selectedItem);
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
@@ -1101,8 +1114,17 @@ function buildDMAMenu(selectedItem) {
     menuItems += productDashboard('dma');
     menuItems += '              </ul>';
     menuItems += '        </li>';
+
+
+    menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '<ul class="dropdown-menu" role="menu">';
+
+    menuItems += '        <li style="display:block"><a href="/Products/DMA/releasedma.html">Release</a></li>';
+    menuItems += '</ul>';
+    menuItems += '</li>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "DMA Reports") + ' href="/Products/DMA/genericDmaReportList.html" role="button" aria-expanded="false">DMA Reports </span></a>';
     menuItems += '       </li>';
+
     menuItems += productDashboard('');
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
     menuItems += '    </ul>';
