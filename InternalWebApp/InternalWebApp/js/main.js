@@ -1,4 +1,12 @@
-;(function () {
+
+const gMediaTypeRadio = "RADIO";
+const gMediaTypeTelevision = "TELEVISION";
+const gMediaTypeNewspapers = "NEWSPAPERS";
+const gMediaTypeOutOfHome = "OUT OF HOME";
+const gMediaTypeNetwork = "NETWORK";
+const gMediaTypeSurvey = "SURVEY";
+
+; (function () {
 	
 	'use strict';
 
