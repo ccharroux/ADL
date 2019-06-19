@@ -150,6 +150,9 @@
                             <input type="hidden" id="revision" value="0" />
                             <label for="MarketRanked"><u>Market Status</u> </label><br />
                             <div id="MarketRanked"></div>
+                            <br />
+                            <label for="TimeSalesStationsSubmitted"><u>Time Sales Stations Submitted</u></label><br />
+                            <div id="TimeSalesStationsSubmitted"></div>
                         </div>
                         <div class="divInternalComment" style="display:none">
                             <label for="InternalCommentText"><u>Internal Comment</u></label>
@@ -851,6 +854,7 @@
         showStationContactInfo();
         showStationComment();
         showMarketRankedStatus();
+        showTimeSalesStationsSubmitted();
     }
 
     function showStationEnteredStatus()
@@ -1093,6 +1097,49 @@
             $("#revisionSection").hide();
 
         }
+    }
+
+    function showTimeSalesStationsSubmitted() {
+        var url = ServicePrefix + '/api/TVB/GetTimeSalesStationsSubmitted';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                showTimeSalesStationsSubmittedSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function showTimeSalesStationsSubmittedSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get time sales stations submitted");
+            return;
+        }
+
+        var submittedCount = data.report.rows[0].submittedCount;
+        var totalCount = data.report.rows[0].totalCount;
+        var submittedPercent = Math.round(1000 * submittedCount / totalCount) / 10; // one decimal place, .toFixed() apparently has occasional float weirdness
+        var newText = submittedPercent + "% (" + submittedCount + " of " + totalCount + ")";
+        $("#TimeSalesStationsSubmitted").text(newText);
     }
 
 
