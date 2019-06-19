@@ -441,7 +441,7 @@ function addDialogComponents()
 
     $("body").append(d)
 
-    setTimeout(buildDialog, 250);
+    setTimeout(buildFavoritesDialog, 250);
 
 }
 function cancelFavorite()
@@ -567,7 +567,7 @@ function deleteFavorite(id) {
 
 }
 
-function buildDialog()
+function buildFavoritesDialog()
 {
 
         $("#favoritesDialog").dialog({
@@ -1031,7 +1031,7 @@ function buildMRRMenu(selectedItem) {
     menuItems += '<ul class="dropdown-menu" role="menu">';
     menuItems += '        <li style="display:block"><a href="releasemrr.html">Release</a></li>';
     menuItems += '        <li style="display:block"><a href="remindersmrr.html">Reminders</a></li>';
-    menuItems += '        <li style="display:block"><a href="revenuedetailmrr.html">Data Entry/Rank</a></li>';
+    menuItems += '        <li style="display:block"><a href="revenuedetailmrr.html">Revenue Detail</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
 
