@@ -140,6 +140,7 @@
         buildFavoriteList();
         buildMainMenu("");
 
+        clearSearchButtonSetup();
 
     });
 
@@ -231,7 +232,10 @@
 
                             //    }
                             //}
-                        ]
+                        ],
+                        initComplete: function () {
+                            $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+                        }
                         //,
                         //"footerCallback": tableFooterCallback
                     });
@@ -250,6 +254,7 @@
         var columns = new Array();
 
         columns.push({
+            "title": "Favorite Name",
             "mRender": function (data, type, row) {
                 return "<a href='" + row.URL + "'><b>" + row.Title + "</b></a>";
             },
@@ -259,6 +264,7 @@
         });
 
         columns.push({
+            "title":"Favorite URL",
             "mRender": function (data, type, row) {
                 return "<a href='" + row.URL + "' style='font-size:13px'><i>" + row.URL + "</i></a>";
             },
@@ -297,6 +303,14 @@
         });
 
         return columns;
+    }
+
+    function clearSearchButtonSetup() {
+        $("body").on("click", "#clear_search_button", function () {
+            var table = $("#dtResults").DataTable();
+            table.search('').draw();
+        });
+
     }
 
     function drawSegmentLabel(canvas, context, i) {
