@@ -17,31 +17,39 @@
     <link rel="stylesheet" href="/css/style.css">
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
     <style>
         dt {
             float: left;
             padding: 4px;
         }
-        .productDiv{
-            display:none;
-            margin-top:20px;
-            border-radius:15px;
+
+        .productDiv {
+            display: none;
+            margin-top: 20px;
+            border-radius: 15px;
             border: silver 1px solid;
             width: 50%;
- 
         }
-        .textAlignLeft{
-            text-align:left;
+
+        .textAlignLeft {
+            text-align: left;
             margin-left: 10px;
         }
-        .textAlignRight{
-            text-align:right;
+
+        .textAlignRight {
+            text-align: right;
             margin-right: 10px;
         }
-        .mediaHeader
-        {
-            color:blue;
-            font-weight:800;
+
+        .mediaHeader {
+            color: blue;
+            font-weight: 800;
         }
     </style>
 </head>
@@ -55,7 +63,16 @@
         <div id="fh5co-contact-section" class="contact-section">
             <div class="margin-0-auto text-align-center">
                 <center>
-                    <div id="divFavoriteList" style="padding-top:20px; padding-bottom:20px;display:none;width:90%;border:solid 1px silver;border-radius:15px"></div>
+                    <!--<div id="divFavoriteList" style="padding-top:20px; padding-bottom:20px;display:none;width:90%;border:solid 1px silver;border-radius:15px"></div>-->
+                    <!-- start datatable coding-->
+                    <div class="container">
+                        <div class="dataTable-top-margin">
+                            <table id="dtResults" class="stripe"></table>
+                            <div id="noDataFound" style="display:none; color: red">No data found</div>
+                        </div>
+                    </div>
+                    <!-- end datatable coding-->
+
                 </center>
             </div>
         </div>
@@ -78,13 +95,23 @@
     <script src="/js/config.js"></script>
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
+
+
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+
 </body>
 </html>
 <script>
 
 
-    $( document ).ready(function()
-    {
+    $(document).ready(function () {
         var lastPageList = getLocalStorage("latestRequestArray");
 
 
@@ -116,8 +143,7 @@
 
     });
 
-    function buildFavoriteList()
-    {
+    function buildFavoriteList() {
         $.ajax({
             url: ServicePrefix + '/api/InternalFavorite/GetInternalFavoriteList',
             dataType: 'json',
@@ -133,22 +159,81 @@
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
                 else {
-                    
-                    $.each(data.report.rows, function (index) {
- 
-                        var id = data.report.rows[index]["Internal Favorite Id"];
-                        var title = data.report.rows[index].Title;
-                        var url = data.report.rows[index].URL;
-                        var str = "<div class='row'>";
-                        str = str + "<div class='col-md-8 textAlignLeft'><a href='" + url + "'><b>" + title + "</b></a><br>";
-                        str = str + "&nbsp;&nbsp;&nbsp;&nbsp;<a href='" + url + "' style='font-size:13px'><i>" + url + "</i></a></div>";
-                        str = str + "<div class='col-md-1 textAlignRight'><a href='" + url + "'>go</a></div>";
-                        str = str + "<div class='col-md-1 textAlignRight'><a href='#' onclick='editFavorite(\"" + title + "\",\"" + url + "\"," + id + ")'>edit</a></div>";
-                        str = str + "<div class='col-md-1 textAlignRight'><a href='#' onclick='deleteFavorite(" + id + ")'>delete</a></div>";
 
-                        str = str + "</div>"
-                        $("#divFavoriteList").append(str);
-                        $("#divFavoriteList").show();
+                    //$.each(data.report.rows, function (index) {
+
+                    //    var id = data.report.rows[index]["Internal Favorite Id"];
+                    //    var title = data.report.rows[index].Title;
+                    //    var url = data.report.rows[index].URL;
+                    //    var str = "<div class='row'>";
+                    //    str = str + "<div class='col-md-8 textAlignLeft'><a href='" + url + "'><b>" + title + "</b></a><br>";
+                    //    str = str + "&nbsp;&nbsp;&nbsp;&nbsp;<a href='" + url + "' style='font-size:13px'><i>" + url + "</i></a></div>";
+                    //    str = str + "<div class='col-md-1 textAlignRight'><a href='" + url + "'>go</a></div>";
+                    //    str = str + "<div class='col-md-1 textAlignRight'><a href='#' onclick='editFavorite(\"" + title + "\",\"" + url + "\"," + id + ")'>edit</a></div>";
+                    //    str = str + "<div class='col-md-1 textAlignRight'><a href='#' onclick='deleteFavorite(" + id + ")'>delete</a></div>";
+
+                    //    str = str + "</div>"
+                    //    $("#divFavoriteList").append(str);
+                    //    $("#divFavoriteList").show();
+                    //});
+
+                    var dataColumns = buildDataTableColumns();
+
+
+                    var results = data["report"]["rows"];
+
+                    var searchTable;
+
+                    if ($.fn.DataTable.isDataTable('#dtResults')) {
+
+                        searchTable = $('#dtResults').DataTable();
+                        searchTable.destroy();
+                    }
+
+                    searchTable = $("#dtResults").DataTable({
+                        "dom": "Blfrtip",
+                        //"pageLength": gDataTableDefaultRows,
+                        "order": [],
+                        "data": results,
+                        "columns": dataColumns,
+                        "paging": false,
+                        "select": true,
+                        language: {
+                            search: "Filter Results:",
+                            emptyTable: "No favorites available"
+                        },
+                        "buttons": [
+                            //{
+                            //    extend: 'csv',
+                            //    exportOptions: {
+                            //        columns: columnsToExport
+                            //    }
+                            //},
+                            //{
+                            //    extend: 'excel',
+                            //    title: auditObject.reportTitle,
+                            //    exportOptions: {
+                            //        columns: columnsToExport
+                            //    }
+                            //},
+                            //{
+                            //    extend: 'pdf',
+                            //    title: auditObject.reportTitle,
+                            //    exportOptions: {
+                            //        columns: columnsToExport
+                            //     }
+                            //},
+                            //{
+                            //    extend: 'print',
+                            //    title: auditObject.reportTitle,
+                            //    exportOptions: {
+                            //        columns: columnsToExport
+
+                            //    }
+                            //}
+                        ]
+                        //,
+                        //"footerCallback": tableFooterCallback
                     });
 
                 }
@@ -159,6 +244,59 @@
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+    }
+
+    function buildDataTableColumns() {
+        var columns = new Array();
+
+        columns.push({
+            "mRender": function (data, type, row) {
+                return "<a href='" + row.URL + "'><b>" + row.Title + "</b></a>";
+            },
+            "orderable": true,
+            "searchable": true,
+            "className": "textAlignLeft"
+        });
+
+        columns.push({
+            "mRender": function (data, type, row) {
+                return "<a href='" + row.URL + "' style='font-size:13px'><i>" + row.URL + "</i></a>";
+            },
+            "orderable": true,
+            "searchable": true,
+            "className": "textAlignLeft"
+        });
+
+        columns.push({
+            "mRender": function (data, type, row) {
+                return "<a href='" + row.URL + "'>go</a>";
+            },
+            "orderable": false,
+            "searchable": false,
+            "className": "textAlignRight"
+        });
+
+        columns.push({
+            "mRender": function (data, type, row) {
+                var id = row["Internal Favorite Id"];
+                return "<a href='#' onclick='editFavorite(\"" + row.Title + "\",\"" + row.URL + "\"," + id + ")'>Edit</a>";
+            },
+            "orderable": false,
+            "searchable": false,
+            "className": "textAlignRight"
+        });
+
+        columns.push({
+            "mRender": function (data, type, row) {
+                var id = row["Internal Favorite Id"];
+                return "<a href='#' onclick='deleteFavorite(" + id + ")'>Delete</a>";
+            },
+            "orderable": false,
+            "searchable": false,
+            "className": "textAlignRight"
+        });
+
+        return columns;
     }
 
     function drawSegmentLabel(canvas, context, i) {
