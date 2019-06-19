@@ -198,6 +198,7 @@ const gMediaTypeSurvey = "SURVEY";
 }());
 var unblockHandle;
 
+
 //function processSuccessResult(data, successMessage)
 //{
 //    if (data.response.status != "SUCCESS") 
@@ -309,6 +310,11 @@ var navTool = {
 
 $( document ).ready(function() 
 {
+    environment = getEnvironment();
+
+    if (environment.length > 0) {
+        $("#fh5co-header").prepend("<div class='container' style='color:white; background:red; padding-top: 3px; font-weight:600;border-radius:15px; text-align: center;'>" + environment + "</div>");
+    }
 
     var nonLoggedInPages = new Array();
     nonLoggedInPages.push('login.html');
@@ -365,11 +371,7 @@ $( document ).ready(function()
 		
 	}
 
-	var environment = getEnvironment();
 
-	if (environment.length > 0) {
-	    $("#fh5co-header").prepend("<div class='container' style='color:white; background:red; padding-top: 3px; font-weight:600;border-radius:15px; text-align: center;'>" + environment + "</div>");
-	}
 
 	if (bDoLoginCheck == true)
 	{
@@ -676,7 +678,7 @@ function duplicateURL(lastPageArray, url)
 function isThisProduction() {
 
     var bRet = true;
-
+    
     if ((environment.indexOf("DEV") > -1) ||
        (environment.indexOf("LOCAL") > -1) ||
        (environment.indexOf("STAGING") > -1)) {
