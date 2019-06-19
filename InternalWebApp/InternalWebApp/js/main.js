@@ -1390,16 +1390,15 @@ function getPeriodList(inType) {
 
 }
 
-function convertToSumoSelect(selectName) {
+function convertToChosenSelect(selectName, allowSearchContains, allowSplitWordSearch) {
 
-    $("#" + selectName).SumoSelect({
-         search: true
-        ,searchText: gSearchTextPlaceholder
+    $("#" + selectName).chosen({
+        inherit_select_classes: true,
+        search_contains: allowSearchContains,
+        enable_split_word_search: allowSplitWordSearch
     });
 
-    //reloading the select so it will pick up the items in the list
-    var selectSumo = $("#" + selectName).SumoSelect();
-    selectSumo.sumo.reload();
+    $("#" + selectName).trigger("chosen:updated");
 }
 
 function scrollToAnchor(aid) {
