@@ -170,10 +170,10 @@
 
                     <div class="col-md-6" style="text-align:center">
                         <div style="padding-top:5px">
-                            <input type="button" style="width:200px" class="marketHistoryButton" onclick="rankMarket();" value="Rank Market" />
+                            <input type="button" style="width:200px" class="marketHistoryButton" onclick="rankYearPeriod();" value="Rank Market" />
                         </div>
                         <div style="display:none;padding-top:5px" id="revisionSection">
-                            <input type="button" style="width:200px" class="marketHistoryButton" onclick="unrankMarket();" value="Un-rank market (revision)" />
+                            <input type="button" style="width:200px" class="marketHistoryButton" onclick="unrankYearPeriod();" value="Un-rank market (revision)" />
                         </div>
                         <div style="padding-top:5px">
                             <input type="button" style="width:200px" class="marketHistoryButton" onclick="generateSnapshotReport();" value="Generate Snapshot" />
@@ -390,13 +390,13 @@
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
             "columns": [
-                { "data": 'marketCategoryDescription' },
+                { "data": 'categoryDescription' },
                 { "data": 'revenueAmount' },
                 { "data": 'priorRevenueAmount' },
                 {
                     mRender: function (data, type, row) {
                         var changeRatio = getChangeRatio(row.revenueAmount, row.priorRevenueAmount);
-                        return '<span id="change-' + row.marketCategoryId + '">' + changeRatio + "</span>%";
+                        return '<span id="change-' + row.categoryId + '">' + changeRatio + "</span>%";
                     },
                     "orderable": false,
                     "searchable": false
@@ -410,10 +410,9 @@
                     "className": "text-align-right",
                     "render": function (data, type, row) {
                         return '$<input type="text" onFocus="this.select()" class="revenue-detail text-align-right"'
-                            + ' id="revenue-detail-' + row['marketCategoryId'] + '"'
-                            + ' data-category-id="' + row['marketCategoryId'] + '"'
-                            + ' data-contributes-to-category-id="' + row['contributesToMarketCategoryId'] + '"'
-                            + ' data-adds-or-subtracts="' + row['addsOrSubtractsRevenue'] + '"'
+                            + ' id="revenue-detail-' + row['categoryId'] + '"'
+                            + ' data-category-id="' + row['categoryId'] + '"'
+                            + ' data-contributes-to-category-id="' + row['contributesToCategoryId'] + '"'
                             + (row['isTotal'] ? ' disabled' : '')
                             + ' onchange="recalculateTotals();"'
                             + ' value="' + data + '"></input><span class="implicit-thousands">,000</span>';
@@ -425,7 +424,7 @@
                     ],
                     "className": "text-align-right",
                     "render": function (data, type, row) {
-                        return '$<span id="prior-revenue-detail-' + row['marketCategoryId'] + '">' + data
+                        return '$<span id="prior-revenue-detail-' + row['categoryId'] + '">' + data
                             + '</span><span class="implicit-thousands">,000</span>';
                     }
                 },
@@ -1195,7 +1194,6 @@
         var foundInvalidRevenueAmount = false;
         var priorRevenueAmount = 0;
         var contributesToCategoryId = '';
-        var addsOrSubtracts = 0;
         var categoryTotals = {};
         var changeRatio = 0;
 
@@ -1224,7 +1222,6 @@
 
             // calculate the total (if any) that is directly affected by this category
             contributesToCategoryId = $(this).attr("data-contributes-to-category-id");
-            addsOrSubtracts = $(this).attr("data-adds-or-subtracts");
 
             if (contributesToCategoryId != null)
             {
@@ -1232,7 +1229,7 @@
                 {
                     categoryTotals[contributesToCategoryId] = 0;
                 }
-                categoryTotals[contributesToCategoryId] += revenueAmount * addsOrSubtracts;
+                categoryTotals[contributesToCategoryId] += parseInt(revenueAmount);
             }
 
             // recalculate the change % in case the current amount changed
@@ -1251,19 +1248,19 @@
     }
 
     function getRevenueDetailFromPage() {
-        var marketCategoryId = null;
+        var categoryId = null;
         var revenueAmount = null;
         var isTotal = null;
         var revenueDetailFromPage = [];
         $(".revenue-detail").each(function (index, value)
         {
-            marketCategoryId = $(this).attr("data-category-id");
+            categoryId = $(this).attr("data-category-id");
             revenueAmount = $(this).val();
             isTotal = $(this).prop("disabled");
 
             revenueDetailObj = new Object();
             revenueDetailObj = {
-                marketCategoryId: marketCategoryId,
+                categoryId: categoryId,
                 revenueAmount: revenueAmount,
                 isTotal: isTotal
             }
@@ -1360,7 +1357,7 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                saveChanges_getMarketRankStatusSuccess(data, textStatus, jQxhr);
+                saveChanges_getRankStatusSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -1370,7 +1367,7 @@
         $.ajax(url, settings);
     }
 
-    function saveChanges_getMarketRankStatusSuccess(data, textStatus, jQxhr)
+    function saveChanges_getRankStatusSuccess(data, textStatus, jQxhr)
     {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
@@ -1378,23 +1375,23 @@
         }
 
         if (data.report.rows.length == 0) {
-            MKAErrorMessageRtn("Failed to get market rank status");
+            MKAErrorMessageRtn("Failed to get rank status");
             return;
         }
 
-        if (data.report.rows[0].marketRankingInProgress) {
-            bootbox.alert("Market ranking is still in progress");
+        if (data.report.rows[0].rankingInProgress) {
+            bootbox.alert("Ranking is still in progress");
             return;
         }
 
         confirmIfNeeded(
-            data.report.rows[0].marketRanked,
-            "Market will be flagged as unranked",
-            saveChanges_getMarketWarnings
+            data.report.rows[0].ranked,
+            "Year/period will be flagged as unranked",
+            saveChanges_getWarnings
         );
     }
 
-    function saveChanges_getMarketWarnings() {
+    function saveChanges_getWarnings() {
         var url = ServicePrefix + '/api/TVB/UpdateRevenueDetailWarnings';
 
         var settings = {
@@ -1410,7 +1407,7 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                saveChanges_getMarketWarningsSuccess(data, textStatus, jQxhr);
+                saveChanges_getWarningsSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -1421,7 +1418,7 @@
 
     }
 
-    function saveChanges_getMarketWarningsSuccess(data, textStatus, jQxhr) {
+    function saveChanges_getWarningsSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -1500,7 +1497,7 @@
 
         scrollToAnchor("topOfStations");
 
-        if ($("#ddlStation option:selected").index() == 0) {
+        if ($("#ddlStation option:selected").index() == 1) { // index 0 is "Select a station"
             bootbox.alert("Already on first station");
             return;
         }
@@ -1564,12 +1561,7 @@
         $("#ddlYearPeriod").trigger("change");
     }
 
-    function rankMarket() {
-        if ($("#ddlMarket").val() == -1) {
-            bootbox.alert("Must select a market first");
-            return;
-        }
-
+    function rankYearPeriod() {
         var url = ServicePrefix + '/api/TVB/GetYearPeriodOkayToRank';
 
         var settings = {
@@ -1640,15 +1632,10 @@
             return;
         }
 
-        bootbox.alert("Market scheduled for ranking - you should receive an e-mail when it is complete")
+        bootbox.alert("Year/period scheduled for ranking - you should receive an e-mail when it is complete")
     }
 
-    function unrankMarket() {
-        if ($("#ddlMarket").val() == -1) {
-            bootbox.alert("Must select a market first");
-            return;
-        }
-
+    function unrankYearPeriod() {
         var url = ServicePrefix + '/api/TVB/YearPeriodResetReviewAndApproval';
 
         var settings = {
