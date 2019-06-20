@@ -187,7 +187,7 @@
                             <input type="button" style="width:200px" class="marketHistoryButton" onclick="rankMarket();" value="Rank Market" />
                         </div>
                         <div style="display:none;padding-top:5px" id="revisionSection">
-                            <input type="button" style="width:200px"class="marketHistoryButton" onclick="unrankMarket();" value="Un-rank market (revision)" />
+                            <input type="button" style="width:200px"class="marketHistoryButton" onclick="openRevisionDialog()" value="Un-rank market (revision)" />
                         </div>
                         <div style="padding-top:5px">
                             <input type="button" style="width:200px"class="marketHistoryButton" onclick="generateSnapshotReport();" value="Generate Snapshot" />
@@ -288,7 +288,23 @@
             </div>
         </center>
     </div>
-    
+    <div id="revisionDialog" title="" style="display:none">
+        <div>
+            <input type="radio" name="revisionType" value="leave" />&nbsp;Leave old data <font color="green">available</font><br />
+            <input type="radio" name="revisionType" value="remove" />&nbsp;Make old data <font color="red">unavailable</font>
+        </div>
+        <center>
+            NOTE: These comments are part of the email that goes to the client!<br />
+            <textArea style="width:100%;overflow:auto" maxlength="250" id="commentsRevision" placeholder="Enter Revision comments here..."></textArea><hr />
+            <div style="margin-top:5px;margin-bottom:5px">
+
+                <input type="button" id="btnProcessRevision" value="Process" onclick="unrankMarket_initiateRevision()" \>
+            </div>
+            <div style="margin-top:5px;margin-bottom:5px">
+                <input type="button" id="btnCancelRevision" value="Cancel" onclick="cancelItRevision()" \>
+            </div>
+        </center>
+    </div>
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
     <!-- jQuery Easing -->
@@ -389,6 +405,39 @@
             });
         });
     }
+
+    //------------------------
+    // Revision Dialog
+    //------------------------
+    function openRevisionDialog() {
+
+        buildDialogRevision();
+
+        $("#revisionDialog").dialog({ title: 'Revision' });
+
+        $("#revisionDialog").dialog("open");
+        //$("#comments").val($("#InternalCommentText").html());
+    }
+    function buildDialogRevision() {
+
+        $(function () {
+
+            $("#revisionDialog").dialog({
+                autoOpen: false,
+                resizable: false,
+                width: 600,
+                height: 350,
+                modal: true
+            });
+        });
+    }
+    function cancelItRevision() {
+        $("#revisionDialog").dialog("close");
+    }
+    //------------------------
+    // Revision Dialog END
+    //------------------------
+
     function getChangeRatio(revenueAmount, priorRevenueAmount) {
         var changeRatio = 0;
         if (revenueAmount == 0 && priorRevenueAmount == 0) {
@@ -1333,11 +1382,14 @@
         revenueAmountsAllValid = true;
     }
 
-    function getRevenueDetailFromPage() {
+    function getRevenueDetailFromPage()
+    {
+
         var marketCategoryId = null;
         var revenueAmount = null;
         var isTotal = null;
         var revenueDetailFromPage = [];
+
         $(".revenue-detail").each(function (index, value)
         {
             marketCategoryId = $(this).attr("data-category-id");
@@ -1352,11 +1404,15 @@
             }
             revenueDetailFromPage.push(revenueDetailObj);
         });
+
         return revenueDetailFromPage;
     }
 
-    function confirmIfNeeded(isNeeded, confirmMessage, nextFunction) {
-        if (!isNeeded) {
+    function confirmIfNeeded(isNeeded, confirmMessage, nextFunction)
+    {
+
+        if (isNeeded == false)
+        {
             nextFunction();
             return;
         }
@@ -1512,12 +1568,15 @@
         }
 
         var warningMessage = null;
+
         if (data.report.rows.length == 1) {
             warningMessage = data.report.row[0].WarningMessage;
         }
+
         if (data.report.rows.length > 1) {
             warningMessage = "Large changes in revenue";
         }
+
         confirmIfNeeded(
             warningMessage != null,
             warningMessage,
@@ -1525,7 +1584,9 @@
         );
     }
 
-    function saveChanges_saveRevenueDetail() {
+    function saveChanges_saveRevenueDetail()
+    {
+
         var url = ServicePrefix + '/api/MRR/UpdateRevenueDetail';
 
         var settings = {
@@ -1551,7 +1612,9 @@
         $.ajax(url, settings);
     }
 
-    function saveChanges_saveRevenueDetailSuccess(data, textStatus, jQxhr) {
+    function saveChanges_saveRevenueDetailSuccess(data, textStatus, jQxhr)
+    {
+
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -1562,6 +1625,7 @@
 
     function saveChanges_postSaveChanges()
     {
+
         revenueDetailChanged = false;
 
         if (postSaveCallback != null)
@@ -1570,6 +1634,9 @@
         }
         else
         {
+            $.blockUI({ message: 'Station Updated' });
+            setTimeout("$.unblockUI()", 3000);
+
             if ($("#ddlStation option:selected").index() < $("#ddlStation option").length - 1) {
                 moveToNextStation();
             }
@@ -1601,6 +1668,7 @@
     function moveToNextStation()
     {
         scrollToAnchor("topOfStations");
+
         if ($("#ddlStation option:selected").index() == $("#ddlStation option").length - 1) {
             bootbox.alert("Already on last station");
             return;
@@ -1633,11 +1701,14 @@
         $("#ddlYearPeriod").trigger("change");
     }
 
-    function moveToNextPeriod() {
+    function moveToNextPeriod()
+    {
+
         if ($("#ddlYearPeriod option:selected").index() == $("#ddlYearPeriod option").length - 1) {
             bootbox.alert("Already on last period");
             return;
         }
+
         postSaveCallback = moveToNextPeriodSuccess;
         saveChanges();
     }
@@ -1798,7 +1869,30 @@
         });
     }
 
-    function unrankMarket_initiateRevision(leaveOldDataAvailable) {
+    function unrankMarket_initiateRevision()
+    {
+
+
+        if ($('input:radio[name=revisionType]')[0].checked == false &&
+            $('input:radio[name=revisionType]')[1].checked == false)
+        {
+            bootbox.alert("You must select how you would like to leave the old data");
+            return;
+        }
+
+        var leaveOldDataAvailable = true;
+        
+        if ($('input:radio[name=revisionType]')[0].checked == true)
+        {
+            leaveOldDataAvailable = true;
+        }
+        else
+        {
+            leaveOldDataAvailable = false;
+        }
+        
+        cancelItRevision(); // closes the dialog
+
         var url = ServicePrefix + '/api/MRR/MarketYearPeriodInitiateRevision';
 
         var settings = {
@@ -1824,7 +1918,9 @@
         $.ajax(url, settings);
     }
 
-    function unrankMarket_initiateRevisionSuccess(data, textStatus, jQxhr) {
+    function unrankMarket_initiateRevisionSuccess(data, textStatus, jQxhr)
+    {
+
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
