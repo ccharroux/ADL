@@ -1382,11 +1382,14 @@
         revenueAmountsAllValid = true;
     }
 
-    function getRevenueDetailFromPage() {
+    function getRevenueDetailFromPage()
+    {
+
         var marketCategoryId = null;
         var revenueAmount = null;
         var isTotal = null;
         var revenueDetailFromPage = [];
+
         $(".revenue-detail").each(function (index, value)
         {
             marketCategoryId = $(this).attr("data-category-id");
@@ -1401,11 +1404,15 @@
             }
             revenueDetailFromPage.push(revenueDetailObj);
         });
+
         return revenueDetailFromPage;
     }
 
-    function confirmIfNeeded(isNeeded, confirmMessage, nextFunction) {
-        if (!isNeeded) {
+    function confirmIfNeeded(isNeeded, confirmMessage, nextFunction)
+    {
+
+        if (isNeeded == false)
+        {
             nextFunction();
             return;
         }
@@ -1561,12 +1568,15 @@
         }
 
         var warningMessage = null;
+
         if (data.report.rows.length == 1) {
             warningMessage = data.report.row[0].WarningMessage;
         }
+
         if (data.report.rows.length > 1) {
             warningMessage = "Large changes in revenue";
         }
+
         confirmIfNeeded(
             warningMessage != null,
             warningMessage,
@@ -1574,7 +1584,9 @@
         );
     }
 
-    function saveChanges_saveRevenueDetail() {
+    function saveChanges_saveRevenueDetail()
+    {
+
         var url = ServicePrefix + '/api/MRR/UpdateRevenueDetail';
 
         var settings = {
@@ -1600,7 +1612,9 @@
         $.ajax(url, settings);
     }
 
-    function saveChanges_saveRevenueDetailSuccess(data, textStatus, jQxhr) {
+    function saveChanges_saveRevenueDetailSuccess(data, textStatus, jQxhr)
+    {
+
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -1611,6 +1625,7 @@
 
     function saveChanges_postSaveChanges()
     {
+
         revenueDetailChanged = false;
 
         if (postSaveCallback != null)
@@ -1619,6 +1634,9 @@
         }
         else
         {
+            $.blockUI({ message: 'Station Updated' });
+            setTimeout("$.unblockUI()", 3000);
+
             if ($("#ddlStation option:selected").index() < $("#ddlStation option").length - 1) {
                 moveToNextStation();
             }
@@ -1650,6 +1668,7 @@
     function moveToNextStation()
     {
         scrollToAnchor("topOfStations");
+
         if ($("#ddlStation option:selected").index() == $("#ddlStation option").length - 1) {
             bootbox.alert("Already on last station");
             return;
@@ -1682,11 +1701,14 @@
         $("#ddlYearPeriod").trigger("change");
     }
 
-    function moveToNextPeriod() {
+    function moveToNextPeriod()
+    {
+
         if ($("#ddlYearPeriod option:selected").index() == $("#ddlYearPeriod option").length - 1) {
             bootbox.alert("Already on last period");
             return;
         }
+
         postSaveCallback = moveToNextPeriodSuccess;
         saveChanges();
     }
