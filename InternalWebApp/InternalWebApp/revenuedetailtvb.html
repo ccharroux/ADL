@@ -299,6 +299,7 @@
     var revenueDetailChanged = false;
     var revenueAmountsAllValid = true;
     var postSaveCallback = null;
+    var minimumPercentSubmittedBeforeRank = 80;
 
     $(document).ready(function () {
 
@@ -1041,15 +1042,8 @@
 
         if (message.length == 0) {
             message = "Preparing";
-            // *** TVB doesn't work this way, it can rank even if some stations are not submitted
-            // hide all market history functionality
-            //$(".marketHistoryButton").hide();
         }
         else {
-            // show it, all market history functionality
-            // but if not ranked, we will hide the revision button later in this
-            // routine
-            $(".marketHistoryButton").show();
             message = message + (data.report.rows[0].isRanked
                                                                 ? " RANKED <br><strong>by:</strong> " + data.report.rows[0].rankUser + " <strong>on:</strong> " + data.report.rows[0].rankDateTime
                                                                 : " NOT RANKED"
@@ -1131,6 +1125,14 @@
         var totalCount = data.report.rows[0].totalCount;
         var submittedPercent = Math.round(1000 * submittedCount / totalCount) / 10; // one decimal place, .toFixed() apparently has occasional float weirdness
         var newText = submittedPercent + "% (" + submittedCount + " of " + totalCount + ")";
+
+        if (submittedPercent >= minimumPercentSubmittedBeforeRank) {
+            $(".marketHistoryButton").show();
+        } else {
+            $(".marketHistoryButton").hide();
+            newText += " - need at least " + minimumPercentSubmittedBeforeRank + "% before ranking";
+        }
+
         $("#TimeSalesStationsSubmitted").text(newText);
     }
 
