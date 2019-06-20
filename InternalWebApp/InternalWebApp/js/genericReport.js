@@ -125,8 +125,10 @@ reportName.push("rptMRRRevenueEntryMissingList");
 reportName.push("rptAdvertiserAgencyRevenueList");
 reportName.push("rptMRRMarketDistributionList");
 
-
 reportName.push("rptOwnershipProductList");
+
+reportName.push("rptEmailStatusList");
+
 
 function buildReportArray()
 {
@@ -4719,6 +4721,52 @@ function getReportObject_OwnershipProductList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'owner',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_EmailStatusList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "EmailStatus",
+        objectName: "ddlEmailStatus",
+        jsCall: "getEmailStatusList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "EmailDaysBack",
+        objectName: "ddlEmailDaysBack",
+        jsCall: "getEmailDaysBackList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+    return arrayFilters;
+}
+function getReportObject_EmailStatusList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "Email Status",
+        apiControllerAction: "/api/Email/GetEmailStatus",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'tech',
         autoUpdate: false
     }
 
