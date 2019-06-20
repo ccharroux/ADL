@@ -128,6 +128,10 @@
                             <label for="ddlAsyncJobDaysBack" class="dropdown-label rptView rptAsyncJobDaysBack">Send Date<br />Days Back</label>
                             <select id="ddlAsyncJobDaysBack" apiInput="inDaysBack" class="dropdown-select rptView rptAsyncJobDaysBack"></select>
                         </div>
+                        <div class="form-group rptView rptParentMarketCategoryTemplate">
+                            <label for="ddlParentMarketCategoryTemplate" class="dropdown-label rptView rptParentMarketCategoryTemplate">Category Template</label>
+                            <select id="ddlParentMarketCategoryTemplate" apiInput="inParentMarketCategoryTemplateId" class="dropdown-select rptView rptParentMarketCategoryTemplate"></select>
+                        </div>
                         <div class="form-group rptView rptProduct" >
                             <label for="ddlProduct" class="dropdown-label rptView rptProduct">Product</label>
                             <select id="ddlProduct" apiInput="inProductId" class="dropdown-select rptView rptProduct"></select>
@@ -354,6 +358,7 @@
         {
             $("#btnReport").show();
             loadAdvancedSearch();
+
             if (getRequiredFiltersCount() == 0)
             {
                 getReport();
@@ -1246,6 +1251,50 @@
  
 
     }
+
+    function getParentMarketCategoryTemplateHeaders() {
+        $.ajax({
+            url: ServicePrefix + '/api/ParentMarketCategoryTemplate/GetParentMarketCategoryTemplateHeaderList?inApiToken=' + getLocalStorage("APIToken"),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textType, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    var str = '';
+
+                    str = "<option value=''>-- Select a Template --</option>";
+
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+
+                        str = str + "<option value='" + obj.templateId + "'>" + obj['template Description'] + "</option>";
+
+                    });
+
+                    $("#ddlParentMarketCategoryTemplate").append(str);
+
+                    //if (data.report.rows.length == 1) {
+                    //    //automatically load the categories or should automatically load the first one
+                    //    $("#ddlCategoryTemplates option:first").attr('selected', 'selected');
+                    //    $("#ddlCategoryTemplates").click();
+                    //}
+                }
+
+            },
+            error: function (jqXhr, textType, errorThrown) {
+                genericAjaxError(jqXhr, textType, errorThrown);
+            }
+        });
+    }
+
     //--------------------------------
     // Filters get loaded end here
     //--------------------------------

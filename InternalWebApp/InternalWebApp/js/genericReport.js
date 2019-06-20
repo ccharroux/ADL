@@ -3745,8 +3745,16 @@ function getReportObject_AdminDeviceList() {
 function getReportFilterArray_ParentMarketCategoryTemplateList() {
 
     var arrayFilters = new Array();
-    var arrayObject = new Object();
  
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "ParentMarketCategoryTemplate",
+        jsCall: "getParentMarketCategoryTemplateHeaders",
+        objectName: "ddlParentMarketCategoryTemplate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
 
     return arrayFilters;
 }
@@ -3760,7 +3768,7 @@ function getReportObject_ParentMarketCategoryTemplateList() {
     tempObject =
     {
         reportTitle: "DMA Market Category Template List",
-        apiControllerAction: "/api/DMAReport/GetParentMarketCategoryTemplateList",
+        apiControllerAction: "/api/ParentMarketCategoryTemplate/GetParentMarketCategoryTemplateByTemplateId",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'dma'
