@@ -163,7 +163,7 @@
                 <div class="row marketStatus" style="display:none;border:silver solid 1px;background:#F7F1F1;border-radius:15px;padding-bottom:5px">
                     <div class="col-md-6">
                         <div>
-                            <input type="hidden" id="revision" value="0" />
+                            <input type="hidden" id="hidRevision" value="0" />
                             <label for="MarketRanked"><u>Market Status</u> </label><br />
                             <div id="MarketRanked"></div>
                         </div>
@@ -182,14 +182,14 @@
                     </div> 
 
  
-                    <div class="col-md-6" style="text-align:center">
+                    <div class="col-md-6 rankSection" style="text-align:center"  >
                         <div style="padding-top:5px">
                             <input type="button" style="width:200px" class="marketHistoryButton" onclick="rankMarket();" value="Rank Market" />
                         </div>
                         <div style="display:none;padding-top:5px" id="revisionSection">
                             <input type="button" style="width:200px"class="marketHistoryButton" onclick="openRevisionDialog()" value="Un-rank market (revision)" />
                         </div>
-                        <div style="padding-top:5px">
+                        <div style="padding-top:5px" class="rankSection">
                             <input type="button" style="width:200px"class="marketHistoryButton" onclick="generateSnapshotReport();" value="Generate Snapshot" />
                         </div>
                     </div>
@@ -279,7 +279,8 @@
 
     <div id="internalCommentDialog" title="" style="display:none">
          <center>
-            <textArea style="width:100%;overflow:auto" maxlength="250" id="comments" placeholder="Enter comments here..."></textArea><hr />
+            <textArea style="width:100%;overflow:auto" maxlength="250" id="comments" placeholder="Enter comments here..."></textArea>
+             <hr />
             <div style="margin-top:5px;margin-bottom:5px">
                 <input type="button" id="btnProcess" value="Process" onclick="updateMarketHistoryComment()" \>
             </div>
@@ -294,8 +295,7 @@
             <input type="radio" name="revisionType" value="remove" />&nbsp;Make old data <font color="red">unavailable</font>
         </div>
         <center>
-            NOTE: These comments are part of the email that goes to the client!<br />
-            <textArea style="width:100%;overflow:auto" maxlength="250" id="commentsRevision" placeholder="Enter Revision comments here..."></textArea><hr />
+
             <div style="margin-top:5px;margin-bottom:5px">
 
                 <input type="button" id="btnProcessRevision" value="Process" onclick="unrankMarket_initiateRevision()" \>
@@ -305,6 +305,33 @@
             </div>
         </center>
     </div>
+    <div id="rankDialog" title="" style="display:none">
+ 
+        <center>
+
+            <div style="margin-top:5px;margin-bottom:5px;display:none" id="divExternalCommentsRank">
+                External Client facing comments<br />
+                <textArea style="width:100%;overflow:auto" maxlength="250" id="externalCommentsRank" placeholder="Enter external comments here..."></textArea>
+             </div>
+            <div style="margin-top:5px;margin-bottom:5px">
+                Internal Market comments<br />
+                <textArea style="width:100%;overflow:auto" maxlength="250" id="internalCommentsRank" placeholder="Enter internal comments here..."></textArea>
+            </div>
+
+            <hr />
+            <div style="margin-top:5px;margin-bottom:5px">
+
+                <input type="button" id="btnProcessRank" value="Process" onclick="rankMarket_okayToRankSuccessAJAX()" \>
+            </div>
+
+            <div style="margin-top:5px;margin-bottom:5px">
+                <input type="button" id="btnCancelRank" value="Cancel" onclick="cancelItRank()" \>
+            </div>
+
+        </center>
+    </div>
+
+
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
     <!-- jQuery Easing -->
@@ -412,6 +439,8 @@
     function openRevisionDialog() {
 
         buildDialogRevision();
+        $('input:radio[name=revisionType]')[0].checked = false; 
+        $('input:radio[name=revisionType]')[1].checked = false;
 
         $("#revisionDialog").dialog({ title: 'Revision' });
 
@@ -426,13 +455,56 @@
                 autoOpen: false,
                 resizable: false,
                 width: 600,
-                height: 350,
+                height: 200,
                 modal: true
             });
         });
     }
     function cancelItRevision() {
         $("#revisionDialog").dialog("close");
+    }
+    //------------------------
+    // Revision Dialog END
+    //------------------------
+
+    //------------------------
+    // Rank Dialog
+    //------------------------
+    function openRankDialog() {
+
+        buildDialogRank();
+
+        $("#rankDialog").dialog({ title: 'Rank' });
+
+        $("#rankDialog").dialog("open");
+
+        $("#externalCommentsRank").val("");
+        $("#internalCommentsRank").val($("#InternalCommentText").html());
+
+        if ($("#hidRevision").val() == "0")
+        {
+            $("#divExternalCommentsRank").hide();
+        }
+        else
+        {
+            $("#divExternalCommentsRank").show();
+        }
+    }
+    function buildDialogRank() {
+
+        $(function () {
+
+            $("#rankDialog").dialog({
+                autoOpen: false,
+                resizable: false,
+                width: 600,
+                height: 420,
+                modal: true
+            });
+        });
+    }
+    function cancelItRank() {
+        $("#rankDialog").dialog("close");
     }
     //------------------------
     // Revision Dialog END
@@ -617,6 +689,9 @@
         });
     }
 
+    //--------------
+    // Filters
+    //--------------
     function getMediaTypes() {
         var url = ServicePrefix + '/api/MediaType/GetMediaTypeList';
 
@@ -803,6 +878,10 @@
         gotYearsPeriods = true;
         getRevenueDetail();
     }
+
+    //--------------
+    // Filters END
+    //--------------
 
     function setStationLabels()
     {
@@ -1243,7 +1322,7 @@
         $(".divInternalComment").hide();
         $(".divExternalComment").hide();
 
-        $("#revision").val((data.report.rows[0].revision || 0));
+        $("#hidRevision").val((data.report.rows[0].revision || 0));
         $("#InternalCommentText").html("");
  
 
@@ -1272,6 +1351,12 @@
             $("#revisionSection").hide();
         
         }
+
+        // This does not complete the 
+        // rank process, the variable passed 
+        // is bDisplay only, it gives us fuller 
+        // status of the market
+        rankMarket(true);
     }
 
 
@@ -1718,8 +1803,17 @@
         $("#ddlYearPeriod").get(0).selectedIndex = nextIndex;
         $("#ddlYearPeriod").trigger("change");
     }
-    
-    function rankMarket() {
+
+    //-------------------------
+    // Rank Market
+    //-------------------------
+    function rankMarket(bDisplayOnly)
+    {
+        if (!bDisplayOnly)
+        {
+            bDisplayOnly = false;
+        }
+
         if ($("#ddlMarket").val() == -1) {
             bootbox.alert("Must select a market first");
             return;
@@ -1739,7 +1833,9 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                rankMarket_okayToRankSuccess(data, textStatus, jQxhr);
+ 
+                rankMarket_okayToRankSuccess(data, textStatus, jQxhr, bDisplayOnly);
+ 
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -1749,7 +1845,8 @@
         $.ajax(url, settings);
     }
 
-    function rankMarket_okayToRankSuccess(data, textStatus, jQxhr) {
+    function rankMarket_okayToRankSuccess(data, textStatus, jQxhr, bDisplayOnly) {
+
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -1760,11 +1857,35 @@
             return;
         }
 
-        if (!data.report.rows[0].okayToRank) {
-            bootbox.alert(data.report.rows[0].reasonNotOkayToRank);
-            return;
-        }
+        var row = data.report.rows[0];
+        if (bDisplayOnly == false) {
+            if (row.okayToRank == false) {
+                bootbox.alert(row.reasonNotOkayToRank);
+                return;
+            }
 
+            openRankDialog();
+        }
+        else
+        {
+            // set some screen variables...
+            if (row.okayToRank == false)
+            {
+                $("#MarketRanked").append("<div><b><u>Market Rank Status</u></b><br>" + row.reasonNotOkayToRank + "</div>");
+                // hide buttons
+                $(".rankSection").hide();
+            }
+            else
+            {
+                // show buttons
+                $(".rankSection").show();
+            }
+
+        }
+    }
+
+    function rankMarket_okayToRankSuccessAJAX()
+    {
         var url = ServicePrefix + '/api/MRR/QueueMarketRank';
 
         var settings = {
@@ -1776,8 +1897,8 @@
                 "inMarketId": $("#ddlMarket").val(),
                 "inYear": currentRevenueYear(),
                 "inPeriod": currentRevenuePeriod(),
-                "inInternalRevisionMessage": $("#txtInternalRevisionMessage").val(),
-                "inClientRevisionMessage": $("#txtClientRevisionMessage").val()
+                "inInternalRevisionMessage": $("#internalCommentsRank").val(),
+                "inClientRevisionMessage": $("#externalCommentsRank").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -1791,15 +1912,24 @@
         $.ajax(url, settings);
     }
 
-    function rankMarket_queueRankingSuccess(data, textStatus, jQxhr) {
+    function rankMarket_queueRankingSuccess(data, textStatus, jQxhr)
+    {
+
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
+        // Close Rank Dialog
+        cancelItRank();
+
         bootbox.alert("Market scheduled for ranking - you should receive an e-mail when it is complete")
     }
 
+
+    // ------------------
+    // Unrank Market  
+    //-------------------
     function unrankMarket() {
         if ($("#ddlMarket").val() == -1) {
             bootbox.alert("Must select a market first");
@@ -1829,7 +1959,6 @@
 
         $.ajax(url, settings);
     }
-
     function unrankMarket_resetReviewAndApprovalSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
@@ -1869,28 +1998,28 @@
         });
     }
 
-    function unrankMarket_initiateRevision()
-    {
+
+    // ------------------
+    // Unrank Market Initiate Revision
+    //-------------------
+    function unrankMarket_initiateRevision() {
 
 
         if ($('input:radio[name=revisionType]')[0].checked == false &&
-            $('input:radio[name=revisionType]')[1].checked == false)
-        {
+            $('input:radio[name=revisionType]')[1].checked == false) {
             bootbox.alert("You must select how you would like to leave the old data");
             return;
         }
 
         var leaveOldDataAvailable = true;
-        
-        if ($('input:radio[name=revisionType]')[0].checked == true)
-        {
+
+        if ($('input:radio[name=revisionType]')[0].checked == true) {
             leaveOldDataAvailable = true;
         }
-        else
-        {
+        else {
             leaveOldDataAvailable = false;
         }
-        
+
         cancelItRevision(); // closes the dialog
 
         var url = ServicePrefix + '/api/MRR/MarketYearPeriodInitiateRevision';
@@ -1917,7 +2046,6 @@
 
         $.ajax(url, settings);
     }
-
     function unrankMarket_initiateRevisionSuccess(data, textStatus, jQxhr)
     {
 
@@ -1928,12 +2056,14 @@
 
         unrankMarket_indicateOverallSuccess();
     }
-
     function unrankMarket_indicateOverallSuccess() {
+        showMarketRankedStatus();
         bootbox.alert("Market has been un-ranked");
     }
 
-
+    // ------------------
+    // Update Market History
+    //-------------------
     function updateMarketHistoryComment() {
 
 
@@ -1963,6 +2093,7 @@
                 "inMarketId": $("#ddlMarket").val(),
                 "inRevenueYear": $("#ddlYearPeriod").val().toString().substring(0, 4),
                 "inRevenuePeriod": $("#ddlYearPeriod").val().toString().substring(4, 6),
+                "inRevision": $("#hidRevision").val(),
                 "inDescription": $("#comments").val()
             }),
             processData: false,
@@ -1990,6 +2121,9 @@
  
     }
 
+    //-------------------
+    // Update Station Comment 
+    //-------------------
     function updateStationComment()
     {
 
@@ -2039,6 +2173,10 @@
             bootbox.alert("Station Comment Updated");
         }
     }
+
+    //-------------------
+    // Snapshot 
+    //-------------------
     function generateSnapshotReport() {
         var settings = {
             dataType: 'json',
