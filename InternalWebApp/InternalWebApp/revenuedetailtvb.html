@@ -1382,12 +1382,12 @@
         confirmIfNeeded(
             data.report.rows[0].ranked,
             "Year/period will be flagged as unranked",
-            saveChanges_getWarnings
+            saveChanges_updateRevenueDetailInternalEdit
         );
     }
 
-    function saveChanges_getWarnings() {
-        var url = ServicePrefix + '/api/TVB/UpdateRevenueDetailWarnings';
+    function saveChanges_updateRevenueDetailInternalEdit() {
+        var url = ServicePrefix + '/api/TVB/UpdateRevenueDetailInternalEdit';
 
         var settings = {
             dataType: 'json',
@@ -1399,6 +1399,37 @@
                 "inYear": currentRevenueYear(),
                 "inPeriod": currentRevenuePeriod(),
                 "inRevenueDetail": getRevenueDetailFromPage()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                saveChanges_updateRevenueDetailInternalEditSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function saveChanges_updateRevenueDetailInternalEditSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var url = ServicePrefix + '/api/TVB/GetRevenueDetailWarningsInternalEdit';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": $("#ddlStation").val(),
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
