@@ -1393,12 +1393,21 @@ function getPeriodList(inType) {
 
 function convertToChosenSelect(selectName, allowSearchContains, allowSplitWordSearch) {
 
+    //This sets up up the properties for the Chosen dropdown.
+    //All of the other properties are set to default values.
     $("#" + selectName).chosen({
         inherit_select_classes: true,
+        //This defaults to false for allowing contains searches. 
+        //Passing in the parameter in case we decide to allow contains searches.
         search_contains: allowSearchContains,
+        //This allows for searching on word breaks. 
+        //This is different from a contains search since it only looks at the beginning of words.
+        //This defaults to true. Passing the value in because we only want it to start with 
+        //beginning of the first word. We can pass true to turn on the feature.
         enable_split_word_search: allowSplitWordSearch
     });
 
+    //This code reloads the dropdown to pick up new values.
     $("#" + selectName).trigger("chosen:updated");
 }
 
