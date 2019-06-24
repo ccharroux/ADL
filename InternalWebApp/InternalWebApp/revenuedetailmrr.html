@@ -1619,8 +1619,8 @@
         );
     }
 
-    function saveChanges_getMarketWarnings() {
-        var url = ServicePrefix + '/api/MRR/UpdateRevenueDetailWarnings';
+    function saveChanges_updateRevenueDetailInternalEdit() {
+        var url = ServicePrefix + '/api/MRR/UpdateRevenueDetailInternalEdit';
 
         var settings = {
             dataType: 'json',
@@ -1632,6 +1632,37 @@
                 "inYear": currentRevenueYear(),
                 "inPeriod": currentRevenuePeriod(),
                 "inRevenueDetail": getRevenueDetailFromPage()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                saveChanges_updateRevenueDetailInternalEditSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function saveChanges_updateRevenueDetailInternalEditSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var url = ServicePrefix + '/api/MRR/GetRevenueDetailWarningsInternalEdit';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": $("#ddlStation").val(),
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -1936,7 +1967,7 @@
             return;
         }
 
-        var url = ServicePrefix + '/api/MRR/MarketYearPeriodResetReviewAndApproval';
+        var url = ServicePrefix + '/api/MRR/UpdateMarketReviewAndApproval';
 
         var settings = {
             dataType: 'json',
@@ -2022,7 +2053,7 @@
 
         cancelItRevision(); // closes the dialog
 
-        var url = ServicePrefix + '/api/MRR/MarketYearPeriodInitiateRevision';
+        var url = ServicePrefix + '/api/MRR/InitiateMarketRevision';
 
         var settings = {
             dataType: 'json',
