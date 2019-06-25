@@ -903,7 +903,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Markets") + '">Market Menu<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block"><a href="/marketlist.html" role="button" aria-expanded="false">Markets </a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/marketlist.html?NonPrimaryOnly=true">Complementary</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/marketlist.html?NonPrimaryOnly=true">Complimentary</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/parentmarketlist.html">Parent</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
