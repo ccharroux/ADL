@@ -75,7 +75,7 @@
                             <label for="ddlMarket">Market</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlMarket" class="mkaRequired field-width-325" errorMessage="You must select a market." onchange="getOwnerList();"></select>
+                            <select id="ddlMarket" class="mkaRequired field-width-325" errorMessage="You must select a market." onchange="marketChanged = true; getOwnerList();"></select>
                         </div>
                     </div>
                     <!--Old Ownership-->
@@ -84,7 +84,7 @@
                             <label for="ddlOldOwnership">Old Ownership</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlOldOwnership" class="mkaRequired field-width-325" errorMessage="You must select an old ownership." onchange="getDetails();"></select>
+                            <select id="ddlOldOwnership" class="mkaRequired field-width-325" errorMessage="You must select an old ownership." onchange="oldOwnerChanged = true; getDetails();"></select>
                         </div>
                     </div>
                     <!--New Ownership-->
@@ -93,7 +93,7 @@
                             <label for="ddlNewOwnership">New Ownership</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlNewOwnership" class="mkaRequired field-width-325" errorMessage="You must select a new ownership." onchange="getMarketList();"></select>
+                            <select id="ddlNewOwnership" class="mkaRequired field-width-325" errorMessage="You must select a new ownership." onchange="newOwnerChanged = true; getMarketList();"></select>
                         </div>
                     </div>
                 </div>
@@ -204,6 +204,72 @@
                             <tfoot>
                                 <tr>
                                     <th>Name</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 text-align-center">
+                        <h3>Old owner's user station roles</h3>
+                        <table id="dtOldUserStationRoles" class="stripe oldOwnerDetails">
+                            <thead>
+                                <tr>
+                                    <th class="exportColumn text-align-right">Personnel ID</th>
+                                    <th class="exportColumn">Email</th>
+                                    <th class="exportColumn text-align-right">Station ID</th>
+                                    <th class="exportColumn">Station</th>
+                                    <th class="exportColumn">Report / Access</th>
+                                    <th class="exportColumn">Manager</th>
+                                    <th class="exportColumn">Contact</th>
+                                    <th class="exportColumn">Submitter</th>
+                                    <th class="exportColumn">Personnel Linked to Owner</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-align-right">Personnel ID</th>
+                                    <th>Email</th>
+                                    <th class="text-align-right">Station ID</th>
+                                    <th>Station</th>
+                                    <th>Report / Access</th>
+                                    <th>Manager</th>
+                                    <th>Contact</th>
+                                    <th>Submitter</th>
+                                    <th>Personnel Linked to Owner</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 text-align-center">
+                        <h3>New owner's user station roles</h3>
+                        <table id="dtNewUserStationRoles" class="stripe newOwnerDetails">
+                            <thead>
+                                <tr>
+                                    <th class="exportColumn text-align-right">Personnel ID</th>
+                                    <th class="exportColumn">Email</th>
+                                    <th class="exportColumn text-align-right">Station ID</th>
+                                    <th class="exportColumn">Station</th>
+                                    <th class="exportColumn">Report / Access</th>
+                                    <th class="exportColumn">Manager</th>
+                                    <th class="exportColumn">Contact</th>
+                                    <th class="exportColumn">Submitter</th>
+                                    <th class="exportColumn">Personnel Linked to Owner</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-align-right">Personnel ID</th>
+                                    <th>Email</th>
+                                    <th class="text-align-right">Station ID</th>
+                                    <th>Station</th>
+                                    <th>Report / Access</th>
+                                    <th>Manager</th>
+                                    <th>Contact</th>
+                                    <th>Submitter</th>
+                                    <th>Personnel Linked to Owner</th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -384,6 +450,10 @@
     var marketsRefreshed = false;
     var ownersRefreshed = false;
 
+    var marketChanged = true;
+    var oldOwnerChanged = true;
+    var newOwnerChanged = true;
+
     $(document).ready(function () {
         buildMainMenu("Stations");
         $(".oldOwnerDetails").hide();
@@ -491,6 +561,9 @@
                 return false;
             }
         });
+        if (!previousMarketIdStillInList) {
+            marketChanged = true;
+        }
         $("#ddlMarket").val(previousMarketIdStillInList ? previousMarketId : -1);
 
         marketsRefreshed = true;
@@ -565,6 +638,9 @@
                 return false;
             }
         });
+        if (!previousOldOwnerIdStillInList) {
+            oldOwnerChanged = true;
+        }
         $("#ddlOldOwnership").val(previousOldOwnerIdStillInList ? previousOldOwnerId : -1);
 
         var previousNewOwnerIdStillInList = false;
@@ -574,6 +650,9 @@
                 return false;
             }
         });
+        if (!previousNewOwnerIdStillInList) {
+            newOwnerChanged = true;
+        }
         $("#ddlNewOwnership").val(previousNewOwnerIdStillInList ? previousNewOwnerId : -1);
 
         gotOwners = true;
@@ -614,18 +693,32 @@
             return;
         }
 
-        getStations();
-        getUsers();
-        getAEs();
-        getUserAELinks();
-        getAEAssignments();
+        var oldOrNew;
+        if ((marketChanged || oldOwnerChanged) && oldOwnerId != -1) {
+            oldOrNew = "Old";
+            getStations(oldOrNew);
+            getUsers(oldOrNew);
+            getAEs(oldOrNew);
+            getUserStationRoles(oldOrNew);
+            getUserAELinks(oldOrNew);
+            getAEAssignments(oldOrNew);
+        }
+        if ((marketChanged || newOwnerChanged) && newOwnerId != -1) {
+            oldOrNew = "New";
+            getStations(oldOrNew);
+            getUsers(oldOrNew);
+            getAEs(oldOrNew);
+            getUserStationRoles(oldOrNew);
+            getUserAELinks(oldOrNew);
+            getAEAssignments(oldOrNew);
+        }
 
     }
 
-    function getStations() {
+    function getStations(oldOrNew) {
 
         var marketId = $("#ddlMarket").val();
-        var ownerId = $("#ddlOldOwnership").val();
+        var ownerId = $("#ddl" + oldOrNew + "Ownership").val();
 
         var url = ServicePrefix + '/api/Station/GetStationListByProductMarketOwner';
 
@@ -641,43 +734,25 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getStationsSuccess(data, textStatus, jQxhr, "Old");
+                getStationsSuccess(data, textStatus, jQxhr, oldOrNew);
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
             }
         };
 
-        if (ownerId != -1) {
-            $.ajax(url, settings);
-        }
-
-        ownerId = $("#ddlNewOwnership").val();
-
-        settings.data = JSON.stringify({
-            "inApiToken": getLocalStorage("APIToken"),
-            "inMarketId": marketId,
-            "inOwnerId": ownerId,
-            "inProductId": "XRY"
-        });
-        settings.success = function (data, textStatus, jQxhr) {
-            getStationsSuccess(data, textStatus, jQxhr, "New");
-        };
-
-        if (ownerId != -1) {
-            $.ajax(url, settings);
-        }
+        $.ajax(url, settings);
 
     }
 
-    function getStationsSuccess(data, textStatus, jQxhr, OldOrNew) {
+    function getStationsSuccess(data, textStatus, jQxhr, oldOrNew) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
-        var stationsTableId = "dt" + OldOrNew + "Stations";
+        var stationsTableId = "dt" + oldOrNew + "Stations";
 
         $("#" + stationsTableId).DataTable({
             "destroy": true,
@@ -706,10 +781,10 @@
 
     }
 
-    function getUsers() {
+    function getUsers(oldOrNew) {
 
         var marketId = $("#ddlMarket").val();
-        var ownerId = $("#ddlOldOwnership").val();
+        var ownerId = $("#ddl" + oldOrNew + "Ownership").val();
 
         var url = ServicePrefix + '/api/Personnel/GetPersonnelListByProductMarketOwner';
 
@@ -725,43 +800,25 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getUsersSuccess(data, textStatus, jQxhr, "Old");
+                getUsersSuccess(data, textStatus, jQxhr, oldOrNew);
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
             }
         };
 
-        if (ownerId != -1) {
-            $.ajax(url, settings);
-        }
-
-        ownerId = $("#ddlNewOwnership").val();
-
-        settings.data = JSON.stringify({
-            "inApiToken": getLocalStorage("APIToken"),
-            "inMarketId": marketId,
-            "inOwnerId": ownerId,
-            "inProductId": "XRY"
-        });
-        settings.success = function (data, textStatus, jQxhr) {
-            getUsersSuccess(data, textStatus, jQxhr, "New");
-        };
-
-        if (ownerId != -1) {
-            $.ajax(url, settings);
-        }
+        $.ajax(url, settings);
 
     }
 
-    function getUsersSuccess(data, textStatus, jQxhr, OldOrNew) {
+    function getUsersSuccess(data, textStatus, jQxhr, oldOrNew) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
-        var usersTableId = "dt" + OldOrNew + "Users";
+        var usersTableId = "dt" + oldOrNew + "Users";
 
         $("#" + usersTableId).DataTable({
             "destroy": true,
@@ -784,10 +841,10 @@
 
     }
 
-    function getAEs() {
+    function getAEs(oldOrNew) {
 
         var marketId = $("#ddlMarket").val();
-        var ownerId = $("#ddlOldOwnership").val();
+        var ownerId = $("#ddl" + oldOrNew + "Ownership").val();
 
         var url = ServicePrefix + '/api/XRAY/GetAEListByMarketOwner';
 
@@ -802,43 +859,25 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getAEsSuccess(data, textStatus, jQxhr, "Old");
+                getAEsSuccess(data, textStatus, jQxhr, oldOrNew);
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
             }
         };
 
-        if (ownerId != -1) {
-            $.ajax(url, settings);
-        }
-
-        ownerId = $("#ddlNewOwnership").val();
-
-        settings.data = JSON.stringify({
-            "inApiToken": getLocalStorage("APIToken"),
-            "inMarketId": marketId,
-            "inOwnerId": ownerId,
-            "inProductId": "XRY"
-        });
-        settings.success = function (data, textStatus, jQxhr) {
-            getAEsSuccess(data, textStatus, jQxhr, "New");
-        };
-
-        if (ownerId != -1) {
-            $.ajax(url, settings);
-        }
+        $.ajax(url, settings);
 
     }
 
-    function getAEsSuccess(data, textStatus, jQxhr, OldOrNew) {
+    function getAEsSuccess(data, textStatus, jQxhr, oldOrNew) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
-        var aesTableId = "dt" + OldOrNew + "AEs";
+        var aesTableId = "dt" + oldOrNew + "AEs";
 
         $("#" + aesTableId).DataTable({
             "destroy": true,
@@ -858,10 +897,84 @@
 
     }
 
-    function getUserAELinks() {
+    function getUserStationRoles(oldOrNew) {
 
         var marketId = $("#ddlMarket").val();
-        var ownerId = $("#ddlOldOwnership").val();
+        var ownerId = $("#ddl" + oldOrNew + "Ownership").val();
+
+        var url = ServicePrefix + '/api/Personnel/GetPersonnelAssignmentListByMarketOwner';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId,
+                "inOwnerId": ownerId,
+                "inProductId": "XRY"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getUserStationRolesSuccess(data, textStatus, jQxhr, oldOrNew);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getUserStationRolesSuccess(data, textStatus, jQxhr, oldOrNew) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var userStationRolesTableId = "dt" + oldOrNew + "UserStationRoles";
+
+        $("#" + userStationRolesTableId).DataTable({
+            "destroy": true,
+            "dom": "Blfrtip",
+            "pageLength": 10,
+            "columns": [
+                { "data": 'PersonnelId' },
+                { "data": 'Email' },
+                { "data": 'StationId' },
+                { "data": 'Station' },
+                { "data": 'Report/Access' },
+                { "data": 'Manager' },
+                { "data": 'Contact' },
+                { "data": 'Submitter' },
+                { "data": 'PersonnelLinkedToOwner' }
+            ],
+            "columnDefs": [
+                {
+                    "targets": [
+                        0, // PersonnelId
+                        2 // StationId
+                    ],
+                    "className": "text-align-right"
+                }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [],
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+        populateDataTable(userStationRolesTableId, data);
+
+    }
+
+    function getUserAELinks(oldOrNew) {
+
+        var marketId = $("#ddlMarket").val();
+        var ownerId = $("#ddl" + oldOrNew + "Ownership").val();
 
         var url = ServicePrefix + '/api/XRAY/GetUserAEListByMarketOwner';
 
@@ -876,43 +989,25 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getUserAELinksSuccess(data, textStatus, jQxhr, "Old");
+                getUserAELinksSuccess(data, textStatus, jQxhr, oldOrNew);
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
             }
         };
 
-        if (ownerId != -1) {
-            $.ajax(url, settings);
-        }
-
-        ownerId = $("#ddlNewOwnership").val();
-
-        settings.data = JSON.stringify({
-            "inApiToken": getLocalStorage("APIToken"),
-            "inMarketId": marketId,
-            "inOwnerId": ownerId,
-            "inProductId": "XRY"
-        });
-        settings.success = function (data, textStatus, jQxhr) {
-            getUserAELinksSuccess(data, textStatus, jQxhr, "New");
-        };
-
-        if (ownerId != -1) {
-            $.ajax(url, settings);
-        }
+        $.ajax(url, settings);
 
     }
 
-    function getUserAELinksSuccess(data, textStatus, jQxhr, OldOrNew) {
+    function getUserAELinksSuccess(data, textStatus, jQxhr, oldOrNew) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
-        var userAELinksTableId = "dt" + OldOrNew + "UserAELinks";
+        var userAELinksTableId = "dt" + oldOrNew + "UserAELinks";
 
         $("#" + userAELinksTableId).DataTable({
             "destroy": true,
@@ -941,10 +1036,10 @@
 
     }
 
-    function getAEAssignments() {
+    function getAEAssignments(oldOrNew) {
 
         var marketId = $("#ddlMarket").val();
-        var ownerId = $("#ddlOldOwnership").val();
+        var ownerId = $("#ddl" + oldOrNew + "Ownership").val();
 
         var url = ServicePrefix + '/api/XRAY/GetAEAssignmentsByMarketOwner';
 
@@ -959,43 +1054,25 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getAEAssignmentsSuccess(data, textStatus, jQxhr, "Old");
+                getAEAssignmentsSuccess(data, textStatus, jQxhr, oldOrNew);
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
             }
         };
 
-        if (ownerId != -1) {
-            $.ajax(url, settings);
-        }
-
-        ownerId = $("#ddlNewOwnership").val();
-
-        settings.data = JSON.stringify({
-            "inApiToken": getLocalStorage("APIToken"),
-            "inMarketId": marketId,
-            "inOwnerId": ownerId,
-            "inProductId": "XRY"
-        });
-        settings.success = function (data, textStatus, jQxhr) {
-            getAEAssignmentsSuccess(data, textStatus, jQxhr, "New");
-        };
-
-        if (ownerId != -1) {
-            $.ajax(url, settings);
-        }
+        $.ajax(url, settings);
 
     }
 
-    function getAEAssignmentsSuccess(data, textStatus, jQxhr, OldOrNew) {
+    function getAEAssignmentsSuccess(data, textStatus, jQxhr, oldOrNew) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
-        var aeAssignmentsTableId = "dt" + OldOrNew + "AEAssignments";
+        var aeAssignmentsTableId = "dt" + oldOrNew + "AEAssignments";
 
         $("#" + aeAssignmentsTableId).DataTable({
             "destroy": true,
