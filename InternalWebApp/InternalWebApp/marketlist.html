@@ -163,7 +163,7 @@
 
     $(document).ready(function () {
 
-        bSecondaryMarketsOnly = (getParameterByName("NonPrimaryOnly") == null ? false : (getParameterByName("NonPrimaryOnly").toLowerCase() === 'true'));
+        getComplimentaryMarketSettings();
  
         setTitle();
 
@@ -188,6 +188,22 @@
         setLocalStorage("searchPage", window.location);
 
     });
+
+    function getComplimentaryMarketSettings() {
+        if (getParameterByName("NonPrimaryOnly") == null) {
+            //check local storage
+            var secondaryMarketsOnly = getLocalStorage("secondaryMarketsOnly");
+            //reset local storage
+            setLocalStorage("secondaryMarketsOnly", '');
+            if (secondaryMarketsOnly.length > 0 && secondaryMarketsOnly === 'true') {
+                bSecondaryMarketsOnly = true;
+            } else {
+                bSecondaryMarketsOnly = false;
+            }
+        } else {
+            bSecondaryMarketsOnly = (getParameterByName("NonPrimaryOnly") == null ? false : (getParameterByName("NonPrimaryOnly").toLowerCase() === 'true'));
+        }
+    }
 
     function clearSearchButtonSetup()
     {
@@ -473,7 +489,7 @@
 
     function editMarket(marketId) {
 
-        window.location = "market.html?marketId=" + marketId;
+        window.location = "market.html?marketId=" + marketId + "&secondaryMarketsOnly="+bSecondaryMarketsOnly;
 
     }
 

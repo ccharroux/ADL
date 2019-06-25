@@ -42,6 +42,10 @@
     <script src="js/respond.min.js"></script>
     <![endif]-->
 
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
+
 </head>
 <body>
     <div id="fh5co-page">
@@ -58,19 +62,95 @@
                         <h2>DMA Market Category Mapping</h2>
                     </div>
                 </div>
-                
+
                 <div class="row input-row">
                     <div class="col-md-3 text-align-left">
                         <label for="txtMarketName">Market Name</label>
                     </div>
                     <div class="col-md-9 text-align-left">
+                        <input type="hidden" id="txtParentMarketId" value="" />
                         <input type="hidden" id="txtMarketId" value="" />
                         <input type="text" class="field-width-325" id="txtMarketName" value="" maxlength="50" disabled="disabled" />
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col-md-12">
+                        <hr />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="text-center">
+                        <h3>Category Assignments</h3>
+                    </div>
+                </div>
+
+                <div class="row input-row">
+                    <div class="col-md-6">
+                        <select class="field-width-325" id="ddlDMACategories" size="10">
+                            <option value="1">Category 1</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row input-row">
+                    <div class="col-md-12">
+                        <table id="dtAssignmentList" class="stripe">
+                            <thead>
+                                <tr>
+                                    <th class="exportColumn">Advertiser Name</th>
+                                    <th class="exportColumn">Parent Advertiser</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Agency Name</th>
+                                    <th>Parent Agency</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
 
 
+                <!-- select with category and counts -->
+                <!--
+                datatable with values
+                add will map to this category
+                    pass(marketid, mrrcategoryid)
+                release will remove from this category
+                    pass(parentmarketid, marketid, mrrcategoryid)
+                addfromother will remove entry and add to this category
+                    pass(parentmarketid, marketid, mrrcategoryid)
+                -->
+                <!-- Buttons -->
+                <div class="default-button-section">
+                    <div class="row input-row">
+                        <div class="col-md-12" id="txtMessaging">
+                            Messaging will go here based on assignments
+                        </div>
+
+                    </div>
+                    <div class="row input-row">
+                        <div class="col-md-3">
+                            <div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <div>
+                                <input value="Assign Category Template" onclick="assignCategoriesToParentMarket()" class="default-button" type="button">
+                            </div>
+                            <div style="padding-top: 10px">
+                                <input value="Back" onclick="goBackToMarket();" class="default-button" type="button">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Buttons-->
             </div>
         </div>
     </div>
@@ -93,6 +173,16 @@
     <!-- Config JS -->
     <script src="/js/config.js"></script>
     <!-- MAIN JS -->
+    <script src="/js/main.js"></script>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
 
 </body>
 </html>
@@ -100,16 +190,23 @@
 <script>
     var marketId = 0;
     var marketName = '';
+    var parentMarketId = 0;
 
     $(document).ready(function () {
 
         marketId = (getParameterByName("MarketID") == null ? 0 : getParameterByName("MarketID"));
         marketName = (getParameterByName("MarketName") == null ? '' : getParameterByName("MarketName"));
+        parentMarketId = (getParameterByName("ParentMarketId") == null ? 0 : getParameterByName("ParentMarketId"));
 
         if (marketId <= 0) {
             //need to determine what to do if no market id is passed through
         }
 
+        $("#txtMarketId").val(marketId);
+        $("#txtMarketName").val(marketName);
+        $("#txtParentMarketId").val(parentMarketId);
+
+        buildMainMenu("Markets");
         //need to determine which menu to display. probably markets since we started on the market page.
 
         //need to figure out if new or not to activate the product
@@ -129,5 +226,13 @@
 
 
         //cancel button should go back to market page
+
+        $("#dtAssignmentList").DataTable();
     });
+
+
+    function goBackToMarket() {
+        window.location = "/market.html?MarketID=" + $("#txtMarketId").val();
+    }
+
 </script>
