@@ -1,0 +1,597 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>MKA Internal Media Site</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+    <!-- Facebook and Twitter integration -->
+    <meta property="og:title" content="" />
+    <meta property="og:image" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:site_name" content="" />
+    <meta property="og:description" content="" />
+    <meta name="twitter:title" content="" />
+    <meta name="twitter:image" content="" />
+    <meta name="twitter:url" content="" />
+    <meta name="twitter:card" content="" />
+
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="shortcut icon" href="favicon.ico">
+
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
+
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700" rel="stylesheet">
+
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="/css/animate.css">
+    <!-- Icomoon Icon Fonts-->
+    <link rel="stylesheet" href="/css/icomoon.css">
+    <!-- Simple Line Icons -->
+    <link rel="stylesheet" href="/css/simple-line-icons.css">
+    <!-- Bootstrap  -->
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <!-- Theme style  -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
+
+    <!-- Modernizr JS -->
+    <script src="/js/modernizr-2.6.2.min.js"></script>
+
+    <!-- FOR IE9 below -->
+    <!--[if lt IE 9]>
+    <script src="js/respond.min.js"></script>
+    <![endif]-->
+    <style>
+    </style>
+</head>
+<body>
+    <div id="fh5co-page">
+        <header id="fh5co-header" role="banner">
+            <div class="container">
+                <div class="header-inner" id="menu">
+                </div>
+            </div>
+        </header>
+        <div id="fh5co-contact-section" class="contact-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
+                        <h2>MRR Categories</h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="ddlMediaType">Media Type</label><br />
+                        <select id="ddlMediaType" onchange="getMarkets();"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="ddlMarket">Market</label><br />
+                        <select id="ddlMarket" style="width:220px" onchange="getCategories(); getExclusions();"></select>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editCategory('')" />
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="text-center">
+                    <h3>Category Definitions</h3>
+                </div>
+
+                <!-- start datatable-->
+                <div class="dataTable-top-margin">
+                    <table id="dtCategoryList" class="stripe">
+                        <thead>
+                            <tr>
+                                <th class="exportColumn">Category Name</th>
+                                <th class="exportColumn">Definition</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Category Name</th>
+                                <th>Definition</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <!-- end datatable -->
+
+                <hr />
+
+                <div class="text-center">
+                    <h3>Market Exclusions</h3>
+                    <p>"Instructions and definitions for revenue categories not displayed in the market"</p>
+                </div>
+
+                <!-- start datatable-->
+                <div class="dataTable-top-margin">
+                    <table id="dtExclusionList" class="stripe">
+                        <thead>
+                            <tr>
+                                <th class="exportColumn">Exclusion Name</th>
+                                <th class="exportColumn">Definition</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Exclusion Name</th>
+                                <th>Definition</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <!-- end datatable -->
+            </div>
+        </div>
+    </div>
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+    <!-- jQuery Easing -->
+    <script src="/js/jquery.easing.1.3.js"></script>
+    <!-- Bootstrap -->
+    <script src="/js/bootstrap.min.js"></script>
+    <!-- Bootbox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+    <!-- Waypoints -->
+    <script src="/js/jquery.waypoints.min.js"></script>
+    <!-- BlockUI JS -->
+    <script src="/js/blockUI.js"></script>
+    <!-- Config JS -->
+    <script src="/js/config.js"></script>
+    <!-- MAIN JS -->
+    <script src="/js/main.js"></script>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+
+</body>
+</html>
+
+<script>
+
+    var gotMarkets = false;
+    var setUpCategories = false;
+    var setUpExclusions = false;
+
+    $(document).ready(function () {
+
+        var reportTitle = 'Categories List';
+        var exportColumns = returnTableColumnsByClass("dtCategoryList", "exportColumn");
+
+        $("#dtCategoryList").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                { "data": 'Category Name' },
+                { "data": 'Definition' },
+                {
+                    mRender: function(data, type, row) {
+                        var editCategoryParams = "'" + row["Category ID"] + "'";
+                        return '<a href="#" onclick="editCategory(' + editCategoryParams + ')">Edit</a>&nbsp;<a href="#" onclick="deleteCategory(' + editCategoryParams + ')">Delete</a>';
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": "text-align-right"
+                }
+            ],
+            "bSort": false,
+            "pagingType": "full_numbers",
+            "buttons": [
+               {
+                   extend: 'csv',
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'excel',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'pdf',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
+                           }
+                       }
+                   }
+               }
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            initComplete: recordCategoriesSetUp,
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+
+        $("#dtExclusionList").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                { "data": 'Exclusion Name' },
+                { "data": 'Definition' },
+                {
+                    mRender: function (data, type, row) {
+                        var editExclusionParams = "'" + row["Exclusion ID"] + "'";
+                        return '<a href="#" onclick="editExclusion(' + editExclusionParams + ')">Edit</a>&nbsp;<a href="#" onclick="deleteExclusion(' + editExclusionParams + ')">Delete</a>';
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": "text-align-right"
+                }
+            ],
+            "bSort": false,
+            "pagingType": "full_numbers",
+            "buttons": [
+               {
+                   extend: 'csv',
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'excel',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'pdf',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
+                           }
+                       }
+                   }
+               }
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            initComplete: recordExclusionsSetUp,
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+
+        //$("body").on("click",
+        //    "#clear_search_button",
+        //    function () {
+        //        var table = $("#dtCategoryList").DataTable();
+        //        table.search('').draw();
+        //    });
+
+        buildMainMenu("Settings");
+        //loadLastSearch();
+
+        //setLocalStorage("search", $("#searchText").val().trim());
+        //setLocalStorage("searchPage", window.location);
+
+        getMediaTypes();
+
+    });
+
+    function recordCategoriesSetUp() {
+        setUpCategories = true;
+        adjustDataTableFilters();
+    }
+
+    function recordExclusionsSetUp() {
+        setUpExclusions = true;
+        adjustDataTableFilters();
+    }
+
+    function adjustDataTableFilters() {
+        if (!setUpCategories || !setUpExclusions) {
+            return;
+        }
+
+        $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+    }
+
+    function loadLastSearch() {
+        var search = getParameterByName("search");
+
+        if (!search == false) {
+            if (search.length > 0) {
+                $("#searchText").val(search);
+                getCategoryList();
+            }
+        }
+    }
+
+    function getMediaTypes() {
+        var url = ServicePrefix + '/api/MediaType/GetMediaTypeList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMediaTypesSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getMediaTypesSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '';
+
+        str = '<option selected value="-1">-- All Media Types</option>';
+        $.each(data.report.rows, function (index) {
+
+            str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+
+        });
+
+        $("#ddlMediaType").html(str);
+
+        getMarkets();
+
+    }
+
+    function getMarkets() {
+        var url = ServicePrefix + '/api/Market/GetMarketList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMediaTypeId": $("#ddlMediaType").val(),
+                "inActiveOnly": "1",
+                "inPrimaryMarketOnly": "0"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getMarketsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var previousMarketId = gotMarkets ? $("#ddlMarket").val() : -1;
+        var str = '';
+
+        str = '<option value="-1">-- Select a Market</option>';
+        $.each(data.report.rows, function (index) {
+
+            str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
+
+        });
+
+        $("#ddlMarket").html(str);
+
+        var previousMarketIdStillInList = false;
+        $("#ddlMarket option").each(function () {
+            if (this.value == previousMarketId) {
+                previousMarketIdStillInList = true;
+                return false;
+            }
+        });
+        $("#ddlMarket").val(previousMarketIdStillInList ? previousMarketId : -1);
+
+        gotMarkets = true;
+        getCategories();
+        getExclusions();
+
+    }
+
+    function getCategories() {
+        if (!gotMarkets) {
+            $("#dtCategoryList").hide();
+            return;
+        }
+
+        var marketId = $("#ddlMarket").val();
+        if (marketId == -1) {
+            $("#dtCategoryList").hide();
+            return;
+        }
+
+        //setLocalStorage("search", $("#searchText").val().trim());
+        //setLocalStorage("searchPage", window.location);
+
+        //filling out url for ajax call
+        var url = ServicePrefix + '/api/MRR/GetCategoryList';
+
+        //filling out settings for ajax call
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                populateDataTable("dtCategoryList", data);
+                $("#dtCategoryList").show();
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        }
+
+        //ajax call
+        $.ajax(url, settings);
+    }
+
+    function getExclusions() {
+        if (!gotMarkets) {
+            $("#dtExclusionList").hide();
+            return;
+        }
+
+        var marketId = $("#ddlMarket").val();
+        if (marketId == -1) {
+            $("#dtExclusionList").hide();
+            return;
+        }
+
+        //setLocalStorage("search", $("#searchText").val().trim());
+        //setLocalStorage("searchPage", window.location);
+
+        //filling out url for ajax call
+        var url = ServicePrefix + '/api/MRR/GetExclusionList';
+
+        //filling out settings for ajax call
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                populateDataTable("dtExclusionList", data);
+                $("#dtExclusionList").show();
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        }
+
+        //ajax call
+        $.ajax(url, settings);
+    }
+
+    function editCategory(CategoryId) {
+        window.location = "mrrcategory.html?CategoryId=" + CategoryId.trim();
+    }
+
+    function deleteCategory(CategoryId) {
+        bootbox.alert('Delete category functionality is still under development.', function () {
+        });
+    }
+
+    function editExclusion(ExclusionId) {
+        window.location = "mrrexclusion.html?ExclusionId=" + ExclusionId.trim();
+    }
+
+    function deleteExclusion(ExclusionId) {
+        bootbox.alert('Delete exclusion functionality is still under development.', function () {
+        });
+    }
+
+</script>
