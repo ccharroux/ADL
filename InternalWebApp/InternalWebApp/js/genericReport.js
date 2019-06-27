@@ -129,6 +129,8 @@ reportName.push("rptOwnershipProductList");
 
 reportName.push("rptEmailStatusList");
 
+reportName.push("rptMRRUploadTemplateByOwner")
+
 
 function buildReportArray()
 {
@@ -4775,6 +4777,43 @@ function getReportObject_EmailStatusList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'tech',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+//rptMRRUploadTemplateByOwner
+function getReportFilterArray_MRRUploadTemplateByOwner() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        objectName: "ddlOwner",
+        jsCall: "getOwnerListMRR",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+
+    return arrayFilters;
+}
+function getReportObject_MRRUploadTemplateByOwner() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "MRR Upload Category Template",
+        apiControllerAction: "/api/MRRReport/GetMRRUploadTemplateByOwner",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr',
         autoUpdate: false
     }
 

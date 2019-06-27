@@ -1004,6 +1004,67 @@
         });
 
     }
+
+    function getOwnerListMRR()
+    {
+        getOwnerListByProduct('MRR');
+    }
+    function getOwnerListXRY() {
+        getOwnerListByProduct('XRY');
+    }
+    function getOwnerListMSS() {
+        getOwnerListByProduct('MSS');
+    }
+    function getOwnerListTVB() {
+        getOwnerListByProduct('TVB');
+    }
+    function getOwnerListDMA() {
+        getOwnerListByProduct('DMA');
+    }
+
+    function getOwnerListByProduct(inProduct) {
+
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerListByProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": inProduct
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    var str = '';
+
+                    $("#ddlOwner").html("<option value=''> -- Select an Owner --</option>");
+
+                    var holdOwnerID = "0";
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = str + "<option value='" + obj.ownerid + "'>" + obj.ownername + "</option>";
+
+                    });
+
+                    $("#ddlOwner").append(str);
+                    saveLoadedControlSelection("ddlOwner");
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
     function getOwnerList() {
 
         $.ajax({
