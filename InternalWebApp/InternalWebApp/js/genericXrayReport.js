@@ -23,6 +23,21 @@ auditName.push("auditAEStatusList");
 auditName.push("auditNewAdvertisers");
 auditName.push("auditNewAgencies");
 
+auditName.push("auditAdvertisersList");
+auditName.push("auditAdvertisersAgenciesList");
+auditName.push("auditDisabledAdvertisersList");
+auditName.push("auditMediaAdvertisersList");
+auditName.push("auditParentAdvertiserList");
+auditName.push("auditParentAdvertiserAdvertiserList");
+auditName.push("auditStationAdvertisersList");
+
+auditName.push("auditAgencyList");
+auditName.push("auditAgencyAdvertiserAccountsList");
+auditName.push("auditDisabledAgencyList");
+auditName.push("auditParentAgencyList");
+auditName.push("auditParentAgencyAgencyList");
+auditName.push("auditStationAgencyList");
+
 function buildAuditArray() {
     var auditCounter = 1;
     var success = true;
@@ -1062,4 +1077,421 @@ function getAuditObject_AEStatusList() {
     return tempObject;
 }
 
+function getAuditFilterArray_AdvertisersList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "AdvertiserName",
+        objectName: "txtAdvertiserName",
+        jsCall: null,
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    //The onchange property includes a function that will
+    //be executed for that object if it exists.
+    arrayObject = {
+        token: "Industry",
+        jsCall: "getIndustryList",
+        objectName: "ddlIndustry",
+        onchange: function () {
+
+            getSubIndustryList($("#ddlIndustry").val(), '');
+
+        },
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "SubIndustry",
+        jsCall: "getDefaultSubIndustry",
+        objectName: "ddlSubIndustry",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getAuditObject_AdvertisersList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Market Advertiser Name");
+    columnsToDisplay.push("Is Active");
+    columnsToDisplay.push("Market Name");
+    columnsToDisplay.push("Industry Name");
+    columnsToDisplay.push("Sub Industry Name");
+    columnsToDisplay.push("Date Modified");
+    columnsToDisplay.push("Posted By");
+
+    tempObject =
+    {
+        auditTitle: "Advertisers List",
+        apiControllerAction: "/api/Advertiser/GetMarketAdvertiserList",
+        apiType: "post",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advreports'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_AdvertisersAgenciesList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "AdvertiserName",
+        objectName: "txtAdvertiserName",
+        jsCall: null,
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getAuditObject_AdvertisersAgenciesList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Advertiser Name");
+    columnsToDisplay.push("Agency Name");
+    columnsToDisplay.push("Market Name");
+    columnsToDisplay.push("Account Type Name");
+
+    tempObject =
+    {
+        auditTitle: "Advertisers / Agencies List",
+        apiControllerAction: "/api/Advertiser/GetMarketAdvertiserMarketAgencyList",
+        apiType: "post",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advreports'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_DisabledAdvertisersList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    
+
+    return arrayFilters;
+}
+
+function getAuditObject_DisabledAdvertisersList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+  
+
+    tempObject =
+    {
+        auditTitle: "Disabled Advertisers List",
+        apiControllerAction: "",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advreports'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_MediaAdvertisersList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+   
+
+    return arrayFilters;
+}
+
+function getAuditObject_MediaAdvertisersList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    
+
+    tempObject =
+    {
+        auditTitle: "Media Advertisers List",
+        apiControllerAction: "",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advreports'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_ParentAdvertiserList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "ParentAdvertiserName",
+        jsCall: null,
+        objectName: "txtParentAdvertiserName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getAuditObject_ParentAdvertiserList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Parent Advertiser Name");
+    columnsToDisplay.push("Industry Name");
+    columnsToDisplay.push("Sub Industry Name");
+    
+    tempObject =
+    {
+        auditTitle: "Parent Advertisers List",
+        apiControllerAction: "/api/ParentAdvertiser/GetParentAdvertiserListForReport",
+        apiType: "post",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advreports'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_ParentAdvertiserAdvertiserList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "ParentAdvertiserName",
+        jsCall: null,
+        objectName: "txtParentAdvertiserName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getAuditObject_ParentAdvertiserAdvertiserList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Parent Advertiser Name");
+    columnsToDisplay.push("Market Advertiser Name");
+    columnsToDisplay.push("Market Name");
+
+    tempObject =
+    {
+        auditTitle: "Parent Advertisers / Advertisers List",
+        apiControllerAction: "/api/ParentAdvertiser/GetParentAdvertiserMarketAdvertiserList",
+        apiType: "post",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advreports'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_StationAdvertisersList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+
+    return arrayFilters;
+}
+
+function getAuditObject_StationAdvertisersList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    
+
+    tempObject =
+    {
+        auditTitle: "Station Advertisers List",
+        apiControllerAction: "",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advreports'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_AgencyList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+   
+
+    return arrayFilters;
+}
+
+function getAuditObject_AgencyList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    
+
+    tempObject =
+    {
+        auditTitle: "Agency List",
+        apiControllerAction: "",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'agyreports'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_AgencyAdvertiserAccountsList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+
+    return arrayFilters;
+}
+
+function getAuditObject_AgencyAdvertiserAccountsList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    
+
+    tempObject =
+    {
+        auditTitle: "Agency / Advertiser Account List",
+        apiControllerAction: "",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'agyreports'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_DisabledAgencyList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+
+    return arrayFilters;
+}
+
+function getAuditObject_DisabledAgencyList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        auditTitle: "Disabled Agency List",
+        apiControllerAction: "",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'agyreports'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_ParentAgencyList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+
+    return arrayFilters;
+}
+
+function getAuditObject_ParentAgencyList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        auditTitle: "Parent Agency List",
+        apiControllerAction: "",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'agyreports'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_ParentAgencyAgencyList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    return arrayFilters;
+}
+
+function getAuditObject_ParentAgencyAgencyList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        auditTitle: "Parent Agency / Agency List",
+        apiControllerAction: "",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'agyreports'
+    }
+
+    return tempObject;
+}
+
+function getAuditFilterArray_StationAgencyList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    return arrayFilters;
+}
+
+function getAuditObject_StationAgencyList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+   
+    tempObject =
+    {
+        auditTitle: "Station Agency List",
+        apiControllerAction: "",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'agyreports'
+    }
+
+    return tempObject;
+}
 
