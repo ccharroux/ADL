@@ -185,7 +185,10 @@
                 { "data": 'Category Name' },
                 { "data": 'Definition' },
                 {
-                    mRender: function(data, type, row) {
+                    mRender: function (data, type, row) {
+                        if (row["IsTotal"]) {
+                            return "";
+                        }
                         var editCategoryParams = "'" + row["Category ID"] + "'";
                         return '<a href="#" onclick="editCategory(' + editCategoryParams + ')">Edit</a>&nbsp;<a href="#" onclick="deleteCategory(' + editCategoryParams + ')">Delete</a>';
                     },
@@ -467,7 +470,14 @@
             return;
         }
 
-        var previousMarketId = gotMarkets ? $("#ddlMarket").val() : -1;
+        var previousMarketId = -1;
+        if (gotMarkets) {
+            previousMarketId = $("#ddlMarket").val();
+        } else {
+            if (getParameterByName("marketId") != null) {
+                previousMarketId = getParameterByName("marketId");
+            }
+        }
         var str = '';
 
         str = '<option value="-1">-- Select a Market</option>';
@@ -576,22 +586,21 @@
         $.ajax(url, settings);
     }
 
-    function editCategory(CategoryId) {
-        window.location = "mrrcategory.html?CategoryId=" + CategoryId.trim();
+    function editCategory(categoryId) {
+        window.location = "mrrmarketcategorydefinition.html?marketId=" + $("#ddlMarket").val() + "&categoryId=" + categoryId.trim();
     }
 
-    function deleteCategory(CategoryId) {
-        bootbox.alert('Delete category functionality is still under development.', function () {
-        });
+    function deleteCategory(categoryId) {
+        bootbox.alert('Delete category functionality is still under development.');
     }
 
-    function editExclusion(ExclusionId) {
-        window.location = "mrrexclusion.html?ExclusionId=" + ExclusionId.trim();
+    function editExclusion(exclusionId) {
+        bootbox.alert('Edit exclusion functionality is still under development.');
+        // window.location = "mrrmarketexclusiondefinition.html?marketId=" + $("#ddlMarket").val() + "&exclusionId=" + exclusionId.trim();
     }
 
-    function deleteExclusion(ExclusionId) {
-        bootbox.alert('Delete exclusion functionality is still under development.', function () {
-        });
+    function deleteExclusion(exclusionId) {
+        bootbox.alert('Delete exclusion functionality is still under development.');
     }
 
 </script>
