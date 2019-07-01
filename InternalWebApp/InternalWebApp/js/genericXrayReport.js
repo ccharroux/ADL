@@ -1211,7 +1211,7 @@ function getAuditObject_DisabledAdvertisersList() {
     tempObject =
     {
         auditTitle: "Disabled Advertiser List",
-        apiControllerAction: "",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'advreports'
@@ -1238,7 +1238,7 @@ function getAuditObject_MediaAdvertisersList() {
     tempObject =
     {
         auditTitle: "Media Advertiser List",
-        apiControllerAction: "",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'advreports'
@@ -1334,7 +1334,7 @@ function getAuditObject_StationAdvertisersList() {
     tempObject =
     {
         auditTitle: "Station Advertiser List",
-        apiControllerAction: "",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'advreports'
@@ -1361,7 +1361,7 @@ function getAuditObject_AgencyList() {
     tempObject =
     {
         auditTitle: "Agency List",
-        apiControllerAction: "",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'agyreports'
@@ -1387,7 +1387,7 @@ function getAuditObject_AgencyAdvertiserAccountsList() {
     tempObject =
     {
         auditTitle: "Agency / Advertiser Account List",
-        apiControllerAction: "",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'agyreports'
@@ -1413,7 +1413,7 @@ function getAuditObject_DisabledAgencyList() {
     tempObject =
     {
         auditTitle: "Disabled Agency List",
-        apiControllerAction: "",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'agyreports'
@@ -1438,7 +1438,7 @@ function getAuditObject_ParentAgencyList() {
     tempObject =
     {
         auditTitle: "Parent Agency List",
-        apiControllerAction: "",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'agyreports'
@@ -1462,7 +1462,7 @@ function getAuditObject_ParentAgencyAgencyList() {
     tempObject =
     {
         auditTitle: "Parent Agency / Agency List",
-        apiControllerAction: "",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'agyreports'
@@ -1486,7 +1486,7 @@ function getAuditObject_StationAgencyList() {
     tempObject =
     {
         auditTitle: "Station Agency List",
-        apiControllerAction: "",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'agyreports'
