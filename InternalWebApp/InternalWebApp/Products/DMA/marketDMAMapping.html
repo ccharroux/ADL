@@ -88,31 +88,13 @@
 
                 <div class="row input-row">
                     <div class="col-md-6">
-                        <select class="field-width-325" id="ddlDMACategories" size="10">
-                            <option value="1">Category 1</option>
-                        </select>
+                        <select class="field-width-500" id="ddlDMACategories" onchange="getCategoryMappings()" size="10"></select>
                     </div>
                 </div>
 
-                <div class="row input-row">
-                    <div class="col-md-12">
-                        <table id="dtAssignmentList" class="stripe">
-                            <thead>
-                                <tr>
-                                    <th class="exportColumn">Advertiser Name</th>
-                                    <th class="exportColumn">Parent Advertiser</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tfoot>
-                                <tr>
-                                    <th>Agency Name</th>
-                                    <th>Parent Agency</th>
-                                    <th></th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
+                <div class="dataTable-top-margin">
+                    <table id="dtResults" class="stripe"></table>
+                    <div id="noDataFound" style="display:none; color: red">No data found</div>
                 </div>
 
 
@@ -191,6 +173,7 @@
     var marketId = 0;
     var marketName = '';
     var parentMarketId = 0;
+    var displayColumns = [];
 
     $(document).ready(function () {
 
@@ -200,6 +183,10 @@
 
         if (marketId <= 0) {
             //need to determine what to do if no market id is passed through
+        }
+
+        if (parentMarketId <= 0) {
+            //go get the parent market
         }
 
         $("#txtMarketId").val(marketId);
@@ -227,9 +214,213 @@
 
         //cancel button should go back to market page
 
+        getDMACategoriesByParentandMarket();
+
+        displayColumns = getDisplayColumns();
+
         $("#dtAssignmentList").DataTable();
     });
 
+    function getDMACategoriesByParentandMarket() {
+
+        //still need to get back the total for each category
+
+        $.ajax({
+            url: ServicePrefix + '/api/ParentMarketCategory/GetDMACategoriesByParentAndMarket?inApiToken=' + getLocalStorage("APIToken") +
+                "&inParentMarketId=" + $("#txtParentMarketId").val() + "&inMarketId=" + $("#txtMarketId").val(),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textType, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    var str = '';
+
+                    //str = "<option value='-1'>-- Select a Template --</option>";
+
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+
+                        str = str + "<option value='" + obj.CategoryId + "'>" + obj['Category Name'] + "</option>";
+
+                    });
+
+                    $("#ddlDMACategories").append(str);
+
+                }
+
+            },
+            error: function (jqXhr, textType, errorThrown) {
+                genericAjaxError(jqXhr, textType, errorThrown);
+            }
+        });
+
+    }
+
+    function getCategoryMappings() {
+
+        //console.log($("#ddlDMACategories").val());
+        //pass apitoken, parentmarket, market to the api
+
+        $.ajax({
+            url: ServicePrefix + '/api/ParentMarketCategory/GetDMAMRRCategoryAssignmentsByParentAndMarket?inApiToken=' + getLocalStorage("APIToken") +
+                "&inParentMarketId=" + $("#txtParentMarketId").val() + "&inMarketId=" + $("#txtMarketId").val() +
+                "&inDMACategoryId=" + $("#ddlDMACategories").val(),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textType, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    //build the datatable
+                    loadResults("dtResults", data, displayColumns);
+                }
+
+            },
+            error: function (jqXhr, textType, errorThrown) {
+                genericAjaxError(jqXhr, textType, errorThrown);
+            }
+        });
+    }
+
+    function getDisplayColumns() {
+
+        var columnsToDisplay = new Array();
+
+        columnsToDisplay.push(
+            {
+                "title": "MRR Category",
+                "visible": true,
+                "mData": "MRR Category",
+                "orderable": true,
+                "searchable": true
+            });
+
+        columnsToDisplay.push({
+            "title": "Assigned DMA Category Id",
+            "visible": true,
+            "mData": "Assigned DMA Category Id",
+            "orderable": true
+        });
+
+        columnsToDisplay.push({
+            "title": "Assigned DMA Category",
+            "visible": true,
+            "mData": "Assigned DMA Category",
+            "orderable": true,
+            "searchable": true
+        });
+
+        columnsToDisplay.push({
+            "title": "Status",
+            "mRender": function(data, type, row) {
+                //build link to assign/remove etc
+                var action = "assignMRRCategory('" +
+                    row["MRR Category Id"] +
+                    "','" +
+                    $("#ddlDMACategories").val() +
+                    "'," +
+                    row["Parent Market Id"] +
+                    "," +
+                    row["Market Id"] +
+                    ")";
+                return '<a href="#" onclick="' + action + '">'+ row.Status + '</a>';
+            },
+            "orderable": false,
+            "searchable": false
+        });
+
+        return columnsToDisplay;
+    }
+
+    function loadResults(tableObject, data, columns) {
+
+        var results = data["report"]["rows"];
+
+        var searchTable;
+
+        if ($.fn.DataTable.isDataTable('#' + tableObject)) {
+            searchTable = $('#' + tableObject).DataTable();
+            searchTable.destroy();
+        }
+
+        searchTable = $('#' + tableObject).DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "order": [],
+            "data": results,
+            "columns": columns,
+            "select": true,
+            language: {
+                search: "Filter Results:"
+            },
+            "buttons": [
+
+            ],
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            }
+        });
+    }
+
+    function assignMRRCategory(mrrCategoryId, dmaCategoryId, parentMarketId, marketId) {
+        //console.log(mrrCategoryId + " " + dmaCategoryId + " " + parentMarketId + " " + marketId);
+        bootbox.alert("Under development", function () { });
+        //do call to update the assignment
+        //afterwards update the dropdown of counts and clear the datatable
+
+        //$.ajax({
+        //    url: ServicePrefix + '/api/ParentMarketCategory/',
+        //    dataType: 'json',
+        //    type: 'post',
+        //    contentType: 'application/json',
+        //    data: JSON.stringify({
+        //        "inApiToken": getLocalStorage("APIToken"),
+        //        "inParentMarketId": parentMarketId,
+        //        "inMarketId": marketId,
+        //        "inMRRCategoryId": mrrCategoryId,
+        //        "inDMACategoryId": dmaCategoryId
+        //    }),
+        //    processData: false,
+        //    success: function (data, textType, jQxhr) {
+
+        //        if (data.response.status != "SUCCESS") {
+        //            MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+        //        }
+        //        else {
+
+        //            //if successful, update dropdown and clear datatable
+        //            getDMACategoriesByParentandMarket();
+
+        //            if ($.fn.DataTable.isDataTable('#dtResults')) {
+        //                searchTable = $('#dtResults').DataTable();
+        //                searchTable.destroy();
+        //            }
+
+        //        }
+
+        //    },
+        //    error: function (jqXhr, textType, errorThrown) {
+        //        genericAjaxError(jqXhr, textType, errorThrown);
+        //    }
+        //});
+
+    }
 
     function goBackToMarket() {
         window.location = "/market.html?MarketID=" + $("#txtMarketId").val();

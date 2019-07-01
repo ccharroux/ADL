@@ -1283,10 +1283,12 @@ function buildTechMenu(selectedItem) {
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="/dashboardtech.html">Tech Tools</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/encryptdecrypt.html">Encryption/Decryption Tool</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/mrrarchiverollover.html">MRR Rollover</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/mrrMarketHistoryDataMatrix.html">MRR Market History Maintenance</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/xrayMarketHistoryDataMatrix.html">XRAY Market History Maintenance</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/mrrstationownerchanged.html">MRR Station Ownership Change</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/xryMarketHistoryDataMatrix.html">XRY Market History Maintenance</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/tvbMarketHistoryDataMatrix.html">TVB Market History Maintenance</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/stationownerchangedmrr.html">MRR Station Ownership Change</a></li>';
+
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += productDashboard('');

@@ -1129,17 +1129,17 @@ function getAuditObject_AdvertisersList() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("Market Advertiser Name");
-    columnsToDisplay.push("Is Active");
-    columnsToDisplay.push("Market Name");
-    columnsToDisplay.push("Industry Name");
-    columnsToDisplay.push("Sub Industry Name");
+    columnsToDisplay.push("Market Advertiser");
+    columnsToDisplay.push("Active");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Industry");
+    columnsToDisplay.push("Sub Industry");
     columnsToDisplay.push("Date Modified");
     columnsToDisplay.push("Posted By");
 
     tempObject =
     {
-        auditTitle: "Advertisers List",
+        auditTitle: "Market Advertiser List",
         apiControllerAction: "/api/Advertiser/GetMarketAdvertiserList",
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
@@ -1176,14 +1176,14 @@ function getAuditObject_AdvertisersAgenciesList() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("Advertiser Name");
-    columnsToDisplay.push("Agency Name");
-    columnsToDisplay.push("Market Name");
-    columnsToDisplay.push("Account Type Name");
+    columnsToDisplay.push("Advertiser");
+    columnsToDisplay.push("Agency");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Account Type");
 
     tempObject =
     {
-        auditTitle: "Advertisers / Agencies List",
+        auditTitle: "Advertiser / Agency List",
         apiControllerAction: "/api/Advertiser/GetMarketAdvertiserMarketAgencyList",
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
@@ -1210,8 +1210,8 @@ function getAuditObject_DisabledAdvertisersList() {
 
     tempObject =
     {
-        auditTitle: "Disabled Advertisers List",
-        apiControllerAction: "",
+        auditTitle: "Disabled Advertiser List",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'advreports'
@@ -1237,8 +1237,8 @@ function getAuditObject_MediaAdvertisersList() {
 
     tempObject =
     {
-        auditTitle: "Media Advertisers List",
-        apiControllerAction: "",
+        auditTitle: "Media Advertiser List",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'advreports'
@@ -1266,13 +1266,13 @@ function getAuditObject_ParentAdvertiserList() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("Parent Advertiser Name");
-    columnsToDisplay.push("Industry Name");
-    columnsToDisplay.push("Sub Industry Name");
+    columnsToDisplay.push("Parent Advertiser");
+    columnsToDisplay.push("Industry");
+    columnsToDisplay.push("Sub Industry");
     
     tempObject =
     {
-        auditTitle: "Parent Advertisers List",
+        auditTitle: "Parent Advertiser List",
         apiControllerAction: "/api/ParentAdvertiser/GetParentAdvertiserListForReport",
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
@@ -1301,13 +1301,13 @@ function getAuditObject_ParentAdvertiserAdvertiserList() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("Parent Advertiser Name");
-    columnsToDisplay.push("Market Advertiser Name");
-    columnsToDisplay.push("Market Name");
+    columnsToDisplay.push("Parent Advertiser");
+    columnsToDisplay.push("Market Advertiser");
+    columnsToDisplay.push("Market");
 
     tempObject =
     {
-        auditTitle: "Parent Advertisers / Advertisers List",
+        auditTitle: "Parent Advertiser / Advertiser List",
         apiControllerAction: "/api/ParentAdvertiser/GetParentAdvertiserMarketAdvertiserList",
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
@@ -1333,8 +1333,8 @@ function getAuditObject_StationAdvertisersList() {
 
     tempObject =
     {
-        auditTitle: "Station Advertisers List",
-        apiControllerAction: "",
+        auditTitle: "Station Advertiser List",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'advreports'
@@ -1361,7 +1361,7 @@ function getAuditObject_AgencyList() {
     tempObject =
     {
         auditTitle: "Agency List",
-        apiControllerAction: "",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'agyreports'
@@ -1387,7 +1387,7 @@ function getAuditObject_AgencyAdvertiserAccountsList() {
     tempObject =
     {
         auditTitle: "Agency / Advertiser Account List",
-        apiControllerAction: "",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'agyreports'
@@ -1413,7 +1413,7 @@ function getAuditObject_DisabledAgencyList() {
     tempObject =
     {
         auditTitle: "Disabled Agency List",
-        apiControllerAction: "",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'agyreports'
@@ -1438,7 +1438,7 @@ function getAuditObject_ParentAgencyList() {
     tempObject =
     {
         auditTitle: "Parent Agency List",
-        apiControllerAction: "",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'agyreports'
@@ -1462,7 +1462,7 @@ function getAuditObject_ParentAgencyAgencyList() {
     tempObject =
     {
         auditTitle: "Parent Agency / Agency List",
-        apiControllerAction: "",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'agyreports'
@@ -1486,7 +1486,7 @@ function getAuditObject_StationAgencyList() {
     tempObject =
     {
         auditTitle: "Station Agency List",
-        apiControllerAction: "",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'agyreports'
