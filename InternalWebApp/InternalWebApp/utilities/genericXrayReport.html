@@ -139,6 +139,10 @@
                             <label for="ddlMarket" class="dropdown-label rptView auditMarket">Market</label>
                             <select id="ddlMarket" apiInput="inMarketId" class="dropdown-select rptView auditMarket"></select>
                         </div>
+                        <div class="form-group rptView auditStation">
+                            <label for="ddlStation" class="dropdown-label rptView auditStation">Station</label>
+                            <select id="ddlStation" apiInput="inStationId" class="dropdown-select rptView auditStation"></select>
+                        </div>
                         <div class="form-group rptView auditMediaCode">
                             <label for="ddlMediaCode" class="dropdown-label rptView auditMediaCode">Media Code</label>
                             <select id="ddlMediaCode" apiInput="inMediaCodeId" class="dropdown-select rptView auditMediaCode"></select>
@@ -795,6 +799,10 @@
         getMarketList('XRY');
     }
 
+    function getXrayStationList() {
+        getStationList('XRY');
+    }
+
     function getMarketList(inProduct) {
 
         $.ajax({
@@ -828,6 +836,49 @@
                     convertToChosenSelect('ddlMarket', false, false);
                     saveLoadedControlSelection("ddlMarket");
                     //preSelectItem('quickReportQS');
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function getStationList(inProduct) {
+
+        $.ajax({
+            url: ServicePrefix + '/api/Station/GetStationListByProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": inProduct,
+                "inActiveOnly ": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Station --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].reid + '">' + data.report.rows[index].fullName + '</option>';
+
+                    });
+
+                    $("#ddlStation").html(str);
+
+                    convertToChosenSelect('ddlStation', false, false);
+                    saveLoadedControlSelection("ddlStation");
 
                 }
 

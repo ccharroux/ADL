@@ -1183,7 +1183,7 @@ function getAuditObject_AdvertisersAgenciesList() {
 
     tempObject =
     {
-        auditTitle: "Advertiser / Agency List",
+        auditTitle: "Market Advertiser / Market Agency List",
         apiControllerAction: "/api/Advertiser/GetMarketAdvertiserMarketAgencyList",
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
@@ -1197,7 +1197,7 @@ function getAuditFilterArray_DisabledAdvertisersList() {
     var arrayFilters = new Array();
     var arrayObject = new Array();
 
-    
+    //Currently no filters
 
     return arrayFilters;
 }
@@ -1207,12 +1207,13 @@ function getAuditObject_DisabledAdvertisersList() {
 
     var columnsToDisplay = new Array();
   
+    //currently defaults to all columns
 
     tempObject =
     {
         auditTitle: "Disabled Advertiser List",
-        apiControllerAction: null,
-        apiType: "get",
+        apiControllerAction: "/api/StationAdvertiser/GetDisabledAdvertiserList",
+        apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: 'advreports'
     }
@@ -1224,6 +1225,55 @@ function getAuditFilterArray_MediaAdvertisersList() {
     var arrayFilters = new Array();
     var arrayObject = new Array();
 
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaAdvertiserName",
+        jsCall: null,
+        objectName: "txtMediaAdvertiserName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MarketAdvertiserName",
+        jsCall: null,
+        objectName: "txtMarketAdvertiserName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaAdvertiserMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
    
 
     return arrayFilters;
@@ -1238,8 +1288,8 @@ function getAuditObject_MediaAdvertisersList() {
     tempObject =
     {
         auditTitle: "Media Advertiser List",
-        apiControllerAction: null,
-        apiType: "get",
+        apiControllerAction: null, //"/api/MediaAdvertiser/GetMediaAdvertiserListForReport",
+        apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: 'advreports'
     }
@@ -1321,6 +1371,39 @@ function getAuditFilterArray_StationAdvertisersList() {
     var arrayFilters = new Array();
     var arrayObject = new Array();
 
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getXrayStationList",
+        objectName: "ddlStation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "StationAdvertiserName",
+        jsCall: null,
+        objectName: "txtStationAdvertiserName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MarketAdvertiserName",
+        jsCall: null,
+        objectName: "txtMarketAdvertiserName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
 
     return arrayFilters;
 }
@@ -1330,12 +1413,18 @@ function getAuditObject_StationAdvertisersList() {
 
     var columnsToDisplay = new Array();
     
+    columnsToDisplay.push("Owner Name");
+    columnsToDisplay.push("Station Advertiser");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Market Advertiser");
+    columnsToDisplay.push("Date Modified");
+
 
     tempObject =
     {
         auditTitle: "Station Advertiser List",
-        apiControllerAction: null,
-        apiType: "get",
+        apiControllerAction: "/api/StationAdvertiser/GetStationAdvertiserListForReport",
+        apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: 'advreports'
     }
@@ -1347,7 +1436,21 @@ function getAuditFilterArray_AgencyList() {
     var arrayFilters = new Array();
     var arrayObject = new Array();
 
-   
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "AgencyName",
+        jsCall: null,
+        objectName: "txtAgencyName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
 
     return arrayFilters;
 }
@@ -1356,13 +1459,18 @@ function getAuditObject_AgencyList() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    
+    columnsToDisplay.push("Agency Name");
+    columnsToDisplay.push("Account Type Name");
+    columnsToDisplay.push("Market Name");
+    columnsToDisplay.push("Parent Agency Name");
+    columnsToDisplay.push("Date Modified");
+    columnsToDisplay.push("Posted By");
 
     tempObject =
     {
-        auditTitle: "Agency List",
-        apiControllerAction: null,
-        apiType: "get",
+        auditTitle: "Market Agency List",
+        apiControllerAction: "/api/Agency/GetMarketAgencyList",
+        apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: 'agyreports'
     }
@@ -1374,6 +1482,21 @@ function getAuditFilterArray_AgencyAdvertiserAccountsList() {
     var arrayFilters = new Array();
     var arrayObject = new Array();
 
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "AgencyName",
+        jsCall: null,
+        objectName: "txtAgencyName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
 
     return arrayFilters;
 }
@@ -1382,11 +1505,14 @@ function getAuditObject_AgencyAdvertiserAccountsList() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    
+    columnsToDisplay.push("Agency Name");
+    columnsToDisplay.push("Advertiser Name");
+    columnsToDisplay.push("Market Name");
+    columnsToDisplay.push("Account Type Name");
 
     tempObject =
     {
-        auditTitle: "Agency / Advertiser Account List",
+        auditTitle: "Market Agency / Market Advertiser List",
         apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
