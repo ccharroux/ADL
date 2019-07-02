@@ -1591,6 +1591,14 @@ function getAuditFilterArray_ParentAgencyAgencyList() {
     var arrayFilters = new Array();
     var arrayObject = new Array();
 
+    arrayObject = {
+        token: "ParentAgencyName",
+        jsCall: null,
+        objectName: "txtParentAgencyName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
     return arrayFilters;
 }
 
@@ -1598,12 +1606,15 @@ function getAuditObject_ParentAgencyAgencyList() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
+    columnsToDisplay.push("Parent Agency");
+    columnsToDisplay.push("Market Agency");
+    columnsToDisplay.push("Market");
 
     tempObject =
     {
-        auditTitle: "Parent Agency / Agency List",
-        apiControllerAction: null,
-        apiType: "get",
+        auditTitle: "Parent Agency / Market Agency List",
+        apiControllerAction: "/api/ParentAgency/GetParentAgencyMarketAgencyList",
+        apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: 'agyreports'
     }
