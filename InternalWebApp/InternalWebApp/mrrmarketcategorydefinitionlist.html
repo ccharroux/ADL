@@ -596,12 +596,14 @@
                         + one or more "<li><strong>NAME:</strong> DEFINITION</li>"
                         + "</ul>"
                 */
-                var exclusionDefinition = data.report.rows[0].Definition;
+                var exclusionDefinition = (data.report.rows == 0) ? "" : data.report.rows[0].Definition.trim();
 
                 // Extract the middle part
-                exclusionDefinition = exclusionDefinition.substring(
-                    exclusionDefinition.indexOf("<ul><li>") + 8,
-                    exclusionDefinition.lastIndexOf("</li></ul>"));
+                if (exclusionDefinition != "") {
+                    exclusionDefinition = exclusionDefinition.substring(
+                        exclusionDefinition.indexOf("<ul><li>") + 8,
+                        exclusionDefinition.lastIndexOf("</li></ul>"));
+                }
 
                 // Convert it to an array
                 var newReport = [];
@@ -659,12 +661,13 @@
         var exclusionDefinition = '<p style="font-style: italic; font-weight: bold; color: navy">Instructions and definitions for revenue categories not displayed in the market:</p><ul>';
 
         var okayToUpdate = true;
+        var exclusionItems = new Array();
         $(".exclusion-name").each(function (index, value) {
             var currentExclusionId = $(this).attr("data-exclusion-id");
-            var currentExclusionName = $(this).text().trim();
-            var currentExclusionDefinition = $("#exclusion-definition-" + currentExclusionId).text().trim();
+            var currentExclusionName = $(this).val().trim();
+            var currentExclusionDefinition = $("#exclusion-definition-" + currentExclusionId).val().trim();
             if (currentExclusionName != "" && currentExclusionDefinition != "") {
-                exclusionDefinition += "<li><strong>" + currentExclusionName + ":</strong> " + currentExclusionDefinition + "</li>";
+                exclusionItems[currentExclusionId] = "<li><strong>" + currentExclusionName + ":</strong> " + currentExclusionDefinition + "</li>";
                 return true; // continue to next iteration of .each() loop
             }
             if (currentExclusionName != "") {
@@ -681,6 +684,12 @@
         if (!okayToUpdate) {
             return;
         }
+        for (var exclusionItemIndex = 1; exclusionItemIndex < exclusionItems.length; ++exclusionItemIndex) {
+            if (exclusionItems[exclusionItemIndex] != null) {
+                exclusionDefinition += exclusionItems[exclusionItemIndex];
+            }
+        }
+        exclusionDefinition += "</ul>";
 
         //filling out url for ajax call
         var url = ServicePrefix + '/api/MRR/UpdateMarketExclusionDefinitions';
