@@ -1357,7 +1357,7 @@ function getAuditObject_ParentAdvertiserAdvertiserList() {
 
     tempObject =
     {
-        auditTitle: "Parent Advertiser / Advertiser List",
+        auditTitle: "Parent Advertiser / Market Advertiser List",
         apiControllerAction: "/api/ParentAdvertiser/GetParentAdvertiserMarketAdvertiserList",
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
@@ -1513,8 +1513,8 @@ function getAuditObject_AgencyAdvertiserAccountsList() {
     tempObject =
     {
         auditTitle: "Market Agency / Market Advertiser List",
-        apiControllerAction: null,
-        apiType: "get",
+        apiControllerAction: "/api/Agency/GetMarketAgencyMarketAdvertiserList",
+        apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: 'agyreports'
     }
