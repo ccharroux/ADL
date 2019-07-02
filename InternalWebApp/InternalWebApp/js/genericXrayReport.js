@@ -1183,7 +1183,7 @@ function getAuditObject_AdvertisersAgenciesList() {
 
     tempObject =
     {
-        auditTitle: "Advertiser / Agency List",
+        auditTitle: "Market Advertiser / Market Agency List",
         apiControllerAction: "/api/Advertiser/GetMarketAdvertiserMarketAgencyList",
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
