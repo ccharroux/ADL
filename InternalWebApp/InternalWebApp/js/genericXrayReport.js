@@ -1626,6 +1626,40 @@ function getAuditFilterArray_StationAgencyList() {
     var arrayFilters = new Array();
     var arrayObject = new Array();
 
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getXrayStationList",
+        objectName: "ddlStation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "StationAgencyName",
+        jsCall: null,
+        objectName: "txtStationAgencyName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MarketAgencyName",
+        jsCall: null,
+        objectName: "txtMarketAgencyName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
     return arrayFilters;
 }
 
@@ -1633,12 +1667,18 @@ function getAuditObject_StationAgencyList() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-   
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Station Agency");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Station Agency Code");
+    columnsToDisplay.push("Market Agency");
+    columnsToDisplay.push("Date Modified");
+
     tempObject =
     {
         auditTitle: "Station Agency List",
-        apiControllerAction: null,
-        apiType: "get",
+        apiControllerAction: "/api/StationAgency/GetStationAgencyListForReport",
+        apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: 'agyreports'
     }
