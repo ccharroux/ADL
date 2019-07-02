@@ -1526,6 +1526,7 @@ function getAuditFilterArray_DisabledAgencyList() {
     var arrayFilters = new Array();
     var arrayObject = new Array();
 
+    //no filters at this time
 
     return arrayFilters;
 }
@@ -1534,13 +1535,16 @@ function getAuditObject_DisabledAgencyList() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Station Agency");
+    columnsToDisplay.push("Market Agency");
 
     tempObject =
     {
         auditTitle: "Disabled Agency List",
-        apiControllerAction: null,
-        apiType: "get",
+        apiControllerAction: "/api/StationAgency/GetDisabledAgencyList",
+        apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: 'agyreports'
     }
