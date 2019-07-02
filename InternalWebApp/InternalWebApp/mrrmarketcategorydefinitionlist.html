@@ -112,6 +112,7 @@
                 <div class="text-center">
                     <h3>Market Exclusion Definitions</h3>
                     <p>"Instructions and definitions for revenue categories not displayed in the market"</p>
+                    <p><input type="button" value="Update" onclick="updateExclusions();" /></p>
                 </div>
 
                 <!-- start datatable-->
@@ -121,14 +122,12 @@
                             <tr>
                                 <th class="exportColumn">Exclusion Name</th>
                                 <th class="exportColumn">Definition</th>
-                                <th></th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
                                 <th>Exclusion Name</th>
                                 <th>Definition</th>
-                                <th></th>
                             </tr>
                         </tfoot>
                     </table>
@@ -269,15 +268,31 @@
             "data": [],
             "columns": [
                 { "data": 'Exclusion Name' },
-                { "data": 'Definition' },
+                { "data": 'Definition' }
+            ],
+            "columnDefs": [
                 {
-                    mRender: function (data, type, row) {
-                        var editExclusionParams = "'" + row["Exclusion ID"] + "'";
-                        return '<a href="#" onclick="editExclusion(' + editExclusionParams + ')">Edit</a>&nbsp;<a href="#" onclick="deleteExclusion(' + editExclusionParams + ')">Delete</a>';
-                    },
-                    "orderable": false,
-                    "searchable": false,
-                    "className": "text-align-right"
+                    "targets": [
+                        0 // Exclusion Name
+                    ],
+                    "render": function (data, type, row) {
+                        return '<input type="text" class="exclusion-name"'
+                            + ' id="exclusion-name-' + row['Exclusion ID'] + '"'
+                            + ' data-exclusion-id="' + row['Exclusion ID'] + '"'
+                            + ' value="' + data + '"></input>';
+                    }
+                },
+                {
+                    "targets": [
+                        1 // Definition
+                    ],
+                    "render": function (data, type, row) {
+                        return '<textarea class="exclusion-definition"'
+                            + ' id="exclusion-definition-' + row['Exclusion ID'] + '"'
+                            + ' data-exclusion-id="' + row['Exclusion ID'] + '"'
+                            + ' maxlength="2000" rows="10" cols="80" style="height: auto;"'
+                            + '>' + data + '</textarea>';
+                    }
                 }
             ],
             "bSort": false,
@@ -574,6 +589,52 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
+                /*
+                This should look like:
+                    (boilerplate intro)
+                        + "<ul>"
+                        + one or more "<li><strong>NAME:</strong> DEFINITION</li>"
+                        + "</ul>"
+                */
+                var exclusionDefinition = data.report.rows[0].Definition;
+
+                // Extract the middle part
+                exclusionDefinition = exclusionDefinition.substring(
+                    exclusionDefinition.indexOf("<ul><li>") + 8,
+                    exclusionDefinition.lastIndexOf("</li></ul>"));
+
+                // Convert it to an array
+                var newReport = [];
+                var exclusionItems = exclusionDefinition.split("</li><li>");
+                var exclusionItemNumber = 0;
+                var exclusionItemName;
+                var exclusionItemDescription;
+                exclusionItems.forEach(function (exclusionItem) {
+                    ++exclusionItemNumber;
+                    exclusionItemName = exclusionItem.substring(
+                        exclusionItem.indexOf("<strong>") + 8,
+                        exclusionItem.indexOf(":</strong> "));
+                    exclusionItemDescription = exclusionItem.substring(
+                        exclusionItem.indexOf("</strong> ") + 10);
+                    newReport.push({
+                        "Exclusion ID": exclusionItemNumber,
+                        "Exclusion Name": exclusionItemName,
+                        "Definition": exclusionItemDescription
+                    });
+                });
+
+                // Add some empty rows so new items can be added
+                for (var i = 0; i < 5; ++i) {
+                    ++exclusionItemNumber;
+                    newReport.push({
+                        "Exclusion ID": exclusionItemNumber,
+                        "Exclusion Name": "",
+                        "Definition": ""
+                    });
+                }
+
+                data.report.rows = newReport;
+
                 populateDataTable("dtExclusionList", data);
                 $("#dtExclusionList").show();
             },
@@ -594,13 +655,66 @@
         bootbox.alert('Delete category functionality is still under development.');
     }
 
-    function editExclusion(exclusionId) {
-        bootbox.alert('Edit exclusion functionality is still under development.');
-        // window.location = "mrrmarketexclusiondefinition.html?marketId=" + $("#ddlMarket").val() + "&exclusionId=" + exclusionId.trim();
+    function updateExclusions() {
+        var exclusionDefinition = '<p style="font-style: italic; font-weight: bold; color: navy">Instructions and definitions for revenue categories not displayed in the market:</p><ul>';
+
+        var okayToUpdate = true;
+        $(".exclusion-name").each(function (index, value) {
+            var currentExclusionId = $(this).attr("data-exclusion-id");
+            var currentExclusionName = $(this).text().trim();
+            var currentExclusionDefinition = $("#exclusion-definition-" + currentExclusionId).text().trim();
+            if (currentExclusionName != "" && currentExclusionDefinition != "") {
+                exclusionDefinition += "<li><strong>" + currentExclusionName + ":</strong> " + currentExclusionDefinition + "</li>";
+                return true; // continue to next iteration of .each() loop
+            }
+            if (currentExclusionName != "") {
+                bootbox.alert("Cannot save a name without a description");
+                okayToUpdate = false;
+                return false; // break out of .each() loop
+            }
+            if (currentExclusionDefinition != "") {
+                bootbox.alert("Cannot save a description without a name");
+                okayToUpdate = false;
+                return false;
+            }
+        });
+        if (!okayToUpdate) {
+            return;
+        }
+
+        //filling out url for ajax call
+        var url = ServicePrefix + '/api/MRR/UpdateMarketExclusionDefinitions';
+
+        //filling out settings for ajax call
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": $("#ddlMarket").val(),
+                "inDefinition": exclusionDefinition
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                updateExclusionsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        }
+
+        //ajax call
+        $.ajax(url, settings);
     }
 
-    function deleteExclusion(exclusionId) {
-        bootbox.alert('Delete exclusion functionality is still under development.');
+    function updateExclusionsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+            bootbox.alert('Definition updated');
+        }
     }
 
 </script>
