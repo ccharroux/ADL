@@ -1288,7 +1288,7 @@ function getAuditObject_MediaAdvertisersList() {
     tempObject =
     {
         auditTitle: "Media Advertiser List",
-        apiControllerAction: null, //"/api/MediaAdvertiser/GetMediaAdvertiserListForReport",
+        apiControllerAction: "/api/MediaAdvertiser/GetMediaAdvertiserListForReport",
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: 'advreports'
