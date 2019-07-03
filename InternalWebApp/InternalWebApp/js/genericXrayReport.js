@@ -1206,8 +1206,10 @@ function getAuditObject_DisabledAdvertisersList() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-  
-    //currently defaults to all columns
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Station Advertiser");
+    columnsToDisplay.push("Market Advertiser");
 
     tempObject =
     {
@@ -1283,7 +1285,12 @@ function getAuditObject_MediaAdvertisersList() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    
+    columnsToDisplay.push("Media Advertiser");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Media Type");
+    columnsToDisplay.push("Market Advertiser");
+    columnsToDisplay.push("Date Modified");
+    columnsToDisplay.push("Radio Advertiser");
 
     tempObject =
     {
@@ -1505,10 +1512,10 @@ function getAuditObject_AgencyAdvertiserAccountsList() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("Agency Name");
-    columnsToDisplay.push("Advertiser Name");
-    columnsToDisplay.push("Market Name");
-    columnsToDisplay.push("Account Type Name");
+    columnsToDisplay.push("Agency");
+    columnsToDisplay.push("Advertiser");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Account Type");
 
     tempObject =
     {
