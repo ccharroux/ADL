@@ -1466,10 +1466,10 @@ function getAuditObject_AgencyList() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("Agency Name");
-    columnsToDisplay.push("Account Type Name");
-    columnsToDisplay.push("Market Name");
-    columnsToDisplay.push("Parent Agency Name");
+    columnsToDisplay.push("Agency");
+    columnsToDisplay.push("Account Type");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Parent Agency");
     columnsToDisplay.push("Date Modified");
     columnsToDisplay.push("Posted By");
 

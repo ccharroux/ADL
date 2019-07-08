@@ -124,8 +124,11 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <div>
-                                <input value="Assign Category Template" onclick="assignCategoriesToParentMarket()" class="default-button" type="button">
+                                <input value="Enable DMA" onclick="enableDMA()" class="default-button" type="button">
                             </div>
+                            <!--<div style="padding-top: 10px">
+                                <input value="Disable DMA" onclick="disableDMA()" class="default-button" type="button">
+                            </div>-->
                             <div style="padding-top: 10px">
                                 <input value="Back" onclick="goBackToMarket();" class="default-button" type="button">
                             </div>
@@ -184,7 +187,7 @@
         parentMarketId = (getParameterByName("ParentMarketId") == null ? 0 : getParameterByName("ParentMarketId"));
         bEditMode = getParameterByName("Edit") === "true" ? true : false;
 
-        console.log(bEditMode);
+        //console.log(bEditMode);
 
         if (marketId <= 0) {
             //need to determine what to do if no market id is passed through
@@ -224,6 +227,7 @@
         displayColumns = getDisplayColumns();
 
         $("#dtAssignmentList").DataTable();
+
     });
 
     function getDMACategoriesByParentAndMarket(dmaCategory) {
@@ -265,11 +269,13 @@
                     $("#ddlDMACategories").append(str);
 
                     //if the dropdown is updating to reflect changes
-                    //select the DMA category that was initially clicked 
+                    //select the DMA category that was initially clicked
                     //and refresh the assignment table.
                     if (dmaCategory !== null && dmaCategory !== undefined) {
                         $("#ddlDMACategories").val(dmaCategory).change();
                     }
+
+                    getUserMessaging();
 
                 }
 
@@ -278,6 +284,31 @@
                 genericAjaxError(jqXhr, textType, errorThrown);
             }
         });
+
+    }
+
+    function getUserMessaging() {
+
+        //still need to deal with button and functionality
+        if (iTotalAssigned == 0 && bEditMode == false) {
+            //this should be new
+            $("#txtMessaging").text("Please map MRR categories before trying to activating the product.");
+            //disable the button
+        }
+        else if (iTotalAssigned == 0 && bEditMode == true) {
+            //previously existed and will disable
+            $("#txtMessaging").text("There are no MRR categories mapped so the product will be disabled.");
+        }
+        else if (iTotalAssigned > 0 && bEditMode == false) {
+            // >0 and new continue
+            $("#txtMessaging").text("There are MRR categories mapped so you can continue activating the product if you are done mapping.");
+            //enable the active/enable button
+        }
+        else if (iTotalAssigned > 0 && bEditMode == true) {
+            // >0 and existing just go back to market
+            $("#txtMessaging").text("If you are done making changes to the MRR category mappings, you can go back to the Market.");
+        }
+
 
     }
 
@@ -326,13 +357,6 @@
                 "searchable": true
             });
 
-        //columnsToDisplay.push({
-        //    "title": "Assigned DMA Category Id",
-        //    "visible": true,
-        //    "mData": "Assigned DMA Category Id",
-        //    "orderable": true
-        //});
-
         columnsToDisplay.push({
             "title": "Assigned DMA Category",
             "visible": true,
@@ -343,7 +367,7 @@
 
         columnsToDisplay.push({
             "title": "Status",
-            "mRender": function(data, type, row) {
+            "mRender": function (data, type, row) {
                 //build link to assign/remove etc
                 var action = "assignMRRCategory('" +
                     row["MRR Category Id"] +
@@ -354,7 +378,7 @@
                     "," +
                     row["Market Id"] +
                     ")";
-                return '<a href="#" onclick="' + action + '">'+ row.Status + '</a>';
+                return '<a href="#" onclick="' + action + '">' + row.Status + '</a>';
             },
             "orderable": false,
             "searchable": false
@@ -435,5 +459,14 @@
     function goBackToMarket() {
         window.location = "/market.html?MarketID=" + $("#txtMarketId").val();
     }
+
+    function enableDMA() {
+        //what needs to happen here?
+        window.location = "/marketproductdma.html?MarketId=" + marketId + "&ProductNew=1";
+    }
+
+    //function disableDMA() {
+    //    //what needs to happen here?
+    //}
 
 </script>
