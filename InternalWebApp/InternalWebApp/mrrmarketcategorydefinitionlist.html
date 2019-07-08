@@ -49,6 +49,14 @@
     <script src="js/respond.min.js"></script>
     <![endif]-->
     <style>
+        .mrr-name {
+            width: 150px;
+            min-width: 150px;
+        }
+        .mrr-definition {
+            width: 700px;
+            min-width: 700px;
+        }
     </style>
 </head>
 <body>
@@ -178,6 +186,8 @@
     var gotMarkets = false;
     var setUpCategories = false;
     var setUpExclusions = false;
+    var gotCategories = false;
+    var gotExclusions = false;
 
     $(document).ready(function () {
 
@@ -201,223 +211,7 @@
 
     });
 
-    function setUpDataTableCategories() {
-
-        $("#dtCategoryList").DataTable({
-            "dom": "Blfrtip",
-            "pageLength": gDataTableDefaultRows,
-            "data": [],
-            "columns": [
-                { "data": 'Category Name' },
-                {
-                    // "data": 'Definition',
-                    "mRender": function (data, type, row) {
-                        return row["Definition"].replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                    }
-                },
-                {
-                    mRender: function (data, type, row) {
-                        if (row["IsTotal"]) {
-                            return "";
-                        }
-                        var editCategoryParams = "'" + row["Category ID"] + "'";
-                        return '<a href="#" onclick="editCategory(' + editCategoryParams + ')">Edit</a>&nbsp;<a href="#" onclick="deleteCategory(' + editCategoryParams + ')">Delete</a>';
-                    },
-                    "orderable": false,
-                    "searchable": false,
-                    "className": "text-align-right"
-                }
-            ],
-            "bSort": false,
-            "paging": false, // probably unneeded in practice, but just in case
-            "pagingType": "full_numbers",
-            "bLengthChange": false, // omit "Show <number> entries"
-            "searching": false, // omit "Filter Results:"
-            "bInfo": false, // omit "Showing X to Y of Z entries"
-            "buttons": [ // omit = default buttons, explicit empty list = no buttons
-            //   {
-            //       extend: 'csv',
-            //       exportOptions: {
-            //           columns: exportColumns,
-            //           format: {
-            //               header: function (data, columnIdx) {
-            //                   return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
-            //               }
-            //           }
-            //       }
-            //   },
-            //   {
-            //       extend: 'excel',
-            //       title: reportTitle,
-            //       exportOptions: {
-            //           columns: exportColumns,
-            //           format: {
-            //               header: function (data, columnIdx) {
-            //                   return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
-            //               }
-            //           }
-            //       }
-            //   },
-            //   {
-            //       extend: 'pdf',
-            //       title: reportTitle,
-            //       exportOptions: {
-            //           columns: exportColumns,
-            //           format: {
-            //               header: function (data, columnIdx) {
-            //                   return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
-            //               }
-            //           }
-            //       }
-            //   },
-            //   {
-            //       extend: 'print',
-            //       title: reportTitle,
-            //       exportOptions: {
-            //           columns: exportColumns,
-            //           format: {
-            //               header: function (data, columnIdx) {
-            //                   return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
-            //               }
-            //           }
-            //       }
-            //   }
-            //   //,
-            //   //this button is supposed to handle column visibility
-            //   //however it isn't working on our site
-            //   //'colvis'
-            ],
-            initComplete: recordCategoriesSetUp,
-            createdRow: function (row, data, index) {
-                //this adds the class to every row
-                $(row).addClass('single-line-height');
-            },
-            language: {
-                //this changes search box label from Search: to Filter Results:
-                search: "Filter Results:"
-            }
-        });
-
-    }
-
-    function setUpDataTableExclusions() {
-
-        $("#dtExclusionList").DataTable({
-            "dom": "Blfrtip",
-            "pageLength": gDataTableDefaultRows,
-            "data": [],
-            "columns": [
-                { "data": 'Exclusion Name' },
-                { "data": 'Definition' }
-            ],
-            "columnDefs": [
-                {
-                    "targets": [
-                        0 // Exclusion Name
-                    ],
-                    "render": function (data, type, row) {
-                        return '<input type="text" class="exclusion-name"'
-                            + ' id="exclusion-name-' + row['Exclusion ID'] + '"'
-                            + ' data-exclusion-id="' + row['Exclusion ID'] + '"'
-                            + ' value="' + data + '"></input>';
-                    }
-                },
-                {
-                    "targets": [
-                        1 // Definition
-                    ],
-                    "render": function (data, type, row) {
-                        return '<textarea class="exclusion-definition"'
-                            + ' id="exclusion-definition-' + row['Exclusion ID'] + '"'
-                            + ' data-exclusion-id="' + row['Exclusion ID'] + '"'
-                            + ' maxlength="2000" rows="10" cols="80" style="height: auto;"'
-                            + '>' + data + '</textarea>';
-                    }
-                }
-            ],
-            "bSort": false,
-            "paging": false, // probably unneeded in practice, but just in case
-            "pagingType": "full_numbers",
-            "bLengthChange": false, // omit "Show <number> entries"
-            "searching": false, // omit "Filter Results:"
-            "bInfo": false, // omit "Showing X to Y of Z entries"
-            "buttons": [ // omit = default buttons, explicit empty list = no buttons
-            //   {
-            //       extend: 'csv',
-            //       exportOptions: {
-            //           columns: exportColumns,
-            //           format: {
-            //               header: function (data, columnIdx) {
-            //                   return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
-            //               }
-            //           }
-            //       }
-            //   },
-            //   {
-            //       extend: 'excel',
-            //       title: reportTitle,
-            //       exportOptions: {
-            //           columns: exportColumns,
-            //           format: {
-            //               header: function (data, columnIdx) {
-            //                   return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
-            //               }
-            //           }
-            //       }
-            //   },
-            //   {
-            //       extend: 'pdf',
-            //       title: reportTitle,
-            //       exportOptions: {
-            //           columns: exportColumns,
-            //           format: {
-            //               header: function (data, columnIdx) {
-            //                   return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
-            //               }
-            //           }
-            //       }
-            //   },
-            //   {
-            //       extend: 'print',
-            //       title: reportTitle,
-            //       exportOptions: {
-            //           columns: exportColumns,
-            //           format: {
-            //               header: function (data, columnIdx) {
-            //                   return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
-            //               }
-            //           }
-            //       }
-            //   }
-            //   //,
-            //   //this button is supposed to handle column visibility
-            //   //however it isn't working on our site
-            //   //'colvis'
-            ],
-            initComplete: recordExclusionsSetUp,
-            createdRow: function (row, data, index) {
-                //this adds the class to every row
-                $(row).addClass('single-line-height');
-            },
-            language: {
-                //this changes search box label from Search: to Filter Results:
-                search: "Filter Results:"
-            }
-        });
-
-    }
-
-    function recordCategoriesSetUp() {
-        setUpCategories = true;
-        adjustDataTableFilters();
-    }
-
-    function recordExclusionsSetUp() {
-        setUpExclusions = true;
-        adjustDataTableFilters();
-    }
-
-    function adjustDataTableFilters() {
+    function adjustDataTableLayouts() {
         if (!setUpCategories || !setUpExclusions) {
             return;
         }
@@ -555,8 +349,118 @@
         setLocalStorage("searchPage", window.location);
     }
 
+    function setUpDataTableCategories() {
+
+        $("#dtCategoryList").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                {
+                    "data": 'Category Name',
+                    "className": "mrr-name"
+                },
+                {
+                    // "data": 'Definition',
+                    "className": "mrr-definition",
+                    "mRender": function (data, type, row) {
+                        return row["Definition"].replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    }
+                },
+                {
+                    mRender: function (data, type, row) {
+                        if (row["IsTotal"]) {
+                            return "";
+                        }
+                        var editCategoryParams = "'" + row["Category ID"] + "'";
+                        return '<a href="#" onclick="editCategory(' + editCategoryParams + ')">Edit</a>&nbsp;<a href="#" onclick="deleteCategory(' + editCategoryParams + ')">Delete</a>';
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": "text-align-right"
+                }
+            ],
+            "bSort": false,
+            "paging": false, // probably unneeded in practice, but just in case
+            "pagingType": "full_numbers",
+            "bLengthChange": false, // omit "Show <number> entries"
+            "searching": false, // omit "Filter Results:"
+            "bInfo": false, // omit "Showing X to Y of Z entries"
+            "buttons": [ // omit = default buttons, explicit empty list = no buttons
+            //   {
+            //       extend: 'csv',
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   },
+            //   {
+            //       extend: 'excel',
+            //       title: reportTitle,
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   },
+            //   {
+            //       extend: 'pdf',
+            //       title: reportTitle,
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   },
+            //   {
+            //       extend: 'print',
+            //       title: reportTitle,
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   }
+            //   //,
+            //   //this button is supposed to handle column visibility
+            //   //however it isn't working on our site
+            //   //'colvis'
+            ],
+            initComplete: setUpDataTableCategoriesSuccess,
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+
+    }
+
+    function setUpDataTableCategoriesSuccess() {
+
+        setUpCategories = true;
+        adjustDataTableLayouts();
+
+    }
+
     function getCategories() {
-        if (!gotMarkets) {
+        if (gotMarkets == false) {
             $("#marketCategoryData").hide();
             return;
         }
@@ -567,10 +471,9 @@
             return;
         }
 
-        setUpDataTableCategories();
-
-        //setLocalStorage("search", $("#searchText").val().trim());
-        //setLocalStorage("searchPage", window.location);
+        if (gotCategories == false) {
+            setUpDataTableCategories();
+        }
 
         //filling out url for ajax call
         var url = ServicePrefix + '/api/MRR/GetMarketCategoryDefinitionList';
@@ -588,6 +491,7 @@
             success: function (data, textStatus, jQxhr) {
                 populateDataTable("dtCategoryList", data);
                 $("#marketCategoryData").show();
+                gotCategories = true;
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -598,8 +502,128 @@
         $.ajax(url, settings);
     }
 
+    function setUpDataTableExclusions() {
+
+        $("#dtExclusionList").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                {
+                    "data": 'Exclusion Name',
+                    "className": "mrr-name"
+                },
+                {
+                    "data": 'Definition',
+                    "className": "mrr-definition"
+                }
+            ],
+            "columnDefs": [
+                {
+                    "targets": [
+                        0 // Exclusion Name
+                    ],
+                    "render": function (data, type, row) {
+                        return '<input type="text" class="exclusion-name"'
+                            + ' id="exclusion-name-' + row['Exclusion ID'] + '"'
+                            + ' data-exclusion-id="' + row['Exclusion ID'] + '"'
+                            + ' value="' + data + '"></input>';
+                    }
+                },
+                {
+                    "targets": [
+                        1 // Definition
+                    ],
+                    "render": function (data, type, row) {
+                        return '<textarea class="exclusion-definition"'
+                            + ' id="exclusion-definition-' + row['Exclusion ID'] + '"'
+                            + ' data-exclusion-id="' + row['Exclusion ID'] + '"'
+                            + ' maxlength="2000" rows="10" cols="80" style="height: auto;"'
+                            + '>' + data + '</textarea>';
+                    }
+                }
+            ],
+            "bSort": false,
+            "paging": false, // probably unneeded in practice, but just in case
+            "pagingType": "full_numbers",
+            "bLengthChange": false, // omit "Show <number> entries"
+            "searching": false, // omit "Filter Results:"
+            "bInfo": false, // omit "Showing X to Y of Z entries"
+            "buttons": [ // omit = default buttons, explicit empty list = no buttons
+            //   {
+            //       extend: 'csv',
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   },
+            //   {
+            //       extend: 'excel',
+            //       title: reportTitle,
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   },
+            //   {
+            //       extend: 'pdf',
+            //       title: reportTitle,
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   },
+            //   {
+            //       extend: 'print',
+            //       title: reportTitle,
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   }
+            //   //,
+            //   //this button is supposed to handle column visibility
+            //   //however it isn't working on our site
+            //   //'colvis'
+            ],
+            initComplete: setUpDataTableExclusionsSuccess,
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+
+    }
+
+    function setUpDataTableExclusionsSuccess() {
+
+        setUpExclusions = true;
+        adjustDataTableLayouts();
+
+    }
+
     function getExclusions() {
-        if (!gotMarkets) {
+        if (gotMarkets == false) {
             $("#marketExclusionData").hide();
             return;
         }
@@ -610,10 +634,9 @@
             return;
         }
 
-        setUpDataTableExclusions();
-
-        //setLocalStorage("search", $("#searchText").val().trim());
-        //setLocalStorage("searchPage", window.location);
+        if (gotExclusions == false) {
+            setUpDataTableExclusions();
+        }
 
         //filling out url for ajax call
         var url = ServicePrefix + '/api/MRR/GetMarketExclusionDefinitionList';
@@ -625,7 +648,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inMarketId": marketId
+                "inMarketId": $("#ddlMarket").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -679,6 +702,7 @@
 
                 populateDataTable("dtExclusionList", data);
                 $("#marketExclusionData").show();
+                gotExclusions = true;
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
