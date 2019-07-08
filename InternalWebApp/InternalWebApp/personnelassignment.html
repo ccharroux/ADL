@@ -105,7 +105,7 @@
 
                 </div>
                 <!-- start datatable-->
-                <div class="dataTable-top-margin" style="padding-top:10px; padding-bottom:10px">
+                <div id="dtPersonnelAssignmentListHolder" class="dataTable-top-margin" style="padding-top:10px; padding-bottom:10px">
                     <table id="dtPersonnelAssignmentList" class="stripe"></table>
                 </div>
                 <!-- end datatable -->
@@ -442,7 +442,7 @@
         $('#' + dataTable).show();
         var data = dataObj["report"]["rows"][0];
         var ctr = -1;
-        columns = [];
+        columns = new Array();
 
         $.each(data, function (objectName, objectValue)
         {
@@ -483,20 +483,36 @@
         //creating a variable that will used for datatable functions later
         var searchTable;
 
+
         //if the datatable already exists need to destroy it before building it
         //again with new results from the search.
         //if you try to destroy before it is a datatable, an error will occur.
         //this code will only destroy it if the table is a datatable.
+
+        //The destroy function only destroys the data in the datatable.
+        //However, the columns need to be same if repopulating the table.
         if ($.fn.DataTable.isDataTable('#' + dataTable)) {
             searchTable = $('#' + dataTable).DataTable();
-            
             searchTable.destroy();
         }
 
         //this code rebuilds the datatable with the updated data from the search 
         //or initial load.
         console.log(columns.length);
+       
+        //If you want to repopulate the datatable with new columns and data,
+        //you need to remove the datatable from the DOM. 
+        //The .remove function will remove it.
+        $("#" + dataTable).remove();
 
+        //Once you remove the datatable from the DOM, you need add the HTML back to the page.
+        //I added a name to the DIV that has the table html. I used the datatable name plus added "Holder".
+        //The following coding adds the table back.
+        $("#"+ dataTable +"Holder").html('<table id="dtPersonnelAssignmentList" class="stripe"></table>');
+
+
+        //once the remove and the html is added back, you can reload the table.
+        //the new columns and data should now populate properly in the datatable.
         searchTable = $('#' + dataTable).DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
