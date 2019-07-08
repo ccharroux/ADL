@@ -130,6 +130,7 @@ reportName.push("rptOwnershipProductList");
 reportName.push("rptEmailStatusList");
 
 reportName.push("rptMRRUploadTemplateByOwner")
+reportName.push("rptMRRUploadTemplateByOwnerWithRevenue")
 
 
 function buildReportArray()
@@ -312,32 +313,6 @@ function getReportFilterArray_OwnershipList() {
     var arrayFilters = new Array();
     var arrayObject = new Object();
 
-    //arrayObject = {
-    //    token:  "Market",
-    //    jsCall:  "getMRRMarketList",
-    //    objectName:  "ddlMarket",
-    //    required:  true
-    //}
-    //arrayFilters.push(arrayObject);
-
-    //arrayObject = new Object();
-    //arrayObject = {
-    //    token:  "Year",
-    //    jsCall:  "getYearList",
-    //    objectName:  "ddlYear",
-    //    required:  true
-    //}
-    //arrayFilters.push(arrayObject);
-
-    //arrayObject = new Object();
-    //arrayObject = {
-    //    token:  "Period",
-    //    objectName:  "ddlPeriod",
-    //    jsCall:  "getPeriodList",
-    //    required:  true
-    //}
-    //arrayFilters.push(arrayObject);
-
     return arrayFilters;
 }
 function getReportObject_OwnershipList() {
@@ -345,13 +320,7 @@ function getReportObject_OwnershipList() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    //columnsToDisplay.push("ownerName");
-    //columnsToDisplay.push("ownerID");
-    //columnsToDisplay.push("ownerAbbreviation");
-    //columnsToDisplay.push("parentOwnerName");
-    //columnsToDisplay.push("productID");
-    //columnsToDisplay.push("productActiveDate");
-    //columnsToDisplay.push("productDisableDate");
+
 
     tempObject =
     {
@@ -4811,6 +4780,61 @@ function getReportObject_MRRUploadTemplateByOwner() {
     {
         reportTitle: "MRR Upload Category Template",
         apiControllerAction: "/api/MRRReport/GetMRRUploadTemplateByOwner",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRUploadTemplateByOwnerWithRevenue() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        objectName: "ddlOwner",
+        jsCall: "getOwnerListMRR",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token:  "Year",
+        jsCall:  "getYearList",
+        objectName:  "ddlYear",
+        required:  true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token:  "Period",
+        objectName:  "ddlPeriod",
+        jsCall:  "getPeriodList",
+        required:  true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MRRUploadTemplateByOwnerWithRevenue() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    bLongQuery = true;
+
+    tempObject =
+    {
+        reportTitle: "MRR Upload Category Template - With Revenue",
+        apiControllerAction: "/api/MRRReport/GetMRRUploadTemplateByOwnerWithRevenue",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'mrr',

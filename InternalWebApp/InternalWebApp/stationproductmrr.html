@@ -116,7 +116,7 @@
                     </div>
 
 
-                    <!--Assigned Recipient List-->                    
+                    <!--Assigned Recipient List-->
                     <div id="divAssignedHidden" class="margin-top-50 hidden">
                         <div id="divAssignedRecipientList" class="default-button-selection silver-border-2">
                             <div class="row margin-bottom-5">
@@ -128,7 +128,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     User:
-                                    <input type="text" id="txtAssignedNameFilter" onkeyup="showAssignedRecipients(this)" />
+                                    <input type="text" id="txtAssignedNameFilter" onkeyup="showAssignedRecipients();" />
                                 </div>
                             </div>
                             <div class="row">
@@ -171,7 +171,7 @@
                         <div id="divUnassignedRecipientList" class="default-button-section silver-border-2">
                             <div class="row margin-bottom-5 ">
                                 <div class="col-md-2 text-align-center">
-                                    <input type="checkbox" id="chkUnassignedSelectAll" onchange="selectAllUnassigned();" />
+                                    <input type="checkbox" id="chkUnassignedSelectAll" onchange="selectAllUnassignedRecipients();" />
                                 </div>
                                 <div class="col-md-2">
 
@@ -219,7 +219,7 @@
                                     <span id="lblRecipientsSelected">0</span>
                                 </div>
                                 <div class="col-md-4 text-align-right">
-                                    <input type="button" class="default-button" value="Add Recipient" onclick="addRecipient();" />
+                                    <input type="button" class="default-button" value="Assign Recipient(s)" onclick="assignMRRRecipientsInBulk();" />
                                 </div>
                             </div>
                         </div>
@@ -235,7 +235,7 @@
                     </div>
 
 
-                  
+
 
                 </div>
             </div>
@@ -274,7 +274,7 @@
         setStationLabel();
         checkIfInsertOrUpdate();
     });
-  
+
     function setStationLabel() {
 
         if (stationId <= 0) {
@@ -402,6 +402,11 @@
             $("#lblAssignedCount").text(cnt.toLocaleString());
             $("#assignedRecipientList").append(str);
 
+            //if list is empty, show (none)
+            if (cnt == 0) {
+                $("#assignedRecipientList").append("(none)");
+            }
+
             getRecipientList(false);
         }
 
@@ -423,7 +428,7 @@
 
                 str = str + '<div class="row unassignedRecipient ' + obj.firstName.toUpperCase() + '_' + obj.lastName.toUpperCase() + '" style="padding-top:3px;">';
                 str = str + '<div class="col-md-2 text-align-center">';
-                str = str + '<input type="checkbox" onchange="updateUnassignedList();" value="' + obj.personnelId + '" / >';
+                str = str + '<input type="checkbox" onchange="updateUnassignedListCount();" value="' + obj.personnelId + '" / >';
                 str = str + '</div>';
                 str = str + '<div class="col-md-10 text-align-left">';
                 str = str + obj.firstName + " " + obj.lastName + " (" + obj.personnelId + ")";
@@ -434,21 +439,26 @@
             $("#lblUnassignedCount").text(cnt.toLocaleString());
             $("#unassignedRecipientList").append(str);
 
+            // if unassigned list is empty, show (none)
+            if (cnt == 0) {
+                $("#unassignedRecipientList").append("(none)");
+            }
+
         }
     }
 
-    function showAssignedRecipients(ctl) {
+    function showAssignedRecipients() {
 
-        if (ctl.value.length > 0) {
+        if ($("#txtAssignedNameFilter").val().length > 0) {
 
             $(".assignedRecipient").each(function () {
                 $(this).hide();
             });
 
-            $("[class*=" + ctl.value.toUpperCase().trim().split(' ').join('_') + "]").each(function () {
+            $("[class*=" + $("#txtAssignedNameFilter").val().toUpperCase().trim().split(' ').join('_') + "]").each(function () {
                 $(this).show();
 
-            }); 
+            });
 
 
         } else {
@@ -485,7 +495,7 @@
 
     }
 
-    function selectAllUnassigned() {
+    function selectAllUnassignedRecipients() {
 
         $("#txtUnassignedNameFilter").val('');
 
@@ -504,11 +514,11 @@
 
         }
 
-        updateUnassignedList();
+        updateUnassignedListCount();
     }
 
 
-    function updateUnassignedList() {
+    function updateUnassignedListCount() {
 
         showUnassignedRecipients();
 
@@ -536,13 +546,72 @@
         }
     }
 
+    function assignMRRRecipientsInBulk() {
+
+        var selectedPersonnelIdList = [];
+
+        $(".unassignedRecipient").each(function () {
+            if ($(this).find("input[type=checkbox]").prop("checked") == true) {
+                selectedPersonnelIdList.push($(this).find("input[type=checkbox]").val())
+            }
+        });
+
+        if (selectedPersonnelIdList.length == 0) {
+            bootbox.alert("You must select at least one recipient from the Unassigned Recipient table.", function () {
+
+            });
+            return;
+        }
+
+        var url = ServicePrefix + '/api/MRRRecipient/AssignMRRRecipientsInBulk';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId,
+                "inPersonnelIdList": selectedPersonnelIdList
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                assignMRRRecipientsInBulkSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function assignMRRRecipientsInBulkSuccess(data, textStatus, errorThrown) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            bootbox.alert('Mass assignement successful.', function () {
+
+                //Refresh name filters, selected count and recipient lists
+                $("#lblRecipientsSelected").text("0");
+                $("#txtUnassignedNameFilter").val("");
+                $("#txtAssignedNameFilter").val("");
+                $("#chkUnassignedSelectAll").prop("checked", false);
+                getRecipientList(true);
+
+            });
+        }
+    }
+
     function goBackToStationPage() {
         window.location = "station.html?StationID=" + stationId;
     }
 
     function updateMRRProduct() {
 
-        var url = ServicePrefix + '/api/MRR/UpdateReportingMRRStation'; 
+        var url = ServicePrefix + '/api/MRR/UpdateReportingMRRStation';
 
         var settings = {
             dataType: 'json',
@@ -583,7 +652,7 @@
 
                 });
             }
-          
+
         }
     }
 
@@ -624,8 +693,6 @@
         }
     }
 
-    function addRecipient() {
-        bootbox.alert("This functionality is still under development.");
-    }
+
 
 </script>
