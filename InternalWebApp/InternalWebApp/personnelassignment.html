@@ -97,10 +97,10 @@
                         <hr />
                         <strong>Data Level View:</strong> &nbsp;&nbsp;
  
-                        <input type="radio" name="dataView" value="role" />&nbsp;Role
-                        <input type="radio" name="dataView" value="market" />&nbsp;Market
-                        <input type="radio" name="dataView" value="owner" />&nbsp;Owner
-                        <input type="radio" name="dataView" value="station" />&nbsp;Station
+                        <input type="radio" name="dataView" value="role" onclick="loadScreenForProductChange()" />&nbsp;Role
+                        <input type="radio" name="dataView" value="market" onclick="loadScreenForProductChange()"/>&nbsp;Market
+                        <input type="radio" name="dataView" value="owner" onclick="loadScreenForProductChange()"/>&nbsp;Owner
+                        <input type="radio" name="dataView" value="station" onclick="loadScreenForProductChange()" />&nbsp;Station
                     </div>
 
                 </div>
@@ -317,27 +317,33 @@
 
     function loadPersonnelAssignmentList(dataTable)
     {
+        if (!$("input[name='dataView']:checked").val())
+        {
+            //bootbox.alert("A view must be selected");
+            return;
+        }
+
         var apiParameters = new Object();
         var columns = [];
         var apiToken = getLocalStorage("APIToken");
-        var api = '/api/personnel/GetPersonnelAssigmentList'
+ 
+        // need to branch here by product...
+        var api = '/api/mrr/GetPersonnelAssignmentsBy';
+        api = api + $("input[name='dataView']:checked").val();
+        api = api + "?inApiToken=" + apiToken;
+        api = api + "&inPersonnelId=" + personnelId;
 
-        apiParameters["inApiToken"] = apiToken;
-        apiParameters["inPersonnelId"] = personnelId;
-
-
-        if ($("#ddlProduct").val() != "")
-        {
-            apiParameters["inProductId"] = $("#ddlProduct").val();
-        }
+        //if ($("#ddlProduct").val() != "")
+        //{
+        //    apiParameters["inProductId"] = $("#ddlProduct").val();
+        //}
 
 
         $.ajax({
             url: ServicePrefix + api,
             dataType: 'json',
-            type: 'post',
+            type: 'get',
             contentType: 'application/json',
-            data: JSON.stringify(apiParameters),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 if (data.response.status.toUpperCase() === "SUCCESS") {
@@ -359,26 +365,64 @@
 
     function destroyDataTable(tableToDestroy)
     {
-            if ($.fn.DataTable.isDataTable('#' + tableToDestroy)) {
+        if ($.fn.DataTable.isDataTable('#' + tableToDestroy))
+        {
                 var searchTable = $('#' + tableToDestroy).DataTable();
                 searchTable.destroy();
                 $('#' + tableToDestroy).hide();
-            }
+        }
 
     }
 
     function buildColumnsArray(dataObj, dataTable)
     {
+        //destroyDataTable("dtPersonnelAssignmentList");
 
-        columnsToDisplay.length = 0;
-        columnsToDisplay.push("MarketId");
-        columnsToDisplay.push("MarketName");
-        columnsToDisplay.push("StationId");
-        columnsToDisplay.push("Station");
-        columnsToDisplay.push("Product");
-        columnsToDisplay.push("Report/Access");
-        columnsToDisplay.push("Manager");
-        columnsToDisplay.push("Submitter");
+        columnsToDisplay = new Array();
+
+        if ($("input[name='dataView']:checked").val() == "market")
+        {
+            columnsToDisplay.push("Market");
+            //columnsToDisplay.push("Owner");
+            //columnsToDisplay.push("Station");
+            columnsToDisplay.push("Role");
+            columnsToDisplay.push("Station Count");
+            //columnsToDisplay.push("Report Count");
+        }
+
+        if ($("input[name='dataView']:checked").val() == "owner") {
+            //columnsToDisplay.push("Market");
+            columnsToDisplay.push("Owner");
+            //columnsToDisplay.push("Station");
+            columnsToDisplay.push("Role");
+            columnsToDisplay.push("Station Count");
+            //columnsToDisplay.push("Report Count");
+        }
+
+
+        if ($("input[name='dataView']:checked").val() == "role") {
+            //columnsToDisplay.push("Market");
+            //columnsToDisplay.push("Owner");
+            //columnsToDisplay.push("Station");
+            columnsToDisplay.push("Role");
+            columnsToDisplay.push("Station Count");
+            //columnsToDisplay.push("Report Count");
+        }
+
+        if ($("input[name='dataView']:checked").val() == "station") {
+            columnsToDisplay.push("Market");
+            columnsToDisplay.push("Owner");
+            columnsToDisplay.push("Station");
+            columnsToDisplay.push("Role");
+            //columnsToDisplay.push("Station Count");
+            columnsToDisplay.push("Report Count");
+        }
+        //columnsToDisplay.push("Market");
+        //columnsToDisplay.push("Owner");
+        //columnsToDisplay.push("Station");
+        //columnsToDisplay.push("Role");
+        //columnsToDisplay.push("Station Count");
+        //columnsToDisplay.push("Report Count");
 
         columnsToExport = new Array();
 
@@ -392,8 +436,8 @@
             return;
         }
 
-        $('#dtPersonnelAssignmentList').show();
 
+        $('#' + dataTable).show();
         var data = dataObj["report"]["rows"][0];
         var ctr = -1;
         columns = [];
@@ -422,76 +466,76 @@
                 });
             }
         });
-
+        //console.log(columns);
+        //$('#dtPersonnelAssignmentList').show();
         loadResults(dataObj, columns, dataTable);
     }
 
     function loadResults(data, columns, dataTable) {
-            //data is the data from the ajax call
-            //columns is the array that was built previously
+        //data is the data from the ajax call
+        //columns is the array that was built previously
 
-            //assigns the data from the ajax call
-            var results = data["report"]["rows"];
+        //assigns the data from the ajax call
+        var results = data["report"]["rows"];
 
-            //creating a variable that will used for datatable functions later
-            var searchTable;
+        //creating a variable that will used for datatable functions later
+        var searchTable;
 
-            //if the datatable already exists need to destroy it before building it
-            //again with new results from the search.
-            //if you try to destroy before it is a datatable, an error will occur.
-            //this code will only destroy it if the table is a datatable.
-            if ($.fn.DataTable.isDataTable('#' + dataTable)) {
-                searchTable = $('#' + dataTable).DataTable();
-                searchTable.destroy();
-            }
+        //if the datatable already exists need to destroy it before building it
+        //again with new results from the search.
+        //if you try to destroy before it is a datatable, an error will occur.
+        //this code will only destroy it if the table is a datatable.
+        if ($.fn.DataTable.isDataTable('#' + dataTable)) {
+            searchTable = $('#' + dataTable).DataTable();
+            
+            searchTable.destroy();
+        }
 
+        //this code rebuilds the datatable with the updated data from the search 
+        //or initial load.
+        console.log(columns.length);
 
-            //this code rebuilds the datatable with the updated data from the search 
-            //or initial load.
-
-
-            var searchTable2 = $("#" + dataTable).DataTable({
-                "dom": "Blfrtip",
-                "pageLength": gDataTableDefaultRows,
-                "data": results,
-                "columns": columns,
-                "select": true,
-                language: {
-                    search: "Filter Results:"
-                },
-                "buttons": [
-                   //{
-                   //    extend: 'csv',
-                   //    exportOptions: {
-                   //        columns: columnsToExport
-                   //    }
-                   //},
-                   {
-                       extend: 'excel',
-                       title: "Personnel Assignments",
-                       exportOptions: {
-                           columns: columnsToExport
-                       }
-                   },
-                   //{
-                   //    extend: 'pdf',
-                   //    title: reportObject.reportTitle,
-                   //    exportOptions: {
-                   //        columns: columnsToExport
-                   //     }
-                   //},
-                   {
-                       extend: 'print',
-                       title: "Personnel Assignments",
-                       exportOptions: {
-                           columns: columnsToExport
-
-                       }
+        searchTable = $('#' + dataTable).DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "order": [],
+            "data": results,
+            "columns": columns,
+            "select": true,
+            language: {
+                search: "Filter Results:"
+            },
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: columnsToExport
+               //    }
+               //},
+               {
+                   extend: 'excel',
+                   title: "Personnel Assignments",
+                   exportOptions: {
+                       columns: columnsToExport
                    }
-                ],
-            });
+               },
+               //{
+               //    extend: 'pdf',
+               //    title: reportObject.reportTitle,
+               //    exportOptions: {
+               //        columns: columnsToExport
+               //     }
+               //},
+               {
+                   extend: 'print',
+                   title: "Personnel Assignments",
+                   exportOptions: {
+                       columns: columnsToExport
 
- 
+                   }
+               }
+            ],
+        });
 
     }
 
