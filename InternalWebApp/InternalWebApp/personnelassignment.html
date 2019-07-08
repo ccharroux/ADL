@@ -74,11 +74,35 @@
                     </div>
                 </div>
                 <!-- search / filter area -->
-                <div class="row search-section">
-                    <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-3">
                         <label for="ddlProduct" class="search-ddl-label">Product</label>
                         <select id="ddlProduct" class="search-ddl-select" style="" onchange="loadScreenForProductChange()"></select>
                     </div>
+                    <div class="col-md-3">
+                        <label for="ddlOwner" class="search-ddl-label">Owner</label>
+                        <select id="ddlOwner" class="search-ddl-select" style="" onchange="loadScreenForProductChange()"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="ddlMarket" class="search-ddl-label">Market</label>
+                        <select id="ddlMarket" class="search-ddl-select" style="" onchange="loadScreenForProductChange()"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="ddlStation" class="search-ddl-label">Station</label>
+                        <select id="ddlStation" class="search-ddl-select" style="" onchange="loadScreenForProductChange()"></select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12" style="text-align:center">
+                        <hr />
+                        <strong>Data Level View:</strong> &nbsp;&nbsp;
+ 
+                        <input type="radio" name="dataView" value="role" />&nbsp;Role
+                        <input type="radio" name="dataView" value="market" />&nbsp;Market
+                        <input type="radio" name="dataView" value="owner" />&nbsp;Owner
+                        <input type="radio" name="dataView" value="station" />&nbsp;Station
+                    </div>
+
                 </div>
                 <!-- start datatable-->
                 <div class="dataTable-top-margin" style="padding-top:10px; padding-bottom:10px">
@@ -210,62 +234,49 @@
 </html>
 <script>
 
-
-
     var personnelId = 0;
     var nameOfUser = "";
+
     var columns = [];
     var columnsToDisplay = new Array();
     var columnsToExport = new Array();
 
     $(document).ready(function () {
 
-     //   var input = document.getElementById("searchText");
-    //    var input2 = document.getElementById("searchText2");
+        pullQSData();
 
-        // Execute a function when the user releases a key on the keyboard
-//        input.addEventListener("keyup", function (event) {
-//            // Cancel the default action, if needed
-//            event.preventDefault();
-//            // Number 13 is the "Enter" key on the keyboard
-//           if (event.keyCode === 13) {
-//
-//               getPersonnelByEmail();
-//            }
-//        });
+        setUI();
 
+        buildMainMenu("Personnel");
+
+        loadProductList();
+
+        loadPersonnelAssignmentList("dtPersonnelAssignmentList");
+
+    });
+
+    function pullQSData()
+    {
         personnelId = getParameterByName("PersonnelId");
-        if (personnelId == null)
-        {
+        if (personnelId == null) {
             window.location = "/dashboard.html";
         }
         nameOfUser = getParameterByName("Name");
 
         $("#nameOfPersonnel").html(nameOfUser.toUpperCase());
+    }
 
-     //   var reportTitle = "Personnel List";
-     //   var exportColumns = returnTableColumnsByClass("dtPersonnelList", "exportColumn");
+    function setUI()
+    {
+        $("body").on("click", "#clear_search_button",
+                     function () {
+                         var table = $("#dtPersonnelList").DataTable();
+                         table.search('').draw();
+                     });
+    }
 
-  
-
-        $("body").on("click",
-            "#clear_search_button",
-            function () {
-                var table = $("#dtPersonnelList").DataTable();
-                table.search('').draw();
-            });
-
-        buildMainMenu("Personnel");
-        loadProductList();
-        loadPersonnelAssignmentList("dtPersonnelAssignmentList");
-
-        //getOwnerList();
-
-    });
     function selectItems(controlchecked, control)
     {
-        console.log($("#" + controlchecked).is(':checked'));
-
 
         if ($("#" + controlchecked).is(':checked') == false)
         {
