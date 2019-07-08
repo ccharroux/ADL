@@ -73,66 +73,74 @@
                     </div>
                     <div class="col-md-3">
                         <label for="ddlMarket">Market</label><br />
-                        <select id="ddlMarket" style="width:220px" onchange="getCategories(); getExclusions();"></select>
+                        <select id="ddlMarket" style="width:220px" onchange="recordCurrentMarket(); getCategories(); getExclusions();"></select>
                     </div>
                     <div class="col-md-6">
                         <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editCategory('')" />
                     </div>
                 </div>
 
-                <hr />
+                <div id="marketCategoryData">
 
-                <div class="text-center">
-                    <h3>Market Category Definitions</h3>
+                    <hr />
+
+                    <div class="text-center">
+                        <h3>Market Category Definitions</h3>
+                    </div>
+
+                    <!-- start datatable-->
+                    <div class="dataTable-top-margin">
+                        <table id="dtCategoryList" class="stripe">
+                            <thead>
+                                <tr>
+                                    <th class="exportColumn">Category Name</th>
+                                    <th class="exportColumn">Definition</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <!--<tfoot>
+                                <tr>
+                                    <th>Category Name</th>
+                                    <th>Definition</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>-->
+                        </table>
+                    </div>
+                    <!-- end datatable -->
+
                 </div>
 
-                <!-- start datatable-->
-                <div class="dataTable-top-margin">
-                    <table id="dtCategoryList" class="stripe">
-                        <thead>
-                            <tr>
-                                <th class="exportColumn">Category Name</th>
-                                <th class="exportColumn">Definition</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tfoot>
-                            <tr>
-                                <th>Category Name</th>
-                                <th>Definition</th>
-                                <th></th>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-                <!-- end datatable -->
+                <div id="marketExclusionData">
 
-                <hr />
+                    <hr />
 
-                <div class="text-center">
-                    <h3>Market Exclusion Definitions</h3>
-                    <p>"Instructions and definitions for revenue categories not displayed in the market"</p>
-                    <p><input type="button" value="Update" onclick="updateExclusions();" /></p>
-                </div>
+                    <div class="text-center">
+                        <h3>Market Exclusion Definitions</h3>
+                        <p>"Instructions and definitions for revenue categories not displayed in the market"</p>
+                        <p><input type="button" value="Update" onclick="updateExclusions();" /></p>
+                    </div>
 
-                <!-- start datatable-->
-                <div class="dataTable-top-margin">
-                    <table id="dtExclusionList" class="stripe">
-                        <thead>
-                            <tr>
-                                <th class="exportColumn">Exclusion Name</th>
-                                <th class="exportColumn">Definition</th>
-                            </tr>
-                        </thead>
-                        <tfoot>
-                            <tr>
-                                <th>Exclusion Name</th>
-                                <th>Definition</th>
-                            </tr>
-                        </tfoot>
-                    </table>
+                    <!-- start datatable-->
+                    <div class="dataTable-top-margin">
+                        <table id="dtExclusionList" class="stripe">
+                            <thead>
+                                <tr>
+                                    <th class="exportColumn">Exclusion Name</th>
+                                    <th class="exportColumn">Definition</th>
+                                </tr>
+                            </thead>
+                            <!--<tfoot>
+                                <tr>
+                                    <th>Exclusion Name</th>
+                                    <th>Definition</th>
+                                </tr>
+                            </tfoot>-->
+                        </table>
+                    </div>
+                    <!-- end datatable -->
+
                 </div>
-                <!-- end datatable -->
             </div>
         </div>
     </div>
@@ -176,13 +184,37 @@
         var reportTitle = 'Categories List';
         var exportColumns = returnTableColumnsByClass("dtCategoryList", "exportColumn");
 
+        //$("body").on("click",
+        //    "#clear_search_button",
+        //    function () {
+        //        var table = $("#dtCategoryList").DataTable();
+        //        table.search('').draw();
+        //    });
+
+        buildMainMenu("Settings");
+        //loadLastSearch();
+
+        //setLocalStorage("search", $("#searchText").val().trim());
+        //setLocalStorage("searchPage", window.location);
+
+        getMediaTypes();
+
+    });
+
+    function setUpDataTableCategories() {
+
         $("#dtCategoryList").DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
             "data": [],
             "columns": [
                 { "data": 'Category Name' },
-                { "data": 'Definition' },
+                {
+                    // "data": 'Definition',
+                    "mRender": function (data, type, row) {
+                        return row["Definition"].replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    }
+                },
                 {
                     mRender: function (data, type, row) {
                         if (row["IsTotal"]) {
@@ -197,59 +229,63 @@
                 }
             ],
             "bSort": false,
+            "paging": false, // probably unneeded in practice, but just in case
             "pagingType": "full_numbers",
-            "buttons": [
-               {
-                   extend: 'csv',
-                   exportOptions: {
-                       columns: exportColumns,
-                       format: {
-                           header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
-                           }
-                       }
-                   }
-               },
-               {
-                   extend: 'excel',
-                   title: reportTitle,
-                   exportOptions: {
-                       columns: exportColumns,
-                       format: {
-                           header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
-                           }
-                       }
-                   }
-               },
-               {
-                   extend: 'pdf',
-                   title: reportTitle,
-                   exportOptions: {
-                       columns: exportColumns,
-                       format: {
-                           header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
-                           }
-                       }
-                   }
-               },
-               {
-                   extend: 'print',
-                   title: reportTitle,
-                   exportOptions: {
-                       columns: exportColumns,
-                       format: {
-                           header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
-                           }
-                       }
-                   }
-               }
-               //,
-               //this button is supposed to handle column visibility
-               //however it isn't working on our site
-               //'colvis'
+            "bLengthChange": false, // omit "Show <number> entries"
+            "searching": false, // omit "Filter Results:"
+            "bInfo": false, // omit "Showing X to Y of Z entries"
+            "buttons": [ // omit = default buttons, explicit empty list = no buttons
+            //   {
+            //       extend: 'csv',
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   },
+            //   {
+            //       extend: 'excel',
+            //       title: reportTitle,
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   },
+            //   {
+            //       extend: 'pdf',
+            //       title: reportTitle,
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   },
+            //   {
+            //       extend: 'print',
+            //       title: reportTitle,
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtCategoryList", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   }
+            //   //,
+            //   //this button is supposed to handle column visibility
+            //   //however it isn't working on our site
+            //   //'colvis'
             ],
             initComplete: recordCategoriesSetUp,
             createdRow: function (row, data, index) {
@@ -261,6 +297,10 @@
                 search: "Filter Results:"
             }
         });
+
+    }
+
+    function setUpDataTableExclusions() {
 
         $("#dtExclusionList").DataTable({
             "dom": "Blfrtip",
@@ -296,59 +336,63 @@
                 }
             ],
             "bSort": false,
+            "paging": false, // probably unneeded in practice, but just in case
             "pagingType": "full_numbers",
-            "buttons": [
-               {
-                   extend: 'csv',
-                   exportOptions: {
-                       columns: exportColumns,
-                       format: {
-                           header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
-                           }
-                       }
-                   }
-               },
-               {
-                   extend: 'excel',
-                   title: reportTitle,
-                   exportOptions: {
-                       columns: exportColumns,
-                       format: {
-                           header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
-                           }
-                       }
-                   }
-               },
-               {
-                   extend: 'pdf',
-                   title: reportTitle,
-                   exportOptions: {
-                       columns: exportColumns,
-                       format: {
-                           header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
-                           }
-                       }
-                   }
-               },
-               {
-                   extend: 'print',
-                   title: reportTitle,
-                   exportOptions: {
-                       columns: exportColumns,
-                       format: {
-                           header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
-                           }
-                       }
-                   }
-               }
-               //,
-               //this button is supposed to handle column visibility
-               //however it isn't working on our site
-               //'colvis'
+            "bLengthChange": false, // omit "Show <number> entries"
+            "searching": false, // omit "Filter Results:"
+            "bInfo": false, // omit "Showing X to Y of Z entries"
+            "buttons": [ // omit = default buttons, explicit empty list = no buttons
+            //   {
+            //       extend: 'csv',
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   },
+            //   {
+            //       extend: 'excel',
+            //       title: reportTitle,
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   },
+            //   {
+            //       extend: 'pdf',
+            //       title: reportTitle,
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   },
+            //   {
+            //       extend: 'print',
+            //       title: reportTitle,
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtExclusionList", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   }
+            //   //,
+            //   //this button is supposed to handle column visibility
+            //   //however it isn't working on our site
+            //   //'colvis'
             ],
             initComplete: recordExclusionsSetUp,
             createdRow: function (row, data, index) {
@@ -361,22 +405,7 @@
             }
         });
 
-        //$("body").on("click",
-        //    "#clear_search_button",
-        //    function () {
-        //        var table = $("#dtCategoryList").DataTable();
-        //        table.search('').draw();
-        //    });
-
-        buildMainMenu("Settings");
-        //loadLastSearch();
-
-        //setLocalStorage("search", $("#searchText").val().trim());
-        //setLocalStorage("searchPage", window.location);
-
-        getMediaTypes();
-
-    });
+    }
 
     function recordCategoriesSetUp() {
         setUpCategories = true;
@@ -489,8 +518,8 @@
         if (gotMarkets) {
             previousMarketId = $("#ddlMarket").val();
         } else {
-            if (getParameterByName("marketId") != null) {
-                previousMarketId = getParameterByName("marketId");
+            if (getParameterByName("search") != null) {
+                previousMarketId = getParameterByName("search");
             }
         }
         var str = '';
@@ -514,22 +543,31 @@
         $("#ddlMarket").val(previousMarketIdStillInList ? previousMarketId : -1);
 
         gotMarkets = true;
+        recordCurrentMarket();
         getCategories();
         getExclusions();
 
     }
 
+    // main.js goBackToDashboard() uses these
+    function recordCurrentMarket() {
+        setLocalStorage("search", $("#ddlMarket").val().trim());
+        setLocalStorage("searchPage", window.location);
+    }
+
     function getCategories() {
         if (!gotMarkets) {
-            $("#dtCategoryList").hide();
+            $("#marketCategoryData").hide();
             return;
         }
 
         var marketId = $("#ddlMarket").val();
         if (marketId == -1) {
-            $("#dtCategoryList").hide();
+            $("#marketCategoryData").hide();
             return;
         }
+
+        setUpDataTableCategories();
 
         //setLocalStorage("search", $("#searchText").val().trim());
         //setLocalStorage("searchPage", window.location);
@@ -549,7 +587,7 @@
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 populateDataTable("dtCategoryList", data);
-                $("#dtCategoryList").show();
+                $("#marketCategoryData").show();
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -562,15 +600,17 @@
 
     function getExclusions() {
         if (!gotMarkets) {
-            $("#dtExclusionList").hide();
+            $("#marketExclusionData").hide();
             return;
         }
 
         var marketId = $("#ddlMarket").val();
         if (marketId == -1) {
-            $("#dtExclusionList").hide();
+            $("#marketExclusionData").hide();
             return;
         }
+
+        setUpDataTableExclusions();
 
         //setLocalStorage("search", $("#searchText").val().trim());
         //setLocalStorage("searchPage", window.location);
@@ -638,7 +678,7 @@
                 data.report.rows = newReport;
 
                 populateDataTable("dtExclusionList", data);
-                $("#dtExclusionList").show();
+                $("#marketExclusionData").show();
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
