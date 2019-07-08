@@ -1034,7 +1034,11 @@ function buildMRRMenu(selectedItem) {
     menuItems += '        <li style="display:block"><a href="revenuedetailmrr.html">Revenue Detail</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
-
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="/mrrmarketcategorydefinitionlist.html" role="button" aria-expanded="false">Market Categories</a></li>';
+    menuItems += '              </ul>';
+    menuItems += '        </li>';
     menuItems += productDashboard('');
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
     menuItems += '    </ul>';
