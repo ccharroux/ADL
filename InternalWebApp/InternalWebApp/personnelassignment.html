@@ -84,15 +84,15 @@
                 <div class="row">
                     <div class="col-md-3">
                         <label for="ddlOwner" class="search-ddl-label">Owner</label>
-                        <select id="ddlOwner" class="search-ddl-select" style="" onchange="loadScreenForProductChange()"></select>
+                        <select id="ddlOwner" class="search-ddl-select" style="" onchange="resetFiltersAndRefreshGrid('owner');"></select>
                     </div>
                     <div class="col-md-3">
                         <label for="ddlMarket" class="search-ddl-label">Market</label>
-                        <select id="ddlMarket" class="search-ddl-select" style="" onchange="loadScreenForProductChange()"></select>
+                        <select id="ddlMarket" class="search-ddl-select" style="" onchange="resetFiltersAndRefreshGrid('market');"></select>
                     </div>
                     <div class="col-md-2">
-                        <label for="ddlStation" class="search-ddl-label">Station</label>
-                        <select id="ddlStation" class="search-ddl-select" style="" onchange="loadScreenForProductChange()"></select>
+                        <label for="ddlStationProduct" class="search-ddl-label">Station</label>
+                        <select id="ddlStationProduct" class="search-ddl-select" style="" onchange="resetFiltersAndRefreshGrid('station');"></select>
                     </div>
                 </div>
                 <div class="row">
@@ -100,10 +100,10 @@
                         <hr />
                         <strong>Data Level View:</strong> &nbsp;&nbsp;
  
-                        <input type="radio" name="dataView" value="role" onclick="loadScreenForProductChange()" />&nbsp;Role
-                        <input type="radio" name="dataView" value="market" onclick="loadScreenForProductChange()"/>&nbsp;Market
-                        <input type="radio" name="dataView" value="owner" onclick="loadScreenForProductChange()"/>&nbsp;Owner
-                        <input type="radio" name="dataView" value="station" onclick="loadScreenForProductChange()" />&nbsp;Station
+                        <input type="radio" name="dataView" checked="checked" value="role" onclick="loadPersonnelAssignmentList('dtPersonnelAssignmentList');" />&nbsp;Role&nbsp;&nbsp;
+                        <input type="radio" name="dataView" value="market" onclick="loadPersonnelAssignmentList('dtPersonnelAssignmentList');"/>&nbsp;Market&nbsp;&nbsp;
+                        <input type="radio" name="dataView" value="owner" onclick="loadPersonnelAssignmentList('dtPersonnelAssignmentList');"/>&nbsp;Owner&nbsp;&nbsp;
+                        <input type="radio" name="dataView" value="station" onclick="loadPersonnelAssignmentList('dtPersonnelAssignmentList');" />&nbsp;Station
                     </div>
 
                 </div>
@@ -255,12 +255,36 @@
         buildMainMenu("Personnel");
 
         loadProductList();
-        loadOwnerList();
-        loadMarketList();
+        //loadOwnerList();
+        //loadMarketList();
+        //loadStationListByProduct();
         //loadPersonnelAssignmentList("dtPersonnelAssignmentList");
 
     });
 
+
+    function resetFiltersAndRefreshGrid(filter)
+    {
+        if (filter.toLowerCase() == "station")
+        {
+            $("#ddlMarket").val("");
+            $("#ddlOwner").val("");
+        }
+
+        if (filter.toLowerCase() == "market")
+        {
+            $("#ddlStationProduct").val("");
+            $("#ddlOwner").val("");
+        }
+
+        if (filter.toLowerCase() == "owner")
+        {
+            $("#ddlMarket").val("");
+            $("#ddlStationProduct").val("");
+        }
+
+        loadPersonnelAssignmentList('dtPersonnelAssignmentList');
+    }
     function pullQSData()
     {
         personnelId = getParameterByName("PersonnelId");
@@ -317,9 +341,11 @@
             $("#marketChoice").show();
         }
 
-        loadPersonnelAssignmentList("dtPersonnelAssignmentList");
+
         loadMarketList();
         loadOwnerList();
+        loadStationListByProduct();
+        loadPersonnelAssignmentList("dtPersonnelAssignmentList");
     }
 
     function loadPersonnelAssignmentList(dataTable)
@@ -339,6 +365,18 @@
         api = api + $("input[name='dataView']:checked").val();
         api = api + "?inApiToken=" + apiToken;
         api = api + "&inPersonnelId=" + personnelId;
+
+        if ($("#ddlStationProduct").val() != "")
+        {
+            api = api + "&inStationId=" + $("#ddlStationProduct").val();
+        }
+        if ($("#ddlOwner").val() != "") {
+            api = api + "&inOwnerId=" + $("#ddlOwner").val();
+        }
+ 
+        if ($("#ddlMarket").val() != "") {
+            api = api + "&inMarketId=" + $("#ddlMarket").val();
+        }
 
         //if ($("#ddlProduct").val() != "")
         //{
@@ -843,7 +881,7 @@
                         var obj = data.report.rows[index];
 
                         str = str + '<option value="' + obj.ownerId + '">';
-                        str = str + obj.ownerName.toUpperCase();
+                        str = str + obj.ownerName;
                         str = str + '</option>';
 
                         $("#ddlOwner").append(str);
@@ -863,6 +901,70 @@
 
 
     }
+    function loadStationListByProduct() {
+
+        var str = '';
+
+        if ($("#ddlProduct").val() == "") {
+            return;
+        }
+
+
+        $("#ddlStationProduct").html("");
+        str = str + '<option value="">';
+        str = str + '-- Select a Station';
+        str = str + '</option>';
+
+        $("#ddlStationProduct").append(str);
+
+        $.ajax({
+            url: ServicePrefix + '/api/Personnel/GetPersonnelAssignedStationListByProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelId,
+                "inProduct": $("#ddlProduct").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+
+                    $.each(data.report.rows, function (index) {
+
+                        str = '';
+                        var obj = data.report.rows[index];
+
+                        str = str + '<option value="' + obj["Station Id"] + '">';
+                        str = str + obj.Station;
+                        str = str + '</option>';
+
+                        $("#ddlStationProduct").append(str);
+
+                    });
+
+
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+
+
+    }
+
+
+
     function loadLastSearch() {
 
         var search = getParameterByName("search");
