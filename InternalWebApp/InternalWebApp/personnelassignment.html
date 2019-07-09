@@ -75,10 +75,13 @@
                 </div>
                 <!-- search / filter area -->
                 <div class="row">
-                    <div class="col-md-3">
-                        <label for="ddlProduct" class="search-ddl-label">Product</label>
+                    <div class="col-md-12">
+                        <label for="ddlProduct" class="search-ddl-label">Product</label><br>
                         <select id="ddlProduct" class="search-ddl-select" style="" onchange="loadScreenForProductChange()"></select>
                     </div>
+                </div>
+
+                <div class="row">
                     <div class="col-md-3">
                         <label for="ddlOwner" class="search-ddl-label">Owner</label>
                         <select id="ddlOwner" class="search-ddl-select" style="" onchange="loadScreenForProductChange()"></select>
@@ -252,8 +255,9 @@
         buildMainMenu("Personnel");
 
         loadProductList();
-
-        loadPersonnelAssignmentList("dtPersonnelAssignmentList");
+        loadOwnerList();
+        loadMarketList();
+        //loadPersonnelAssignmentList("dtPersonnelAssignmentList");
 
     });
 
@@ -315,6 +319,7 @@
 
         loadPersonnelAssignmentList("dtPersonnelAssignmentList");
         loadMarketList();
+        loadOwnerList();
     }
 
     function loadPersonnelAssignmentList(dataTable)
@@ -780,7 +785,68 @@
 
 
     }
+    function loadOwnerList() {
 
+        var str = '';
+
+        if ($("#ddlProduct").val()=="")
+        {
+            return;
+        }
+
+
+        $("#ddlOwner").html("");
+        str = str + '<option value="">';
+        str = str + '-- Select an Owner';
+        str = str + '</option>';
+
+        $("#ddlOwner").append(str);
+
+        $.ajax({
+            url: ServicePrefix + '/api/Personnel/GetPersonnelAssignedOwnershipList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelId,
+                "inProduct": $("#ddlProduct").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+
+                    $.each(data.report.rows, function (index) {
+
+                        str = '';
+                        var obj = data.report.rows[index];
+
+                        str = str + '<option value="' + obj.ownerId + '">';
+                        str = str + obj.ownerName.toUpperCase();
+                        str = str + '</option>';
+
+                        $("#ddlOwner").append(str);
+
+                    });
+
+
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+
+
+    }
     function loadLastSearch() {
 
         var search = getParameterByName("search");
