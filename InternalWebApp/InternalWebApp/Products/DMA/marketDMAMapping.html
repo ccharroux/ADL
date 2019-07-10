@@ -246,7 +246,7 @@
         //still need to get back the total for each category
 
         $.ajax({
-            url: ServicePrefix + '/api/ParentMarketCategory/GetDMACategoriesByParentAndMarket?inApiToken=' + getLocalStorage("APIToken") +
+            url: ServicePrefix + '/api/CategoryMapping/GetCategoryMappingSummaryList?inApiToken=' + getLocalStorage("APIToken") +
                 "&inParentMarketId=" + $("#txtParentMarketId").val() + "&inMarketId=" + $("#txtMarketId").val(),
             dataType: 'json',
             type: 'get',
@@ -342,7 +342,7 @@
         }
 
         $.ajax({
-            url: ServicePrefix + '/api/ParentMarketCategory/GetDMAMRRCategoryAssignmentsByParentAndMarket?inApiToken=' + getLocalStorage("APIToken") +
+            url: ServicePrefix + '/api/CategoryMapping/GetCategoryIdAssignmentOptionList?inApiToken=' + getLocalStorage("APIToken") +
                 "&inParentMarketId=" + $("#txtParentMarketId").val() + "&inMarketId=" + $("#txtMarketId").val() +
                 "&inDMACategoryId=" + $("#ddlDMACategories").val(),
             dataType: 'json',
@@ -399,10 +399,13 @@
                     "','" +
                     $("#ddlDMACategories").val() +
                     "'," +
-                    row["Parent Market Id"] +
+                    //row["Parent Market Id"] +
+                    $("#txtParentMarketId").val() +
                     "," +
                     row["Market Id"] +
-                    ")";
+                    ",'" +
+                    row.Status +
+                    "')";
                 return '<a href="#" onclick="' + action + '">' + row.Status + '</a>';
             },
             "orderable": false,
@@ -445,12 +448,12 @@
         });
     }
 
-    function assignMRRCategory(mrrCategoryId, dmaCategoryId, parentMarketId, marketId) {
+    function assignMRRCategory(mrrCategoryId, dmaCategoryId, parentMarketId, marketId, updateActionToken) {
         //do call to update the assignment
         //afterwards update the dropdown of counts and this should also reload the mapping table.
 
         $.ajax({
-            url: ServicePrefix + '/api/MarketCategory/UpdateDMAMRRCategoryAssignmentByMarket',
+            url: ServicePrefix + '/api/CategoryMapping/UpdateMarketRevenueCategoryMap',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
@@ -458,7 +461,8 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inMarketId": marketId,
                 "inMRRCategoryId": mrrCategoryId,
-                "inDMACategoryId": dmaCategoryId
+                "inDMACategoryId": dmaCategoryId,
+                "inUpdateActionToken": updateActionToken.toUpperCase()
             }),
             processData: false,
             success: function (data, textType, jQxhr) {
