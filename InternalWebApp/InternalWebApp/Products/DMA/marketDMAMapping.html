@@ -191,12 +191,7 @@
 
     $(document).ready(function () {
 
-        marketId = (getParameterByName("MarketID") == null ? 0 : getParameterByName("MarketID"));
-        //need to not pass this in the query string.
-        //will fix when have a global solution to pass these types of parameters to page
-        marketName = (getParameterByName("MarketName") == null ? '' : getParameterByName("MarketName"));
-        parentMarketId = (getParameterByName("ParentMarketId") == null ? 0 : getParameterByName("ParentMarketId"));
-        bEditMode = getParameterByName("Edit") === "true" ? true : false;
+        getPageParameters();
 
         if (marketId <= 0) {
             bootbox.alert("Unable to determine the market.", function() {
@@ -210,9 +205,7 @@
             });
         }
 
-        $("#txtMarketId").val(marketId);
-        $("#txtMarketName").val(marketName);
-        $("#txtParentMarketId").val(parentMarketId);
+        setPageValues();
 
         $("#dmaMappingSection").hide();
 
@@ -223,6 +216,33 @@
         assignmentDisplayColumns = getAssignmentDisplayColumns();
 
     });
+
+    function getPageParameters() {
+
+        //these are values past in local storage
+        if (getLocalStorage("gPageParameters").length > 0) {
+           
+            var pageParameters = $.parseJSON(getLocalStorage("gPageParameters"));
+            marketName = pageParameters["marketName"];
+
+        }
+
+        //these values are from the query string
+        marketId = getParameterByName("MarketID") == null ? 0 : getParameterByName("MarketID");
+        parentMarketId = getParameterByName("ParentMarketId") == null ? 0 : getParameterByName("ParentMarketId");
+        bEditMode = getParameterByName("Edit") === "true" ? true : false;
+
+        //clear out local storage
+        setLocalStorage("gPageParameters", "");
+    }
+
+    function setPageValues() {
+
+        $("#txtMarketId").val(marketId);
+        $("#txtMarketName").val(marketName);
+        $("#txtParentMarketId").val(parentMarketId);
+
+    }
 
     function getDMACategoriesByParentAndMarket(dmaCategory) {
 
