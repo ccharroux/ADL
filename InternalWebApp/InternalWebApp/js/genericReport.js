@@ -4888,7 +4888,7 @@ function getReportObject_MRRMarketRevisionHistory() {
     tempObject =
     {
         reportTitle: "MRR Market Revision History",
-        apiControllerAction: null,
+        apiControllerAction: "/api/MRRReport/GetMarketRevisionHistoryReport",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'mrr',
