@@ -217,6 +217,17 @@
                             <label for="dtEndDate" class="dropdown-label rptEndDate rptView">End Date</label>
                             <input type="text" id="dtEndDate" class="rptEndDate rptView" style="max-width:100px;" apiInput="inEndDate">
                         </div>
+                        
+                        
+                        <div class="form-group rptView rptFromYearPeriod">
+                            <label for="ddlFromYYYYMM" class="dropdown-label rptView rptFromYearPeriod">From Period</label>
+                            <select id="ddlFromYYYYMM" apiInput="inFromPeriodYYYYMM" class="dropdown-select rptView rptFromYearPeriod"></select>
+                        </div>
+
+                        <div class="form-group rptView rptToYearPeriod">
+                            <label for="ddlToYYYYMM" class="dropdown-label rptView rptToYearPeriod">To Period</label>
+                            <select id="ddlToYYYYMM" apiInput="inToPeriodYYYYMM" class="dropdown-select rptView rptToYearPeriod"></select>
+                        </div>
 
                         <div class="form-group col-md-3 rptButton" style="text-align:right">
                             <label for="btnReport" class="dropdown-label">&nbsp;</label>
@@ -369,7 +380,7 @@
             }
  
         }
-        
+
     });
 
     function getRequiredFiltersCount()
@@ -504,7 +515,17 @@
             return;
         }
 
-        window[filterObject.jsCall]();
+        //this function is currently written to handle just 1 extra parameter 
+        //besides the actual jsCall
+        var jsCallParams = filterObject.jsCall.split(" ");
+
+        if (jsCallParams.length > 1) {
+            window[jsCallParams[0]](jsCallParams[1]);
+        } else {
+            window[filterObject.jsCall]();
+        }
+
+        //window[filterObject.jsCall]();
     }
 
     //--------------------------------
@@ -529,6 +550,27 @@
         saveLoadedControlSelection("ddlYear");
         saveLoadedControlSelection("ddlToYear");
         saveLoadedControlSelection("ddlFromYear");
+    }
+
+    function getPeriodList_YYYYMM(control) {
+        var str = '';
+        str = '<option value="">-- Select a Period --</option>';
+
+        var thisYear = (new Date()).getFullYear();
+
+        for (var i = thisYear; i > (thisYear - 10) ; i--) {
+
+            for (var i2 = 12; i2 > 0; i2--) {
+
+                var period = i + '/' + addZero(i2);
+
+                //console.log(period);
+                str = str + '<option value="' + period + '">' + period + '</option>';
+            }
+        }
+
+        $("#" + control).html(str);
+
     }
 
     function getMediaTypeList() {

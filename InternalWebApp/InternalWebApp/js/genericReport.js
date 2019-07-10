@@ -129,9 +129,10 @@ reportName.push("rptOwnershipProductList");
 
 reportName.push("rptEmailStatusList");
 
-reportName.push("rptMRRUploadTemplateByOwner")
-reportName.push("rptMRRUploadTemplateByOwnerWithRevenue")
+reportName.push("rptMRRUploadTemplateByOwner");
+reportName.push("rptMRRUploadTemplateByOwnerWithRevenue");
 
+reportName.push("rptMRRMarketRevisionHistory");
 
 function buildReportArray()
 {
@@ -4835,6 +4836,59 @@ function getReportObject_MRRUploadTemplateByOwnerWithRevenue() {
     {
         reportTitle: "MRR Upload Category Template - With Revenue",
         apiControllerAction: "/api/MRRReport/GetMRRUploadTemplateByOwnerWithRevenue",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRMarketRevisionHistory() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        objectName: "ddlMarket",
+        jsCall: "getMRRMarketList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "FromYearPeriod",
+        jsCall: "getPeriodList_YYYYMM ddlFromYYYYMM",
+        objectName: "ddlFromYYYYMM",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "ToYearPeriod",
+        jsCall: "getPeriodList_YYYYMM ddlToYYYYMM",
+        objectName: "ddlToYYYYMM",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MRRMarketRevisionHistory() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    bLongQuery = true;
+
+    tempObject =
+    {
+        reportTitle: "MRR Market Revision History",
+        apiControllerAction: null,
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'mrr',
