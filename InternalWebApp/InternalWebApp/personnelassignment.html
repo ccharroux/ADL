@@ -355,13 +355,17 @@
             //bootbox.alert("A view must be selected");
             return;
         }
+        if ($("#ddlProduct").val() == "")
+        {
+            return;
+        }
 
         var apiParameters = new Object();
         var columns = [];
         var apiToken = getLocalStorage("APIToken");
  
         // need to branch here by product...
-        var api = '/api/mrr/GetPersonnelAssignmentsBy';
+        var api = '/api/' + getProductController($("#ddlProduct").val()) + '/Get' + $("#ddlProduct").val() + 'PersonnelAssignmentsBy';
         api = api + $("input[name='dataView']:checked").val();
         api = api + "?inApiToken=" + apiToken;
         api = api + "&inPersonnelId=" + personnelId;
@@ -515,7 +519,17 @@
         //$('#dtPersonnelAssignmentList').show();
         loadResults(dataObj, columns, dataTable);
     }
-
+    function getProductController(product)
+    {
+        if (product.toLowerCase() == 'xry')
+        {
+            return 'xray';
+        }
+        else
+        {
+            return product;
+        }
+    }
     function loadResults(data, columns, dataTable) {
         //data is the data from the ajax call
         //columns is the array that was built previously
