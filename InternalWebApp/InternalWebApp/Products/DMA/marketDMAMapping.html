@@ -185,25 +185,29 @@
     var marketId = 0;
     var marketName = '';
     var parentMarketId = 0;
-    var displayColumns = [];
+    var assignmentDisplayColumns = [];
     var bEditMode = false;
     var iTotalAssigned = 0;
 
     $(document).ready(function () {
 
         marketId = (getParameterByName("MarketID") == null ? 0 : getParameterByName("MarketID"));
+        //need to not pass this in the query string.
+        //will fix when have a global solution to pass these types of parameters to page
         marketName = (getParameterByName("MarketName") == null ? '' : getParameterByName("MarketName"));
         parentMarketId = (getParameterByName("ParentMarketId") == null ? 0 : getParameterByName("ParentMarketId"));
         bEditMode = getParameterByName("Edit") === "true" ? true : false;
 
-        //console.log(bEditMode);
-
         if (marketId <= 0) {
-            //need to determine what to do if no market id is passed through
+            bootbox.alert("Unable to determine the market.", function() {
+                window.location = "/marketlist.html";
+            });
         }
 
         if (parentMarketId <= 0) {
-            //go get the parent market
+            bootbox.alert("Unable to determine the parent market.", function() {
+                window.location = "/marketlist.html";
+            });
         }
 
         $("#txtMarketId").val(marketId);
@@ -213,37 +217,14 @@
         $("#dmaMappingSection").hide();
 
         buildMainMenu("Markets");
-        //need to determine which menu to display. probably markets since we started on the market page.
-
-        //need to figure out if new or not to activate the product
-        //also does this still need the partnerid functionality to activate?
-
-        //get parent market id based on market
-
-
-        //get DMA categories along with any MRR mappings
-        //the list of DMA categories should include the number MRR categories mapped
-        //list any MRR categories that are not mapped
-        //need to figure out the design of the page
-
-        //if no mapping display messaging at the bottom saying the product will be disabled
-
-        //once there are mappings continue to the marketproductdma.html?MarketId=" + marketId + "&ProductNew=1
-
-
-        //cancel button should go back to market page
 
         getDMACategoriesByParentAndMarket();
 
-        displayColumns = getDisplayColumns();
-
-        //$("#dtResults").DataTable();
+        assignmentDisplayColumns = getAssignmentDisplayColumns();
 
     });
 
     function getDMACategoriesByParentAndMarket(dmaCategory) {
-
-        //still need to get back the total for each category
 
         $.ajax({
             url: ServicePrefix + '/api/CategoryMapping/GetCategoryMappingSummaryList?inApiToken=' + getLocalStorage("APIToken") +
@@ -276,8 +257,6 @@
                         iTotalAssigned += obj['Assigned Total'];
 
                     });
-
-                    //console.log(iTotalAssigned);
 
                     $("#ddlDMACategories").append(str);
 
@@ -359,7 +338,7 @@
 
                     $("#dmaMappingSection").show();
                     //build the datatable
-                    loadResults("dtResults", data, displayColumns);
+                    loadResults("dtResults", data, assignmentDisplayColumns);
                 }
 
             },
@@ -369,7 +348,7 @@
         });
     }
 
-    function getDisplayColumns() {
+    function getAssignmentDisplayColumns() {
 
         var columnsToDisplay = new Array();
 
