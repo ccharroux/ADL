@@ -48,7 +48,12 @@
 
     <!-- CSS for the Chosen dropdown -->
     <link rel="stylesheet" href="/css/chosen.min.css" />
-
+    <style>
+        h3
+        {
+            margin-bottom:10px;
+        }
+    </style>
 </head>
 <body>
     <div id="fh5co-page">
@@ -73,73 +78,69 @@
                     <div class="col-md-9 text-align-left">
                         <input type="hidden" id="txtParentMarketId" value="" />
                         <input type="hidden" id="txtMarketId" value="" />
-                        <input type="text" class="field-width-325" id="txtMarketName" value="" maxlength="50" disabled="disabled" />
+                        <input type="text" class="field-width-325" id="txtMarketName" value="" style="padding-left: 5px;" maxlength="50" disabled="disabled"  />
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="col-md-12">
-                        <hr />
-                    </div>
-                </div>
-
-                <!-- Buttons -->
-                <div class="default-button-section">
-                    <div class="row input-row">
-                        <div class="col-md-12" id="txtMessaging">
-                            Messaging will go here based on assignments
-                        </div>
-
-                    </div>
-                    <div class="row input-row">
-                        <div class="col-md-3">
-                            <div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div>
-                                <input id="btnContinue" value="Continue" style="" onclick="continueEnableDMA()" class="default-button" type="button">
-                                <input value="Back" style="margin-top: 10px;" onclick="goBackToMarket();" class="default-button" type="button">
-                            </div>
-                        </div>
-                        <!--<div class="col-md-3 text-align-left">
-                            <div style="">
-                                <input value="Back" onclick="goBackToMarket();" class="default-button" type="button">
-                            </div>
-                        </div>-->
-                    </div>
-                </div>
-                <!-- End Buttons-->
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <!-- add label -->
-                        <label for="ddlDMACategories" class="dropdown-label rptView">DMA Categories</label>
-                        <select id="ddlDMACategories" class="dropdown-select rptView" onchange="getCategoryMappings()"></select>
-                    </div>
-                </div>
-
-                <div id="dmaMappingSection" class="dataTable-top-margin" style="display:none;padding-top:10px; padding-bottom:10px">
-                    <label for="dtResults" class="dropdown-label rptView">Map DMA Categories</label>
-                    <table id="dtResults" class="stripe"></table>
-                    <div id="noDataFound" style="display:none; color: red">No data found</div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <hr />
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="text-center">
+                    <div class="text-center" style="padding-top:15px">
                         <h3>Category Assignments</h3>
                     </div>
                 </div>
 
-                <div class="dataTable-top-margin" style="padding-top:10px; padding-bottom:10px">
+                <div class="dataTable-top-margin" style="padding-top:0px; padding-bottom:10px; margin-top:10px;margin-bottom:0px">
                     <table id="dtCategoryMappings" class="stripe"></table>
+                    <div id="noMappings"></div>
                 </div>
+
+                <!-- Buttons -->
+                <div class="default-button-section" style="padding-top:0px">
+                    <div class="row input-row">
+                        <div class="col-md-12" style="text-align:center">
+                            <div>
+                                <!--<hr style="margin-top:10px;margin-bottom:10px" />-->
+                                <div><input id="btnContinue" value="Continue" style="" onclick="continueEnableDMA()" class="default-button" type="button"></div>
+                                <input value="Back" style="margin-top: 10px;" onclick="goBackToMarket();" class="default-button" type="button">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row input-row">
+                        <div class="col-md-12" id="txtMessaging" style="padding-top:10px">
+                            Messaging will go here based on assignments
+                        </div>
+                    </div>
+
+                </div>
+                <!-- End Buttons-->
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- add label -->
+                        <label for="ddlDMACategories" class="dropdown-label rptView" style="color:red">To add or remove mappings, select a DMA category:&nbsp;&nbsp;</label>
+                        <select id="ddlDMACategories" class="dropdown-select rptView" onchange="getCategoryMappings()"></select>
+                    </div>
+                </div>
+
+                <div id="dmaMappingSection" class="dataTable-top-margin" style="display:none;padding-top:10px; padding-bottom:15px; margin-top:0px">
+                    <!--<label for="dtResults" class="dropdown-label rptView">Map DMA Categories</label>-->
+                    <table id="dtResults" class="stripe"></table>
+                    <div id="noDataFound" style="display:none; color: red">No data found</div>
+                    <div style="margin-top:5px">
+                        <ul>
+                            <li><b>Add</b> - Maps the MRR category to the selected DMA category.</li>
+                            <li><b>Remove</b> - The MRR category is mapped to the selected DMA category. This will remove the mapping.</li>
+                            <li><b>Reassign</b> - The MRR category is already mapped to <i>ANOTHER</i> DMA category. This assigns the MRR category to the selected DMA category.</li>
+                        </ul>
+                   </div>
+                </div>
+
+                <!--<div class="row">
+                    <div class="col-md-12">
+                        <hr />
+                    </div>
+                </div>-->
+
+
 
 
             </div>
@@ -234,7 +235,7 @@
         bEditMode = getParameterByName("Edit") === "true" ? true : false;
 
         //clear out local storage
-        setLocalStorage("gPageParameters", "");
+        //setLocalStorage("gPageParameters", "");
     }
 
     function setPageValues() {
@@ -250,6 +251,8 @@
         var url = ServicePrefix + '/api/CategoryMapping/GetCategoryMappingSummaryList?inApiToken=' + getLocalStorage("APIToken");
         url = url + "&inParentMarketId=" + $("#txtParentMarketId").val();
         url = url + "&inMarketId=" + $("#txtMarketId").val();
+
+        var iNoMappings = 0;
 
         $.ajax({
             url: url,
@@ -271,6 +274,7 @@
                     $("#ddlDMACategories").empty();
 
                     var str = '';
+                    var strNoMappings = "";
 
                     str = '<option value="">-- Select a DMA category --</option>';
 
@@ -280,13 +284,22 @@
                     {
 
                         var obj = data.report.rows[index];
-
                         str = str + "<option value='" + obj.CategoryId + "'>" + obj['Category Name'] + "</option>";
-
                         iTotalAssigned += obj['Assigned Total'];
+
+                        if (obj['Assigned Total'] == 0)
+                        {
+                            iNoMappings = iNoMappings + 1;
+
+                            strNoMappings = strNoMappings + "<li>" + obj['Category Name'].replace("- 0", " ") + "</li>";
+                        }
 
                     });
 
+                    if (strNoMappings.length > 0)
+                    {
+                        $("#noMappings").html("<br><b>The following DMA " + (iNoMappings == 1 ? "category" : "categories") + " have no MRR categories assigned to them</b>" + strNoMappings);
+                    }
                     $("#ddlDMACategories").append(str);
 
                     convertToChosenSelect('ddlDMACategories', false, false);
@@ -318,7 +331,7 @@
         //still need to deal with button and functionality
         if (iTotalAssigned == 0 && bEditMode == false) {
             //this should be new
-            $("#txtMessaging").text("Please map MRR categories to continue activating the product.");
+            $("#txtMessaging").html("<b>NOTE:</b> You must map MRR categories to a DMA category to continue activating the product.");
             //disable the button
             $("#btnContinue").hide();
         }
@@ -328,7 +341,7 @@
             //}
         else if (iTotalAssigned > 0 && bEditMode == false) {
             // >0 and new continue
-            $("#txtMessaging").text("There are MRR categories mapped so you can continue activating the product if you are done mapping.");
+            $("#txtMessaging").html("<b>NOTE:</b> There are MRR categories mapped to a DMA category, so you can continue activating the product.");
             //enable the active/enable button
             $("#btnContinue").show();
         }
@@ -394,7 +407,20 @@
         columnsToDisplay.push({
             "title": "Assigned DMA Category",
             "visible": true,
-            "mData": "Assigned DMA Category",
+            //"mData": "Assigned DMA Category",
+            "mRender": function (data, type, row) {
+                //build link to assign/remove etc
+                var str = "";
+                if (row["Assigned DMA Category"].toString().indexOf($("#ddlDMACategories").val()) > -1)
+                {
+                    str = "<b>" + row["Assigned DMA Category"] + "</b>";
+                }
+                else
+                {
+                    str = row["Assigned DMA Category"];
+                }
+                return str;
+            },
             "orderable": true,
             "searchable": true
         });
@@ -444,6 +470,7 @@
             "select": true,
             "searching": false,
             "paging": false,
+            "bInfo" : false,
             language: {
                 search: "Filter Results:"
             },
@@ -554,8 +581,33 @@
         window.location = "/market.html?MarketID=" + $("#txtMarketId").val();
     }
 
-    function continueEnableDMA() {
-        window.location = "/marketproductdma.html?MarketId=" + marketId + "&ProductNew=1";
+    function continueEnableDMA()
+    {
+        var message = "<div>Are you sure you want to complete the activation process?</div>";
+ 
+        if ($("#noMappings").html() != "")
+        {
+            message = message + $("#noMappings").html();
+        }
+        message = message + "<br><div>Currently there is limited functionality around editing this information once activation is complete.<br><br>Also, your mapping changes will not be lost if you Cancel.</div>";
+
+
+        bootbox.confirm(message,
+                    function (result) {
+
+                        if (result)
+                        {
+                            window.location = "/marketproductdma.html?MarketId=" + marketId + "&ProductNew=1";
+                        }
+                        else
+                        {
+                            return;
+                        }
+
+ 
+                    });
+
+
     }
 
     //function disableDMA() {
