@@ -103,9 +103,9 @@
                         <label for="ddlOwner" class="search-ddl-label">Owner</label>
                         <select id="ddlOwner" class="search-ddl-select" onchange="resetFilters('owner');"></select>
                     </div>
-                    <div class="col-md-3">
-                        <label for="ddlNumberOfDays" class="search-ddl-label">Date</label>
-                        <select id="ddlNumberOfDays" class="search-ddl-select" onchange="resetFilters('numberofdays');">
+                    <div class="col-md-1">
+                        <label for="ddlNumberOfDays" class="field-width-100 search-ddl-label">Date</label>
+                        <select id="ddlNumberOfDays" class="field-width-100 search-ddl-select" onchange="resetFilters('numberofdays');">
                             <option value="">All</option>
                             <option selected value="30">30 Days</option>
                             <option value="90">90 Days</option>
@@ -113,20 +113,15 @@
                             <option value="365">1 Year</option>
                         </select>
                     </div>
-                </div>
-
-                <!-- Show button-->
-                <div class="row">
-                    <div class="col-md-9">
-
-                    </div>
-                    <div class="col-md-3 text-align-right margin-top-10">
+                    <div class="col-md-2 text-align-right" style="margin-top:5px;">
+                        <br/>
                         <input type="button" id="btnShow" class="search-button" value="Show" onclick="getClientPersonnelNotificationList();" />
+
                     </div>
                 </div>
 
                 <!--Start Notification List datatable-->
-                <div id="dtNotificationListHolder" class="dataTAble-top-maragin" style="padding-top:10px; padding-bottom:10px;">
+                <div id="dtNotificationListHolder" class="dataTable-top-margin" style="padding-top:10px; padding-bottom:10px;">
                     <table id="dtNotificationList" class="striped"></table>
                 </div>
 
@@ -142,7 +137,7 @@
                             <span id="lblUsersSelected">0</span>-->
                         </div>
                         <div class="col-md-4 text-align-right">
-                            <input type="button" class="default-button" value="Send" onclick="sendEmail();" />
+                            <input type="button" class="default-button" value="Send Bulk" onclick="sendEmail();" />
                         </div>
                     </div>
                 </div>
@@ -192,8 +187,6 @@
         buildMainMenu("Personnel");
         loadAdvancedSearch();
         getMarketList();
-
-
 
     });
 
@@ -331,6 +324,8 @@
 
     }
 
+
+
     function buildColumnsArray(dataObj, dataTable) {
 
         columnsToDisplay = new Array();
@@ -358,6 +353,17 @@
         var ctr = -1;
         columns = new Array();
 
+        //Adding column of checkboxes to first column
+        columns.push({
+            mRender: function (data, type, row) {
+                return '<input type="checkbox" onclick="userSelected(' + row["Personnel ID"] + ')" />';
+            },
+            "orderable": false,
+            "searchabble": false,
+            "className": "chkColumn"
+        });
+
+
         $.each(data, function (objectName, objectValue) {
 
             if (columnsToDisplay.includes(objectName)) {
@@ -380,6 +386,15 @@
                 });
             }
         });
+
+        columns.push({
+            mRender: function (data, type, row) {
+                return '<a href="#" onclick="sendIndividualEmail(' + row["Personnel ID"] + ')">Send</a>';
+            },
+            "orderable": false,
+            "searchable": false,
+            "className": "text-align-right"
+        })
 
         loadResults(dataObj, columns, dataTable);
     }
@@ -407,6 +422,7 @@
             searchTable.destroy();
         }
 
+
         searchTable = $('#' + dataTable).DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
@@ -416,6 +432,24 @@
             "select": true,
             language: {
                 search: "Filter Results:"
+            },
+            initComplete: function () {
+
+                $("#dtNotificationList_length").after("<label class='users-selected'>Users Selected: <span id='spnUsersSelected'>0</span></label>");
+                $(".dataTables_filter input").unbind();
+                $(".dataTables_filter input").bind('keyup', function () {
+
+                    //data table filter
+                    searchTable.search(this.value).draw();
+
+                    //getting all hidden rows and unchecking all checkboxes
+                    var hiddenRows = searchTable.rows({ search: 'removed' }).nodes();
+                    $(hiddenRows).find('.chkColumn input[type=checkbox]').prop('checked', false);
+
+                    //updating selected checkbox count
+                    updateSelectedCount();
+
+                })
             },
             "buttons": [
                  //{
@@ -449,6 +483,21 @@
             ],
 
         });
+    }
+
+    function updateSelectedCount() {
+
+        var cnt = 0;
+
+        //looping through all rows to count all selected checkboxes
+        $("#dtNotificationList").DataTable().rows().every(function (index, element) {
+            var row = $(this.node());
+            if (row.find('.chkColumn input[type=checkbox]').prop('checked') == true) {
+                cnt = cnt + 1;
+            }
+        });
+
+        $("#spnUsersSelected").text(cnt);
     }
 
     function getMarketList() {
@@ -608,6 +657,14 @@
         $("#hid" + control).val("");
     }
 
+    function userSelected(personnelId) {
+        console.log(personnelId);
 
+        updateSelectedCount();
+    }
+
+    function sendIndividualEmail() {
+        bootbox.alert("This functionality is currently in development.");
+    }
 
 </script>
