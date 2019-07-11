@@ -35,21 +35,18 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
-    <!-- Date Picker-->
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
+
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
     <!-- FOR IE9 below -->
     <!--[if lt IE 9]>
     <script src="js/respond.min.js"></script>
     <![endif]-->
-    <style>
-        .rptView {
-            margin-left: 5px;
-            vertical-align: top;
-            display: inline-block;
-        }
-    </style>
+
 </head>
 <body>
 
@@ -71,91 +68,85 @@
 
                 <input type="hidden" id="hdnPersonnelId" value="" />
 
-
-                <!--Search Filters-->
-                <!--<div class="row search-section">
-                    <div class="col-md-12">
-
-                        <div class="rptView">
-                            <label for="ddlStatus">Status: </label>
-                            <select id="ddlStatus" onchange="loadFilter(this.value)" class="mkaRequired">
-                                <option value="" selected>-- Select a Status</option>
-                                <option value="Pending">Pending</option>
-                                <option value="Notified">Notified</option>
-                                <option value="Both">Both</option>
-                            </select>
-                        </div>
-                        <div class="rptView">
-                            <label for="ddlFilter">Filter By: </label>
-                            <select id="ddlFilter" onchange="loadSelectedFilter(this.value)" disabled class="mkaRequired disabled">
-                                <option value="" selected>-- Select a Filter</option>
-                            </select>
-                        </div>
-                        <div class="rptView">
-                            <label id="lblSelectedFilter"></label>
-                            <div id="divSelectedFilter" style="display:inline-block;">
-
-                            </div>
-                        </div>
-                        <input type="button" id="btnShowPersonnel" onclick="showNotifications();" class="search-button" value="Show" />
+                <!--Search Filters Top Row-->
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="ddlStatus" class="search-ddl-label">Status</label><br />
+                        <select id="ddlStatus" class="search-ddl-select" style="">
+                            <option value="">All</option>
+                            <option value="notified">Notified</option>
+                            <option value="pending">Pending</option>
+                        </select>
                     </div>
-                </div>-->
-                <!--Notification list-->
-                <div id="divNotificationList" class="margin-top-10">
-                    <div class="default-button-section silver-border-2">
-                        <div class="row silver-border-bottom margin-0-auto margin-bottom-5">
-                            <div class="col-md-1">
-
-                            </div>
-                            <div class="col-md-3">
-                                <strong>User</strong>
-                            </div>
-                            <div class="col-md-1">
-                                <strong>Contact</strong>
-                            </div>
-                            <div class="col-md-1">
-                                <strong>Recipient</strong>
-                            </div>
-                            <div class="col-md-1">
-                                <strong>Status</strong>
-                            </div>
-                            <div class="col-md-2">
-                                <strong>Date</strong>
-                            </div>
-                            <div class="col-md-2">
-                                <strong>Action</strong>
-                            </div>
-                            <div class="col-md-1">
-                                <strong>Web User</strong>
-                            </div>
-                        </div>
-
-
-                        <div class="row margin-0-auto">
-                            <div id="notificationList" class="overflow-y-auto max-height-600">
-
-                            </div>
-                        </div>
-
+                    <div class="col-md-3">
+                        <label for="ddlRoles" class="search-ddl-label">Roles</label><br />
+                        <select id="ddlRoles" class="search-ddl-select" style="">
+                            <option value="">All Client Personnel</option>
+                            <option value="contactsonly">Contacts Only</option>
+                            <option value="recipientsonly">Recipients Only</option>
+                        </select>
                     </div>
-
-                    <div class="default-button-section margin-top-10">
-                        <div class="row">
-                            <div class="col-md-4">
-
-                            </div>
-                            <div class="col-md-4">
-                                <!--Users Selected:
-                                <span id="lblUsersSelected">0</span>-->
-                            </div>
-                            <div class="col-md-4 text-align-right">
-                                <input type="button" class="default-button" value="Send" onclick="sendEmail();" />
-                            </div>
-                        </div>
-                    </div>
-
-
                 </div>
+
+                <!--Search Filters Bottom Row-->
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="txtPersonnel" class="search-ddl-label">Personnel</label>
+                        <input id="txtPersonnel" class="field-width-210" onclick="getPersonnel()" readonly />&nbsp;&nbsp;
+                        <a class="" href="#" onclick="clearSelection('Personnel')">X</a>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="ddlMarket" class="search-ddl-label">Market</label>
+                        <select id="ddlMarket" class="search-ddl-select" onchange="resetFilters('market');"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="ddlOwner" class="search-ddl-label">Owner</label>
+                        <select id="ddlOwner" class="search-ddl-select" onchange="resetFilters('owner');"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="ddlNumberOfDays" class="search-ddl-label">Date</label>
+                        <select id="ddlNumberOfDays" class="search-ddl-select" onchange="resetFilters('numberofdays');">
+                            <option value="">All</option>
+                            <option selected value="30">30 Days</option>
+                            <option value="90">90 Days</option>
+                            <option value="180">6 Months</option>
+                            <option value="365">1 Year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Show button-->
+                <div class="row">
+                    <div class="col-md-9">
+
+                    </div>
+                    <div class="col-md-3 text-align-right margin-top-10">
+                        <input type="button" id="btnShow" class="search-button" value="Show" onclick="getClientPersonnelNotificationList();" />
+                    </div>
+                </div>
+
+                <!--Start Notification List datatable-->
+                <div id="dtNotificationListHolder" class="dataTAble-top-maragin" style="padding-top:10px; padding-bottom:10px;">
+                    <table id="dtNotificationList" class="striped"></table>
+                </div>
+
+                <!--End Notification List datatable-->
+
+                <div class="default-button-section margin-top-10">
+                    <div class="row">
+                        <div class="col-md-4">
+
+                        </div>
+                        <div class="col-md-4">
+                            <!--Users Selected:
+                            <span id="lblUsersSelected">0</span>-->
+                        </div>
+                        <div class="col-md-4 text-align-right">
+                            <input type="button" class="default-button" value="Send" onclick="sendEmail();" />
+                        </div>
+                    </div>
+                </div>
+
 
             </div>
         </div>
@@ -178,23 +169,128 @@
     <script src="/js/config.js"></script>
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
-    <!-- Date Picker-->
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
 
 </body>
 </html>
 <script>
 
+    var columns = [];
+    var columnsToDisplay = new Array();
+    var columnsToExport = new Array();
+
     $(document).ready(function () {
 
         buildMainMenu("Personnel");
-        //loadAdvancedSearch();
-        getClientPersonnelNotificationList();
+        loadAdvancedSearch();
+        getMarketList();
+
+
 
     });
 
+    function resetFilters(filter) {
+
+        if (filter.toLowerCase() == "personnel") {
+            $("#ddlMarket").val("");
+            $("#ddlOwner").val("");
+            $("#ddlNumberOfDays").val("");
+        }
+
+        if (filter.toLowerCase() == "market") {
+            $("#ddlOwner").val("");
+            $("#ddlNumberOfDays").val("");
+            $("#txtPersonnel").val("");
+        }
+
+        if (filter.toLowerCase() == "owner") {
+            $("#ddlMarket").val("");
+            $("#ddlNumberOfDays").val("");
+            $("#txtPersonnel").val("");
+        }
+
+        if (filter.toLowerCase() == "numberofdays") {
+            $("#ddlMarket").val("");
+            $("#ddlOwner").val("");
+            $("#txtpersonnel").val("");
+        }
+
+    }
+
+    function buildInputParamObj() {
+
+        var inputParamsObj = {};
+
+        //ApiToken
+        inputParamsObj["inApiToken"] = getLocalStorage("APIToken");
+
+        if ($("#ddlStatus").val() != "") {
+
+            //status param
+            switch ($("#ddlStatus").val().toLowerCase()) {
+
+                case "notified":
+                    inputParamsObj["inNotifiedOnly"] = "1";
+                    break;
+                case "pending":
+                    inputParamsObj["inPendingOnly"] = "1";
+                    break;
+                default:
+                    bootbox.alert("There was an issue when selecting a status.");
+
+            }
+        }
+
+        if ($("#ddlRoles").val() != "") {
+
+            //role param
+            switch ($("#ddlRoles").val().toLowerCase()) {
+
+                case "contactsonly":
+                    inputParamsObj["inContactsOnly"] = "1";
+                    break;
+                case "recipientsonly":
+                    inputParamsObj["inRecipientsOnly"] = "1";
+                    break;
+                default:
+                    bootbox.alert("There was an issue when selecting a role.");
+            }
+        }
+
+        if ($("#txtPersonnel").val().trim() != "") {
+            inputParamsObj["inPersonnelId"] = $("#hdnPersonnelId").val().trim();
+        }
+
+        if ($("#ddlMarket").val() != "") {
+            inputParamsObj["inMarketId"] = $("#ddlMarket").val();
+        }
+
+        if ($("#ddlOwner").val() != "") {
+            inputParamsObj["inOwnerId"] = $("#ddlOwner").val();
+        }
+
+        if ($("#ddlNumberOfDays").val() != "") {
+            inputParamsObj["inNumberDays"] = $("#ddlNumberOfDays").val();
+        }
+
+        return inputParamsObj;
+    }
+
+
+
     function getClientPersonnelNotificationList() {
+
+        var inputParams = {};
+
+        inputParams = buildInputParamObj();
 
         var url = ServicePrefix + '/api/Notification/GetClientPersonnelNotificationList';
 
@@ -202,18 +298,7 @@
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inPendingOnly": "",
-                "inNotifiedOnly": "",
-                "inContactsOnly": "",
-                "inRecipientsOnly": "",
-                "inPersonnelId": "",
-                "inMarketId": "",
-                "inOwnerId": "",
-                "inStartDate": "",
-                "inEndDate": ""
-            }),
+            data: JSON.stringify(inputParams),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 getClientPersonnelNotificationListSuccess(data, textStatus, jQxhr);
@@ -232,331 +317,295 @@
             MKAErrorMessageRtn(data.repsponse.errorMessage[0]);
         } else {
 
-            var str = '';
-            var cnt = 0;
-
-            $("#notificationList").html("");
-
-
-            $.each(data.report.rows, function (index) {
-
-                var obj = data.report.rows[index];
-                cnt = cnt + 1
-
-                str = str + '<div class="row" style="padding-top:3px;">';
-                str = str + '<div class="col-md-1 text-align-center">';
-                str = str + '<input type="checkbox" />';
-                str = str + '</div>';
-                str = str + '<div class="col-md-3 text-align-left">';
-                str = str + obj["Client Personnel"];
-                str = str + '</div>';
-                str = str + '<div class="col-md-1 text-align-center">';
-                str = str + obj["Contact"];
-                str = str + '</div>';
-                str = str + '<div class="col-md-1 text-align-center">';
-                str = str + obj["Recipient"];
-                str = str + '</div>';
-                str = str + '<div class="col-md-1 text-align-center">';
-                str = str + obj["Status"];
-                str = str + '</div>';
-                str = str + '<div class="col-md-2 text-align-center">';
-                str = str + obj["Date"];
-                str = str + '</div>';
-                str = str + '<div class="col-md-2 text-align-left">';
-                str = str + obj["Action"];
-                str = str + '</div>';
-                str = str + '<div class="col-md-1 text-align-center">';
-                str = str + obj["Web User"];
-                str = str + '</div>';
-                str = str + '</div>';
-
-            });
-
-            $("#notificationList").append(str);
-
-            //if notification list is empty
-            if (cnt == 0) {
-                $("#notificationList").append("(none)");
-            }
+            buildColumnsArray(data, "dtNotificationList");
 
         }
     }
 
+    function destroyDataTable(tableToDestroy) {
+        if ($.fn.DataTable.isDataTable('#' + tableToDestroy)) {
+            var searchTable = $('#' + tableToDestroy).DataTable();
+            searchTable.destroy();
+            $('#' + tableToDestroy).hide();
+        }
+
+    }
+
+    function buildColumnsArray(dataObj, dataTable) {
+
+        columnsToDisplay = new Array();
+
+        columnsToDisplay.push("Client Personnel");
+        columnsToDisplay.push("Contact");
+        columnsToDisplay.push("Recipient");
+        columnsToDisplay.push("Status");
+        columnsToDisplay.push("Date");
+        columnsToDisplay.push("Action");
+        columnsToDisplay.push("Web User");
+
+        if (!dataObj["report"]["rows"]) {
+            destroyDataTable("dtNotificationList");
+            return;
+        }
+
+        if (dataObj["report"]["rows"].length == 0) {
+            destroyDataTable("dtNotificationList");
+            return;
+        }
+
+        $('#' + dataTable).show();
+        var data = dataObj["report"]["rows"][0];
+        var ctr = -1;
+        columns = new Array();
+
+        $.each(data, function (objectName, objectValue) {
+
+            if (columnsToDisplay.includes(objectName)) {
+
+                var className = "";
+
+                if (isNaN(objectValue) == false) {
+                    className = "text-align-right";
+                }
+
+                ctr++;
+                columnsToExport.push(ctr);
+
+                columns.push({
+                    "title": objectName,
+                    "visible": true,
+                    "mData": objectName,
+                    "orderable": true,
+                    "className": className
+                });
+            }
+        });
+
+        loadResults(dataObj, columns, dataTable);
+    }
+
+    function loadResults(data, columns, dataTable) {
+        //data is the data from the ajax call
+        //columns is the array that was built previously
+
+        //assigns the data from the ajax call
+        var results = data["report"]["rows"];
+
+        //creating a variable that will be used for datatable functions later
+        var searchTable;
+
+
+        //if the datatable already exists need to destroy it before building it
+        //again with new results from the search.
+        //if you try to destroy before it is a datatable, an error will occur.
+        //this code will only destroy it if the table is a datatable.
+
+        //The destroy function only destroys the data in the datatable.
+        //However, the columns need to be same if repopulating the table.
+        if ($.fn.DataTable.isDataTable('#' + dataTable)) {
+            searchTable = $('#' + dataTable).DataTable();
+            searchTable.destroy();
+        }
+
+        searchTable = $('#' + dataTable).DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "order": [],
+            "data": results,
+            "columns": columns,
+            "select": true,
+            language: {
+                search: "Filter Results:"
+            },
+            "buttons": [
+                 //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: columnsToExport
+               //    }
+               //},
+               {
+                   extend: 'excel',
+                   title: "Notifications",
+                   exportOptions: {
+                       columns: columnsToExport
+                   }
+               },
+               //{
+               //    extend: 'pdf',
+               //    title: reportObject.reportTitle,
+               //    exportOptions: {
+               //        columns: columnsToExport
+               //     }
+               //},
+               {
+                   extend: 'print',
+                   title: "Notifications",
+                   exportOptions: {
+                       columns: columnsToExport
+
+                   }
+               }
+            ],
+
+        });
+    }
+
+    function getMarketList() {
+
+        var url = ServicePrefix + '/api/Market/GetMarketList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
 
+        $.ajax(url, settings);
 
+    }
 
+    function getMarketListSuccess(data, textStatus, jQxhr) {
 
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
 
+        else {
+            var str = '';
+            str = '<option value="">-- Select a Market </option>';
 
-    //function loadFilter(status) {
+            $.each(data.report.rows, function (index) {
+                str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
 
-    //    var mainFilterList = ["All Client Personnel", "Contacts Only", "Recipients Only", "---------", "Client Personnel", "Market", "Ownership"];
+            });
 
-    //    $("#ddlFilter").html("");
-    //    clearSelectedFilter();
+            $("#ddlMarket").append(str);
 
-    //    var str = '<option value="">--Select a Filter</option>';
+            getOwnerList();
+        }
+    }
 
-    //    for (var i = 0; i < mainFilterList.length; i++) {
-    //        str = str + '<option value="' + mainFilterList[i] + '">' + mainFilterList[i] + '</option>';
-    //    }
+    function getOwnerList() {
 
-    //    if (status.toUpperCase() != "PENDING") {
-    //        str = str + '<option value="Date Range">Date Range</option>';
-    //    }
+        var url = ServicePrefix + '/api/Owner/GetOwnerListUnfiltered';
 
-    //    $("#ddlFilter").html(str);
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerName": "",
+                "inActiveOnly": "1",
+                "inAddDetails": "0"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOwnerListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
 
-    //    if (status != "") {
+        $.ajax(url, settings);
 
-    //        $("#ddlFilter").prop("disabled", false);
-    //        $("#ddlFilter").removeClass("disabled");
+    }
 
-    //    }
-    //    else {
-    //        $("#ddlFilter").prop("disabled", true);
-    //        $("#ddlFilter").addClass("disabled");
-    //    }
+    function getOwnerListSuccess(data, textStauts, jQxhr) {
 
-    //}
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0])
+        }
 
-    //function loadSelectedFilter(filter) {
+        else {
 
-    //    destroySearchCriteria();
-    //    clearSelectedFilter();
+            var str = '';
 
-    //    switch (filter) {
-    //        case "Client Personnel":
-    //            loadClientPersonnelFilter(filter);
-    //            break;
-    //        case "Market":
-    //            loadMarketFilter(filter);
-    //            break;
-    //        case "Ownership":
-    //            loadOwnershipFilter(filter);
-    //            break;
-    //        case "Date Range":
-    //            loadDateRangeFilter(filter);
-    //            break;
-    //        default:
-    //            clearSelectedFilter();
-    //            break;
+            str = "<option value=''> -- Select an Owner </option>";
 
-    //    }
-    //}
+            $.each(data.report.rows, function (index) {
+                str = str + "<option value='" + data.report.rows[index].OwnerID + "'>" + data.report.rows[index].OwnerName + "</option>";
+            });
 
-    //function clearSelectedFilter() {
-    //    $("#divSelectedFilter").html("");
-    //    $("#lblSelectedFilter").html("");
-    //}
+            $("#ddlOwner").append(str);
 
-    //function loadMarketFilter(filter) {
-    //    $("#lblSelectedFilter").text(filter + ":");
+            getClientPersonnelNotificationList();
 
-    //    var str = '<select id="ddlMarketFilter" class="mkaRequired"></select>';
-    //    $("#divSelectedFilter").html(str);
+        }
 
-    //    getMarketList();
-    //}
+    }
 
-    //function loadOwnershipFilter(filter) {
-    //    $("#lblSelectedFilter").text(filter + ":");
+    function getPersonnel() {
 
-    //    var str = '<select id="ddlOwnerFilter" class="mkaRequired"></selected>';
-    //    $("#divSelectedFilter").html(str);
+        var searchCriteriaObj = {
+            "searchToken": "PERSONNEL",
+            "txtPersonnel": $("#txtPersonnel").html(),
+            "ddlStatus": $("#ddlStatus").val(),
+            "ddlRoles": $("#ddlRoles").val(),
+            "searchPage": window.location
+        }
 
-    //    getOwnerList();
-    //}
+        setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
 
-    //function loadDateRangeFilter(filter) {
-    //    $("#lblSelectedFilter").text(filter + ":");
+        window.location = "/utilities/search.html";
+    }
 
-    //    var str = '';
+    function loadAdvancedSearch() {
 
-    //    str = str + '<input type="text" id="dtStartDate" class="text-align-center" style="max-width:100px; margin-right:5px;" />';
-    //    str = str + '&nbsp;<b>To</b>&nbsp;';
-    //    str = str + '<input type="text" id="dtEndDate" class="text-align-center" style="max-width:100px; margin-left:5px;" />';
-    //    $("#divSelectedFilter").html(str);
+        var searchResults = getLocalStorage("gSearchResults");
 
-    //    $("#dtStartDate").datepicker();
-    //    $("#dtEndDate").datepicker();
+        if (!searchResults) {
+            return;
+        }
 
-    //    loadDefaultDateRange();
+        var searchCriteria = $.parseJSON(searchResults);
 
-    //}
+        if (searchCriteria["searchToken"] == "PERSONNEL") {
 
-    //function loadDefaultDateRange() {
+            resetFilters("personnel");
 
-    //    var d = new Date();
-    //    var currentMonth = d.getMonth() + 1;
-    //    var currentYear = d.getFullYear();
-    //    var lastDayOfTheMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+            $("#ddlStatus").val(searchCriteria["ddlStatus"]);
 
-    //    $("#dtStartDate").val(currentMonth + "/01/" + currentYear);
-    //    $("#dtEndDate").val(currentMonth + "/" + lastDayOfTheMonth.getDate() + "/" + currentYear);
+            $("#ddlRoles").val(searchCriteria["ddlRoles"]);
 
-    //}
+            $("#txtPersonnel").val(searchCriteria["txtPersonnel"]);
+            $("#hdnPersonnelId").val(searchCriteria["personnelId"]);
 
-    //function loadClientPersonnelFilter(filter) {
-    //    $("#lblSelectedFilter").text(filter + ":");
+            searchCriteria["txtPersonnel"] = "";
+            searchCriteria["personnelId"] = "";
+            searchCriteria["ddlStatus"] = "";
+            searchCriteria["ddlFilter"] = "";
 
-    //    var str = '<input type="text" id="txtPersonnel" onclick="getPersonnel()" readonly />';
-    //    $("#divSelectedFilter").html(str);
+            getClientPersonnelNotificationList();
+        }
+        destroySearchCriteria();
 
-    //}
+    }
 
-
-    //function getMarketList() {
-
-    //    var url = ServicePrefix + '/api/Market/GetMarketList';
-
-    //    var settings = {
-    //        dataType: 'json',
-    //        type: 'post',
-    //        contentType: 'application/json',
-    //        data: JSON.stringify({
-    //            "inApiToken": getLocalStorage("APIToken")
-    //        }),
-    //        processData: false,
-    //        success: function (data, textStatus, jQxhr) {
-    //            getMarketListSuccess(data, textStatus, jQxhr);
-    //        },
-    //        error: function (jQxhr, textStatus, errorThrown) {
-    //            genericAjaxError(jQxhr, textStatus, errorThrown);
-    //        }
-    //    };
-
-    //    $.ajax(url, settings);
-
-    //}
-
-    //function getMarketListSuccess(data, textStatus, jQxhr) {
-
-    //    if (data.response.status != "SUCCESS") {
-    //        MKAErrorMessageRtn(data.response.errorMessage[0]);
-    //    }
-
-    //    else {
-    //        var str = '';
-    //        str = '<option value="">-- Select a Market </option>';
-
-    //        $.each(data.report.rows, function (index) {
-    //            str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
-
-    //        });
-
-    //        $("#ddlMarketFilter").html(str);
-    //    }
-    //}
-
-    //function getOwnerList() {
-
-    //    var url = ServicePrefix + '/api/Owner/GetOwnerListUnfiltered';
-
-    //    var settings = {
-    //        dataType: 'json',
-    //        type: 'post',
-    //        contentType: 'application/json',
-    //        data: JSON.stringify({
-    //            "inApiToken": getLocalStorage("APIToken"),
-    //            "inOwnerName": "",
-    //            "inActiveOnly": "1",
-    //            "inAddDetails": "0"
-    //        }),
-    //        processData: false,
-    //        success: function (data, textStatus, jQxhr) {
-    //            getOwnerListSuccess(data, textStatus, jQxhr);
-    //        },
-    //        error: function (jQxhr, textStatus, errorThrown) {
-    //            genericAjaxError(jQxhr, textStatus, errorThrown);
-    //        }
-    //    };
-
-    //    $.ajax(url, settings);
-
-    //}
-
-    //function getOwnerListSuccess(data, textStauts, jQxhr) {
-
-    //    if (data.response.status != "SUCCESS") {
-    //        MKAErrorMessageRtn(data.response.errorMessage[0])
-    //    }
-
-    //    else {
-
-    //        var str = '';
-
-    //        str = "<option value=''> -- Select an Owner </option>";
-
-    //        $.each(data.report.rows, function (index) {
-    //            str = str + "<option value='" + data.report.rows[index].OwnerID + "'>" + data.report.rows[index].OwnerName + "</option>";
-    //        });
-
-    //        $("#ddlOwnerFilter").html(str);
-
-    //    }
-
-    //}
-
-    //function getPersonnel() {
-
-    //    var searchCriteriaObj = {
-    //        "searchToken": "PERSONNEL",
-    //        "txtPersonnel": $("#txtPersonnel").html(),
-    //        "ddlStatus": $("#ddlStatus").val(),
-    //        "ddlFilter": $("#ddlFilter").val(),
-    //        "searchPage": window.location
-    //    }
-
-    //    setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
-
-    //    window.location = "/utilities/search.html";
-    //}
-
-    //function loadAdvancedSearch() {
-
-    //    var searchResults = getLocalStorage("gSearchResults");
-
-
-    //    if (!searchResults) {
-    //        return;
-    //    }
-
-    //    var searchCriteria = $.parseJSON(searchResults);
-
-    //    if (searchCriteria["searchToken"] == "PERSONNEL") {
-
-    //        $("#ddlStatus").val(searchCriteria["ddlStatus"]);
-
-    //        loadFilter(searchCriteria["ddlStatus"]);
-
-    //        $("#ddlFilter").val(searchCriteria["ddlFilter"]);
-    //        loadClientPersonnelFilter(searchCriteria["ddlFilter"]);
-
-    //        $("#txtPersonnel").val(searchCriteria["txtPersonnel"]);
-    //        $("#hhmPersonnel").val(searchCriteria["personnelId"]);
-
-    //        searchCriteria["txtPersonnel"] = "";
-    //        searchCriteria["personnelId"] = "";
-    //        searchCriteria["ddlStatus"] = "";
-    //        searchCriteria["ddlFilter"] = "";
-
-    //    }
-
-    //}
-
-    //function destroySearchCriteria() {
-    //    setLocalStorage("gSearchCriteria", null);
-    //    setLocalStorage("gSearchResults", null);
-    //}
-
-    //function showNotifications() {
-
-    //    $("#divNotificationList").removeClass("hidden");
-    //}
+    function destroySearchCriteria() {
+        setLocalStorage("gSearchCriteria", null);
+        setLocalStorage("gSearchResults", null);
+    }
 
     function sendEmail() {
         bootbox.alert("This functionality is currently in development.");
+    }
+
+    function clearSelection(control) {
+        $("#txt" + control).val("");
+        $("#hid" + control).val("");
     }
 
 
