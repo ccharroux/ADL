@@ -134,6 +134,9 @@ reportName.push("rptMRRUploadTemplateByOwnerWithRevenue");
 
 reportName.push("rptMRRMarketRevisionHistory");
 
+//reportName.push("rptMRRNationwideTVByAffiliation");
+
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -4861,7 +4864,7 @@ function getReportFilterArray_MRRMarketRevisionHistory() {
 
     arrayObject = {
         token: "FromYearPeriod",
-        jsCall: "getPeriodList_YYYYMM ddlFromYYYYMM",
+        jsCall: "getPeriodList_YYYYMM|ddlFromYYYYMM",
         objectName: "ddlFromYYYYMM",
         required: true
     }
@@ -4869,7 +4872,7 @@ function getReportFilterArray_MRRMarketRevisionHistory() {
 
     arrayObject = {
         token: "ToYearPeriod",
-        jsCall: "getPeriodList_YYYYMM ddlToYYYYMM",
+        jsCall: "getPeriodList_YYYYMM|ddlToYYYYMM",
         objectName: "ddlToYYYYMM",
         required: true
     }
@@ -4897,3 +4900,56 @@ function getReportObject_MRRMarketRevisionHistory() {
 
     return tempObject;
 }
+
+//function getReportFilterArray_MRRNationwideTVByAffiliation() {
+
+//    var arrayFilters = new Array();
+//    var arrayObject = new Object();
+
+//    arrayObject = new Object();
+//    arrayObject = {
+//        token: "Market",
+//        objectName: "ddlMarket",
+//        jsCall: "getMRRMarketList",
+//        required: true
+//    }
+//    arrayFilters.push(arrayObject);
+
+//    arrayObject = {
+//        token: "FromYearPeriod",
+//        jsCall: "getPeriodList_YYYYMM ddlFromYYYYMM",
+//        objectName: "ddlFromYYYYMM",
+//        required: true
+//    }
+//    arrayFilters.push(arrayObject);
+
+//    arrayObject = {
+//        token: "ToYearPeriod",
+//        jsCall: "getPeriodList_YYYYMM ddlToYYYYMM",
+//        objectName: "ddlToYYYYMM",
+//        required: true
+//    }
+//    arrayFilters.push(arrayObject);
+
+//    return arrayFilters;
+//}
+//function getReportObject_MRRNationwideTVByAffiliation() {
+
+//    var tempObject = new Object();
+
+//    columnsToDisplay = new Array();
+
+//    bLongQuery = true;
+
+//    tempObject =
+//    {
+//        reportTitle: "MRR Market Revision History",
+//        apiControllerAction: "/api/MRRReport/GetMarketRevisionHistoryReport",
+//        apiType: "get",
+//        columnsToDisplay: columnsToDisplay,
+//        product: 'mrr',
+//        autoUpdate: false
+//    }
+
+//    return tempObject;
+//}
