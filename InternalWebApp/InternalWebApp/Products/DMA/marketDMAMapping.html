@@ -119,7 +119,7 @@
                     </div>
                 </div>
 
-                <div id="dmaMappingSection" class="dataTable-top-margin" style="padding-top:10px; padding-bottom:10px">
+                <div id="dmaMappingSection" class="dataTable-top-margin" style="display:none;padding-top:10px; padding-bottom:10px">
                     <label for="dtResults" class="dropdown-label rptView">Map DMA Categories</label>
                     <table id="dtResults" class="stripe"></table>
                     <div id="noDataFound" style="display:none; color: red">No data found</div>
@@ -193,21 +193,23 @@
 
         getPageParameters();
 
-        if (marketId <= 0) {
+        if (marketId <= 0)
+        {
             bootbox.alert("Unable to determine the market.", function() {
                 window.location = "/marketlist.html";
             });
+            return;
         }
 
-        if (parentMarketId <= 0) {
+        if (parentMarketId <= 0)
+        {
             bootbox.alert("Unable to determine the parent market.", function() {
                 window.location = "/marketlist.html";
             });
+            return;
         }
 
         setPageValues();
-
-        $("#dmaMappingSection").hide();
 
         buildMainMenu("Markets");
 
@@ -220,11 +222,10 @@
     function getPageParameters() {
 
         //these are values past in local storage
-        if (getLocalStorage("gPageParameters").length > 0) {
-           
+        if (getLocalStorage("gPageParameters").length > 0)
+        {
             var pageParameters = $.parseJSON(getLocalStorage("gPageParameters"));
             marketName = pageParameters["marketName"];
-
         }
 
         //these values are from the query string
@@ -244,22 +245,28 @@
 
     }
 
-    function getDMACategoriesByParentAndMarket(dmaCategory) {
-
+    function getDMACategoriesByParentAndMarket(dmaCategory)
+    {
+        var url = ServicePrefix + '/api/CategoryMapping/GetCategoryMappingSummaryList?inApiToken=' + getLocalStorage("APIToken");
+        url = url + "&inParentMarketId=" + $("#txtParentMarketId").val();
+        url = url + "&inMarketId=" + $("#txtMarketId").val();
         $.ajax({
-            url: ServicePrefix + '/api/CategoryMapping/GetCategoryMappingSummaryList?inApiToken=' + getLocalStorage("APIToken") +
-                "&inParentMarketId=" + $("#txtParentMarketId").val() + "&inMarketId=" + $("#txtMarketId").val(),
+            url: api,
             dataType: 'json',
             type: 'get',
             contentType: 'application/json',
             processData: false,
-            success: function (data, textType, jQxhr) {
+            success: function (data, textType, jQxhr)
+            {
 
-                if (data.response.status != "SUCCESS") {
+                if (data.response.status != "SUCCESS")
+                {
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
-
                 }
-                else {
+                else
+                {
+
+                
                     $("#ddlDMACategories").empty();
 
                     var str = '';
@@ -268,7 +275,8 @@
 
                     iTotalAssigned = 0;
 
-                    $.each(data.report.rows, function (index) {
+                    $.each(data.report.rows, function (index)
+                    {
 
                         var obj = data.report.rows[index];
 
@@ -285,7 +293,8 @@
                     //if the dropdown is updating to reflect changes
                     //select the DMA category that was initially clicked
                     //and refresh the assignment table.
-                    if (dmaCategory !== null && dmaCategory !== undefined) {
+                    if (dmaCategory !== null && dmaCategory !== undefined)
+                    {
                         $("#ddlDMACategories").val(dmaCategory).trigger('chosen:updated').change();
                     }
 
@@ -341,7 +350,7 @@
         }
 
         $.ajax({
-            url: ServicePrefix + '/api/CategoryMapping/GetCategoryIdAssignmentOptionList?inApiToken=' + getLocalStorage("APIToken") +
+            url: ServicePrefix + '/api/CategoryMapping/GetCategoryAssignmentOptionList?inApiToken=' + getLocalStorage("APIToken") +
                 "&inParentMarketId=" + $("#txtParentMarketId").val() + "&inMarketId=" + $("#txtMarketId").val() +
                 "&inDMACategoryId=" + $("#ddlDMACategories").val(),
             dataType: 'json',
