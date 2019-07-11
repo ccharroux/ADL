@@ -1420,7 +1420,7 @@ function getAuditObject_StationAdvertisersList() {
 
     var columnsToDisplay = new Array();
     
-    columnsToDisplay.push("Owner Name");
+    columnsToDisplay.push("Owner");
     columnsToDisplay.push("Station Advertiser");
     columnsToDisplay.push("Station");
     columnsToDisplay.push("Market Advertiser");
