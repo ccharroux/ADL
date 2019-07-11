@@ -255,32 +255,6 @@ function getReportFilterArray_ParentOwnershipList() {
     var arrayFilters = new Array();
     var arrayObject = new Object();
 
-    //arrayObject = {
-    //    token:  "Market",
-    //    jsCall:  "getMRRMarketList",
-    //    objectName:  "ddlMarket",
-    //    required:  true
-    //}
-    //arrayFilters.push(arrayObject);
-
-    //arrayObject = new Object();
-    //arrayObject = {
-    //    token:  "Year",
-    //    jsCall:  "getYearList",
-    //    objectName:  "ddlYear",
-    //    required:  true
-    //}
-    //arrayFilters.push(arrayObject);
-
-    //arrayObject = new Object();
-    //arrayObject = {
-    //    token:  "Period",
-    //    objectName:  "ddlPeriod",
-    //    jsCall:  "getPeriodList",
-    //    required:  true
-    //}
-    //arrayFilters.push(arrayObject);
-
     return arrayFilters;
 }
 function getReportObject_ParentOwnershipList() {
@@ -288,15 +262,6 @@ function getReportObject_ParentOwnershipList() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    //columnsToDisplay.push("parentOwnerID");
-    //columnsToDisplay.push("parentOwnerName");
-    //columnsToDisplay.push("parentOwnerActive");
-    //columnsToDisplay.push("ownerID");
-    //columnsToDisplay.push("ownerName");
-    //columnsToDisplay.push("ownerAbbreviation");
-    //columnsToDisplay.push("productID");
-    //columnsToDisplay.push("productActiveDate");
-    //columnsToDisplay.push("productDisableDate");
 
     tempObject =
     {
@@ -348,7 +313,8 @@ function getReportFilterArray_MRRMarketSummary()
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMRRMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['MRR'],
         objectName: "ddlMarket",
         required: true
     }
@@ -425,7 +391,8 @@ function getReportFilterArray_XRAYUsage() {
 
     arrayObject = {
         token:  "Market",
-        jsCall:  "getXRYMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
         objectName:  "ddlMarket",
         required:  false
     }
@@ -433,7 +400,8 @@ function getReportFilterArray_XRAYUsage() {
 
     arrayObject = {
         token:  "Owner",
-        jsCall:  "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
         objectName:  "ddlOwner",
         required:  false
     }
@@ -493,7 +461,8 @@ function getReportFilterArray_MRRUsage() {
 
     arrayObject = {
         token:  "Market",
-        jsCall:  "getMRRMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['MRR'],
         objectName:  "ddlMarket",
         required:  false
     }
@@ -501,7 +470,8 @@ function getReportFilterArray_MRRUsage() {
 
     arrayObject = {
         token:  "Owner",
-        jsCall:  "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
         objectName:  "ddlOwner",
         required:  false
     }
@@ -561,7 +531,8 @@ function getReportFilterArray_TVBUsage() {
 
     arrayObject = {
         token:  "Market",
-        jsCall:  "getTVBMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
         objectName:  "ddlMarket",
         required:  false
     }
@@ -569,7 +540,8 @@ function getReportFilterArray_TVBUsage() {
 
     arrayObject = {
         token:  "Owner",
-        jsCall:  "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['TVB'],
         objectName:  "ddlOwner",
         required:  false
     }
@@ -630,7 +602,8 @@ function getReportFilterArray_MarketRevenueHourlyActivity() {
 
     arrayObject = {
         token:  "Market",
-        jsCall:  "getMRRMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['MRR'],
         objectName:  "ddlMarket",
         required:  false
     }
@@ -638,7 +611,8 @@ function getReportFilterArray_MarketRevenueHourlyActivity() {
 
     arrayObject = {
         token:  "Owner",
-        jsCall:  "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['MRR'],
         objectName:  "ddlOwner",
         required:  false
     }
@@ -699,7 +673,8 @@ function getReportFilterArray_UserActivity() {
 
     arrayObject = {
         token:  "Market",
-        jsCall:  "getXRYMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
         objectName:  "ddlMarket",
         required:  false
     }
@@ -707,7 +682,8 @@ function getReportFilterArray_UserActivity() {
 
     arrayObject = {
         token:  "Owner",
-        jsCall:  "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
         objectName:  "ddlOwner",
         required:  false
     }
@@ -768,7 +744,8 @@ function getReportFilterArray_UserActivityDetail() {
 
     arrayObject = {
         token:  "Market",
-        jsCall:  "getXRYMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
         objectName:  "ddlMarket",
         required:  false
     }
@@ -776,7 +753,8 @@ function getReportFilterArray_UserActivityDetail() {
 
     arrayObject = {
         token:  "Owner",
-        jsCall:  "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
         objectName:  "ddlOwner",
         required:  false
     }
@@ -836,7 +814,8 @@ function getReportFilterArray_UserQuerySummary() {
 
     arrayObject = {
         token:  "Market",
-        jsCall:  "getXRYMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
         objectName:  "ddlMarket",
         required:  false
     }
@@ -844,7 +823,8 @@ function getReportFilterArray_UserQuerySummary() {
 
     arrayObject = {
         token:  "Owner",
-        jsCall:  "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
         objectName:  "ddlOwner",
         required:  false
     }
@@ -898,7 +878,8 @@ function getReportFilterArray_UserQuerySummaryByOwner() {
 
     arrayObject = {
         token:  "Market",
-        jsCall:  "getXRYMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
         objectName:  "ddlMarket",
         required:  false
     }
@@ -906,7 +887,8 @@ function getReportFilterArray_UserQuerySummaryByOwner() {
 
     arrayObject = {
         token:  "Owner",
-        jsCall:  "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
         objectName:  "ddlOwner",
         required:  false
     }
@@ -1008,7 +990,8 @@ function getReportFilterArray_AEStatus() {
 
     arrayObject = {
         token:  "Market",
-        jsCall:  "getXRYMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
         objectName:  "ddlMarket",
         required:  true
     }
@@ -1050,7 +1033,9 @@ function getReportFilterArray_MarketDelivery() {
     var arrayFilters = new Array();
     var arrayObject = new Object();
 
-    arrayObject = {
+
+
+     arrayObject = {
         token:  "StartDate",
         jsCall:  null,
         objectName:  "dtStartDate",
@@ -1068,24 +1053,28 @@ function getReportFilterArray_MarketDelivery() {
 
     arrayObject = {
         token:  "Market",
-        jsCall:  "getMarketListAll",
+        jsCall: "getMarketList",
+        jsCallParameters: new Array(),
         objectName:  "ddlMarket",
-        required:  true
+        required: true,
+        reloadBasedProduct: true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
         token:  "Owner",
-        jsCall:  "getOwnerList",
+        jsCall:  "getOwnerListByProduct",
         objectName:  "ddlOwner",
-        required:  false
+        required: false,
+        reloadBasedProduct: true
     }
     arrayFilters.push(arrayObject);
+
     arrayObject = {
-        token:  "Product",
-        jsCall:  "getProductList",
-        objectName:  "ddlProduct",
-        required:  true
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: true
     }
     arrayFilters.push(arrayObject);
     return arrayFilters;
@@ -1119,7 +1108,8 @@ function getReportFilterArray_TVBUserListing() {
 
     arrayObject = {
         token:  "Market",
-        jsCall:  "getTVBMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
         objectName:  "ddlMarket",
         required:  false
     }
@@ -1127,7 +1117,8 @@ function getReportFilterArray_TVBUserListing() {
 
     arrayObject = {
         token:  "Owner",
-        jsCall:  "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['TVB'],
         objectName:  "ddlOwner",
         required:  false
     }
@@ -2900,7 +2891,8 @@ function getReportFilterArray_MRRMarketStationRelease() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMRRMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['MRR'],
         objectName: "ddlMarket",
         required: true
     }
@@ -3012,7 +3004,8 @@ function getReportFilterArray_XRYMarketStationRelease() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getXRYMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
         objectName: "ddlMarket",
         required: true
     }
@@ -3124,7 +3117,8 @@ function getReportFilterArray_TVBMarketStationRelease() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getTVBMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
         objectName: "ddlMarket",
         required: true
     }
@@ -3211,7 +3205,8 @@ function getReportFilterArray_TVBMRRCompare() {
 
     arrayObject = {
         token:  "Owner",
-        jsCall:  "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['MRR'],
         objectName:  "ddlOwner",
         required:  false
     }
@@ -3219,7 +3214,8 @@ function getReportFilterArray_TVBMRRCompare() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMRRMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['MRR'],
         objectName: "ddlMarket",
         required: false
     }
@@ -3929,7 +3925,8 @@ function getReportFilterArray_MRRWithoutManager() {
     var arrayObject = new Object();
     arrayObject = {
         token: "Market",
-        jsCall: "getMRRMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['MRR'],
         objectName: "ddlMarket",
         required: false
     }
@@ -3937,7 +3934,8 @@ function getReportFilterArray_MRRWithoutManager() {
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['MRR'],
         objectName: "ddlOwner",
         required: false
     }
@@ -4228,7 +4226,8 @@ function getReportFilterArray_MRRReportMatrix() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMRRMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['MRR'],
         objectName: "ddlMarket",
         required: false
     }
@@ -4573,7 +4572,8 @@ function getReportFilterArray_AdvertiserAgencyRevenueList() {
     arrayObject = {
         token: "Market",
         objectName: "ddlMarket",
-        jsCall: "getXRYMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -4609,7 +4609,8 @@ function getReportFilterArray_MRRMarketDistributionList() {
     arrayObject = {
         token: "Market",
         objectName: "ddlMarket",
-        jsCall: "getMRRMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['MRR'],
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -4618,7 +4619,8 @@ function getReportFilterArray_MRRMarketDistributionList() {
     arrayObject = {
         token: "Owner",
         objectName: "ddlOwner",
-        jsCall: "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['MRR'],
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -4765,7 +4767,8 @@ function getReportFilterArray_MRRUploadTemplateByOwner() {
     arrayObject = {
         token: "Owner",
         objectName: "ddlOwner",
-        jsCall: "getOwnerListMRR",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['MRR'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -4802,7 +4805,8 @@ function getReportFilterArray_MRRUploadTemplateByOwnerWithRevenue() {
     arrayObject = {
         token: "Owner",
         objectName: "ddlOwner",
-        jsCall: "getOwnerListMRR",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['MRR'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -4857,7 +4861,8 @@ function getReportFilterArray_MRRMarketRevisionHistory() {
     arrayObject = {
         token: "Market",
         objectName: "ddlMarket",
-        jsCall: "getMRRMarketList",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['MRR'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -4910,7 +4915,8 @@ function getReportObject_MRRMarketRevisionHistory() {
 //    arrayObject = {
 //        token: "Market",
 //        objectName: "ddlMarket",
-//        jsCall: "getMRRMarketList",
+//jsCall: "getMarketListByProduct",
+//    jsCallParameters: ['MRR'],
 //        required: true
 //    }
 //    arrayFilters.push(arrayObject);

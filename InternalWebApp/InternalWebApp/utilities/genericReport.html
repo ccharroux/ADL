@@ -134,7 +134,7 @@
                         </div>
                         <div class="form-group rptView rptProduct" >
                             <label for="ddlProduct" class="dropdown-label rptView rptProduct">Product</label>
-                            <select id="ddlProduct" apiInput="inProductId" class="dropdown-select rptView rptProduct"></select>
+                            <select id="ddlProduct" apiInput="inProductId" onchange="updateProductDependent(this.value)" class="dropdown-select rptView rptProduct"></select>
                         </div>
                         <div class="form-group rptView rptMediaType" >
                             <label for="ddlMediaType" class="dropdown-label rptView rptMediaType">Media Type</label>
@@ -383,6 +383,31 @@
 
     });
 
+    function updateProductDependent(val)
+    {
+        
+        $.each(reportFilterArray, function (objectName, objectValue)
+        {
+
+            if (objectValue.reloadBasedProduct != undefined && objectValue.reloadBasedProduct == true)
+            {
+                //if () 
+                // create array
+                var params = new Array();
+                // add value to array
+                params.push(val);
+                // set object parameters to the array
+                objectValue.jsCallParameters = params;
+                // activate / reload the filter
+                activateFilter(objectValue);
+            }
+
+        });
+ 
+
+
+    }
+
     function getRequiredFiltersCount()
     {
         var ctr = 0;
@@ -494,7 +519,6 @@
             activateFilter(arrayFilters[i]);
             if (arrayFilters[i].required == true)
             {
- 
                 var input = $("#" + arrayFilters[i].objectName);
                 $("label[for=" + input.attr("id") + "]").css("color", "red");
                 $("label[for=" + input.attr("id") + "]").prepend(" * ");
@@ -514,18 +538,13 @@
         {
             return;
         }
+ 
 
-        //this function is currently written to handle just 1 extra parameter 
-        //besides the actual jsCall
-        var jsCallParams = filterObject.jsCall.split("|");
+        var jsCallParams = (filterObject.jsCallParameters == undefined ? new Array() : filterObject.jsCallParameters);
+        
+        var fn = window[filterObject.jsCall];
+        fn.apply(filterObject, jsCallParams);
 
-        if (jsCallParams.length > 1) {
-            window[jsCallParams[0]](jsCallParams[1]);
-        } else {
-            window[filterObject.jsCall]();
-        }
-
-        //window[filterObject.jsCall]();
     }
 
     //--------------------------------
@@ -854,23 +873,7 @@
     function getDMAStationList() {
         getStationListByProduct('DMA');
     }
-
-    function getXRYMarketList()
-    {
-        getMarketList('XRY');
-    }
-    function getMRRMarketList() {
-        getMarketList('MRR');
-    }
-    function getMSSMarketList() {
-        getMarketList('MSS');
-    }
-    function getTVBMarketList() {
-        getMarketList('TVB');
-    }
-    function getDMAMarketList() {
-        getMarketList('DMA');
-    }
+    
     function getParentMarketListDMA()
     {
 
@@ -957,8 +960,18 @@
             }
         });
     }
-    function getMarketList(inProduct)
+
+    function getMarketListByProduct(inProduct)
     {
+        var control = this.objectName;
+ 
+        if (inProduct == "" || inProduct == null || inProduct == undefined)
+        {
+            var str = '';
+            str = '<option value="">-- Select a Market --</option>';
+            $("#" + control).html(str);
+            return;
+        }
 
         $.ajax({
             url: ServicePrefix + '/api/Market/GetMarketListByProduct',
@@ -986,8 +999,8 @@
 
                     });
 
-                    $("#ddlMarket").html(str);
-                    saveLoadedControlSelection("ddlMarket");
+                    $("#" + control).html(str);
+                    saveLoadedControlSelection(control);
                     //preSelectItem('quickReportQS');
 
                 }
@@ -1047,24 +1060,14 @@
 
     }
 
-    function getOwnerListMRR()
+    function getOwnerListByProduct(inProduct)
     {
-        getOwnerListByProduct('MRR');
-    }
-    function getOwnerListXRY() {
-        getOwnerListByProduct('XRY');
-    }
-    function getOwnerListMSS() {
-        getOwnerListByProduct('MSS');
-    }
-    function getOwnerListTVB() {
-        getOwnerListByProduct('TVB');
-    }
-    function getOwnerListDMA() {
-        getOwnerListByProduct('DMA');
-    }
+        var control = this.objectName;
 
-    function getOwnerListByProduct(inProduct) {
+        if (inProduct == "" || inProduct == null || inProduct == undefined) {
+            $("#" + control).html("<option value=''> -- Select an Owner --</option>");
+            return;
+        }
 
         $.ajax({
             url: ServicePrefix + '/api/Owner/GetOwnerListByProduct',
@@ -1078,26 +1081,26 @@
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
-                if (data.response.status != "SUCCESS") {
+                if (data.response.status != "SUCCESS")
+                {
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
-
                 }
                 else {
 
                     var str = '';
 
-                    $("#ddlOwner").html("<option value=''> -- Select an Owner --</option>");
+                    $("#" + control).html("<option value=''> -- Select an Owner --</option>");
 
                     var holdOwnerID = "0";
 
-                    $.each(data.report.rows, function (index) {
+                    $.each(data.report.rows, function (index)
+                    {
                         var obj = data.report.rows[index];
                         str = str + "<option value='" + obj.ownerid + "'>" + obj.ownername + "</option>";
 
                     });
-
-                    $("#ddlOwner").append(str);
-                    saveLoadedControlSelection("ddlOwner");
+                    $("#" + control).append(str);
+                    saveLoadedControlSelection(control);
                 }
 
             },
