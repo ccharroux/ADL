@@ -184,10 +184,13 @@
 
     $(document).ready(function () {
 
+        getDisplayColumns();
+
         buildMainMenu("Personnel");
         loadAdvancedSearch();
         getMarketList();
 
+       
     });
 
     function resetFilters(filter) {
@@ -324,11 +327,17 @@
 
     }
 
-
-
-    function buildColumnsArray(dataObj, dataTable) {
-
+    function getDisplayColumns() {
         columnsToDisplay = new Array();
+
+        //columnsToDisplay.push({
+        //    mRender: function (data, type, row) {
+        //        return '<input type="checkbox" onclick="userSelected(' + row["Personnel ID"] + ')" />';
+        //    },
+        //    "orderable": false,
+        //    "searchabble": false,
+        //    "className": "chkColumn"
+        //});
 
         columnsToDisplay.push("Client Personnel");
         columnsToDisplay.push("Contact");
@@ -337,6 +346,29 @@
         columnsToDisplay.push("Date");
         columnsToDisplay.push("Action");
         columnsToDisplay.push("Web User");
+
+        //columnsToDisplay.push({
+        //    mRender: function(data, type, row) {
+        //        return '<a href="#" onclick="sendIndividualEmail(' + row["Personnel ID"] + ')">Send</a>';
+        //    },
+        //    "orderable": false,
+        //    "searchable": false,
+        //    "className": "text-align-right"
+        //});
+
+    }
+
+    function buildColumnsArray(dataObj, dataTable) {
+
+        //columnsToDisplay = new Array();
+
+        //columnsToDisplay.push("Client Personnel");
+        //columnsToDisplay.push("Contact");
+        //columnsToDisplay.push("Recipient");
+        //columnsToDisplay.push("Status");
+        //columnsToDisplay.push("Date");
+        //columnsToDisplay.push("Action");
+        //columnsToDisplay.push("Web User");
 
         if (!dataObj["report"]["rows"]) {
             destroyDataTable("dtNotificationList");
@@ -365,7 +397,7 @@
 
 
         $.each(data, function (objectName, objectValue) {
-
+            
             if (columnsToDisplay.includes(objectName)) {
 
                 var className = "";
@@ -388,13 +420,13 @@
         });
 
         columns.push({
-            mRender: function (data, type, row) {
+            mRender: function(data, type, row) {
                 return '<a href="#" onclick="sendIndividualEmail(' + row["Personnel ID"] + ')">Send</a>';
             },
             "orderable": false,
             "searchable": false,
             "className": "text-align-right"
-        })
+        });
 
         loadResults(dataObj, columns, dataTable);
     }
@@ -433,23 +465,28 @@
             language: {
                 search: "Filter Results:"
             },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
             initComplete: function () {
 
                 $("#dtNotificationList_length").after("<label class='users-selected'>Users Selected: <span id='spnUsersSelected'>0</span></label>");
                 $(".dataTables_filter input").unbind();
-                $(".dataTables_filter input").bind('keyup', function () {
+                $(".dataTables_filter input").bind('keyup',
+                    function() {
 
-                    //data table filter
-                    searchTable.search(this.value).draw();
+                        //data table filter
+                        searchTable.search(this.value).draw();
 
-                    //getting all hidden rows and unchecking all checkboxes
-                    var hiddenRows = searchTable.rows({ search: 'removed' }).nodes();
-                    $(hiddenRows).find('.chkColumn input[type=checkbox]').prop('checked', false);
+                        //getting all hidden rows and unchecking all checkboxes
+                        var hiddenRows = searchTable.rows({ search: 'removed' }).nodes();
+                        $(hiddenRows).find('.chkColumn input[type=checkbox]').prop('checked', false);
 
-                    //updating selected checkbox count
-                    updateSelectedCount();
+                        //updating selected checkbox count
+                        updateSelectedCount();
 
-                })
+                    });
             },
             "buttons": [
                  //{
@@ -480,7 +517,7 @@
 
                    }
                }
-            ],
+            ]
 
         });
     }
