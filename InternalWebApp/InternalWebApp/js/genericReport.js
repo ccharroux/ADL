@@ -134,8 +134,9 @@ reportName.push("rptMRRUploadTemplateByOwnerWithRevenue");
 
 reportName.push("rptMRRMarketRevisionHistory");
 
-//reportName.push("rptMRRNationwideTVByAffiliation");
-
+reportName.push("rptMRRNationwideTVByAffiliation");
+reportName.push("rptMRRNationwideTVByRegion");
+reportName.push("rptMRRNationwideTVBySize");
 
 function buildReportArray()
 {
@@ -4857,7 +4858,6 @@ function getReportFilterArray_MRRMarketRevisionHistory() {
     var arrayFilters = new Array();
     var arrayObject = new Object();
 
-    arrayObject = new Object();
     arrayObject = {
         token: "Market",
         objectName: "ddlMarket",
@@ -4869,7 +4869,7 @@ function getReportFilterArray_MRRMarketRevisionHistory() {
 
     arrayObject = {
         token: "FromYearPeriod",
-        jsCall: "getPeriodList_YYYYMM|ddlFromYYYYMM",
+        jsCall: "getPeriodList_YYYYMM",
         objectName: "ddlFromYYYYMM",
         required: true
     }
@@ -4877,7 +4877,7 @@ function getReportFilterArray_MRRMarketRevisionHistory() {
 
     arrayObject = {
         token: "ToYearPeriod",
-        jsCall: "getPeriodList_YYYYMM|ddlToYYYYMM",
+        jsCall: "getPeriodList_YYYYMM",
         objectName: "ddlToYYYYMM",
         required: true
     }
@@ -4885,6 +4885,7 @@ function getReportFilterArray_MRRMarketRevisionHistory() {
 
     return arrayFilters;
 }
+
 function getReportObject_MRRMarketRevisionHistory() {
 
     var tempObject = new Object();
@@ -4906,56 +4907,164 @@ function getReportObject_MRRMarketRevisionHistory() {
     return tempObject;
 }
 
-//function getReportFilterArray_MRRNationwideTVByAffiliation() {
+function getReportFilterArray_MRRNationwideTVByAffiliation() {
 
-//    var arrayFilters = new Array();
-//    var arrayObject = new Object();
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
 
-//    arrayObject = new Object();
-//    arrayObject = {
-//        token: "Market",
-//        objectName: "ddlMarket",
-//jsCall: "getMarketListByProduct",
-//    jsCallParameters: ['MRR'],
-//        required: true
-//    }
-//    arrayFilters.push(arrayObject);
+    arrayObject = {
+        token: "MediaType",
+        objectName: "ddlMediaType",
+        jsCall: "getMediaTypeListByType",
+        jsCallParameters: ["television"],
+        required: true
+    }
+    arrayFilters.push(arrayObject);
 
-//    arrayObject = {
-//        token: "FromYearPeriod",
-//        jsCall: "getPeriodList_YYYYMM ddlFromYYYYMM",
-//        objectName: "ddlFromYYYYMM",
-//        required: true
-//    }
-//    arrayFilters.push(arrayObject);
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
 
-//    arrayObject = {
-//        token: "ToYearPeriod",
-//        jsCall: "getPeriodList_YYYYMM ddlToYYYYMM",
-//        objectName: "ddlToYYYYMM",
-//        required: true
-//    }
-//    arrayFilters.push(arrayObject);
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
 
-//    return arrayFilters;
-//}
-//function getReportObject_MRRNationwideTVByAffiliation() {
+    return arrayFilters;
+}
 
-//    var tempObject = new Object();
+function getReportObject_MRRNationwideTVByAffiliation() {
 
-//    columnsToDisplay = new Array();
+    var tempObject = new Object();
 
-//    bLongQuery = true;
+    columnsToDisplay = new Array();
 
-//    tempObject =
-//    {
-//        reportTitle: "MRR Market Revision History",
-//        apiControllerAction: "/api/MRRReport/GetMarketRevisionHistoryReport",
-//        apiType: "get",
-//        columnsToDisplay: columnsToDisplay,
-//        product: 'mrr',
-//        autoUpdate: false
-//    }
+    bLongQuery = true;
 
-//    return tempObject;
-//}
+    tempObject =
+    {
+        reportTitle: "MRR Nationwide TV By Affiliation",
+        apiControllerAction: "/api/MRRReport/GetNationwideRevenueByAffiliationReport",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRNationwideTVByRegion() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "MediaType",
+        objectName: "ddlMediaType",
+        jsCall: "getMediaTypeListByType",
+        jsCallParameters: ["television"],
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_MRRNationwideTVByRegion() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    bLongQuery = true;
+
+    tempObject =
+    {
+        reportTitle: "MRR Nationwide TV By Region",
+        apiControllerAction: "/api/MRRReport/GetNationwideRevenueByRegionReport",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRNationwideTVBySize() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "MediaType",
+        objectName: "ddlMediaType",
+        jsCall: "getMediaTypeListByType",
+        jsCallParameters: ["television"],
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_MRRNationwideTVBySize() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    bLongQuery = true;
+
+    tempObject =
+    {
+        reportTitle: "MRR Nationwide TV By Size",
+        apiControllerAction: "/api/MRRReport/GetNationwideRevenueBySizeReport",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
