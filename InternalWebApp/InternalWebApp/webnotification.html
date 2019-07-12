@@ -61,8 +61,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 text-center col-md-offset-3 fh5co-heading">
-                        <h2>Web Notifications</h2>
-                        <div style="color:red">TEMP: Web Notification List is currently cut off at 1000.</div>
+                        <h2>Web Notifications</h2>                       
                     </div>
                 </div>
 
@@ -114,7 +113,7 @@
                         </select>
                     </div>
                     <div class="col-md-2 text-align-right" style="margin-top:5px;">
-                        <br/>
+                        <br />
                         <input type="button" id="btnShow" class="search-button" value="Show" onclick="getClientPersonnelNotificationList();" />
 
                     </div>
@@ -137,7 +136,7 @@
                             <span id="lblUsersSelected">0</span>-->
                         </div>
                         <div class="col-md-4 text-align-right">
-                            <input type="button" class="default-button" value="Send Bulk" onclick="sendEmail();" />
+                            <input type="button" class="default-button" value="Send Bulk" onclick="sendBulkEmail();" />
                         </div>
                     </div>
                 </div>
@@ -190,7 +189,13 @@
         loadAdvancedSearch();
         getMarketList();
 
-       
+        $("body").on("click",
+            "#clear_search_button",
+            function () {
+                var table = $("#dtNotificationList").DataTable();
+                table.search('').draw();
+            });
+
     });
 
     function resetFilters(filter) {
@@ -330,16 +335,7 @@
     function getDisplayColumns() {
         columnsToDisplay = new Array();
 
-        //columnsToDisplay.push({
-        //    mRender: function (data, type, row) {
-        //        return '<input type="checkbox" onclick="userSelected(' + row["Personnel ID"] + ')" />';
-        //    },
-        //    "orderable": false,
-        //    "searchabble": false,
-        //    "className": "chkColumn"
-        //});
-
-        columnsToDisplay.push("Client Personnel");
+        columnsToDisplay.push("User");
         columnsToDisplay.push("Contact");
         columnsToDisplay.push("Recipient");
         columnsToDisplay.push("Status");
@@ -347,28 +343,9 @@
         columnsToDisplay.push("Action");
         columnsToDisplay.push("Web User");
 
-        //columnsToDisplay.push({
-        //    mRender: function(data, type, row) {
-        //        return '<a href="#" onclick="sendIndividualEmail(' + row["Personnel ID"] + ')">Send</a>';
-        //    },
-        //    "orderable": false,
-        //    "searchable": false,
-        //    "className": "text-align-right"
-        //});
-
     }
 
     function buildColumnsArray(dataObj, dataTable) {
-
-        //columnsToDisplay = new Array();
-
-        //columnsToDisplay.push("Client Personnel");
-        //columnsToDisplay.push("Contact");
-        //columnsToDisplay.push("Recipient");
-        //columnsToDisplay.push("Status");
-        //columnsToDisplay.push("Date");
-        //columnsToDisplay.push("Action");
-        //columnsToDisplay.push("Web User");
 
         if (!dataObj["report"]["rows"]) {
             destroyDataTable("dtNotificationList");
@@ -382,7 +359,7 @@
 
         $('#' + dataTable).show();
         var data = dataObj["report"]["rows"][0];
-        var ctr = -1;
+        var ctr = 0;
         columns = new Array();
 
         //Adding column of checkboxes to first column
@@ -397,7 +374,7 @@
 
 
         $.each(data, function (objectName, objectValue) {
-            
+
             if (columnsToDisplay.includes(objectName)) {
 
                 var className = "";
@@ -420,7 +397,7 @@
         });
 
         columns.push({
-            mRender: function(data, type, row) {
+            mRender: function (data, type, row) {
                 return '<a href="#" onclick="sendIndividualEmail(' + row["Personnel ID"] + ')">Send</a>';
             },
             "orderable": false,
@@ -440,7 +417,6 @@
 
         //creating a variable that will be used for datatable functions later
         var searchTable;
-
 
         //if the datatable already exists need to destroy it before building it
         //again with new results from the search.
@@ -471,11 +447,14 @@
             },
             initComplete: function () {
 
+                //adding counter and filter clear button
                 $("#dtNotificationList_length").after("<label class='users-selected'>Users Selected: <span id='spnUsersSelected'>0</span></label>");
-                $(".dataTables_filter input").unbind();
-                $(".dataTables_filter input").bind('keyup',
-                    function() {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
 
+                
+                $(".dataTables_filter input").unbind();
+                $(".dataTables_filter input").bind('keyup', function () {
+                 
                         //data table filter
                         searchTable.search(this.value).draw();
 
@@ -487,6 +466,7 @@
                         updateSelectedCount();
 
                     });
+
             },
             "buttons": [
                  //{
@@ -685,7 +665,7 @@
         setLocalStorage("gSearchResults", null);
     }
 
-    function sendEmail() {
+    function sendBulkEmail() {
         bootbox.alert("This functionality is currently in development.");
     }
 
@@ -695,7 +675,6 @@
     }
 
     function userSelected(personnelId) {
-        console.log(personnelId);
 
         updateSelectedCount();
     }
