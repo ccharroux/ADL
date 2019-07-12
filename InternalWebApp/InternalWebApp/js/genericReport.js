@@ -1241,17 +1241,19 @@ function getReportFilterArray_StationListing() {
 
     arrayObject = {
         token:  "Market",
-        jsCall:  "getMarketListAll",
+        jsCall:  "getMarketListByProduct",
         objectName:  "ddlMarket",
-        required:  false
+        required: false,
+        reloadBasedProduct: true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
         token:  "Owner",
-        jsCall:  "getOwnerList",
+        jsCall: "getOwnerListByProduct",
         objectName:  "ddlOwner",
-        required:  false
+        required: false,
+        reloadBasedProduct: true
     }
     arrayFilters.push(arrayObject);
 
@@ -1575,17 +1577,19 @@ function getReportFilterArray_ActiveStationList() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
+        jsCall: "getMarketListByProduct",
         objectName: "ddlMarket",
-        required: false
+        required: false,
+        reloadBasedProduct: true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerList",
+        jsCall: "getOwnerListByProduct",
         objectName: "ddlOwner",
-        required: false
+        required: false,
+        reloadBasedProduct: true
     }
     arrayFilters.push(arrayObject);
 
@@ -1635,17 +1639,19 @@ function getReportFilterArray_DisabledStationList() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
+        jsCall: "getMarketListByProduct",
         objectName: "ddlMarket",
-        required: false
+        required: false,
+        reloadBasedProduct: true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerList",
+        jsCall: "getOwnerListByProduct",
         objectName: "ddlOwner",
-        required: false
+        required: false,
+        reloadBasedProduct: true
     }
     arrayFilters.push(arrayObject);
 
@@ -1712,17 +1718,19 @@ function getReportFilterArray_StationChanges() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
+        jsCall: "getMarketListByProduct",
         objectName: "ddlMarket",
-        required: false
+        required: false,
+        reloadBasedProduct: true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerList",
+        jsCall: "getOwnerListByProduct",
         objectName: "ddlOwner",
-        required: false
+        required: false,
+        reloadBasedProduct: true
     }
     arrayFilters.push(arrayObject);
 
@@ -1736,8 +1744,11 @@ function getReportFilterArray_StationChanges() {
 
     arrayObject = {
         token: "Station",
-        jsCall: "getStationList",
+        jsCall: "getStationListByGeneralFilters",
         objectName: "ddlStation",
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
+        reloadBasedProduct: true,
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -1786,7 +1797,8 @@ function getReportFilterArray_MRREstimatedStationList() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: new Array('MRR'),
         objectName: "ddlMarket",
         required: false
     }
@@ -1794,7 +1806,8 @@ function getReportFilterArray_MRREstimatedStationList() {
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: new Array('MRR'),
         objectName: "ddlOwner",
         required: false
     }
@@ -1804,8 +1817,10 @@ function getReportFilterArray_MRREstimatedStationList() {
 
     arrayObject = {
         token: "Station",
-        jsCall: "getStationList",
+        jsCall: "getStationListByGeneralFilters",
         objectName: "ddlStation",
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -1817,12 +1832,7 @@ function getReportObject_MRREstimatedStationList() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("stationName");
-    columnsToDisplay.push("formatName");
-    columnsToDisplay.push("affiliationName");
-    columnsToDisplay.push("ownerName");
-    columnsToDisplay.push("mrrManagerName");
-    columnsToDisplay.push("marketName");
+ 
 
     tempObject =
     {
@@ -1847,9 +1857,19 @@ function getReportFilterArray_DetailedStationSetup() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
+        jsCall: "getMarketListByProduct",
         objectName: "ddlMarket",
-        required: false
+        required: false,
+        reloadBasedProduct: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        objectName: "ddlOwner",
+        required: false,
+        reloadBasedProduct: true
     }
     arrayFilters.push(arrayObject);
 
@@ -1861,19 +1881,16 @@ function getReportFilterArray_DetailedStationSetup() {
     }
     arrayFilters.push(arrayObject);
 
-    arrayObject = {
-        token: "Owner",
-        jsCall: "getOwnerList",
-        objectName: "ddlOwner",
-        required: false
-    }
-    arrayFilters.push(arrayObject);
+ 
 
     arrayObject = {
         token: "Station",
-        jsCall: "getStationList",
+        jsCall: "getStationListByGeneralFilters",
         objectName: "ddlStation",
-        required: false
+        required: false,
+        reloadBasedProduct: true,
+        reloadBasedOwner: true,
+        reloadBasedMarket: true
     }
     arrayFilters.push(arrayObject);
 
@@ -1884,21 +1901,7 @@ function getReportObject_DetailedStationSetup() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("stationName");
-    columnsToDisplay.push("formatName");
-    columnsToDisplay.push("affiliationName");
-    columnsToDisplay.push("ownerName");
-    columnsToDisplay.push("marketName");
-    columnsToDisplay.push("stationClientNumber");
-    columnsToDisplay.push("stationNickname");
-    columnsToDisplay.push("stationAddress");
-    columnsToDisplay.push("stationPhone");
-    columnsToDisplay.push("stationEmail");
-    columnsToDisplay.push("stationPreviousName");
-    columnsToDisplay.push("stationComment");
-    columnsToDisplay.push("productID");
-    columnsToDisplay.push("productActiveDate");
-    columnsToDisplay.push("productDisableDate");
+ 
 
     tempObject =
     {
@@ -1923,7 +1926,8 @@ function getReportFilterArray_MRRStationManagerList() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: new Array('MRR'),
         objectName: "ddlMarket",
         required: false
     }
@@ -1931,7 +1935,8 @@ function getReportFilterArray_MRRStationManagerList() {
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: new Array('MRR'),
         objectName: "ddlOwner",
         required: false
     }
@@ -1941,8 +1946,10 @@ function getReportFilterArray_MRRStationManagerList() {
 
     arrayObject = {
         token: "Station",
-        jsCall: "getStationList",
+        jsCall: "getStationListByGeneralFilters",
         objectName: "ddlStation",
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -1954,18 +1961,7 @@ function getReportObject_MRRStationManagerList() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("stationName");
-    columnsToDisplay.push("formatName");
-    columnsToDisplay.push("affiliationName");
-    columnsToDisplay.push("ownerName");
-    columnsToDisplay.push("marketName");
-    columnsToDisplay.push("managerName");
-    columnsToDisplay.push("managerPosition");
-    columnsToDisplay.push("managerTitle");
-    columnsToDisplay.push("managerAddress");
-    columnsToDisplay.push("managerPhone");
-    columnsToDisplay.push("managerEmail");
-    columnsToDisplay.push("managerComment");
+ 
 
     tempObject =
     {
@@ -2036,25 +2032,6 @@ function getReportFilterArray_OwnershipGroupDistributionList() {
     var arrayFilters = new Array();
     var arrayObject = new Object();
 
-
-    //arrayObject = {
-    //    token: "Product",
-    //    jsCall: "getProductList",
-    //    objectName: "ddlProduct",
-    //    required: true
-    //}
-    //arrayFilters.push(arrayObject);
-
-    //arrayObject = {
-    //    token: "Personnel",
-    //    jsCall: null,
-    //    objectName: "hidPersonnel",
-    //    required: false
-    //}
-    //arrayFilters.push(arrayObject);
-
-
-
     arrayObject = {
         token: "OwnerGroup",
         jsCall: "getOwnerGroupList",
@@ -2099,10 +2076,11 @@ function getReportFilterArray_MarketOwnershipGroup() {
 
 
     arrayObject = {
-        token: "Product",
-        jsCall: "getProductList",
-        objectName: "ddlProduct",
-        required: true
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        objectName: "ddlMarket",
+        required: false,
+        reloadBasedProduct: true
     }
     arrayFilters.push(arrayObject);
 
@@ -2477,27 +2455,34 @@ function getReportFilterArray_PersonnelContactList() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
+        jsCall: "getMarketListByProduct",
         objectName: "ddlMarket",
-        required: false
-    }
-    arrayFilters.push(arrayObject);
-
-    arrayObject = {
-        token: "Station",
-        jsCall: "getStationList",
-        objectName: "ddlStation",
-        required: false
+        required: false,
+        reloadBasedProduct: true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerList",
+        jsCall: "getOwnerListByProduct",
         objectName: "ddlOwner",
+        required: false,
+        reloadBasedProduct: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationListByGeneralFilters",
+        objectName: "ddlStation",
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
+        reloadBasedProduct: true,
         required: false
     }
     arrayFilters.push(arrayObject);
+
+ 
 
     arrayObject = {
         token: "Product",
@@ -2552,17 +2537,19 @@ function getReportFilterArray_PersonnelRecipientList() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
+        jsCall: "getMarketListByProduct",
         objectName: "ddlMarket",
-        required: false
+        required: false,
+        reloadBasedProduct: true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerList",
+        jsCall: "getOwnerListByProduct",
         objectName: "ddlOwner",
-        required: false
+        required: false,
+        reloadBasedProduct: true
     }
     arrayFilters.push(arrayObject);
 
@@ -2626,17 +2613,19 @@ function getReportFilterArray_WebUserList() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
+        jsCall: "getMarketListByProduct",
         objectName: "ddlMarket",
-        required: false
+        required: false,
+        reloadBasedProduct: true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerList",
+        jsCall: "getOwnerListByProduct",
         objectName: "ddlOwner",
-        required: false
+        required: false,
+        reloadBasedProduct: true
     }
     arrayFilters.push(arrayObject);
 
@@ -2838,14 +2827,6 @@ function getReportFilterArray_MRRMarketRelease() {
     }
     arrayFilters.push(arrayObject);
 
-    //arrayObject = {
-    //    token: "Product",
-    //    jsCall: "getProductList",
-    //    objectName: "ddlProduct",
-    //    required: true
-    //}
-    //arrayFilters.push(arrayObject);
-
     arrayObject = {
         token: "Year",
         jsCall: "getYearList",
@@ -2951,13 +2932,6 @@ function getReportFilterArray_XRYMarketRelease() {
     }
     arrayFilters.push(arrayObject);
 
-    //arrayObject = {
-    //    token: "Product",
-    //    jsCall: "getProductList",
-    //    objectName: "ddlProduct",
-    //    required: true
-    //}
-    //arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "Year",
@@ -3055,22 +3029,6 @@ function getReportFilterArray_TVBMarketRelease() {
 
     var arrayFilters = new Array();
     var arrayObject = new Object();
-
-    //arrayObject = {
-    //    token: "MediaType",
-    //    jsCall: "getMediaTypeList",
-    //    objectName: "ddlMediaType",
-    //    required: false
-    //}
-    //arrayFilters.push(arrayObject);
-
-    //arrayObject = {
-    //    token: "Product",
-    //    jsCall: "getProductList",
-    //    objectName: "ddlProduct",
-    //    required: true
-    //}
-    //arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "Year",
@@ -3170,14 +3128,6 @@ function getReportFilterArray_FeatureImplementationList() {
 
     var arrayFilters = new Array();
     var arrayObject = new Object();
-
-    //arrayObject = {
-    //    token:  "Owner",
-    //    jsCall:  "getOwnerList",
-    //    objectName:  "ddlOwner",
-    //    required:  true
-    //}
-    //arrayFilters.push(arrayObject);
 
     return arrayFilters;
 }
@@ -3446,38 +3396,7 @@ function getReportFilterArray_GeneralStationData() {
 
     var arrayFilters = new Array();
     var arrayObject = new Object();
-    //arrayObject = {
-    //    token: "Product",
-    //    jsCall: "getProductList",
-    //    objectName: "ddlProduct",
-    //    required: false
-    //}
-    //arrayFilters.push(arrayObject);
-
-    //arrayObject = {
-    //    token: "Market",
-    //    jsCall: "getMarketListAll",
-    //    objectName: "ddlMarket",
-    //    required: false
-    //}
-    //arrayFilters.push(arrayObject);
-
-    //arrayObject = {
-    //    token: "Owner",
-    //    jsCall: "getOwnerList",
-    //    objectName: "ddlOwner",
-    //    required: false
-    //}
-    //arrayFilters.push(arrayObject);
-
-    //arrayObject = {
-    //    token: "MediaType",
-    //    jsCall: "getMediaTypeList",
-    //    objectName: "ddlMediaType",
-    //    required: false
-    //}
-    //arrayFilters.push(arrayObject);
-
+ 
     return arrayFilters;
 }
 function getReportObject_GeneralStationData() {

@@ -134,7 +134,7 @@
                         </div>
                         <div class="form-group rptView rptProduct" >
                             <label for="ddlProduct" class="dropdown-label rptView rptProduct">Product</label>
-                            <select id="ddlProduct" apiInput="inProductId" onchange="updateProductDependent(this.value)" class="dropdown-select rptView rptProduct"></select>
+                            <select id="ddlProduct" apiInput="inProductId" onchange="updateDependentLists(this)" class="dropdown-select rptView rptProduct"></select>
                         </div>
                         <div class="form-group rptView rptMediaType" >
                             <label for="ddlMediaType" class="dropdown-label rptView rptMediaType">Media Type</label>
@@ -142,27 +142,28 @@
                         </div>
                         <div class="form-group rptView rptMarket" >
                             <label for="ddlMarket" class="dropdown-label rptView rptMarket">Market</label>
-                            <select id="ddlMarket" apiInput="inMarketId" class="dropdown-select rptView rptMarket"></select>
+                            <select id="ddlMarket" apiInput="inMarketId" onchange="updateDependentLists(this)" class="dropdown-select rptView rptMarket"></select>
                         </div>
                         <div class="form-group rptView rptParentMarket">
                             <label for="ddlParentMarket" class="dropdown-label rptView rptParentMarket">Market</label>
                             <select id="ddlParentMarket" apiInput="inParentMarketId" class="dropdown-select rptView rptParentMarket"></select>
                         </div>
-                        <div class="form-group rptView rptStation" >
-                            <label for="ddlStation" class="dropdown-label rptView rptStation">Station</label>
-                            <select id="ddlStation" apiInput="inStationId" class="dropdown-select rptView rptStation"></select>
-                        </div>
+
                         <div class="form-group rptView rptParentOwner">
                             <label for="ddlParentOwner" class="dropdown-label rptView rptParentOwner">Parent Owner</label>
                             <select id="ddlParentOwner" apiInput="inParentOwnerId" class="dropdown-select rptView rptParentOwner"></select>
                         </div>
                         <div class="form-group rptView rptOwner" >
                             <label for="ddlOwner" class="dropdown-label rptView rptOwner">Owner</label>
-                            <select id="ddlOwner" apiInput="inOwnerId" class="dropdown-select rptView rptOwner"></select>
+                            <select id="ddlOwner" apiInput="inOwnerId" onchange="updateDependentLists(this)" class="dropdown-select rptView rptOwner"></select>
                         </div>
                         <div class="form-group rptView rptOwnerGroup">
                             <label for="ddlOwnerGroup" class="dropdown-label rptView rptOwnerGroup">Owner</label>
                             <select id="ddlOwnerGroup" apiInput="inOwnerGroupId" class="dropdown-select rptView rptOwnerGroup"></select>
+                        </div>
+                        <div class="form-group rptView rptStation">
+                            <label for="ddlStation" class="dropdown-label rptView rptStation">Station</label>
+                            <select id="ddlStation" apiInput="inStationId" class="dropdown-select rptView rptStation"></select>
                         </div>
                         <div class="form-group rptView rptMrrReport">
                             <label for="ddlMrrReport" class="dropdown-label rptView rptMrrReport">Report</label>
@@ -304,8 +305,7 @@
 
     $(document).ready(function () {
 
-        //var outReportArray = buildReportArray();
-        //console.log(outReportArray);
+ 
 
 
         LoadDefaultDates();
@@ -383,25 +383,90 @@
 
     });
 
-    function updateProductDependent(val)
+    function updateDependentLists(controlThatWasClicked)
     {
-        
         $.each(reportFilterArray, function (objectName, objectValue)
         {
+            var bReloadNeeded = false;
+
+            // create array
+            var params = new Array();
+            var thisControl = "";
+ 
 
             if (objectValue.reloadBasedProduct != undefined && objectValue.reloadBasedProduct == true)
             {
-                //if () 
-                // create array
-                var params = new Array();
-                // add value to array
-                params.push(val);
+
+                thisControl = "ddlProduct";
+
+                if ($("#" + thisControl).val() != "")
+                {
+                    // add value to array
+                    params.push($("#" + thisControl).val()); // this will be the market value...
+                }
+                else
+                {
+                    params.push(null);
+                }
+
+                if (controlThatWasClicked.id != objectValue.objectName)
+                {
+                    bReloadNeeded = true;
+                }
+
+            } else {
+                params.push(null);
+            }
+
+            if (objectValue.reloadBasedMarket != undefined && objectValue.reloadBasedMarket == true)
+            {
+
+                thisControl = "ddlMarket";
+ 
+                if ($("#" + thisControl).val() != "") {
+                    // add value to array
+                    params.push($("#" + thisControl).val()); // this will be the market value...
+                }
+                else
+                {
+                    params.push(null);
+                }
+                if (controlThatWasClicked.id != objectValue.objectName) {
+                    bReloadNeeded = true;
+                }
+ 
+            } else {
+                params.push(null);
+            }
+
+            if (objectValue.reloadBasedOwner != undefined && objectValue.reloadBasedOwner == true) {
+                thisControl = "ddlOwner";
+ 
+                if ($("#" + thisControl).val() != "") {
+                    // add value to array
+                    params.push($("#" + thisControl).val()); // this will be the market value...
+                }
+                else {
+                    params.push(null);
+                }
+                if (controlThatWasClicked.id != objectValue.objectName) {
+                    bReloadNeeded = true;
+                }
+ 
+            } else {
+                params.push(null);
+            }
+            
+ 
+ 
+
+            if (bReloadNeeded == true)
+            {
                 // set object parameters to the array
                 objectValue.jsCallParameters = params;
                 // activate / reload the filter
                 activateFilter(objectValue);
             }
-
         });
  
 
@@ -586,7 +651,7 @@
 
                 var period = i + '/' + addZero(i2);
 
-                //console.log(period);
+ 
                 str = str + '<option value="' + period + '">' + period + '</option>';
             }
         }
@@ -823,7 +888,52 @@
         });
 
     }
+    function getStationListByGeneralFilters(product, marketId, ownerId)
+    {
+        var control = this.objectName;
 
+        var str = '';
+        str = '<option value="">-- Select a Station --</option>';
+        $("#" + control).html(str);
+
+        $.ajax({
+            url: ServicePrefix + '/api/Station/GetStationListByGeneralFilters',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProduct": product,
+                "inMarketId": marketId,
+                "inOwnerId": ownerId,
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    $.each(data.report.rows, function (index)
+                    {
+                        str = str + '<option value="' + data.report.rows[index]["Station Id"] + '">' + data.report.rows[index].Station + '</option>';
+                    });
+
+                    $("#" + control).append(str);
+                    saveLoadedControlSelection(control);
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
     function getStationList() {
 
         $.ajax({
@@ -1011,6 +1121,13 @@
     function getMarketListByProduct(inProduct)
     {
         var control = this.objectName;
+
+        //if (inProduct == "" || inProduct == null || inProduct == undefined) {
+        //    var str = '';
+        //    str = '<option value="">-- Select a Market --</option>';
+        //    $("#" + control).html(str);
+        //    return;
+        //}
  
         if (inProduct == "" || inProduct == null || inProduct == undefined)
         {
