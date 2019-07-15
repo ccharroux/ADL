@@ -35,6 +35,9 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
+    
+    <link rel="stylesheet" href="/css/chosen.min.css" />
+
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
     <!-- FOR IE9 below -->
@@ -42,7 +45,7 @@
         <script src="js/respond.min.js"></script>
     <![endif]-->
     <style>
- 
+
     </style>
 </head>
 <body>
@@ -99,7 +102,7 @@
                             <select id="ddlAccountType" class="mkaRequired field-width-325" style="" errorMessage="You must select an Account Type."></select>
                         </div>
                     </div>
-                    
+
 
                     <!-- parent agency section -->
                     <div class="row input-row">
@@ -110,7 +113,7 @@
                             <input type="hidden" id="oldParentAgencyId" value="" />
                             <input type="hidden" id="oldParentAgencyName" value="" />
                             <input type="hidden" id="txtParentAgencyId" value="" />
-                            <input type="text" id="txtParentAgencyName" class="disabled field-width-325 margin-right-10"  disabled="disabled" style="" errorMessage=""><span id="parentLinkedMessage" class="hidden to-be-linked-message">* Will be linked and revenues merged</span>
+                            <input type="text" id="txtParentAgencyName" class="disabled field-width-325 margin-right-10" disabled="disabled" style="" errorMessage=""><span id="parentLinkedMessage" class="hidden to-be-linked-message">* Will be linked and revenues merged</span>
                         </div>
                     </div>
 
@@ -133,7 +136,7 @@
                             <input value="Link Parent Agency" id="btnLinkParentAgency" onclick="linkParentAgencyQuestion();" class="default-button" type="button">
                         </div>
                     </div>
-                    
+
                     <div class="row input-row">
                         <div class="col-md-3">
 
@@ -147,7 +150,6 @@
 
 
                     <!-- end parent agency section -->
-                    
                     <!-- begin link agency section -->
                     <div class="row input-row agency-link-agency">
                         <div class="col-md-3 text-align-left">
@@ -179,7 +181,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row input-row link-agency" style="display: none;">
                         <div class="col-md-3 text-align-left">
                             <!--<label for="chkLinkParent">Link Parent</label>-->
@@ -188,7 +190,7 @@
                             <input value="Link Agency" id="btnLinkAgency" onclick="linkAgencyQuestion();" class="default-button" type="button">
                         </div>
                     </div>
-                    
+
                     <!-- end link agency section -->
 
                     <div class="row input-row">
@@ -208,7 +210,7 @@
                             <input type="checkbox" id="chkActive" value="">
                         </div>
                     </div>
-                    
+
                     <div class="row input-row change-date">
                         <div class="col-md-3 text-align-left">
                             <label for="txtChangeDate">Change Date</label>
@@ -264,6 +266,9 @@
     <script src="/js/config.js"></script>
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
+
+    <script src="/js/chosen.jquery.min.js"></script>
+
 </body>
 </html>
 
@@ -322,6 +327,8 @@
 
                     });
 
+                    convertToChosenSelect("ddlMarket", false, false);
+
                     getAccountTypeList();;
                 }
             },
@@ -361,11 +368,13 @@
 
                         $.each(data.report.rows, function (index) {
                             var obj = data.report.rows[index];
-                            str = "<option value='" + obj.accountTypeId + "'>" + obj.accountTypeId + " - " + obj.accountTypeName + "</option>";
+                            str = "<option value='" + obj.accountTypeId + "'>" + obj.accountTypeName + " (" + obj.accountTypeId + ")" + "</option>";
                             $("#ddlAccountType").append(str);
                         });
 
                     });
+
+                    convertToChosenSelect("ddlAccountType", false, false);
 
                     //getParentAgencyList();
                     getAgency();
@@ -377,7 +386,7 @@
         });
     }
 
-   function initializeActiveDate() {
+    function initializeActiveDate() {
         var activeDate = new Date();
         console.log(activeDate);
         $("#txtActiveDate").val(addZero(activeDate.getMonth() + 1) + '/' + addZero(activeDate.getDate()) + '/' + activeDate.getFullYear());
@@ -416,19 +425,19 @@
                         var obj = data.report.rows[index];
 
                         if (obj["marketId"] === null || obj["marketId"].length === 0) {
-                            $("#ddlMarket").val(-1);
+                            $("#ddlMarket").val(-1).trigger('chosen:updated');
                         } else {
-                            $("#ddlMarket").val(obj["marketId"]);
+                            $("#ddlMarket").val(obj["marketId"]).trigger('chosen:updated');
                         }
 
                         if ($("#ddlMarket").val() != "-1") {
-                            $("#ddlMarket").prop('disabled', true);
+                            $("#ddlMarket").prop('disabled', true).trigger('chosen:updated');
                         }
 
                         $("#txtAgencyId").val(obj["agencyId"]);
                         $("#txtAgencyName").val(obj["agencyName"]);
 
-                        $("#ddlAccountType").val(obj["accountTypeId"]);
+                        $("#ddlAccountType").val(obj["accountTypeId"]).trigger('chosen:updated');
 
                         //if (obj["parentAgencyId"] === null || obj["parentAgencyId"].length === 0) {
                         //    $("#ddlParentAgency").val(-1);
@@ -484,7 +493,7 @@
 
     }
 
-   
+
 
     function validationPassed() {
         var loopBreak = true;
@@ -598,7 +607,7 @@
                 "inNewParentAgencyId": $("#txtParentAgencyId").val()
             }),
             processData: false,
-            success: function(data, textStatus, jQxhr) {
+            success: function (data, textStatus, jQxhr) {
 
                 if (data.response.status != "SUCCESS") {
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
@@ -610,10 +619,10 @@
                     }
                 }
             },
-                error: function (jqXhr, textStatus, errorThrown) {
-                    MKAErrorMessageRtn(errorThrown);
-                }
-            });
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
     }
 
     function linkAgency() {
@@ -630,12 +639,12 @@
                 "inMarketId": $("#ddlMarket").val()
             }),
             processData: false,
-            success: function(data, textStatus, jQxhr) {
+            success: function (data, textStatus, jQxhr) {
 
                 if (data.response.status != "SUCCESS") {
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 } else {
-                        window.location = "agency.html?AgencyID=" + $("#txtAgencyId").val();
+                    window.location = "agency.html?AgencyID=" + $("#txtAgencyId").val();
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -730,10 +739,10 @@
         var searchResults = $.parseJSON(getLocalStorage("gSearchResults"));
 
         //load the results
-        $("#ddlMarket").val(searchResults["marketID"]);
+        $("#ddlMarket").val(searchResults["marketID"]).trigger('chosen:updated');
         $("#txtAgencyId").val(searchResults["agencyID"]);
         $("#txtAgencyName").val(searchResults["agencyName"]);
-        $("#ddlAccountType").val(searchResults["accountType"]);
+        $("#ddlAccountType").val(searchResults["accountType"]).trigger('chosen:updated');
         $("#oldParentAgencyId").val(searchResults["oldParentAgencyID"]);
         $("#oldParentAgencyName").val(searchResults["oldParentAgencyName"]);
         $("#txtParentAgencyId").val(searchResults["linkParentAgencyID"]);
@@ -753,7 +762,7 @@
     }
 
     function linkParentAgencyQuestion() {
-     
+
         if ($("#txtParentAgencyName").val().length > 0 &&
             $("#oldParentAgencyId").val() !== $("#txtParentAgencyName").val()) {
 
@@ -794,7 +803,7 @@
 
 
     function linkAgencyQuestion() {
-      
+
         if ($("#txtLinkedAgencyId").length > 0) {
 
             var linkAgencyMessage = "You are about to move agency " +
@@ -850,7 +859,7 @@
         if (bIsNew) {
             //hide
             $(".link-agency").hide();
-        } else if ( $("#txtLinkedAgencyId").val().length == 0) {
+        } else if ($("#txtLinkedAgencyId").val().length == 0) {
             //hide
             $(".link-agency").hide();
         } else {
