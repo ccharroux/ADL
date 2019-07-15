@@ -141,7 +141,7 @@ reportName.push("rptMRRNationwideTVBySize");
 reportName.push("rptMRRNationwideRadioByFormat");
 reportName.push("rptMRRNationwideRadioByRegion");
 reportName.push("rptMRRNationwideRadioBySize");
-
+reportName.push("rptStationOutOfSyncList");
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -5202,6 +5202,33 @@ function getReportObject_MRRNationwideRadioBySize() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'mrr',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_StationOutOfSyncList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    return arrayFilters;
+}
+
+function getReportObject_StationOutOfSyncList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Station Out Of Sync List",
+        apiControllerAction: "/api/StationReport/GetStationOutOfSyncList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'station',
         autoUpdate: false
     }
 
