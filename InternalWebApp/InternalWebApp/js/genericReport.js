@@ -138,6 +138,10 @@ reportName.push("rptMRRNationwideTVByAffiliation");
 reportName.push("rptMRRNationwideTVByRegion");
 reportName.push("rptMRRNationwideTVBySize");
 
+reportName.push("rptMRRNationwideRadioByFormat");
+reportName.push("rptMRRNationwideRadioByRegion");
+reportName.push("rptMRRNationwideRadioBySize");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -4978,6 +4982,222 @@ function getReportObject_MRRNationwideTVBySize() {
     tempObject =
     {
         reportTitle: "MRR Nationwide TV By Size",
+        apiControllerAction: "/api/MRRReport/GetNationwideRevenueBySizeReport",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRNationwideRadioByFormat() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "MediaType",
+        objectName: "ddlMediaType",
+        jsCall: "getMediaTypeListByType",
+        jsCallParameters: ["radio"],
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_MRRNationwideRadioByFormat() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    bLongQuery = true;
+
+    tempObject =
+    {
+        reportTitle: "MRR Nationwide Radio By Format",
+        apiControllerAction: "/api/MRRReport/GetNationwideRevenueByFormatReport",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRNationwideRadioByFormat() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "MediaType",
+        objectName: "ddlMediaType",
+        jsCall: "getMediaTypeListByType",
+        jsCallParameters: ["radio"],
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_MRRNationwideRadioByFormat() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    bLongQuery = true;
+
+    tempObject =
+    {
+        reportTitle: "MRR Nationwide Radio By Format",
+        apiControllerAction: "/api/MRRReport/GetNationwideRevenueByFormatReport",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRNationwideRadioByRegion() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "MediaType",
+        objectName: "ddlMediaType",
+        jsCall: "getMediaTypeListByType",
+        jsCallParameters: ["radio"],
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_MRRNationwideRadioByRegion() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    bLongQuery = true;
+
+    tempObject =
+    {
+        reportTitle: "MRR Nationwide Radio By Region",
+        apiControllerAction: "/api/MRRReport/GetNationwideRevenueByRegionReport",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'mrr',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRNationwideRadioBySize() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "MediaType",
+        objectName: "ddlMediaType",
+        jsCall: "getMediaTypeListByType",
+        jsCallParameters: ["radio"],
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_MRRNationwideRadioBySize() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    bLongQuery = true;
+
+    tempObject =
+    {
+        reportTitle: "MRR Nationwide Radio By Size",
         apiControllerAction: "/api/MRRReport/GetNationwideRevenueBySizeReport",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
