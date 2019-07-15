@@ -852,7 +852,14 @@
         $("#ddlPeriod").html(str);
         saveLoadedControlSelection("ddlPeriod");
     }
-    function getProductList() {
+
+    function getProductList(inProduct)
+    {
+
+        if (!inProduct)
+        {
+            inProduct = "";
+        }
 
         $.ajax({
             url: ServicePrefix + '/api/Product/GetProductList',
@@ -871,11 +878,23 @@
                 else {
 
                     var str = '';
-                    str = '<option value="">-- Select a Product --</option>';
+                    if (inProduct == "") {
+                        str = '<option value="">-- Select a Product --</option>';
+                    }
+
                     $.each(data.report.rows, function (index) {
 
-                        str = str + '<option value="' + data.report.rows[index].P_ProductID + '">' + data.report.rows[index].P_ProductName + '</option>';
-
+                        if (inProduct == "")
+                        {
+                            str = str + '<option value="' + data.report.rows[index].P_ProductID + '">' + data.report.rows[index].P_ProductName + '</option>';
+                        }
+                        else
+                        {
+                            if (inProduct.toUpperCase() == data.report.rows[index].P_ProductID.toUpperCase())
+                            {
+                                str = str + '<option value="' + data.report.rows[index].P_ProductID + '">' + data.report.rows[index].P_ProductName + '</option>';
+                            }
+                        }
                     });
 
                     $("#ddlProduct").html(str);

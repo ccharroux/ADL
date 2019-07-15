@@ -2559,9 +2559,12 @@ function getReportFilterArray_PersonnelRecipientList() {
 
     arrayObject = {
         token: "Station",
-        jsCall: "getStationList",
+        jsCall: "getStationListByGeneralFilters",
         objectName: "ddlStation",
-        required: false
+        required: false,
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
+        reloadBasedProduct: true
     }
     arrayFilters.push(arrayObject);
 
@@ -2643,10 +2646,13 @@ function getReportFilterArray_WebUserList() {
 
     arrayObject = {
         token: "Station",
-        jsCall: "getStationList",
+        jsCall: "getStationListByGeneralFilters",
         objectName: "ddlStation",
-        required: false
-    }
+        required: false,
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
+        reloadBasedProduct: true
+}
     arrayFilters.push(arrayObject);
 
     arrayObject = {
@@ -2693,35 +2699,53 @@ function getReportFilterArray_MRRNoPrimaryContactList() {
     var arrayFilters = new Array();
     var arrayObject = new Object();
 
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Product",
+        objectName: "ddlProduct",
+        jsCall: "getProductList",
+        jsCallParameters: ['MRR'],
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+    arrayObject = new Object();
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
         objectName: "ddlMarket",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['MRR'],
         required: false
     }
     arrayFilters.push(arrayObject);
 
+    arrayObject = new Object();
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerList",
         objectName: "ddlOwner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['MRR'],
         required: false
     }
     arrayFilters.push(arrayObject);
 
-    arrayObject = {
-        token: "OwnerGroup",
-        jsCall: "getOwnerGroupList",
-        objectName: "ddlOwnerGroup",
-        required: false
-    }
-    arrayFilters.push(arrayObject);
+    //arrayObject = {
+    //    token: "OwnerGroup",
+    //    jsCall: "getOwnerGroupList",
+    //    objectName: "ddlOwnerGroup",
+    //    required: false
+    //}
+    //arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "Station",
-        jsCall: "getStationList",
         objectName: "ddlStation",
-        required: false
+        jsCall: "getStationListByGeneralFilters",
+        required: false,
+        reloadBasedProduct: true,
+        reloadBasedOwner: true,
+        reloadBasedMarket: true
     }
     arrayFilters.push(arrayObject);
 
@@ -2745,7 +2769,7 @@ function getReportObject_MRRNoPrimaryContactList() {
     tempObject =
     {
 
-        reportTitle: "Market Revenue - Missing Primary Contact",
+        reportTitle: "MRR Missing Primary Contact",
         apiControllerAction: "/api/MRRReport/GetNoPrimaryContactList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -4528,7 +4552,17 @@ function getReportFilterArray_MRRMarketDistributionList() {
 
     var arrayFilters = new Array();
     var arrayObject = new Object();
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Product",
+        objectName: "ddlProduct",
+        jsCall: "getProductList",
+        jsCallParameters: ['MRR'],
+        required: false
+    }
+    arrayFilters.push(arrayObject);
 
+ 
     arrayObject = new Object();
     arrayObject = {
         token: "Market",
@@ -4553,8 +4587,11 @@ function getReportFilterArray_MRRMarketDistributionList() {
     arrayObject = {
         token: "Station",
         objectName: "ddlStation",
-        jsCall: "getMRRStationList",
-        required: false
+        jsCall: "getStationListByGeneralFilters",
+        required: false,
+        reloadBasedProduct: true,
+        reloadBasedOwner: true,
+        reloadBasedMarket: true
     }
     arrayFilters.push(arrayObject);
 
@@ -4578,7 +4615,7 @@ function getReportObject_MRRMarketDistributionList() {
 
     tempObject =
     {
-        reportTitle: "MRR - Market Distribution List",
+        reportTitle: "MRR Market Distribution List",
         apiControllerAction: "/api/MRRReport/GetMRRMarketDistributionList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
