@@ -5018,7 +5018,7 @@ function getReportObject_MRRNationwideTVBySize() {
 
     tempObject =
     {
-        reportTitle: "MRR Nationwide TV By Size",
+        reportTitle: "MRR Nationwide TV By Market Size",
         apiControllerAction: "/api/MRRReport/GetNationwideRevenueBySizeReport",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -5234,7 +5234,7 @@ function getReportObject_MRRNationwideRadioBySize() {
 
     tempObject =
     {
-        reportTitle: "MRR Nationwide Radio By Size",
+        reportTitle: "MRR Nationwide Radio By Market Size",
         apiControllerAction: "/api/MRRReport/GetNationwideRevenueBySizeReport",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
