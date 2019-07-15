@@ -128,6 +128,14 @@
                                 <select id="ddlStation" class="search-ddl-select" style="width:400px" multiple size="10"></select>
                             </div>
                         </div>
+                        <div class="col-md-6 ProductChoices DMAChoices">
+                            <div class="assignmentBoxes">
+                                <label for="ddlReportDMA" class="search-ddl-label" style="vertical-align: top;">Reports</label><br />
+                                <div><input type="checkbox" id="chkSelectedReportsDMA" onclick="selectItems('chkSelectedReportsDMA', 'ddlReportDMA')" /><span>&nbsp;Select All</span></div>
+
+                                <select id="ddlReportDMA" class="search-ddl-select" style="width:400px" multiple size="10"></select>
+                            </div>
+                        </div>
                         <div class="col-md-6 ProductChoices MRRChoices">
                             <div class="assignmentBoxes">
                                 <label for="ddlReport" class="search-ddl-label" style="vertical-align: top;">Reports</label><br />
@@ -342,6 +350,9 @@
         switch ($("#ddlProduct").val().toString().toLowerCase())
         {
 
+            case "dma":
+                return areDMAAssignmentsValid();
+
             case "mrr":
                 return areMRRAssignmentsValid();
 
@@ -382,7 +393,19 @@
 
 
     }
+    function areDMAAssignmentsValid()
+    {
 
+        // Recipients
+ 
+        var count = $("#ddlReportDMA :selected").length;
+
+        if (count <= 0) {
+            bootbox.alert("You must select at least 1 report to perform the assignment operation.");
+            return false;
+        }
+
+    }
     function areXRYAssignmentsValid()
     {
 
@@ -792,9 +815,15 @@
 
         $(controlToLoad).html("");
 
+        // no market select
         if ($("#ddlMarketAssign").val() == "")
         {
+
+
+
             $("#ddlReport").html("");
+            $("#ddlReportDMA").html("");
+
             return;
         }
 
@@ -853,11 +882,17 @@
         {
             loadReportList();
         }
-        console.log($("#ddlProduct").val());
+
         if ($("#ddlProduct").val().toString().toLowerCase() == 'xry')
         {
             loadXrayAccessLevelList();
         }
+
+        if ($("#ddlProduct").val().toString().toLowerCase() == 'dma') {
+            loadReportListDMA();
+ 
+        }
+
 
     }
     function loadXrayAccessLevelList()
@@ -901,6 +936,64 @@
 
                         str = str + '<option value="' + obj.AccessLevelId + '">';
                         str = str + (obj['Access Description']);
+                        str = str + '</option>';
+
+                        $(controlToLoad).append(str);
+
+                    });
+
+
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+
+
+    }
+
+    function loadReportListDMA()
+    {
+        var str = '';
+        var controlToLoad = "#ddlReportDMA";
+
+        $(controlToLoad).html("");
+        //str = str + '<option value="">';
+        //str = str + '-- Select a Market';
+        //str = str + '</option>';
+        //$(controlToLoad).append(str);
+
+        var apiParameters = new Object();
+        var apiToken = getLocalStorage("APIToken");
+
+        apiParameters["inApiToken"] = apiToken;
+
+        $.ajax({
+            url: ServicePrefix + '/api/DMA/GetReportList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify(apiParameters),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+
+                    $.each(data.report.rows, function (index) {
+
+                        str = '';
+                        var obj = data.report.rows[index];
+
+                        str = str + '<option value="' + obj.reportId + '">';
+                        str = str + (obj.reportTitle);
                         str = str + '</option>';
 
                         $(controlToLoad).append(str);
