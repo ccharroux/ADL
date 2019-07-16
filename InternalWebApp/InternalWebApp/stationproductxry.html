@@ -206,9 +206,14 @@
                                         <div class="col-md-2 text-align-left">
 
                                         </div>
-                                        <div class="col-md-10 text-align-left">
+                                        <div class="col-md-4 text-align-left">
                                             <strong>
-                                               User
+                                                User
+                                            </strong>
+                                        </div>
+                                        <div class="col-md-6 text-align-left">
+                                            <strong>
+                                                Access Level
                                             </strong>
                                         </div>
                                     </div>
@@ -235,7 +240,7 @@
                                     <span id="lblRecipientsSelected">0</span>
                                 </div>
                                 <div class="col-md-4 text-align-right">
-                                    <input type="button" class="default-button" value="Add Recipient" onclick="addRecipient();" />
+                                    <input type="button" class="default-button" value="Add Recipient" onclick="assignXRAYRecipientsInBulk();" />
                                 </div>
                             </div>
                         </div>
@@ -307,7 +312,7 @@
 
     });
 
-    function checkIfNewProduct(){
+    function checkIfNewProduct() {
         if (isNewProduct == 1) {
 
             $("#divAddSubmission").addClass("hidden");
@@ -485,12 +490,28 @@
 
                 str = str + '<div class="row unassignedRecipient ' + obj.firstName.toUpperCase() + '_' + obj.lastName.toUpperCase() + '" style="padding-top:3px;">';
                 str = str + '<div class="col-md-2 text-align-center">';
-                str = str + '<input type="checkbox" onchange="updateUnassignedList();" value="' + obj.personnelId + '" / >';
+
+                if (obj.accessLevels == "1") {
+                    str = str + '<input type="checkbox" onchange="updateUnassignedList();" value="' + obj.personnelId + '_' + obj.accessLevelId + '" / >';
+                } else {
+                    str = str + 'N/A';
+                }
+
                 str = str + '</div>';
-                str = str + '<div class="col-md-10 text-align-left">';
+                str = str + '<div class="col-md-4 text-align-left">';
                 str = str + obj.firstName + " " + obj.lastName + " (" + obj.personnelId + ")";
                 str = str + '</div>';
+                str = str + '<div class="col-md-6 text-align-left">';
+
+                if (obj.accessLevels == "1") {
+                    str = str + obj.description;
+                } else {
+                    str = str + obj.description + ' - Not Eligible for Mass Assignment';
+                }
+
                 str = str + '</div>';
+                str = str + '</div>';
+
             });
 
             $("#lblUnassignedCount").text(cnt.toLocaleString());
@@ -613,7 +634,7 @@
     }
 
     function enableProductForStation() {
-        
+
         var url = ServicePrefix + '/api/Station/UpdateStationProduct';
 
         var settings = {
@@ -663,8 +684,73 @@
         window.location = "station.html?StationID=" + stationId;
     }
 
-    function addRecipient() {
-        bootbox.alert("This functionality is currently in development");
+    function assignXRAYRecipientsInBulk() {
+
+        var selectedPersonnelList = new Array();
+        var selectedPersonnelObj = new Object();
+
+        $(".unassignedRecipient").each(function () {
+            if ($(this).find("input[type=checkbox]").prop("checked") == true) {
+
+                selectedPersonnelObj = new Object();
+
+                var sArray = new Array();
+                sArray = $(this).find("input[type=checkbox]").val().split("_");
+
+                selectedPersonnelObj["inPersonnelId"] = sArray[0];
+                selectedPersonnelObj["inAccessLevelId"] = sArray[1];
+
+                selectedPersonnelList.push(selectedPersonnelObj);
+
+            }
+        });
+
+        if (selectedPersonnelList.length == 0) {
+            bootbox.alert("You must select at least one recipient from the Unassigned Recipient table.", function () {
+
+            });
+            return;
+        }
+
+        var url = ServicePrefix + '/api/XRAYRecipient/AssignXRAYRecipientsInBulk';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId,
+                "inMarketId": getLocalStorage("tempStationMarketId"),
+                "inXRAYRecipientList": selectedPersonnelList
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                assignXRAYRecipientsInBulkSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function assignXRAYRecipientsInBulkSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            bootbox.alert("Mass assignment successful.", function () {
+
+                //Refresh name filters, selected count and recipient lists
+                $("#lblRecipientsSelected").text("0");
+                $("#txtUnassignedNameFilter").val("");
+                $("#txtAssignedNameFilter").val("");
+                $("#chkUnassignedSelectAll").prop("checked", false);
+                getRecipientList(true);
+
+            })
+        }
     }
 
 
