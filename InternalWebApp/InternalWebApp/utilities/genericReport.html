@@ -194,6 +194,22 @@
                             </div>
  
                         </div>
+                        <div class="form-group rptView rptAffiliation">
+                            <label for="ddlAffiliation" class="dropdown-label rptView rptAffiliation">Affiliation</label>
+                            <select id="ddlAffiliation" apiInput="inAffiliationId" class="dropdown-select rptView rptAffiliation"></select>
+                        </div>
+                        <div class="form-group rptView rptRegion">
+                            <label for="ddlRegion" class="dropdown-label rptView rptRegion">Region</label>
+                            <select id="ddlRegion" apiInput="inRegionId" class="dropdown-select rptView rptRegion"></select>
+                        </div>
+                        <div class="form-group rptView rptMarketSize">
+                            <label for="ddlMarketSize" class="dropdown-label rptView rptMarketSize">Market Size</label>
+                            <select id="ddlMarketSize" apiInput="inSizeId" class="dropdown-select rptView rptMarketSize"></select>
+                        </div>
+                        <div class="form-group rptView rptFormat">
+                            <label for="ddlFormat" class="dropdown-label rptView rptFormat">Format</label>
+                            <select id="ddlFormat" apiInput="inFormatId" class="dropdown-select rptView rptFormat"></select>
+                        </div>
                         <div class="form-group rptView rptYear" >
                             <label for="ddlYear" class="dropdown-label rptView rptYear">Year</label>
                             <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView rptYear"></select>
@@ -482,7 +498,7 @@
             var isRequired = objectValue.required;
 
             if (isRequired) {
-                ctr = ctr + 1
+                ctr = ctr + 1;
             }
 
         });
@@ -615,6 +631,170 @@
     //--------------------------------
     // Filters get loaded here
     //--------------------------------
+
+    function getAffiliationList() {
+
+        var control = this.objectName;
+
+        $.ajax({
+            url: ServicePrefix + '/api/Affiliation/GetAffiliationList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="-1">-- Select an Affiliation --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].affiliationId + '">' + data.report.rows[index].networkName + '</option>';
+
+                    });
+
+                    $("#" + control).html(str);
+                    saveLoadedControlSelection(control);
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getRegionListByMediaType(mediaType) {
+        //var control = this.objectName;
+
+        $.ajax({
+            url: ServicePrefix + '/api/Region/GetRegionList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMediaTypeId": mediaType
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="-1">-- Select a Region --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].regionCode + '">' + data.report.rows[index].regionName + '</option>';
+
+                    });
+
+                    $("#ddlRegion").html(str);
+                    saveLoadedControlSelection("ddlRegion");
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getFormatListByMediaType(mediaType) {
+        //var control = this.objectName;
+
+        $.ajax({
+            url: ServicePrefix + '/api/Format/GetFormatList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMediaTypeId": mediaType
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="-1">-- Select a Format --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index]["Format ID"] + '">' + data.report.rows[index]["Format Name"] + '</option>';
+
+                    });
+
+                    $("#ddlFormat").html(str);
+                    saveLoadedControlSelection("ddlFormat");
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getMarketSizeList() {
+        var control = this.objectName;
+
+        $.ajax({
+            url: ServicePrefix + '/api/MarketSize/GetMarketSizeList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="-1">-- Select a Market Size --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].marketSizeId + '">' + data.report.rows[index].marketSizeDescription + '</option>';
+
+                    });
+
+                    $("#" + control).html(str);
+                    saveLoadedControlSelection(control);
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
     function getYearList()
     {
         var str = '';
@@ -738,6 +918,16 @@
                     $("#" + control).html(str);
                     saveLoadedControlSelection(control);
 
+                    //if($(""))
+                    //if ($(".multi-field-message-area").is(":visible")) {
+                    if ($("#ddlRegion").is(":visible")) {
+                        getRegionListByMediaType($("#" + control).val());
+                    }
+
+                    console.log($("#" + control).val());
+                    if ($("#ddlFormat").is(":visible")) {
+                        getFormatListByMediaType($("#" + control).val());
+                    }
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -1911,7 +2101,7 @@
  
                    }
                }
-            ],
+            ]
         });
 
     }

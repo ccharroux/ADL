@@ -4882,6 +4882,14 @@ function getReportFilterArray_MRRNationwideTVByAffiliation() {
     arrayFilters.push(arrayObject);
 
     arrayObject = {
+        token: "Affiliation",
+        objectName: "ddlAffiliation",
+        jsCall: "getAffiliationList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
         token: "Year",
         jsCall: "getYearList",
         objectName: "ddlYear",
@@ -4906,6 +4914,16 @@ function getReportObject_MRRNationwideTVByAffiliation() {
 
     columnsToDisplay = new Array();
 
+    columnsToDisplay.push("Category");
+    columnsToDisplay.push("Affiliation");
+    columnsToDisplay.push("PTD Current");
+    columnsToDisplay.push("PTD Prior");
+    columnsToDisplay.push("PTD Change");
+    columnsToDisplay.push("YTD Current");
+    columnsToDisplay.push("YTD Prior");
+    columnsToDisplay.push("YTD Change");
+
+
     bLongQuery = true;
 
     tempObject =
@@ -4915,7 +4933,8 @@ function getReportObject_MRRNationwideTVByAffiliation() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'mrr',
-        autoUpdate: false
+        autoUpdate: false,
+        sortable: false
     }
 
     return tempObject;
@@ -4932,6 +4951,14 @@ function getReportFilterArray_MRRNationwideTVByRegion() {
         jsCall: "getMediaTypeListByType",
         jsCallParameters: ["television"],
         required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Region",
+        objectName: "ddlRegion",
+        jsCall: null,
+        required: false
     }
     arrayFilters.push(arrayObject);
 
@@ -4960,6 +4987,15 @@ function getReportObject_MRRNationwideTVByRegion() {
 
     columnsToDisplay = new Array();
 
+    columnsToDisplay.push("Category");
+    columnsToDisplay.push("Region");
+    columnsToDisplay.push("PTD Current");
+    columnsToDisplay.push("PTD Prior");
+    columnsToDisplay.push("PTD Change");
+    columnsToDisplay.push("YTD Current");
+    columnsToDisplay.push("YTD Prior");
+    columnsToDisplay.push("YTD Change");
+
     bLongQuery = true;
 
     tempObject =
@@ -4969,7 +5005,8 @@ function getReportObject_MRRNationwideTVByRegion() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'mrr',
-        autoUpdate: false
+        autoUpdate: false,
+        sortable: false
     }
 
     return tempObject;
@@ -4986,6 +5023,14 @@ function getReportFilterArray_MRRNationwideTVBySize() {
         jsCall: "getMediaTypeListByType",
         jsCallParameters: ["television"],
         required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MarketSize",
+        objectName: "ddlMarketSize",
+        jsCall: "getMarketSizeList",
+        required: false
     }
     arrayFilters.push(arrayObject);
 
@@ -5014,6 +5059,15 @@ function getReportObject_MRRNationwideTVBySize() {
 
     columnsToDisplay = new Array();
 
+    columnsToDisplay.push("Category");
+    columnsToDisplay.push("Market Size");
+    columnsToDisplay.push("PTD Current");
+    columnsToDisplay.push("PTD Prior");
+    columnsToDisplay.push("PTD Change");
+    columnsToDisplay.push("YTD Current");
+    columnsToDisplay.push("YTD Prior");
+    columnsToDisplay.push("YTD Change");
+
     bLongQuery = true;
 
     tempObject =
@@ -5023,7 +5077,8 @@ function getReportObject_MRRNationwideTVBySize() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'mrr',
-        autoUpdate: false
+        autoUpdate: false,
+        sortable: false
     }
 
     return tempObject;
@@ -5040,6 +5095,14 @@ function getReportFilterArray_MRRNationwideRadioByFormat() {
         jsCall: "getMediaTypeListByType",
         jsCallParameters: ["radio"],
         required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Format",
+        objectName: "ddlFormat",
+        jsCall: null,
+        required: false
     }
     arrayFilters.push(arrayObject);
 
@@ -5068,59 +5131,14 @@ function getReportObject_MRRNationwideRadioByFormat() {
 
     columnsToDisplay = new Array();
 
-    bLongQuery = true;
-
-    tempObject =
-    {
-        reportTitle: "MRR Nationwide Radio By Format",
-        apiControllerAction: "/api/MRRReport/GetNationwideRevenueByFormatReport",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: 'mrr',
-        autoUpdate: false
-    }
-
-    return tempObject;
-}
-
-function getReportFilterArray_MRRNationwideRadioByFormat() {
-
-    var arrayFilters = new Array();
-    var arrayObject = new Object();
-
-    arrayObject = {
-        token: "MediaType",
-        objectName: "ddlMediaType",
-        jsCall: "getMediaTypeListByType",
-        jsCallParameters: ["radio"],
-        required: true
-    }
-    arrayFilters.push(arrayObject);
-
-    arrayObject = {
-        token: "Year",
-        jsCall: "getYearList",
-        objectName: "ddlYear",
-        required: true
-    }
-    arrayFilters.push(arrayObject);
-
-    arrayObject = {
-        token: "Period",
-        objectName: "ddlPeriod",
-        jsCall: "getPeriodList",
-        required: true
-    }
-    arrayFilters.push(arrayObject);
-
-    return arrayFilters;
-}
-
-function getReportObject_MRRNationwideRadioByFormat() {
-
-    var tempObject = new Object();
-
-    columnsToDisplay = new Array();
+    columnsToDisplay.push("Category");
+    columnsToDisplay.push("Format");
+    columnsToDisplay.push("PTD Current");
+    columnsToDisplay.push("PTD Prior");
+    columnsToDisplay.push("PTD Change");
+    columnsToDisplay.push("YTD Current");
+    columnsToDisplay.push("YTD Prior");
+    columnsToDisplay.push("YTD Change");
 
     bLongQuery = true;
 
@@ -5131,7 +5149,8 @@ function getReportObject_MRRNationwideRadioByFormat() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'mrr',
-        autoUpdate: false
+        autoUpdate: false,
+        sortable: false
     }
 
     return tempObject;
@@ -5148,6 +5167,14 @@ function getReportFilterArray_MRRNationwideRadioByRegion() {
         jsCall: "getMediaTypeListByType",
         jsCallParameters: ["radio"],
         required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Region",
+        objectName: "ddlRegion",
+        jsCall: null,
+        required: false
     }
     arrayFilters.push(arrayObject);
 
@@ -5176,6 +5203,15 @@ function getReportObject_MRRNationwideRadioByRegion() {
 
     columnsToDisplay = new Array();
 
+    columnsToDisplay.push("Category");
+    columnsToDisplay.push("Region");
+    columnsToDisplay.push("PTD Current");
+    columnsToDisplay.push("PTD Prior");
+    columnsToDisplay.push("PTD Change");
+    columnsToDisplay.push("YTD Current");
+    columnsToDisplay.push("YTD Prior");
+    columnsToDisplay.push("YTD Change");
+
     bLongQuery = true;
 
     tempObject =
@@ -5185,7 +5221,8 @@ function getReportObject_MRRNationwideRadioByRegion() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'mrr',
-        autoUpdate: false
+        autoUpdate: false,
+        sortable: false
     }
 
     return tempObject;
@@ -5202,6 +5239,14 @@ function getReportFilterArray_MRRNationwideRadioBySize() {
         jsCall: "getMediaTypeListByType",
         jsCallParameters: ["radio"],
         required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MarketSize",
+        objectName: "ddlMarketSize",
+        jsCall: "getMarketSizeList",
+        required: false
     }
     arrayFilters.push(arrayObject);
 
@@ -5230,6 +5275,15 @@ function getReportObject_MRRNationwideRadioBySize() {
 
     columnsToDisplay = new Array();
 
+    columnsToDisplay.push("Category");
+    columnsToDisplay.push("Market Size");
+    columnsToDisplay.push("PTD Current");
+    columnsToDisplay.push("PTD Prior");
+    columnsToDisplay.push("PTD Change");
+    columnsToDisplay.push("YTD Current");
+    columnsToDisplay.push("YTD Prior");
+    columnsToDisplay.push("YTD Change");
+
     bLongQuery = true;
 
     tempObject =
@@ -5239,7 +5293,8 @@ function getReportObject_MRRNationwideRadioBySize() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'mrr',
-        autoUpdate: false
+        autoUpdate: false,
+        sortable: false
     }
 
     return tempObject;
