@@ -83,7 +83,13 @@
                 <div class="row search-section">
                     <div class="col-md-10 ">
                         <label for="ddlOwner" class="search-ddl-label">Owner</label>
-                        <select id="ddlOwner" class="search-ddl-select" style="" onchange="getStationListByOwner()"></select><br />
+                        <select id="ddlOwner" class="search-ddl-select" style="" onchange="getStationListByOwner()"></select>
+                        <label for="ddlMarket" class="search-ddl-label">Market</label>
+                        <select id="ddlMarket" class="search-ddl-select" style="" onchange="getStationListByOwner()"></select><br />
+                        <label for="ddlMediaType" class="search-ddl-label">Media Type</label>
+                        <select id="ddlMediaType" class="search-ddl-select" style="" onchange="getStationListByOwner()"></select>
+                        <label for="ddlProduct" class="search-ddl-label">Product</label>
+                        <select id="ddlProduct" class="search-ddl-select" style="" onchange="getStationListByOwner()"></select><br />
 
                         <label for="searchText" class="search-ddl-label">Station Name</label>
                         <input type="text" id="searchText" />
@@ -170,18 +176,19 @@
 
     $(document).ready(function () {
 
-        var input = document.getElementById("searchText");
-        // Execute a function when the user releases a key on the keyboard
-        input.addEventListener("keyup", function (event) {
-            // Cancel the default action, if needed
-            event.preventDefault();
-            // Number 13 is the "Enter" key on the keyboard
-            if (event.keyCode === 13) {
-                $("#ddlOwner").val("");
-                getStationList();
-            }
-        });
+        buildDataTable();
+        buildEvents();
 
+        buildMainMenu("Stations");
+        getMediaTypeList();
+        getOwnerList();
+        getProductList();
+        getMarketListAll();
+        buildQuickReports('station');
+        
+    });
+    function buildDataTable()
+    {
         var reportTitle = 'Station List';
         var exportColumns = returnTableColumnsByClass("dtStationList", "exportColumn");
 
@@ -193,7 +200,7 @@
                 { "data": 'stationName' },
                 {
                     mRender: function (data, type, row) {
-  
+
                         var ownerID = row["ownerId"];
                         var ownerName = row["ownerName"];
                         return '<a href="#" onclick="editOwner(' + ownerID + ')">' + ownerName + '</a>';
@@ -302,6 +309,21 @@
                 search: "Filter Results:"
             }
         });
+    }
+
+    function buildEvents()
+    {
+        var input = document.getElementById("searchText");
+        // Execute a function when the user releases a key on the keyboard
+        input.addEventListener("keyup", function (event) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Number 13 is the "Enter" key on the keyboard
+            if (event.keyCode === 13) {
+                $("#ddlOwner").val("");
+                getStationList();
+            }
+        });
 
         $("body").on("click",
             "#clear_search_button",
@@ -309,21 +331,126 @@
                 var table = $("#dtStationList").DataTable();
                 table.search('').draw();
             });
+    }
+    function getProductList() {
 
-        buildMainMenu("Stations");
+ 
 
-        getOwnerList();
+        $.ajax({
+            url: ServicePrefix + '/api/Product/GetProductList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
 
-        buildQuickReports('station');
-        
-    });
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
 
+                    var str = '';
+                    str = '<option value="">-- Select a Product --</option>';
+
+                    $.each(data.report.rows, function (index) {
+                            str = str + '<option value="' + data.report.rows[index].P_ProductID + '">' + data.report.rows[index].P_ProductName + '</option>';
+                    });
+
+                    $("#ddlProduct").html(str);
+ 
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+    function getMediaTypeList() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Media Type --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+
+                    });
+
+                    $("#ddlMediaType").html(str);
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
     function getStationListByOwner()
     {
         $("#searchText").val("");
         getStationList();
     }
+    function getMarketListAll()
+    {
 
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Market --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
+
+                    });
+
+                    $("#ddlMarket").html(str);
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
     function getOwnerList() {
 
         $.ajax({
@@ -394,13 +521,24 @@
 
         var searchCtr = 0
 
-        //if ($("#ddlMediaType").val().trim() == 0) {
-        //    searchCtr = searchCtr;
-        //}
-        //else {
-        //    searchCtr = searchCtr + 1;
-        //}
-
+        if ($("#ddlMediaType").val().trim() == 0) {
+            searchCtr = searchCtr;
+        }
+        else {
+            searchCtr = searchCtr + 1;
+        }
+        if ($("#ddlMediaType").val().trim() == 0) {
+            searchCtr = searchCtr;
+        }
+        else {
+            searchCtr = searchCtr + 1;
+        }
+        if ($("#ddlMarket").val().trim() == 0) {
+            searchCtr = searchCtr;
+        }
+        else {
+            searchCtr = searchCtr + 1;
+        }
         if ($("#ddlOwner").val().trim() == 0) {
             searchCtr = searchCtr;
         }
@@ -408,6 +546,12 @@
             searchCtr = searchCtr + 1;
         }
 
+        if ($("#ddlProduct").val().trim() == "") {
+            searchCtr = searchCtr;
+        }
+        else {
+            searchCtr = searchCtr + 1;
+        }
         if ($("#searchText").val().trim() == 0) {
             searchCtr = searchCtr;
         }
@@ -416,7 +560,7 @@
         }
 
         if (searchCtr == 0) {
-            bootbox.alert("Please select/enter at least 1 filter for the Station Search", function () { });
+            //bootbox.alert("Please select/enter at least 1 filter for the Station Search", function () { });
             return;
         }
 
@@ -432,7 +576,10 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inStationName": $("#searchText").val(),
                 "inActiveOnly": "1",
-              "inOwnerID": $("#ddlOwner").val() == 0 ? null : $("#ddlOwner").val()
+                "inOwnerID": $("#ddlOwner").val() == 0 ? null : $("#ddlOwner").val(),
+                "inMarketId": $("#ddlMarket").val() == 0 ? null : $("#ddlMarket").val(),
+                "inMediaTypeId": $("#ddlMediaType").val() == 0 ? null : $("#ddlMediaType").val(),
+                "inProductId": $("#ddlProduct").val() == 0 ? null : $("#ddlProduct").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
