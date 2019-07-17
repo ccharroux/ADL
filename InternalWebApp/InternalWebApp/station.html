@@ -928,19 +928,19 @@
             $.each(data.report.rows, function (index) {
 
                 var obj = data.report.rows[index];
-                var productId = "" + obj.P_ProductId;
+                var productId = obj.P_ProductID.toUpperCase();
 
-                str = str + '<div class="row row_' + obj.P_ProductID + '" style="display:none; padding-top:3px;">';
+                str = str + '<div class="row row_' + productId + '" style="display:none; padding-top:3px;">';
                 str = str + '<div class="col-md-4" style="text-align:left">';
-                str = str + obj.P_ProductID + " - " + obj.P_ProductName;
+                str = str + productId + " - " + obj.P_ProductName;
                 str = str + '</div>';
                 str = str + '<div class="col-md-2" style="text-align:left">';
-                str = str + '<div id="date' + obj.P_ProductID + '" />';
+                str = str + '<div id="date' + productId + '" />';
                 str = str + '</div>';
-                str = str + '<div id="productButtons' + obj.P_ProductID + '" class="col-md-6" style="text-align:left;">';
-                str = str + '<input type="button" id="productAdd' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="setVariablesAndDupCheck(\'' + obj.P_ProductID + '\',' + 1 + ')" Value="Enable" />';
-                str = str + '<input type="button" id="productEdit' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="setVariablesAndDupCheck(\'' + obj.P_ProductID + '\',' + 0 + ')" Value="Edit" />';
-                str = str + '<input type="button" id="productDisable' + obj.P_ProductID + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="disableProduct(' + '\'' + obj.P_ProductID + '\')" Value="Disable" />';
+                str = str + '<div id="productButtons' + productId + '" class="col-md-6" style="text-align:left;">';
+                str = str + '<input type="button" id="productAdd' + productId + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="setVariablesAndDupCheck(\'' + productId + '\',' + 1 + ')" Value="Enable" />';
+                str = str + '<input type="button" id="productEdit' + productId + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="setVariablesAndDupCheck(\'' + productId + '\',' + 0 + ')" Value="Edit" />';
+                str = str + '<input type="button" id="productDisable' + productId + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="disableProduct(' + '\'' + productId + '\')" Value="Disable" />';
                 str = str + '</div>';
                 str = str + '</div>';
             });
@@ -994,33 +994,35 @@
                 // to be set up for a station
                 // default is set to hidden in getProductListSuccess routine...
 
-                $(".row_" + obj.productId).show();
+                var productId = obj.productId.toUpperCase();
+
+                $(".row_" + productId).show();
 
                 if (obj.activeDate != null & obj.active == true) {
                     stationHasActiveProducts = true;
                     showRetainHistory = true;
-                    $("#productDisable" + obj.productId).removeClass("hidden");
-                    $("#date" + obj.productId).html(extractDateOnly(obj.activeDate));
-                    $("#date" + obj.productId).css("color", "green");
-                    if (obj.productId.toUpperCase() != "MSS" && obj.productId.toUpperCase() != "DMA") {
-                        $("#productEdit" + obj.productId).removeClass("hidden");
+                    $("#productDisable" + productId).removeClass("hidden");
+                    $("#date" + productId).html(extractDateOnly(obj.activeDate));
+                    $("#date" + productId).css("color", "green");
+                    if (productId != "MSS" && productId != "DMA") {
+                        $("#productEdit" + productId).removeClass("hidden");
                     }
                 }
 
                 else if (obj.disableDate != null && obj.active == false) {
                     showRetainHistory = true;
-                    $("#productAdd" + obj.productId).removeClass("hidden");
-                    $("#date" + obj.productId).html(extractDateOnly(obj.disableDate));
-                    $("#date" + obj.productId).css("color", "red");
+                    $("#productAdd" + productId).removeClass("hidden");
+                    $("#date" + productId).html(extractDateOnly(obj.disableDate));
+                    $("#date" + productId).css("color", "red");
                 }
                 else if (obj.disableDate == null && obj.activeDate == null) {
-                    $("#productAdd" + obj.productId).removeClass("hidden");
+                    $("#productAdd" + productId).removeClass("hidden");
                 }
 
                 //If returning product is not active in the station's market, inform the user
                 if (obj.marketProductId.trim() == "") {
-                    $("#productButtons" + obj.productId).html("");
-                    $("#productButtons" + obj.productId).html("This product is not active in this station's Market.");
+                    $("#productButtons" + productId).html("");
+                    $("#productButtons" + productId).html("This product is not active in this station's Market.");
                 }
 
                 //if station has any products, disbled or enabled, show Retain History checkbox.
