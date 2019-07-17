@@ -1335,13 +1335,15 @@ function getYearList() {
 
     $("#ddlYear").html(str);
 
+    convertToChosenSelect("ddlYear", false, false);
+
     if (typeof paramRevenueYear == 'undefined')
     {
         return;
     }
  
     if (paramRevenueYear.length > 0) {
-        $("#ddlYear").val(paramRevenueYear);
+        $("#ddlYear").val(paramRevenueYear).trigger('chosen:updated');
     }
  
 
@@ -1386,13 +1388,15 @@ function getPeriodList(inType) {
 
     $("#ddlPeriod").html(str);
 
+    convertToChosenSelect("ddlPeriod", false, false);
+
     if (typeof paramRevenuePeriod == "undefined")
     {
         return;
     }
 
     if (paramRevenuePeriod.length > 0) {
-        $("#ddlPeriod").val(paramRevenuePeriod);
+        $("#ddlPeriod").val(paramRevenuePeriod).trigger('chosen:updated');
     }
 
 }
