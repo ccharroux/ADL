@@ -35,6 +35,10 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
+
+    <!--Chosen Dropdown-->
+    <link rel="stylesheet" href="/css/chosen.min.css" />
+
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
     <!-- FOR IE9 below -->
@@ -285,6 +289,8 @@
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
 
+    <!--Chosen Dropdown-->
+    <script src="/js/chosen.jquery.min.js"></script>
 
 </body>
 </html>
@@ -407,7 +413,10 @@
             });
 
             $("#ddlReportingFrequency").html(str);
+            convertToChosenSelect("ddlReportingFrequency", false, false);
+
             $("#ddlSubmittingFrequency").html(str);
+            convertToChosenSelect("ddlSubmittingFrequency", false, false);
 
             getProcessorList();
         }
@@ -449,7 +458,9 @@
             $.each(data.report.rows, function (index) {
                 str = str + '<option value="' + data.report.rows[index].operatorID + '">' + data.report.rows[index].operator + '</option>';
             });
+
             $("#ddlProcessor").html(str);
+            convertToChosenSelect("ddlProcessor", false, false);
 
             getPartnerList();
 
@@ -495,6 +506,7 @@
             });
 
             $("#ddlPartnerList").html(str);
+            convertToChosenSelect("ddlPartnerList", false, false);
 
             getAssociatedMarkets();
         }
@@ -666,9 +678,9 @@
             $.each(data.report.rows, function (index) {
                 var obj = data.report.rows[index];
 
-                $("#ddlReportingFrequency").val(obj["period"]);
-                $("#ddlSubmittingFrequency").val(obj["submittingPeriod"]);
-                $("#ddlProcessor").val(obj["operatorId"]);
+                $("#ddlReportingFrequency").val(obj["period"]).trigger("chosen:updated");
+                $("#ddlSubmittingFrequency").val(obj["submittingPeriod"]).trigger("chosen:updated");
+                $("#ddlProcessor").val(obj["operatorId"]).trigger("chosen:updated");
 
                 if (obj["exclusivityMethod"].toLowerCase() == "cluster") {
                     $("#rdCluster").prop("checked", true);
@@ -679,7 +691,7 @@
                 $("#txtMinMarketShare").val(obj["minimumShareYTD"]);
                 $("#txtMaxMarketShare").val(obj["maximumShareYTD"]);
                 $("#txtNewsRevMinimum").val(obj["minimumNewspaperRevenue"]);
-                $("#ddlPartnerList").val(obj["partnerId"]);
+                $("#ddlPartnerList").val(obj["partnerId"]).trigger("chosen:updated");
                 $("#chkMarketOnHold").prop("checked", (obj["onHoldFlag"] == true ? true : false));
                 $("#hdnQueryCutOff").val(obj["queryCutOff"]);
                 $("#hdnNumberPriorYears").val(obj["numberPriorYears"]);
