@@ -36,6 +36,10 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
+
+    <!--Chosen Dropdown-->
+    <link rel="stylesheet" href="/css/chosen.min.css" />
+
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
     <!-- FOR IE9 below -->
@@ -260,6 +264,10 @@
     <script src="/js/main.js"></script>
     <!-- genericReport JS -->
     <script src="/js/genericReport.js"></script>
+
+    <!--Chosen Dropdown-->
+    <script src="/js/chosen.jquery.min.js"></script>
+
 </body>
 </html>
 <script>
@@ -287,6 +295,8 @@
         //}
 
         buildQuickReports('market');
+        convertToChosenSelect("ddlQuickReport", false, false);
+
         checkForInsertOrUpdate();
         getMediaTypes();
 
@@ -354,6 +364,9 @@
             });
 
             $("#ddlMediaType").html(str);
+
+            convertToChosenSelect("ddlMediaType", false, false);
+
         }
 
         getRegionList();
@@ -398,6 +411,8 @@
             });
 
             $("#ddlRegion").html(str);
+
+            convertToChosenSelect("ddlRegion", false, false);
         }
 
         getMarketSizeList();
@@ -439,6 +454,8 @@
                 str = str + '<option value="' + data.report.rows[index].marketSizeId + '">' + data.report.rows[index].marketSizeDescription + '</option>';
             });
             $("#ddlMarketSize").html(str);
+
+            convertToChosenSelect("ddlMarketSize", false, false);
         }
         getParentMarketList();
 
@@ -483,6 +500,7 @@
             });
             $("#ddlParentMarket").html(str);
 
+            convertToChosenSelect("ddlParentMarket", false, false);
 
         }
 
@@ -737,11 +755,11 @@
 
                 var obj = data.report.rows[index];
 
-                $("#ddlMediaType").val(obj["mediaTypeId"]);
+                $("#ddlMediaType").val(obj["mediaTypeId"]).trigger("chosen:updated");
                 $("#txtMarketName").val(obj["marketName"]);
                 $("#chkPrimaryMarket").prop("checked", (obj["primaryMarket"] == true ? true : false));
-                $("#ddlParentMarket").val(obj["parentMarketId"]);
-                $("#ddlMarketSize").val(obj["marketSizeId"]);
+                $("#ddlParentMarket").val(obj["parentMarketId"]).trigger("chosen:updated");
+                $("#ddlMarketSize").val(obj["marketSizeId"]).trigger("chosen:updated");
                 $("#lblTimeZone").text(obj["timeZone"]);
                 $("#ddlPartner").val(obj["partnerId"])
                 $("#txtEntityName").val(obj["entityName"]);
@@ -858,7 +876,7 @@
             if ($("#ddlMediaType").val() <= 0)
             {
                 bootbox.alert("Please choose Media Type first.", function () {});
-                $("#ddlParentMarket").val(-1);
+                $("#ddlParentMarket").val(-1).trigger("chosen:updated");
             }
 
             return;
@@ -905,7 +923,7 @@
 
                 var obj = data.report.rows[index];
 
-                $("#ddlRegion").val(obj.marketRegionId);
+                $("#ddlRegion").val(obj.marketRegionId).trigger("chosen:updated");
                 $("#lblState").text(obj.parentStateAbbreviation);
                 $("#lblTimeZone").text(obj.parentTimeZone);
 
