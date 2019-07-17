@@ -144,6 +144,7 @@ reportName.push("rptMRRNationwideRadioBySize");
 reportName.push("rptStationOutOfSyncList");
 reportName.push("rptStationProductSetupList");
 reportName.push("rptMRRMissingManagerSuggestedList");
+reportName.push("rptStationMissingDataList");
 
 function buildReportArray()
 {
@@ -5415,6 +5416,33 @@ function getReportObject_MRRMissingManagerSuggestedList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'mrr',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_StationMissingDataList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    return arrayFilters;
+}
+
+function getReportObject_StationMissingDataList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Station Missing Data List",
+        apiControllerAction: "/api/StationReport/GetStationMissingDataList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'station',
         autoUpdate: false
     }
 
