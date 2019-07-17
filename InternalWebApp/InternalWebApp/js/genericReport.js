@@ -142,6 +142,8 @@ reportName.push("rptMRRNationwideRadioByFormat");
 reportName.push("rptMRRNationwideRadioByRegion");
 reportName.push("rptMRRNationwideRadioBySize");
 reportName.push("rptStationOutOfSyncList");
+reportName.push("rptStationProductSetupList");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -5318,6 +5320,68 @@ function getReportObject_StationOutOfSyncList() {
     {
         reportTitle: "Station Out Of Sync List",
         apiControllerAction: "/api/StationReport/GetStationOutOfSyncList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'station',
+        autoUpdate: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_StationProductSetupList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        objectName: "ddlParentMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: new Array(),
+        objectName: "ddlMarket",
+        required: false,
+        reloadBasedProduct: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        objectName: "ddlOwner",
+        required: false,
+        reloadBasedProduct: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_StationProductSetupList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Station Product Setup List",
+        apiControllerAction: "/api/StationReport/GetStationProductSetupList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: 'station',
