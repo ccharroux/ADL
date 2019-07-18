@@ -1032,6 +1032,7 @@ function buildMRRMenu(selectedItem) {
     menuItems += '        <li style="display:block"><a href="releasemrr.html">Release</a></li>';
     menuItems += '        <li style="display:block"><a href="remindersmrr.html">Reminders</a></li>';
     menuItems += '        <li style="display:block"><a href="revenuedetailmrr.html">Revenue Detail</a></li>';
+    menuItems += '        <li style="display:block"><a href="mrrsnapshot.html">Snapshot</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
@@ -1335,6 +1336,7 @@ function getYearList() {
 
     $("#ddlYear").html(str);
 
+
     convertToChosenSelect("ddlYear", false, false);
 
     if (typeof paramRevenueYear == 'undefined')
@@ -1387,7 +1389,7 @@ function getPeriodList(inType) {
     }
 
     $("#ddlPeriod").html(str);
-
+ 
     convertToChosenSelect("ddlPeriod", false, false);
 
     if (typeof paramRevenuePeriod == "undefined")
