@@ -2028,7 +2028,7 @@ function getReportObject_OwnershipGroupList() {
         apiControllerAction: "/api/OwnerGroupReport/GetOwnershipGroupList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'ownergroup'
+        product: 'owner group'
     }
 
     return tempObject;
@@ -2070,7 +2070,7 @@ function getReportObject_OwnershipGroupDistributionList() {
         apiControllerAction: "/api/OwnerGroupReport/GetOwnershipGroupDistributionList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'ownergroup'
+        product: 'owner group'
     }
 
     return tempObject;
@@ -2124,7 +2124,7 @@ function getReportObject_MarketOwnershipGroup() {
         apiControllerAction: "/api/OwnerGroupReport/GetMarketOwnershipGroup",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'ownergroup'
+        product: 'owner group'
     }
 
     return tempObject;
@@ -2166,7 +2166,7 @@ function getReportObject_DetailedOwnerGroupSetup() {
         apiControllerAction: "/api/OwnerGroupReport/GetDetailedOwnerGroupSetup",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'ownergroup',
+        product: 'owner group',
         sortable: false
     }
 
@@ -2444,7 +2444,7 @@ function getReportObject_MarketSetupMarketVirtualGroups() {
     tempObject =
     {
 
-        reportTitle: "Market Setup - Market Virtual Groups",
+        reportTitle: "Market Setup - Virtual Groups",
         apiControllerAction: "/api/MarketReport/GetMarketSetupMarketVirtualGroups",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -3965,7 +3965,7 @@ function getReportObject_OwnerGroupReportingEntityIssues() {
         apiControllerAction: "/api/OwnerGroupReport/GetOwnerGroupReportingEntityIssuesList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'ownergroup'
+        product: 'owner group'
     }
 
     return tempObject;
@@ -4049,7 +4049,7 @@ function getReportObject_UsersAssignedReportsInvalidOwner() {
 
     tempObject =
     {
-        reportTitle: "User Assigned Invalid Owner Report List",
+        reportTitle: "User Assigned Invalid Owner Report",
         apiControllerAction: "/api/PersonnelReport/GetUsersAssignedReportsInvalidOwnerList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -4076,7 +4076,7 @@ function getReportObject_UsersAssignedInvalidMarket() {
 
     tempObject =
     {
-        reportTitle: "User Assigned Invalid Market Report List",
+        reportTitle: "User Assigned Invalid Market Report",
         apiControllerAction: "/api/PersonnelReport/GetUsersAssignedInvalidMarketReportList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -4104,7 +4104,7 @@ function getReportObject_UsersWithDisabledStationAssigned() {
 
     tempObject =
     {
-        reportTitle: "Users Assigned to Disabled Station List",
+        reportTitle: "Users Assigned to Disabled Stations",
         apiControllerAction: "/api/PersonnelReport/GetUsersWithDisabledStationAssignedList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -4806,7 +4806,7 @@ function getReportObject_MRRUploadTemplateByOwnerWithRevenue() {
 
     tempObject =
     {
-        reportTitle: "MRR Upload Category Template - With Revenue",
+        reportTitle: "MRR Upload Category Template (Revenue)",
         apiControllerAction: "/api/MRRReport/GetMRRUploadTemplateByOwnerWithRevenue",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -4932,7 +4932,7 @@ function getReportObject_MRRNationwideTVByAffiliation() {
 
     tempObject =
     {
-        reportTitle: "MRR Nationwide TV By Affiliation",
+        reportTitle: "MRR Nationwide TV Affiliation",
         apiControllerAction: "/api/MRRReport/GetNationwideRevenueByAffiliationReport",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -5004,7 +5004,7 @@ function getReportObject_MRRNationwideTVByRegion() {
 
     tempObject =
     {
-        reportTitle: "MRR Nationwide TV By Region",
+        reportTitle: "MRR Nationwide TV Region",
         apiControllerAction: "/api/MRRReport/GetNationwideRevenueByRegionReport",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -5076,7 +5076,7 @@ function getReportObject_MRRNationwideTVBySize() {
 
     tempObject =
     {
-        reportTitle: "MRR Nationwide TV By Market Size",
+        reportTitle: "MRR Nationwide TV Market Size",
         apiControllerAction: "/api/MRRReport/GetNationwideRevenueBySizeReport",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -5148,7 +5148,7 @@ function getReportObject_MRRNationwideRadioByFormat() {
 
     tempObject =
     {
-        reportTitle: "MRR Nationwide Radio By Format",
+        reportTitle: "MRR Nationwide Radio Format",
         apiControllerAction: "/api/MRRReport/GetNationwideRevenueByFormatReport",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -5220,7 +5220,7 @@ function getReportObject_MRRNationwideRadioByRegion() {
 
     tempObject =
     {
-        reportTitle: "MRR Nationwide Radio By Region",
+        reportTitle: "MRR Nationwide Radio Region",
         apiControllerAction: "/api/MRRReport/GetNationwideRevenueByRegionReport",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -5292,7 +5292,7 @@ function getReportObject_MRRNationwideRadioBySize() {
 
     tempObject =
     {
-        reportTitle: "MRR Nationwide Radio By Market Size",
+        reportTitle: "MRR Nationwide Radio Market Size",
         apiControllerAction: "/api/MRRReport/GetNationwideRevenueBySizeReport",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -5411,7 +5411,7 @@ function getReportObject_MRRMissingManagerSuggestedList() {
 
     tempObject =
     {
-        reportTitle: "MRR Missing Manager Suggested List",
+        reportTitle: "MRR Missing Manager Suggestions",
         apiControllerAction: "/api/MRRReport/GetMRRMissingManagerSuggestedList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,

@@ -69,7 +69,21 @@
                         <h2 id="reportTitle">Media Reports</h2>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <h4>Report Categories</h4>
+                        <div id="rptTags"style="border-right:solid 1px silver">
+
+                        </div> 
+                    </div>
+                    <div class="col-md-9">
+                        <h4 id="tagReportTitle"></h4>
+                        <div id="rptList" class="row"  ></div>
+                    </div>
+                </div>
+
                 <!-- start datatable coding-->
+
 
                 <div class="dataTable-top-margin">
                     <div class="col-md-4 stripe" id="dtResults"></div>
@@ -124,57 +138,83 @@
     $(document).ready(function () {
 
         outReportArray = reportObjectArray;
+ 
+        // build Tag List
+        buildTagList(outReportArray);
 
         // build menu
         buildMainMenu("Reports");
 
-        buildReportLists();
+        //buildReportLists();
 
         destroySearchCriteria();
         
     });
 
+    function buildTagList(rptArray)
+    {
+        var tagArray = new Array();
+        for (var i = 0; i < rptArray.length; i++)
+        {
+            if (tagArray.indexOf(rptArray[i].product) === -1 )
+            {
+                tagArray.push(rptArray[i].product);
+                $("#rptTags").append("<div><a href='#' onclick='loadReports(" + '"' + rptArray[i].product + '"'+ ");'>" + rptArray[i].product.toUpperCase() + "</a></div>")
+            }
+        }
+    }
+
+    function loadReports(product)
+    {
+        $("#rptList").html("");
+        $("#tagReportTitle").html(product.toUpperCase() + " Reports");
+        buildReportList(product, "rptList", null, outReportArray);
+    }
     function destroySearchCriteria()
     {
         setLocalStorage("gSearchCriteria", null);
         setLocalStorage("gSearchResults", null);
     }
 
-    function buildReportLists()
-    {
+    //function buildReportLists()
+    //{
 
-        buildReportList("mrr", "dtResults", "Market Revenue Reports", outReportArray);
-        buildReportList("xry", "dtResults", "XRay Reports", outReportArray);
-        buildReportList("tvb", "dtResults", "TVB Reports", outReportArray);
-        buildReportList("dma", "dtResults", "DMA Reports", outReportArray);
+    //    buildReportList("mrr", "dtResults", "Market Revenue Reports", outReportArray);
+    //    buildReportList("xry", "dtResults", "XRay Reports", outReportArray);
+    //    buildReportList("tvb", "dtResults", "TVB Reports", outReportArray);
+    //    buildReportList("dma", "dtResults", "DMA Reports", outReportArray);
 
 
-        // 2nd column starts here...
-        buildReportList("station", "dtResultsCol2", "Station Reports", outReportArray);
-        buildReportList("market", "dtResultsCol2", "Market Reports", outReportArray);
-        buildReportList("personnel", "dtResultsCol2", "Personnel Reports", outReportArray);
-        buildReportList("owner", "dtResultsCol2", "Owner Reports", outReportArray);
-        buildReportList("ownergroup", "dtResultsCol2", "Owner Group Reports", outReportArray);
+    //    // 2nd column starts here...
+    //    buildReportList("station", "dtResultsCol2", "Station Reports", outReportArray);
+    //    buildReportList("market", "dtResultsCol2", "Market Reports", outReportArray);
+    //    buildReportList("personnel", "dtResultsCol2", "Personnel Reports", outReportArray);
+    //    buildReportList("owner", "dtResultsCol2", "Owner Reports", outReportArray);
+    //    buildReportList("ownergroup", "dtResultsCol2", "Owner Group Reports", outReportArray);
 
-        buildReportList("", "dtResultsCol3", "Miscellaneous Product Reports", outReportArray);
-        buildReportList("misc", "dtResultsCol3", "Miscellaneous Reports", outReportArray);
-        buildReportList("tech", "dtResultsCol3", "Tech Reports", outReportArray);
+    //    buildReportList("", "dtResultsCol3", "Miscellaneous Product Reports", outReportArray);
+    //    buildReportList("misc", "dtResultsCol3", "Miscellaneous Reports", outReportArray);
+    //    buildReportList("tech", "dtResultsCol3", "Tech Reports", outReportArray);
 
-    }
+    //}
 
     function buildReportList(productId, control, title, reportArray)    
     {
  
        
-  
-        $("#" + control).append("<h3 style='padding-top: 10px;padding-bottom: 10px; margin-bottom: 0px; margin-top: 15px;'>" + title + "</h3>");
+        if (title != null)
+        {
+            $("#" + control).append("<h3 style='padding-top: 10px;padding-bottom: 10px; margin-bottom: 0px; margin-top: 15px;'>" + title + "</h3>");
+        }
 
         for (var i = 0; i < reportArray.length; i++) {
 
-            if (reportArray[i].product.toLowerCase() == productId.toLowerCase()) {
-                $("#" + control).append("<div>");
-                $("#" + control).append("<a href='/utilities/genericReport.html?reportId=" + i + "'>" + reportArray[i].reportTitle + "</a>");
-                $("#" + control).append("</div>");
+            if (reportArray[i].product.toLowerCase() == productId.toLowerCase())
+            {
+                var str = "<div class='col-md-4'>";
+                str = str + "<a href='/utilities/genericReport.html?reportId=" + i + "'>" + reportArray[i].reportTitle + "</a>";
+                str = str + "</div>";
+                $("#" + control).append(str);
             }
 
         }
