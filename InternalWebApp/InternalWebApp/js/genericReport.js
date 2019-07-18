@@ -2181,7 +2181,8 @@ function getReportFilterArray_MarketSetupMarket() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: new Array('MRR'),
         objectName: "ddlMarket",
         required: true
     }
@@ -2201,7 +2202,7 @@ function getReportObject_MarketSetupMarket() {
         apiControllerAction: "/api/MarketReport/GetMarketSetupMarket",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'market',
+        product: 'mrr',
         sortable: true
     }
 
@@ -2217,7 +2218,8 @@ function getReportFilterArray_MarketSetupMarketMRRCategories() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: new Array('MRR'),
         objectName: "ddlMarket",
         required: true
     }
@@ -2238,7 +2240,7 @@ function getReportObject_MarketSetupMarketMRRCategories() {
         apiControllerAction: "/api/MarketReport/GetMarketSetupMarketMRRCategories",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'market',
+        product: 'mrr',
         sortable: true
     }
 
@@ -2253,7 +2255,8 @@ function getReportFilterArray_MarketSetupMarketMRRReports() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: new Array('MRR'),
         objectName: "ddlMarket",
         required: true
     }
@@ -2273,7 +2276,7 @@ function getReportObject_MarketSetupMarketMRRReports() {
         apiControllerAction: "/api/MarketReport/GetMarketSetupMarketMRRReports",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'market',
+        product: 'mrr',
         sortable: true
     }
 
@@ -2288,7 +2291,8 @@ function getReportFilterArray_MarketSetupMarketOwnerGroups() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: new Array('MRR'),
         objectName: "ddlMarket",
         required: true
     }
@@ -2308,7 +2312,7 @@ function getReportObject_MarketSetupMarketOwnerGroups() {
         apiControllerAction: "/api/MarketReport/GetMarketSetupMarketOwnerGroups",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'market',
+        product: 'mrr',
         sortable: true
     }
 
@@ -2323,7 +2327,8 @@ function getReportFilterArray_MarketSetupMarketProducts() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: new Array('MRR'),
         objectName: "ddlMarket",
         required: true
     }
@@ -2343,7 +2348,7 @@ function getReportObject_MarketSetupMarketProducts() {
         apiControllerAction: "/api/MarketReport/GetMarketSetupMarketProducts",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'market',
+        product: 'mrr',
         sortable: true
     }
 
@@ -2358,7 +2363,8 @@ function getReportFilterArray_MarketSetupMarketStations() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: new Array('MRR'),
         objectName: "ddlMarket",
         required: true
     }
@@ -2378,7 +2384,7 @@ function getReportObject_MarketSetupMarketStations() {
         apiControllerAction: "/api/MarketReport/GetMarketSetupMarketStations",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'market',
+        product: 'mrr',
         sortable: true
     }
 
@@ -2393,7 +2399,8 @@ function getReportFilterArray_MarketSetupMarketUsers() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: new Array('MRR'),
         objectName: "ddlMarket",
         required: true
     }
@@ -2413,7 +2420,7 @@ function getReportObject_MarketSetupMarketUsers() {
         apiControllerAction: "/api/MarketReport/GetMarketSetupMarketUsers",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'market',
+        product: 'mrr',
         sortable: true
     }
 
@@ -2428,7 +2435,8 @@ function getReportFilterArray_MarketSetupMarketVirtualGroups() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: new Array('MRR'),
         objectName: "ddlMarket",
         required: true
     }
@@ -2448,7 +2456,7 @@ function getReportObject_MarketSetupMarketVirtualGroups() {
         apiControllerAction: "/api/MarketReport/GetMarketSetupMarketVirtualGroups",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'market',
+        product: 'mrr',
         sortable: true
     }
 

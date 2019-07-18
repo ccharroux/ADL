@@ -173,6 +173,7 @@ function getDMAReportObject_RevenueComparisonStation() {
         "action": "edit",
         "mRender": function (data, type, row) {
             var reportIndex = dmaReportName.indexOf("dmaRevenueComparisonStationDetail");
+            reportArray
             var action = "";
 
             var revenuePeriodParts = row["Revenue Period"].split("/");
