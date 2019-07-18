@@ -138,7 +138,8 @@ function getDMAReportFilterArray_RevenueComparisonMarket() {
 
     arrayObject = {
         token: "Period",
-        jsCall: "getPeriodList quarters",
+        jsCall: "getPeriodList",
+        jsCallParameters: ["quarters"],
         objectName: "ddlPeriod",
         required: true
     }
@@ -241,7 +242,8 @@ function getDMAReportFilterArray_RevenueComparisonStation() {
 
     arrayObject = {
         token: "Period",
-        jsCall: "getPeriodList quarters",
+        jsCall: "getPeriodList",
+        jsCallParameters: ["quarters"],
         objectName: "ddlPeriod",
         required: true
     }
@@ -344,7 +346,8 @@ function getDMAReportFilterArray_RevenueComparisonStationDetail() {
     //revenue period
     arrayObject = {
         token: "Period",
-        jsCall: "getPeriodList quarters",
+        jsCall: "getPeriodList",
+        jsCallParameters: ["quarters"],
         objectName: "ddlPeriod",
         required: true
     }

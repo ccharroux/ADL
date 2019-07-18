@@ -41,6 +41,9 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
+    
+    <!--Chosen Dropdown-->
+    <link rel="stylesheet" href="/css/chosen.min.css" />
 
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
@@ -239,6 +242,10 @@
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
 
+    <!--Chosen Dropdown-->
+    <script src="/js/chosen.jquery.min.js"></script>
+
+
 </body>
 </html>
 <script>
@@ -278,7 +285,7 @@
                 if (data.response.status.toUpperCase() === "SUCCESS") {
                     var $marketList = $("#ddlMarkets");
 
-                    $marketList.append("<option value='-1'>-- Select a Market</option>");
+                    $marketList.append("<option value='-1'>-- Select a Market --</option>");
 
                     $.each(data.report.rows,
                         function () {
@@ -288,6 +295,8 @@
                         });
 
                 }
+
+                convertToChosenSelect("ddlMarkets");
 
                 //setMarketValue();
                 //getStationAdvertiser();
@@ -320,7 +329,7 @@
 
                     var str = '';
                     //console.log(JSON.stringify(data));
-                    str = '<option value="">-- Select a Media Type</option>';
+                    str = '<option value="">-- Select a Media Type --</option>';
                     $.each(data.report.rows, function (index) {
 
                         str = str + '<option value="' + data.report.rows[index].mediaTypeId + '">' + data.report.rows[index].mediaType + '</option>';
@@ -328,6 +337,8 @@
                     });
 
                     $("#ddlMediaType").html(str);
+
+                    convertToChosenSelect("ddlMediaType");
 
                     //loadLastSearch();
                     getMediaAdvertiser();
@@ -386,8 +397,8 @@
 
         if (mediaAdvertiserId <= 0) {
             //load everthing but market advertiser and id
-            $('#ddlMarkets').val(searchResults["marketID"]);
-            $('#ddlMediaType').val(searchResults["mediaType"]);
+            $('#ddlMarkets').val(searchResults["marketID"]).trigger('chosen:updated');
+            $('#ddlMediaType').val(searchResults["mediaType"]).trigger('chosen:updated');
             $('#txtMediaAdvertiser').val(searchResults["advertiserName"]);
             $('#txtMediaAdvertiserCode').val(searchResults["advertiserCode"]);
         }
@@ -436,9 +447,9 @@
 
                         //console.log(obj);
 
-                        $('#ddlMarkets').val(obj["marketId"]);
-                        $('#ddlMediaType').val(obj["mediaType"]);
-                        $("#ddlMediaType").prop('disabled', true);
+                        $('#ddlMarkets').val(obj["marketId"]).trigger('chosen:updated');
+                        $('#ddlMediaType').val(obj["mediaType"]).trigger('chosen:updated');
+                        $("#ddlMediaType").prop('disabled', true).trigger('chosen:updated');
                         $('#txtMediaAdvertiser').val(obj["mediaAdvertiserName"]);
                         $('#txtMediaAdvertiserCode').val(obj["mediaAdvertiserCode"]);
 
