@@ -287,6 +287,9 @@ var navTool = {
                 }
             }
 
+            if (checkIfChosenObjectExists(e)) {
+                $("#" + e.id).trigger('chosen:updated');
+            }
         }
         else {
             if (e.selectedIndex == e.length - 1) {
@@ -295,6 +298,10 @@ var navTool = {
             else {
                 e.selectedIndex = e.selectedIndex + direction;
 
+            }
+
+            if (checkIfChosenObjectExists(e)) {
+                $("#" + e.id).trigger('chosen:updated');
             }
         }
  
@@ -1406,6 +1413,16 @@ function convertToChosenSelect(selectName, allowSearchContains, allowSplitWordSe
 
     //This code reloads the dropdown to pick up new values.
     $("#" + selectName).trigger("chosen:updated");
+}
+
+function checkIfChosenObjectExists(object) {
+
+    if ($("#" + object.id + "_chosen").length > 0) {
+        return true;
+    } else {
+        return false;
+    }
+
 }
 
 function scrollToAnchor(aid) {
