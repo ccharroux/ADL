@@ -988,7 +988,7 @@
 
                 var obj = data.report.rows[index];
                 var showRetainHistory = false;
-                var inactiveEntity = "";
+                var showEditButton = true;
 
                 // This code is added to restrict
                 // visibility of products that are NOT allowed
@@ -1010,27 +1010,30 @@
                     $("#productDisable" + productId).removeClass("hidden");
                     $("#date" + productId).html(extractDateOnly(obj.activeDate));
                     $("#date" + productId).css("color", "green");
-                    if (productId != "MSS" && productId != "DMA") {
-                        $("#productEdit" + productId).removeClass("hidden");
-                    }
+                   
                     
                     //Active product that Station should NOT have - add message under Edit/Disable button
                     if (marketProductId == "" || ownerProductId == "") {
 
+                        showEditButton = false;
+
                         if (marketProductId == "") {
-                            inactiveEntity = "Market";
+                            $("#productButtons" + productId).append("<div class='col-md-12' style='padding-left: 0px;'>" + productId + " is active for this station but is not active for this station's Market.</div>");
                         }
 
                         if (ownerProductId == "") {
-                            inactiveEntity = "Ownership";
+                            $("#productButtons" + productId).append("<div class='col-md-12' style='padding-left: 0px;'>" + productId + " is active for this station but is not active for this station's Ownership.</div>");
                         }
 
-                        if (marketProductId == "" && ownerProductId == "") {
-                            inactiveEntity = "Market and Ownership";
-                        }
-
-                        $("#productButtons" + productId).append("<div class='col-md-12' style='padding-left: 0px;'>Warning: " + productId + " is active for this station but is not active for this station's " + inactiveEntity + ".</div>"); 
+                        
                     }
+
+                    //Only show edit button if product is not mss, dma, and product is supposed to be active
+                    if (productId != "MSS" && productId != "DMA" && showEditButton == true) {
+                        $("#productEdit" + productId).removeClass("hidden");
+                    }
+
+
                 }
                 
                 //Disabled product - Show Add button and disabled date
@@ -1053,18 +1056,12 @@
                     $("#productButtons" + productId).html("");
 
                     if (marketProductId == "") {
-                        inactiveEntity = "Market";
+                        $("#productButtons" + productId).append("<div class='col-md-12' style='padding-left: 0px;'>" + productId + " is not active in this station's Market.");
                     }
 
                     if (ownerProductId == "") {
-                        inactiveEntity = "Ownership";
+                        $("#productButtons" + productId).append("<div class='col-md-12' style='padding-left: 0px;'>" + productId + " is not active in this station's Ownership.");
                     }
-
-                    if (marketProductId == "" && ownerProductId == "") {
-                        inactiveEntity = "Market and Ownership"
-                    }
-
-                    $("#productButtons" + productId).append(productId + " is not active in this station's " + inactiveEntity + ".");
 
                 }
 
