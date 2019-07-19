@@ -69,7 +69,7 @@ function buildAuditObjectArray() {
 
     for (var x = 0; x < auditName.length; x++) {
         var module = auditName[x].replace("audit", "");
-        //console.log(module);
+ 
         arrayObject = window[("getAuditObject_" + module)]();
         arrayObject.filters = window[("getAuditFilterArray_" + module)]();
         auditObjectArray.push(arrayObject);

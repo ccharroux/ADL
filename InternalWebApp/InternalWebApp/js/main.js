@@ -225,7 +225,7 @@ var unblockHandle;
 //            {
 //                bootbox.alert(successMessage, function () 
 //                {
-//                    console.log('return now');
+ 
 //                    return true;
 //                });
 //            }
@@ -330,7 +330,7 @@ $( document ).ready(function()
 
 	if (bLongQuery == false) {
 	    // Force unblock after 10 seconds
-	    //console.log("force stop of block ui");
+ 
 	    unblockHandle = setInterval("$.unblockUI();", 10000);
 	}
 
@@ -626,7 +626,7 @@ function getLastPage()
     {
 
         var lastPageList = getLocalStorage("latestRequestArray");
-        //console.log(lastPageList);
+ 
 
         if (lastPageList.length > 0)
         {
@@ -854,7 +854,7 @@ function MKAErrorMessageRtn(message, url)
     else if (message.toLowerCase().indexOf('authentication failed') > -1)
     {
         newMessage = "Authentication Failed";
-        console.log(message);
+  
         bootbox.alert(newMessage, function () {});
     }
     else

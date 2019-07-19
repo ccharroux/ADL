@@ -429,7 +429,7 @@ function linkParentAgency() {
 
     var rowData = searchTable.rows('.selected').data();
 
-    console.log(rowData);
+ 
 
     var searchResults = {};
 

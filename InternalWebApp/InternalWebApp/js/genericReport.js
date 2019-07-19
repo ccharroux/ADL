@@ -183,7 +183,7 @@ function buildReportObjectArray()
     for (var x = 0; x < reportName.length; x++)
     {
         var module = reportName[x].replace("rpt", "");
-       // console.log(module);
+ 
         arrayObject = window[("getReportObject_" + module)]();
         arrayObject.filters = window[("getReportFilterArray_" + module)]();
         reportObjectArray.push(arrayObject);
@@ -2095,10 +2095,10 @@ function getReportFilterArray_MarketOwnershipGroup() {
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "Market",
-        jsCall: "getMarketListAll",
-        objectName: "ddlMarket",
-        required: false
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: true
     }
     arrayFilters.push(arrayObject);
 
