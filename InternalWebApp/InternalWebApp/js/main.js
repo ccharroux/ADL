@@ -950,10 +950,6 @@ function buildXRYMenu(selectedItem) {
     menuItems += productDashboard('dma');
     menuItems += '              </ul>';
     menuItems += '        </li>';
-    //menuItems += '              <ul class="dropdown-menu" role="menu">';
-    //menuItems += '                  <li style="display:block;"><a href="/stationagencylist.html">Station Agency</a></li>';
-    //menuItems += '                  <li style="display:block;"><a href="/parentagencylist.html">Parent Agency</a></li>';
-    //menuItems += '              </ul>';
     menuItems += '        </li>';
 
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
@@ -963,22 +959,9 @@ function buildXRYMenu(selectedItem) {
     menuItems += '</ul>';
     menuItems += '</li>';
 
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "XRay Reports") + ' href="/products/xry/xrygenericreport.html" role="button" aria-expanded="false">XRay Reports </span></a>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "XRay Reports") + ' href="/products/xry/xrygenericreportlist.html" role="button" aria-expanded="false">XRay Reports </span></a>';
 
 
-    //menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Advertiser") + ' href="/advertiserlist.html" role="button" aria-expanded="false">Advertiser <span style="margin-right:10px;" class="caret"></span></a>';
-    //menuItems += '              <ul class="dropdown-menu" role="menu">';
-    //menuItems += '                  <li style="display:block;"><a href="/stationadvertiserlist.html">Station Advertiser</a></li>';
-    //menuItems += '                  <li style="display:block;"><a href="/mediaadvertiserlist.html">Media Advertiser</a></li>';
-    //menuItems += '                  <li style="display:block;"><a href="/parentadvertiserlist.html">Parent Advertiser</a></li>';
-    //menuItems += '              </ul>';
-    //menuItems += '        </li>';
-    //menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Agency") + ' href="/agencylist.html" role="button" aria-expanded="false">Agency <span style="margin-right:10px;" class="caret"></span></a>';
-    //menuItems += '              <ul class="dropdown-menu" role="menu">';
-    //menuItems += '                  <li style="display:block;"><a href="/stationagencylist.html">Station Agency</a></li>';
-    //menuItems += '                  <li style="display:block;"><a href="/parentagencylist.html">Parent Agency</a></li>';
-    //menuItems += '              </ul>';
-    //menuItems += '        </li>';
 
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
@@ -987,7 +970,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/mediaadvertiserlist.html">&nbsp;Media Advertiser</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/parentadvertiserlist.html">&nbsp;Parent Advertiser</a></li>';
 
-    menuItems += '                  <li style="display:block;"><a href="/agencylist.html" role="button" aria-expanded="false">Agency</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/Admin/agency/agencylist.html" role="button" aria-expanded="false">Agency</a></li>';
  
     menuItems += '                  <li style="display:block;"><a href="/stationagencylist.html">&nbsp;Station Agency</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/parentagencylist.html">&nbsp;Parent Agency</a></li>';

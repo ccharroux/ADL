@@ -505,7 +505,7 @@ function getAuditObject_Agencies() {
     columnsToDisplay.push({
         "action": "edit",
         "mRender": function (data, type, row) {
-            var action = "/agency.html?AgencyID=";
+            var action = "/Admin/agency/agency.html?AgencyID=";
             return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.agencyId + ')\'>Edit</a>';
         },
         "orderable": false,
@@ -677,7 +677,7 @@ function getAuditObject_NewAgencies() {
                 );
             }
 
-            var action = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/agency.html?AgencyID=",' + row.agencyId + ')\'>Edit&nbsp;Agency</a>';
+            var action = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/Admin/agency/agency.html?AgencyID=",' + row.agencyId + ')\'>Edit&nbsp;Agency</a>';
             var action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/stationagency.html?StationAgencyID=",' + row.stationAgencyId + ')\'>Edit&nbsp;Station&nbsp;Agency</a>';
             return action + '<br />' + action2;
         },
