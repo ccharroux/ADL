@@ -93,7 +93,7 @@ function getDMAReportObject_RevenueComparisonMarket() {
             var revenuePeriodParts = row["Revenue Period"].split("/");
 
             if (reportIndex > -1) {
-                action = "/Products/DMA/reports/genericDMAreport.html?reportid=" + reportIndex +
+                action = "/Products/DMA/reports/dmagenericreport.html?reportid=" + reportIndex +
                         "&parentmarketid=" + row["Parent Market ID"] +
                         "&marketid=" + row["Market Id"] +
                         "&revenueperiod=" + revenuePeriodParts[1] +
@@ -113,7 +113,7 @@ function getDMAReportObject_RevenueComparisonMarket() {
         apiControllerAction: "/api/DMAReport/GetDMARevenueReviewByMarket",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        reportPath: "/Products/DMA/reports/genericDMAreport.html",
+        reportPath: "/Products/DMA/reports/dmagenericreport.html",
         product: 'dmarevenue',
         showBackNav: false,
         reportToken: "dmaMarket",
@@ -180,7 +180,7 @@ function getDMAReportObject_RevenueComparisonStation() {
             var revenuePeriodParts = row["Revenue Period"].split("/");
 
             if (reportIndex > -1) {
-                action = "/Products/DMA/reports/genericDMAreport.html?reportid=" + reportIndex +
+                action = "/Products/DMA/reports/dmagenericreport.html?reportid=" + reportIndex +
                     "&parentmarketid=" + $("#ddlParentMarket").val() +
                     "&marketid=" + row["Market ID"] +
                     "&revenueperiod=" + revenuePeriodParts[1] +
@@ -204,7 +204,7 @@ function getDMAReportObject_RevenueComparisonStation() {
         apiControllerAction: "/api/DMAReport/GetDMARevenueReviewByStation",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        reportPath: "/Products/DMA/reports/genericDMAreport.html",
+        reportPath: "/Products/DMA/reports/dmagenericreport.html",
         product: 'dmarevenue',
         showBackNav: true,
         backNavButtons: arrButtons,
@@ -284,7 +284,7 @@ function getDMAReportObject_RevenueComparisonStationDetail() {
         apiControllerAction: "/api/DMAReport/GetDMARevenueReviewByStationDetails",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        reportPath: "/Products/DMA/reports/genericDMAreport.html",
+        reportPath: "/Products/DMA/reports/dmagenericreport.html",
         product: 'dmarevenue',
         sortable: false,
         showBackNav: true,

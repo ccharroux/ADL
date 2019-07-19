@@ -1118,7 +1118,7 @@ function buildDMAMenu(selectedItem) {
 
     menuItems += '<ul>';
 
-//    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="/Products/DMA/releasedma.html">Release</a></li>';
+//    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="/Products/DMA/dmarelease.html">Release</a></li>';
     menuItems += buildGenericReportsLink2(selectedItem);
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
@@ -1134,10 +1134,10 @@ function buildDMAMenu(selectedItem) {
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
 
-    menuItems += '        <li style="display:block"><a href="/Products/DMA/releasedma.html">Release</a></li>';
+    menuItems += '        <li style="display:block"><a href="/Products/DMA/dmarelease.html">Release</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "DMA Reports") + ' href="/Products/DMA/genericDmaReportList.html" role="button" aria-expanded="false">DMA Reports </span></a>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "DMA Reports") + ' href="/Products/DMA/dmagenericreportlist.html" role="button" aria-expanded="false">DMA Reports </span></a>';
     menuItems += '       </li>';
 
     menuItems += productDashboard('');
@@ -1178,7 +1178,7 @@ function productDashboard(productId)
             break;
         case 'dma':
             style = 'display:block;';
-            strOut = '<a href="/Products/DMA/dashboarddma.html">DMA</a>';
+            strOut = '<a href="/Products/DMA/dmadashboard.html">DMA</a>';
             break;
     }
 
