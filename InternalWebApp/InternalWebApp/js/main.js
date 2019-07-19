@@ -956,7 +956,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
     menuItems += '        <li style="display:block"><a href="releasexry.html">Release</a></li>';
-    menuItems += '        <li style="display:block"><a href="remindersxry.html">Reminders</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/xry/xryreminders.html">Reminders</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
 
@@ -1014,7 +1014,7 @@ function buildMRRMenu(selectedItem) {
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
     menuItems += '        <li style="display:block"><a href="releasemrr.html">Release</a></li>';
-    menuItems += '        <li style="display:block"><a href="remindersmrr.html">Reminders</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrreminders.html">Reminders</a></li>';
     menuItems += '        <li style="display:block"><a href="revenuedetailmrr.html">Revenue Detail</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/mrr/mrrsnapshot.html">Snapshot</a></li>';
     menuItems += '</ul>';
@@ -1055,7 +1055,7 @@ function buildTVBMenu(selectedItem) {
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
 
-    menuItems += '        <li style="display:block"><a href="reminderstvb.html">Reminders</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbreminders.html">Reminders</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += productDashboard('');
