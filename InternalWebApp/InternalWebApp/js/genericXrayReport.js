@@ -258,7 +258,7 @@ function getAuditObject_MediaAdvertisers() {
     columnsToDisplay.push({
         "action": "edit",
         "mRender": function (data, type, row) {
-            var action = "/mediaadvertiser.html?MediaAdvertiserID=";
+            var action = "/admin/mediaadvertiser/mediaadvertiser.html?MediaAdvertiserID=";
             return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.mediaAdvertiserId + ')\'>Edit</a>';
         },
         "orderable": false,
@@ -455,7 +455,7 @@ function getAuditObject_NewAdvertisers() {
             if (row.stationAdvertiserId != null) {
                 action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/stationadvertiser/stationadvertiser.html?StationAdvertiserID=",' + row.stationAdvertiserId + ')\'>Edit&nbsp;Station&nbsp;Advertiser</a>';
             } else {
-                action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/mediaadvertiser.html?MediaAdvertiserID=",' + row.mediaAdvertiserId + ')\'>Edit&nbsp;Media&nbsp;Advertiser</a>';
+                action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/mediaadvertiser/mediaadvertiser.html?MediaAdvertiserID=",' + row.mediaAdvertiserId + ')\'>Edit&nbsp;Media&nbsp;Advertiser</a>';
             }
             return action + '<br />' + action2;
         },

@@ -921,7 +921,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/marketsizelist.html">Market Sizes</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/position/positionlist.html">Positions</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/region/regionlist.html">Regions</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/revenuecategorieslist.html">Revenue Categories</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/revenuecategory/revenuecategorylist.html">Revenue Categories</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/dashboardtech.html">Tech Tools</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
@@ -968,19 +968,19 @@ function buildXRYMenu(selectedItem) {
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="/admin/advertiser/advertiserlist.html" role="button" aria-expanded="false">Advertiser</a></li>'; 
     menuItems += '                  <li style="display:block;"><a href="/admin/stationadvertiser/stationadvertiserlist.html">&nbsp;Station Advertiser</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/mediaadvertiserlist.html">&nbsp;Media Advertiser</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/parentadvertiserlist.html">&nbsp;Parent Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/mediaadvertiser/mediaadvertiserlist.html">&nbsp;Media Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html">&nbsp;Parent Advertiser</a></li>';
 
-    menuItems += '                  <li style="display:block;"><a href="/Admin/agency/agencylist.html" role="button" aria-expanded="false">Agency</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/agency/agencylist.html" role="button" aria-expanded="false">Agency</a></li>';
  
     menuItems += '                  <li style="display:block;"><a href="/admin/stationagency/stationagencylist.html">&nbsp;Station Agency</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/parentagencylist.html">&nbsp;Parent Agency</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/parentagency/parentagencylist.html">&nbsp;Parent Agency</a></li>';
  
     
 
-    menuItems += '                  <li style="display:block;"><a href="/industrylist.html">Industry</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/industry/industrylist.html">Industry</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/subindustry/subindustrylist.html">Sub Industry</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/nielsenmarketnamelist.html">Nielson Market</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/nielsenmarketname/nielsenmarketnamelist.html">Nielson Market</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += productDashboard('');
