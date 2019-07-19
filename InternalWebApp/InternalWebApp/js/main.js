@@ -876,7 +876,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += productDashboard('mrr');
     //menuItems += '                  <li style="display:block;"><a href="/dashboardmrr.html">MRR</a></li>';
-    //menuItems += '                  <li style="display:block;"><a href="/dashboardxray.html">XRY</a></li>';
+    //menuItems += '                  <li style="display:block;"><a href="/products/xry/xrydashboard.html">XRY</a></li>';
     menuItems += productDashboard('xry');
     menuItems += productDashboard('tvb');
     //menuItems += '                  <li style="display:block;"><a href="/dashboardtvb.html">TVB</a></li>';
@@ -965,7 +965,7 @@ function buildXRYMenu(selectedItem) {
 
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/advertiserlist.html" role="button" aria-expanded="false">Advertiser</a></li>'; 
+    menuItems += '                  <li style="display:block;"><a href="/admin/advertiser/advertiserlist.html" role="button" aria-expanded="false">Advertiser</a></li>'; 
     menuItems += '                  <li style="display:block;"><a href="/stationadvertiserlist.html">&nbsp;Station Advertiser</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/mediaadvertiserlist.html">&nbsp;Media Advertiser</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/parentadvertiserlist.html">&nbsp;Parent Advertiser</a></li>';
@@ -1149,7 +1149,7 @@ function productDashboard(productId)
             break;
         case 'xry':
             style = 'display:block;';
-            strOut = '<a href="/dashboardxray.html">XRY</a>';
+            strOut = '<a href="/products/xry/xrydashboard.html">XRY</a>';
             break;
         case 'tvb':
             style = 'display:block;';
