@@ -903,15 +903,15 @@ function buildMainMenu(selectedItem) {
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Markets") + '">Market Menu<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block"><a href="/marketlist.html" role="button" aria-expanded="false">Markets </a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/marketlist.html?NonPrimaryOnly=true">Complimentary</a></li>';
+    menuItems += '                  <li style="display:block"><a href="/admin/market/marketlist.html" role="button" aria-expanded="false">Markets </a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/market/marketlist.html?NonPrimaryOnly=true">Complimentary</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/parentmarket/parentmarketlist.html">Parent</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Ownerships") + '">Ownership Menu<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/ownershiplist.html" role="button" aria-expanded="false">Ownerships </a>';
-    menuItems += '                  <li style="display:block;"><a href="/ownershipgrouplist.html">Groups</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/ownership/ownershiplist.html" role="button" aria-expanded="false">Ownerships </a>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/ownershipgroup/ownershipgrouplist.html">Groups</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/parentownership/parentownershiplist.html">Parents</a></li>';
     menuItems += '              </ul>';  
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="/dashboard.html">Virtual Groups</a></li>';
@@ -1015,7 +1015,7 @@ function buildMRRMenu(selectedItem) {
     menuItems += '<ul class="dropdown-menu" role="menu">';
     menuItems += '        <li style="display:block"><a href="/products/mrr/mrrrelease.html">Release</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/mrr/mrrreminders.html">Reminders</a></li>';
-    menuItems += '        <li style="display:block"><a href="revenuedetailmrr.html">Revenue Detail</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrrevenuedetail.html">Revenue Detail</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/mrr/mrrsnapshot.html">Snapshot</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';

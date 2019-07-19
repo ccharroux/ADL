@@ -47,9 +47,6 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
 
-    <!--Chosen Dropdown-->
-    <link rel="stylesheet" href="/css/chosen.min.css" />
-
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
 
@@ -72,49 +69,43 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2 id="pageTitle">Markets</h2>
+                        <h2>Ownership Groups</h2>
                     </div>
                 </div>
 
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-10 ">
-                        <label for="ddlMediaType" class="dropdown-label">Media Type</label>
-                        <select id="ddlMediaType" class="dropdown-select"  onchange="getMarketList();"></select>
-
-                        <label for="searchText">Market Name</label>
+                        <label for="searchText">Ownership Group Name</label>
                         <input type="text" id="searchText" />
-
-                        <label for="searchTextNumber">Market Number</label>
-                        <input type="text" id="searchTextNumber" value="" />
-                        <!--<input type="button" class="search-button" style="" value="Search" onclick="getMarketList()" />-->
+                        <!--<label for="ddlMediaType" style="padding-left:10px">Media Type</label>
+                        <select id="ddlMediaType">
+                        </select>-->
+                        <input type="button" class="search-button" value="Search" onclick="getOwnerGroupList()" />
                     </div>
                     <div class="col-md-2 ">
-                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editMarket(0)" />
+                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editOwnershipGroup(0)" />
                     </div>
                 </div>
-                <div id="divQuickReport" style="float:right;padding-right:25px;padding-bottom:10px">
+                <div id="divQuickReport" style="float:right;padding-right:25px;padding-bottom:10px;">
                     <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
                     <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
                 </div>
-
                 <!-- start datatable-->
                 <div class="dataTable-top-margin">
-                    <table id="dtMarketList" class="stripe">
+                    <table id="dtOwnershipGroupList" class="stripe">
                         <thead>
                             <tr>
-                                <th class="exportColumn">Market</th>
-                                <th class="exportColumn">Media Type</th>
-                                <th class="exportColumn">Primary Market</th>
+                                <th class="exportColumn">Ownership Group Name</th>
+                                <th class="exportColumn">Owner</th>
                                 <th class="exportColumn">Products</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <th>Market</th>
-                                <th>Media Type</th>
-                                <th>Primary Market</th>
+                                <th>Ownership Group Name</th>
+                                <th>Owner</th>
                                 <th>Products</th>
                                 <th></th>
                             </tr>
@@ -147,7 +138,6 @@
     <script src="/js/main.js"></script>
     <!-- genericReport JS -->
     <script src="/js/genericReport.js"></script>
-
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
@@ -157,91 +147,28 @@
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
 
-    <!--Chosen Dropdown-->
-    <script src="/js/chosen.jquery.min.js"></script>
-
 </body>
 </html>
 <script>
 
-
-    var bSecondaryMarketsOnly = false;
-
     $(document).ready(function () {
+        var reportTitle = "Ownership Groups List";
+        var exportColumns = returnTableColumnsByClass("dtOwnershipGroupList", "exportColumn");
 
-        getComplimentaryMarketSettings();
- 
-        setTitle();
-
-        getMediaTypes();
-
-        setEventListeners();
-
-        setDataTable();
-
-        clearSearchButtonSetup();
-
-        buildMainMenu("Markets");
-
-        buildQuickReports('market');
-        convertToChosenSelect("ddlQuickReport", false, false);
-
-        // Reset this variable
-        //setLocalStorage("quickReportQS", null);
-
-        setTimeout(loadLastSearch, 1000);
-
-        setLocalStorage("search", $("#searchText").val().trim() + '|' + $("#searchTextNumber").val().trim() + '|' + $("#ddlMediaType").val()  );
-        setLocalStorage("searchPage", window.location);
-
-    });
-
-    function getComplimentaryMarketSettings() {
-        if (getParameterByName("NonPrimaryOnly") == null) {
-            //check local storage
-            var secondaryMarketsOnly = getLocalStorage("NonPrimaryOnly");
-            //reset local storage
-            setLocalStorage("NonPrimaryOnly", '');
-            if (secondaryMarketsOnly.length > 0 && secondaryMarketsOnly === 'true') {
-                bSecondaryMarketsOnly = true;
-            } else {
-                bSecondaryMarketsOnly = false;
-            }
-        } else {
-            bSecondaryMarketsOnly = (getParameterByName("NonPrimaryOnly") == null ? false : (getParameterByName("NonPrimaryOnly").toLowerCase() === 'true'));
-        }
-    }
-
-    function clearSearchButtonSetup()
-    {
-        $("body").on("click", "#clear_search_button", function () {
-                                                        var table = $("#dtMarketList").DataTable();
-                                                        table.search('').draw();
-            });
-
-    }
-    function setDataTable()
-    {
-        var reportTitle = "Markets List";
-        var exportColumns = returnTableColumnsByClass("dtMarketList", "exportColumn");
-
-
-        $("#dtMarketList").DataTable({
+        $("#dtOwnershipGroupList").DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
             "data": [],
             "columns": [
-                { "data": 'marketName' },
+                { "data": 'OG_OwnerGroupName' },
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="#" onclick="editMediaType(' + row.mediaTypeId + ')">' + row.mediaType + '</a>';
-
-                    },
-                    "orderable": true,
-                    "searchable": true
-                },
-                {
-                    "data": 'primaryMarket'
+                        return '<a href="#" onclick="editOwnership(' +
+                            row.OG_OwnerID +
+                            ')">' +
+                            row.OW_OwnerName +
+                            '</a>';
+                    }
                 },
                 {
                     mRender: function (data, type, row) {
@@ -250,11 +177,10 @@
 
                     }
                 },
-
                 {
                     mRender: function (data, type, row) {
 
-                        return '<a href="#" onclick="editMarket(' + row.marketId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteMarket(' + row.marketId + ')">Delete</a>';
+                        return '<a href="#" onclick="editOwnershipGroup(' + row.OG_OwnerGroupID + ')">Edit</a>&nbsp;<a href="#" onclick="deleteOwnershipGroup(' + row.OG_OwnerGroupID + ')">Delete</a>';
 
                     },
                     "orderable": false,
@@ -270,7 +196,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtOwnershipGroupList", data, columnIdx);
                            }
                        }
                    }
@@ -282,7 +208,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtOwnershipGroupList", data, columnIdx);
                            }
                        }
                    }
@@ -294,7 +220,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtOwnershipGroupList", data, columnIdx);
                            }
                        }
                    }
@@ -306,7 +232,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtOwnershipGroupList", data, columnIdx);
                            }
                        }
                    }
@@ -322,13 +248,6 @@
             createdRow: function (row, data, index) {
                 //this adds the class to every row
                 $(row).addClass('single-line-height');
-
-                //adding this class so can filter table later on if only wanting secondary markets
-                if (data.primaryMarket == true || data.primaryMarket == 'true') {
-                    $(row).addClass('primary-market');
-                } else {
-                    $(row).addClass('secondary-market');
-                }
             },
             language: {
                 //this changes search box label from Search: to Filter Results:
@@ -336,157 +255,60 @@
             }
         });
 
-    }
-
-    function setEventListeners()
-    {
-        var input = document.getElementById("searchTextNumber");
-        input.addEventListener("keyup", function (event) {
-            // Cancel the default action, if needed
-            event.preventDefault();
-            // Number 13 is the "Enter" key on the keyboard
-            if (event.keyCode === 13) {
-                setLocalStorage("search", "");
-                editMarket(document.getElementById("searchTextNumber").value);
-            }
-        });
-
-        var input = document.getElementById("searchText");
-        input.addEventListener("keyup", function (event) {
-            // Cancel the default action, if needed
-            event.preventDefault();
-            // Number 13 is the "Enter" key on the keyboard
-            if (event.keyCode === 13) {
-
-                getMarketList();
-            }
-        });
-    }
-
-    function setTitle()
-    {
-        if (bSecondaryMarketsOnly == true) {
-            $("#pageTitle").text("Complimentary Markets");
-        }
-        else {
-            $("#pageTitle").text("Markets");
-        }
-    }
-
-    function getMediaTypes() {
-        var url = ServicePrefix + '/api/MediaType/GetMediaTypeList';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getMediaTypesSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
-
-    }
-
-    function getMediaTypesSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-        }
-        else {
-
-            var str = '';
-            //console.log(JSON.stringify(data));
-            str = '<option value="-1">-- Select a Media Type</option>';
-            $.each(data.report.rows, function (index) {
-
-                str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
-
+        $("body").on("click",
+            "#clear_search_button",
+            function () {
+                var table = $("#dtOwnershipGroupList").DataTable();
+                table.search('').draw();
             });
 
-            $("#ddlMediaType").html(str);
 
-            convertToChosenSelect("ddlMediaType", false, false);
-           
-        }
-    }
+        buildMainMenu("Ownerships");
+        buildQuickReports('ownergroup');
+        loadLastSearch();
+
+        setLocalStorage("search", $("#searchText").val().trim());
+        setLocalStorage("searchPage", window.location);
+    });
+
     function loadLastSearch() {
-
         var search = getParameterByName("search");
 
         if (!search == false) {
             if (search.length > 0) {
-                var sArray = new Array();
-                sArray = search.split("|");
-
-                $("#searchText").val(sArray[0].toString());
-                $("#searchTextNumber").val(sArray[1].toString());
-                $("#ddlMediaType").val(sArray[2].toString()).trigger("chosen:updated");
-
-                getMarketList();
+                $("#searchText").val(search);
+                getOwnerGroupList();
             }
         }
-
     }
 
-    function getMarketList() {
+    function getOwnerGroupList() {
+        if ($("#searchText").val().trim() == 0) {
+            bootbox.alert("Please enter text to search for Owner Group(s)", function () {
 
-        if ($("#ddlMediaType").val().length == 0)
-        {
-            var table = $("#dtMarketList").DataTable();
-            table.clear().draw();
+            });
+
             return;
+
         }
 
-        if ( $("#searchText").val().trim().length > 0 && $("#searchText").val().trim().length < 3)
-        {
-            bootbox.alert('Market Name filter must be 3 characters or more. Filter being ignored.', function () {});
-            $("#searchText").val("");
-        }
-
-        setLocalStorage("search", $("#searchText").val().trim() + '|' + $("#searchTextNumber").val().trim() + '|' + $("#ddlMediaType").val());
+        setLocalStorage("search", $("#searchText").val().trim());
         setLocalStorage("searchPage", window.location);
 
         $.ajax({
-            url: ServicePrefix + '/api/Market/GetMarketList',
+            url: ServicePrefix + '/api/OwnerGroup/GetOwnerGroupList',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inMediaTypeId": $("#ddlMediaType").val(),
-                "inMarketName" : $("#searchText").val().trim(),
-                "inActiveOnly": "1",
-                "inPrimaryMarketOnly": "0"
+                "inOwnerGroupName": $("#searchText").val(),
+                "inActiveOnly": "1"
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                if (data.response.status.toUpperCase() === "SUCCESS")
-                {
-                    if (data.report.rows.length == 1)
-                    {
-                        var id = data.report.rows[0].marketId;
-                        setLocalStorage("search", "");
-                        editMarket(id);
-                        return;
-                    }
-                }
-                populateDataTable("dtMarketList", data);
 
-                //if we are wanting secondary markets only, this code will remove all rows with
-                //the primary-market class and redraw the datatable.
-                if (bSecondaryMarketsOnly) {
-                    //console.log("secondary only");
-                    $("#dtMarketList").DataTable().rows('.primary-market').remove().draw();
-                }
+                    populateDataTable("dtOwnershipGroupList", data);
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -496,23 +318,25 @@
 
     }
 
-    function editMarket(marketId) {
+    function editOwnershipGroup(ownerGroupID) {
 
-        window.location = "market.html?marketId=" + marketId + "&NonPrimaryOnly=" + bSecondaryMarketsOnly;
+        window.location = "/admin/ownershipgroup/ownershipgroup.html?ownerGroupID=" + ownerGroupID;
 
     }
 
-    function deleteMarket(marketId) {
-
+    function deleteOwnershipGroup(ownerGroupID) {
         bootbox.alert('This functionality is still under development.', function () {
         });
-
     }
 
     function editProduct(productId) {
-
         bootbox.alert('This functionality is still under development.', function () {
         });
+    }
+
+    function editOwnership(ownerID) {
+
+        window.location = "/admin/ownership/ownership.html?ownerID=" + ownerID;
 
     }
 
