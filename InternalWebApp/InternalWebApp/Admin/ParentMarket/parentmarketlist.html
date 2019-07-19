@@ -1,5 +1,4 @@
-﻿
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
@@ -7,6 +6,7 @@
 <html class="no-js">
 <!--<![endif]-->
 <head>
+
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>MKA Internal Media Site</title>
@@ -47,21 +47,16 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
 
-    <style>
-       
-    </style>
-
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
 
     <!-- FOR IE9 below -->
     <!--[if lt IE 9]>
-    <script src="js/respond.min.js"></script>
+        <script src="js/respond.min.js"></script>
     <![endif]-->
 
 </head>
 <body>
-
 
     <div id="fh5co-page">
         <header id="fh5co-header" role="banner">
@@ -73,39 +68,58 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Market Sizes</h2>
+                        <h2>Parent Markets</h2>
                     </div>
                 </div>
 
                 <!-- search / filter area -->
                 <div class="row search-section">
-                    <div class="col-md-12">
-                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editMarketSize(0)" />
+                    <div class="col-md-10 ">
+                        <!--<label for="searchText">Parent Market Name</label>
+                        <input type="text" id="searchText" />-->
+                    </div>
+                    <div class="col-md-2 ">
+                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editParentMarket(0)" />
                     </div>
                 </div>
+                <!--<div id="divQuickReport" style="float:right;padding-right:25px;padding-bottom:10px">
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>-->
 
+                <!-- start datatable-->
                 <div class="dataTable-top-margin">
-                    <table id="dtMarketSizeList" class="stripe">
+                    <table id="dtParentMarketList" class="stripe">
                         <thead>
                             <tr>
-                                <th>Market Size Code</th>
-                                <th class="exportColumn">Market Size</th>
+                                <th class="exportColumn">Parent Market</th>
+                                <th class="exportColumn">Parent State</th>
+                                <th class="exportColumn">Parent Timezone</th>
+                                <th class="exportColumn">DMA Enabled</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <th>Market Size Code</th>
-                                <th>Market Size</th>
+                                <th>Parent Market</th>
+                                <th>Parent State</th>
+                                <th>Parent Timezone</th>
+                                <th>DMA Enabled</th>
                                 <th></th>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
+                <!-- end datatable -->
             </div>
         </div>
+        <!--<div id="map" data-animate-effect="fadeIn"></div>-->
 
     </div>
+
+
+
+
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
     <!-- jQuery Easing -->
@@ -122,6 +136,8 @@
     <script src="/js/config.js"></script>
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
+    <!-- genericReport JS -->
+    <script src="/js/genericReport.js"></script>
 
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
@@ -131,146 +147,148 @@
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
-
-
 </body>
 </html>
 <script>
 
     $(document).ready(function () {
 
-        //easier to set the api url to variable to setup datatable
-        var dataTableURL = ServicePrefix + '/api/MarketSize/GetMarketSizeList';
+        var reportTitle = "Parent Markets List";
+        var exportColumns = returnTableColumnsByClass("dtParentMarketList", "exportColumn");
 
-        var reportTitle = 'Market Size List';
-        var exportColumns = returnTableColumnsByClass("dtMarketSizeList", "exportColumn");
-
-        //assign table to be a datatable
-        $('#dtMarketSizeList').DataTable({
-            //this tells the table where to put the buttons
+        $("#dtParentMarketList").DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
-            "ajax": {
-                "url": dataTableURL,
-                "dataType": "json",
-                "contentType": "application/json",
-                "type": "POST",
-                "data": function (d) {
-                    return JSON.stringify({
-                        "inApiToken": getLocalStorage("APIToken")
-                    });
-                },
-                //datatables expect the json to come back with "data" as the highest level
-                //this section will convert it to format datatables is looking for
-                //you json stringigy the report rows section since this is the data we want coming back
-                //from api. Parse the json again and it will be in the expected format
-                "dataSrc": function (json) {
-                    //since the data is coming back as part of the datatable ajax call, can't use the populateDataTable function.
-                    if (json.response.status.toUpperCase() === "SUCCESS") {
-
-                        json = JSON.stringify(json.report.rows);
-                        json = $.parseJSON(json);
-                        return json;
-
-                    }
-                    else {
-                        MKAErrorMessageRtn(json.response.errorMessage[0]);
-                        return json;
-                    }
-                }
-            }
-            ,
-            //this sets up the columns to show and assign them from the data being returned in the json
+            "data": [],
             "columns": [
-                {"data": 'marketSizeId'},
-                {
-                    "data": 'marketSizeDescription',
-                    "orderable": false
-                },
+                { "data": 'parentMarketName' },
+                { "data": 'parentState' },
+                { "data": 'parentTimeZone' },
+                { "data": 'DMA Enabled' },
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="#" onclick="editMarketSize(' + row.marketSizeId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteMarketSize(' + row.marketSizeId + ')">Delete</a>';
+
+                        return '<a href="#" onclick="editParentMarket(' + row.parentMarketId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteParentMarket(' + row.parentMarketId + ')">Delete</a>';
+
                     },
                     "orderable": false,
                     "searchable": false,
                     "className": "text-align-right"
                 }
             ],
-            "columnDefs":[
-                {
-                    "targets": [0],
-                    "visible": false,
-                    "searchable": false,
-                    "orderData": 0
-                }
-            ],
-            //setup the paging navigation buttons
             "pagingType": "full_numbers",
-            //adding buttons to the grid. built in buttons include csv, excel, pdf, print and making columns visible
             "buttons": [
-                {
-                    extend: 'csv',
-                    exportOptions: {
-                        columns: exportColumns
-                    }
-                },
-                {
-                    extend: 'excel',
-                    title: reportTitle,
-                    exportOptions: {
-                        columns: exportColumns
-                    }
-                },
-                {
-                    extend: 'pdf',
-                    title: reportTitle,
-                    exportOptions: {
-                        columns: exportColumns
-                    }
-                },
-                {
-                    extend: 'print',
-                    title: reportTitle,
-                    exportOptions: {
-                        columns: exportColumns
-                    }
-                }
-                //,
-                //'colvis'
+               {
+                   extend: 'csv',
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtParentMarketList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'excel',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtParentMarketList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'pdf',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtParentMarketList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtParentMarketList", data, columnIdx);
+                           }
+                       }
+                   }
+               }
             ],
             initComplete: function () {
                 $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
             },
             createdRow: function (row, data, index) {
+                //this adds the class to every row
                 $(row).addClass('single-line-height');
             },
             language: {
+                //this changes search box label from Search: to Filter Results:
                 search: "Filter Results:"
             }
         });
 
+
         $("body").on("click",
             "#clear_search_button",
             function () {
-                var table = $("#dtMarketSizeList").DataTable();
+                var table = $("#dtParentMarketList").DataTable();
                 table.search('').draw();
             });
 
-        buildMainMenu("Settings");
 
-        setLocalStorage("search",'');
+        setLocalStorage("search", "");
         setLocalStorage("searchPage", window.location);
 
+        getParentMarketList();
 
+        buildMainMenu("Markets");
     });
 
-    function editMarketSize(marketSizeId) {
-        window.location = "marketsize.html?marketsizeid=" + marketSizeId;
+    function getParentMarketList() {
+
+        setLocalStorage("search", "");
+        setLocalStorage("searchPage", window.location);
+
+        var url = ServicePrefix + '/api/ParentMarket/GetParentMarketList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inParentMarketName": null
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                populateDataTable("dtParentMarketList", data);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
     }
 
-    function deleteMarketSize(marketSizeId) {
+    function editParentMarket(parentMarketId) {
+        window.location = "/admin/parentmarket/parentmarket.html?ParentMarketID=" + parentMarketId;
+    }
+
+    function deleteParentMarket(parentMarketId) {
         bootbox.alert('This functionality is still under development.', function () {
         });
     }
-
 </script>
