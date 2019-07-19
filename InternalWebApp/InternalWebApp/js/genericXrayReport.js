@@ -110,6 +110,8 @@ function buildQuickReports(rptType, control, container, postfix) {
         $("#" + control).prepend("<option value='-1'>  -- Select an Audit --  </option>");
         $("#" + control).val("-1");
         $("#" + container).show();
+
+        convertToChosenSelect(control, false, false);
     }
     else {
         $("#" + container).hide();
@@ -258,7 +260,7 @@ function getAuditObject_MediaAdvertisers() {
     columnsToDisplay.push({
         "action": "edit",
         "mRender": function (data, type, row) {
-            var action = "/mediaadvertiser.html?MediaAdvertiserID=";
+            var action = "/admin/mediaadvertiser/mediaadvertiser.html?MediaAdvertiserID=";
             return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.mediaAdvertiserId + ')\'>Edit</a>';
         },
         "orderable": false,
@@ -337,7 +339,7 @@ function getAuditObject_StationAdvertisers() {
     columnsToDisplay.push({
         "action": "edit",
         "mRender": function (data, type, row) {
-            var action = "/stationadvertiser.html?StationAdvertiserID=";
+            var action = "/admin/stationadvertiser/stationadvertiser.html?StationAdvertiserID=";
             return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.stationAdvertiserId + ')\'>Edit</a>';
         },
         "orderable": false,
@@ -453,9 +455,9 @@ function getAuditObject_NewAdvertisers() {
             var action = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/advertiser/advertiser.html?AdvertiserID=",' + row.advertiserId + ')\'>Edit&nbsp;Advertiser</a>';
             var action2 = '';
             if (row.stationAdvertiserId != null) {
-                action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/stationadvertiser.html?StationAdvertiserID=",' + row.stationAdvertiserId + ')\'>Edit&nbsp;Station&nbsp;Advertiser</a>';
+                action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/stationadvertiser/stationadvertiser.html?StationAdvertiserID=",' + row.stationAdvertiserId + ')\'>Edit&nbsp;Station&nbsp;Advertiser</a>';
             } else {
-                action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/mediaadvertiser.html?MediaAdvertiserID=",' + row.mediaAdvertiserId + ')\'>Edit&nbsp;Media&nbsp;Advertiser</a>';
+                action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/mediaadvertiser/mediaadvertiser.html?MediaAdvertiserID=",' + row.mediaAdvertiserId + ')\'>Edit&nbsp;Media&nbsp;Advertiser</a>';
             }
             return action + '<br />' + action2;
         },
@@ -580,7 +582,7 @@ function getAuditObject_StationAgencies() {
     columnsToDisplay.push({
         "action": "edit",
         "mRender": function (data, type, row) {
-            var action = "/stationagency.html?StationAgencyID=";
+            var action = "/admin/stationagency/stationagency.html?StationAgencyID=";
             return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.stationAgencyId + ')\'>Edit</a>';
         },
         "orderable": false,
@@ -678,7 +680,7 @@ function getAuditObject_NewAgencies() {
             }
 
             var action = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/Admin/agency/agency.html?AgencyID=",' + row.agencyId + ')\'>Edit&nbsp;Agency</a>';
-            var action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/stationagency.html?StationAgencyID=",' + row.stationAgencyId + ')\'>Edit&nbsp;Station&nbsp;Agency</a>';
+            var action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/stationagency/stationagency.html?StationAgencyID=",' + row.stationAgencyId + ')\'>Edit&nbsp;Station&nbsp;Agency</a>';
             return action + '<br />' + action2;
         },
         "orderable": false,
@@ -1054,7 +1056,7 @@ function getAuditObject_AEStatusList() {
     columnsToDisplay.push({
         "action": "edit",
         "mRender": function (data, type, row) {
-            var action = "/accountexecutivedetails.html?AccountExecutiveID=" + row.AEId +
+            var action = "/admin/AccountExecutive/accountexecutivedetails.html?AccountExecutiveID=" + row.AEId +
                 "&AEName=" +row.AE + "&Owner=" + row.Owner +
                 "&Market=" + row.Market + "&LinkedUser=" +row["Linked User"] +
                 "&ActiveDate=" + row["Active Date"] + "&DisableDate=" + row["Disable Date"];

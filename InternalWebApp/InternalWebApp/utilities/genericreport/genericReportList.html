@@ -6,13 +6,10 @@
 <html class="no-js">
 <!--<![endif]-->
 <head>
-    <title></title>
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>MKA Internal Media Site</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-
 
     <!-- Facebook and Twitter integration -->
     <meta property="og:title" content="" />
@@ -45,29 +42,48 @@
 
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
+
     <!-- FOR IE9 below -->
     <!--[if lt IE 9]>
-        <script src="js/respond.min.js"></script>
+    <script src="js/respond.min.js"></script>
     <![endif]-->
-
+    <style>
+        .fh5co-heading{
+            margin-bottom: 0!important;
+        }
+    </style>
 </head>
 <body>
+
+
     <div id="fh5co-page">
         <header id="fh5co-header" role="banner">
             <div class="container">
                 <div class="header-inner" id="menu"></div>
             </div>
         </header>
-
         <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2 id="reportTitle">DMA Reports</h2>
+                        <h2 id="reportTitle">Media Reports</h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <h4>Report Categories</h4>
+                        <div id="rptTags"style="border-right:solid 1px silver">
+
+                        </div> 
+                    </div>
+                    <div class="col-md-9">
+                        <h4 id="tagReportTitle"></h4>
+                        <div id="rptList" class="row"  ></div>
                     </div>
                 </div>
 
                 <!-- start datatable coding-->
+
 
                 <div class="dataTable-top-margin">
                     <div class="col-md-4 stripe" id="dtResults"></div>
@@ -76,7 +92,6 @@
                 </div>
 
                 <!-- end datatable coding-->
-
 
             </div>
         </div>
@@ -101,9 +116,6 @@
     <script src="/js/main.js"></script>
     <!-- genericReport JS -->
     <script src="/js/genericReport.js"></script>
-    <!-- genericDMAReport JS -->
-    <script src="/js/genericDMAReport.js"></script>
-
 
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
@@ -113,57 +125,96 @@
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+    
+ 
 
 </body>
 </html>
 <script>
 
-    var outGenericReportArray = new Array();
-    var outDMAReportArray = new Array();
+
+    var outReportArray = new Array();
 
     $(document).ready(function () {
 
-        outGenericReportArray = reportObjectArray;
-        outDMAReportArray = dmaReportObjectArray;
+        outReportArray = reportObjectArray;
+ 
+        // build Tag List
+        buildTagList(outReportArray);
+
         // build menu
-        buildDMAMenu("DMA Reports");
+        buildMainMenu("Reports");
 
-        buildReportLists();
+        //buildReportLists();
 
-        //destroySearchCriteria();
-
+        destroySearchCriteria();
+        
     });
 
-    function buildReportLists() {
-
-        buildReportList("dma", "dtResults", "DMA Category Lists", outGenericReportArray, "GRPT");
-        buildReportList("dmarevenue", "dtResults", "DMA/MRR Revenue", outDMAReportArray, "DRPT");
-
+    function buildTagList(rptArray)
+    {
+        var tagArray = new Array();
+        for (var i = 0; i < rptArray.length; i++)
+        {
+            if (tagArray.indexOf(rptArray[i].product) === -1 )
+            {
+                tagArray.push(rptArray[i].product);
+                $("#rptTags").append("<div><a href='#' onclick='loadReports(" + '"' + rptArray[i].product + '"'+ ");'>" + rptArray[i].product.toUpperCase() + "</a></div>")
+            }
+        }
     }
 
-    function buildReportList(productId, control, title, reportArray, reportPage) {
-        var gReportsPage = "/utilities/genericreport/genericReport.html?reportId=";
-        var gDMAReportsPage = "/Products/DMA/reports/dmagenericreport.html?reportid=";
+    function loadReports(product)
+    {
+        $("#rptList").html("");
+        $("#tagReportTitle").html(product.toUpperCase() + " Reports");
+        buildReportList(product, "rptList", null, outReportArray);
+    }
+    function destroySearchCriteria()
+    {
+        setLocalStorage("gSearchCriteria", null);
+        setLocalStorage("gSearchResults", null);
+    }
 
-        $("#" + control).append("<h3 style='padding-top: 10px;padding-bottom: 10px; margin-bottom: 0px; margin-top: 15px;'>" + title + "</h3>");
+    //function buildReportLists()
+    //{
+
+    //    buildReportList("mrr", "dtResults", "Market Revenue Reports", outReportArray);
+    //    buildReportList("xry", "dtResults", "XRay Reports", outReportArray);
+    //    buildReportList("tvb", "dtResults", "TVB Reports", outReportArray);
+    //    buildReportList("dma", "dtResults", "DMA Reports", outReportArray);
+
+
+    //    // 2nd column starts here...
+    //    buildReportList("station", "dtResultsCol2", "Station Reports", outReportArray);
+    //    buildReportList("market", "dtResultsCol2", "Market Reports", outReportArray);
+    //    buildReportList("personnel", "dtResultsCol2", "Personnel Reports", outReportArray);
+    //    buildReportList("owner", "dtResultsCol2", "Owner Reports", outReportArray);
+    //    buildReportList("ownergroup", "dtResultsCol2", "Owner Group Reports", outReportArray);
+
+    //    buildReportList("", "dtResultsCol3", "Miscellaneous Product Reports", outReportArray);
+    //    buildReportList("misc", "dtResultsCol3", "Miscellaneous Reports", outReportArray);
+    //    buildReportList("tech", "dtResultsCol3", "Tech Reports", outReportArray);
+
+    //}
+
+    function buildReportList(productId, control, title, reportArray)    
+    {
+ 
+       
+        if (title != null)
+        {
+            $("#" + control).append("<h3 style='padding-top: 10px;padding-bottom: 10px; margin-bottom: 0px; margin-top: 15px;'>" + title + "</h3>");
+        }
 
         for (var i = 0; i < reportArray.length; i++) {
 
-            if (reportArray[i].product.toLowerCase() == productId.toLowerCase()) {
-                $("#" + control).append("<div>");
-                switch (reportPage.toUpperCase()) {
-                    case "GRPT":
-                        $("#" + control).append("<a href=\"" + gReportsPage + i + "\">" + reportArray[i].reportTitle + "</a>");
-                        break;
-                    case "DRPT":
-                        //get report path and build link
-                        var dReportLink = reportArray[i].reportPath + "?reportid=" + i + "&direct=true&showbackbutton=false";
-                        $("#" + control).append("<a href=\"" + dReportLink + "\">" + reportArray[i].reportTitle + "</a>");
-                        break;
-                    default:
-                        $("#" + control).append("<a href=\"" + gDMAReportsPage + i + "&direct=true&showbackbutton=false\">" + reportArray[i].reportTitle + "</a>");
-                }
-                $("#" + control).append("</div>");
+            if (reportArray[i].product.toLowerCase() == productId.toLowerCase())
+            {
+                var str = "<div class='col-md-4'>";
+                str = str + "<a href='/utilities/genericreport/genericReport.html?reportId=" + i + "'>" + reportArray[i].reportTitle + "</a>";
+                str = str + "</div>";
+                $("#" + control).append(str);
             }
 
         }

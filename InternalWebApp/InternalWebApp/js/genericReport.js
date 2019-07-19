@@ -242,7 +242,7 @@ function getQuickReport(reportId)
 {
     if (reportId > -1)
     {
-        var url = "/utilities/genericReport.html?reportId=" + reportId;
+        var url = "/utilities/genericreport/genericReport.html?reportId=" + reportId;
 
         var i = parseInt($("#ddlMarket").val());
 
