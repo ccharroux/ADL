@@ -1350,7 +1350,8 @@ function getYearList() {
  
 
 }
-function getPeriodList(inType) {
+function getPeriodList(inType)
+{
 
   
 
