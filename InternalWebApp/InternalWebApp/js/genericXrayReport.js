@@ -120,7 +120,7 @@ function buildQuickReports(rptType, control, container, postfix) {
 function getQuickReport(reportId) {
     if (reportId > -1) {
         setLocalStorage("gSearchResults", "");
-        window.location = "/utilities/genericXrayReport.html?reportId=" + reportId;
+        window.location = "/products/xry/xrygenericreport.html?reportId=" + reportId;
     }
 }
 
