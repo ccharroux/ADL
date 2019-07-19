@@ -897,7 +897,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Stations") + ' role="button" aria-expended="false">Station Menu<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block"><a href="/stationlist.html">Stations</a></li>';
+    menuItems += '                  <li style="display:block"><a href="/admin/station/stationlist.html">Stations</a></li>';
     menuItems += '                  <li style="display:block"><a href="">MRR/X-Ray Link</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
@@ -967,19 +967,19 @@ function buildXRYMenu(selectedItem) {
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="/admin/advertiser/advertiserlist.html" role="button" aria-expanded="false">Advertiser</a></li>'; 
-    menuItems += '                  <li style="display:block;"><a href="/stationadvertiserlist.html">&nbsp;Station Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/stationadvertiser/stationadvertiserlist.html">&nbsp;Station Advertiser</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/mediaadvertiserlist.html">&nbsp;Media Advertiser</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/parentadvertiserlist.html">&nbsp;Parent Advertiser</a></li>';
 
     menuItems += '                  <li style="display:block;"><a href="/Admin/agency/agencylist.html" role="button" aria-expanded="false">Agency</a></li>';
  
-    menuItems += '                  <li style="display:block;"><a href="/stationagencylist.html">&nbsp;Station Agency</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/stationagency/stationagencylist.html">&nbsp;Station Agency</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/parentagencylist.html">&nbsp;Parent Agency</a></li>';
  
     
 
     menuItems += '                  <li style="display:block;"><a href="/industrylist.html">Industry</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/subindustrylist.html">Sub Industry</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/subindustry/subindustrylist.html">Sub Industry</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/nielsenmarketnamelist.html">Nielson Market</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
