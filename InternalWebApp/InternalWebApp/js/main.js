@@ -325,8 +325,7 @@ $( document ).ready(function()
 
     var nonLoggedInPages = new Array();
     nonLoggedInPages.push('/admin/login/login.html');
-    nonLoggedInPages.push('/utilities/splash.html');
-    nonLoggedInPages.push('index.html');
+     nonLoggedInPages.push('index.html');
 
 
     // Block UI Stuff
