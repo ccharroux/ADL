@@ -987,7 +987,8 @@
             $.each(data.report.rows, function (index) {
 
                 var obj = data.report.rows[index];
-                var showRetainHistory = false
+                var showRetainHistory = false;
+                var inactiveEntity = "";
 
                 // This code is added to restrict
                 // visibility of products that are NOT allowed
@@ -995,10 +996,15 @@
                 // default is set to hidden in getProductListSuccess routine...
 
                 var productId = obj.productId.toUpperCase();
+                var marketProductId = obj.marketProductId.trim();
+                var ownerProductId = obj.ownerProductId.trim();
 
+                //Show row of product returned from proc
                 $(".row_" + productId).show();
 
-                if (obj.activeDate != null & obj.active == true) {
+                //Active product - Show Disable/Edit buttons
+                if (obj.activeDate != null && obj.active == true) {
+
                     stationHasActiveProducts = true;
                     showRetainHistory = true;
                     $("#productDisable" + productId).removeClass("hidden");
@@ -1007,30 +1013,67 @@
                     if (productId != "MSS" && productId != "DMA") {
                         $("#productEdit" + productId).removeClass("hidden");
                     }
-                }
+                    
+                    //Active product that Station should NOT have - add message under Edit/Disable button
+                    if (marketProductId == "" || ownerProductId == "") {
 
-                else if (obj.disableDate != null && obj.active == false) {
+                        if (marketProductId == "") {
+                            inactiveEntity = "Market";
+                        }
+
+                        if (ownerProductId == "") {
+                            inactiveEntity = "Ownership";
+                        }
+
+                        if (marketProductId == "" && ownerProductId == "") {
+                            inactiveEntity = "Market and Ownership";
+                        }
+
+                        $("#productButtons" + productId).append("<div class='col-md-12' style='padding-left: 0px;'>Warning: " + productId + " is active for this station but is not active for this station's " + inactiveEntity + ".</div>"); 
+                    }
+                }
+                
+                //Disabled product - Show Add button and disabled date
+                if (obj.disableDate != null && obj.active == false) {
                     showRetainHistory = true;
                     $("#productAdd" + productId).removeClass("hidden");
                     $("#date" + productId).html(extractDateOnly(obj.disableDate));
                     $("#date" + productId).css("color", "red");
                 }
-                else if (obj.disableDate == null && obj.activeDate == null) {
+
+                //New product - Show Add button
+                if (obj.disableDate == null && obj.activeDate == null) {
                     $("#productAdd" + productId).removeClass("hidden");
                 }
 
-                //If returning product is not active in the station's market, inform the user
-                if (obj.marketProductId.trim() == "") {
+                //Non eligible product (Product is not active for station and market and/or ownership is missing active product)
+                //Do not show button and show message saying why
+                if (obj.active != true && (marketProductId == "" || ownerProductId == "")) {
+
                     $("#productButtons" + productId).html("");
-                    $("#productButtons" + productId).html("This product is not active in this station's Market.");
+
+                    if (marketProductId == "") {
+                        inactiveEntity = "Market";
+                    }
+
+                    if (ownerProductId == "") {
+                        inactiveEntity = "Ownership";
+                    }
+
+                    if (marketProductId == "" && ownerProductId == "") {
+                        inactiveEntity = "Market and Ownership"
+                    }
+
+                    $("#productButtons" + productId).append(productId + " is not active in this station's " + inactiveEntity + ".");
+
                 }
 
-                //if station has any products, disbled or enabled, show Retain History checkbox.
+                //If station has any products, disbled or enabled, show Retain History checkbox.
                 if (showRetainHistory == true) {
                     $("#divRetainHistory").removeClass("hidden");
                 }
 
-
+              
             });
 
         }
