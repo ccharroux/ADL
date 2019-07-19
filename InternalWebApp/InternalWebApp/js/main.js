@@ -955,7 +955,7 @@ function buildXRYMenu(selectedItem) {
 
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
-    menuItems += '        <li style="display:block"><a href="releasexry.html">Release</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/xry/xryrelease.html">Release</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/xry/xryreminders.html">Reminders</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
@@ -1013,7 +1013,7 @@ function buildMRRMenu(selectedItem) {
     menuItems += '</li>';
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
-    menuItems += '        <li style="display:block"><a href="releasemrr.html">Release</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrrelease.html">Release</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/mrr/mrrreminders.html">Reminders</a></li>';
     menuItems += '        <li style="display:block"><a href="revenuedetailmrr.html">Revenue Detail</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/mrr/mrrsnapshot.html">Snapshot</a></li>';
