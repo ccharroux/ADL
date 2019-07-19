@@ -882,15 +882,9 @@ function buildMainMenu(selectedItem) {
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' role="button" aria-expanded="false">Products<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += productDashboard('mrr');
-    //menuItems += '                  <li style="display:block;"><a href="/dashboardmrr.html">MRR</a></li>';
-    //menuItems += '                  <li style="display:block;"><a href="/products/xry/xrydashboard.html">XRY</a></li>';
     menuItems += productDashboard('xry');
     menuItems += productDashboard('tvb');
-    //menuItems += '                  <li style="display:block;"><a href="/dashboardtvb.html">TVB</a></li>';
-    //menuItems += '                  <li style="display:block;"><a href="/dashboardmss.html">MSS</a></li>';
     menuItems += productDashboard('mss');
-
-    //menuItems += '                  <li style="display:block;"><a href="/dashboarddma.html">DMA</a></li>';
     menuItems += productDashboard('dma');
 
     menuItems += '              </ul>';
@@ -1152,7 +1146,7 @@ function productDashboard(productId)
             break;
         case 'mrr':
             style = 'display:block;';
-            strOut = '<a href="/dashboardmrr.html">MRR</a>';
+            strOut = '<a href="/products/mrr/mrrdashboard.html">MRR</a>';
             break;
         case 'xry':
             style = 'display:block;';
@@ -1160,11 +1154,11 @@ function productDashboard(productId)
             break;
         case 'tvb':
             style = 'display:block;';
-            strOut = '<a href="/dashboardtvb.html">TVB</a>';
+            strOut = '<a href="/products/tvb/tvbdashboard.html">TVB</a>';
             break;
         case 'mss':
             style = 'display:block;';
-            strOut = '<a href="/dashboardmss.html">MSS</a>';
+            strOut = '<a href="/products/mss/mssdashboard.html">MSS</a>';
             break;
         case 'dma':
             style = 'display:block;';
