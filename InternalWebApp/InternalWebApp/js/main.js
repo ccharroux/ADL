@@ -324,8 +324,8 @@ $( document ).ready(function()
     }
 
     var nonLoggedInPages = new Array();
-    nonLoggedInPages.push('login.html');
-    nonLoggedInPages.push('splash.html');
+    nonLoggedInPages.push('/admin/login/login.html');
+    nonLoggedInPages.push('/utilities/splash.html');
     nonLoggedInPages.push('index.html');
 
 
@@ -444,7 +444,7 @@ function addDialogComponents()
     d = d + '</div>';
 
     d = d + '<div style="position:absolute;top:5px; right:10px;z-index:1000"><input type="button"  value="Add as Favorite" onclick="showFavoriteDialog();"/>';
-    d = d + '&nbsp;<input type="button" value="My Favorites" onclick="window.location=\'/dashboard.html\'"/></div>';
+    d = d + '&nbsp;<input type="button" value="My Favorites" onclick="window.location=\'/admin/login/dashboard.html\'"/></div>';
 
     $("body").append(d)
 
@@ -505,8 +505,8 @@ function updateFavorite(id)
         {
             $("#favoritesDialog").dialog("close");
             bootbox.alert('Favorite has been ' + (id == 0 ? 'saved' : 'updated') + '.', function () {
-                if ((id > 0) || ($("#favURL").val().trim().toLowerCase().indexOf('dashboard.html') > -1)) {
-                    window.location = "dashboard.html";
+                if ((id > 0) || ($("#favURL").val().trim().toLowerCase().indexOf('/admin/login/dashboard.html') > -1)) {
+                    window.location = "/admin/login/dashboard.html";
                 }
             });
 
@@ -554,7 +554,7 @@ function deleteFavorite(id) {
                 processData: false,
                 success: function (data, textStatus, jQxhr) {
                     $("#favoritesDialog").dialog("close");
-                    bootbox.alert('Favorite has been deleted.', function () {window.location = "dashboard.html"; });
+                    bootbox.alert('Favorite has been deleted.', function () { window.location = "/admin/login/dashboard.html"; });
                     
 
                 },
@@ -771,7 +771,7 @@ function logout() {
 
    // var counter = whereAreYou.replace("//", "/").split('/').length - 1;
 
-    var locationToRedirect = "/login.html";
+    var locationToRedirect = "/admin/login/login.html";
 
     window.location = locationToRedirect;
 }
@@ -842,7 +842,7 @@ function goBackToDashboard() {
     }
 
     // Fall thru
-    window.location = "dashboard.html";
+    window.location = "/admin/login/dashboard.html";
 }
 
 function MKAErrorMessageRtn(message, url)
@@ -856,7 +856,7 @@ function MKAErrorMessageRtn(message, url)
         {
             
         });
-        window.location = "/login.html";
+        window.location = "/admin/login/login.html";
     }
     else if (message.toLowerCase().indexOf('authentication failed') > -1)
     {
@@ -874,7 +874,7 @@ function buildMainMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="/dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">'
 
     menuItems += '<ul>';
@@ -891,8 +891,8 @@ function buildMainMenu(selectedItem) {
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Personnel") + '">Personnel <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block"><a href="/personnellist.html">Personnel</a></li>';
-    menuItems += '                  <li style="display:block"><a href="/webnotification.html">Web Notifications</a></li>';
+    menuItems += '                  <li style="display:block"><a href="/admin/personnel/personnellist.html">Personnel</a></li>';
+    menuItems += '                  <li style="display:block"><a href="/admin/webnotification/webnotification.html">Web Notifications</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Stations") + ' role="button" aria-expended="false">Station Menu<span style="margin-right:10px;" class="caret"></span></a>';
@@ -914,7 +914,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/admin/ownershipgroup/ownershipgrouplist.html">Groups</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/parentownership/parentownershiplist.html">Parents</a></li>';
     menuItems += '              </ul>';  
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="/dashboard.html">Virtual Groups</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="/admin/login/dashboard.html">Virtual Groups</a></li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Settings") + ' role="button" aria-expanded="false">Settings <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="/admin/format/formatlist.html">Formats</a></li>';
@@ -922,7 +922,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/admin/position/positionlist.html">Positions</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/region/regionlist.html">Regions</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/revenuecategory/revenuecategorylist.html">Revenue Categories</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/dashboardtech.html">Tech Tools</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html">Tech Tools</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
@@ -936,7 +936,7 @@ function buildXRYMenu(selectedItem) {
     
     var menuItems = '';
 
-    menuItems += '<h1><a href="/dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
@@ -996,7 +996,7 @@ function buildMRRMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="/dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">'
 
     menuItems += '<ul>';
@@ -1038,7 +1038,7 @@ function buildTVBMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="/dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">'
 
     menuItems += '<ul>';
@@ -1070,7 +1070,7 @@ function buildTVBMenu(selectedItem) {
 function buildMSSMenu(selectedItem) {
     var menuItems = '';
 
-    menuItems += '<h1><a href="/dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
@@ -1097,7 +1097,7 @@ function buildDMAMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="/dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
@@ -1142,7 +1142,7 @@ function productDashboard(productId)
     switch(productId.toLowerCase()) 
     {
         case '':
-            strOut = '<a href="/dashboard.html">Dashboard</a>';
+            strOut = '<a href="/admin/login/dashboard.html">Dashboard</a>';
             break;
         case 'mrr':
             style = 'display:block;';
@@ -1173,7 +1173,7 @@ function buildGenericReportsLink(selectedItem)
     var strOut = '';
     var style = '';
 
-    strOut = '<a ' + getSelectedItemClass(selectedItem, "Reports") +' href="/genericReportList.html">Reports</a>';
+    strOut = '<a ' + getSelectedItemClass(selectedItem, "Reports") +' href="/utilities/genericreport/genericReportList.html">Reports</a>';
 
     return '<li style="' + style + '">' + strOut + '</li>';
 }
@@ -1181,7 +1181,7 @@ function buildGenericReportsLink2(selectedItem) {
     var strOut = '';
     var style = '';
 
-    strOut = '<a ' + getSelectedItemClass(selectedItem, "Reports") + ' href="/genericReportList.html">All Reports</a>';
+    strOut = '<a ' + getSelectedItemClass(selectedItem, "Reports") + ' href="/utilities/genericreport/genericReportList.html">All Reports</a>';
 
     return '<li style="' + style + '">' + strOut + '</li>';
 }
@@ -1265,13 +1265,13 @@ function buildTechMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="/dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
     menuItems += '<ul>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "TechTools") + ' role="button" aria-expanded="false">Tools <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/dashboardtech.html">Tech Tools</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/encryptdecrypt.html">Encryption/Decryption Tool</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html">Tech Tools</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/encryptdecrypt.html">Encryption/Decryption Tool</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrarchiverollover.html">MRR Rollover</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrmarkethistorydatamatrix.html">MRR Market History Maintenance</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrstationownerchanged.html">MRR Station Ownership Change</a></li>';
