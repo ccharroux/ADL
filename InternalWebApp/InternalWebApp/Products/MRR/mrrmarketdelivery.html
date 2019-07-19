@@ -113,6 +113,14 @@
                                     <input id="chkShowDelivered" type="checkbox" onchange="getMarketDeliveryList();" />
                                 </div>
                             </div>
+                            <div>
+                                <div class="col-md-6 col-offset-6">
+                                    <div class="divExternalComment">
+                                        <label for="externalComments"><u>Client Comment</u></label>
+                                        <textArea style="width:100%;overflow:auto" maxlength="250" id="externalComments" placeholder="Enter external comments here..."></textArea>
+                                    </div>
+                                </div>
+                            </div>
                         </center>
                         <hr />
                     </div>
@@ -758,19 +766,67 @@
             return;
         }
 
-        bootbox.alert(currentMarketName + " is released for " + currentYearPeriodText());
+        bootbox.alert(
+            currentMarketName + " is released for " + currentYearPeriodText(),
+            function () {
+                if (currentEmailRecipients) {
+                    prepToSendEmailToRecipients();
+                } else {
+                    postSendEmailToRecipients();
+                }
+            }
+        );
+    }
 
-        if (currentEmailRecipients) {
+    function prepToSendEmailToRecipients() {
+        var externalComments = $("#externalComments").val().trim();
+        if (externalComments == "") {
             sendEmailToRecipients();
-        } else {
-            postSendEmailToRecipients();
+            return;
         }
+
+        var url = ServicePrefix + '/api/MRR/UpdateMarketYearPeriodClientRevisionMessage';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": currentMarketId,
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod(),
+                "inClientRevisionMessage": externalComments
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                prepToSendEmailToRecipientsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function prepToSendEmailToRecipientsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        sendEmailToRecipients();
     }
 
     function sendEmailToRecipients() {
-        bootbox.alert("NOT YET IMPLEMENTED: Market Recipients have been notified that " + currentMarketName + " is released for " + currentYearPeriodText());
-
-        checkOwnerGroupsOkayToRelease();
+        bootbox.alert(
+            "NOT YET IMPLEMENTED: Market Recipients have been notified that " + currentMarketName + " is released for " + currentYearPeriodText(),
+            function () {
+                checkOwnerGroupsOkayToRelease();
+            }
+        );
     }
 
     function checkOwnerGroupsOkayToRelease() {
@@ -829,6 +885,7 @@
 
     function postSendEmailToRecipients() {
         clearCurrentSettings();
+        $("#externalComments").val("");
         getMarketDeliveryList();
     }
 
