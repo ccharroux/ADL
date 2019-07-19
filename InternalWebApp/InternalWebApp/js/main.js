@@ -1292,6 +1292,7 @@ function buildTechMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrmarkethistorydatamatrix.html">MRR Market History Maintenance</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrstationownerchanged.html">MRR Station Ownership Change</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/products/xry/xrymarkethistorydatamatrix.html">XRY Market History Maintenance</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/xry/xrystationownerchanged.html">XRY Station Ownership Change</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/products/tvb/tvbMarketHistoryDataMatrix.html">TVB Market History Maintenance</a></li>';
 
     menuItems += '              </ul>';
