@@ -44,6 +44,10 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    
+    <!--Chosen Dropdown-->
+    <link rel="stylesheet" href="/css/chosen.min.css" />
+    
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
 
@@ -298,6 +302,9 @@
     
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
+    <!--Chosen Dropdown-->
+    <script src="/js/chosen.jquery.min.js"></script>
+
 </body>
 </html>
 <script>
@@ -472,12 +479,9 @@
             } else {
                 params.push(null);
             }
-            
- 
- 
 
-            if (bReloadNeeded == true)
-            {
+
+            if (bReloadNeeded == true) {
                 // set object parameters to the array
                 objectValue.jsCallParameters = params;
                 // activate / reload the filter
@@ -538,8 +542,8 @@
             setLocalStorage("gSearchResults", JSON.stringify(searchCriteria));
 
 
-            $("#ddlMarket").val(searchCriteria["ddlMarket"]);
-            $("#ddlOwner").val(searchCriteria["ddlOwner"]);
+            $("#ddlMarket").val(searchCriteria["ddlMarket"]).trigger('chosen:updated');
+            $("#ddlOwner").val(searchCriteria["ddlOwner"]).trigger('chosen:updated');
         }
 
     }
@@ -571,6 +575,10 @@
 
         var searchCriteria = $.parseJSON(searchResults);
         $("#" + control).val(searchCriteria[control]);
+
+        if ($("#" + control + "_chosen").length > 0) {
+            $("#" + control).trigger('chosen:updated');
+        }
 
     }
 
@@ -609,11 +617,18 @@
 
     }
 
-    function activateFilter(filterObject)
-    {
+    function activateFilter(filterObject) {
+
+        console.log(filterObject);
 
         var classToShow = "rpt" + filterObject.token;
         $("." + classToShow).show();
+
+        //$(filterObject.).hide();
+        if ($("#" + filterObject.objectName + "_chosen").length > 0) {
+            $("#" + filterObject.objectName).hide();
+        }
+
 
         if (filterObject.jsCall == null)
         {
@@ -661,6 +676,9 @@
                     });
 
                     $("#" + control).html(str);
+
+                    convertToChosenSelect(control, false, false);
+
                     saveLoadedControlSelection(control);
 
                 }
@@ -702,6 +720,9 @@
                     });
 
                     $("#ddlRegion").html(str);
+
+                    convertToChosenSelect("ddlRegion", false, false);
+
                     saveLoadedControlSelection("ddlRegion");
 
                 }
@@ -743,6 +764,9 @@
                     });
 
                     $("#ddlFormat").html(str);
+
+                    convertToChosenSelect("ddlFormat", false, false);
+
                     saveLoadedControlSelection("ddlFormat");
 
                 }
@@ -783,6 +807,9 @@
                     });
 
                     $("#" + control).html(str);
+
+                    convertToChosenSelect(control, false, false);
+
                     saveLoadedControlSelection(control);
 
                 }
@@ -811,6 +838,11 @@
         $("#ddlYear").html(str);
         $("#ddlFromYear").html(str);
         $("#ddlToYear").html(str);
+
+        convertToChosenSelect("ddlYear", false, false);
+        convertToChosenSelect("ddlFromYear", false, false);
+        convertToChosenSelect("ddlToYear", false, false);
+
         saveLoadedControlSelection("ddlYear");
         saveLoadedControlSelection("ddlToYear");
         saveLoadedControlSelection("ddlFromYear");
@@ -837,6 +869,8 @@
         }
 
         $("#" + control).html(str);
+
+        convertToChosenSelect(control, false, false);
 
         saveLoadedControlSelection(control);
 
@@ -869,6 +903,9 @@
                     });
 
                     $("#ddlMediaType").html(str);
+
+                    convertToChosenSelect("ddlMediaType", false, false);
+
                     saveLoadedControlSelection("ddlMediaType");
 
                 }
@@ -916,6 +953,9 @@
                     });
 
                     $("#" + control).html(str);
+
+                    convertToChosenSelect(control, false, false);
+
                     saveLoadedControlSelection(control);
 
                     //if($(""))
@@ -994,6 +1034,9 @@
                     });
 
                     $("#ddlParentMarket").html(str);
+
+                    convertToChosenSelect("ddlParentMarket", false, false);
+
                     saveLoadedControlSelection("ddlParentMarket");
 
                 }
@@ -1040,6 +1083,9 @@
 
 
         $("#ddlPeriod").html(str);
+
+        convertToChosenSelect("ddlPeriod", false, false);
+
         saveLoadedControlSelection("ddlPeriod");
     }
 
@@ -1088,6 +1134,9 @@
                     });
 
                     $("#ddlProduct").html(str);
+
+                    convertToChosenSelect("ddlProduct", false, false);
+
                     saveLoadedControlSelection("ddlProduct");
                 }
 
@@ -1133,6 +1182,9 @@
                     });
 
                     $("#" + control).append(str);
+
+                    convertToChosenSelect(control, false, false);
+
                     saveLoadedControlSelection(control);
 
                 }
@@ -1173,6 +1225,9 @@
                     });
 
                     $("#ddlStation").html(str);
+
+                    convertToChosenSelect("ddlStation", false, false);
+
                     saveLoadedControlSelection("ddlStation");
 
                 }
@@ -1214,6 +1269,9 @@
                     });
 
                     $("#ddlStation").html(str);
+
+                    convertToChosenSelect("ddlStation", false, false);
+
                     saveLoadedControlSelection("ddlStation");
 
                 }
@@ -1277,6 +1335,7 @@
 
                     $("#ddlParentMarket").html(str);
 
+                    convertToChosenSelect("ddlParentMarket", false, false);
                 }
 
 
@@ -1315,6 +1374,8 @@
 
                     $("#ddlMarket").html(str);
 
+                    convertToChosenSelect("ddlMarket", false, false);
+
                     saveLoadedControlSelection("ddlMarket");
                     //preSelectItem('quickReportQS');
      
@@ -1345,6 +1406,7 @@
             var str = '';
             str = '<option value="">-- Select a Market --</option>';
             $("#" + control).html(str);
+            convertToChosenSelect(control, false, false);
             return;
         }
 
@@ -1375,6 +1437,9 @@
                     });
 
                     $("#" + control).html(str);
+
+                    convertToChosenSelect(control, false, false);
+
                     saveLoadedControlSelection(control);
                     //preSelectItem('quickReportQS');
 
@@ -1424,6 +1489,9 @@
                     });
 
                     $("#ddlParentOwner").append(str);
+
+                    convertToChosenSelect("ddlParentOwner", false, false);
+
                     saveLoadedControlSelection("ddlParentOwner");
                 }
 
@@ -1441,6 +1509,7 @@
 
         if (inProduct == "" || inProduct == null || inProduct == undefined) {
             $("#" + control).html("<option value=''> -- Select an Owner --</option>");
+            convertToChosenSelect(control, false, false);
             return;
         }
 
@@ -1475,6 +1544,9 @@
 
                     });
                     $("#" + control).append(str);
+
+                    convertToChosenSelect(control, false, false);
+
                     saveLoadedControlSelection(control);
                 }
 
@@ -1520,6 +1592,9 @@
                     });
 
                     $("#ddlOwner").append(str);
+
+                    convertToChosenSelect("ddlOwner", false, false);
+
                     saveLoadedControlSelection("ddlOwner");
                 }
 
@@ -1562,6 +1637,9 @@
                     });
 
                     $("#ddlMrrReport").append(str);
+
+                    convertToChosenSelect("ddlMrrReport", false, false);
+
                     saveLoadedControlSelection("ddlMrrReport");
                 }
 
@@ -1605,6 +1683,9 @@
                     });
 
                     $("#ddlOwnerGroup").append(str);
+
+                    convertToChosenSelect("ddlOwnerGroup", false, false);
+
                     saveLoadedControlSelection("ddlOwnerGroup");
                 }
 
@@ -1648,6 +1729,9 @@
                     });
 
                     $("#ddlAsyncJobType").append(str);
+
+                    convertToChosenSelect("ddlAsyncJobType", false, false);
+
                     saveLoadedControlSelection("ddlAsyncJobType");
                 }
 
@@ -1687,6 +1771,9 @@
                     });
 
                     $("#ddlAsyncJobStatus").append(str);
+
+                    convertToChosenSelect("ddlAsyncJobStatus", false, false);
+
                     saveLoadedControlSelection("ddlAsyncJobStatus");
                 }
 
@@ -1711,6 +1798,9 @@
         str = str + "<option value='-90'>Three Months</option>";
 
         $("#ddlAsyncJobDaysBack").append(str);
+
+        convertToChosenSelect("ddlAsyncJobDaysBack", false, false);
+
         saveLoadedControlSelection("ddlAsyncJobDaysBack");
 
 
@@ -1728,6 +1818,9 @@
             str = str + "<option value='-30'>One Month</option>";
 
             $("#ddlAsyncJobDaysBack").append(str);
+
+            convertToChosenSelect("ddlAsyncJobDaysBack", false, false);
+
             saveLoadedControlSelection("ddlAsyncJobDaysBack");
  
 
@@ -1762,6 +1855,7 @@
 
                     $("#ddlParentMarketCategoryTemplate").append(str);
 
+                    convertToChosenSelect("ddlParentMarketCategoryTemplate", false, false);
                     //if (data.report.rows.length == 1) {
                     //    //automatically load the categories or should automatically load the first one
                     //    $("#ddlCategoryTemplates option:first").attr('selected', 'selected');
@@ -2115,6 +2209,8 @@
         str = str + "<option value='-30'>30 Days Back</option>";
 
         $("#ddlEmailDaysBack").html(str);
+
+        convertToChosenSelect("ddlEmailDaysBack", false, false);
     }
     function getEmailStatusList() {
 
@@ -2125,6 +2221,8 @@
         str = str + "<option value='unsent'>Unsent</option>";
 
         $("#ddlEmailStatus").html(str);
+
+        convertToChosenSelect("ddlEmailStatus", false, false);
 
     }
     //----------------------
@@ -2144,7 +2242,7 @@
                 sArray = search.split("|");
 
                 $("#searchText").val(sArray[0]);
-                $("#ddlMarket").val(sArray[1].toString());
+                $("#ddlMarket").val(sArray[1].toString()).trigger('chosen:updated');
 
                 getAgencyList();
             }

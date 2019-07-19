@@ -229,6 +229,8 @@ function buildQuickReports(rptType, control, container, postfix)
         $("#" + control).prepend("<option value='-1'>  -- Select a Report --  </option>");
         $("#" + control).val("-1");
         $("#" + container).show();
+
+        convertToChosenSelect(control, false, false);
     }
     else
     {
@@ -1062,7 +1064,7 @@ function getReportFilterArray_MarketDelivery() {
 
     arrayObject = {
         token:  "Market",
-        jsCall: "getMarketList",
+        jsCall: "getMarketListByProduct",
         jsCallParameters: new Array(),
         objectName:  "ddlMarket",
         required: true,
