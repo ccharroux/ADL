@@ -438,15 +438,15 @@
         if (searchCriteria["searchToken"].toUpperCase() == "PARENTADVAUDIT") {
 
             //market,
-            $("#ddlMarket").val(searchCriteria["ddlMarket"]);
+            $("#ddlMarket").val(searchCriteria["ddlMarket"]).trigger('chosen:updated');
             //media code,
-            $("#ddlMediaCode").val(searchCriteria["ddlMediaCode"]);
+            $("#ddlMediaCode").val(searchCriteria["ddlMediaCode"]).trigger('chosen:updated');
             //media type,
-            $("#ddlMediaType").val(searchCriteria["ddlMediaType"]);
+            $("#ddlMediaType").val(searchCriteria["ddlMediaType"]).trigger('chosen:updated');
             //advertiser name
             $("#txtAdvertiserName").val(searchCriteria["txtAdvertiserName"]);
             //industry
-            $("#ddlIndustry").val(searchCriteria["ddlIndustry"]);
+            $("#ddlIndustry").val(searchCriteria["ddlIndustry"]).trigger('chosen:updated');
             //subindustry
             getSubIndustryList(searchCriteria["ddlIndustry"], searchCriteria["ddlSubIndustry"]);
 
@@ -462,8 +462,8 @@
             //parent agency
         else if (searchCriteria["searchToken"].toUpperCase() == "PARENTAGENCYAUDIT") {
 
-            $("#ddlMarket").val(searchCriteria["ddlMarket"]);
-            $("#ddlMediaType").val(searchCriteria["ddlMediaType"]);
+            $("#ddlMarket").val(searchCriteria["ddlMarket"]).trigger('chosen:updated');
+            $("#ddlMediaType").val(searchCriteria["ddlMediaType"]).trigger('chosen:updated');
             $("#txtAgencyName").val(searchCriteria["txtAgencyName"]);
             $("#hidParentAgency").val(searchCriteria["hidParentAgency"]);
             $("#txtParentAgency").val(searchCriteria["txtParentAgency"]);
@@ -503,6 +503,9 @@
         var searchCriteria = $.parseJSON(searchResults);
         $("#" + control).val(searchCriteria[control]);
 
+        if ($("#" + control + "_chosen").length > 0) {
+            $("#" + control).trigger('chosen:updated');
+        }
     }
 
     function LoadDefaultDates() {
@@ -554,14 +557,34 @@
 
     function activateFilter(filterObject) {
 
+        //var classToShow = "audit" + filterObject.token;
+        //$("." + classToShow).show();
+
+        //if (filterObject.jsCall == null) {
+        //    return;
+        //}
+
+        //window[filterObject.jsCall]();
+
         var classToShow = "audit" + filterObject.token;
         $("." + classToShow).show();
+
+        //$(filterObject.).hide();
+        if ($("#" + filterObject.objectName + "_chosen").length > 0) {
+            $("#" + filterObject.objectName).hide();
+        }
+
 
         if (filterObject.jsCall == null) {
             return;
         }
 
-        window[filterObject.jsCall]();
+
+        var jsCallParams = (filterObject.jsCallParameters == undefined ? new Array() : filterObject.jsCallParameters);
+
+        var fn = window[filterObject.jsCall];
+        fn.apply(filterObject, jsCallParams);
+
     }
 
     //--------------------------------
@@ -1242,7 +1265,7 @@
                 sArray = search.split("|");
 
                 $("#searchText").val(sArray[0]);
-                $("#ddlMarket").val(sArray[1].toString());
+                $("#ddlMarket").val(sArray[1].toString()).trigger('chosen:updated');
 
                 getAgencyList();
             }
@@ -1364,9 +1387,9 @@
                     convertToChosenSelect('ddlSubIndustry', false, false);
 
                     if (subIndustryId.length === 0) {
-                        $("#ddlSubIndustry").val(-1);
+                        $("#ddlSubIndustry").val(-1).trigger('chosen:updated');
                     } else {
-                        $("#ddlSubIndustry").val(subIndustryId);
+                        $("#ddlSubIndustry").val(subIndustryId).trigger('chosen:updated');
                     }
 
                 }
