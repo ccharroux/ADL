@@ -917,10 +917,10 @@ function buildMainMenu(selectedItem) {
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="/dashboard.html">Virtual Groups</a></li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Settings") + ' role="button" aria-expanded="false">Settings <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/formatlist.html">Formats</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/format/formatlist.html">Formats</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/marketsizelist.html">Market Sizes</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/positionlist.html">Positions</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/regionlist.html">Regions</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/position/positionlist.html">Positions</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/region/regionlist.html">Regions</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/revenuecategorieslist.html">Revenue Categories</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/dashboardtech.html">Tech Tools</a></li>';
     menuItems += '              </ul>';
@@ -1016,12 +1016,12 @@ function buildMRRMenu(selectedItem) {
     menuItems += '        <li style="display:block"><a href="releasemrr.html">Release</a></li>';
     menuItems += '        <li style="display:block"><a href="remindersmrr.html">Reminders</a></li>';
     menuItems += '        <li style="display:block"><a href="revenuedetailmrr.html">Revenue Detail</a></li>';
-    menuItems += '        <li style="display:block"><a href="mrrsnapshot.html">Snapshot</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrsnapshot.html">Snapshot</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/mrrmarketcategorydefinitionlist.html" role="button" aria-expanded="false">Market Categories</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrmarketcategorydefinitionlist.html" role="button" aria-expanded="false">Market Categories</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += productDashboard('');

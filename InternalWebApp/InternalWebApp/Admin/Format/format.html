@@ -4,7 +4,7 @@
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]><!-->
 <html class="no-js">
- <!--<![endif]-->
+<!--<![endif]-->
 <head>
     <title></title>
     <meta charset="utf-8" />
@@ -43,25 +43,27 @@
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
 
+    <!--Chosen Dropdown-->
+    <link rel="stylesheet" href="/css/chosen.min.css" />
+
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
     <!-- FOR IE9 below -->
     <!--[if lt IE 9]>
     <script src="js/respond.min.js"></script>
     <![endif]-->
+
     <style>
         .standardText, select {
             width: 300px !important;
         }
-
-  
     </style>
 
 
 </head>
 <body>
     <div id="fh5co-page">
-        <header id="fh5co-header" role="banner" >
+        <header id="fh5co-header" role="banner">
             <div class="container">
                 <div class="header-inner" id="menu"></div>
             </div>
@@ -71,41 +73,48 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Position</h2>
+                        <h2>Format</h2>
                     </div>
                 </div>
 
                 <div class="text-center margin-top-0">
+                    <input type="hidden" id="txtFormatID" value="" />
 
-                    <!-- Position Code -->
-                    <input type="hidden" id="txtPositionID" value=""/>
-                    <!--<div class="row input-row" id="positionIdDiv" >
-                        <div class="col-md-3 text-align-left">
-                            <label for="txtPositionCodeInsert">Position Code</label>
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <span id="txtPositionCodeUpdate" />
-                        </div>
-                    </div>-->
-
-                    <!-- Position Title -->
+                    <!-- Media Type -->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtPositionTitle">Position Title</label>
+                            <label for="ddlMediaType">Media Type</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-
-                            <input type="text" class="mkaRequired field-width-325" id="txtPositionTitle" maxlength="40" errorMessage="You must enter a Position Title" value="" />
+                            <select id="ddlMediaType" class="mkaRequired" errorMessage="You must select a Media Type"></select>
                         </div>
                     </div>
 
+                    <!--Format Name-->
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtFormatName">Format Name</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" id="txtFormatName" maxlength="40" class="mkaRequired" errorMessage="You must enter a Format Name " value="" />
+                        </div>
+                    </div>
+
+                    <!--Abbreviation-->
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtFormatAbbreviation">Abbreviation</label>
+                        </div>
+                        <div class="col-md-4 text-align-left">
+                            <input type="text" id="txtFormatAbbreviation" maxlength="4" class="mkaRequired" errorMessage="You must enter an Abbreviation" value="" />
+                        </div>
+                    </div>
+
+
                     <!-- Buttons -->
                     <div class="default-button-section">
-                        <div class="row input-row">
-                            <div class="col-md-3">
-
-                            </div>
-                            <div class="col-md-9 text-align-left">
+                        <div class="row">
+                            <div class="col-md-12">
                                 <div>
                                     <div>
                                         <input value="Update" onclick="insertUpdate()" class="default-button" type="button">
@@ -116,12 +125,12 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
     <!-- jQuery Easing -->
@@ -139,29 +148,33 @@
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
 
+    <!--Chosen Dropdown-->
+    <script src="/js/chosen.jquery.min.js"></script>
 
 </body>
 </html>
 <script>
 
-    var positionID = 0;
+    var formatId = 0;
 
     $(document).ready(function () {
         buildMainMenu("");
-        positionID = (getParameterByName("positionID") == null ? 0 : getParameterByName("positionID"));
-        $("#txtPositionID").val(positionID);
-        getPosition();
+
+        formatId = (getParameterByName("formatId") == null ? 0 : getParameterByName("formatId"));
+        $("#txtFormatID").val(formatId);
+
+        getMediaTypes();
 
     });
 
-    function getPosition() {
+    function getFormat() {
 
-        if (positionID <= 0) {
+        if (formatId <= 0) {
             return;
         }
 
         //filling out url for ajax call
-        var url = ServicePrefix + '/api/Position/GetPosition';
+        var url = ServicePrefix + '/api/Format/GetFormat';
 
         //filling out settings for ajax call
         var settings = {
@@ -170,13 +183,13 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inPositionCode": positionID
+                "inFormatId": formatId
             }),
             processData: false,
-            success: function(data, textStatus,jQxhr){
-                ajaxGetPositionSuccess(data, textStatus, jQxhr);
+            success: function (data, textStatus, jQxhr) {
+                ajaxGetFormatSuccess(data, textStatus, jQxhr);
             },
-            error: function(jqXhr, textStatus, errorThrown){
+            error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         }
@@ -185,27 +198,38 @@
         $.ajax(url, settings);
     }
     //ajax call success
-    function ajaxGetPositionSuccess(data, textStatus, jQxhr) {
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    var str = '';
-                    $.each(data.report.rows, function (index) {
-                        var obj = data.report.rows[index];
-                        $("#txtPositionTitle").val(obj["Position Title"]);
-                    });
-                }
+    function ajaxGetFormatSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+            var str = '';
+            $.each(data.report.rows, function (index) {
+                var obj = data.report.rows[index];
+
+                $("#ddlMediaType").val(obj["Media Type ID"]);
+                $("#txtFormatName").val(obj["Format Name"]);
+                $("#txtFormatAbbreviation").val(obj["Abbreviation"]);
+
+            });
+        }
     }
 
     function insertUpdate() {
         //validation check
+        var inFormatId;
         if (validationPassed() == false) {
             return;
         }
+        //update or insert check
+        if (formatId == 0) {
+            inFormatId = 0;
+        } else {
+            inFormatId = formatId;
+        }
 
         //filling out url for ajax call
-        var url = ServicePrefix + '/api/Position/UpdatePosition';
+        var url = ServicePrefix + '/api/Format/UpdateFormat';
 
         //filling out settings for ajax call
         var settings = {
@@ -214,11 +238,13 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inPositionCode": positionID,
-                "inPositionTitle": $("#txtPositionTitle").val().trim()
+                "inFormatId": inFormatId,
+                "inMediaTypeID": $("#ddlMediaType").val().trim(),
+                "inFormatName": $("#txtFormatName").val().trim(),
+                "inAbbreviation": $("#txtFormatAbbreviation").val().trim(),
             }),
             processData: false,
-            success: function(data, textStatus, jQxhr){
+            success: function (data, textStatus, jQxhr) {
                 ajaxInsertUpdateSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -232,29 +258,33 @@
     function ajaxInsertUpdateSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
-
         }
         else {
-            
+
             var bReloadPage = false;
-            var obj = data.report.rows[0];
+            $.each(data.report.rows, function (index) {
 
-            if ($("#txtPositionID").val() === "0") {
-                bReloadPage = true;
-                $("#txtPositionID").val(obj._updateStatus);
-            }
+                var obj = data.report.rows[index];
 
-            bootbox.alert('Positions have successfully been updated.');
+                if ($("#txtFormatID").val() === '0') {
+                    bReloadPage = true;
+                    $("#txtFormatID").val(obj["Format ID"]);
+                }
 
-            if (bReloadPage) {
-                window.location = "position.html?positionID=" + $("#txtPositionID").val();
-            }
+                bootbox.alert('Format have successfully been updated.', function () {
+                    if (bReloadPage) {
+                        window.location = "/admin/format/format.html?formatId=" + $("#txtFormatID").val();
+                    }
+                });
+
+               
+            });
+
         }
     }
 
     function genericAjaxError(jqXhr, textStatus, errorThrown) {
         MKAErrorMessageRtn(errorThrown);
-
     }
 
     function validationPassed() {
@@ -284,4 +314,55 @@
         return loopBreak;
     }
 
+    function getMediaTypes() {
+        var url = ServicePrefix + '/api/MediaType/GetMediaTypeList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMediaTypesSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getMediaTypesSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+
+            var str = '';
+ 
+            str = '<option value="-1">-- Select a Media Type</option>';
+            $.each(data.report.rows, function (index) {
+
+                str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+
+            });
+
+            $("#ddlMediaType").html(str);
+
+            convertToChosenSelect("ddlMediaType", false, false);
+
+            getFormat();
+        }
+    }
+
+
+
+
 </script>
+
