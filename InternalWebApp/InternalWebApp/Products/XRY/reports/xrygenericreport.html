@@ -296,7 +296,7 @@
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
     <!-- genericReport JS -->
-    <script src="/js/genericXrayReport.js"></script>
+    <script src="/js/genericReport.js"></script>
 
 
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
@@ -317,7 +317,7 @@
 </html>
 <script>
 
-    var auditObject = new Object();
+    var reportObject = new Object();
     var reportFilterArray = new Array();
 
     var api = "";
@@ -342,14 +342,60 @@
 
         reportId = getParameterByName("reportId");
 
-        if (!reportId) {
+        if (validReportIdCheck(reportId) == false)
+        {
+            return;
+        }
+
+        setupDatePickers();
+
+        // get report objects
+        reportObject = getReportObject(reportId);
+        reportFilterArray = reportObject.filters;
+
+        if (reportObject.apiControllerAction == null || reportObject.apiControllerAction.length == 0)
+        {
+            var msg = reportObject.reportTitle + " Report has not been implemented.";
+            bootbox.alert(msg, function () { window.location = "/products/xry/xrygenericreport.html"; });
+            return false;
+        }
+
+        tableFooterCallback = setFooterCallback(reportObject);
+
+
+        // report title
+        $("#reportTitle").html(reportObject.reportTitle);
+
+        setUIEvents();
+
+        // build menu
+        buildXRYMenu("Audits");
+        buildQuickReports(reportObject.product);
+
+        // display filters
+        displayFilters(reportFilterArray);
+
+        loadOnChangeEvents(reportFilterArray);
+
+        setAutoRun(reportFilterArray);
+
+    });
+    function validReportIdCheck(reportId)
+    {
+        var bReturn = true;
+
+        if (!reportId)
+        {
+
             //if we got here from js/main.js goBackToDashboard(), then extract reportId and redirect
             var searchParams = getParameterByName("search");
             if (searchParams != null)
             {
                 searchParams = searchParams.toLowerCase().split('|');
-                if (searchParams.length > 0) {
-                    if (searchParams[0].indexOf('reportid=') >= 0) {
+                if (searchParams.length > 0)
+                {
+                    if (searchParams[0].indexOf('reportid=') >= 0)
+                    {
                         reportId = searchParams[0].substring(9, searchParams[0].length);
                         getQuickReport(reportId);
                         return false;
@@ -358,55 +404,26 @@
             }
 
             //else punt
-            var msg = "Invalid page request, no report passed.";
+            var msg = "Invalid page request, no report passed."; 
             bootbox.alert(msg, function () { window.location = "/admin/login/dashboard.html"; });
             return false;
         }
+        else
+        {
 
-        // setup date pickers
-        $(function () {
-            $("#dtStartDate").datepicker();
-            $("#dtEndDate").datepicker();
-        });
-
-        // get report objects
-        auditObject = getAuditObject(reportId);
-        reportFilterArray = auditObject.filters;
-
-        if (auditObject.apiControllerAction == null || auditObject.apiControllerAction.length == 0) {
-            var msg = auditObject.auditTitle + " Report has not been implemented.";
-
-            bootbox.alert(msg, function () { window.location = "/products/xry/xrygenericreport.html"; });
-
-            return false;
+            return true;
         }
+    }
 
-        if (auditObject.footerCallback !== undefined || auditObject.footerCallback !== "undefined") {
-            tableFooterCallback = auditObject.footerCallback;
-        } else {
-            tableFooterCallback = function () { }
-        }
+    function setUpBackButton()
+    {
+        setLocalStorage("search", "reportId=" + getParameterByName("reportId"));
+        setLocalStorage("searchPage", window.location);
+        //setLocalStorage("quickReportQS", "ddlMarket|" + $("#ddlMarket").val());
+    }
 
-        // report title
-        $("#reportTitle").html(auditObject.auditTitle);
-
-        // clear
-        $("body").on("click",
-            "#clear_search_button",
-            function () {
-                var table = $("#dtAgencyList").DataTable();
-                table.search('').draw();
-            });
-
-        // build menu
-        buildXRYMenu("Audits");
-        buildQuickReports(auditObject.product);
-
-        // display filters
-        displayFilters(reportFilterArray);
-
-        loadOnChangeEvents(reportFilterArray);
-
+    function setAutoRun(reportFilterArray)
+    {
         // Auto Run
         if (reportFilterArray.length == 0) {
             getReport();
@@ -416,7 +433,39 @@
             $("#btnReport").show();
             loadAdvancedSearch();
         }
-    });
+    }
+
+    function setUIEvents()
+    {
+        // clear
+        $("body").on("click",
+            "#clear_search_button",
+            function () {
+                var table = $("#dtAgencyList").DataTable();
+                table.search('').draw();
+            });
+    }
+    function setFooterCallback(reportObject)
+    {
+        var tableFooterCallback = function () { };
+
+        if (reportObject.footerCallback !== undefined || reportObject.footerCallback !== "undefined")
+        {
+            tableFooterCallback = reportObject.footerCallback;
+        }
+ 
+
+        return tableFooterCallback;
+    }
+    function setupDatePickers()
+    {
+        // setup date pickers
+        $(function () {
+            $("#dtStartDate").datepicker();
+            $("#dtEndDate").datepicker();
+        });
+
+    }
 
     function clearSelection(control) {
         $("#txt" + control).val("");
@@ -934,9 +983,9 @@
 
         $("#noDataFound").hide();
 
-        //console.log(auditObject);
+ 
 
-        api = auditObject.apiControllerAction;
+        api = reportObject.apiControllerAction;
         apiParameters = new Object();
         apiToken = getLocalStorage("APIToken");
         searchText = "";
@@ -946,7 +995,7 @@
         //setup the parameters for the API
         //------------------------
 
-        if (auditObject.apiType.toLowerCase() == "post") {
+        if (reportObject.apiType.toLowerCase() == "post") {
             apiParameters["inApiToken"] = apiToken;
         }
         else {
@@ -990,7 +1039,7 @@
             //if ($(item).prop("tagName") == "SELECT") {
 
             if ($(item).val() != "") {
-                if (auditObject.apiType.toLowerCase() == "post") {
+                if (reportObject.apiType.toLowerCase() == "post") {
                     apiParameters[nameOfParm] = $(item).val();
                 }
                 else {
@@ -1038,7 +1087,7 @@
         $.ajax({
             url: ServicePrefix + api,
             dataType: 'json',
-            type: auditObject.apiType.toString().toLowerCase(),
+            type: reportObject.apiType.toString().toLowerCase(),
             contentType: 'application/json',
             data: JSON.stringify(apiParameters),
             processData: false,
@@ -1093,8 +1142,8 @@
 
         $.each(data, function (objectName, objectValue) {
 
-            if (auditObject.columnsToDisplay.length == 0 ||
-                IsInArray(auditObject.columnsToDisplay, objectName) == true) {
+            if (reportObject.columnsToDisplay.length == 0 ||
+                IsInArray(reportObject.columnsToDisplay, objectName) == true) {
 
                 var className = "";
 
@@ -1122,11 +1171,11 @@
 
 
                 var bSortable = true;
-                if (auditObject.sortable == 'undefined') {
+                if (reportObject.sortable == 'undefined') {
                     bSortable = true;
 
                 } else {
-                    bSortable = auditObject.sortable;
+                    bSortable = reportObject.sortable;
                 }
 
 
@@ -1147,19 +1196,20 @@
         //if the action is found, the column will be added to the table.
         //this has to be done after the fact since these columns do not come back
         //in the data.
-        for (var i = 0; i < auditActionsArray.length; i++) {
-            var actionIndex = GetActionColumnIndex(auditObject, auditActionsArray[i]);
+        for (var i = 0; i < reportActionsArray.length; i++) {
+            var actionIndex = GetActionColumnIndex(reportObject, reportActionsArray[i]);
             //a -1 means the item wasn't found in the array
             if (actionIndex > -1) {
-                columns.push(auditObject.columnsToDisplay[actionIndex]);
+                columns.push(reportObject.columnsToDisplay[actionIndex]);
             }
         }
 
         loadResults(dataObj, columns);
     }
 
-    function GetActionColumnIndex(auditObject, actionName) {
-        return auditObject.columnsToDisplay.map(
+    function GetActionColumnIndex(reportObject, actionName)
+    {
+        return reportObject.columnsToDisplay.map(
             function (x) {
                 return x.action;
             }).indexOf(actionName);
@@ -1182,8 +1232,8 @@
         //Since some of the audit have footer with calculations,
         //the footer needs to be added to the table html before the
         //datatable is initialized. Otherwise the footer can't be added later.
-        if (auditObject.footerFormat !== "undefined" && $(".rev-research-footer").length === 0) {
-            $("#dtResults").append(auditObject.footerFormat);
+        if (reportObject.footerFormat !== "undefined" && $(".rev-research-footer").length === 0) {
+            $("#dtResults").append(reportObject.footerFormat);
         }
 
         //assigns the data from the ajax call
@@ -1223,7 +1273,7 @@
                //},
                {
                    extend: 'excel',
-                   title: auditObject.reportTitle,
+                   title: reportObject.reportTitle,
                    exportOptions: {
                        columns: columnsToExport
                    }
@@ -1237,7 +1287,7 @@
                //},
                {
                    extend: 'print',
-                   title: auditObject.reportTitle,
+                   title: reportObject.reportTitle,
                    exportOptions: {
                        columns: columnsToExport
 
@@ -1277,7 +1327,9 @@
     //if there needs to be more than page parameter
     //this function will need to be modified
     //this will direct to the proper page and id for editing, etc.
-    function loadActionPage(pageLocation, itemId) {
+    function loadActionPage(pageLocation, itemId)
+    {
+ 
         window.location = pageLocation + itemId;
     }
 

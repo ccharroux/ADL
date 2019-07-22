@@ -959,7 +959,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += '</ul>';
     menuItems += '</li>';
 
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "XRay Reports") + ' href="/products/xry/xrygenericreportlist.html" role="button" aria-expanded="false">XRay Reports </span></a>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "XRay Reports") + ' href="/utilities/genericreport/genericreportlist.html?tag=xry" role="button" aria-expanded="false">XRay Reports </span></a>';
 
 
 
@@ -1320,8 +1320,12 @@ function getYearList() {
 
     $("#ddlYear").html(str);
 
-
-    convertToChosenSelect("ddlYear", false, false);
+    try {
+        convertToChosenSelect("ddlYear", false, false);
+    }
+    catch (err) {
+        console.log("This page is not converted to use Choisen selects yet.");
+    }
 
     if (typeof paramRevenueYear == 'undefined')
     {
@@ -1375,7 +1379,13 @@ function getPeriodList(inType)
 
     $("#ddlPeriod").html(str);
  
-    convertToChosenSelect("ddlPeriod", false, false);
+    try {
+        convertToChosenSelect("ddlPeriod", false, false);
+    }
+    catch (err) {
+        console.log("This page is not converted to use Chosen selects yet.");
+    }
+
 
     if (typeof paramRevenuePeriod == "undefined")
     {
@@ -1387,6 +1397,22 @@ function getPeriodList(inType)
     }
 
 }
+
+//This will trigger "change" event when "val(new_val)" called
+//with value different than the current one
+(function($){
+    var originalVal = $.fn.val;
+    $.fn.val = function(){
+        var prev;
+        if(arguments.length>0){
+            prev = originalVal.apply(this,[]);
+        }
+        var result =originalVal.apply(this,arguments);
+        if(arguments.length>0 && prev!=originalVal.apply(this,[]))
+            $(this).change();  // OR with custom event $(this).trigger('value-changed')
+        return result;
+    };
+})(jQuery);
 
 function convertToChosenSelect(selectName, allowSearchContains, allowSplitWordSearch) {
 
@@ -1406,6 +1432,10 @@ function convertToChosenSelect(selectName, allowSearchContains, allowSplitWordSe
 
     //This code reloads the dropdown to pick up new values.
     $("#" + selectName).trigger("chosen:updated");
+
+    $("#" + selectName).change(function() {
+        $(this).trigger("chosen:updated");
+    });
 }
 
 function checkIfChosenObjectExists(object) {
