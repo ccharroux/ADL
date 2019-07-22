@@ -1388,6 +1388,22 @@ function getPeriodList(inType)
 
 }
 
+//This will trigger "change" event when "val(new_val)" called
+//with value different than the current one
+(function($){
+    var originalVal = $.fn.val;
+    $.fn.val = function(){
+        var prev;
+        if(arguments.length>0){
+            prev = originalVal.apply(this,[]);
+        }
+        var result =originalVal.apply(this,arguments);
+        if(arguments.length>0 && prev!=originalVal.apply(this,[]))
+            $(this).change();  // OR with custom event $(this).trigger('value-changed')
+        return result;
+    };
+})(jQuery);
+
 function convertToChosenSelect(selectName, allowSearchContains, allowSplitWordSearch) {
 
     //This sets up up the properties for the Chosen dropdown.
@@ -1406,6 +1422,10 @@ function convertToChosenSelect(selectName, allowSearchContains, allowSplitWordSe
 
     //This code reloads the dropdown to pick up new values.
     $("#" + selectName).trigger("chosen:updated");
+
+    $("#" + selectName).change(function() {
+        $(this).trigger("chosen:updated");
+    });
 }
 
 function checkIfChosenObjectExists(object) {
