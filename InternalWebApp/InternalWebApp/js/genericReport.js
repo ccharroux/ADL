@@ -3,6 +3,10 @@ var autoRerunInterval = 120 * 1000; //
 var reportObjectArray = new Array();
 var reportFilterObjectArray = new Array();
 
+// dma drill down reports
+var reportActionsArray = new Array();
+reportActionsArray.push("edit");
+
 var reportName = new Array();
 reportName.push("rptMRRMarketSummary");
 reportName.push("rptXRAYUsage");
@@ -146,6 +150,10 @@ reportName.push("rptStationProductSetupList");
 reportName.push("rptMRRMissingManagerSuggestedList");
 reportName.push("rptStationMissingDataList");
 
+reportName.push("rptRevenueComparisonMarket");
+reportName.push("rptRevenueComparisonStation");
+reportName.push("rptRevenueComparisonStationDetail");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -254,8 +262,20 @@ function getQuickReport(reportId)
         window.location = url;
     }
 }
+function getDMAReportObjectByKeyValue(inKey, inValue) {
+    //get the item by the key with a value
 
+    for (var i = 0; i < reportObjectArray.length; i++)
+    {
+        if (reportObjectArray[i][inKey] === inValue)
+        {
+            reportObjectArray[i].reportIndex = i;
+            return reportObjectArray[i];
+        }
+    }
+    return null;
 
+}
 //-------------------------
 // REPORT AREA
 //-------------------------
@@ -5457,4 +5477,305 @@ function getReportObject_StationMissingDataList() {
     }
 
     return tempObject;
+}
+
+
+function getReportObject_RevenueComparisonMarket() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Parent Market");
+    //columnsToDisplay.push("Revenue Year");
+    columnsToDisplay.push("Revenue Period");
+    columnsToDisplay.push("DMA Cat Id");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("DMA Revenue");
+    columnsToDisplay.push("MRR Revenue");
+    columnsToDisplay.push("Revenue Diff");
+
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row)
+        {
+            var reportIndex = reportName.indexOf("rptRevenueComparisonStation");
+            var action = "";
+
+            var revenuePeriodParts = row["Revenue Period"].split("/");
+
+            if (reportIndex > -1)
+            {
+                action = "/Products/DMA/reports/dmagenericreport.html?reportid=" + reportIndex +
+                        "&parentmarketid=" + row["Parent Market ID"] +
+                        "&marketid=" + row["Market Id"] +
+                        "&revenueperiod=" + revenuePeriodParts[1] +
+                        "&revenueyear=" + revenuePeriodParts[0] +
+                        "&direct=false";
+            }
+
+            return '<a href="' + action + '">Stations</a>';
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject = {
+        reportTitle: "DMA/MRR Data Comparison - Market Level",
+        apiControllerAction: "/api/DMAReport/GetDMARevenueReviewByMarket",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        reportPath: "/Products/DMA/reports/dmagenericreport.html",
+        product: 'dma',
+        showBackNav: false,
+        reportToken: "dmaMarket",
+        reportIndex: ""
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_RevenueComparisonMarket() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        objectName: "ddlParentMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Period",
+        jsCall: "getPeriodList",
+        jsCallParameters: ["quarters"],
+        objectName: "ddlPeriod",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+
+}
+
+function getReportObject_RevenueComparisonStation() {
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Market");
+    //columnsToDisplay.push("Revenue Year");
+    columnsToDisplay.push("Revenue Period");
+    columnsToDisplay.push("DMA Cat Id");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("DMA Revenue");
+    columnsToDisplay.push("MRR Revenue");
+    columnsToDisplay.push("Revenue Diff");
+
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row)
+        {
+            var reportIndex = reportName.indexOf("rptRevenueComparisonStationDetail");
+            var action = "";
+
+            var revenuePeriodParts = row["Revenue Period"].split("/");
+
+            if (reportIndex > -1)
+            {
+                action = "/Products/DMA/reports/dmagenericreport.html?reportid=" + reportIndex +
+                    "&parentmarketid=" + $("#ddlParentMarket").val() +
+                    "&marketid=" + row["Market ID"] +
+                    "&revenueperiod=" + revenuePeriodParts[1] +
+                    "&revenueyear=" + revenuePeriodParts[0] +
+                    "&stationid=" + row["Station Id"] +
+                    "&direct=false";
+            }
+
+            return '<a href="' + action + '">Details</a>';
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    var arrButtons = new Array();
+    arrButtons.push({ name: "Market", title: "Back to Market Level" });
+
+    tempObject = {
+        reportTitle: "DMA/MRR Data Comparison - Station Level",
+        apiControllerAction: "/api/DMAReport/GetDMARevenueReviewByStation",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        reportPath: "/Products/DMA/reports/dmagenericreport.html",
+        product: 'dma',
+        showBackNav: true,
+        backNavButtons: arrButtons,
+        reportToken: "dmaStation",
+        reportIndex: ""
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_RevenueComparisonStation() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        objectName: "ddlParentMarket",
+        required: true,
+        onchange: function () {
+
+            getMarketList($("#ddlParentMarket").val());
+
+        }
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getDefaultMarket",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Period",
+        jsCall: "getPeriodList",
+        jsCallParameters: ["quarters"],
+        objectName: "ddlPeriod",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_RevenueComparisonStationDetail() {
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    //need to figure out how to make them non-sortable
+    columnsToDisplay.push("Desc");
+    //columnsToDisplay.push("Revenue Year");
+    columnsToDisplay.push("Revenue Period");
+    columnsToDisplay.push("DMA Cat Id");
+    columnsToDisplay.push("MRR Cat Id");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("DMA Revenue");
+
+    var arrButtons = new Array();
+
+    arrButtons.push({ name: "Market", title: "Back to Market Level" });
+    arrButtons.push({ name: "Station", title: "Back to Station Level" });
+
+    tempObject = {
+        reportTitle: "DMA/MRR Data Comparison - MRR Level",
+        apiControllerAction: "/api/DMAReport/GetDMARevenueReviewByStationDetails",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        reportPath: "/Products/DMA/reports/dmagenericreport.html",
+        product: 'dma',
+        sortable: false,
+        showBackNav: true,
+        backNavButtons: arrButtons,
+        reportToken: "dmaStationDetail",
+        reportIndex: ""
+    }
+
+    //back to market
+    //back to station
+    //include button title
+
+
+
+    return tempObject;
+}
+
+function getReportFilterArray_RevenueComparisonStationDetail() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    //parent market
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        objectName: "ddlParentMarket",
+        required: true,
+        onchange: function () {
+
+            getMarketList($("#ddlParentMarket").val());
+
+        }
+    }
+    arrayFilters.push(arrayObject);
+
+
+
+    //market
+    arrayObject = {
+        token: "Market",
+        jsCall: "getDefaultMarket",
+        objectName: "ddlMarket",
+        required: true,
+        onchange: function () {
+
+            getStationList($("#ddlMarket").val());
+
+        }
+    }
+    arrayFilters.push(arrayObject);
+
+    //station
+    arrayObject = {
+        token: "Station",
+        jsCall: "getDefaultStation",
+        objectName: "ddlStation",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    //revenue period
+    arrayObject = {
+        token: "Period",
+        jsCall: "getPeriodList",
+        jsCallParameters: ["quarters"],
+        objectName: "ddlPeriod",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    //revenue year
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
 }

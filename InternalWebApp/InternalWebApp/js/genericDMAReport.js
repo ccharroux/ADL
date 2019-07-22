@@ -114,7 +114,7 @@ function getDMAReportObject_RevenueComparisonMarket() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         reportPath: "/Products/DMA/reports/dmagenericreport.html",
-        product: 'dmarevenue',
+        product: 'dma',
         showBackNav: false,
         reportToken: "dmaMarket",
         reportIndex: ""
@@ -204,7 +204,7 @@ function getDMAReportObject_RevenueComparisonStation() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         reportPath: "/Products/DMA/reports/dmagenericreport.html",
-        product: 'dmarevenue',
+        product: 'dma',
         showBackNav: true,
         backNavButtons: arrButtons,
         reportToken: "dmaStation",
@@ -233,7 +233,9 @@ function getDMAReportFilterArray_RevenueComparisonStation() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getDefaultMarket",
+        jsCall: "
+
+",
         objectName: "ddlMarket",
         required: true
     }
@@ -284,7 +286,7 @@ function getDMAReportObject_RevenueComparisonStationDetail() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         reportPath: "/Products/DMA/reports/dmagenericreport.html",
-        product: 'dmarevenue',
+        product: 'dma',
         sortable: false,
         showBackNav: true,
         backNavButtons: arrButtons,

@@ -180,7 +180,7 @@
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
     <!-- genericReport JS -->
-    <script src="/js/genericDMAReport.js"></script>
+    <script src="/js/genericReport.js"></script>
 
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
@@ -239,7 +239,7 @@
 
         getUrlParameters();
 
-        reportObject = getDMAReportObject(reportId);
+        reportObject = getReportObject(reportId);
         reportFilterArray = reportObject.filters;
 
         displayFilters(reportFilterArray);
@@ -259,25 +259,41 @@
 
     function autoRunReportSetup()
     {
+
+ 
         //determines when all ajax calls are completed
         //if flags are set the report will load
-        $(document).ajaxStop(function () {
-            if (bRunReport && bDirectPageLink == false) {
-                getReport();
+        $(document).ajaxStop(function ()
+        {
+            if (bRunReport && bDirectPageLink == false)
+            {
+                var bAutoRun = true;
+                for (var i = 0; i < reportFilterArray.length; i++)
+                {
+                    if ($("#" + reportFilterArray[i].objectName).val() == "")
+                    {
+                        bAutoRun = false;
+                    }
+                }
+
+                if (bAutoRun == true)
+                {
+                    getReport();
+                }
             }
         });
     }
 
-    function getUrlParameters() {
+    function getUrlParameters()
+    {
 
-        paramParentMarketId =
-            getParameterByName("parentmarketid") !== null ? getParameterByName("parentmarketid") : "";
+        paramParentMarketId = getParameterByName("parentmarketid") !== null ? getParameterByName("parentmarketid") : "";
 
         paramMarketId = getParameterByName("marketid") !== null ? getParameterByName("marketid") : "";
 
         paramRevenuePeriod = getParameterByName("revenueperiod") !== null
-            ? getParameterByName("revenueperiod").toUpperCase()
-            : "";
+                                    ? getParameterByName("revenueperiod").toUpperCase()
+                                    : "";
 
         paramRevenueYear = getParameterByName("revenueyear") !== null ? getParameterByName("revenueyear") : "";
 
@@ -340,23 +356,29 @@
 
                     saveLoadedControlSelection("ddlParentMarket");
 
-                    if (paramParentMarketId !== 0) {
-                        $("#ddlParentMarket").val(paramParentMarketId).trigger('chosen:updated');
-                    } else {
+                    if (paramParentMarketId !== 0)
+                    {
+                        $("#ddlParentMarket").val(paramParentMarketId)
+                    }
+                    else
+                    {
                         $("#ddlParentMarket").selectedIndex = 0;
-                        $("#ddlParentMarket").trigger('chosen:updated');
                     }
 
+                    $("#ddlParentMarket").trigger('chosen:updated');
                     //try to do fire a change event
                     //if has onchange, execute event
-                    try {
-
-                        if ($("#ddlMarket").is(":visible")) {
+                    try
+                    {
+ 
+                        if ($("#ddlMarket_chosen").is(":visible"))
+                        {
                             $("#ddlParentMarket").change();
                         }
-
-                    } catch (e) {
-
+                    }
+                    catch (e)
+                    {
+                        console.log(e);
                     }
                 }
 
@@ -368,20 +390,25 @@
 
     }
 
-    function getMarketList(parentMarketId) {
-
-        if (parentMarketId == "") {
-
+    function getMarketList(parentMarketId)
+    {
+        if (parentMarketId == "")
+        {
             $("#ddlMarket").html('');
             getDefaultMarket();
             return;
         }
 
-        if (parentMarketId !== paramParentMarketId) {
+        if (parentMarketId !== paramParentMarketId)
+        {
             paramMarketId = 0;
             paramStationId = 0;
             paramRevenuePeriod = "";
             paramRevenueYear = "";
+
+            $("#ddlMarket").html('');
+            getDefaultMarket();
+            return;
         }
 
         $.ajax({
@@ -417,10 +444,13 @@
 
                     saveLoadedControlSelection("ddlMarket");
                     //preSelectItem('quickReportQS');
-
-                    if (paramMarketId !== 0) {
+                    console.log(paramMarketId);
+                    if (paramMarketId !== 0)
+                    {
                         $("#ddlMarket").val(paramMarketId).trigger('chosen:updated');
-                    } else {
+                    }
+                    else
+                    {
                         $("#ddlMarket").selectedIndex = 0;
                         $("#ddlMarket").trigger('chosen:updated');
                     }
@@ -429,7 +459,7 @@
                     //if has onchange, execute event
                     try {
 
-                        if ($("#ddlStation").is(":visible")) {
+                        if ($("#ddlStation_chosen").is(":visible")) {
                             $("#ddlMarket").change();
                         }
 
@@ -446,7 +476,8 @@
 
     }
 
-    function getStationList(marketId) {
+    function getStationList(marketId)
+    {
 
         if (marketId == "") {
 
@@ -455,8 +486,12 @@
             return;
         }
 
-        if (marketId !== paramMarketId) {
+        if (marketId !== paramMarketId)
+        {
             paramStationId = 0;
+            $("#ddlStation").html('');
+            getDefaultStation();
+            return;
         }
 
         $.ajax({
@@ -513,11 +548,11 @@
         // set all filters display to none
         $(".rptView").hide();
 
-        for (var i = 0; i < arrayFilters.length; i++) {
-
+        for (var i = 0; i < arrayFilters.length; i++)
+        {
             activateFilter(arrayFilters[i]);
-            if (arrayFilters[i].required == true) {
-
+            if (arrayFilters[i].required == true)
+            {
                 var input = $("#" + arrayFilters[i].objectName);
                 $("label[for=" + input.attr("id") + "]").css("color", "red");
                 $("label[for=" + input.attr("id") + "]").prepend(" * ");
@@ -544,7 +579,8 @@
 
     }
 
-    function goBack(reportToken) {
+    function goBack(reportToken)
+    {
 
         var backButtonObject = getDMAReportObjectByKeyValue("reportToken", reportToken);
         var bIsDirect = false;
@@ -559,7 +595,8 @@
 
         var sParameters = "?reportid=" + backButtonObject.reportIndex;
         
-        if ($("#ddlParentMarket_chosen").is(":visible")) {
+        if ($("#ddlParentMarket_chosen").is(":visible"))
+        {
             sParameters += "&parentmarketid=" + $("#ddlParentMarket").val();
 
             if ($("#ddlParentMarket").val() == "") {
@@ -567,19 +604,23 @@
             }
         }
 
-        if ($("#ddlMarket_chosen").is(":visible")) {
+        if ($("#ddlMarket_chosen").is(":visible"))
+        {
             sParameters += "&marketid=" + $("#ddlMarket").val();
 
-            if (reportToken == "dmaStation" && $("#ddlMarket").val() == "") {
+            if (reportToken == "dmaStation" && $("#ddlMarket").val() == "")
+            {
                 bIsDirect = true;
             }
         }
 
-        if ($("#ddlStation_chosen").is(":visible")) {
+        if ($("#ddlStation_chosen").is(":visible"))
+        {
             sParameters += "&stationid=" + $("#ddlStation").val();
         }
 
-        if ($("#ddlPeriod_chosen").is(":visible")) {
+        if ($("#ddlPeriod_chosen").is(":visible"))
+        {
             sParameters += "&revenueperiod=" + $("#ddlPeriod").val();
 
             if ($("#ddlPeriod").val() == "") {
@@ -587,7 +628,8 @@
             }
         }
 
-        if ($("#ddlYear_chosen").is(":visible")) {
+        if ($("#ddlYear_chosen").is(":visible"))
+        {
             sParameters += "&revenueyear=" + $("#ddlYear").val();
 
             if ($("#ddlYear").val() == "") {
@@ -601,16 +643,20 @@
 
     }
 
-    function buildRedirectQueryString(parameters) {
+    function buildRedirectQueryString(parameters)
+    {
 
         var sParamString = "";
 
         Object.keys(parameters).forEach(function (key, index) {
             // key: the name of the object key
             // index: the ordinal position of the key within the object
-            if (index === 0) {
+            if (index === 0)
+            {
                 sParamString += key + "=" + encodeURIComponent(parameters[key]);
-            } else {
+            }
+            else
+            {
                 sParamString += "&" + key + "=" + encodeURIComponent(parameters[key]);
             }
         });
@@ -970,7 +1016,8 @@
     // misc
     //--------------------
 
-    function getDefaultMarket() {
+    function getDefaultMarket()
+    {
         $("#ddlMarket").html('');
 
         var str = '';
@@ -979,7 +1026,8 @@
         convertToChosenSelect("ddlMarket", false, false);
     }
 
-    function getDefaultStation() {
+    function getDefaultStation()
+    {
         $("#ddlStation").html('');
 
         var str = '';
@@ -988,14 +1036,14 @@
         convertToChosenSelect("ddlStation", false, false);
     }
 
-    function loadOnChangeEvents(reportFilterArray) {
+    function loadOnChangeEvents(reportFilterArray)
+    {
 
-        for (var i = 0; i < reportFilterArray.length - 1; i++) {
-
-            if (reportFilterArray[i].onchange != "undefined") {
-
+        for (var i = 0; i < reportFilterArray.length - 1; i++) 
+        {
+            if (reportFilterArray[i].onchange != "undefined") 
+            {
                 $("#" + reportFilterArray[i].objectName).change(reportFilterArray[i].onchange);
-
             }
         }
     }
