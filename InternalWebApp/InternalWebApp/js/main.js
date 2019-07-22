@@ -1120,7 +1120,7 @@ function buildDMAMenu(selectedItem) {
     menuItems += '        <li style="display:block"><a href="/Products/DMA/dmarelease.html">Release</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "DMA Reports") + ' href="/Products/DMA/dmagenericreportlist.html" role="button" aria-expanded="false">DMA Reports </span></a>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "DMA Reports") + ' href="/utilities/genericreport/genericreportlist.html?tag=dma" role="button" aria-expanded="false">DMA Reports </span></a>';
     menuItems += '       </li>';
 
     menuItems += productDashboard('');
