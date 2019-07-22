@@ -131,6 +131,7 @@
                                     <th class="exportColumn">Media Type</th>
                                     <th class="exportColumn">On Hold</th>
                                     <th class="exportColumn">Revised On</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tfoot>
@@ -146,6 +147,7 @@
                                     <th class="exportColumn">Media Type</th>
                                     <th class="exportColumn">On Hold</th>
                                     <th class="exportColumn">Revised On</th>
+                                    <th></th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -246,7 +248,21 @@
                 { "data": 'Delivered On' },
                 { "data": 'Media Type' },
                 { "data": 'On Hold' },
-                { "data": 'Revised On' }
+                { "data": 'Revised On' },
+                {
+                    mRender: function (data, type, row) {
+                        // these should never both be true, but they may both be false
+                        if (row["Can Approve"]) {
+                            return '<a href="#" onclick="approveOrUnapproveMarket(' + row["Market ID"] + ', true)">Approve</a>';
+                        }
+                        if (row["Can Unapprove"]) {
+                            return '<a href="#" onclick="approveOrUnapproveMarket(' + row["Market ID"] + ', false)">Unapprove</a>';
+                        }
+                        return '';
+                    },
+                    "orderable": false,
+                    "searchable": false
+                }
             ],
             "columnDefs": [
                 {
@@ -606,6 +622,41 @@
         var nextIndex = $("#ddlYearPeriod option:selected").index() + 1;
         $("#ddlYearPeriod").get(0).selectedIndex = nextIndex;
         $("#ddlYearPeriod").trigger("change");
+    }
+
+    function approveOrUnapproveMarket(marketId, approveMarket) {
+        var url = ServicePrefix + '/api/MRR/UpdateMarketApproval';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId,
+                "inPeriod": currentRevenuePeriod(),
+                "inYear": currentRevenueYear(),
+                "inApproved": approveMarket
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                approveOrUnapproveMarketSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function approveOrUnapproveMarketSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        getMarketApprovalList();
     }
 
 </script>
