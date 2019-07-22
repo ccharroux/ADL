@@ -959,7 +959,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += '</ul>';
     menuItems += '</li>';
 
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "XRay Reports") + ' href="/products/xry/xrygenericreportlist.html" role="button" aria-expanded="false">XRay Reports </span></a>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "XRay Reports") + ' href="/utilities/genericreport/genericreportlist.html?tag=xry" role="button" aria-expanded="false">XRay Reports </span></a>';
 
 
 

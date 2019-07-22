@@ -20,23 +20,23 @@ auditName.push("auditMediaRevenueResearch");
 auditName.push("auditAEStatusList");
 //month-end close out
 //auditName.push("auditMarketStationSummary");
-auditName.push("auditNewAdvertisers");
-auditName.push("auditNewAgencies");
+auditName.push("rptNewAdvertisers");
+auditName.push("rptNewAgencies");
 
-auditName.push("auditAdvertisersList");
-auditName.push("auditAdvertisersAgenciesList");
-auditName.push("auditDisabledAdvertisersList");
-auditName.push("auditMediaAdvertisersList");
-auditName.push("auditParentAdvertiserList");
-auditName.push("auditParentAdvertiserAdvertiserList");
-auditName.push("auditStationAdvertisersList");
+auditName.push("rptAdvertisersList");
+auditName.push("rptAdvertisersAgenciesList");
+auditName.push("rptDisabledAdvertisersList");
+auditName.push("rptMediaAdvertisersList");
+auditName.push("rptParentAdvertiserList");
+auditName.push("rptParentAdvertiserAdvertiserList");
+auditName.push("rptStationAdvertisersList");
 
-auditName.push("auditAgencyList");
-auditName.push("auditAgencyAdvertiserAccountsList");
-auditName.push("auditDisabledAgencyList");
-auditName.push("auditParentAgencyList");
-auditName.push("auditParentAgencyAgencyList");
-auditName.push("auditStationAgencyList");
+auditName.push("rptAgencyList");
+auditName.push("rptAgencyAdvertiserAccountsList");
+auditName.push("rptDisabledAgencyList");
+auditName.push("rptParentAgencyList");
+auditName.push("rptParentAgencyAgencyList");
+auditName.push("rptStationAgencyList");
 
 function buildAuditArray() {
     var auditCounter = 1;
@@ -892,7 +892,6 @@ function getAuditFilterArray_AdvertisersRevenueResearch() {
 
     return arrayFilters;
 }
-
 
 function getAuditObject_MediaRevenueResearch() {
     var tempObject = new Object();

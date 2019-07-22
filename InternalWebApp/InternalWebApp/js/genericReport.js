@@ -150,9 +150,29 @@ reportName.push("rptStationProductSetupList");
 reportName.push("rptMRRMissingManagerSuggestedList");
 reportName.push("rptStationMissingDataList");
 
+// dma reports
 reportName.push("rptRevenueComparisonMarket");
 reportName.push("rptRevenueComparisonStation");
 reportName.push("rptRevenueComparisonStationDetail");
+
+// xray reports
+reportName.push("rptNewAdvertisers");
+reportName.push("rptNewAgencies");
+
+reportName.push("rptAdvertisersList");
+reportName.push("rptAdvertisersAgenciesList");
+reportName.push("rptDisabledAdvertisersList");
+reportName.push("rptMediaAdvertisersList");
+reportName.push("rptParentAdvertiserList");
+reportName.push("rptParentAdvertiserAdvertiserList");
+reportName.push("rptStationAdvertisersList");
+
+reportName.push("rptAgencyList");
+reportName.push("rptAgencyAdvertiserAccountsList");
+reportName.push("rptDisabledAgencyList");
+reportName.push("rptParentAgencyList");
+reportName.push("rptParentAgencyAgencyList");
+reportName.push("rptStationAgencyList");
 
 function buildReportArray()
 {
@@ -250,7 +270,13 @@ function getQuickReport(reportId)
 {
     if (reportId > -1)
     {
-        var url = "/utilities/genericreport/genericReport.html?reportId=" + reportId;
+        var reportPath = '/utilities/genericreport/genericReport.html';
+        if (!reportObjectArray[reportId].reportPath == false) {
+            reportPath = reportObjectArray[reportId].reportPath;
+        }
+  
+
+        var url = reportPath + "?reportId=" + reportId;
 
         var i = parseInt($("#ddlMarket").val());
 
@@ -1007,7 +1033,7 @@ function getReportObject_UserListing() {
         apiControllerAction:  "/api/PersonnelReport/GetUserListing",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product:  ''
+        product:  'personnel'
     }
 
     return tempObject;
@@ -1250,7 +1276,7 @@ function getReportObject_NewUserListing() {
         apiControllerAction:  "/api/PersonnelReport/GetNewUserListing",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product:  ''
+        product: 'personnel'
     }
 
     return tempObject;
@@ -1321,7 +1347,7 @@ function getReportObject_StationListing() {
         apiControllerAction:  "/api/StationReport/GetStationListing",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product:  ''
+        product: 'station'
     }
 
     return tempObject;
@@ -1391,7 +1417,7 @@ function getReportObject_Training() {
         apiControllerAction:  "/api/Report/GetTraining",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product:  ''
+        product:  'training'
     }
 
     return tempObject;
@@ -1463,7 +1489,7 @@ function getReportObject_StationChangeHistory() {
         apiControllerAction:  "/api/StationReport/GetStationChangeHistory",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product:  ''
+        product:  'station'
     }
 
     return tempObject;
@@ -1592,7 +1618,7 @@ function getReportObject_MarketRevenueXRay() {
         apiControllerAction:  "/api/Report/GetMarketRevenueRevenueXRay",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product:  ''
+        product:  'mrr/xry'
     }
 
     return tempObject;
@@ -3205,7 +3231,7 @@ function getReportObject_FeatureImplementationList() {
         apiControllerAction: "/api/Feature/GetFeatureImplementationList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'misc'
+        product: 'tech'
     }
 
     return tempObject;
@@ -3631,7 +3657,7 @@ function getReportObject_CorporateGroupUserList() {
         apiControllerAction: "/api/Report/GetCorporateAndGroupUserList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'misc'
+        product: 'personnel'
     }
 
     return tempObject;
@@ -4355,7 +4381,7 @@ function getReportObject_AsyncJobQueueStatus() {
         apiControllerAction: "/api/Async/GetAsyncJobQueueStatusList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'misc',
+        product: 'tech',
         autoUpdate: true
     }
 
@@ -5478,7 +5504,7 @@ function getReportObject_StationMissingDataList() {
 
     return tempObject;
 }
-
+// DMA Reports start here...
 
 function getReportObject_RevenueComparisonMarket() {
 
@@ -5779,3 +5805,1596 @@ function getReportFilterArray_RevenueComparisonStationDetail() {
 
     return arrayFilters;
 }
+
+// DMA Reports end here...
+
+// XRY Reports start here...
+function getReportObject_Advertisers() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("market");
+    columnsToDisplay.push("advertiser");
+    columnsToDisplay.push("industry Name");
+    columnsToDisplay.push("sub Industry");
+    columnsToDisplay.push("parent Advertiser");
+
+    //this column is used to create the edit link
+    //for each result row
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+            var action = "/admin/advertiser/advertiser.html?AdvertiserID=";
+            return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.advertiserId + ')\'>Edit</a>';
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject =
+    {
+        reportTitle: "Advertisers",
+        apiControllerAction: "/api/AdvertiserAudit/GetAdvertiserAuditList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advertisers',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_Advertisers() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "MediaCode",
+        jsCall: "getXRYMediaCodeList",
+        objectName: "ddlMediaCode",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "AdvertiserName",
+        objectName: "txtAdvertiserName",
+        jsCall: null,
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    //The onchange property includes a function that will
+    //be executed for that object if it exists.
+    arrayObject = {
+        token: "Industry",
+        jsCall: "getIndustryList",
+        objectName: "ddlIndustry",
+        onchange: function () {
+
+            getSubIndustryList($("#ddlIndustry").val(), '');
+
+        },
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "SubIndustry",
+        jsCall: "getDefaultSubIndustry",
+        objectName: "ddlSubIndustry",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "ParentAdvertiser",
+        jsCall: null,
+        objectName: "hidParentAdvertiser",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_MediaAdvertisers() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("market");
+    columnsToDisplay.push("media Advertiser");
+    columnsToDisplay.push("media Advertiser Code");
+    columnsToDisplay.push("market Advertiser");
+    columnsToDisplay.push("mediaType");
+
+    //this column is used to create the edit link
+    //for each result row
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+            var action = "/admin/mediaadvertiser/mediaadvertiser.html?MediaAdvertiserID=";
+            return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.mediaAdvertiserId + ')\'>Edit</a>';
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject =
+    {
+        reportTitle: "Media Advertisers",
+        apiControllerAction: "/api/MediaAdvertiserAudit/GetMediaAdvertiserAuditList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advertisers',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MediaAdvertisers() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaAdvertiserName",
+        jsCall: null,
+        objectName: "txtMediaAdvertiserName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MarketAdvertiserName",
+        jsCall: null,
+        objectName: "txtMarketAdvertiserName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaAdvertiserMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+    return arrayFilters;
+}
+
+function getReportObject_StationAdvertisers() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("market");
+    columnsToDisplay.push("station");
+    columnsToDisplay.push("station Advertiser");
+    columnsToDisplay.push("station Code");
+    columnsToDisplay.push("market Advertiser");
+    columnsToDisplay.push("industry Name");
+    columnsToDisplay.push("sub Industry");
+
+    //this column is used to create the edit link
+    //for each result row
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+            var action = "/admin/stationadvertiser/stationadvertiser.html?StationAdvertiserID=";
+            return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.stationAdvertiserId + ')\'>Edit</a>';
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject =
+    {
+        reportTitle: "Station Advertisers",
+        apiControllerAction: "/api/StationAdvertiserAudit/GetStationAdvertiserAuditList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advertisers',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_StationAdvertisers() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        onchange: function () {
+
+            getOwnerList($("#ddlMarket").val());
+
+        },
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getDefaultOwner",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "StationAdvertiserName",
+        jsCall: null,
+        objectName: "txtStationAdvertiserName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MarketAdvertiserName",
+        jsCall: null,
+        objectName: "txtMarketAdvertiserName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Industry",
+        jsCall: "getIndustryList",
+        objectName: "ddlIndustry",
+        onchange: function () {
+
+            getSubIndustryList($("#ddlIndustry").val(), '');
+
+        },
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "SubIndustry",
+        jsCall: "getDefaultSubIndustry",
+        objectName: "ddlSubIndustry",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_NewAdvertisers() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("station advertiser name");
+    columnsToDisplay.push("advertiser name");
+    columnsToDisplay.push("industry name");
+    columnsToDisplay.push("sub industry name");
+    //columnsToDisplay.push("media code id");
+    columnsToDisplay.push("station name");
+    columnsToDisplay.push("action code");
+    columnsToDisplay.push("comment");
+
+    //this column is used to create the edit links
+    //for each result row
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row)
+        {
+            if ($("#header-summary-section").is(":visible") == false || $("#header-summary").html() == "")
+            {
+                $("#header-summary-section").show();
+                $("#header-summary").html(
+                    'Market last released ' + new Date(row.releaseDate).toLocaleString('en-US')
+                );
+            }
+
+            var action = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/advertiser/advertiser.html?AdvertiserID=",' + row.advertiserId + ')\'>Edit&nbsp;Advertiser</a>';
+            var action2 = '';
+
+            if (row.stationAdvertiserId != null)
+            {
+                action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/stationadvertiser/stationadvertiser.html?StationAdvertiserID=",' + row.stationAdvertiserId + ')\'>Edit&nbsp;Station&nbsp;Advertiser</a>';
+            }
+
+            if (row.mediaAdvertiserId != null)
+            {
+                action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/mediaadvertiser/mediaadvertiser.html?MediaAdvertiserID=",' + row.mediaAdvertiserId + ')\'>Edit&nbsp;Media&nbsp;Advertiser</a>';
+            }
+
+            return action + (action2.length == 0 ? '' :'<br />' + action2);
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject =
+    {
+        reportTitle: "New Advertisers",
+        apiControllerAction: "/api/AdvertiserAudit/GetNewAdvertiserAuditList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry month end',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_NewAdvertisers() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_Agencies() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("market");
+    columnsToDisplay.push("agency");
+    columnsToDisplay.push("parent Agency");
+    columnsToDisplay.push("account Type");
+
+    //this column is used to create the edit link
+    //for each result row
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+            var action = "/Admin/agency/agency.html?AgencyID=";
+            return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.agencyId + ')\'>Edit</a>';
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject =
+    {
+        reportTitle: "Agencies",
+        apiControllerAction: "/api/AgencyAudit/GetAgencyAuditList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'agencies',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_Agencies() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "AgencyName",
+        jsCall: null,
+        objectName: "txtAgencyName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "ParentAgency",
+        jsCall: null,
+        objectName: "hidParentAgency",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_StationAgencies() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("market");
+    columnsToDisplay.push("station");
+    columnsToDisplay.push("station Agency");
+    columnsToDisplay.push("station Agency Code");
+    columnsToDisplay.push("market Agency");
+    columnsToDisplay.push("account Type");
+
+    //this column is used to create the edit link
+    //for each result row
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+            var action = "/admin/stationagency/stationagency.html?StationAgencyID=";
+            return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.stationAgencyId + ')\'>Edit</a>';
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject =
+    {
+        reportTitle: "Station Agencies",
+        apiControllerAction: "/api/StationAgencyAudit/GetStationAgencyAuditList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'agencies',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_StationAgencies() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        onchange: function () {
+
+            getOwnerList($("#ddlMarket").val());
+
+        },
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "StationAgencyName",
+        jsCall: null,
+        objectName: "txtStationAgencyName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MarketAgencyName",
+        jsCall: null,
+        objectName: "txtMarketAgencyName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getDefaultOwner",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "AccountType",
+        jsCall: "getAccountTypeList",
+        objectName: "ddlAccountType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_NewAgencies() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("station agency name");
+    columnsToDisplay.push("agency name");
+    columnsToDisplay.push("station name");
+    columnsToDisplay.push("action code");
+    columnsToDisplay.push("comment");
+
+    //this column is used to create the edit links
+    //for each result row
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+            if ($("#header-summary-section").is(":visible") == false || $("#header-summary").html() == "") {
+                $("#header-summary-section").show();
+                $("#header-summary").html(
+                    'Market last released ' + new Date(row.releaseDate).toLocaleString('en-US')
+                );
+            }
+
+            var action = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/Admin/agency/agency.html?AgencyID=",' + row.agencyId + ')\'>Edit&nbsp;Agency</a>';
+            var action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/stationagency/stationagency.html?StationAgencyID=",' + row.stationAgencyId + ')\'>Edit&nbsp;Station&nbsp;Agency</a>';
+            return action + '<br />' + action2;
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject =
+    {
+        reportTitle: "New Agencies",
+        apiControllerAction: "/api/AgencyAudit/GetNewAgencyAuditList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xry',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_NewAgencies() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_MarketStationSummary() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "Market Station Summary",
+        apiControllerAction: "",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'xray',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_MarketStationSummary() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    //media type
+    //load markets
+    //period
+    //years
+
+    return arrayFilters;
+}
+
+function getReportObject_AdvertisersRevenueResearch() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("market");
+    columnsToDisplay.push("advertiser");
+    columnsToDisplay.push("station");
+    columnsToDisplay.push("period");
+    columnsToDisplay.push("revenue");
+    columnsToDisplay.push("agency");
+    columnsToDisplay.push("account Type");
+    columnsToDisplay.push("posted By");
+    columnsToDisplay.push("date Posted");
+
+    //For the Revenue Research audits,
+    //need to add a footerFormat property to allow for 
+    //the totals to be created.
+    //The footerCallback property creates a function that will
+    //create the revenue totals for the page and entire datatable.
+    tempObject =
+    {
+        reportTitle: "Advertiser Revenue Research",
+        apiControllerAction: "/api/AdvertiserAudit/GetAdvertiserRevenueResearchList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advertiser',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        footerFormat: '<tfoot class="rev-research-footer" style="display: none;"><tr>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '</tr></tfoot>',
+        footerCallback: function (row, data, start, end, display) {
+
+            $(".rev-research-footer").show();
+
+            var api = this.api(), data;
+
+            // Remove the formatting to get integer data for summation
+            var intVal = function (i) {
+                return typeof i === 'string' ?
+                    i.replace(/[\$,]/g, '') * 1 :
+                    typeof i === 'number' ?
+                    i : 0;
+            };
+
+            // Total over all pages
+            var total = api
+                .column(4)
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+
+            // Total over this page
+            var pageTotal = api
+                .column(4, { page: 'current' })
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+
+            // Update footer
+            $(api.column(4).footer()).html(
+                pageTotal.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 0
+                }) + ' ( ' + total.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 0
+                }) + ' total)'
+            );
+        }
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_AdvertisersRevenueResearch() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        onchange: function () {
+
+            getOwnerList($("#ddlMarket").val());
+
+        },
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "AdvertiserName",
+        objectName: "txtAdvertiserName",
+        jsCall: null,
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "AgencyName",
+        jsCall: null,
+        objectName: "txtAgencyName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getDefaultOwner",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_MediaRevenueResearch() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("market");
+    columnsToDisplay.push("advertiser");
+    columnsToDisplay.push("media Code");
+    columnsToDisplay.push("period");
+    columnsToDisplay.push("revenue");
+    columnsToDisplay.push("posted By");
+    columnsToDisplay.push("date Posted");
+
+    tempObject =
+    {
+        reportTitle: "Media Revenue Research",
+        apiControllerAction: "/api/MediaAdvertiserAudit/GetMediaRevenueResearchList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advertiser',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        footerFormat: '<tfoot class="rev-research-footer" style="display: none;"><tr>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '<th></th>' +
+            '</tr></tfoot>',
+        footerCallback: function (row, data, start, end, display) {
+
+            $(".rev-research-footer").show();
+
+            var api = this.api(), data;
+
+            // Remove the formatting to get integer data for summation
+            var intVal = function (i) {
+                return typeof i === 'string' ?
+                    i.replace(/[\$,]/g, '') * 1 :
+                    typeof i === 'number' ?
+                    i : 0;
+            };
+
+            // Total over all pages
+            var total = api
+                .column(4)
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+
+            // Total over this page
+            var pageTotal = api
+                .column(4, { page: 'current' })
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+
+            // Update footer
+            $(api.column(4).footer()).html(
+                pageTotal.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 0
+                }) + ' ( ' + total.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 0
+                }) + ' total)'
+            );
+        }
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MediaRevenueResearch() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "AdvertiserName",
+        objectName: "txtAdvertiserName",
+        jsCall: null,
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaAdvertiserMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportFilterArray_AEStatusList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "FirstName",
+        jsCall: null,
+        objectName: "txtFirstName",
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "LastName",
+        jsCall: null,
+        objectName: "txtLastName",
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_AEStatusList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("ae");
+    columnsToDisplay.push("owner");
+    columnsToDisplay.push("market");
+    columnsToDisplay.push("active date");
+    columnsToDisplay.push("disable date");
+    columnsToDisplay.push("linked user");
+
+    //this column is used to create the edit link
+    //for each result row
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+            var action = "/admin/AccountExecutive/accountexecutivedetails.html?AccountExecutiveID=" + row.AEId +
+                "&AEName=" + row.AE + "&Owner=" + row.Owner +
+                "&Market=" + row.Market + "&LinkedUser=" + row["Linked User"] +
+                "&ActiveDate=" + row["Active Date"] + "&DisableDate=" + row["Disable Date"];
+            return '<a href="' + encodeURI(action) + '" >Details</a>';
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject =
+    {
+        reportTitle: "Account Executive Status List",
+        apiControllerAction: "/api/AccountExecutiveReport/GetAEStatusList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: 'account executive',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_AdvertisersList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "AdvertiserName",
+        objectName: "txtAdvertiserName",
+        jsCall: null,
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    //The onchange property includes a function that will
+    //be executed for that object if it exists.
+    arrayObject = {
+        token: "Industry",
+        jsCall: "getIndustryList",
+        objectName: "ddlIndustry",
+        onchange: function () {
+
+            getSubIndustryList($("#ddlIndustry").val(), '');
+
+        },
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "SubIndustry",
+        jsCall: "getDefaultSubIndustry",
+        objectName: "ddlSubIndustry",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_AdvertisersList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Market Advertiser");
+    columnsToDisplay.push("Active");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Industry");
+    columnsToDisplay.push("Sub Industry");
+    columnsToDisplay.push("Date Modified");
+    columnsToDisplay.push("Posted By");
+
+    tempObject =
+    {
+        reportTitle: "Market Advertiser List",
+        apiControllerAction: "/api/Advertiser/GetMarketAdvertiserList",
+        apiType: "post",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advertiser',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_AdvertisersAgenciesList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "AdvertiserName",
+        objectName: "txtAdvertiserName",
+        jsCall: null,
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_AdvertisersAgenciesList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Advertiser");
+    columnsToDisplay.push("Agency");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Account Type");
+
+    tempObject =
+    {
+        reportTitle: "Market Advertiser / Market Agency List",
+        apiControllerAction: "/api/Advertiser/GetMarketAdvertiserMarketAgencyList",
+        apiType: "post",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advertiser',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_DisabledAdvertisersList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    //Currently no filters
+
+    return arrayFilters;
+}
+
+function getReportObject_DisabledAdvertisersList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Station Advertiser");
+    columnsToDisplay.push("Market Advertiser");
+
+    tempObject =
+    {
+        reportTitle: "Disabled Advertiser List",
+        apiControllerAction: "/api/StationAdvertiser/GetDisabledAdvertiserList",
+        apiType: "post",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advertiser',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MediaAdvertisersList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaAdvertiserName",
+        jsCall: null,
+        objectName: "txtMediaAdvertiserName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MarketAdvertiserName",
+        jsCall: null,
+        objectName: "txtMarketAdvertiserName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaAdvertiserMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+
+    return arrayFilters;
+}
+
+function getReportObject_MediaAdvertisersList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Media Advertiser");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Media Type");
+    columnsToDisplay.push("Market Advertiser");
+    columnsToDisplay.push("Date Modified");
+    columnsToDisplay.push("Radio Advertiser");
+
+    tempObject =
+    {
+        reportTitle: "Media Advertiser List",
+        apiControllerAction: "/api/MediaAdvertiser/GetMediaAdvertiserListForReport",
+        apiType: "post",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advertiser',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_ParentAdvertiserList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "ParentAdvertiserName",
+        jsCall: null,
+        objectName: "txtParentAdvertiserName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_ParentAdvertiserList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Parent Advertiser");
+    columnsToDisplay.push("Industry");
+    columnsToDisplay.push("Sub Industry");
+
+    tempObject =
+    {
+        reportTitle: "Parent Advertiser List",
+        apiControllerAction: "/api/ParentAdvertiser/GetParentAdvertiserListForReport",
+        apiType: "post",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advertiser',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_ParentAdvertiserAdvertiserList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "ParentAdvertiserName",
+        jsCall: null,
+        objectName: "txtParentAdvertiserName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_ParentAdvertiserAdvertiserList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Parent Advertiser");
+    columnsToDisplay.push("Market Advertiser");
+    columnsToDisplay.push("Market");
+
+    tempObject =
+    {
+        reportTitle: "Parent Advertiser / Market Advertiser List",
+        apiControllerAction: "/api/ParentAdvertiser/GetParentAdvertiserMarketAdvertiserList",
+        apiType: "post",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advertiser',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_StationAdvertisersList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getXrayStationList",
+        objectName: "ddlStation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "StationAdvertiserName",
+        jsCall: null,
+        objectName: "txtStationAdvertiserName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MarketAdvertiserName",
+        jsCall: null,
+        objectName: "txtMarketAdvertiserName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_StationAdvertisersList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Station Advertiser");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Market Advertiser");
+    columnsToDisplay.push("Date Modified");
+
+
+    tempObject =
+    {
+        reportTitle: "Station Advertiser List",
+        apiControllerAction: "/api/StationAdvertiser/GetStationAdvertiserListForReport",
+        apiType: "post",
+        columnsToDisplay: columnsToDisplay,
+        product: 'advertiser',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_AgencyList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "AgencyName",
+        jsCall: null,
+        objectName: "txtAgencyName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_AgencyList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Agency");
+    columnsToDisplay.push("Account Type");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Parent Agency");
+    columnsToDisplay.push("Date Modified");
+    columnsToDisplay.push("Posted By");
+
+    tempObject =
+    {
+        reportTitle: "Market Agency List",
+        apiControllerAction: "/api/Agency/GetMarketAgencyList",
+        apiType: "post",
+        columnsToDisplay: columnsToDisplay,
+        product: 'agency',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_AgencyAdvertiserAccountsList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "AgencyName",
+        jsCall: null,
+        objectName: "txtAgencyName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_AgencyAdvertiserAccountsList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Agency");
+    columnsToDisplay.push("Advertiser");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Account Type");
+
+    tempObject =
+    {
+        reportTitle: "Market Agency / Market Advertiser List",
+        apiControllerAction: "/api/Agency/GetMarketAgencyMarketAdvertiserList",
+        apiType: "post",
+        columnsToDisplay: columnsToDisplay,
+        product: 'agency',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_DisabledAgencyList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    //no filters at this time
+
+    return arrayFilters;
+}
+
+function getReportObject_DisabledAgencyList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Station Agency");
+    columnsToDisplay.push("Market Agency");
+
+    tempObject =
+    {
+        reportTitle: "Disabled Agency List",
+        apiControllerAction: "/api/StationAgency/GetDisabledAgencyList",
+        apiType: "post",
+        columnsToDisplay: columnsToDisplay,
+        product: 'agency',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_ParentAgencyList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "ParentAgencyName",
+        jsCall: null,
+        objectName: "txtParentAgencyName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_ParentAgencyList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Parent Agency");
+    columnsToDisplay.push("Date Setup");
+    columnsToDisplay.push("Date Changed");
+
+    tempObject =
+    {
+        reportTitle: "Parent Agency List",
+        apiControllerAction: "/api/ParentAgency/GetParentAgencyListForReport",
+        apiType: "post",
+        columnsToDisplay: columnsToDisplay,
+        product: 'agency',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_ParentAgencyAgencyList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "ParentAgencyName",
+        jsCall: null,
+        objectName: "txtParentAgencyName",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_ParentAgencyAgencyList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Parent Agency");
+    columnsToDisplay.push("Market Agency");
+    columnsToDisplay.push("Market");
+
+    tempObject =
+    {
+        reportTitle: "Parent Agency / Market Agency List",
+        apiControllerAction: "/api/ParentAgency/GetParentAgencyMarketAgencyList",
+        apiType: "post",
+        columnsToDisplay: columnsToDisplay,
+        product: 'agency',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_StationAgencyList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getXrayStationList",
+        objectName: "ddlStation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "StationAgencyName",
+        jsCall: null,
+        objectName: "txtStationAgencyName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MarketAgencyName",
+        jsCall: null,
+        objectName: "txtMarketAgencyName",
+        required: false,
+        multiFieldOption: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_StationAgencyList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Station Agency");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Station Agency Code");
+    columnsToDisplay.push("Market Agency");
+    columnsToDisplay.push("Date Modified");
+
+    tempObject =
+    {
+        reportTitle: "Station Agency List",
+        apiControllerAction: "/api/StationAgency/GetStationAgencyListForReport",
+        apiType: "post",
+        columnsToDisplay: columnsToDisplay,
+        product: 'agency',
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+    }
+
+    return tempObject;
+}
+// XRY Reports end here
