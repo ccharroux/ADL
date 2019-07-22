@@ -258,7 +258,12 @@ function buildQuickReports(rptType, control, container, postfix)
         $("#" + control).val("-1");
         $("#" + container).show();
 
-        convertToChosenSelect(control, false, false);
+        try {
+            convertToChosenSelect(control, false, false);
+        }
+        catch (err) {
+            console.log("This page is not converted to use Chosen selects yet.");
+        }
     }
     else
     {

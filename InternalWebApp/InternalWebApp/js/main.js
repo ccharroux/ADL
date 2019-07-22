@@ -1320,8 +1320,12 @@ function getYearList() {
 
     $("#ddlYear").html(str);
 
-
-    convertToChosenSelect("ddlYear", false, false);
+    try {
+        convertToChosenSelect("ddlYear", false, false);
+    }
+    catch (err) {
+        console.log("This page is not converted to use Choisen selects yet.");
+    }
 
     if (typeof paramRevenueYear == 'undefined')
     {
@@ -1375,7 +1379,13 @@ function getPeriodList(inType)
 
     $("#ddlPeriod").html(str);
  
-    convertToChosenSelect("ddlPeriod", false, false);
+    try {
+        convertToChosenSelect("ddlPeriod", false, false);
+    }
+    catch (err) {
+        console.log("This page is not converted to use Chosen selects yet.");
+    }
+
 
     if (typeof paramRevenuePeriod == "undefined")
     {
