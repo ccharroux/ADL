@@ -110,6 +110,8 @@ function buildQuickReports(rptType, control, container, postfix) {
         $("#" + control).prepend("<option value='-1'>  -- Select an Audit --  </option>");
         $("#" + control).val("-1");
         $("#" + container).show();
+
+        convertToChosenSelect(control, false, false);
     }
     else {
         $("#" + container).hide();

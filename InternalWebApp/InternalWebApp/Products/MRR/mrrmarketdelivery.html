@@ -113,6 +113,14 @@
                                     <input id="chkShowDelivered" type="checkbox" onchange="getMarketDeliveryList();" />
                                 </div>
                             </div>
+                            <div>
+                                <div class="col-md-6 col-offset-6">
+                                    <div class="divExternalComment">
+                                        <label for="externalComments"><u>Client Comment</u></label>
+                                        <textArea style="width:100%;overflow:auto" maxlength="250" id="externalComments" placeholder="Enter external comments here..."></textArea>
+                                    </div>
+                                </div>
+                            </div>
                         </center>
                         <hr />
                     </div>
@@ -121,7 +129,7 @@
                 <!-- start datatable-->
                 <div class="dataTable-top-margin">
 
-                    <div class="col-md-8  ">
+                    <div class="col-md-12">
                         <table id="dtMarketDeliveryList" class="stripe">
                             <thead>
                                 <tr>
@@ -132,6 +140,7 @@
                                     <th class="exportColumn text-align-right">Revision</th>
                                     <th class="exportColumn">Client Blurb</th>
                                     <th class="exportColumn">Media</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tfoot>
@@ -143,6 +152,7 @@
                                     <th class="exportColumn text-align-right">Revision</th>
                                     <th class="exportColumn">Client Blurb</th>
                                     <th class="exportColumn">Media</th>
+                                    <th></th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -150,43 +160,47 @@
                 </div>
                 <!-- end datatable -->
 
-                <div class="row">
-                    <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h3>Awaiting Partner Review</h3>
+                <div id="divPartnerReview">
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-3 text-center fh5co-heading margin-top-50">
+                            <h3>Awaiting Partner Review</h3>
+                        </div>
                     </div>
-                </div>
 
-                <!-- start datatable-->
-                <div class="dataTable-top-margin">
+                    <!-- start datatable-->
+                    <div class="dataTable-top-margin">
 
-                    <div class="col-md-8  ">
-                        <table id="dtMarketDeliveryListPartnerReview" class="stripe">
-                            <thead>
-                                <tr>
-                                    <th class="exportColumn">Market</th>
-                                    <th class="exportColumn">Ranked On</th>
-                                    <th class="exportColumn">Approved On</th>
-                                    <th class="exportColumn">Delivered On</th>
-                                    <th class="exportColumn text-align-right">Revision</th>
-                                    <th class="exportColumn">Client Blurb</th>
-                                    <th class="exportColumn">Media</th>
-                                </tr>
-                            </thead>
-                            <tfoot>
-                                <tr>
-                                    <th class="exportColumn">Market</th>
-                                    <th class="exportColumn">Ranked On</th>
-                                    <th class="exportColumn">Approved On</th>
-                                    <th class="exportColumn">Delivered On</th>
-                                    <th class="exportColumn text-align-right">Revision</th>
-                                    <th class="exportColumn">Client Blurb</th>
-                                    <th class="exportColumn">Media</th>
-                                </tr>
-                            </tfoot>
-                        </table>
+                        <div class="col-md-12">
+                            <table id="dtMarketDeliveryListPartnerReview" class="stripe">
+                                <thead>
+                                    <tr>
+                                        <th class="exportColumn">Market</th>
+                                        <th class="exportColumn">Ranked On</th>
+                                        <th class="exportColumn">Approved On</th>
+                                        <th class="exportColumn">Delivered On</th>
+                                        <th class="exportColumn text-align-right">Revision</th>
+                                        <th class="exportColumn">Client Blurb</th>
+                                        <th class="exportColumn">Media</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th class="exportColumn">Market</th>
+                                        <th class="exportColumn">Ranked On</th>
+                                        <th class="exportColumn">Approved On</th>
+                                        <th class="exportColumn">Delivered On</th>
+                                        <th class="exportColumn text-align-right">Revision</th>
+                                        <th class="exportColumn">Client Blurb</th>
+                                        <th class="exportColumn">Media</th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
                     </div>
+                    <!-- end datatable -->
                 </div>
-                <!-- end datatable -->
             </div>
         </div>
         <!--<div id="map" data-animate-effect="fadeIn"></div>-->
@@ -233,6 +247,10 @@
     var gotYearsPeriods = false;
     var initializedDataTable = false;
     var initializedDataTablePartnerReview = false;
+    var currentMarketId = null;
+    var currentRevision = null;
+    var currentMarketName = null;
+    var currentEmailRecipients = false;
 
     $(document).ready(function () {
 
@@ -286,7 +304,23 @@
                 { "data": 'Delivered On' },
                 { "data": 'Revision' },
                 { "data": 'Client Blurb' },
-                { "data": 'Media' }
+                { "data": 'Media' },
+                {
+                    mRender: partnerReview ? function (data, type, row) {
+                        return '';
+                    } : function (data, type, row) {
+                        if (row["Delivered On"] != null) {
+                            return '';
+                        }
+                        var text = '<a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', true)">Release</a>';
+                        if (row["Revision"] > 0) {
+                            text += ' | <a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', false)">Release without email</a>';
+                        }
+                        return text;
+                    },
+                    "orderable": false,
+                    "searchable": false
+                }
             ],
             "columnDefs": [
                 {
@@ -403,7 +437,7 @@
         var reportTitle = "Market Delivery List";
         var exportColumns = returnTableColumnsByClass("dtMarketDeliveryList", "exportColumn");
 
-        if (initializedDataTable == false) {
+        if ((initializedDataTable == false) || (initializedDataTablePartnerReview == false)) {
             setUpDataTable(partnerReview);
         }
 
@@ -449,6 +483,14 @@
 
         var dtMarketDeliveryList = dtMarketDeliveryListId(partnerReview);
         populateDataTable(dtMarketDeliveryList, data);
+
+        if (partnerReview) {
+            if (data.report.rows.length == 0) {
+                $("#divPartnerReview").hide();
+            } else {
+                $("#divPartnerReview").show();
+            }
+        }
 
     }
 
@@ -636,6 +678,10 @@
         return $("#ddlYearPeriod").val().toString().substring(4, 6); // second argument is also index, not length like .NET
     }
 
+    function currentYearPeriodText() {
+        return $("#ddlYearPeriod option:selected").text();
+    }
+
     function moveToPreviousPeriod() {
         if ($("#ddlYearPeriod option:selected").index() == 0) {
             bootbox.alert("Already on first period");
@@ -667,6 +713,187 @@
         var nextIndex = $("#ddlYearPeriod option:selected").index() + 1;
         $("#ddlYearPeriod").get(0).selectedIndex = nextIndex;
         $("#ddlYearPeriod").trigger("change");
+    }
+
+    function releaseMarket(marketId, revision, marketName, emailRecipients) {
+        currentMarketId = marketId;
+        currentRevision = revision;
+        currentMarketName = marketName;
+        currentEmailRecipients = emailRecipients;
+
+        bootbox.confirm({
+            message: "Release " + currentMarketName + " for " + currentYearPeriodText() + (currentEmailRecipients ? " and email recipients" : "") + "?",
+            callback: function (confirmed) {
+                if (confirmed) {
+                    releaseMarketConfirm();
+                } else {
+                    clearCurrentSettings();
+                }
+            }
+        });
+    }
+
+    function releaseMarketConfirm() {
+        var url = ServicePrefix + '/api/MRR/UpdateMarketYearPeriodRelease';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": currentMarketId,
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod(),
+                "inRevision": currentRevision
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                releaseMarketSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function releaseMarketSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert(
+            currentMarketName + " is released for " + currentYearPeriodText(),
+            function () {
+                if (currentEmailRecipients) {
+                    prepToSendEmailToRecipients();
+                } else {
+                    postSendEmailToRecipients();
+                }
+            }
+        );
+    }
+
+    function prepToSendEmailToRecipients() {
+        var externalComments = $("#externalComments").val().trim();
+        if (externalComments == "") {
+            sendEmailToRecipients();
+            return;
+        }
+
+        var url = ServicePrefix + '/api/MRR/UpdateMarketYearPeriodClientRevisionMessage';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": currentMarketId,
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod(),
+                "inClientRevisionMessage": externalComments
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                prepToSendEmailToRecipientsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function prepToSendEmailToRecipientsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        sendEmailToRecipients();
+    }
+
+    function sendEmailToRecipients() {
+        bootbox.alert(
+            "NOT YET IMPLEMENTED: Market Recipients have been notified that " + currentMarketName + " is released for " + currentYearPeriodText(),
+            function () {
+                checkOwnerGroupsOkayToRelease();
+            }
+        );
+    }
+
+    function checkOwnerGroupsOkayToRelease() {
+        var mediaTypeId = $("#ddlMediaType").val();
+        if (mediaTypeId == -1) {
+            mediaTypeId = "";
+        }
+
+        var url = ServicePrefix + '/api/MRR/GetOwnerGroupsOkayToRelease';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod(),
+                "inMediaTypeId": mediaTypeId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                checkOwnerGroupsOkayToReleaseSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function checkOwnerGroupsOkayToReleaseSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("checkOwnerGroupsOkayToReleaseSuccess failed to get result");
+            return;
+        }
+
+        if (data.report.rows[0]["Okay to Release Owner Groups"]) {
+            var mediaTypeId = $("#ddlMediaType").val();
+            var mediaTypeQualifier = "";
+            if (mediaTypeId != -1) {
+                mediaTypeQualifier = $("#ddlMediaType option:selected").text() + " ";
+            }
+
+            bootbox.alert(mediaTypeQualifier + "Ownership Groupings may be delivered for " + currentYearPeriodText());
+        }
+
+        postSendEmailToRecipients();
+    }
+
+    function postSendEmailToRecipients() {
+        clearCurrentSettings();
+        $("#externalComments").val("");
+        getMarketDeliveryList();
+    }
+
+    function clearCurrentSettings() {
+        currentMarketId = null;
+        currentRevision = null;
+        currentMarketName = null;
+        currentEmailRecipients = null;
     }
 
 </script>
