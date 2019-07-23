@@ -476,15 +476,16 @@ function getReportObject_XRAYUsage() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("QueryDateTime");
-    columnsToDisplay.push("PersonnelId");
-    columnsToDisplay.push("QueryForm");
-    columnsToDisplay.push("LoginDateTime");
+    columnsToDisplay.push("Query Date");
+ 
+    columnsToDisplay.push("Query");
+    columnsToDisplay.push("Login Date ");
     columnsToDisplay.push("Browser");
-    columnsToDisplay.push("MarketId");
-    columnsToDisplay.push("MarketName");
-    columnsToDisplay.push("OwnerName");
-    columnsToDisplay.push("UserName");
+ 
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("User");
+    columnsToDisplay.push("Duration");
 
     tempObject =
     {
