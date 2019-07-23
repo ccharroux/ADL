@@ -1327,7 +1327,7 @@ function getYearList() {
         console.log("This page is not converted to use Choisen selects yet.");
     }
 
-    if (typeof paramRevenueYear == 'undefined')
+    if (typeof paramRevenueYear == 'undefined' || paramRevenueYear == null)
     {
         return;
     }
@@ -1387,7 +1387,7 @@ function getPeriodList(inType)
     }
 
 
-    if (typeof paramRevenuePeriod == "undefined")
+    if (typeof paramRevenuePeriod == "undefined" || paramRevenuePeriod == null)
     {
         return;
     }
