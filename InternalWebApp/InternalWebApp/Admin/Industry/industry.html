@@ -63,6 +63,106 @@
                     </div>
                 </div>
                 <div class="text-center" style="margin-top: 0">
+                    
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtIndustryId">Industry Id</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" class="mkaRequired" style="width: 50px;" maxlength="3" id="txtIndustryId" errorMessage="You must enter an Industry Id." value="" />
+                        </div>
+                    </div>
+                    
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtIndustryName">Industry Description</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" class="mkaRequired field-width-325" maxlength="50" id="txtIndustryName" errorMessage="You must enter an Industry Name." value="" />
+                        </div>
+                    </div>
+                    
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtIndustryShortName">Industry Short Description</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" class="field-width-325" maxlength="25" id="txtIndustryShortName" errorMessage="You must enter an Industry Name." value="" />
+                        </div>
+                    </div>
+                    
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label>Number of Advertisers To Print</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" class="mkaRequired" style="width: 50px;" maxlength="3" id="txtAdvsToPrint" errorMessage="You must enter a Number of Advertisers to Print." value="" />
+                        </div>
+                    </div>
+                    
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="chkIncludeInTop50">Include in Top 50</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="checkbox" class=""  id="chkIncludeInTop50" value="" />
+                        </div>
+                    </div>
+                    
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label>Active Date</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" class="field-width-325" id="txtActiveDate" value="" maxlength="50" placeholder="MM/DD/YYYY" disabled="disabled" />
+                        </div>
+                    </div>
+                    
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="chkActive">Active</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="checkbox" id="chkActive" value="" disabled="disabled">
+                        </div>
+                    </div>
+                    
+                    <div class="row input-row change-date" style="display: none;">
+                        <div class="col-md-3 text-align-left">
+                            <label>Change Date</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" class="field-width-325" id="txtChangeDate" value="" maxlength="50" disabled="disabled" />
+                        </div>
+                    </div>
+                    
+                    <div class="row input-row" style="display: none;">
+                        <div class="col-md-3 text-align-left">
+                            <label>Disable Date</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" id="txtDisableDate" value="" maxlength="50" placeholder="MM/DD/YYYY" readonly />
+                        </div>
+                    </div>
+                    
+                    <!-- Buttons -->
+                    <div class="default-button-section">
+                        <div class="row input-row">
+                            <div class="col-md-3">
+
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <div>
+                                    <input value="Update" onclick="updateIndustry()" class="default-button" type="button">
+                                </div>
+                                <div style="padding-top: 10px">
+                                    <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Buttons-->
+
                 </div>
             </div>
         </div>
@@ -92,6 +192,109 @@
 
 <script>
 
+    var industryId = 0;
+    var bIsNew = false;
 
+    $(document).ready(function () {
+
+        buildXRYMenu("Utility");
+
+        industryId = (getParameterByName("IndustryID") == null ? 0 : getParameterByName("IndustryID"));
+
+        bIsNew = industryId <= 0;
+
+        getIndustry();
+
+
+    });
+
+    function getIndustry() {
+
+        if (industryId <= 0) {
+            initializeActiveDate();
+            $('.change-date').hide();
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Industry/GetIndustry',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inIndustryId": industryId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+
+                        $("#txtIndustryId").prop("disabled",true).val(obj["industryId"]);
+                        $("#txtIndustryName").val(obj["industryDescription"]);
+                        $("#txtIndustryShortName").val(obj["shortDescription"]);
+                        $("#txtAdvsToPrint").val(obj["numberAdvertisersToPrint"]);
+                        
+                        if (obj["top50Report"] == true) {
+                            $("#chkIncludeInTop50").prop('checked', true);
+                        }
+
+
+                        if (obj["dateSetup"] !== null) {
+                            var activeDate = new Date(obj["dateSetup"]);
+                            $("#txtActiveDate").val(addZero(activeDate.getMonth() + 1) + '/' + addZero(activeDate.getDate()) + '/' + activeDate.getFullYear());
+                        }
+
+                        if (obj["dateChanged"] !== null) {
+                            var changeDate = new Date(obj["dateChanged"]);
+                            $("#txtChangeDate").val(addZero(changeDate.getMonth() + 1) + '/' + addZero(changeDate.getDate()) + '/' + changeDate.getFullYear());
+                        }
+
+                        $('.change-date').show();
+
+                        if (obj["disableDate"] === null) {
+                            $("#chkActive").prop('checked', true);
+                        }
+
+                        if (obj["disableDate"] !== null) {
+                            var disableDate = new Date(obj["disableDate"]);
+                            $("#txtDisableDate").val(addZero(disableDate.getMonth() + 1) +
+                                '/' +
+                                addZero(disableDate.getDate()) +
+                                '/' +
+                                disableDate.getFullYear());
+                            $(".disable-date").show();
+                        } else {
+                            $(".disable-date").hide();
+                        }
+
+                    });
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
+
+    }
+
+    function initializeActiveDate() {
+        var activeDate = new Date();
+
+        $("#txtActiveDate").val(addZero(activeDate.getMonth() + 1) + '/' + addZero(activeDate.getDate()) + '/' + activeDate.getFullYear());
+        $("#chkActive").prop('checked', true);
+    }
+
+    function updateIndustry() {
+        var message = "Functionality under development."
+        bootbox.alert(message, function () { });
+    }
 
 </script>
