@@ -35,12 +35,15 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
+    <!--Chosen Dropdown-->
+    <link rel="stylesheet" href="/css/chosen.min.css" />
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
     <!-- FOR IE9 below -->
     <!--[if lt IE 9]>
     <script src="js/respond.min.js"></script>
     <![endif]-->
+
 
 </head>
 <body>
@@ -373,6 +376,8 @@
     <script src="/js/config.js"></script>
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
+    <!--Chosen Dropdown-->
+    <script src="/js/chosen.jquery.min.js"></script>
 
 </body>
 </html>
@@ -414,13 +419,13 @@
         } else {
 
             //The user cannot update a station's market, media type, or ownership
-            $("#ddlMarket").prop("disabled", true);
+            $("#ddlMarket").prop("disabled", true).trigger("chosen:updated");
             $("#ddlMarket").addClass("disabled");
 
-            $("#ddlMediaType").prop("disabled", true);
+            $("#ddlMediaType").prop("disabled", true).trigger("chosen:updated");
             $("#ddlMediaType").addClass("disabled");
 
-            $("#ddlOwnership").prop("disabled", true);
+            $("#ddlOwnership").prop("disabled", true).trigger("chosen:updated");
             $("#ddlOwnership").addClass("disabled");
 
             $("#aTagProductList").removeClass("hidden");
@@ -463,6 +468,7 @@
 
             });
             $("#ddlMediaType").html(str);
+            convertToChosenSelect("ddlMediaType", false, false);
         }
 
         getStateList();
@@ -505,6 +511,7 @@
             });
 
             $("#ddlState").html(str);
+            convertToChosenSelect("ddlState", false, false);
         }
 
         getDemographicList();
@@ -547,7 +554,10 @@
             });
 
             $("#ddlPrimaryDemo").html(str);
+            convertToChosenSelect("ddlPrimaryDemo");
+
             $("#ddlSecondaryDemo").html(str);
+            convertToChosenSelect("ddlSecondaryDemo");
 
         }
 
@@ -590,6 +600,7 @@
             });
 
             $("#ddlAffiliation").html(str);
+            convertToChosenSelect("ddlAffiliation", false, false);
         }
 
         getMarketBandList();
@@ -631,6 +642,7 @@
                 str = str + '<option value="' + data.report.rows[index].marketBand + '">' + data.report.rows[index].marketBand + '</option>';
             });
             $("#ddlSuffix").html(str);
+            convertToChosenSelect("ddlSuffix", false, false);
         }
         getStation();
     }
@@ -710,10 +722,17 @@
                     $("#ddlAffiliation").val(obj["affiliationId"]);
                     $("#divAffiliation").removeClass("hidden");
 
+                    //Width of hidden Chosen select gets auto set to 0. Remove width when unhiding Chosen Select.
+                    $("#ddlAffiliation_chosen").css("width", "");
+
                 } else {
                     $("#ddlFormat").val(obj["formatId"]);
                     $("#hdnFormatId").val(obj["formatId"]);
                     $("#divFormat").removeClass("hidden");
+
+                    //Width of hidden Chosen select gets auto set to 0. Remove width when unhiding Chosen Select.
+                    $("#ddlFormat_chosen").css("width", "");
+
                 }
 
 
@@ -772,6 +791,7 @@
 
             });
             $("#ddlMarket").html(str);
+            convertToChosenSelect("ddlMarket", false, false);
 
             if ($("#hdnMarketId").val() != "") {
                 $("#ddlMarket").val($("#hdnMarketId").val());
@@ -830,6 +850,7 @@
             });
 
             $("#ddlOwnership").html(str);
+            convertToChosenSelect("ddlOwnership", false, false);
 
             if ($("#hdnOwnershipId").val() != "") {
                 $("#ddlOwnership").val($("#hdnOwnershipId").val());
@@ -882,10 +903,10 @@
                 str = str + '<option value="' + data.report.rows[index]["Format ID"] + '">' + data.report.rows[index]["Format Name"] + '</option>';
             });
             $("#ddlFormat").html(str);
+            convertToChosenSelect("ddlFormat", false, false);
 
             if ($("#hdnFormatId").val() != "") {
                 $("#ddlFormat").val($("#hdnFormatId").val());
-                $("#hdnFormatId").val("");
             } else {
                 $("#ddlFormat").val("-1");
             }
@@ -1079,6 +1100,10 @@
 
     function onChangeMediaType() {
 
+        if (stationId > 0) {
+            return;
+        }
+
         var mediaTypeId = $("#ddlMediaType").val();
         var mediaType = $("#ddlMediaType option:selected").text();
 
@@ -1095,12 +1120,18 @@
         if (mediaType.toUpperCase() == gMediaTypeTelevision.toUpperCase()) {
             $("#divAffiliation").removeClass("hidden");
 
+            //Width of hidden Chosen select gets auto set to 0. Remove width when unhiding Chosen Select.
+            $("#ddlAffiliation_chosen").css("width", "");
+
             if ($("#divFormat").hasClass("hidden") == false) {
                 $("#divFormat").addClass("hidden");
             }
 
         } else {
             $("#divFormat").removeClass("hidden");
+
+            //Width of hidden Chosen select gets auto set to 0. Remove width when unhiding Chosen Select.
+            $("#ddlFormat_chosen").css("width", "");
 
             if ($("#divAffiliation").hasClass("hidden") == false) {
                 $("#divAffiliation").addClass("hidden");
@@ -1111,19 +1142,19 @@
 
     function mediaTypeIsNotValid() {
 
-        $("#ddlMarket").prop("disabled", true);
+        $("#ddlMarket").prop("disabled", true).trigger("chosen:updated");
         $("#ddlMarket").addClass("disabled");
         $("#ddlMarket").html("");
 
-        $("#ddlOwnership").prop("disabled", true);
+        $("#ddlOwnership").prop("disabled", true).trigger("chosen:updated");
         $("#ddlOwnership").addClass("disabled");
         $("#ddlOwnership").html("");
 
-        $("#ddlAffiliation").prop("disabled", true);
+        $("#ddlAffiliation").prop("disabled", true).trigger("chosen:updated");
         $("#ddlAffiliation").addClass("disabled");
         $("#ddlAffiliation").html("");
 
-        $("#ddlFormat").prop("disabled", true);
+        $("#ddlFormat").prop("disabled", true).trigger("chosen:updated");
         $("#ddlFormat").addClass("disabled");
         $("#ddlFormat").html("");
 
@@ -1131,16 +1162,16 @@
 
     function mediaTypeIsValid() {
 
-        $("#ddlMarket").prop("disabled", false);
+        $("#ddlMarket").prop("disabled", false).trigger("chosen:updated");
         $("#ddlMarket").removeClass("disabled");
 
-        $("#ddlOwnership").prop("disabled", false);
+        $("#ddlOwnership").prop("disabled", false).trigger("chosen:updated");
         $("#ddlOwnership").removeClass("disabled");
 
-        $("#ddlAffiliation").prop("disabled", false);
+        $("#ddlAffiliation").prop("disabled", false).trigger("chosen:updated");
         $("#ddlAffiliation").removeClass("disabled");
 
-        $("#ddlFormat").prop("disabled", false);
+        $("#ddlFormat").prop("disabled", false).trigger("chosen:updated");
         $("#ddlFormat").removeClass("disabled");
 
         //Reload the market list everytime the user changes the media type ID to a valid ID
@@ -1190,7 +1221,7 @@
                 "inSuffix": $("#ddlSuffix").val(),
                 "inNickname": $("#txtNickname").val().trim(),
                 "inFormatID": $("#ddlFormat").val(),
-                "inAffiliation": $("#ddlAffiliation").val(),
+                "inAffiliationID": $("#ddlAffiliation").val(),
                 "inPrimaryDemo": $("#ddlPrimaryDemo").val(),
                 "inSecondaryDemo": $("#ddlSecondaryDemo").val(),
                 "inOwnerID": $("#ddlOwnership").val(),
