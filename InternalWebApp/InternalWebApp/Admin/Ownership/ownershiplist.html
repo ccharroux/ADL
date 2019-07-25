@@ -69,6 +69,10 @@
         </header>
         <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
+                <div id="divQuickReport" style="float:right;padding-right:25px;padding-bottom:10px">
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>                
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
                         <h2>Ownerships</h2>
@@ -91,10 +95,7 @@
                 </div>
 
 
-                <div id="divQuickReport" style="float:right;padding-right:25px;padding-bottom:10px">
-                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
-                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
-                </div>
+
 
                 <!-- new datatable start -->
                 <div class="dataTable-top-margin">
@@ -162,6 +163,34 @@
 
     $(document).ready(function () {
 
+
+        buildMainMenu("Ownerships");
+
+        buildQuickReports('owner');
+
+        loadScreen();
+        setupUI();
+        setupSearch();
+
+
+    });
+
+    function setupSearch()
+    {
+        var search = getParameterByName("search");
+
+        if (!search == false) {
+            if (search.length > 0) {
+                $("#searchText").val(search);
+                getOwnerList();
+            }
+        }
+
+        setLocalStorage("search", $("#searchText").val().trim());
+        setLocalStorage("searchPage", window.location);
+    }
+    function loadScreen()
+    {
         var reportTitle = "Ownerships List";
         var exportColumns = returnTableColumnsByClass("dtOwnershipList", "exportColumn");
         //var filterColumns = returnTableColumnsByClass("dtOwnershipList", "filterColumn");
@@ -294,34 +323,19 @@
             }
         });
 
+
+    }
+
+    function setupUI()
+    {
+
         $("body").on("click",
             "#clear_search_button",
             function () {
                 var table = $("#dtOwnershipList").DataTable();
                 table.search('').draw();
             });
-
-        buildMainMenu("Ownerships");
-
-        buildQuickReports('owner');
-
-        // Reset this variable
-        //setLocalStorage("quickReportQS", null);
-
-        var search = getParameterByName("search");
-
-        if (!search == false) {
-            if (search.length > 0) {
-                $("#searchText").val(search);
-                getOwnerList();
-            }
-        }
-
-        setLocalStorage("search", $("#searchText").val().trim());
-        setLocalStorage("searchPage", window.location);
-
-    });
-
+    }
     function getOwnerList() {
         if ($("#searchText").val().trim() == 0) {
             bootbox.alert("Please enter text to search for Owner(s)", function () {
