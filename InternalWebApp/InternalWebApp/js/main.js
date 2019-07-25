@@ -388,7 +388,40 @@ $( document ).ready(function()
 	setTimeout(getLastPage, delayForLastPage);
 
 
+
 });
+function showComponentDialog(url)
+{
+    $("#componentDialog").dialog("close");
+    $("#componentIFrame").attr("src", url);
+    $("#componentDialog").dialog("open");
+    
+}
+function buildPopupComponent()
+{
+    var str = '<div id="componentDialog" title="" display="none">';
+    str = str + '<center>';
+    str = str + '<iframe id="componentIFrame" src = "" width = "555" height = "200">';
+    str = str + '     Sorry your browser does not support inline frames.';
+    str = str + '  </iframe>';
+    str = str + '</center>';
+    str = str + '</div>';
+    $("body").append(str);
+
+    setTimeout(instantiatePopupComponent, 250);
+
+}
+function instantiatePopupComponent()
+{
+    $("#componentDialog").dialog({
+        autoOpen: false,
+        resizable: true,
+        width: 1000,
+        height: 1000,
+        modal: false
+    });
+ 
+}
 
 function showFavoriteDialog()
 {
@@ -430,7 +463,7 @@ function addDialogComponents()
     d = d + '<div style="margin-top:5px;margin-bottom:5px">Add this page as one of your favorites</div>';
     d = d + '<input type="hidden" id="favId" value="">';
 
-    d = d + '   <label>Title</label><input type="text" class="favText" id="favTitle" placeholder="Enter Name..." /><br>';
+    d = d + '   <label>Title</label> <input type="text" class="favText" id="favTitle" placeholder="Enter Name..." /><br>';
     d = d + '   <label>URL</label> <input type="text" class="favText" readonly="readonly" id="favURL" /><hr />';
     d = d + '<center>';
     d = d + '   <div style="margin-top:5px;margin-bottom:5px">';
@@ -449,6 +482,8 @@ function addDialogComponents()
 
     setTimeout(buildFavoritesDialog, 250);
 
+    buildPopupComponent();
+ 
 }
 function cancelFavorite()
 {
