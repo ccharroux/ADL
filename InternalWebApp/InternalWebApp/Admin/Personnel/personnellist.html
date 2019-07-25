@@ -77,6 +77,10 @@
         </header>
         <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
+                <div id="divQuickReport" style="float:right;padding-right:0px;padding-bottom:10px">
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>                
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
                         <h2>Personnel</h2>
@@ -99,10 +103,7 @@
                         <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editPersonnel(0)" />
                     </div>
                 </div>
-                <div id="divQuickReport" style="float:right;padding-right:25px;padding-bottom:10px">
-                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
-                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
-                </div>
+
                 <!-- start datatable-->
                 <div class="dataTable-top-margin">
                     <table id="dtPersonnelList" class="stripe">
@@ -175,34 +176,20 @@
 
     $(document).ready(function () {
 
-        //clear out local storage
-        setLocalStorage("gPageParameters", "");
+        setupUI();
 
-        var input = document.getElementById("searchText");
-        var input2 = document.getElementById("searchText2");
+        loadScreen();
 
-        // Execute a function when the user releases a key on the keyboard
-        input.addEventListener("keyup", function (event) {
-            // Cancel the default action, if needed
-            event.preventDefault();
-            // Number 13 is the "Enter" key on the keyboard
-            if (event.keyCode === 13) {
+        buildMainMenu("Personnel");
 
-                getPersonnelByEmail();
-            }
-        });
+        getOwnerList();
 
-        // Execute a function when the user releases a key on the keyboard
-        input2.addEventListener("keyup", function (event) {
-            // Cancel the default action, if needed
-            event.preventDefault();
-            // Number 13 is the "Enter" key on the keyboard
-            if (event.keyCode === 13) {
+        buildQuickReports('personnel');
 
-                getPersonnelByName();
-            }
-        });
+    });
 
+    function loadScreen()
+    {
         var reportTitle = "Personnel List";
         var exportColumns = returnTableColumnsByClass("dtPersonnelList", "exportColumn");
 
@@ -307,20 +294,45 @@
         });
 
 
+
+    }
+
+    function setupUI()
+    {
+        //clear out local storage
+        setLocalStorage("gPageParameters", "");
+
+        var input = document.getElementById("searchText");
+        var input2 = document.getElementById("searchText2");
+
+        // Execute a function when the user releases a key on the keyboard
+        input.addEventListener("keyup", function (event) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Number 13 is the "Enter" key on the keyboard
+            if (event.keyCode === 13) {
+
+                getPersonnelByEmail();
+            }
+        });
+
+        // Execute a function when the user releases a key on the keyboard
+        input2.addEventListener("keyup", function (event) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Number 13 is the "Enter" key on the keyboard
+            if (event.keyCode === 13) {
+
+                getPersonnelByName();
+            }
+        });
         $("body").on("click",
             "#clear_search_button",
             function () {
                 var table = $("#dtPersonnelList").DataTable();
                 table.search('').draw();
             });
-
-        buildMainMenu("Personnel");
-
-        getOwnerList();
-
-        buildQuickReports('personnel');
-
-    });
+    }
 
     function getPersonnelByName()
     {
