@@ -55,7 +55,11 @@
         {
             width: 300px;
         }
-
+        .productButtonClass
+        {
+            margin-right:3px;
+            margin-left:3px;
+        }
     </style>
 </head>
 <body>
@@ -554,45 +558,61 @@
                 var obj = data.report.rows[index];
                 var productId = obj.P_ProductID.toUpperCase();
 
+                // open master div
                 str = str + '<div class="row row_' + productId + '" style="display:none;padding-top:3px;">';
+        
+                // product name
                 str = str + '<div class="col-md-3" style="text-align:left">';
                 str = str + productId + " - " + obj.P_ProductName;
                 str = str + '</div>';
+
+                // product id
                 str = str + '<div class="col-md-2" style="text-align:left">';
                 str = str + '<div id="date' + productId + '" />';
                 str = str + '</div>';
-                str = str +
-                    '<div id="productButtons' +
-                    productId +
-                    '" class="col-md-7" style="text-align:left;">';
+
+                // product button div
+                str = str + '<div id="productButtons' + productId + '" class="col-md-7" style="text-align:left;">';
+
+                // enable button
                 str = str +
                     '<input type="button"  id="productAdd' +
                     productId +
-                    '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="enableProduct(' +
+                    '" class="hidden productButtonClass" onClick="enableProduct(' +
                     '\'' +
                     productId +
                     '\')" Value="Enable" />';
+
+                // edit button
                 str = str +
                     '<input type="button" id="productEdit' +
                     productId +
-                    '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="editProduct(' +
+                    '" class="hidden productButtonClass" onClick="editProduct(' +
                     '\'' +
                     productId +
                     '\')" Value="Edit" />';
+
+                // disable button
                 str = str +
                     '<input type="button"  id="productDisable' +
                     productId +
-                    '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="disableProduct(' +
+                    '" class="hidden productButtonClass" onClick="disableProduct(' +
                     '\'' +
                     productId +
                     '\')" Value="Disable" />';
+
+                // add stations button
                 str = str + '<input type="button"  id="productAddStations' +
                     productId +
-                    '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="assignStations(' +
+                    '" class="hidden productButtonClass" onClick="assignStations(' +
                     '\'' +
                     productId +
                     '\')" Value="Assign Stations" />';
+
+                // close product button div
                 str = str + '</div>';
+
+                // close master div
                 str = str + '</div>';
 
 
@@ -609,7 +629,7 @@
                 $("#productAddXRY").removeClass('hidden');
                 $("#productAddTVB").removeClass('hidden');
                 $("#productAddMSS").removeClass('hidden');
-
+ 
             }
         }
 
@@ -644,69 +664,110 @@
 
     }
 
-    function getMarketProductsSuccess(data, textStatus, jQxhr) {
+    function getMarketProductsSuccess(data, textStatus, jQxhr)
+    {
+
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
         }
-        else {
-            var str = '';
 
-            var holdMarketID = "0";
-            var productList = "";
-            var holdObject = new Object();
+        var str = '';
 
-            $.each(data.report.rows, function (index) {
+        var holdMarketID = "0";
+        var productList = "";
+        var holdObject = new Object();
 
-                var obj = data.report.rows[index];
+        $.each(data.report.rows, function (index) {
 
-                // This code is added to restrict 
-                // visibility of products that are NOT allowed
-                // to be set up for a station
-                // default is set to hidden in getProductListSuccess routine...
+            var obj = data.report.rows[index];
 
-                var productId = obj.productId.toUpperCase();
+            // This code is added to restrict 
+            // visibility of products that are NOT allowed
+            // to be set up for a station
+            // default is set to hidden in getProductListSuccess routine...
 
-                $(".row_" + productId).show();
+            var productId = obj.productId.toUpperCase();
 
-                if (obj.activeDate != null && obj.activeFlag == true) {
-                    $("#productEdit" + productId).removeClass('hidden');
-                    $("#productDisable" + productId).removeClass('hidden');
-                    $("#date" + productId).html(extractDateOnly(obj.activeDate));
-                    $("#date" + productId).css("color", "green");
+            $(".row_" + productId).show();
 
-                    //chkPrimaryMarket
+            if (obj.activeDate != null && obj.activeFlag == true)
+            {
+                $("#productEdit" + productId).removeClass('hidden');
+                $("#productDisable" + productId).removeClass('hidden');
+                $("#date" + productId).html(extractDateOnly(obj.activeDate));
+                $("#date" + productId).css("color", "green");
+
+                //chkPrimaryMarket
  
-                    if ($('#chkPrimaryMarket').is(':checked') == false) {
-                        $("#productAddStations" + productId).removeClass('hidden');
-                    } else {
-                        $("#productAddStations" + productId).addClass('hidden');
-                    }
+                if ($('#chkPrimaryMarket').is(':checked') == false)
+                {
+                    $("#productAddStations" + productId).removeClass('hidden');
                 }
-                else if (obj.disableDate != null && obj.activeFlag == false) {
-                    $("#productAdd" + productId).removeClass('hidden');
-                    $("#date" + productId).html(extractDateOnly(obj.disableDate));
-                    $("#date" + productId).css("color", "red");
+                else
+                {
+                    $("#productAddStations" + productId).addClass('hidden');
                 }
-                else if (obj.disableDate == null && obj.activeDate == null) {
-                    $("#productAdd" + productId).removeClass('hidden');
+            }
+            else if (obj.disableDate != null && obj.activeFlag == false)
+            {
+                $("#productAdd" + productId).removeClass('hidden');
+                $("#date" + productId).html(extractDateOnly(obj.disableDate));
+                $("#date" + productId).css("color", "red");
+            }
+            else if (obj.disableDate == null && obj.activeDate == null)
+            {
+                $("#productAdd" + productId).removeClass('hidden');
 
-                }
+            }
 
-                if (productId == "MRR" && obj.activeFlag == true) {
-                    var btnStr = '<input id="mrrReportSetup" value="Report Setup" style="margin-right:3px; margin-left:3px;" onclick="goToMarketReportSetup()" type="button">';
-                    btnStr = btnStr + '<input id="mrrRevenueDefinition" style="margin-right:3px; margin-left:3px;" value="Revenue Definition" onclick="goToRevenueDefinition(' + marketId + ');" type="button">';
+            // product specific buttons
+            //-------------------------
+            // revenue definition
+            if (productId == "MRR" && obj.activeFlag == true)
+            {
+                var btnStr = '<input id="mrrReportSetup" value="Report Setup" class="productButtonClass" onclick="goToMarketReportSetup()" type="button">';
+                btnStr = btnStr + '<input id="mrrRevenueDefinition" class="productButtonClass" value="Revenue Definition" onclick="goToRevenueDefinition(' + marketId + ');" type="button">';
 
-                    $("#productButtons" + productId).append(btnStr);
-                }
+                $("#productButtons" + productId).append(btnStr);
+            }
 
-            });
+            addStationLookupButton(productId, obj);
+
+
+        });
+ 
+
+
         }
-        //if (marketId > 0) {
-        //    getMarket();
-        //}
 
+        function addStationLookupButton(productId, obj)
+        {
+            // only allow these products
+            if (productId != 'MRR' &&
+                productId != 'XRY' && 
+                productId != 'DMA')
+            {
+                return;
+            }
 
-    }
+            // only allow active
+            if (obj.activeFlag != true)
+            {
+                return;
+            }
+
+            // build link
+            var url = '/utilities/genericreport/genericReport.html?hideHeader=true&reportId=21&productId=' + productId + '&marketid=' + marketId;
+
+            // build button
+            var str = '<input type="button"  id="viewStations' + productId + '"  class="productButtonClass" ' +
+                ' onClick="showComponentDialog(' + "'" + url + "','Stations'" + ')" Value="Stations" />';
+
+            // add to object
+            $("#productButtons" + productId).append(str);
+
+        }
 
     function getMarket() {
         if (marketId <= 0) {

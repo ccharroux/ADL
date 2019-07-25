@@ -390,35 +390,45 @@ $( document ).ready(function()
 
 
 });
-function showComponentDialog(url)
+function showComponentDialog(url, title)
 {
     $("#componentDialog").dialog("close");
     $("#componentIFrame").attr("src", url);
     $("#componentDialog").dialog("open");
+    $("#componentDialog").dialog({ "title": title });
     
 }
 function buildPopupComponent()
 {
-    var str = '<div id="componentDialog" title="" display="none">';
-    str = str + '<center>';
-    str = str + '<iframe id="componentIFrame" src = "" width = "555" height = "200">';
-    str = str + '     Sorry your browser does not support inline frames.';
-    str = str + '  </iframe>';
-    str = str + '</center>';
-    str = str + '</div>';
-    $("body").append(str);
+    var hideHeader = getParameterByName("hideHeader");
 
-    setTimeout(instantiatePopupComponent, 250);
+    if (!hideHeader) {
 
+        var str = '<div id="componentDialog" class="componentDialogClass" title="cc" display="none">';
+        str = str + '<center>';
+        str = str + '<iframe id="componentIFrame" src="" width="100%" height="500">';
+        str = str + '     Sorry your browser does not support inline frames.';
+        str = str + '  </iframe>';
+        str = str + '</center>';
+        str = str + '</div>';
+        $("body").append(str);
+
+        setTimeout(instantiatePopupComponent, 250);
+    }
 }
 function instantiatePopupComponent()
-{
+{	   
+    
+    var wWidth = $(window).width();
+    var dWidth = wWidth * 0.95;
+ 
     $("#componentDialog").dialog({
         autoOpen: false,
-        resizable: true,
-        width: 1000,
-        height: 1000,
-        modal: false
+        resizable: false,
+        width: dWidth,
+        height: 600,
+        modal: false,
+        dialogClass: 'componentDialogClass'
     });
  
 }
@@ -475,8 +485,8 @@ function addDialogComponents()
     d = d + '</center>';
     d = d + '</div>';
 
-    d = d + '<div style="position:absolute;top:5px; right:10px;z-index:1000"><input type="button"  value="Add as Favorite" onclick="showFavoriteDialog();"/>';
-    d = d + '&nbsp;<input type="button" value="My Favorites" onclick="window.location=\'/admin/login/dashboard.html\'"/></div>';
+    d = d + '<div class="favoriteButtonClass" style="position:absolute;top:5px; right:10px;z-index:1000"><input type="button"  value="Add as Favorite" onclick="showFavoriteDialog();"/>';
+    d = d + '&nbsp;<input class="favoriteButtonClass" type="button" value="My Favorites" onclick="window.location=\'/admin/login/dashboard.html\'"/></div>';
 
     $("body").append(d)
 

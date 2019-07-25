@@ -89,7 +89,7 @@
     </style>
 
 </head>
-<body>
+<body style="display:none">
 
 
     <div id="fh5co-page">
@@ -100,7 +100,7 @@
         </header>
         <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
-                <div class="row">
+                <div class="row" id="reportTitleRow">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
                         <h2 id="reportTitle"></h2>
                     </div>
@@ -325,55 +325,35 @@
     var startDate = "";
     var endDate = "";
     var init_marketId = "";
+    var param_productId = null;
 
     $(document).ready(function () {
 
- 
-
+        showHeader();
 
         LoadDefaultDates();
 
+        // get input parameters
+        param_productId = getParameterByName("productId");
         init_marketId = getParameterByName("marketid");
         reportId = getParameterByName("reportId");
 
-        if (!reportId)
+        if (validReportId(reportId) == false)
         {
-            var msg = "Invalid page request, no report passed.";
-            bootbox.alert(msg, function () { window.location = "/admin/login/dashboard.html"; });
-            return false;
+            return;
         }
-
-        // setup date pickers
-        $(function () {
-            $("#dtStartDate").datepicker();
-            $("#dtEndDate").datepicker();
-        });
-
-
+ 
         // get report objects
         reportObject = getReportObject(reportId);
         reportFilterArray = reportObject.filters;
 
-
-        if (reportObject.apiControllerAction == null)
+        if (validReportRequest(reportObject) == false)
         {
-            var msg = "Invalid report requested. (2)";
-
-            bootbox.alert(msg, function () { window.location = "/admin/login/dashboard.html"; });
-
-            return false;
+            return;
         }
 
-        // report title
-        $("#reportTitle").html(reportObject.reportTitle);
+        setUIEventsAndLabels(reportObject);
 
-        // clear
-        $("body").on("click",
-            "#clear_search_button",
-            function () {
-                var table = $("#dtAgencyList").DataTable();
-                table.search('').draw();
-            });
 
         // build menu
         buildMainMenu("");
@@ -382,29 +362,99 @@
         // display filters
         displayFilters(reportFilterArray);
 
-        // Auto Run
-        if (reportFilterArray.length == 0)
+        autoRun(reportFilterArray);
+
+
+    });
+    function validReportId(reportId)
+    {
+        if (!reportId)
         {
-            getReport();
-            $("#btnReport").hide();
+            var msg = "Invalid page request, no report passed.";
+            bootbox.alert(msg, function () { window.location = "/admin/login/dashboard.html"; });
+            return false;
         }
         else
         {
+            return true;
+        }
+    }
+
+    function validReportRequest(reportObject)
+    {
+        // invalid report
+        if (reportObject.apiControllerAction == null) {
+            var msg = "Invalid report requested. No controller";
+
+            bootbox.alert(msg, function () { window.location = "/admin/login/dashboard.html"; });
+
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+
+    }
+    function setUIEventsAndLabels(reportObject)
+    {
+        // report title
+        $("#reportTitle").html(reportObject.reportTitle);
+
+        // setup date pickers
+        $(function () {
+            $("#dtStartDate").datepicker();
+            $("#dtEndDate").datepicker();
+        });
+
+        // clear
+        $("body").on("click",
+            "#clear_search_button",
+            function () {
+                var table = $("#dtAgencyList").DataTable();
+                table.search('').draw();
+            });
+    }
+
+    function autoRun(reportFilterArray)
+    {
+        // Auto Run
+        if (reportFilterArray.length == 0) {
+            getReport();
+            $("#btnReport").hide();
+        }
+        else {
             $("#btnReport").show();
             loadAdvancedSearch();
 
-            if (getRequiredFiltersCount() == 0)
-            {
-                getReport();
+            if (getRequiredFiltersCount() == 0) {
+                //getReport();
+                setTimeout('getReport(true)', 500);
             }
-            else
-            {
-                setTimeout('getReport(true)', 1000);
+            else {
+                setTimeout('getReport(true)', 500);
             }
- 
+
+        }
+    }
+    function showHeader()
+    {
+        var hideHeader = getParameterByName("hideHeader");
+
+        if (!hideHeader == false && hideHeader.toLowerCase() == "true")
+        {
+            $("#fh5co-header").hide();
+            $("#divQuickReport").hide();
+            $(".favoriteButtonClass").hide();
+            $("#reportTitleRow").hide();
+            gDataTableDefaultRows = 10;
+        }
+        else {
+            $("#fh5co-header").show();
         }
 
-    });
+        $("body").show();
+    }
 
     function updateDependentLists(controlThatWasClicked)
     {
@@ -1148,7 +1198,12 @@
 
                     $("#ddlProduct").html(str);
 
+                    if (param_productId != null)
+                    {
+                        $("#ddlProduct").val(param_productId.toUpperCase());
+                    }
                     convertToChosenSelect("ddlProduct", false, false);
+
 
                     saveLoadedControlSelection("ddlProduct");
                 }
@@ -1452,7 +1507,7 @@
                     $("#" + control).html(str);
 
                     convertToChosenSelect(control, false, false);
-
+                    $("#ddlMarket").val(init_marketId);
                     saveLoadedControlSelection(control);
                     //preSelectItem('quickReportQS');
 

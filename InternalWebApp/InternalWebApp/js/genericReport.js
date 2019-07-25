@@ -290,7 +290,11 @@ function getQuickReport(reportId)
             url = url + "&marketid=" + $("#ddlMarket").val();
         }
 
-        window.location = url;
+        url = url + "&hideHeader=true";
+
+        showComponentDialog(url, reportObjectArray[reportId].reportTitle);
+
+        //window.location = url;
     }
 }
 function getDMAReportObjectByKeyValue(inKey, inValue) {
