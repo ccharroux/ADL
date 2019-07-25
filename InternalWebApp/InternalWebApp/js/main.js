@@ -1453,9 +1453,18 @@ function getPeriodList(inType)
             prev = originalVal.apply(this,[]);
         }
         var result =originalVal.apply(this,arguments);
-        if(arguments.length>0 && prev!=originalVal.apply(this,[]))
-            $(this).change();  // OR with custom event $(this).trigger('value-changed')
+        //if(arguments.length>0 && prev!=originalVal.apply(this,[]))
+        //    $(this).change();  // OR with custom event $(this).trigger('value-changed')
+
+        if ($(this).selector != undefined && $(this).selector.length > 0) {
+            var chosenExists = checkIfChosenExistsForSelector($(this).selector);
+            if (chosenExists) {
+                $(this.selector).trigger('chosen:updated');
+            }
+        }
+
         return result;
+
     };
 })(jQuery);
 
@@ -1478,19 +1487,38 @@ function convertToChosenSelect(selectName, allowSearchContains, allowSplitWordSe
     //This code reloads the dropdown to pick up new values.
     $("#" + selectName).trigger("chosen:updated");
 
-    $("#" + selectName).change(function() {
-        $(this).trigger("chosen:updated");
-    });
+    //$("#" + selectName).change(function() {
+    //    $(this).trigger("chosen:updated");
+    //});
 }
 
 function checkIfChosenObjectExists(object) {
 
-    if ($("#" + object.id + "_chosen").length > 0) {
-        return true;
-    } else {
+    try {
+        if ($("#" + object.id + "_chosen").length > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (err) {
         return false;
     }
 
+}
+
+function checkIfChosenExistsForSelector(selector) {
+
+    try {
+
+        if ($(selector + "_chosen").length > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    catch(err) {
+        return false;
+    }
 }
 
 function scrollToAnchor(aid) {
