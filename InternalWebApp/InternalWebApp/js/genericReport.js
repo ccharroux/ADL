@@ -276,11 +276,12 @@ function getQuickReport(reportId)
     if (reportId > -1)
     {
         var reportPath = '/utilities/genericreport/genericReport.html';
-        if (!reportObjectArray[reportId].reportPath == false) {
+
+        if (!reportObjectArray[reportId].reportPath == false)
+        {
             reportPath = reportObjectArray[reportId].reportPath;
         }
   
-
         var url = reportPath + "?reportId=" + reportId;
 
         var i = parseInt($("#ddlMarket").val());
@@ -6165,7 +6166,7 @@ function getReportObject_NewAdvertisers() {
         apiControllerAction: "/api/AdvertiserAudit/GetNewAdvertiserAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'xry month end',
+        product: 'xry',
         reportPath: "/Products/XRY/reports/xrygenericreport.html"
     }
 

@@ -65,6 +65,10 @@
 
         <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
+                <div id="divQuickReport" style="float:right;padding-right:0px;padding-bottom:10px">
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
                         <h2>Station Advertiser</h2>
@@ -96,7 +100,7 @@
 
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtStationAdvertiser">Advertiser</label>
+                            <label for="txtStationAdvertiser">Station Advertiser</label>
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input type="hidden" id="txtStationAdvertiserId" />
@@ -105,7 +109,7 @@
                     </div>
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtStationAdvertiserCode">Advertiser Code</label>
+                            <label for="txtStationAdvertiserCode">Station Advertiser Code</label>
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input class="field-width-325" type="text" id="txtStationAdvertiserCode" />
@@ -237,6 +241,10 @@
     <script src="/js/config.js"></script>
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
+
+    <!-- genericReport JS -->
+    <script src="/js/genericReport.js"></script>
+
     <!--Chosen Dropdown-->
     <script src="/js/chosen.jquery.min.js"></script>
 
@@ -253,14 +261,23 @@
     $(document).ready(function () {
 
         stationAdvertiserId = (getParameterByName("StationAdvertiserID") == null ? 0 : getParameterByName("StationAdvertiserID"));
+
         $("#txtStationAdvertiserId").val(stationAdvertiserId);
+
         bIsNew = stationAdvertiserId <= 0;
 
         //get station list
         getStationList();
 
         buildXRYMenu("Utility");
+        buildQuickReports('advertiser');
 
+        setupUI();
+
+    });
+
+    function setupUI()
+    {
         $("#chkActive").change(function () {
             if (this.checked) {
                 $(".disable-date").hide();
@@ -278,10 +295,10 @@
                 var marketId = $(this).find(':selected').data('market-id');
                 $("#ddlMarkets").val(marketId);
             });
-    });
+    }
 
     function getStationList() {
-        //api ServicePrefix + '/api/Station/GetStationListByProduct'
+
         $.ajax({
             url: ServicePrefix + '/api/Station/GetStationListByProduct',
             dataType: 'json',

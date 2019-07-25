@@ -390,6 +390,22 @@ $( document ).ready(function()
 
 
 });
+function showHeader() {
+    var hideHeader = getParameterByName("hideHeader");
+
+    if (!hideHeader == false && hideHeader.toLowerCase() == "true") {
+        $("#fh5co-header").hide();
+        $("#divQuickReport").hide();
+        $(".favoriteButtonClass").hide();
+        $("#reportTitleRow").hide();
+        gDataTableDefaultRows = 10;
+    }
+    else {
+        $("#fh5co-header").show();
+    }
+
+    $("body").show();
+}
 function showComponentDialog(url, title)
 {
     $("#componentDialog").dialog("close");

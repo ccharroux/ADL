@@ -67,7 +67,12 @@
             </div>
         </header>
         <div id="fh5co-contact-section" class="contact-section">
+
             <div class="container">
+                <div id="divQuickReport" style="float:right;padding-right:0px;padding-bottom:10px">
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
                         <h2>Station Advertisers</h2>
@@ -136,6 +141,8 @@
     <script src="/js/config.js"></script>
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
+    <!-- genericReport JS -->
+    <script src="/js/genericReport.js"></script>
 
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
@@ -155,6 +162,38 @@
 
     $(document).ready(function () {
 
+        buildQuickReports('advertiser');
+
+        loadScreen();
+        setupUI();
+
+
+
+        setLocalStorage("search","");
+        setLocalStorage("searchPage", window.location);
+
+        buildXRYMenu("Utility");
+
+        getStationList();
+
+
+        //var search = getParameterByName("search");
+
+        //if (!search == false) {
+        //    if (search.length > 0) {
+        //        var sArray = search.split("|");
+
+        //        $("#searchText").val(sArray(0));
+        //        $("#ddlMediaType").val(sArray(1));
+
+        //        getStationList();
+        //    }
+        //}
+
+
+    });
+    function loadScreen()
+    {
         var reportTitle = 'Station Advertiser List';
         var exportColumns = returnTableColumnsByClass("dtStationAdvertiserList", "exportColumn");
 
@@ -248,38 +287,16 @@
                 search: "Filter Results:"
             }
         });
-
+    }
+    function setupUI()
+    {
         $("body").on("click",
             "#clear_search_button",
             function () {
                 var table = $("#dtStationAdvertiserList").DataTable();
                 table.search('').draw();
             });
-
-        setLocalStorage("search","");
-        setLocalStorage("searchPage", window.location);
-
-        buildXRYMenu("Utility");
-
-        getStationList();
-
-
-        //var search = getParameterByName("search");
-
-        //if (!search == false) {
-        //    if (search.length > 0) {
-        //        var sArray = search.split("|");
-
-        //        $("#searchText").val(sArray(0));
-        //        $("#ddlMediaType").val(sArray(1));
-
-        //        getStationList();
-        //    }
-        //}
-
-
-    });
-
+    }
     function getStationList() {
 
         $.ajax({
