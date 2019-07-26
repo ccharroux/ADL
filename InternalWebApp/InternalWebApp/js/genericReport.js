@@ -240,7 +240,7 @@ function buildQuickReports(rptType, control, container, postfix)
     }
 
     var rptHit = false;
-            console.log(rptType);
+
     for (var i = 0; i < reportObjectArray.length; i++)
     {
         for (var v = 0; v < reportObjectArray[i].product.length; v++)

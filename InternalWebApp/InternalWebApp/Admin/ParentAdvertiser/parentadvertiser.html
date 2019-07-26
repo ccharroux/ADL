@@ -59,6 +59,10 @@
 
         <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
+                <div id="divQuickReport" style="float:right;padding-right:25px;padding-bottom:10px">
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
                         <h2>Parent Advertiser</h2>
@@ -219,6 +223,9 @@
     <script src="/js/config.js"></script>
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
+    <!-- genericReport JS -->
+    <script src="/js/genericReport.js"></script>
+
     <!--Chosen Dropdown-->
     <script src="/js/chosen.jquery.min.js"></script>
 
@@ -232,14 +239,28 @@
     $(document).ready(function () {
 
         buildXRYMenu("Utility");
+        buildQuickReports(['advertiser']);
+        loadUIFields();
+        setupUI();
 
-        parentAdvertiserId = (getParameterByName("ParentAdvertiserID") == null ? 0 : getParameterByName("ParentAdvertiserID"));
-        $("#txtParentAdvertiserId").val(parentAdvertiserId);
-
-        bIsNew = parentAdvertiserId <= 0;
 
         getIndustryList();
 
+
+    });
+
+    function loadUIFields()
+    {
+
+        parentAdvertiserId = (getParameterByName("ParentAdvertiserID") == null ? 0 : getParameterByName("ParentAdvertiserID"));
+
+        $("#txtParentAdvertiserId").val(parentAdvertiserId);
+
+        bIsNew = parentAdvertiserId <= 0;
+    }
+
+    function setupUI()
+    {
         $("#chkActive").change(function () {
             if (this.checked) {
                 $(".disable-date").hide();
@@ -255,8 +276,7 @@
         $("#ddlIndustry").change(function () {
             getSubIndustryList($(this).val(), '');
         });
-    });
-
+    }
     function getIndustryList() {
 
         $.ajax({

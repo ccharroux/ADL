@@ -64,6 +64,10 @@
 
         <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
+                <div id="divQuickReport" style="float:right;padding-right:25px;padding-bottom:10px">
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
                         <h2>Station Agency</h2>
@@ -227,6 +231,8 @@
     <script src="/js/config.js"></script>
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
+    <!-- genericReport JS -->
+    <script src="/js/genericReport.js"></script>
 
     <!--Chosen Dropdown-->
     <script src="/js/chosen.jquery.min.js"></script>
@@ -238,37 +244,34 @@
     var bLinkStationAgencyRevenues = false;
     var bIsNew = false;
 
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
+
+        setupUIFields();
+        getStationList();
+
+        buildXRYMenu("Utility");
+        buildQuickReports(['agency']);
+ 
+        setupUI();
+
+    });
+
+    function setupUIFields()
+    {
 
         stationAgencyId = (getParameterByName("StationAgencyID") == null ? 0 : getParameterByName("StationAgencyID"));
         $("#txtStationAgencyId").val(stationAgencyId);
         bIsNew = stationAgencyId <= 0;
-
-        getStationList();
-
-
-        buildXRYMenu("Utility");
-
-        //$("#chkActive").change(function () {
-        //    if (this.checked) {
-        //        $(".disable-date").hide();
-        //    } else {
-        //        if ($("#txtDisableDate").val().length <= 0) {
-        //            var todaysDate = new Date();
-        //            $("#txtDisableDate").val(addZero(todaysDate.getMonth() + 1) + '/' + addZero(todaysDate.getDate()) + '/' + todaysDate.getFullYear());
-        //        }
-        //        $(".disable-date").show();
-        //    }
-        //});
-
+    }
+    function setupUI()
+    {
         $("#ddlStations").on('change',
             function () {
                 var marketId = $(this).find(':selected').data('market-id');
                 $("#ddlMarkets").val(marketId);
             });
-
-    });
-
+    }
     function getStationList() {
         //api ServicePrefix + '/api/Station/GetStationListByProduct'
         $.ajax({

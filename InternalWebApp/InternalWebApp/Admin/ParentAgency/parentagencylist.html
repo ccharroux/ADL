@@ -66,6 +66,10 @@
         </header>
         <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
+                <div id="divQuickReport" style="float:right;padding-right:0px;padding-bottom:10px">
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
                         <h2>Parent Agencies</h2>
@@ -128,6 +132,8 @@
     <script src="/js/config.js"></script>
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
+    <!-- genericReport JS -->
+    <script src="/js/genericReport.js"></script>
 
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
@@ -144,6 +150,31 @@
 
     $(document).ready(function () {
 
+
+        loadScreen();
+        setupUI();
+
+
+        buildXRYMenu("Utility");
+        buildQuickReports(['agency']);
+
+        loadLastSearch();
+
+        setLocalStorage("search", "");
+        setLocalStorage("searchPage", window.location);
+    });
+
+    function setupUI()
+    {
+        $("body").on("click",
+            "#clear_search_button",
+            function () {
+                var table = $("#dtParentAgencyList").DataTable();
+                table.search('').draw();
+            });
+    }
+    function loadScreen()
+    {
         var reportTitle = "Parent Agency List";
         var exportColumns = returnTableColumnsByClass("dtParentAgencyList", "exportColumn");
 
@@ -218,7 +249,7 @@
                //however it isn't working on our site
                //'colvis'
             ],
-            initComplete: function() {
+            initComplete: function () {
                 $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
             },
             createdRow: function (row, data, index) {
@@ -230,21 +261,7 @@
                 search: "Filter Results:"
             }
         });
-
-        $("body").on("click",
-            "#clear_search_button",
-            function() {
-                var table = $("#dtParentAgencyList").DataTable();
-                table.search('').draw();
-            });
-
-        buildXRYMenu("Utility");
-
-        loadLastSearch();
-
-        setLocalStorage("search", "");
-        setLocalStorage("searchPage", window.location);
-    });
+    }
 
     function getParentAgencyList() {
         if ($("#searchText").val().trim() == 0) {
