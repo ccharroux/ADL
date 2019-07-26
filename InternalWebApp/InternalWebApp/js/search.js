@@ -507,6 +507,19 @@ function buildAdvertiserSearch(searchCriteria)
     });
 
     columns.push({
+        "title": "Industry Description",
+        "data": "industryDescription",
+        "orderable": true
+    })
+
+    columns.push({
+        "title": "Sub-Industry Description",
+        "data": "subIndustryDescription",
+        "orderable": true
+    })
+
+
+    columns.push({
         "mRender": function (data, type, row) {
             return '<a href="#" onclick="linkAdvertiserByLink(' + row.advertiserId + ')">Link Advertiser</a>';
         },
@@ -933,6 +946,18 @@ function buildLinkAdvertiserSearch(searchCriteria) {
         "mData": "marketName",
         "orderable": true
     });
+
+    columns.push({
+        "title": "Industry Description",
+        "data": "industryDescription",
+        "orderable": true
+    })
+
+    columns.push({
+        "title": "Sub-Industry Description",
+        "data": "subIndustryDescription",
+        "orderable": true
+    })
 
     columns.push({
         "mRender": function (data, type, row) {
