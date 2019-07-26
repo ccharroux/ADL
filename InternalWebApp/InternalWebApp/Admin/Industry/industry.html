@@ -87,7 +87,7 @@
                             <label for="txtIndustryShortName">Industry Short Description</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" class="field-width-325" maxlength="25" id="txtIndustryShortName" errorMessage="You must enter an Industry Name." value="" />
+                            <input type="text" class="mkaRequired field-width-325" maxlength="25" id="txtIndustryShortName" errorMessage="You must enter an Industry Name." value="" />
                         </div>
                     </div>
                     
@@ -96,7 +96,7 @@
                             <label>Number of Advertisers To Print</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" class="mkaRequired" style="width: 50px;" maxlength="3" id="txtAdvsToPrint" errorMessage="You must enter a Number of Advertisers to Print." value="" />
+                            <input type="text" class="" style="width: 50px;" maxlength="3" id="txtAdvsToPrint" errorMessage="You must enter a Number of Advertisers to Print." value="" />
                         </div>
                     </div>
                     
@@ -293,8 +293,77 @@
     }
 
     function updateIndustry() {
-        var message = "Functionality under development."
-        bootbox.alert(message, function () { });
+
+        //do validation
+        if (validationPassed === false) {
+            return;
+        }
+
+        //call update api
+
+        //console.log($("#chkIncludeInTop50").prop('checked'));
+
+        $.ajax({
+            url: ServicePrefix + '/api/Industry/UpdateIndustry',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inIndustryId": $("#txtIndustryId").val(),
+                "inIndustryDescription": $("#txtIndustryName").val(),
+                "inIndustryShortDescription": $("#txtIndustryShortName").val(),
+                "inNumberOfAdvsToPrint": $("#txtAdvsToPrint").val(),
+                "inTop50Report": $("#chkIncludeInTop50").prop('checked'),
+                "inIsNew": bIsNew,
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    window.location = "/admin/industry/industry.html?IndustryID=" + $("#txtIndustryId").val();
+
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+
+            }
+        });
+
+    }
+
+    function validationPassed() {
+        var loopBreak = true;
+        $(".mkaRequired").each(function (index, el) {
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            // Text
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+            // Select
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == "-1") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+        });
+
+       
+        return loopBreak;
     }
 
 </script>
