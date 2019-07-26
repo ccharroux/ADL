@@ -447,15 +447,19 @@ function linkParentAgency() {
     window.location = searchPage;
 }
 
-function buildAdvertiserSearch(searchCriteria) {
+function buildAdvertiserSearch(searchCriteria)
+{
     if ($('.search-all-markets:visible').is(':checked')) {
         bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
         });
     }
 
-    if ($('.search-text:visible').val().length > 0) {
+    if ($('.search-text:visible').val().length > 0)
+    {
         searchText = $('.search-text:visible').val();
-    } else {
+    }
+    else
+    {
         searchText = searchCriteria["marketAdvertiserName"].length > 0 ? searchCriteria["marketAdvertiserName"] : searchCriteria["advertiserName"];
     }
 

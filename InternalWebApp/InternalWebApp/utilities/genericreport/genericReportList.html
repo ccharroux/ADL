@@ -163,13 +163,20 @@
     function buildTagList(rptArray)
     {
         var tagArray = new Array();
+
         for (var i = 0; i < rptArray.length; i++)
         {
-            if (tagArray.indexOf(rptArray[i].product) === -1 )
+ 
+            for (var v = 0; v < rptArray[i].product.length; v++)
             {
-                tagArray.push(rptArray[i].product);
-                //$("#rptTags").append("<div><a href='#' onclick='loadReports(" + '"' + rptArray[i].product + '"'+ ");'>" + rptArray[i].product.toUpperCase() + "</a></div>")
+ 
+                if (tagArray.indexOf(rptArray[i].product[v].toLowerCase()) === -1)
+                {
+                    tagArray.push(rptArray[i].product[v].toLowerCase());
+                }
+ 
             }
+ 
         }
  
         tagArray = tagArray.sort();
@@ -202,23 +209,33 @@
             $("#" + control).append("<h3 style='padding-top: 10px;padding-bottom: 10px; margin-bottom: 0px; margin-top: 15px;'>" + title + "</h3>");
         }
 
-        for (var i = 0; i < reportArray.length; i++) {
+        // report loop 
+        for (var i = 0; i < reportArray.length; i++)
+        {
 
-            if (reportArray[i].product.toLowerCase() == productId.toLowerCase())
+            for (var v = 0; v < reportArray[i].product.length; v++)
             {
-                var reportPath = '/utilities/genericreport/genericReport.html';
-                if (!reportArray[i].reportPath == false)
-                {
-                    reportPath = reportArray[i].reportPath;
+                if (reportArray[i].product[v].toLowerCase() == productId.toLowerCase()) {
+                    buildReportString(reportArray[i], control, i);
                 }
-
-                var str = "<div class='col-md-4'>";
-                str = str + "<a href='"+reportPath+"?reportId=" + i + "'>" + reportArray[i].reportTitle + "</a>";
-                str = str + "</div>";
-                $("#" + control).append(str);
             }
 
         }
     }
+    function buildReportString(reportArray, control, i)
+    {
+        var reportPath = '/utilities/genericreport/genericReport.html';
 
+        if (!reportArray.reportPath == false)
+        {
+            reportPath = reportArray.reportPath;
+        }
+
+        var str = "<div class='col-md-4'>";
+
+        str = str + "<a href='" + reportPath + "?reportId=" + i + "'>" + reportArray.reportTitle + "</a>";
+        str = str + "</div>";
+
+        $("#" + control).append(str);
+    }
 </script>

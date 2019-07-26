@@ -390,10 +390,13 @@ $( document ).ready(function()
 
 
 });
-function showHeader() {
+
+function showHeader()
+{
     var hideHeader = getParameterByName("hideHeader");
 
-    if (!hideHeader == false && hideHeader.toLowerCase() == "true") {
+    if (!hideHeader == false && hideHeader.toLowerCase() == "true")
+    {
         $("#fh5co-header").hide();
         $("#divQuickReport").hide();
         $(".favoriteButtonClass").hide();
@@ -408,6 +411,7 @@ function showHeader() {
 }
 function showComponentDialog(url, title)
 {
+
     $("#componentDialog").dialog("close");
     $("#componentIFrame").attr("src", url);
     $("#componentDialog").dialog("open");
@@ -1026,15 +1030,15 @@ function buildXRYMenu(selectedItem) {
 
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/admin/advertiser/advertiserlist.html" role="button" aria-expanded="false">Advertiser</a></li>'; 
-    menuItems += '                  <li style="display:block;"><a href="/admin/stationadvertiser/stationadvertiserlist.html">&nbsp;Station Advertiser</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/mediaadvertiser/mediaadvertiserlist.html">&nbsp;Media Advertiser</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html">&nbsp;Parent Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/advertiser/advertiserlist.html" role="button" aria-expanded="false">Market Advertiser</a></li>'; 
+    menuItems += '                  <li style="display:block;"><a href="/admin/stationadvertiser/stationadvertiserlist.html">Station Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/mediaadvertiser/mediaadvertiserlist.html">Media Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html">Parent Advertiser</a></li>';
 
-    menuItems += '                  <li style="display:block;"><a href="/admin/agency/agencylist.html" role="button" aria-expanded="false">Agency</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/agency/agencylist.html" role="button" aria-expanded="false">Market Agency</a></li>';
  
-    menuItems += '                  <li style="display:block;"><a href="/admin/stationagency/stationagencylist.html">&nbsp;Station Agency</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/parentagency/parentagencylist.html">&nbsp;Parent Agency</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/stationagency/stationagencylist.html">Station Agency</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/parentagency/parentagencylist.html">Parent Agency</a></li>';
  
     
 
@@ -1464,17 +1468,24 @@ function getPeriodList(inType)
 (function($){
     var originalVal = $.fn.val;
     $.fn.val = function(){
+
         var prev;
-        if(arguments.length>0){
+
+        if (arguments.length > 0)
+        {
             prev = originalVal.apply(this,[]);
         }
-        var result =originalVal.apply(this,arguments);
+
+        var result = originalVal.apply(this, arguments);
         //if(arguments.length>0 && prev!=originalVal.apply(this,[]))
         //    $(this).change();  // OR with custom event $(this).trigger('value-changed')
 
-        if ($(this).selector != undefined && $(this).selector.length > 0) {
+        if ($(this).selector != undefined && $(this).selector.length > 0)
+        {
             var chosenExists = checkIfChosenExistsForSelector($(this).selector);
-            if (chosenExists) {
+            if (chosenExists)
+            {
+                //console.log($(this).selector);
                 $(this.selector).trigger('chosen:updated');
             }
         }
@@ -1520,6 +1531,21 @@ function checkIfChosenObjectExists(object) {
         return false;
     }
 
+}
+
+function determineLocationOfDMAReport(url, title)
+{
+
+ 
+    if (!gHideHeader == false && gHideHeader == "true" && url.toLowerCase().indexOf("direct=true") == -1) 
+    {     
+        url += "&hideHeader=true";
+        window.location = url;
+        $("#componentDialog").dialog({ "title": title });
+    }
+    else {
+        window.location = url;
+    }
 }
 
 function checkIfChosenExistsForSelector(selector) {

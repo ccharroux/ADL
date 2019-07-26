@@ -84,40 +84,40 @@ function getAuditObject(inAuditId) {
 
 }
 
-function buildQuickReports(rptType, control, container, postfix) {
+//function buildQuickReports(rptType, control, container, postfix) {
 
-    if (!control) {
-        control = 'ddlQuickReport';
-    }
+//    if (!control) {
+//        control = 'ddlQuickReport';
+//    }
 
-    if (!control) {
-        control = 'divQuickReport';
-    }
+//    if (!control) {
+//        control = 'divQuickReport';
+//    }
 
-    var rptHit = false;
+//    var rptHit = false;
 
-    for (var i = 0; i < auditObjectArray.length; i++) {
+//    for (var i = 0; i < auditObjectArray.length; i++) {
 
-        if (auditObjectArray[i].product.toLowerCase() == rptType.toLowerCase()) {
+//        if (auditObjectArray[i].product.toLowerCase() == rptType.toLowerCase()) {
 
-            rptHit = true;
-            $("#" + control).append("<option value='" + i + "'>" + auditObjectArray[i].auditTitle + "</option>");
-        }
+//            rptHit = true;
+//            $("#" + control).append("<option value='" + i + "'>" + auditObjectArray[i].auditTitle + "</option>");
+//        }
 
-    }
+//    }
 
-    if (rptHit == true) {
-        $("#" + control).prepend("<option value='-1'>  -- Select an Audit --  </option>");
-        $("#" + control).val("-1");
-        $("#" + container).show();
+//    if (rptHit == true) {
+//        $("#" + control).prepend("<option value='-1'>  -- Select an Audit --  </option>");
+//        $("#" + control).val("-1");
+//        $("#" + container).show();
 
-        convertToChosenSelect(control, false, false);
-    }
-    else {
-        $("#" + container).hide();
-    }
+//        convertToChosenSelect(control, false, false);
+//    }
+//    else {
+//        $("#" + container).hide();
+//    }
 
-}
+//}
 
 function getQuickReport(reportId) {
     if (reportId > -1) {

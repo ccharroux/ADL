@@ -84,7 +84,7 @@
     </style>
 
 </head>
-<body>
+<body style="display:none">
 
     <div id="fh5co-page">
         <header id="fh5co-header" role="banner">
@@ -116,7 +116,7 @@
                         -->
                         <div class="form-group rptView rptParentMarket">
                             <label for="ddlParentMarket" class="dropdown-label rptView rptParentMarket">Parent Market</label>
-                            <select id="ddlParentMarket" apiInput="inParentMarketId" class="dropdown-select rptView rptParentMarket field-width-210"></select>
+                            <select id="ddlParentMarket" onselect="getMarketList()" apiInput="inParentMarketId" class="dropdown-select rptView rptParentMarket field-width-210"></select>
                         </div>
                         <div class="form-group rptView rptMarket">
                             <label for="ddlMarket" class="dropdown-label rptView rptMarket">Market</label>
@@ -126,14 +126,15 @@
                             <label for="ddlStation" class="dropdown-label rptView rptStation">Station</label>
                             <select id="ddlStation" apiInput="inStationId" class="dropdown-select rptView rptStation field-width-210"></select>
                         </div>
-                        <div class="form-group rptView rptPeriod">
-                            <label for="ddlPeriod" class="dropdown-label rptView rptPeriod">Period</label>
-                            <select id="ddlPeriod" apiInput="inPeriod" class="dropdown-select rptView rptPeriod field-width-100"></select>
-                        </div>
                         <div class="form-group rptView rptYear">
                             <label for="ddlYear" class="dropdown-label rptView rptYear">Year</label>
                             <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView rptYear field-width-100"></select>
                         </div>
+                        <div class="form-group rptView rptPeriod">
+                            <label for="ddlPeriod" class="dropdown-label rptView rptPeriod">Period</label>
+                            <select id="ddlPeriod" apiInput="inPeriod" class="dropdown-select rptView rptPeriod field-width-100"></select>
+                        </div>
+
                         <div class="form-group col-md-2 rptButton" style="text-align: right">
                             <label for="btnReport" class="dropdown-label">&nbsp;</label>
                             <input type="button" id="btnReport" class="search-button" value="Show" onclick="getReport()" />
@@ -224,10 +225,15 @@
     var columns = [];
     var columnsToDisplay = new Array();
     var columnsToExport = new Array();
-
+    var hideHeader = "";
     var bRunReport = true;
+    var gHideHeader = "";
 
     $(document).ready(function () {
+
+        gHideHeader = getParameterByName("hideHeader");
+
+        showHeader();
 
         //get report it
         reportId = getParameterByName("reportId");
@@ -358,28 +364,18 @@
 
                     if (paramParentMarketId !== 0)
                     {
-                        $("#ddlParentMarket").val(paramParentMarketId)
+                        $("#ddlParentMarket").val(paramParentMarketId);
                     }
                     else
                     {
                         $("#ddlParentMarket").selectedIndex = 0;
                     }
 
-                    $("#ddlParentMarket").trigger('chosen:updated');
-                    //try to do fire a change event
-                    //if has onchange, execute event
-                    try
+                    if ($("#ddlMarket_chosen").is(":visible"))
                     {
- 
-                        if ($("#ddlMarket_chosen").is(":visible"))
-                        {
-                            $("#ddlParentMarket").change();
-                        }
+                        getMarketList(paramParentMarketId);
                     }
-                    catch (e)
-                    {
-                        console.log(e);
-                    }
+
                 }
 
             },
@@ -392,14 +388,17 @@
 
     function getMarketList(parentMarketId)
     {
+
+        //var parentMarketId = $("#ddlParentMarket").val();
+
         if (parentMarketId == "")
         {
             $("#ddlMarket").html('');
             getDefaultMarket();
             return;
         }
-
-        if (parentMarketId !== paramParentMarketId)
+ 
+        if (bDirectPageLink == true && parentMarketId !== paramParentMarketId)
         {
             paramMarketId = 0;
             paramStationId = 0;
@@ -410,6 +409,7 @@
             getDefaultMarket();
             return;
         }
+ 
 
         $.ajax({
             url: ServicePrefix + '/api/Market/GetMarketListByParentMarket',
@@ -444,28 +444,21 @@
 
                     saveLoadedControlSelection("ddlMarket");
                     //preSelectItem('quickReportQS');
-                    console.log(paramMarketId);
+
                     if (paramMarketId !== 0)
                     {
-                        $("#ddlMarket").val(paramMarketId).trigger('chosen:updated');
+                        $("#ddlMarket").val(paramMarketId);//.trigger('chosen:updated');
                     }
                     else
                     {
                         $("#ddlMarket").selectedIndex = 0;
-                        $("#ddlMarket").trigger('chosen:updated');
                     }
 
-                    //try to do fire a change event
-                    //if has onchange, execute event
-                    try {
-
-                        if ($("#ddlStation_chosen").is(":visible")) {
-                            $("#ddlMarket").change();
-                        }
-
-                    } catch (e) {
-
+                    if ($("#ddlStation_chosen").is(":visible")) 
+                    {
+                        getStationList(paramMarketId);
                     }
+
                 }
 
             },
@@ -486,7 +479,7 @@
             return;
         }
 
-        if (marketId !== paramMarketId)
+        if (bDirectPageLink == true && marketId !== paramMarketId)
         {
             paramStationId = 0;
             $("#ddlStation").html('');
@@ -639,8 +632,17 @@
 
         sParameters += "&direct=" + bIsDirect;
 
-        window.location = sBackUrl + sParameters;
+        if (!gHideHeader == false && gHideHeader == "true")
+        {
+            sParameters += "&hideHeader=true";
 
+            window.location =  sBackUrl + sParameters;
+            $("#componentDialog").dialog({ "title": backButtonObject.reportTitle });
+        }
+        else
+        {
+            window.location = sBackUrl + sParameters;
+        }
     }
 
     function buildRedirectQueryString(parameters)
