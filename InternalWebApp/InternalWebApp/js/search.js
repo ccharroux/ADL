@@ -513,7 +513,7 @@ function buildAdvertiserSearch(searchCriteria)
     })
 
     columns.push({
-        "title": "Sub-Industry Description",
+        "title": "Sub Industry Description",
         "data": "subIndustryDescription",
         "orderable": true
     })
@@ -954,7 +954,7 @@ function buildLinkAdvertiserSearch(searchCriteria) {
     })
 
     columns.push({
-        "title": "Sub-Industry Description",
+        "title": "Sub Industry Description",
         "data": "subIndustryDescription",
         "orderable": true
     })
