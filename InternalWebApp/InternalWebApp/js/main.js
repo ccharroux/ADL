@@ -287,9 +287,9 @@ var navTool = {
                 }
             }
 
-            if (checkIfChosenObjectExists(e)) {
-                $("#" + e.id).trigger('chosen:updated');
-            }
+            //if (checkIfChosenObjectExists(e)) {
+            //    $("#" + e.id).trigger('chosen:updated');
+            //}
         }
         else {
             if (e.selectedIndex == e.length - 1) {
@@ -300,9 +300,9 @@ var navTool = {
 
             }
 
-            if (checkIfChosenObjectExists(e)) {
-                $("#" + e.id).trigger('chosen:updated');
-            }
+            //if (checkIfChosenObjectExists(e)) {
+            //    $("#" + e.id).trigger('chosen:updated');
+            //}
         }
  
         // Create a new 'change' event
