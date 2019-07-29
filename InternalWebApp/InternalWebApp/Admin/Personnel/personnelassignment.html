@@ -156,7 +156,7 @@
                                     &nbsp;&nbsp;
                                     <input type="radio" name="radContactXRY" id="radXRYSecondaryContact" style="margin-right:5px" value="secondary" /><label for="radXRYSecondaryContact">Secondary Contact</label>
                                     <hr />
-                                    <input type="checkbox" id="chkXRYRecipient" style="margin-right:5px" /><label for="chkXRYRecipient">Recipient</label> <br />
+                                    <input type="checkbox" id="chkXRYRecipient"  onclick="resetRelatedControl(this, 'ddlAccessXRY');"   style="margin-right:5px" /><label for="chkXRYRecipient">Recipient</label> <br />
                                     <label for="ddlAccessXRY" class="search-ddl-label" style="vertical-align: top; margin-left:10px">Access Levels</label>
                                     <select id="ddlAccessXRY" class="search-ddl-select" style="height: 170px;width: 340px;" size="10"></select>
                                 </div>
@@ -166,11 +166,11 @@
                             <div class="assignmentBoxes">
                                 Time Sales Contact
                                 <hr />
-                                <input type="radio" name="radContactTVB" id="radTVBNotAContact" style="margin-right:5px" checked="checked" /><label for="radTVBNotAContact">Not a Contact</label>
+                                <input type="radio" name="radContactTVB" id="radTVBNotAContact" style="margin-right:5px" checked="checked" value="" /><label for="radTVBNotAContact">No Contact Assignment</label>
                                 <br />
-                                <input type="radio" name="radContactTVB" id="radTVBPrimaryContact" style="margin-right:5px" /><label for="radTVBPrimaryContact">Primary Contact</label>
+                                <input type="radio" name="radContactTVB" id="radTVBPrimaryContact" style="margin-right:5px" value="primary" /><label for="radTVBPrimaryContact">Primary Contact</label>
                                 <br />
-                                <input type="radio" name="radContactTVB" id="radTVBSecondaryContact" style="margin-right:5px" /><label for="radTVBSecondaryContact">Secondary Contact</label>
+                                <input type="radio" name="radContactTVB" id="radTVBSecondaryContact" style="margin-right:5px" value="secondary" /><label for="radTVBSecondaryContact">Secondary Contact</label>
                                 <div><b>NOTE:&nbsp;</b>Requires Market / Station selection.</div>
  
                             </div>
@@ -197,18 +197,18 @@
                         <div class="col-md-6 ProductChoices TVBChoices" style="display:none">
                             <div class="assignmentBoxes">
 
-                                <input type="checkbox" id="chkTVBRecipient" style="margin-right:5px" /><label for="chkTVBRecipient">Recipient</label>
+                                <input type="checkbox" id="chkTVBRecipient" onclick="resetRelatedControl(this, 'ddlAccessTVB');" style="margin-right:5px" /><label for="chkTVBRecipient">Recipient</label>
                                 
                                 <hr />
 
                                 <label for="ddlAccessTVB" class="search-ddl-label" style="vertical-align: top; margin-left:10px">Access</label>
-                                <select id="ddlAccesTVB" class="search-ddl-select"  style="margin-top:10px" size="9"></select>
+                                <select id="ddlAccessTVB" class="search-ddl-select"  style="margin-top:10px" size="9"></select>
                                 <div><b>NOTE:&nbsp;</b>Requires Market / Station selection.</div>
                             </div>
                         </div>
                         <div class="col-md-6 ProductChoices TVBChoices" style="display:none">
                             <div class="assignmentBoxes">
-                                <input type="checkbox" id="chkTVBRepDataContact" style="margin-right:5px" /><label for="chkTVBRepDataContact">Rep Data Contact</label>
+                                <input type="checkbox" id="chkTVBRepDataContact"  onclick="resetRelatedControl(this, 'ddlRepFirms', 'chkSelectedRepFirms');"  style="margin-right:5px" /><label for="chkTVBRepDataContact">Rep Data Contact</label>
 
                                 <hr />
 
@@ -219,7 +219,27 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row" style="margin-top:10px;">
+                        <div class="col-md-6 ProductChoices TVBChoices">
 
+                            <div class="assignmentBoxes" style="padding-top:0px;padding-left:0px;padding-right:0px;height:80px">
+ 
+                                <div style="padding-left:20px; padding-right:20px;padding-top:15px">
+                                    <input type="checkbox" id="chkTVBEstimatedContact" style="margin-right:5px" /><label for="chkTVBEstimatedContact">Estimated Contact</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 ProductChoices TVBChoices">
+
+                            <div class="assignmentBoxes" style="padding-top:0px;padding-left:0px;padding-right:0px;height:auto">
+
+                                <div style="padding-left:20px; padding-right:20px;padding-top:15px">
+                                    <input type="checkbox" id="chkTVBAdministrator" style="margin-right:5px" /><label for="chkTVBAdministrator">Administrator</label>
+                                </div>
+                                <div style="padding-left:20px;" ><b>NOTE:&nbsp;</b>Requires Market / Station selection.</div>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
                 <div class="row">
@@ -324,10 +344,7 @@
         buildMainMenu("Personnel");
 
         loadProductList();
-        //loadOwnerList();
-        //loadMarketList();
-        //loadStationListByProduct();
-        //loadPersonnelAssignmentList("dtPersonnelAssignmentList");
+ 
         gDataTableDefaultRows = 10;
     });
 
@@ -416,8 +433,6 @@
             reportArray.push(reportObject);
         });
 
- 
-
         var inputObject = JSON.stringify({
             "inApiToken": getLocalStorage("APIToken"),
             "inPersonnelId": personnelId,
@@ -432,11 +447,10 @@
     function assignTVB()
     {
         var stationArray = new Array();
-        var reportArray = new Array();
+        var repFirmArray = new Array();
 
         $("#ddlStation option:selected").each(function () {
             var stationObject = {
-                "marketId": $("#ddlMarketAssign").val(),
                 "stationId": $(this).val(),
                 "selected": true
             }
@@ -444,15 +458,15 @@
         });
 
 
-        $("#ddlReport option:selected").each(function () {
+        $("#ddlRepFirms option:selected").each(function () {
             var reportObject = {
-                "reportId": $(this).val(),
+                "repFirmId": $(this).val(),
                 "selected": true
             }
-            reportArray.push(reportObject);
+            repFirmArray.push(reportObject);
         });
 
-        var radioValue = $("input[name='radContactMRR']:checked").val();
+        var radioValue = $("input[name='radContactTVB']:checked").val();
 
         // default settings - not a contact
         var isContact = false;
@@ -470,11 +484,21 @@
         var inputObject = JSON.stringify({
             "inApiToken": getLocalStorage("APIToken"),
             "inPersonnelId": personnelId,
-            "inMarketStationList": stationArray,
-            "inReportList": reportArray,
-            "inIsRecipient": 'true'
+            "inMarketId" : $("#ddlMarketAssign").val(),
+            "inStationList": stationArray,
+            "inRepFirmList": repFirmArray,
+            "inAccessLevelId": $("#ddlAccessTVB").val(),
+            "inIsTimeSalesContact" : isContact,
+            "inIsPrimaryTimeSalesContact" :  isPrimaryContact,
+            "inIsRepFirmContact": $("#chkTVBRepDataContact").is(':checked').toString(),
+            "inIsEstimateContact": $("#chkTVBEstimatedContact").is(':checked').toString(),
+            "inIsRecipient" : $("#chkTVBRecipient").is(':checked').toString()
+ 
         });
 
+ 
+
+        console.log(inputObject);
         assignAJAX(inputObject, $("#ddlProduct").val(), $("#ddlProduct").val() + " Assignments Complete");
 
     }
@@ -595,14 +619,24 @@
     }
     function assignAJAX(inputObject, product, successMessage)
     {
+        // reset product for XRAY.. use XRAY instead of XRAY
+        product = (product.toLowerCase() == 'xry' ? 'XRAY' : product.toUpperCase());
 
-        var url = ServicePrefix + '/api/' + (product.toLowerCase() == 'xry' ? 'XRAY' : product.toUpperCase()) + '/UpdatePersonnelMarketStationAssignments';
-        
-        if (product.toUpperCase() == "DMA")
+        //-------------------
+        // API inconsistency accounted for...
+        // MRR & XRY named UpdatePersonnel'MarketStation'Assignments
+        // others UpdatePersonnelAssignments
+        // NOT GOOD
+        //-------------------
+
+        var actionAlter = "";
+        if (product.toUpperCase() == "MRR" || product.toUpperCase() == "XRY")
         {
-            var url = ServicePrefix + '/api/DMA/UpdatePersonnelAssignments';
+            actionAlter = "MarketStation";
         }
-
+ 
+        var url = ServicePrefix + '/api/' + product + '/UpdatePersonnel' + actionAlter+'Assignments';
+        
         $.ajax({
             url: url,
             dataType: 'json',
@@ -631,21 +665,7 @@
 
     function areAssignmentsValid()
     {
-        // a market must be selected
-        if ($("#ddlMarketAssign").val() == "") 
-        {
-            bootbox.alert("You must select a market to perform the assignment operation.");
-            return false;
-        }
 
-        // at least 1 station
-        var count = $("#ddlStation :selected").length;
-
-        if (count <= 0) 
-        {
-            bootbox.alert("You must select at least 1 station to perform the assignment operation.");
-            return false;
-        }
 
         switch ($("#ddlProduct").val().toString().toLowerCase())
         {
@@ -659,12 +679,101 @@
             case "xry":
                 return areXRYAssignmentsValid();
 
+            case "tvb":
+                return areTVBAssignmentsValid();
+
             default:
                 return false;
 
         }
     }
+    function marketSelectionValid()
+    {
+        // a market must be selected
+        if ($("#ddlMarketAssign").val() == "") {
+            bootbox.alert("You must select a market to perform the assignment operation.");
+            return false;
+        }
+        else
+        {
+            return true;
+        }
 
+    }
+
+    function stationSelectionValid()
+    {
+
+        // at least 1 station
+        var count = $("#ddlStation :selected").length;
+
+        if (count <= 0) {
+            bootbox.alert("You must select at least 1 station to perform the assignment operation.");
+            return false;
+        }
+    }
+
+    function areTVBAssignmentsValid()
+    {
+
+        // at least 1 action
+        if ($("#chkTVBRepDataContact").is(':checked') == false &&
+            $("#chkTVBRecipient").is(':checked') == false &&
+            $('input[name=radContactTVB]:checked').val() == "")
+        {
+            bootbox.alert("You must select at least 1 assignment action to perform the assignment operation.");
+            return false;
+        }
+
+        // Time Sales Contact
+        if ($('input[name=radContactTVB]:checked').val() != "")
+        {
+ 
+            if (marketSelectionValid() == false) {
+                return false;
+            }
+
+            if (stationSelectionValid() == false) {
+                return false;
+            }
+
+
+        }
+
+        // Recipients
+        if ($("#chkTVBRecipient").is(':checked'))
+        {
+
+            if (marketSelectionValid() == false) {
+                return false;
+            }
+
+            if (stationSelectionValid() == false) {
+                return false;
+            }
+
+            var count = $("#ddlAccessTVB :selected").length;
+            if (count <= 0) {
+                bootbox.alert("You must select at least 1 Access Level to perform the assignment operation.");
+                return false;
+            }
+ 
+        }
+
+        // Rep Firm Contact
+        if ($("#chkTVBRepDataContact").is(':checked'))
+        {
+            var count = $("#ddlRepFirms :selected").length;
+
+            if (count <= 0) {
+                bootbox.alert("You must select at least 1 Rep Firm to perform the assignment operation.");
+                return false;
+            }
+        }
+
+        return true;
+
+    }
     function areMRRAssignmentsValid()
     {
 
@@ -679,6 +788,15 @@
             return false;
         }
 
+        if (marketSelectionValid() == false)
+        {
+            return false;
+        }
+
+        if (stationSelectionValid() == false)
+        {
+            return false;
+        }
 
         // Recipients
         if ($("#chkMRRRecipient").is(':checked'))
@@ -691,6 +809,7 @@
             }
         }
 
+        return true;
 
     }
     function areDMAAssignmentsValid()
@@ -705,6 +824,15 @@
             return false;
         }
 
+        if (marketSelectionValid() == false) {
+            return false;
+        }
+
+        if (stationSelectionValid() == false) {
+            return false;
+        }
+
+        return true;
     }
     function areXRYAssignmentsValid()
     {
@@ -717,6 +845,15 @@
             return false;
         }
 
+        if (marketSelectionValid() == false)
+        {
+            return false;
+        }
+
+        if (stationSelectionValid() == false)
+        {
+            return false;
+        }
 
         // Recipients
         if ($("#chkXRYRecipient").is(':checked'))
@@ -730,6 +867,7 @@
             }
         }
 
+        return true;
 
     }
     //--------------------------------//
@@ -797,6 +935,11 @@
             });
         }
     }
+    function uncheckACheckbox(controlToUncheck)
+    {
+        $("#" + controlToUncheck).prop("checked", false);
+    }
+
     function uncheckAllCheckboxes()
     { 
         $("#chkSelectedStations").prop("checked", false);
@@ -826,7 +969,6 @@
             }
         }
 
-
         // hide / show assign button
         if ($("#ddlProduct").val() == "") {
             $("#btnAssign").hide();
@@ -842,8 +984,9 @@
         loadMarketList();
         loadOwnerList();
         loadStationListByProduct();
-
         loadPersonnelAssignmentList("dtPersonnelAssignmentList");
+
+        loadProductSpecificAssignmentLists();
 
     }
 
@@ -1284,7 +1427,21 @@
         });
 
     }
+    function resetRelatedControl(masterControl, controlToChange, relatedCheckbox)
+    {
+ 
+        $('#' + controlToChange + ' option').each(function(){
+ 
+             this .selected = false;
 
+        });
+ 
+        if (!relatedCheckbox == false)
+        {
+            uncheckACheckbox(relatedCheckbox);
+        }
+ 
+    }
     function loadStationList()
     {
         var str = '';
@@ -1354,6 +1511,12 @@
             }
         });
 
+        loadProductSpecificAssignmentLists();
+
+    }
+
+    function loadProductSpecificAssignmentLists()
+    {
         if ($("#ddlProduct").val().toString().toLowerCase() == 'mrr')
         {
             loadReportList();
@@ -1366,7 +1529,7 @@
 
         if ($("#ddlProduct").val().toString().toLowerCase() == 'dma') {
             loadReportListDMA();
- 
+
         }
 
         if ($("#ddlProduct").val().toString().toLowerCase() == 'tvb')
@@ -1374,18 +1537,18 @@
             loadRepFirmList();
             loadTVBAccessLevelList();
         }
-
     }
+
     function loadXrayAccessLevelList()
     {
         var str = '';
         var controlToLoad = "#ddlAccessXRY";
 
         $(controlToLoad).html("");
-        str = str + '<option value="">';
-        str = str + '-- Select an Access Level';
-        str = str + '</option>';
-        $(controlToLoad).append(str);
+        //str = str + '<option value="">';
+        //str = str + '-- Select an Access Level';
+        //str = str + '</option>';
+        //$(controlToLoad).append(str);
 
         var apiParameters = new Object();
         var apiToken = getLocalStorage("APIToken");
@@ -1494,7 +1657,8 @@
 
 
     }
-    function loadReportList() {
+    function loadReportList()
+    {
         var str = '';
         var controlToLoad = "#ddlReport";
 
@@ -1504,11 +1668,16 @@
         //str = str + '</option>';
         //$(controlToLoad).append(str);
 
+        if ($("#ddlMarketAssign").val() == "")
+        {
+            return;
+        }
+
         var apiParameters = new Object();
         var apiToken = getLocalStorage("APIToken");
 
         apiParameters["inApiToken"] = apiToken;
-        apiParameters["inMarketId"] = $("#ddlMarket").val();
+        apiParameters["inMarketId"] = $("#ddlMarketAssign").val();
  
  
 
@@ -1557,14 +1726,14 @@
     function loadTVBAccessLevelList() {
 
         var str = '';
-        var controlToLoad = "#ddlAccesTVB";
+        var controlToLoad = "#ddlAccessTVB";
 
         $(controlToLoad).html("");
-        str = str + '<option value="">';
-        str = str + '-- Select an Access Level';
-        str = str + '</option>';
+        //str = str + '<option value="">';
+        //str = str + '-- Select an Access Level';
+        //str = str + '</option>';
 
-        $(controlToLoad).append(str);
+        //$(controlToLoad).append(str);
 
 
         $.ajax({
