@@ -1398,7 +1398,7 @@ function getYearList() {
     }
  
     if (paramRevenueYear.length > 0) {
-        $("#ddlYear").val(paramRevenueYear).trigger('chosen:updated');
+        $("#ddlYear").val(paramRevenueYear);
     }
  
 
@@ -1458,13 +1458,13 @@ function getPeriodList(inType)
     }
 
     if (paramRevenuePeriod.length > 0) {
-        $("#ddlPeriod").val(paramRevenuePeriod).trigger('chosen:updated');
+        $("#ddlPeriod").val(paramRevenuePeriod);
     }
 
 }
 
-//This will trigger "change" event when "val(new_val)" called
-//with value different than the current one
+//This will trigger the chosen:update event when "val(new_val)" called
+//only if the object has a chosen version of the object.
 (function($){
     var originalVal = $.fn.val;
     $.fn.val = function(){
@@ -1477,15 +1477,12 @@ function getPeriodList(inType)
         }
 
         var result = originalVal.apply(this, arguments);
-        //if(arguments.length>0 && prev!=originalVal.apply(this,[]))
-        //    $(this).change();  // OR with custom event $(this).trigger('value-changed')
 
         if ($(this).selector != undefined && $(this).selector.length > 0)
         {
             var chosenExists = checkIfChosenExistsForSelector($(this).selector);
             if (chosenExists)
             {
-                //console.log($(this).selector);
                 $(this.selector).trigger('chosen:updated');
             }
         }
