@@ -398,6 +398,7 @@
 
         $("#ddlStation option:selected").each(function () {
             var stationObject = {
+                "marketId": $("#ddlMarketAssign").val(),
                 "stationId": $(this).val(),
                 "selected": true
             }
@@ -418,13 +419,9 @@
         var inputObject = JSON.stringify({
             "inApiToken": getLocalStorage("APIToken"),
             "inPersonnelId": personnelId,
-            "inMarketId": $("#ddlMarketAssign").val(),
-            "inStationList": stationArray,
+            "inMarketStationList": stationArray,
             "inReportList": reportArray,
-            "inIsContact": isContact.toString(),
-            "inIsPrimaryContact": isPrimaryContact.toString(),
-            "inIsRecipient": $("#chkMRRRecipient").is(':checked').toString(),
-            "inIsAdministrator": $("#chkMRRAdministrator").is(':checked').toString()
+            "inIsRecipient": $("#chkMRRRecipient").is(':checked').toString() 
         });
 
         assignAJAX(inputObject, $("#ddlProduct").val(), $("#ddlProduct").val() + " Assignments Complete");
@@ -598,6 +595,11 @@
     {
 
         var url = ServicePrefix + '/api/' + (product.toLowerCase() == 'xry' ? 'XRAY' : product.toUpperCase()) + '/UpdatePersonnelMarketStationAssignments';
+        
+        if (product.toUpperCase() == "DMA")
+        {
+            var url = ServicePrefix + '/api/DMA/UpdatePersonnelAssignments';
+        }
 
         $.ajax({
             url: url,
@@ -933,53 +935,47 @@
 
     function buildColumnsArray(dataObj, dataTable)
     {
-        //destroyDataTable("dtPersonnelAssignmentList");
 
         columnsToDisplay = new Array();
 
         if ($("input[name='dataView']:checked").val() == "market")
         {
             columnsToDisplay.push("Market");
-            //columnsToDisplay.push("Owner");
-            //columnsToDisplay.push("Station");
+ 
             columnsToDisplay.push("Role");
             columnsToDisplay.push("Station Count");
-            //columnsToDisplay.push("Report Count");
+ 
         }
 
-        if ($("input[name='dataView']:checked").val() == "owner") {
-            //columnsToDisplay.push("Market");
+        if ($("input[name='dataView']:checked").val() == "owner")
+        {
+ 
             columnsToDisplay.push("Owner");
-            //columnsToDisplay.push("Station");
+ 
             columnsToDisplay.push("Role");
             columnsToDisplay.push("Station Count");
-            //columnsToDisplay.push("Report Count");
+ 
         }
 
 
-        if ($("input[name='dataView']:checked").val() == "role") {
-            //columnsToDisplay.push("Market");
-            //columnsToDisplay.push("Owner");
-            //columnsToDisplay.push("Station");
+        if ($("input[name='dataView']:checked").val() == "role")
+        {
+ 
             columnsToDisplay.push("Role");
             columnsToDisplay.push("Station Count");
-            //columnsToDisplay.push("Report Count");
+ 
         }
 
-        if ($("input[name='dataView']:checked").val() == "station") {
+        if ($("input[name='dataView']:checked").val() == "station")
+        {
             columnsToDisplay.push("Market");
             columnsToDisplay.push("Owner");
             columnsToDisplay.push("Station");
             columnsToDisplay.push("Role");
-            //columnsToDisplay.push("Station Count");
+ 
             columnsToDisplay.push("Report Count");
         }
-        //columnsToDisplay.push("Market");
-        //columnsToDisplay.push("Owner");
-        //columnsToDisplay.push("Station");
-        //columnsToDisplay.push("Role");
-        //columnsToDisplay.push("Station Count");
-        //columnsToDisplay.push("Report Count");
+ 
 
         columnsToExport = new Array();
 
@@ -998,6 +994,7 @@
         var data = dataObj["report"]["rows"][0];
         var ctr = -1;
         columns = new Array();
+        var bCreateSpecialExportCol = false;
 
         $.each(data, function (objectName, objectValue)
         {
@@ -1010,17 +1007,131 @@
                 {
                     className = "text-align-right";
                 }
+                switch (objectName) {
+                    case "Market":
+                        {
+                            // This is the exportable column
+                            columns.push({
+                                "title": objectName,
+                                "visible": false,
+                                "mData": objectName,
+                                "orderable": false,
+                                "className": className
+                            });
+                            ctr++;
+                            columnsToExport.push(ctr);
 
-                ctr++;
-                columnsToExport.push(ctr);
+                            // This is the displayable column
+                            columns.push({
+                                "title": objectName,
+                                "visible": true,
+                                "mRender": function (data, type, row) {
+                                    if (($("#ddlProduct").val().toString().toLowerCase() == 'dma') ||
+                                        ($("#ddlProduct").val().toString().toLowerCase() == 'mrr' && row["Role"].toString().toLowerCase() == "recipient") ||
+                                        ($("#ddlProduct").val().toString().toLowerCase() == 'xry'  && row["Role"].toString().toLowerCase().indexOf('contact') == -1 ))
+                                    {
+                                        return row["Market"] + '&nbsp;<a href="#" onclick="buildMarketLevelRemove(\'' + row.MarketId + '\', ' + '\'' + row.Market + '\', ' + '\'' + row.Role + '\'' + ');"><img src="/images/red-x.png" width="20" height="20" title="remove market assignment" alt="remove market assignment"></a>';
+                                    }
+                                    else
+                                    {
+                                        return row["Market"];
+                                    }
 
-                columns.push({
-                    "title": objectName,
-                    "visible": true,
-                    "mData": objectName,
-                    "orderable": true,
-                    "className": className
-                });
+                                },
+                                "orderable": true,
+                                "className": className + " noWrap"
+                            });
+                            ctr++;
+
+                        }
+                        break;
+                    case "Station":
+                        {
+                            // This is the exportable column
+                            columns.push({
+                                "title": objectName,
+                                "visible": false,
+                                "mData": objectName,
+                                "orderable": false,
+                                "className": className
+                            });
+                            ctr++;
+                            columnsToExport.push(ctr);
+
+                            // This is the displayable column
+                            columns.push({
+                                "title": objectName,
+                                "visible": true,
+                                "mRender": function (data, type, row) {
+                                    return row["Station"] + '&nbsp;<a href="#" onclick="buildStationLevelRemove(\'' + row.StationId + '\', ' + '\'' + row.Station + '\', ' + '\'' + row.MarketId + '\', ' + '\'' + row.Role + '\'' + ');"><img src="/images/red-x.png" width="20" height="20" title="remove station assignment" alt="remove station assignment"></a>';
+                                },
+                                "orderable": true,
+                                "className": className + " noWrap"
+                            });
+                            ctr++;
+
+                        }
+                        break;
+                    case "Role":
+                        bCreateSpecialExportCol = false;
+                        // This is the displayable column
+                        columns.push({
+                            "title": objectName,
+                            "visible": true,
+                            "mRender": function (data, type, row) {
+
+                                //if (row.Product.toString().toUpperCase() == "MRR") {
+                                //    bCreateSpecialExportCol = true;
+                                //    return row["Role"] + '&nbsp;<a href="#" onclick="buildGroupReportRemove(\'' + row.Product + '\', ' + row.OwnerGroupId + ', ' + row["ReportId"] + ');"><img src="/images/red-x.png" width="20" height="20" alt="remove report assignment" title="remove report assignment"></a>';
+                                ////}
+                                //else {
+                                    bCreateSpecialExportCol = false;
+                                    return row["Role"];
+                                //}
+                            },
+                            "orderable": true,
+                            "className": className + " noWrap"
+                        });
+                        ctr++;
+
+                        // This is the exportable column
+                        if (bCreateSpecialExportCol == true) {
+
+                            columns.push({
+                                "title": objectName,
+                                "visible": false,
+                                "mData": objectName,
+                                "orderable": false,
+                                "className": className
+                            });
+                            ctr++;
+                        }
+                        columnsToExport.push(ctr);
+
+                        break;
+
+                    default:
+                        ctr++;
+                        columnsToExport.push(ctr);
+                        columns.push({
+                            "title": objectName,
+                            "visible": true,
+                            "mData": objectName,
+                            "orderable": true,
+                            "className": className
+                        });
+
+                }
+                //ctr++;
+                //columnsToExport.push(ctr);
+
+                //columns.push({
+                //    "title": objectName,
+                //    "visible": true,
+                //    "mData": objectName,
+                //    "orderable": true,
+                //    "className": className
+                //});
             }
         });
         //console.log(columns);
@@ -1763,6 +1874,190 @@
         }
 
     }
+    function buildMarketLevelRemove(marketId, descriptor, role, reportId)
+    {
+        buildStationLevelRemove(-1, descriptor, marketId, role, -1);
+    }
 
+    function buildStationLevelRemove(stationId, descriptor, marketId, role, reportId)
+    {
+        if (!reportId) {
+            reportId = -1;
+        }
+
+        if (!stationId) {
+            stationId = -1;
+        }
+
+        switch ($("#ddlProduct").val().toString().toUpperCase()) {
+
+            case "DMA":
+                var inputObject = buildDMARemoveObject(stationId, marketId, role, reportId);
+                break;
+
+            case "MRR":
+                var inputObject = buildMRRRemoveObject(stationId, marketId, role, reportId);
+                break;
+
+            case "XRY":
+                var inputObject = buildXRYRemoveObject(stationId, marketId, role, reportId);
+                break;
+
+            case "TVB":
+                return;
+
+            default:
+                return false;
+
+        }
+
+        var msg = "Are you sure you want to remove " + role + " assignments for " + descriptor;
+
+        bootbox.confirm(msg + "?", function (result)
+        {
+            if (result == false)
+            {
+                return;
+            }  
+            else
+            {
+                assignAJAX(inputObject, $("#ddlProduct").val(), $("#ddlProduct").val() + " Assignments Removed");
+            }
+
+
+        });
+    }
+    function buildMRRRemoveObject(stationId, marketId, role, reportId)
+    {
+        var stationArray = new Array();
+        var reportArray = new Array();
+
+        var stationObject = {
+            "stationId": stationId,
+            "selected": true
+        }
+        stationArray.push(stationObject);
+
+        var reportObject = {
+            "reportId": reportId,
+            "selected": true
+        }
+        reportArray.push(reportObject);
+
+
+        var radioValue = $("input[name='radContactMRR']:checked").val();
+
+        // default settings - not a contact
+        var isContact = false;
+        var isPrimaryContact = false;
+        var isAdministrator = false;
+        var isRecipient = false;
+
+
+        if (role.toLowerCase().toString().indexOf("contact") > -1)
+        {
+            isContact = true;
+        }
+        if (role.toLowerCase() == "recipient")
+        {
+            isRecipient = true;
+        }
+        if (role.toLowerCase() == "manager" || role.toLowerCase() == "administrator")
+        {
+            isAdministrator = true;
+        }
+
+        var inputObject = JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inPersonnelId": personnelId,
+            "inMarketId": marketId,
+            "inStationList": stationArray,
+            "inReportList": reportArray,
+            "inIsContact": isContact.toString(),
+            "inIsPrimaryContact": isContact.toString(),
+            "inIsRecipient": isRecipient.toString(),
+            "inIsAdministrator": isAdministrator.toString(),
+            "inDeleteOperation": true
+        });
+
+        return inputObject;
+    }
+    function buildDMARemoveObject(stationId, marketId, role, reportId)
+    {
+        var stationArray = new Array();
+        var reportArray = new Array();
+
+        var stationObject = {
+            "marketId": marketId,
+            "stationId": stationId,
+            "selected": true
+        }
+        stationArray.push(stationObject);
+
+        var reportObject = {
+            "reportId": reportId,
+            "selected": true
+        }
+        reportArray.push(reportObject);
+
+
+        var inputObject = JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inPersonnelId": personnelId,
+            "inMarketStationList": stationArray,
+            "inReportList": reportArray,
+            "inDeleteOperation": true
+        });
+
+        return inputObject;
+    }
+    function buildXRYRemoveObject(stationId, marketId, role, accessId)
+    {
+        var isContact = false;
+        var isPrimaryContact = false;
+        var isRecipient = false;
+
+
+        if (role.toLowerCase().toString().indexOf("contact") > -1) {
+            isContact = true;
+        }
+        else
+        {
+            isRecipient = true;
+        }
+
+        var stationArray = new Array();
+        var stationSubmissionArray = new Array();
+
+        var stationObject = {
+            "stationId": stationId,
+            "selected": true
+        }
+        stationArray.push(stationObject);
+
+        var submissionObject = {
+            "stationId": stationId,
+            "submissionId": 1,
+            "selected": true
+        }
+        stationSubmissionArray.push(submissionObject);
+
+
+        var inputObject = JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inPersonnelId": personnelId,
+            "inMarketId": marketId,
+            "inStationList": stationArray,
+            "inStationSubmissionList": stationSubmissionArray,
+            "inIsContact": isContact.toString(),
+            "inIsPrimaryContact": isContact.toString(),
+            "inIsRecipient": isRecipient,
+            "inAccessLevelId": accessId,
+            "inDeleteOperation": true
+        });
+
+        return inputObject;
+
+    }
 </script>
 
