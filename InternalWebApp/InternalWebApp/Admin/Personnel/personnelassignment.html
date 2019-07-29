@@ -251,10 +251,11 @@
                         <hr />
                         <strong>Data Level View:</strong> &nbsp;&nbsp;
 
-                        <input type="radio" name="dataView" checked="checked" value="role" onclick="loadPersonnelAssignmentList('dtPersonnelAssignmentList');" />&nbsp;Role&nbsp;&nbsp;
+                        <input type="radio" name="dataView"  value="role" onclick="loadPersonnelAssignmentList('dtPersonnelAssignmentList');" />&nbsp;Role&nbsp;&nbsp;
                         <input type="radio" name="dataView" value="market" onclick="loadPersonnelAssignmentList('dtPersonnelAssignmentList');" />&nbsp;Market&nbsp;&nbsp;
                         <input type="radio" name="dataView" value="owner" onclick="loadPersonnelAssignmentList('dtPersonnelAssignmentList');" />&nbsp;Owner&nbsp;&nbsp;
-                        <input type="radio" name="dataView" value="station" onclick="loadPersonnelAssignmentList('dtPersonnelAssignmentList');" />&nbsp;Station
+                        <input type="radio" name="dataView" checked="checked" value="station" onclick="loadPersonnelAssignmentList('dtPersonnelAssignmentList');" />&nbsp;Station
+                        <div style="display:inline-block" class="MRRChoices ProductChoices"><input type="radio" name="dataView" value="report" onclick="loadPersonnelAssignmentList('dtPersonnelAssignmentList');" />&nbsp;Report</div>
                     </div>
                 </div>
                 <!-- start datatable-->
@@ -330,7 +331,8 @@
         gDataTableDefaultRows = 10;
     });
 
-    function getPageParameters() {
+    function getPageParameters()
+    {
 
         //these are values past in local storage
         if (getLocalStorage("gPageParameters").length > 0) {
@@ -801,7 +803,6 @@
         $("#chkSelectedReportsDMA").prop("checked", false);
         $("#chkSelectedReports").prop("checked", false);
         $("#chkSelectedRepFirms").prop("checked", false);
- 
     }
 
     function loadScreenForProductChange()
@@ -815,9 +816,16 @@
         $("#ddlStation").html("");
 
         uncheckAllCheckboxes();
-        $("#chkSelectedStations").prop("checked", false);
-        $("#chkSelectedReportsDMA").prop("checked", false);
-        $("#chkSelectedReports").prop("checked", false);
+
+        // special scenario for MRR
+        if ($("#ddlProduct").val().toString().toLowerCase() != 'mrr')
+        {
+            if ($("input[name='dataView']:checked").val().toLowerCase() == "report")
+            {
+                $('input:radio[name="dataView"]').filter('[value="station"]').attr('checked', true);
+            }
+        }
+
 
         // hide / show assign button
         if ($("#ddlProduct").val() == "") {
@@ -836,6 +844,7 @@
         loadStationListByProduct();
 
         loadPersonnelAssignmentList("dtPersonnelAssignmentList");
+
     }
 
     function loadPersonnelAssignmentList(dataTable)
@@ -976,7 +985,13 @@
             columnsToDisplay.push("Report Count");
         }
  
-
+        if ($("input[name='dataView']:checked").val() == "report") {
+            columnsToDisplay.push("Market");
+            columnsToDisplay.push("Owner");
+            columnsToDisplay.push("Station");
+            columnsToDisplay.push("Role");
+            columnsToDisplay.push("Report");
+        }
         columnsToExport = new Array();
 
         if (!dataObj["report"]["rows"]) {
@@ -1007,7 +1022,8 @@
                 {
                     className = "text-align-right";
                 }
-                switch (objectName) {
+                switch (objectName)
+                {
                     case "Market":
                         {
                             // This is the exportable column
@@ -1037,6 +1053,41 @@
                                         return row["Market"];
                                     }
 
+                                },
+                                "orderable": true,
+                                "className": className + " noWrap"
+                            });
+                            ctr++;
+
+                        }
+                        break;
+                    case "Report":
+                        {
+                            // This is the exportable column
+                            columns.push({
+                                "title": objectName,
+                                "visible": false,
+                                "mData": objectName,
+                                "orderable": false,
+                                "className": className
+                            });
+                            ctr++;
+                            columnsToExport.push(ctr);
+
+                            // This is the displayable column
+                            columns.push({
+                                "title": objectName,
+                                "visible": true,
+                                "mRender": function (data, type, row) {
+                                    if (    $("#ddlProduct").val().toString().toLowerCase() == 'mrr' && 
+                                            row["Role"].toString().toLowerCase() == "recipient")
+                                    {
+                                        return row["Report"] + '&nbsp;<a href="#" onclick="buildReportLevelRemove(\'' + row.StationId + '\', ' + '\'' + row.Station + ':&nbsp;' + row.Report + '\', ' + '\'' + row.MarketId + '\', ' + '\'' + row.Role + '\',' + '\'' + row.ReportId + '\' ' + ');"><img src="/images/red-x.png" width="20" height="20" title="remove report assignment" alt="remove report assignment"></a>';
+                                    }
+                                    else
+                                    {
+                                        return row["Report"]
+                                    }
                                 },
                                 "orderable": true,
                                 "className": className + " noWrap"
@@ -1877,6 +1928,10 @@
     function buildMarketLevelRemove(marketId, descriptor, role, reportId)
     {
         buildStationLevelRemove(-1, descriptor, marketId, role, -1);
+    }
+    function buildReportLevelRemove(stationId, descriptor, marketId, role, reportId)
+    {
+        buildStationLevelRemove(stationId, descriptor, marketId, role, reportId);
     }
 
     function buildStationLevelRemove(stationId, descriptor, marketId, role, reportId)
