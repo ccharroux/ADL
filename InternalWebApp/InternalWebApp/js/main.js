@@ -287,9 +287,6 @@ var navTool = {
                 }
             }
 
-            //if (checkIfChosenObjectExists(e)) {
-            //    $("#" + e.id).trigger('chosen:updated');
-            //}
         }
         else {
             if (e.selectedIndex == e.length - 1) {
@@ -300,9 +297,6 @@ var navTool = {
 
             }
 
-            //if (checkIfChosenObjectExists(e)) {
-            //    $("#" + e.id).trigger('chosen:updated');
-            //}
         }
  
         // Create a new 'change' event
@@ -1511,9 +1505,6 @@ function convertToChosenSelect(selectName, allowSearchContains, allowSplitWordSe
     //This code reloads the dropdown to pick up new values.
     $("#" + selectName).trigger("chosen:updated");
 
-    //$("#" + selectName).change(function() {
-    //    $(this).trigger("chosen:updated");
-    //});
 }
 
 function checkIfChosenObjectExists(object) {
