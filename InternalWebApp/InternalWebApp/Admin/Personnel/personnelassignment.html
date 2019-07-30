@@ -471,6 +471,8 @@
         // default settings - not a contact
         var isContact = false;
         var isPrimaryContact = false;
+ 
+
 
         if (radioValue.toLowerCase() == "primary") {
             isContact = true;
@@ -492,13 +494,13 @@
             "inIsPrimaryTimeSalesContact" :  isPrimaryContact,
             "inIsRepFirmContact": $("#chkTVBRepDataContact").is(':checked').toString(),
             "inIsEstimateContact": $("#chkTVBEstimatedContact").is(':checked').toString(),
-            "inIsRecipient" : $("#chkTVBRecipient").is(':checked').toString()
+            "inIsAdministrator": $("#chkTVBAdministrator").is(':checked').toString(),
+            "inIsRecipient": $("#chkTVBRecipient").is(':checked').toString()
  
         });
 
  
-
-        console.log(inputObject);
+ 
         assignAJAX(inputObject, $("#ddlProduct").val(), $("#ddlProduct").val() + " Assignments Complete");
 
     }
@@ -635,6 +637,8 @@
             actionAlter = "MarketStation";
         }
  
+        ServicePrefix = 'http://localhost:54064';
+
         var url = ServicePrefix + '/api/' + product + '/UpdatePersonnel' + actionAlter+'Assignments';
         
         $.ajax({
@@ -719,6 +723,8 @@
         // at least 1 action
         if ($("#chkTVBRepDataContact").is(':checked') == false &&
             $("#chkTVBRecipient").is(':checked') == false &&
+            $("#chkTVBEstimatedContact").is(':checked') == false &&
+            $("#chkTVBAdministrator").is(':checked') == false &&
             $('input[name=radContactTVB]:checked').val() == "")
         {
             bootbox.alert("You must select at least 1 assignment action to perform the assignment operation.");
@@ -759,6 +765,21 @@
             }
  
         }
+
+        // Administrator
+        if ($("#chkTVBAdministrator").is(':checked')) {
+
+            if (marketSelectionValid() == false) {
+                return false;
+            }
+
+            if (stationSelectionValid() == false) {
+                return false;
+            }
+ 
+
+        }
+
 
         // Rep Firm Contact
         if ($("#chkTVBRepDataContact").is(':checked'))
@@ -1185,7 +1206,20 @@
                                 "title": objectName,
                                 "visible": true,
                                 "mRender": function (data, type, row) {
+
+                                    var bTVBRecip = false;
+
+                                    if ($("#ddlProduct").val().toString().toLowerCase() == 'tvb') {
+                                        $("#ddlAccessTVB option").each(function () {
+                                            if ($(this).text().toString().toLowerCase() == row["Role"].toString().toLowerCase()) {
+                                                bTVBRecip = true;
+                                            }
+                                        });
+                                    }
+
                                     if (($("#ddlProduct").val().toString().toLowerCase() == 'dma') ||
+                                        (bTVBRecip == true) ||
+                                        ($("#ddlProduct").val().toString().toLowerCase() == 'tvb' && row["Role"].toString().toLowerCase() == "rep firm contact") ||
                                         ($("#ddlProduct").val().toString().toLowerCase() == 'mrr' && row["Role"].toString().toLowerCase() == "recipient") ||
                                         ($("#ddlProduct").val().toString().toLowerCase() == 'xry'  && row["Role"].toString().toLowerCase().indexOf('contact') == -1 ))
                                     {
@@ -1257,7 +1291,15 @@
                                 "title": objectName,
                                 "visible": true,
                                 "mRender": function (data, type, row) {
-                                    return row["Station"] + '&nbsp;<a href="#" onclick="buildStationLevelRemove(\'' + row.StationId + '\', ' + '\'' + row.Station + '\', ' + '\'' + row.MarketId + '\', ' + '\'' + row.Role + '\'' + ');"><img src="/images/red-x.png" width="20" height="20" title="remove station assignment" alt="remove station assignment"></a>';
+
+                                    if (row["Station"] == "N/A")
+                                    {
+                                        return row["Station"];
+                                    }
+                                    else
+                                    {
+                                        return row["Station"] + '&nbsp;<a href="#" onclick="buildStationLevelRemove(\'' + row.StationId + '\', ' + '\'' + row.Station + '\', ' + '\'' + row.MarketId + '\', ' + '\'' + row.Role + '\'' + ');"><img src="/images/red-x.png" width="20" height="20" title="remove station assignment" alt="remove station assignment"></a>';
+                                    }
                                 },
                                 "orderable": true,
                                 "className": className + " noWrap"
@@ -1274,14 +1316,16 @@
                             "visible": true,
                             "mRender": function (data, type, row) {
 
-                                //if (row.Product.toString().toUpperCase() == "MRR") {
-                                //    bCreateSpecialExportCol = true;
-                                //    return row["Role"] + '&nbsp;<a href="#" onclick="buildGroupReportRemove(\'' + row.Product + '\', ' + row.OwnerGroupId + ', ' + row["ReportId"] + ');"><img src="/images/red-x.png" width="20" height="20" alt="remove report assignment" title="remove report assignment"></a>';
-                                ////}
-                                //else {
+                                if ($("#ddlProduct").val().toString().toLowerCase() == 'tvb' && row["Role"].toString().toLowerCase() == "estimated contact")
+                                {
+                                    bCreateSpecialExportCol = true;
+                                    return row["Role"] + '&nbsp;<a href="#" onclick="buildMarketLevelRemove(\'' + row.MarketId + '\', ' + '\'' + row.Role + '\', ' + '\'' + row.Role + '\'' + ');"><img src="/images/red-x.png" width="20" height="20" title="remove role assignment" alt="remove role assignment"></a>';
+                                }
+                                else {
                                     bCreateSpecialExportCol = false;
                                     return row["Role"];
-                                //}
+                                }
+
                             },
                             "orderable": true,
                             "className": className + " noWrap"
@@ -1331,6 +1375,24 @@
         //console.log(columns);
         //$('#dtPersonnelAssignmentList').show();
         loadResults(dataObj, columns, dataTable);
+    }
+
+    function IsThisATVBRecipient(label)
+    {
+        var bReturn = false;
+
+        $("#ddlAccessTVB option").each(function ()
+        {
+ 
+            if ($(this).text().toString().toLowerCase() == label.toLowerCase())
+            {
+ 
+                bReturn = true;
+            }
+        });
+
+        return bReturn;
+
     }
     function getProductController(product)
     {
@@ -2128,7 +2190,8 @@
                 break;
 
             case "TVB":
-                return;
+                var inputObject = buildTVBRemoveObject(stationId, marketId, role, reportId);
+                break;
 
             default:
                 return false;
@@ -2279,6 +2342,76 @@
             "inAccessLevelId": accessId,
             "inDeleteOperation": true
         });
+
+        return inputObject;
+
+    }
+
+    function buildTVBRemoveObject(stationId, marketId, role, accessId)
+    {
+        var repFirmArray = new Array();
+        var stationArray = new Array();
+
+        var isContact = false;
+        var isRecipient = false;
+        var isAdministrator = false;
+        var isEstimatedContact = false;
+        var isRepFirmContact = false;
+
+        if (role.toString().toLowerCase() == "secondary contact" || role.toString().toLowerCase() == "primary contact")
+        {
+            isContact = true;
+        }
+
+        isRecipient = IsThisATVBRecipient(role.toString().toLowerCase());
+        
+        if (role.toString().toLowerCase() == 'manager')
+        {
+            isAdministrator = true;
+        }
+
+        if (role.toString().toLowerCase() == 'estimated contact')
+        {
+            isEstimatedContact = true;
+        }
+        
+        if (role.toString().toLowerCase() == "rep firm contact")
+        {
+            isRepFirmContact = true;
+ 
+        }
+
+        var stationArray = new Array();
+        var stationSubmissionArray = new Array();
+
+        var stationObject = {
+            "stationId": stationId,
+            "selected": true
+        }
+        stationArray.push(stationObject);
+
+        var repFirmObject = {
+            "repFirmId": marketId,
+            "selected": true
+        }
+        repFirmArray.push(repFirmObject);
+
+        var inputObject = JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inPersonnelId": personnelId,
+            "inMarketId": marketId,
+            "inStationList": stationArray,
+            "inRepFirmList": repFirmArray,
+            "inAccessLevelId": accessId,
+            "inIsTimeSalesContact": isContact,
+            "inIsPrimaryTimeSalesContact": isContact,
+            "inIsRepFirmContact": isRepFirmContact.toString(),
+            "inIsEstimateContact": isEstimatedContact.toString(),
+            "inIsAdministrator": isAdministrator.toString(),
+            "inIsRecipient": isRecipient.toString(),
+            "inDeleteOperation": true
+        });
+ 
 
         return inputObject;
 
