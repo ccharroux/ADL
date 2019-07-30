@@ -488,8 +488,8 @@ function buildAdvertiserSearch(searchCriteria)
     });
 
     columns.push({
-        "title": "Advertiser Name",
-        "data": "advertiserName",
+        "title": "Advertiser",
+        "data": "advertiser",
         "orderable": true
     });
 
@@ -501,20 +501,20 @@ function buildAdvertiserSearch(searchCriteria)
     });
 
     columns.push({
-        "title": "Market Name",
-        "data": "marketName",
+        "title": "Market",
+        "data": "market",
         "orderable": true
     });
 
     columns.push({
-        "title": "Industry Description",
-        "data": "industryDescription",
+        "title": "Industry",
+        "data": "industry",
         "orderable": true
     })
 
     columns.push({
-        "title": "Sub Industry Description",
-        "data": "subIndustryDescription",
+        "title": "Sub Industry",
+        "data": "subIndustry",
         "orderable": true
     })
 
@@ -929,8 +929,8 @@ function buildLinkAdvertiserSearch(searchCriteria) {
     });
 
     columns.push({
-        "title": "Advertiser Name",
-        "mData": "advertiserName",
+        "title": "Advertiser",
+        "mData": "advertiser",
         "orderable": true
     });
 
@@ -942,20 +942,20 @@ function buildLinkAdvertiserSearch(searchCriteria) {
     });
 
     columns.push({
-        "title": "Market Name",
-        "mData": "marketName",
+        "title": "Market",
+        "mData": "market",
         "orderable": true
     });
 
     columns.push({
-        "title": "Industry Description",
-        "data": "industryDescription",
+        "title": "Industry",
+        "data": "industry",
         "orderable": true
     })
 
     columns.push({
-        "title": "Sub Industry Description",
-        "data": "subIndustryDescription",
+        "title": "Sub Industry",
+        "data": "subIndustry",
         "orderable": true
     })
 
