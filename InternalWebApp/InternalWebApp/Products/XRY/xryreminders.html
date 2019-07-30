@@ -294,8 +294,9 @@
                 { "data": 'on hold' },
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="#" onclick="sendReminder(' + row.marketId + ',' + row.stationId + ',' + row.personnelId + ')">Send</a>';
-
+                        return (row["stations pending"] == 0)
+                            ? ''
+                            : '<a href="#" onclick="sendReminder(' + row.marketId + ',' + row.stationId + ',' + row.personnelId + ')">Send</a>';
                     },
                     "orderable": false,
                     "searchable": false
@@ -734,6 +735,16 @@
 
     }
 
+    function currentYear() {
+        var yp = $("#ddlYearPeriod").val().toString();
+        return yp.substr(0, 4);
+    }
+
+    function currentPeriod() {
+        var yp = $("#ddlYearPeriod").val().toString();
+        return yp.substr(4, 2);
+    }
+
     function getReminders() {
         if (!gotContacts || !gotYearsPeriods) {
             return;
@@ -743,8 +754,8 @@
         //setLocalStorage("searchPage", window.location);
 
         var yp = $("#ddlYearPeriod").val().toString();
-        var y = yp.substring(0, 4);
-        var p = yp.substring(4, 6); // second argument is also index, not length like .NET
+        var y = currentYear();
+        var p = currentPeriod();
         var url = ServicePrefix + '/api/XRAYReport/GetMarketRelease'
                 + '?inApiToken=' + getLocalStorage("APIToken")
                 + '&inYear=' + y
@@ -820,8 +831,41 @@
     }
 
     function sendReminder(marketId, stationId, personnelId) {
-        bootbox.alert('Send functionality is still under development. MarketID = ' + marketId + ' / StationID = ' + stationId + ' / PersonnelID = ' + personnelId);
+        var url = ServicePrefix + '/api/XRAY/InsertRemindersIntoQueue';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId,
+                "inStationId": stationId,
+                "inYear": currentYear(),
+                "inPeriod": currentPeriod(),
+                // "inEmailNote": null,
+                "inPersonnelId": personnelId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                sendReminderSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function sendReminderSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        getReminders();
     }
 
 </script>
-
