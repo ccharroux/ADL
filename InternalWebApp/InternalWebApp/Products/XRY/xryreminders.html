@@ -294,8 +294,9 @@
                 { "data": 'on hold' },
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="#" onclick="sendReminder(' + row.marketId + ',' + row.stationId + ',' + row.personnelId + ')">Send</a>';
-
+                        return (row["stations pending"] == 0)
+                            ? ''
+                            : '<a href="#" onclick="sendReminder(' + row.marketId + ',' + row.stationId + ',' + row.personnelId + ')">Send</a>';
                     },
                     "orderable": false,
                     "searchable": false
@@ -734,6 +735,16 @@
 
     }
 
+    function currentYear() {
+        var yp = $("#ddlYearPeriod").val().toString();
+        return yp.substr(0, 4);
+    }
+
+    function currentPeriod() {
+        var yp = $("#ddlYearPeriod").val().toString();
+        return yp.substr(4, 2);
+    }
+
     function getReminders() {
         if (!gotContacts || !gotYearsPeriods) {
             return;
@@ -743,8 +754,8 @@
         //setLocalStorage("searchPage", window.location);
 
         var yp = $("#ddlYearPeriod").val().toString();
-        var y = yp.substring(0, 4);
-        var p = yp.substring(4, 6); // second argument is also index, not length like .NET
+        var y = currentYear();
+        var p = currentPeriod();
         var url = ServicePrefix + '/api/XRAYReport/GetMarketRelease'
                 + '?inApiToken=' + getLocalStorage("APIToken")
                 + '&inYear=' + y
