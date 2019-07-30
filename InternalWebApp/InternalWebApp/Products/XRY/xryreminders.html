@@ -820,8 +820,41 @@
     }
 
     function sendReminder(marketId, stationId, personnelId) {
-        bootbox.alert('Send functionality is still under development. MarketID = ' + marketId + ' / StationID = ' + stationId + ' / PersonnelID = ' + personnelId);
+        var url = ServicePrefix + '/api/XRAY/InsertRemindersIntoQueue';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId,
+                "inStationId": stationId,
+                "inYear": currentYear(),
+                "inPeriod": currentPeriod(),
+                // "inEmailNote": null,
+                "inPersonnelId": personnelId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                sendReminderSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function sendReminderSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        getReminders();
     }
 
 </script>
-
