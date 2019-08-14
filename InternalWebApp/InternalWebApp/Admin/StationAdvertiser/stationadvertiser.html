@@ -115,6 +115,18 @@
                             <input class="field-width-325" type="text" id="txtStationAdvertiserCode" />
                         </div>
                     </div>
+                    <!-- extra fields for matching -->
+                    <div class="row advertiser-category input-row" style="display: none;">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtAdvertiserCategory">Advertiser Category</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="hidden" id="txtPeriod"/>
+                            <input type="hidden" id="txtYear"/>
+                            <input type="hidden" id="txtPreviousPageLocation"/>
+                            <input class="field-width-325" type="text" id="txtAdvertiserCategory" value="" maxlength="50" disabled="disabled" />
+                        </div>
+                    </div>
 
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
@@ -163,7 +175,7 @@
                             </div>
                         </div>
                     </div>
-
+                   
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="txtActiveDate">Active Date</label>
@@ -199,7 +211,7 @@
                             <input class="field-width-325" type="text" id="txtDisableDate" value="" maxlength="50" placeholder="MM/DD/YYYY" readonly />
                         </div>
                     </div>
-
+                    
                     <!-- Buttons -->
                     <div class="default-button-section">
                         <div class="row input-row">
@@ -257,12 +269,17 @@
     var stationAdvertiserId = 0;
     var bLinkMarketAdvertiserRevenues = false;
     var bIsNew = false;
+    var bIsAdvMatch = false;
 
     $(document).ready(function () {
 
         stationAdvertiserId = (getParameterByName("StationAdvertiserID") == null ? 0 : getParameterByName("StationAdvertiserID"));
 
         $("#txtStationAdvertiserId").val(stationAdvertiserId);
+
+        bIsAdvMatch = getParameterByName("AdvMatch") == null ? false : getParameterByName("AdvMatch").toLowerCase() == "true";
+
+        //console.log(bIsAdvMatch);
 
         bIsNew = stationAdvertiserId <= 0;
 
@@ -384,6 +401,11 @@
             loadMarketAdvertiserSearchResults();
             $('.change-date').hide();
             initializeActiveDate();
+
+            if (bIsAdvMatch) {
+                loadMatchData();
+            }
+
             return;
         }
 
@@ -611,6 +633,7 @@
     }
 
     function updateStationAdvertiser() {
+
         if (validationPassed() === false) {
             return;
         }
@@ -646,6 +669,15 @@
                     //if new load new station advertiserid
                     if (bIsNew) {
                         $("#txtStationAdvertiserId").val(obj["_updateStatus"]);
+                    }
+
+                    //add function to update using the match functionality
+                    if (bIsAdvMatch) {
+                        //call function to update the match
+                        //how to handle when done in case the user wants to do more updates
+                        //disable update button
+                        //or just send them back to the unmatched list
+                        updateStationAdvertiserMatch();
                     }
 
                     if (bLinkMarketAdvertiserRevenues) {
@@ -751,5 +783,35 @@
             }
         });
 
+    }
+
+    function loadMatchData() {
+
+        if (getLocalStorage("newAdvertiserMatch").length <= 0) {
+            return;
+        }
+
+        var advertiserMatchData = $.parseJSON(getLocalStorage("newAdvertiserMatch"));
+
+        $("#ddlStations").val(advertiserMatchData["station"]);
+        $("#ddlMarkets").val(advertiserMatchData["market"]);
+        $("#txtStationAdvertiser").val(advertiserMatchData["advertiser"]);
+        //can the user change the name??
+        //it is required for the matching process
+        $("#txtStationAdvertiser").prop("disabled", true);
+        $("#txtStationAdvertiserCode").val(advertiserMatchData["stationAdvertiserCode"]);
+        $(".advertiser-category").show();
+        $("#txtAdvertiserCategory").val(advertiserMatchData["advertiserCategory"]);
+        $("#txtPeriod").val(advertiserMatchData["period"]);
+        $("#txtYear").val(advertiserMatchData["year"]);
+        $("#txtPreviousPageLocation").val(advertiserMatchData["previousPage"]);
+
+        //clear local storage
+        setLocalStorage("newAdvertiserMatch", "");
+    }
+
+    function updateStationAdvertiserMatch() {
+        //this will call the api to update the matching
+        window.location = $("#txtPreviousPageLocation").val();
     }
 </script>
