@@ -1015,6 +1015,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += '<ul class="dropdown-menu" role="menu">';
     menuItems += '        <li style="display:block"><a href="/products/xry/xryrelease.html">Release</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/xry/xryreminders.html">Reminders</a></li>';
+    menuItems += '        <li style="display:block;"><a href="/products/xry/xryownershipmappinglist.html">Ownership Mapping</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
 
