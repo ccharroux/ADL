@@ -342,7 +342,7 @@
 
                 action += "editStationAdvertiser(";
                 action += "'" + row["Station Advertiser Name"] + "','" + row["Station Category"] + "','" + row["Station Advertiser Code"] + "'";
-                action += ");"
+                action += ");";
                 //pass the advertiser name, station category
 
                 return '<a onclick="' + action + '">Match</a>';
@@ -364,6 +364,59 @@
          * station agency
          * link
          */
+
+        var columnsToDisplay = new Array();
+
+        columnsToDisplay.push({
+            "title": "Station",
+            "visible": true,
+            "mData": "Station",
+            "orderable": true,
+            "searchable": true
+        });
+
+        columnsToDisplay.push({
+            "title": "Owner",
+            "visible": true,
+            "mData": "Owner",
+            "orderable": true,
+            "searchable": true
+        });
+
+        columnsToDisplay.push({
+            "title": "Market",
+            "visible": true,
+            "mData": "Market",
+            "orderable": true,
+            "searchable": true
+        });
+
+
+        columnsToDisplay.push({
+            "title": "Station Agency",
+            "visible": true,
+            "mData": "Station Agency Name",
+            "orderable": true,
+            "searchable": true
+        });
+
+        columnsToDisplay.push({
+            "mRender": function (data, type, row) {
+                var action = "";
+
+                action += "editStationAgency(";
+                action += "'" + row["Station Agency Name"] + "','" + row["Station Category"] + "','" + row["Station Agency Code"] + "'";
+                action += ");";
+                //pass the advertiser name, station category
+
+                return '<a onclick="' + action + '">Match</a>';
+            },
+            "orderable": false,
+            "searchable": false,
+            "className": "text-align-right"
+        });
+
+        return columnsToDisplay;
     }
 
     function editStationAdvertiser(advertiser, category, stationAdvertiserCode) {
@@ -399,13 +452,36 @@
 
     }
 
-    function editStationAgency() {
+    function editStationAgency(agency, category, stationAgencyCode) {
         /*
          * load object
          * save object to local storage
          * redirect to station agency CRUD page
          * add flag to notate coming from this page
          */
+
+        var queryString = "";
+        queryString += "?Period=" + $("#ddlPeriod").val();
+        queryString += "&Year=" + $("#ddlYear").val();
+        queryString += "&OwnerID=" + $("#ddlOwner").val();
+        queryString += "&MarketID=" + $("#ddlMarket").val();
+        queryString += "&StationID=" + $("#ddlStation").val();
+        queryString += "&MatchPage=" + matchPageType;
+
+        var agencyMatchData =
+        {
+            period: $("#ddlPeriod").val(),
+            year: $("#ddlYear").val(),
+            station: $("#ddlStation").val(),
+            agency: agency,
+            market: $("#ddlMarket").val(),
+            stationAgencyCode: stationAgencyCode,
+            agencyCategory: category,
+            previousPage: "/products/xry/revenue/xrymatch.html" + queryString
+        }
+
+        setLocalStorage("newAgencyMatch", JSON.stringify(agencyMatchData));
+        window.location = "/admin/stationagency/stationagency.html?StationAgencyID=0&AgyMatch=true";
     }
 
     function getMarketListByProduct(inProduct) {
