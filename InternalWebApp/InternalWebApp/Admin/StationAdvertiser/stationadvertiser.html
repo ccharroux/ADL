@@ -225,7 +225,7 @@
                                     <input value="Update" onclick="updateStationAdvertiser()" class="default-button" type="button">
                                 </div>
                                 <div style="padding-top: 10px">
-                                    <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button">
+                                    <input value="Back" onclick="determineGoBack();" class="default-button" type="button">
                                 </div>
                             </div>
                         </div>
@@ -435,6 +435,10 @@
                         $('#txtStationAdvertiser').val(obj["stationAdvertiserName"]);
                         $('#txtStationAdvertiserCode').val(obj["stationAdvertiserCode"]);
 
+                        if (bIsAdvMatch) {
+                            $("#txtStationAdvertiser").prop("disabled", true);
+                        }
+
                         if (obj["dateSetup"] !== null) {
                             var activeDate = new Date(obj["dateSetup"]);
  
@@ -552,7 +556,11 @@
             "oldMarketAdvertiserName": $("#txtOldMarketAdvertiserName").val(),
             "marketAdvertiserName": $("#txtMarketAdvertiser").val(),
             "marketAdvertiserId": $("#txtMarketAdvertiserId").val(),
-            "searchPage": window.location
+            "searchPage": window.location,
+            "advertiserCategory":$("#txtAdvertiserCategory").val(),
+            "period":$("#txtPeriod").val(),
+            "year": $("#txtYear").val(),
+            "previousPage": $("#txtPreviousPageLocation").val()
         }
 
         setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
@@ -574,6 +582,15 @@
             $('#ddlStations').val(searchResults["stationID"]).change();
             $('#txtStationAdvertiser').val(searchResults["advertiserName"]);
             $('#txtStationAdvertiserCode').val(searchResults["advertiserCode"]);
+        }
+
+        if (bIsAdvMatch) {
+            $("#txtStationAdvertiser").prop("disabled", true);
+            $(".advertiser-category").show();
+            $("#txtAdvertiserCategory").val(searchResults["advertiserCategory"]);
+            $("#txtPeriod").val(searchResults["period"]);
+            $("#txtYear").val(searchResults["year"]);
+            $("#txtPreviousPageLocation").val(searchResults["previousPage"]);
         }
 
         //$("#txtStationAdvertiserId").val(searchResults["advertiserId"]);
@@ -672,12 +689,15 @@
                     }
 
                     //add function to update using the match functionality
-                    if (bIsAdvMatch) {
+                    console.log(bIsAdvMatch);
+                    if (bIsAdvMatch || bIsAdvMatch == "true") {
                         //call function to update the match
                         //how to handle when done in case the user wants to do more updates
                         //disable update button
                         //or just send them back to the unmatched list
                         updateStationAdvertiserMatch();
+                        //add processing window
+                        return;
                     }
 
                     if (bLinkMarketAdvertiserRevenues) {
@@ -812,6 +832,51 @@
 
     function updateStationAdvertiserMatch() {
         //this will call the api to update the matching
-        window.location = $("#txtPreviousPageLocation").val();
+
+        console.log("updateStationAdvertiserMatch");
+
+        $.ajax({
+            url: ServicePrefix + '/api/XRAYRevenue/UpdateMatchStationAdvertiser',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inYear": $("#txtYear").val(),
+                "inPeriod": $("#txtPeriod").val(),
+                "inStationId": $("#ddlStations").val(),
+                "inStationAdvertiserName": $("#txtStationAdvertiser").val(),
+                "inMarketAdvertiserId": $("#txtMarketAdvertiserId").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    console.log($("#txtPreviousPageLocation").val());
+                    bootbox.alert("The station advertiser has been matched.", function() {
+                        window.location = $("#txtPreviousPageLocation").val();
+                    });
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+       
+    }
+
+    function determineGoBack() {
+
+        if (bIsAdvMatch) {
+            window.location = $("#txtPreviousPageLocation").val();
+        } else {
+            goBackToDashboard();
+        }
+        
     }
 </script>
