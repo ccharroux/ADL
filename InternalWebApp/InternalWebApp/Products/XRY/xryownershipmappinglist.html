@@ -70,15 +70,19 @@
                     </div>
                 </div>
 
+                <!--Hidden Values-->
+                <input type="hidden" id="hdnMarketId" value="" />
+
                 <!--Serch Filters-->
                 <div class="row">
                     <div class="col-md-10">
                         <label for="ddlOwner" class="search-ddl-label">Owner</label>
-                        <select id="ddlOwner" class="search-ddl-select mkaRequired" errorMessage="You must select an Owner." onchange="getOwnerMappingList(true);"></select>
+                        <select id="ddlOwner" class="search-ddl-select mkaRequired" errorMessage="You must select an Owner." onchange="getMarketListByOwner()"></select>
 
                         <label for="ddlMarket" class="search-ddl-label">Market</label>
-                        <select id="ddlMarket" class="search-ddl-select" onchange="getOwnerMappingList(false);"></select>
+                        <select id="ddlMarket" class="search-ddl-select mkaRequired" errorMessage="You must select a Market."></select>
 
+                        <input type="button" class="search-button" style="" value="Search" onclick="getOwnerMappingList()" />
                     </div>
                     <div class="col-md-2">
                         <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editOwnerMapping('0', '0', '0');" />
@@ -158,7 +162,6 @@
     var columns = [];
     var columnsToDisplay = new Array();
     var columnsToExport = new Array();
-    var bReloadMarketList = false;
 
     $(document).ready(function () {
 
@@ -223,6 +226,11 @@
 
     function getMarketListByOwner() {
 
+        if ($("#ddlOwner").val() == "-1") {
+            bootbox.alert("You must select an Ownership.");
+            return;
+        }
+
         var url = ServicePrefix + '/api/Owner/GetMarketListByOwner';
 
         var settings = {
@@ -254,7 +262,7 @@
         else {
             var str = '';
 
-            str = '<option value="">-- Select a Market </option>';
+            str = '<option value="-1">-- Select a Market </option>';
 
             $.each(data.report.rows, function (index) {
                 str = str + '<option value="' + data.report.rows[index].M_MarketID + '">' + data.report.rows[index].M_MarketName + '</option>';
@@ -263,15 +271,19 @@
             $("#ddlMarket").html(str);
             convertToChosenSelect("ddlMarket", false, false);
 
+            //last saved search
+            if ($("#hdnMarketId").val() != "") {
+                $("#ddlMarket").val($("#hdnMarketId").val());
+                getOwnerMappingList();
+                $("#hdnMarketId").val("");
+            }
+
         }
     }
 
-    function getOwnerMappingList(reloadMarketList) {
+    function getOwnerMappingList() {
 
-        bReloadMarketList = reloadMarketList;
-
-        if ($("#ddlOwner").val().trim() == "-1") {
-            bootbox.alert("You must select an Owner.");
+        if(validationPassed() == false){
             return;
         }
 
@@ -306,11 +318,7 @@
 
             setLocalStorage("search", "");
 
-            buildColumns(data, "dtOwnerMappingList");
-
-            if (bReloadMarketList) {
-                getMarketListByOwner();
-            }
+            buildColumns(data, "dtOwnerMappingList");           
         }
     }
 
@@ -392,7 +400,7 @@
                 },
                 "orderable": false,
                 "searchable": false,
-                "className": "text-align-right"
+                "className": "text-align-right" 
             });
 
         loadResults(dataObj, columns, dataTable);
@@ -453,8 +461,10 @@
 
     function setLastSearch() {
 
+        var searchCriteria = $("#ddlOwner").val().trim() + "|" + $("#ddlMarket").val().trim();
+
         //Set Local Storage for back button
-        setLocalStorage("search", $("#ddlOwner").val().trim());
+        setLocalStorage("search", searchCriteria);
         setLocalStorage("searchPage", window.location);
 
     }
@@ -463,9 +473,15 @@
         var search = getParameterByName("search");
 
         if (!search == false) {
-            $("#ddlOwner").val(search).trigger("change");
+            if (search.length > 0) {
+                var sArray = new Array();
+                sArray = search.split("|");
+
+                $("#ddlOwner").val(sArray[0]).trigger("change");
+                $("#hdnMarketId").val(sArray[1]);
+            }
         }
-        
+
     }
 
     function editOwnerMapping(ownerTypeId, ownerId, marketId) {
@@ -476,6 +492,33 @@
         bootbox.alert("This function is still under development.");
     }
 
+    function validationPassed() {
+        var loopBreak = true;
+        $(".mkaRequired").each(function (index, el) {
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
 
+            // Text
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+            // Select
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == "-1") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+        });
+
+        return loopBreak;
+
+    }
 
 </script>
