@@ -174,6 +174,7 @@ reportName.push("rptParentAgencyList");
 reportName.push("rptParentAgencyAgencyList");
 reportName.push("rptStationAgencyList");
 
+reportName.push("rptUsersNotSetupInSystem");
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -7417,3 +7418,33 @@ function getReportObject_StationAgencyList() {
     return tempObject;
 }
 // XRY Reports end here
+
+function getReportFilterArray_UsersNotSetupInSystem() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+ 
+
+    return arrayFilters;
+}
+
+function getReportObject_UsersNotSetupInSystem()
+{
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Users Not Setup in the System",
+        apiControllerAction: "/api/PersonnelReport/GetUsersNotSetupInSystemList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['personnel'],
+        sortable : false
+
+    }
+
+    return tempObject;
+}
+// XRY Reports end here
+ 
