@@ -341,6 +341,7 @@
                 var action = "";
 
                 action += "editStationAdvertiser(";
+                action += row["marketId"] + "," + row["ownerId"] + "," + row["stationId"] + ",";
                 action += "'" + row["Station Advertiser Name"] + "','" + row["Station Category"] + "','" + row["Station Advertiser Code"] + "'";
                 action += ");";
                 //pass the advertiser name, station category
@@ -405,6 +406,7 @@
                 var action = "";
 
                 action += "editStationAgency(";
+                action += row["marketId"] + "," + row["ownerId"] + "," + row["stationId"] + ",";
                 action += "'" + row["Station Agency Name"] + "','" + row["Station Category"] + "','" + row["Station Agency Code"] + "'";
                 action += ");";
                 //pass the advertiser name, station category
@@ -419,13 +421,15 @@
         return columnsToDisplay;
     }
 
-    function editStationAdvertiser(advertiser, category, stationAdvertiserCode) {
+    function editStationAdvertiser(marketId, ownerId, stationId, advertiserName,  category, stationAdvertiserCode) {
         /*
          * load object
          * save object to local storage
          * redirect to station advertiser CRUD page
          * add flag to notate coming from this page
          */
+
+        //use what is passed in for the edit functionality
 
         var queryString = "";
         queryString += "?Period=" + $("#ddlPeriod").val();
@@ -439,20 +443,20 @@
         {
             period: $("#ddlPeriod").val(),
             year: $("#ddlYear").val(),
-            station: $("#ddlStation").val(),
-            advertiser: advertiser,
-            market: $("#ddlMarket").val(),
+            station: stationId,
+            advertiser: advertiserName,
+            market: marketId,
             stationAdvertiserCode: stationAdvertiserCode,
             advertiserCategory: category,
             previousPage: "/products/xry/revenue/xrymatch.html" + queryString
-    }
+        }
 
         setLocalStorage("newAdvertiserMatch", JSON.stringify(advertiserMatchData));
         window.location = "/admin/stationadvertiser/stationadvertiser.html?StationAdvertiserID=0&AdvMatch=true";
 
     }
 
-    function editStationAgency(agency, category, stationAgencyCode) {
+    function editStationAgency(marketId, ownerId, stationId, agencyName, category, stationAgencyCode) {
         /*
          * load object
          * save object to local storage
@@ -472,9 +476,9 @@
         {
             period: $("#ddlPeriod").val(),
             year: $("#ddlYear").val(),
-            station: $("#ddlStation").val(),
-            agency: agency,
-            market: $("#ddlMarket").val(),
+            station: stationId,
+            agency: agencyName,
+            market: marketId,
             stationAgencyCode: stationAgencyCode,
             agencyCategory: category,
             previousPage: "/products/xry/revenue/xrymatch.html" + queryString
@@ -598,6 +602,9 @@
             //create a blank version to have a standard width ddl for stations.
             $("#" + control).html("<option value=''>-- Select a Station --</option>");
             convertToChosenSelect(control, false, false);
+
+            getUnmatchedList();
+
             return;
         }
 
@@ -659,45 +666,65 @@
         var bIncludeAdvertiserMatched = false;
         var bIncludeAgencyMatched = false;
         var bIncludeBothMatched = false;
+        var bDistinctAdvertisers = false;
+        var bDistinctAgencies = false;
 
         switch (matchPageType.toUpperCase()) {
         case "ADV":
             bIncludeAdvertiserMatched = false;
             bIncludeAgencyMatched = true;
             bIncludeBothMatched = true;
+            bDistinctAdvertisers = true;
             break;
         case "AGY":
             bIncludeAdvertiserMatched = true;
             bIncludeAgencyMatched = false;
-            bIncludeBothMatched = true
+            bIncludeBothMatched = true;
+            bDistinctAgencies = true;
             break;
         default:
             bIncludeAdvertiserMatched = false;
             bIncludeAgencyMatched = true;
             bIncludeBothMatched = true;
+            bDistinctAdvertisers = true;
             break;
         }
 
         //do ajax call
         //api /api/XRAYRevenue/GetStationAccountListForMatching
-        var queryString = "?";
 
-        queryString += "inApiToken=" + getLocalStorage("APIToken");
-        queryString += "&inPeriod=" + $("#ddlPeriod").val();
-        queryString += "&inYear=" + $("#ddlYear").val();
-        queryString += "&inMarketId=" + $("#ddlMarket").val();
-        queryString += "&inOwnerId=" + $("#ddlOwner").val();
-        queryString += "&inStationId=" + $("#ddlStation").val();
-        queryString += "&inIncludeAdvertiserMatched=" + bIncludeAdvertiserMatched;
-        queryString += "&inIncludeAgencyMatched=" + bIncludeAgencyMatched;
-        queryString += "&inIncludeBothMatched=" + bIncludeBothMatched;
+        //changing to a POST since the number of parameters have gotten larger
+        //var queryString = "?";
 
-        var unmatchedApi = "/api/XRAYRevenue/GetStationAccountListForMatching" + queryString;
+        //queryString += "inApiToken=" + getLocalStorage("APIToken");
+        //queryString += "&inPeriod=" + $("#ddlPeriod").val();
+        //queryString += "&inYear=" + $("#ddlYear").val();
+        //queryString += "&inMarketId=" + $("#ddlMarket").val();
+        //queryString += "&inOwnerId=" + $("#ddlOwner").val();
+        //queryString += "&inStationId=" + $("#ddlStation").val();
+        //queryString += "&inIncludeAdvertiserMatched=" + bIncludeAdvertiserMatched;
+        //queryString += "&inIncludeAgencyMatched=" + bIncludeAgencyMatched;
+        //queryString += "&inIncludeBothMatched=" + bIncludeBothMatched;
+
+        //var unmatchedApi = "/api/XRAYRevenue/GetStationAccountListForMatching" + queryString;
 
         $.ajax({
-            url: ServicePrefix + unmatchedApi,
+            url: ServicePrefix + "/api/XRAYRevenue/GetStationAccountListForMatching",
             dataType: 'json',
-            type: 'get',
+            type: 'post',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPeriod": $("#ddlPeriod").val(),
+                "inYear": $("#ddlYear").val(),
+                "inMarketId": $("#ddlMarket").val(),
+                "inOwnerId": $("#ddlOwner").val(),
+                "inStationId": $("#ddlStation").val(),
+                "inIncludeAdvertiserMatched": bIncludeAdvertiserMatched,
+                "inIncludeAgencyMatched": bIncludeAgencyMatched,
+                "inIncludeBothMatched": bIncludeBothMatched,
+                "inDistinctAdvertisers": bDistinctAdvertisers,
+                "inDistinctAgencies": bDistinctAgencies
+            }),
             contentType: 'application/json',
             processData: false,
             success: function (data, textStatus, jQxhr) {
