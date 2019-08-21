@@ -70,6 +70,9 @@
                     </div>
                 </div>
 
+                <!--Hidden Values-->
+                <input type="hidden" id="hdnMarketId" value="" />
+
                 <!--Serch Filters-->
                 <div class="row">
                     <div class="col-md-10">
@@ -223,6 +226,11 @@
 
     function getMarketListByOwner() {
 
+        if ($("#ddlOwner").val() == "-1") {
+            bootbox.alert("You must select an Ownership.");
+            return;
+        }
+
         var url = ServicePrefix + '/api/Owner/GetMarketListByOwner';
 
         var settings = {
@@ -262,6 +270,13 @@
 
             $("#ddlMarket").html(str);
             convertToChosenSelect("ddlMarket", false, false);
+
+            //last saved search
+            if ($("#hdnMarketId").val() != "") {
+                $("#ddlMarket").val($("#hdnMarketId").val());
+                getOwnerMappingList();
+                $("#hdnMarketId").val("");
+            }
 
         }
     }
@@ -446,8 +461,10 @@
 
     function setLastSearch() {
 
+        var searchCriteria = $("#ddlOwner").val().trim() + "|" + $("#ddlMarket").val().trim();
+
         //Set Local Storage for back button
-        setLocalStorage("search", $("#ddlOwner").val().trim());
+        setLocalStorage("search", searchCriteria);
         setLocalStorage("searchPage", window.location);
 
     }
@@ -456,9 +473,15 @@
         var search = getParameterByName("search");
 
         if (!search == false) {
-            $("#ddlOwner").val(search).trigger("change");
+            if (search.length > 0) {
+                var sArray = new Array();
+                sArray = search.split("|");
+
+                $("#ddlOwner").val(sArray[0]).trigger("change");
+                $("#hdnMarketId").val(sArray[1]);
+            }
         }
-        
+
     }
 
     function editOwnerMapping(ownerTypeId, ownerId, marketId) {
