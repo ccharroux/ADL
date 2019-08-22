@@ -118,11 +118,11 @@
                         -->
                         <div class="form-group rptView">
                             <label for="ddlPeriod" class="dropdown-label rptView">Period</label>
-                            <select id="ddlPeriod" apiInput="inPeriod" class="dropdown-select rptView"></select>
+                            <select id="ddlPeriod" apiInput="inPeriod" class="mkaRequired dropdown-select rptView " errorMessage="Select a period."></select>
                         </div>
                         <div class="form-group rptView">
                             <label for="ddlYear" class="dropdown-label rptView">Year</label>
-                            <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView"></select>
+                            <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView mkaRequired" errorMessage="Select a year."></select>
                         </div>
                         <div class="form-group rptView">
                             <label for="ddlMarket" class="dropdown-label rptView">Market</label>
@@ -331,7 +331,7 @@
         columnsToDisplay.push({
             "title": "Station Advertiser",
             "visible": true,
-            "mData": "Station Advertiser Name",
+            "mData": "Station Advertiser",
             "orderable": true,
             "searchable": true
         });
@@ -342,7 +342,7 @@
 
                 action += "editStationAdvertiser(";
                 action += row["marketId"] + "," + row["ownerId"] + "," + row["stationId"] + ",";
-                action += "'" + row["Station Advertiser Name"] + "','" + row["Station Category"] + "','" + row["Station Advertiser Code"] + "'";
+                action += "'" + row["Station Advertiser"] + "','" + row["Station Category"] + "','" + row["Station Advertiser Code"] + "'";
                 action += ");";
                 //pass the advertiser name, station category
 
@@ -396,7 +396,7 @@
         columnsToDisplay.push({
             "title": "Station Agency",
             "visible": true,
-            "mData": "Station Agency Name",
+            "mData": "Station Agency",
             "orderable": true,
             "searchable": true
         });
@@ -407,7 +407,7 @@
 
                 action += "editStationAgency(";
                 action += row["marketId"] + "," + row["ownerId"] + "," + row["stationId"] + ",";
-                action += "'" + row["Station Agency Name"] + "','" + row["Station Category"] + "','" + row["Station Agency Code"] + "'";
+                action += "'" + row["Station Agency"] + "','" + row["Station Category"] + "','" + row["Station Agency Code"] + "'";
                 action += ");";
                 //pass the advertiser name, station category
 
@@ -645,7 +645,8 @@
 
                     $("#" + control).val(stationId);
 
-                    if (($("#ddlMarket").val() !== "" || $("#ddlOwner").val() !== "") &&
+                    if ($("#ddlMarket").val()  !== "" ||
+                        $("#ddlOwner").val()   !== "" ||
                         $("#ddlStation").val() !== "")
                     {
 
@@ -662,6 +663,10 @@
     }
 
     function getUnmatchedList() {
+
+        if (validationPassed() === false) {
+            return;
+        }
 
         var bIncludeAdvertiserMatched = false;
         var bIncludeAgencyMatched = false;
@@ -819,6 +824,38 @@
                //}
             ]
         });
+    }
+
+    function validationPassed() {
+
+        var loopBreak = true;
+
+        $(".mkaRequired").each(function (index, el) {
+
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            // Text
+            if ($(eID).prop('tagName').toLowerCase() === "input") {
+                if ($(eID).val().trim() === "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+            // Select
+            if ($(eID).prop('tagName').toLowerCase() === "select") {
+                if ($(eID).val() === "-1" || $(eID).val() === "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+        });
+
+        return loopBreak;
     }
 
 </script>
