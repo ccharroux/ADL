@@ -175,6 +175,9 @@ reportName.push("rptParentAgencyAgencyList");
 reportName.push("rptStationAgencyList");
 
 reportName.push("rptUsersNotSetupInSystem");
+reportName.push("rptXRAYDataRetentionList");
+reportName.push("rptMRRComplimentaryMarketRevenueEntry");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -7446,5 +7449,58 @@ function getReportObject_UsersNotSetupInSystem()
 
     return tempObject;
 }
-// XRY Reports end here
  
+function getReportFilterArray_XRAYDataRetentionList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+
+    return arrayFilters;
+}
+
+function getReportObject_XRAYDataRetentionList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "XRAY Data Retention Exceptions",
+        apiControllerAction: "/api/XRAYReport/GetDataRetentionList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRComplimentaryMarketRevenueEntry() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+
+    return arrayFilters;
+}
+
+function getReportObject_MRRComplimentaryMarketRevenueEntry()
+{
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "MRR Complimentary Market Revenue Entry",
+        apiControllerAction: "/api/MRRReport/GetComplimentaryMarketRevenueEntry",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['mrr'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
