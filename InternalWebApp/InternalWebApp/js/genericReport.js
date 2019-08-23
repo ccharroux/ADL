@@ -7494,7 +7494,7 @@ function getReportObject_MRRComplimentaryMarketRevenueEntry()
     tempObject =
     {
         reportTitle: "MRR Complimentary Market Revenue Entry",
-        apiControllerAction: "/api/MRRReport/GetComplimentaryMarketRevenueEntry",
+        apiControllerAction: "/api/MRRReport/GetComplimentaryMarketRevenueEntryList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr'],
