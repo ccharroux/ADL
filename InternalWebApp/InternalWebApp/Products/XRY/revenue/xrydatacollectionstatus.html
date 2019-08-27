@@ -230,6 +230,13 @@
 <script>
 
     var product = "XRY";
+    var workingMarketId = 0;
+    var workingStationId = 0;
+    var workingPeriod = "";
+    var workingYear = "";
+    var bRevision = false;
+    var bCorrection = false;
+    var workingRevisionNumber = 0;
 
     $(document).ready(function () {
 
@@ -472,16 +479,325 @@
 
     }
 
+
+
+    function postRevenueProcess(stationId, marketId, period, year) {
+
+        workingStationId = stationId;
+        workingMarketId = marketId;
+        workingPeriod = period;
+        workingYear = year;
+
+        //this doesn't handle 3rd party data
+        //3rd party will probably go to a new page
+
+        //looks like most of the procs based on market, period, year
+        //can we do by market/station??
+
+        //check if released
+        //if released ask revision, correction or cancel
+        //has records is released, no records not released
+        //if not released ask if re-post
+        //can i re-post since posted flag has to be no for link to show
+
+
+        //off-season submission with revenue
+        //if not empty list and ask to clear
+        //if click cancel, do we stop posting process?
+
+        //off season revenue?? 
+
+
+        getMarketPeriodYearLatestRevision(workingMarketId, workingPeriod, workingYear);
+
+
+    }
+
+    function getMarketPeriodYearLatestRevision(marketId, period, year) {
+
+        var queryString = "";
+
+        queryString += "?inApiToken=" + getLocalStorage("APIToken");
+        queryString += "&inMarketId=" + marketId;
+        queryString += "&inPeriod=" + period;
+        queryString += "&inYear=" + year;
+
+        var latestRevisionApi = "/api/XRAYRevenue/GetLatestRevisionByMarketYearPeriod" + queryString;
+
+        $.ajax({
+            url: ServicePrefix + latestRevisionApi,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var results = data["report"]["rows"];
+                   
+                    if (results.length > 0 && results["Release Date"] !== null) {
+                        //prompt question revision, correction, cancel
+                        //if not cancelled initiate revision
+
+                        var strMessage = "";
+                        strMessage +=
+                            "The market has already been release. <br/> Is this a revision and want to notify recipents when re-release?";
+                        strMessage += "<br/>Is this a correction and should not notify recipients?";
+
+                        bootbox.dialog({
+                            message: strMessage,
+                            title: "Initiate Revision",
+                            buttons:
+                            {
+                                btnRevision: {
+                                    label: "Revision",
+                                    className: "btn-primary",
+                                    callback: function () {
+                                        bRevision = true;
+                                        initiateRevision();
+                                    }
+                                },
+                                btnCorrection: {
+                                    label: "Correction",
+                                    callback: function () {
+                                        bCorrection = true;
+                                        initiateRevision();
+                                    }
+                                },
+                                btnCancel: {
+                                    label: "Cancel",
+                                    callback: function () {
+                                        return;
+                                    }
+                                }
+                            }
+                        });
+
+                    } else {
+                        initiateRevision();
+                    }
+                    
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function initiateRevision() {
+
+        var initiateRevisionApi = "/api/XRAYRevenue/InitiateRevisionByMarketYearPeriod";
+
+        $.ajax({
+            url: ServicePrefix + initiateRevisionApi,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": workingMarketId,
+                "inPeriod": workingPeriod,
+                "inYear": workingYear
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    //check for off-season submissions with revenue
+                    checkForOffSeasonSubmissionsWithRevenue();
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function checkForOffSeasonSubmissionsWithRevenue() {
+        //call api
+        //if some exists prompt to remove
+
+        var queryString = "";
+
+        queryString += "?inApiToken=" + getLocalStorage("APIToken");
+        queryString += "&inMarketId=" + workingMarketId;
+        queryString += "&inPeriod=" + workingPeriod;
+        queryString += "&inYear=" + workingYear;
+
+        var offSeasonRevenueApi = "/api/XRAYRevenue/GetOffSeasonSubmissionsWithRevenueByMarketYearPeriod" + queryString;
+
+        $.ajax({
+            url: ServicePrefix + offSeasonRevenueApi,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var results = data["report"]["rows"];
+
+                    if (results.length > 0) {
+                        
+                        var strMessage = "";
+
+                        strMessage = "There is off-season revenue for the following stations: <br/><br/>";
+
+                        for (var i = 0; i < results.length; i++) {
+
+                            if (i % 3 && i > 0) {
+                                strMessage += "<br/>";
+                            }
+
+                            if (i === 0 && results.length === 1) {
+                                strMessage += results[i]["Station"];
+                            } else {
+                                strMessage += results[i]["Station"] + ",";
+                            }
+
+                        }
+
+                        //do we list everything out on the dialog??
+                        //asked christine, she said that station call letters
+                        //would be enough
+                        bootbox.dialog({
+                            message: strMessage,
+                            title: "Has Off Season Submissions with Revenue",
+                            buttons:
+                            {
+                                btnDelete: {
+                                    label: "Delete Submissions",
+                                    className: "btn-primary",
+                                    callback: function () {
+                                        //delete submissions
+                                        removeOffSeasonSubmissionsWithRevenue();
+                                    }
+                                },
+                                btnCancel: {
+                                    label: "Cancel",
+                                    callback: function () {
+                                        return;
+                                    }
+                                }
+                            }
+                        });
+
+                    } else {
+                        updateMarketYearPeriodPostedStatus(false);
+                    }
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function removeOffSeasonSubmissionsWithRevenue() {
+
+        var offSeasonRevenueApi = "/api/XRAYRevenue/DeleteOffSeasonSubmissionsWithRevenueByMarketYearPeriod";
+
+        $.ajax({
+            url: ServicePrefix + offSeasonRevenueApi,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": workingMarketId,
+                "inPeriod": workingPeriod,
+                "inYear": workingYear
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    //need to write the function call
+                    updateMarketYearPeriodPostedStatus(false);
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function updateMarketYearPeriodPostedStatus(postedFlag) {
+
+        var updateMarketYearPeriodPostedStatusApi = "/api/XRAYRevenue/UpdatePostedStatusByMarketYearPeriod";
+
+        $.ajax({
+            url: ServicePrefix + updateMarketYearPeriodPostedStatusApi,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": workingMarketId,
+                "inPeriod": workingPeriod,
+                "inYear": workingYear,
+                "inPosted": postedFlag
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    //need to write the function call
+                    //may need to split programming path based on posted status flag
+                    if (postedFlag === false) {
+                        //unpost station
+                    }
+                    //if true there shouldn't be any other steps
+                    //but this could change based on any additional flow changes
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function updateStationYearPeriodPostedStatus(postedFlag) {
+        
+    }
+
+    //data table functionality
     //get datatable columns and load data functionality
     function getDataColumns() {
         var columnsToDisplay = new Array();
 
         columnsToDisplay.push({
-            //"title": "Status",
-            //"visible": true,
-            //"mData": "Posted",
-            //"orderable": true,
-            //"searchable": true
             "title": "Status",
             "mRender": function (data, type, row) {
                 if (row["Posted"].toLowerCase() === "no") {
@@ -599,7 +915,12 @@
                     row["Agencies Matched"] === row["Number of Records"] &&
                     row["Posted"].toLowerCase() === "no") {
 
-                    actions += "<a>Post</a><br/>";
+                    var parameters = "";
+                    parameters += row["stationId"] + "," + row["marketId"];
+                    parameters += ",\"" + $("#ddlPeriod").val() + "\"";
+                    parameters += ",\"" + $("#ddlYear").val() + "\"";
+
+                    actions += "<a onclick='postRevenueProcess(" + parameters + ");'>Post</a><br/>";
 
                 }
 
