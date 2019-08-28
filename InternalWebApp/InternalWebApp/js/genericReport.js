@@ -177,6 +177,7 @@ reportName.push("rptStationAgencyList");
 reportName.push("rptUsersNotSetupInSystem");
 reportName.push("rptXRAYDataRetentionList");
 reportName.push("rptMRRComplimentaryMarketRevenueEntry");
+reportName.push("rptMRRModeUsageSummary");
 
 function buildReportArray()
 {
@@ -7499,6 +7500,58 @@ function getReportObject_MRRComplimentaryMarketRevenueEntry()
         columnsToDisplay: columnsToDisplay,
         product: ['mrr'],
         sortable: true
+
+    }
+
+    return tempObject;
+}
+//
+function getReportFilterArray_MRRModeUsageSummary() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_MRRModeUsageSummary()
+{
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Effective Report Title");
+    columnsToDisplay.push("Report Type");
+    columnsToDisplay.push("Total Reports");
+    columnsToDisplay.push("Total Interactive");
+    columnsToDisplay.push("% Interactive");
+    columnsToDisplay.push("Total PDF");
+    columnsToDisplay.push("% PDF");
+    columnsToDisplay.push("Total Excel");
+    columnsToDisplay.push("% Excel");
+
+    tempObject =
+    {
+        reportTitle: "MRR Output Mode Usage Summary",
+        apiControllerAction: "/api/MRRReport/GetMRRModeUsageSummary",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['mrr'],
+        sortable: false
 
     }
 
