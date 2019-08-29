@@ -150,17 +150,17 @@
                             <label for="ddlMarket" class="dropdown-label rptView">Market</label>
                             <select id="ddlMarket" apiInput="inMarketId" onchange="" class="dropdown-select rptView"></select>
                         </div>
-                        
+
                         <div class="form-group rptView collection-owner">
                             <label for="ddlOwner" class="dropdown-label rptView">Owner</label>
                             <select id="ddlOwner" apiInput="inOwnerId" onchange="" class="dropdown-select rptView"></select>
                         </div>
-                        
+
                         <div class="form-group rptView collection-station">
                             <label for="ddlStation" class="dropdown-label rptView">Station</label>
                             <select id="ddlStation" apiInput="inStationId" onchange="" class="dropdown-select rptView"></select>
                         </div>
-                        
+
                         <div class="form-group rptView">
                             <label for="ddlYear" class="dropdown-label rptView">Year</label>
                             <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView"></select>
@@ -170,7 +170,7 @@
                             <label for="ddlPeriod" class="dropdown-label rptView">Period</label>
                             <select id="ddlPeriod" apiInput="inPeriod" class="dropdown-select rptView"></select>
                         </div>
-                        
+
                         <div class="form-group col-md-3 rptButton" style="text-align:right">
                             <label for="btnReport" class="dropdown-label">&nbsp;</label>
                             <input type="button" id="btnReport" class="search-button" value="Show" onclick="getDataCollectionList()" />
@@ -178,7 +178,7 @@
 
                     </div>
                 </div>
-                
+
                 <!--
 
                 datatable goes here
@@ -288,19 +288,15 @@
     }
 
     function loadPeriods() {
+
         getPeriodList(); //does this only need to be months or do quarters need to be included
 
-        //if (period.length > 0) {
-        //    $("#ddlPeriod").val(period);
-        //}
     }
 
     function loadYears() {
+
         getYearList();
 
-        //if (year.length > 0) {
-        //    $("#ddlYear").val(year);
-        //}
     }
 
     function getMarketListByProduct(inProduct) {
@@ -479,8 +475,6 @@
 
     }
 
-
-
     function postRevenueProcess(stationId, marketId, period, year) {
 
         workingStationId = stationId;
@@ -505,7 +499,7 @@
         //if not empty list and ask to clear
         //if click cancel, do we stop posting process?
 
-        //off season revenue?? 
+        //off season revenue??
 
 
         getMarketPeriodYearLatestRevision(workingMarketId, workingPeriod, workingYear);
@@ -538,10 +532,12 @@
                 else {
 
                     var results = data["report"]["rows"];
-                   
+
                     if (results.length > 0 && results["Release Date"] !== null) {
                         //prompt question revision, correction, cancel
                         //if not cancelled initiate revision
+
+                        workingRevisionNumber = results["Revision Number"];
 
                         var strMessage = "";
                         strMessage +=
@@ -577,10 +573,15 @@
                             }
                         });
 
-                    } else {
+                    } else if (results.length > 0 && results["Release Date"] === null) {
+                        workingRevisionNumber = results["Revision Number"];
                         initiateRevision();
                     }
-                    
+                    else {
+                        workingRevisionNumber = 0;
+                        initiateRevision();
+                    }
+
                 }
 
             },
@@ -656,7 +657,7 @@
                     var results = data["report"]["rows"];
 
                     if (results.length > 0) {
-                        
+
                         var strMessage = "";
 
                         strMessage = "There is off-season revenue for the following stations: <br/><br/>";
@@ -761,6 +762,7 @@
                 "inMarketId": workingMarketId,
                 "inPeriod": workingPeriod,
                 "inYear": workingYear,
+                "inRevisionNumber": workingRevisionNumber,
                 "inPosted": postedFlag
             }),
             processData: false,
@@ -774,7 +776,8 @@
                     //need to write the function call
                     //may need to split programming path based on posted status flag
                     if (postedFlag === false) {
-                        //unpost station
+                        //un-post station
+                        updateStationYearPeriodPostedStatus(false);
                     }
                     //if true there shouldn't be any other steps
                     //but this could change based on any additional flow changes
@@ -789,8 +792,318 @@
     }
 
     function updateStationYearPeriodPostedStatus(postedFlag) {
-        
+
+        var updateStationYearPeriodPostedStatusApi = "/api/XRAYRevenue/UpdatePostedStatusByStationYearPeriod";
+
+        $.ajax({
+            url: ServicePrefix + updateStationYearPeriodPostedStatusApi,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": workingStationId,
+                "inPeriod": workingPeriod,
+                "inYear": workingYear,
+                "inPosted": postedFlag
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    if (postedFlag) {
+                        //go to the process of looking for unposted submissions and unposted media types
+                        getUnpostedSubmissionsByMarketYearPeriod();
+                    } else {
+                        //look for new owner revenue types
+                        addNewOwnerRevenueTypesByStationYearPeriod();
+                    }
+                    
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
     }
+
+    function addNewOwnerRevenueTypesByStationYearPeriod() {
+
+        var addOwnerRevenueTypesByStationYearPeriodApi = "/api/XRAYRevenue/AddOwnerRevenueTypesByStationYearPeriod";
+
+        $.ajax({
+            url: ServicePrefix + addOwnerRevenueTypesByStationYearPeriodApi,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": workingStationId,
+                "inPeriod": workingPeriod,
+                "inYear": workingYear
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    //get owner revenue types requiring mapping
+                    getOwnerRevenueTypesRequiringMapping();
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function getOwnerRevenueTypesRequiringMapping() {
+
+        var queryString = "";
+
+        queryString += "?inApiToken=" + getLocalStorage("APIToken");
+        queryString += "&inStationId=" + workingStationId;
+        queryString += "&inPeriod=" + workingPeriod;
+        queryString += "&inYear=" + workingYear;
+
+        var offSeasonRevenueApi = "/api/XRAYRevenue/GetOwnerRevenueTypeRequiringMappingByStationYearPeriod" + queryString;
+
+        $.ajax({
+            url: ServicePrefix + offSeasonRevenueApi,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var results = data["report"]["rows"];
+
+                    if (results.length > 0) {
+
+                        //need to build message and stop processing
+
+                        var strMessage = "";
+
+                        //need to determine what the message and content should be
+                        strMessage = "There are owner revenue types that require mapping.";
+
+                        bootbox.alert({
+                            message: strMessage,
+                            function() {
+                                return;
+                            }
+                        });
+
+                    } else {
+                        //unpost revenue by station year and period
+                        unpostRevenueByStationYearPeriod();
+                    }
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function unpostRevenueByStationYearPeriod() {
+
+        var unpostRevenueByStationYearPeriodApi = "/api/XRAYRevenue/UnpostRevenueByStationYearPeriod";
+
+        $.ajax({
+            url: ServicePrefix + unpostRevenueByStationYearPeriodApi,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": workingStationId,
+                "inPeriod": workingPeriod,
+                "inYear": workingYear
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    //post revenue
+                    postRevenueByStationYearPeriod();
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function postRevenueByStationYearPeriod() {
+
+        var postRevenueByStationYearPeriodApi = "/api/XRAYRevenue/PostRevenueByStationYearPeriod";
+
+        $.ajax({
+            url: ServicePrefix + postRevenueByStationYearPeriodApi,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": workingStationId,
+                "inPeriod": workingPeriod,
+                "inYear": workingYear
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    updateStationYearPeriodPostedStatus(true);
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function getUnpostedSubmissionsByMarketYearPeriod() {
+
+        var queryString = "";
+
+        queryString += "?inApiToken=" + getLocalStorage("APIToken");
+        queryString += "&inMarketId=" + workingMarketId;
+        queryString += "&inPeriod=" + workingPeriod;
+        queryString += "&inYear=" + workingYear;
+
+        var unpostedSubmissionsApi = "/api/XRAYRevenue/GetUnpostedSubmissionsByMarketYearPeriod" + queryString;
+
+        $.ajax({
+            url: ServicePrefix + unpostedSubmissionsApi,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var results = data["report"]["rows"];
+
+                    if (results.length > 0) {
+
+                        //need to build message and stop processing
+
+                        var strMessage = "";
+
+                        //need to determine what the message and content should be
+                        strMessage = "There are unposted submissions for the market.";
+
+                        bootbox.alert({
+                            message: strMessage,
+                            function() {
+                                return;
+                            }
+                        });
+
+                    } else {
+                        //unpost revenue by station year and period
+                        getUnpostedMediaTypesByMarketYearPeriod();
+                    }
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function getUnpostedMediaTypesByMarketYearPeriod() {
+
+        //if no records update the market posted status
+        var queryString = "";
+
+        queryString += "?inApiToken=" + getLocalStorage("APIToken");
+        queryString += "&inMarketId=" + workingMarketId;
+        queryString += "&inPeriod=" + workingPeriod;
+        queryString += "&inYear=" + workingYear;
+
+        var unpostedMediaTypesApi = "/api/XRAYRevenue/GetUnpostedMediaTypesByMarketYearPeriod" + queryString;
+
+        $.ajax({
+            url: ServicePrefix + unpostedMediaTypesApi,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var results = data["report"]["rows"];
+
+                    if (results.length > 0) {
+
+                        //need to build message and stop processing
+
+                        var strMessage = "";
+
+                        //need to determine what the message and content should be
+                        strMessage = "There are unposted media types for the market.";
+
+                        bootbox.alert({
+                            message: strMessage,
+                            function() {
+                                return;
+                            }
+                        });
+
+                    } else {
+                        //reset the market posted status
+                        updateMarketYearPeriodPostedStatus(true);
+                    }
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
 
     //data table functionality
     //get datatable columns and load data functionality
@@ -920,12 +1233,12 @@
                     parameters += ",\"" + $("#ddlPeriod").val() + "\"";
                     parameters += ",\"" + $("#ddlYear").val() + "\"";
 
-                    actions += "<a onclick='postRevenueProcess(" + parameters + ");'>Post</a><br/>";
+                    actions += "<a href='#' onclick='postRevenueProcess(" + parameters + ");'>Post</a><br/>";
 
                 }
 
                 if (row["enabled"] === true && row["Posted"].toLowerCase() === "yes") {
-                    actions += "<a>Un-Post</a><br/>";
+                    actions += "<a href='#'>Un-Post</a><br/>";
                 }
 
                 var link = '/products/xry/revenue/xrymatch.html?MatchPage=agy';
@@ -948,11 +1261,11 @@
                 actions += "<a href='" + link + "'>Match&nbsp;Advertisers</a><br/>";
 
                 if (row["enabled"] === false) {
-                    actions += "<a>Enable</a><br/>";
+                    actions += "<a href='#' onclick='enable();'>Enable</a><br/>";
                 }
 
                 if (row["enabled"] === true) {
-                    actions += "<a>Disable</a><br/>";
+                    actions += "<a href='#' onclick='disable();'>Disable</a><br/>";
                 }
 
                 //page uses local storage
@@ -970,7 +1283,7 @@
                     '","' +
                     row["Media Type"] +
                     '"';
-                actions += '<a onclick=changeAvailability(' + availabilityParameters + ');>Change&nbsp;Availability</a>';
+                actions += '<a href="#" onclick=changeAvailability(' + availabilityParameters + ');>Change&nbsp;Availability</a>';
 
                 return actions;
             },
@@ -1047,7 +1360,7 @@
             searchTable.destroy();
         }
 
-        //this code rebuilds the datatable with the updated data from the search 
+        //this code rebuilds the datatable with the updated data from the search
         //or initial load.
 
 
@@ -1079,4 +1392,24 @@
                 //}
             ]
         });
-    }</script>
+    }
+
+    function enable() {
+        bootbox.alert(
+            "Functionality under development.",
+            function() {
+                return;
+            }
+        );
+    }
+
+    function disable() {
+        bootbox.alert(
+            "Functionality under development.",
+            function () {
+                return;
+            }
+        );
+    }
+
+</script>
