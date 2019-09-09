@@ -174,6 +174,11 @@ reportName.push("rptParentAgencyList");
 reportName.push("rptParentAgencyAgencyList");
 reportName.push("rptStationAgencyList");
 
+reportName.push("rptUsersNotSetupInSystem");
+reportName.push("rptXRAYDataRetentionList");
+reportName.push("rptMRRComplimentaryMarketRevenueEntry");
+reportName.push("rptMRRModeUsageSummary");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -7417,3 +7422,138 @@ function getReportObject_StationAgencyList() {
     return tempObject;
 }
 // XRY Reports end here
+
+function getReportFilterArray_UsersNotSetupInSystem() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+ 
+
+    return arrayFilters;
+}
+
+function getReportObject_UsersNotSetupInSystem()
+{
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Users Not Setup in the System",
+        apiControllerAction: "/api/PersonnelReport/GetUsersNotSetupInSystemList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['personnel'],
+        sortable : false
+
+    }
+
+    return tempObject;
+}
+ 
+function getReportFilterArray_XRAYDataRetentionList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+
+    return arrayFilters;
+}
+
+function getReportObject_XRAYDataRetentionList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "XRAY Data Retention Exceptions",
+        apiControllerAction: "/api/XRAYReport/GetDataRetentionList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRComplimentaryMarketRevenueEntry() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+
+    return arrayFilters;
+}
+
+function getReportObject_MRRComplimentaryMarketRevenueEntry()
+{
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "MRR Complimentary Market Revenue Entry",
+        apiControllerAction: "/api/MRRReport/GetComplimentaryMarketRevenueEntryList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['mrr'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+//
+function getReportFilterArray_MRRModeUsageSummary() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_MRRModeUsageSummary()
+{
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Effective Report Title");
+    columnsToDisplay.push("Report Type");
+    columnsToDisplay.push("Total Reports");
+    columnsToDisplay.push("Total Interactive");
+    columnsToDisplay.push("% Interactive");
+    columnsToDisplay.push("Total PDF");
+    columnsToDisplay.push("% PDF");
+    columnsToDisplay.push("Total Excel");
+    columnsToDisplay.push("% Excel");
+
+    tempObject =
+    {
+        reportTitle: "MRR Output Mode Usage Summary",
+        apiControllerAction: "/api/MRRReport/GetMRRModeUsageSummary",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['mrr'],
+        sortable: false
+
+    }
+
+    return tempObject;
+}

@@ -157,7 +157,7 @@ function linkAdvertiser() {
     }
 
     searchResults['marketAdvertiserId'] = rowData[0].advertiserId;
-    searchResults['marketAdvertiserName'] = rowData[0].advertiserName;
+    searchResults['marketAdvertiserName'] = rowData[0].advertiser;
 
     setLocalStorage("gSearchResults", JSON.stringify(searchResults));
 

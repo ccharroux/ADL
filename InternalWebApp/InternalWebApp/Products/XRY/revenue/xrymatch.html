@@ -1,0 +1,868 @@
+﻿<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>MKA Internal Media Site</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Facebook and Twitter integration -->
+    <meta property="og:title" content="" />
+    <meta property="og:image" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:site_name" content="" />
+    <meta property="og:description" content="" />
+    <meta name="twitter:title" content="" />
+    <meta name="twitter:image" content="" />
+    <meta name="twitter:url" content="" />
+    <meta name="twitter:card" content="" />
+
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="shortcut icon" href="favicon.ico">
+
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
+
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700" rel="stylesheet">
+
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="/css/animate.css">
+    <!-- Icomoon Icon Fonts-->
+    <link rel="stylesheet" href="/css/icomoon.css">
+    <!-- Simple Line Icons -->
+    <link rel="stylesheet" href="/css/simple-line-icons.css">
+    <!-- Bootstrap  -->
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <!-- Theme style  -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <!--Chosen Dropdown-->
+    <link rel="stylesheet" href="/css/chosen.min.css" />
+
+    <!-- Modernizr JS -->
+    <script src="/js/modernizr-2.6.2.min.js"></script>
+    <!-- FOR IE9 below -->
+    <!--[if lt IE 9]>
+    <script src="js/respond.min.js"></script>
+    <![endif]-->
+    
+    <style>
+        .rptView {
+            margin-left: 5px;
+            vertical-align: top;
+            display: inline-block;
+        }
+
+        .rptStartDate, .rptEndDate {
+            /*max-width:100px;*/
+            text-align: center;
+        }
+
+        .container {
+            width: 100% !important;
+        }
+
+        .requiredText {
+            color: red !important;
+        }
+
+        .rptButton {
+            vertical-align: top;
+            display: inline-block;
+            float: right;
+        }
+
+        select {
+            max-width: 200px;
+        }
+    </style>
+
+
+
+</head>
+<body>
+    <div id="fh5co-page">
+        <header id="fh5co-header" role="banner">
+            <div class="container">
+                <div class="header-inner" id="menu"></div>
+            </div>
+        </header>
+
+        <div id="fh5co-contact-section" class="contact-section">
+            <div class="container">
+                <div class="row" id="reportTitleRow">
+                    <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
+                        <h2 id="pageTitle"></h2>
+                    </div>
+                </div>
+
+                <div class="row search-section">
+                    <div class="col-md-12 ">
+                        <!-- filters -->
+                        <!--
+                        period
+                        year
+                        market
+                        owner
+                        stations
+                        -->
+                        <div class="form-group rptView">
+                            <label for="ddlPeriod" class="dropdown-label rptView">Period</label>
+                            <select id="ddlPeriod" apiInput="inPeriod" class="mkaRequired dropdown-select rptView " errorMessage="Select a period."></select>
+                        </div>
+                        <div class="form-group rptView">
+                            <label for="ddlYear" class="dropdown-label rptView">Year</label>
+                            <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView mkaRequired" errorMessage="Select a year."></select>
+                        </div>
+                        <div class="form-group rptView">
+                            <label for="ddlMarket" class="dropdown-label rptView">Market</label>
+                            <select id="ddlMarket" apiInput="inMarketId" onchange="" class="dropdown-select rptView"></select>
+                        </div>
+                        <div class="form-group rptView">
+                            <label for="ddlOwner" class="dropdown-label rptView">Owner</label>
+                            <select id="ddlOwner" apiInput="inOwnerId" onchange="" class="dropdown-select rptView"></select>
+                        </div>
+                        <div class="form-group rptView">
+                            <label for="ddlStation" class="dropdown-label rptView">Station</label>
+                            <select id="ddlStation" apiInput="inStationId" onchange="" class="dropdown-select rptView"></select>
+                        </div>
+                        <div class="form-group col-md-3 rptButton" style="text-align:right">
+                            <label for="btnReport" class="dropdown-label">&nbsp;</label>
+                            <input type="button" id="btnReport" class="search-button" value="Show" onclick="getUnmatchedList()" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- datatable -->
+                <div class="dataTable-top-margin">
+                    <table id="dtResults" class="stripe"></table>
+                    <div id="noDataFound" style="display:none; color: red">No data found</div>
+                </div>
+                
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+    <!-- jQuery Easing -->
+    <script src="/js/jquery.easing.1.3.js"></script>
+    <!-- Bootstrap -->
+    <script src="/js/bootstrap.min.js"></script>
+    <!-- Bootbox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+    <!-- Waypoints -->
+    <script src="/js/jquery.waypoints.min.js"></script>
+    <!-- BlockUI JS -->
+    <script src="/js/blockUI.js"></script>
+    <!-- Config JS -->
+    <script src="/js/config.js"></script>
+    <!-- MAIN JS -->
+    <script src="/js/main.js"></script>
+    <!-- genericReport JS -->
+    <script src="/js/genericReport.js"></script>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <!--Chosen Dropdown-->
+    <script src="/js/chosen.jquery.min.js"></script>
+
+</body>
+</html>
+<script>
+
+    //advertiser or agency
+    //will default to advertiser
+    var matchPageType = "";
+    var marketId = 0;
+    var ownerId = 0;
+    var stationId = 0;
+    var period = "";
+    var year = "";
+    var product = "XRY";
+
+    $(document).ready(function () {
+
+        buildXRYMenu("Revenue");
+
+        clearLocalStorage();
+
+        //get the information from link
+        getParameters();
+
+        setupUI();
+
+        //load periods
+        loadPeriods();
+        //load years
+        loadYears();
+        //load markets
+        getMarketListByProduct(product);
+        //load owners
+        //getOwnerListByProduct(product);
+        //load stations (will figure out the order for these loads)
+        //do i just get by product??
+        //getStations();
+        //if has data coming over, load page.
+        //if direct, just load dropdowns
+
+        
+
+    });
+
+    function clearLocalStorage() {
+        setLocalStorage("newAdvertiserMatch", "");
+        setLocalStorage("newAgencyMatch", "");
+    }
+
+    function getParameters() {
+        /*
+         * ownerid
+         * marketid
+         * stationid
+         * period
+         * year
+         * token for advertiser or agency (match type)
+         * need to also get the submission id
+         */
+
+        ownerId = (getParameterByName("OwnerID") == null ? "" : getParameterByName("OwnerID"));
+        marketId = (getParameterByName("MarketID") == null ? "" : getParameterByName("MarketID"));
+        stationId = (getParameterByName("StationID") == null ? "" : getParameterByName("StationID"));
+        //not sure for the default value using empty for now
+        period = (getParameterByName("Period") == null ? "" : getParameterByName("Period"));
+        year = (getParameterByName("Year") == null ? "" : getParameterByName("Year"));
+        matchPageType = (getParameterByName("MatchPage") == null ? "ADV" : getParameterByName("MatchPage"));
+    }
+
+    function assignPageTitle() {
+        switch (matchPageType.toUpperCase()) {
+            case "ADV":
+                $("#pageTitle").html("Station Advertiser Match Page");
+                break;
+            case "AGY":
+                $("#pageTitle").html("Station Agency Match Page");
+                break;
+            default:
+                $("#pageTitle").html("Station Advertiser Match Page");
+                break;
+        }
+    }
+
+    function setupUI() {
+        assignPageTitle();
+
+        //market change get stations
+        $("#ddlMarket").change(function() {
+            getStations();
+        });
+
+        //owner change get stations
+        $("#ddlOwner").change(function() {
+            getStations();
+        });
+    }
+
+    function loadPeriods() {
+        getPeriodList(); //does this only need to be months or do quarters need to be included
+
+        if (period.length > 0) {
+            $("#ddlPeriod").val(period);
+        }
+    }
+
+    function loadYears() {
+        getYearList();
+
+        if (year.length > 0) {
+            $("#ddlYear").val(year);
+        }
+    }
+
+    function getAdvertiserColumns() {
+        /*
+         * station
+         * owner
+         * market
+         * station advertiser
+         * link
+         */
+
+        var columnsToDisplay = new Array();
+
+        columnsToDisplay.push({
+            "title": "Station",
+            "visible": true,
+            "mData": "Station",
+            "orderable": true,
+            "searchable": true
+        });
+
+        columnsToDisplay.push({
+            "title": "Owner",
+            "visible": true,
+            "mData": "Owner",
+            "orderable": true,
+            "searchable": true
+        });
+
+        columnsToDisplay.push({
+            "title": "Market",
+            "visible": true,
+            "mData": "Market",
+            "orderable": true,
+            "searchable": true
+        });
+
+
+        columnsToDisplay.push({
+            "title": "Station Advertiser",
+            "visible": true,
+            "mData": "Station Advertiser",
+            "orderable": true,
+            "searchable": true
+        });
+
+        columnsToDisplay.push({
+            "mRender": function (data, type, row) {
+                var action = "";
+
+                action += "editStationAdvertiser(";
+                action += row["marketId"] + "," + row["ownerId"] + "," + row["stationId"] + ",";
+                action += "'" + row["Station Advertiser"] + "','" + row["Station Category"] + "','" + row["Station Advertiser Code"] + "'";
+                action += ");";
+                //pass the advertiser name, station category
+
+                return '<a href="#" onclick="' + action + '">Match</a>';
+            },
+            "orderable": false,
+            "searchable": false,
+            "className": "text-align-right"
+        });
+
+        return columnsToDisplay;
+
+    }
+
+    function getAgencyColumns() {
+        /*
+         * station
+         * owner
+         * market
+         * station agency
+         * link
+         */
+
+        var columnsToDisplay = new Array();
+
+        columnsToDisplay.push({
+            "title": "Station",
+            "visible": true,
+            "mData": "Station",
+            "orderable": true,
+            "searchable": true
+        });
+
+        columnsToDisplay.push({
+            "title": "Owner",
+            "visible": true,
+            "mData": "Owner",
+            "orderable": true,
+            "searchable": true
+        });
+
+        columnsToDisplay.push({
+            "title": "Market",
+            "visible": true,
+            "mData": "Market",
+            "orderable": true,
+            "searchable": true
+        });
+
+
+        columnsToDisplay.push({
+            "title": "Station Agency",
+            "visible": true,
+            "mData": "Station Agency",
+            "orderable": true,
+            "searchable": true
+        });
+
+        columnsToDisplay.push({
+            "mRender": function (data, type, row) {
+                var action = "";
+
+                action += "editStationAgency(";
+                action += row["marketId"] + "," + row["ownerId"] + "," + row["stationId"] + ",";
+                action += "'" + row["Station Agency"] + "','" + row["Station Category"] + "','" + row["Station Agency Code"] + "'";
+                action += ");";
+                //pass the advertiser name, station category
+
+                return '<a href="#" onclick="' + action + '">Match</a>';
+            },
+            "orderable": false,
+            "searchable": false,
+            "className": "text-align-right"
+        });
+
+        return columnsToDisplay;
+    }
+
+    function editStationAdvertiser(marketId, ownerId, stationId, advertiserName,  category, stationAdvertiserCode) {
+        /*
+         * load object
+         * save object to local storage
+         * redirect to station advertiser CRUD page
+         * add flag to notate coming from this page
+         */
+
+        //use what is passed in for the edit functionality
+
+        var queryString = "";
+        queryString += "?Period=" + $("#ddlPeriod").val();
+        queryString += "&Year=" + $("#ddlYear").val();
+        queryString += "&OwnerID=" + $("#ddlOwner").val();
+        queryString += "&MarketID=" + $("#ddlMarket").val();
+        queryString += "&StationID=" + $("#ddlStation").val();
+        queryString += "&MatchPage=" + matchPageType;
+
+        var advertiserMatchData =
+        {
+            period: $("#ddlPeriod").val(),
+            year: $("#ddlYear").val(),
+            station: stationId,
+            advertiser: advertiserName,
+            market: marketId,
+            stationAdvertiserCode: stationAdvertiserCode,
+            advertiserCategory: category,
+            previousPage: "/products/xry/revenue/xrymatch.html" + queryString
+        }
+
+        setLocalStorage("newAdvertiserMatch", JSON.stringify(advertiserMatchData));
+        window.location = "/admin/stationadvertiser/stationadvertiser.html?StationAdvertiserID=0&AdvMatch=true";
+
+    }
+
+    function editStationAgency(marketId, ownerId, stationId, agencyName, category, stationAgencyCode) {
+        /*
+         * load object
+         * save object to local storage
+         * redirect to station agency CRUD page
+         * add flag to notate coming from this page
+         */
+
+        var queryString = "";
+        queryString += "?Period=" + $("#ddlPeriod").val();
+        queryString += "&Year=" + $("#ddlYear").val();
+        queryString += "&OwnerID=" + $("#ddlOwner").val();
+        queryString += "&MarketID=" + $("#ddlMarket").val();
+        queryString += "&StationID=" + $("#ddlStation").val();
+        queryString += "&MatchPage=" + matchPageType;
+
+        var agencyMatchData =
+        {
+            period: $("#ddlPeriod").val(),
+            year: $("#ddlYear").val(),
+            station: stationId,
+            agency: agencyName,
+            market: marketId,
+            stationAgencyCode: stationAgencyCode,
+            agencyCategory: category,
+            previousPage: "/products/xry/revenue/xrymatch.html" + queryString
+        }
+
+        setLocalStorage("newAgencyMatch", JSON.stringify(agencyMatchData));
+        window.location = "/admin/stationagency/stationagency.html?StationAgencyID=0&AgyMatch=true";
+    }
+
+    function getMarketListByProduct(inProduct) {
+        var control = "ddlMarket";
+
+        if (inProduct == "" || inProduct == null || inProduct == undefined) {
+            var str = '';
+            str = '<option value="">-- Select a Market --</option>';
+            $("#" + control).html(str);
+            convertToChosenSelect(control, false, false);
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketListByProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": product,
+                "inActiveOnly ": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Market --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
+
+                    });
+
+                    $("#" + control).html(str);
+                    convertToChosenSelect(control, false, false);
+
+                    $("#" + control).val(marketId);
+
+                    getOwnerListByProduct(product);
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function getOwnerListByProduct(inProduct) {
+        var control = "ddlOwner";
+
+        if (inProduct == "" || inProduct == null || inProduct == undefined) {
+            $("#" + control).html("<option value=''>-- Select an Owner --</option>");
+            convertToChosenSelect(control, false, false);
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerListByProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": product
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+
+                    $("#" + control).html("<option value=''>-- Select an Owner --</option>");
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = str + "<option value='" + obj.ownerid + "'>" + obj.ownername + "</option>";
+
+                    });
+                    $("#" + control).append(str);
+                    convertToChosenSelect(control, false, false);
+
+                    $("#" + control).val(ownerId);
+
+                    getStations();
+                    //saveLoadedControlSelection(control);
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function getStations() {
+
+        var control = "ddlStation";
+
+        if ($("#ddlMarket").val() == "" && $("#ddlOwner").val() == "") {
+            //create a blank version to have a standard width ddl for stations.
+            $("#" + control).html("<option value=''>-- Select a Station --</option>");
+            convertToChosenSelect(control, false, false);
+
+            getUnmatchedList();
+
+            return;
+        }
+
+        var stationApi = "/api/Station/GetStationList";
+        
+        $.ajax({
+            url: ServicePrefix + stationApi,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": product,
+                "inMarketId": $("#ddlMarket").val(),
+                "inOwnerId": $("#ddlOwner").val(),
+                "inActiveOnly": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+
+                    $("#" + control).html("<option value=''>-- Select a Station --</option>");
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = str + "<option value='" + obj.stationId + "'>" + obj.stationName + "</option>";
+
+                    });
+
+                    $("#" + control).append(str);
+                    convertToChosenSelect(control, false, false);
+
+                    $("#" + control).val(stationId);
+
+                    if ($("#ddlMarket").val()  !== "" ||
+                        $("#ddlOwner").val()   !== "" ||
+                        $("#ddlStation").val() !== "")
+                    {
+
+                        getUnmatchedList();
+
+                    }
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getUnmatchedList() {
+
+        if (validationPassed() === false) {
+            return;
+        }
+
+        var bIncludeAdvertiserMatched = false;
+        var bIncludeAgencyMatched = false;
+        var bIncludeBothMatched = false;
+        var bDistinctAdvertisers = false;
+        var bDistinctAgencies = false;
+
+        switch (matchPageType.toUpperCase()) {
+        case "ADV":
+            bIncludeAdvertiserMatched = false;
+            bIncludeAgencyMatched = true;
+            bIncludeBothMatched = true;
+            bDistinctAdvertisers = true;
+            break;
+        case "AGY":
+            bIncludeAdvertiserMatched = true;
+            bIncludeAgencyMatched = false;
+            bIncludeBothMatched = true;
+            bDistinctAgencies = true;
+            break;
+        default:
+            bIncludeAdvertiserMatched = false;
+            bIncludeAgencyMatched = true;
+            bIncludeBothMatched = true;
+            bDistinctAdvertisers = true;
+            break;
+        }
+
+        //do ajax call
+        //api /api/XRAYRevenue/GetStationAccountListForMatching
+
+        //changing to a POST since the number of parameters have gotten larger
+        //var queryString = "?";
+
+        //queryString += "inApiToken=" + getLocalStorage("APIToken");
+        //queryString += "&inPeriod=" + $("#ddlPeriod").val();
+        //queryString += "&inYear=" + $("#ddlYear").val();
+        //queryString += "&inMarketId=" + $("#ddlMarket").val();
+        //queryString += "&inOwnerId=" + $("#ddlOwner").val();
+        //queryString += "&inStationId=" + $("#ddlStation").val();
+        //queryString += "&inIncludeAdvertiserMatched=" + bIncludeAdvertiserMatched;
+        //queryString += "&inIncludeAgencyMatched=" + bIncludeAgencyMatched;
+        //queryString += "&inIncludeBothMatched=" + bIncludeBothMatched;
+
+        //var unmatchedApi = "/api/XRAYRevenue/GetStationAccountListForMatching" + queryString;
+
+        $.ajax({
+            url: ServicePrefix + "/api/XRAYRevenue/GetStationAccountListForMatching",
+            dataType: 'json',
+            type: 'post',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPeriod": $("#ddlPeriod").val(),
+                "inYear": $("#ddlYear").val(),
+                "inMarketId": $("#ddlMarket").val(),
+                "inOwnerId": $("#ddlOwner").val(),
+                "inStationId": $("#ddlStation").val(),
+                "inIncludeAdvertiserMatched": bIncludeAdvertiserMatched,
+                "inIncludeAgencyMatched": bIncludeAgencyMatched,
+                "inIncludeBothMatched": bIncludeBothMatched,
+                "inDistinctAdvertisers": bDistinctAdvertisers,
+                "inDistinctAgencies": bDistinctAgencies
+            }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    if (matchPageType.toUpperCase() == "AGY") {
+                        //populate datatable with agency stuff
+                        loadAgencyData(data);
+                    }
+                    else {
+                        //populate datatable with advertiser stuff
+                        loadAdvertiserData(data);
+                    }
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function loadAdvertiserData(data) {
+        //get columns
+        var columns = getAdvertiserColumns();
+        var title = "Unmatched Advertisers";
+        loadResults(data, columns, title);
+    }
+
+    function loadAgencyData(data) {
+        //get columns
+        var columns = getAgencyColumns();
+        var title = "Unmatched Agencies";
+        loadResults(data, columns, title);
+
+    }
+
+    function loadResults(data, columns, reportTitle) {
+        //data is the data from the ajax call
+        //columns is the array that was built previously
+
+        //assigns the data from the ajax call
+        var results = data["report"]["rows"];
+
+        //creating a variable that will used for datatable functions later
+        var searchTable;
+
+        //if the datatable already exists need to destroy it before building it
+        //again with new results from the search.
+        //if you try to destroy before it is a datatable, an error will occur.
+        //this code will only destroy it if the table is a datatable.
+        if ($.fn.DataTable.isDataTable('#dtResults')) {
+            searchTable = $('#dtResults').DataTable();
+            searchTable.destroy();
+        }
+
+        //this code rebuilds the datatable with the updated data from the search 
+        //or initial load.
+
+
+        searchTable = $("#dtResults").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "order": [],
+            "data": results,
+            "columns": columns,
+            "select": true,
+            language: {
+                search: "Filter Results:"
+            },
+            "buttons": [
+               //{
+               //    extend: 'excel',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: columnsToExport
+               //    }
+               //},
+               //{
+               //    extend: 'print',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: columnsToExport
+
+               //    }
+               //}
+            ]
+        });
+    }
+
+    function validationPassed() {
+
+        var loopBreak = true;
+
+        $(".mkaRequired").each(function (index, el) {
+
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            // Text
+            if ($(eID).prop('tagName').toLowerCase() === "input") {
+                if ($(eID).val().trim() === "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+            // Select
+            if ($(eID).prop('tagName').toLowerCase() === "select") {
+                if ($(eID).val() === "-1" || $(eID).val() === "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+        });
+
+        return loopBreak;
+    }
+
+</script>

@@ -96,7 +96,7 @@
                     <div class="row input-row">
                         <input type="hidden" id="txtStationAgencyId" value="" />
                         <div class="col-md-3 text-align-left">
-                            <label for="txtStationAgencyName">Agency</label>
+                            <label for="txtStationAgencyName">Station Agency</label>
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input class="mkaRequired field-width-325" maxlength="120" type="text" id="txtStationAgencyName" errorMessage="Enter an Agency Name." />
@@ -107,10 +107,9 @@
                             <label for="txtStationAgencyCode">Agency Code</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input class="field-width-325" type="text" id="txtStationAgencyCode" />
+                            <input class="field-width-325" maxlength="20" type="text" id="txtStationAgencyCode" />
                         </div>
                     </div>
-
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="txtMarketAgency">Market Agency</label>
@@ -199,17 +198,32 @@
                             </div>
                             <div class="col-md-9 text-align-left">
                                 <div>
-                                    <input value="Update" onclick="updateStationAgency()" class="default-button" type="button">
+                                    <input value="Update" onclick="updateStationAgency();" class="default-button" type="button">
                                 </div>
                                 <div style="padding-top: 10px">
-                                    <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button">
+                                    <input value="Back" onclick="determineGoBack();" class="default-button" type="button">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <!-- End Buttons-->
 
+                </div>
 
+                <!-- extra fields for matching -->
+                <div class="row agency-category input-row" style="display: none;">
+ 
+                        <hr />
+                        <div class="col-md-3">
+                            <strong><span>Category from Import:&nbsp;</span></strong>
+                        </div>
+                        <div class="col-md-9">
+                            <span id="txtAgencyCategory"></span>
+                            <input type="hidden" id="txtPeriod" />
+                            <input type="hidden" id="txtYear" />
+                            <input type="hidden" id="txtPreviousPageLocation" />
+                            <!--<input class="field-width-325" type="text" id="txtAgencyCategory" value="" maxlength="50" disabled="disabled" />-->
+                        </div>
                 </div>
             </div>
         </div>
@@ -243,6 +257,7 @@
     var stationAgencyId = 0;
     var bLinkStationAgencyRevenues = false;
     var bIsNew = false;
+    var bIsAgyMatch = false;
 
     $(document).ready(function ()
     {
@@ -263,7 +278,10 @@
         stationAgencyId = (getParameterByName("StationAgencyID") == null ? 0 : getParameterByName("StationAgencyID"));
         $("#txtStationAgencyId").val(stationAgencyId);
         bIsNew = stationAgencyId <= 0;
+
+        bIsAgyMatch = getParameterByName("AgyMatch") == null ? false : getParameterByName("AgyMatch").toLowerCase() == "true";
     }
+
     function setupUI()
     {
         $("#ddlStations").on('change',
@@ -272,6 +290,7 @@
                 $("#ddlMarkets").val(marketId);
             });
     }
+
     function getStationList() {
         //api ServicePrefix + '/api/Station/GetStationListByProduct'
         $.ajax({
@@ -340,7 +359,8 @@
 
                 convertToChosenSelect("ddlMarkets");
 
-                setMarketValue();
+                //removed from here since the station id hasn't been loaded yet.
+                //setMarketValue();
                 getStationAgency();
 
             },
@@ -356,10 +376,16 @@
     }
 
     function getStationAgency() {
+
         if (stationAgencyId <= 0) {
             loadMarketAgencySearchResults();
             initializeActiveDate();
             $('.change-date').hide();
+
+            if (bIsAgyMatch) {
+                loadMatchData();
+            }
+
             return;
         }
 
@@ -418,6 +444,8 @@
                         } else {
                             $(".disable-date").hide();
                         }
+
+                        setMarketValue();
 
                         //get advertiser based on advertiser that comes back
                         getMarketAgency(obj["agencyId"]);
@@ -497,6 +525,15 @@
             $('#txtStationAgencyCode').val(searchResults["agencyCode"]);
         }
 
+        if (bIsAgyMatch) {
+            $('#ddlStations').prop("disabled", true).val(searchResults["stationID"]);
+            $("#txtStationAgencyName").prop("disabled", true);
+            $(".agency-category").show();
+            $("#txtAgencyCategory").html(searchResults["agencyCategory"]);
+            $("#txtPeriod").val(searchResults["period"]);
+            $("#txtYear").val(searchResults["year"]);
+            $("#txtPreviousPageLocation").val(searchResults["previousPage"]);
+        }
 
         $("#txtMarketAgency").val(searchResults["searchAgencyName"]);
 
@@ -532,7 +569,11 @@
             "searchHeading": "Market Agency Search",
             "searchAgencyName": $("#txtMarketAgency").val(),
             "searchAgencyId": $("#txtMarketAgencyId").val(),
-            "searchPage": window.location
+            "searchPage": window.location,
+            "agencyCategory": $("#txtAgencyCategory").html(),
+            "period": $("#txtPeriod").val(),
+            "year": $("#txtYear").val(),
+            "previousPage": $("#txtPreviousPageLocation").val()
         }
 
         setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
@@ -602,7 +643,12 @@
 
                         $("#txtStationAgencyId").val(obj["_updateStatus"]);
 
-                        window.location = "/admin/stationagency/stationagency.html?StationAgencyID=" + $("#txtStationAgencyId").val();
+                        //window.location = "/admin/stationagency/stationagency.html?StationAgencyID=" + $("#txtStationAgencyId").val();
+                    }
+
+                    if (bIsAgyMatch || bIsAgyMatch == "true") {
+                        updateStationAgencyMatch();
+                        return;
                     }
 
                     if (bLinkStationAgencyRevenues) {
@@ -713,4 +759,80 @@
         });
     }
 
+    function loadMatchData() {
+
+        if (getLocalStorage("newAgencyMatch").length <= 0) {
+            return;
+        }
+
+        var agencyMatchData = $.parseJSON(getLocalStorage("newAgencyMatch"));
+
+        //should possibly disable this since required for match
+        $("#ddlStations").prop("disabled", true);
+        $("#ddlStations").val(agencyMatchData["station"]);
+        $("#ddlMarkets").val(agencyMatchData["market"]);
+        $("#txtStationAgencyName").val(agencyMatchData["agency"]);
+        //can the user change the name??
+        //it is required for the matching process
+        $("#txtStationAgencyName").prop("disabled", true);
+        $("#txtStationAgencyCode").val(agencyMatchData["stationAgencyCode"]);
+        $(".agency-category").show();
+        $("#txtAgencyCategory").html(agencyMatchData["agencyCategory"]);
+        $("#txtPeriod").val(agencyMatchData["period"]);
+        $("#txtYear").val(agencyMatchData["year"]);
+        $("#txtPreviousPageLocation").val(agencyMatchData["previousPage"]);
+
+        //clear local storage
+        //setLocalStorage("newAdvertiserMatch", "");
+    }
+
+    function updateStationAgencyMatch() {
+        //this will call the api to update the matching
+
+        //console.log("updateStationAdvertiserMatch");
+
+        $.ajax({
+            url: ServicePrefix + '/api/XRAYRevenue/UpdateMatchStationAgency',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inYear": $("#txtYear").val(),
+                "inPeriod": $("#txtPeriod").val(),
+                "inStationId": $("#ddlStations").val(),
+                "inStationAgencyName": $("#txtStationAgencyName").val(),
+                "inMarketAgencyId": $("#txtMarketAgencyId").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    //console.log($("#txtPreviousPageLocation").val());
+                    bootbox.alert("The station agency has been matched.", function () {
+                        window.location = $("#txtPreviousPageLocation").val();
+                    });
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function determineGoBack() {
+
+        if (bIsAgyMatch) {
+            window.location = $("#txtPreviousPageLocation").val();
+        } else {
+            goBackToDashboard();
+        }
+
+    }
 </script>
