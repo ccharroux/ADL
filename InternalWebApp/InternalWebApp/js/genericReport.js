@@ -1630,7 +1630,7 @@ function getReportObject_MarketRevenueXRay() {
     tempObject =
     {
         // id: rptMarketRevenueXRay,
-        reportTitle:  "MRR / XRay Revenue Comparision",
+        reportTitle:  "MRR / XRay Revenue Comparison",
         apiControllerAction:  "/api/Report/GetMarketRevenueRevenueXRay",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
@@ -5555,7 +5555,7 @@ function getReportObject_RevenueComparisonMarket() {
                         "&direct=false";
             }
 
-            return '<a onclick="determineLocationOfDMAReport(' + "'" + action + "','" + 'DMA/MRR Data Comparision - Station Level' + "'" + ');">Stations</a>';
+            return '<a onclick="determineLocationOfDMAReport(' + "'" + action + "','" + 'DMA/MRR Data Comparison - Station Level' + "'" + ');">Stations</a>';
         },
         "orderable": false,
         "searchable": false,
@@ -5646,7 +5646,7 @@ function getReportObject_RevenueComparisonStation() {
 
             //return '<a href="' + action + '">Details</a>';
 
-            return '<a onclick="determineLocationOfDMAReport(' + "'" + action + "','" + 'DMA/MRR Data Comparision - Detail Level' + "'" + ');">Details</a>';
+            return '<a onclick="determineLocationOfDMAReport(' + "'" + action + "','" + 'DMA/MRR Data Comparison - Detail Level' + "'" + ');">Details</a>';
 
         },
         "orderable": false,
