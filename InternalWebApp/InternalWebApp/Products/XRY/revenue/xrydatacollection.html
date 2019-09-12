@@ -108,6 +108,10 @@
 
         <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
+                <div id="divQuickReport" style="float:right;padding-right:0px;padding-bottom:10px">
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>
                 <div class="row" id="reportTitleRow">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
                         <h2 id="pageTitle">X-Ray Data Collection</h2>
@@ -143,6 +147,7 @@
                         <!-- fix spacing on the radio buttons instead of spaces -->
                         <div class="form-group rptView">
                             <input type="radio" name="collectionType" id="rdoMarket" value="market"><label class="rdo-label rtpViewRight" for="rdoMarket">Market</label>
+                            <br/>
                             <input type="radio" name="collectionType" id="rdoOwner" value="owner"><label class="rdo-label rtpViewRight" for="rdoOwner">Owner</label>
                         </div>
 
@@ -171,9 +176,9 @@
                             <select id="ddlPeriod" apiInput="inPeriod" class="dropdown-select rptView"></select>
                         </div>
 
-                        <div class="form-group col-md-3 rptButton" style="text-align:right">
+                        <div class="form-group col-md-3 rptButton" style="text-align: right">
                             <label for="btnReport" class="dropdown-label">&nbsp;</label>
-                            <input type="button" id="btnReport" class="search-button" value="Show" onclick="getDataCollectionList()" />
+                            <input type="button" id="btnReport" class="search-button" value="Show" onclick="getDataCollectionList()"/>
                         </div>
 
                     </div>
@@ -187,7 +192,7 @@
                 <!-- datatable -->
                 <div class="dataTable-top-margin">
                     <table id="dtResults" class="stripe"></table>
-                    <div id="noDataFound" style="display:none; color: red">No data found</div>
+                    <div id="noDataFound" style="display: none; color: red">No data found</div>
                 </div>
 
             </div>
@@ -241,6 +246,7 @@
     $(document).ready(function () {
 
         buildXRYMenu("Revenue");
+        buildQuickReports(['xry']);
         setupUI();
 
         //load periods
@@ -1157,6 +1163,7 @@
             "title": "Rev Rec $",
             "visible": true,
             "mData": "Revenue",
+            "mRender": $.fn.dataTable.render.number(',', '.', 0, '$'),
             "orderable": true,
             "searchable": true,
             "className": "text-align-right"
@@ -1166,6 +1173,7 @@
             "title": "Rev Rec $<br/>Prev Period",
             "visible": true,
             "mData": "Revenue Previous Period",
+            "mRender": $.fn.dataTable.render.number(',', '.', 0, '$'),
             "orderable": true,
             "searchable": true,
             "className": "text-align-right"
@@ -1175,6 +1183,7 @@
             "title": "Rev Rec $<br/>Prev Year",
             "visible": true,
             "mData": "Revenue Previous Year",
+            "mRender": $.fn.dataTable.render.number(',', '.', 0, '$'),
             "orderable": true,
             "searchable": true,
             "className": "text-align-right"
@@ -1244,14 +1253,6 @@
                 var link = "";
 
                 if (row["Number of Records"] > 0) {
-                    link = '/products/xry/revenue/xrymatch.html?MatchPage=agy';
-                    link += '&OwnerID=' + row["ownerId"];
-                    link += '&MarketID=' + row["marketId"];
-                    link += '&StationID=' + row["stationId"];
-                    link += '&Period=' + $("#ddlPeriod").val();
-                    link += '&Year=' + $("#ddlYear").val();
-
-                    actions += "<a href='" + link + "'>Match&nbsp;Agencies</a><br/>";
 
                     link = "";
                     link = '/products/xry/revenue/xrymatch.html?MatchPage=adv';
@@ -1262,6 +1263,16 @@
                     link += '&Year=' + $("#ddlYear").val();
 
                     actions += "<a href='" + link + "'>Match&nbsp;Advertisers</a><br/>";
+
+                    link = "";
+                    link = '/products/xry/revenue/xrymatch.html?MatchPage=agy';
+                    link += '&OwnerID=' + row["ownerId"];
+                    link += '&MarketID=' + row["marketId"];
+                    link += '&StationID=' + row["stationId"];
+                    link += '&Period=' + $("#ddlPeriod").val();
+                    link += '&Year=' + $("#ddlYear").val();
+
+                    actions += "<a href='" + link + "'>Match&nbsp;Agencies</a><br/>";
                 }
 
                 if (row["enabled"] === false) {
