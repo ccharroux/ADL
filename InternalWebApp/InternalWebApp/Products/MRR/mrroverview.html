@@ -94,7 +94,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>X-Ray Overview</h2>
+                        <h2>Market Revenue Overview</h2>
                     </div>
                 </div>
                 <div id="divQuickReport" style="float:right;padding-right:0px;padding-bottom:0px;margin-top:-100px">
@@ -107,7 +107,11 @@
                         <center>
                             <div class="form-group rptView rptMediaType">
                                 <label for="ddlMediaType" class="dropdown-label rptView rptMediaType">Media Type</label>
-                                <select id="ddlMediaType" apiInput="inMediaTypeId" class="dropdown-select rptView rptMediaType" onchange="getReport()"></select>
+                                <select id="ddlMediaType" apiInput="inMediaTypeId" class="dropdown-select rptView rptMediaType" onchange="getReport();"></select>
+                            </div>
+                            <div class="form-group rptView rptSchedule">
+                                <label for="ddlSchedule" class="dropdown-label rptView rptSchedule">Schedule</label>
+                                <select id="ddlSchedule" apiInput="inScheduleId" class="dropdown-select rptView rptSchedule" onchange="getReport();"></select>
                             </div>
                             <div class="form-group col-md-3 rptButton" style="float:none;text-align:left">
                                 <label for="btnReport" class="dropdown-label">&nbsp;</label>
@@ -188,11 +192,9 @@
     var chartValuePeriod = "";
     var chartValueOnHold = 0;
     var chartValueIncomplete = 0;
-    var chartValueUnmatched = 0;
-    var chartValueUnposted = 0;
-    var chartValueUnprepared = 0;
-    var chartValueUnapproved = 0;
     var chartValueUnranked = 0;
+    var chartValueUnapproved = 0;
+    var chartValuePartnerReview = 0;
     var chartValueReadyToRelease = 0;
     var chartValueReleased = 0;
     var previousChartObject = null;
@@ -200,8 +202,8 @@
     $(document).ready(function ()
     {
 
-        buildXRYMenu("Products");
-        buildQuickReports(['xry']);
+        buildMRRMenu("Products");
+        buildQuickReports(['mrr']);
 
         reportObject = getReportObject();
         reportFilterArray = getReportFilterArray();
@@ -209,6 +211,7 @@
         getYearList();
         getPeriodList();
         getMediaTypeList();
+        getSchedules();
         setTimeout(getReport, 500);
 
     });
@@ -223,20 +226,19 @@
         columnsToDisplay = new Array();
         columnsToDisplay.push("RevenueYear");
         columnsToDisplay.push("RevenuePeriod");
+        columnsToDisplay.push("ScheduleDescription");
         columnsToDisplay.push("Total Number of Markets");
         columnsToDisplay.push("On Hold");
         columnsToDisplay.push("Incomplete");
-        columnsToDisplay.push("Unmatched");
-        columnsToDisplay.push("Unposted");
-        columnsToDisplay.push("Unprepared");
-        columnsToDisplay.push("Unapproved");
         columnsToDisplay.push("Unranked");
+        columnsToDisplay.push("Unapproved");
+        columnsToDisplay.push("Partner Review");
         columnsToDisplay.push("Ready to Release");
         columnsToDisplay.push("Released");
         tempObject =
         {
-            reportTitle: "X-Ray Overview",
-            apiControllerAction: "/api/XRAYReport/GetXRayOverview",
+            reportTitle: "Market Revenue Overview",
+            apiControllerAction: "/api/MRRReport/GetMarketRevenueOverview",
             apiType: "get",
             columnsToDisplay: columnsToDisplay,
             product: 'misc'
@@ -253,6 +255,14 @@
             token: "MediaType",
             jsCall: "getMediaTypeList",
             objectName: "ddlMediaType",
+            required: false
+        }
+        arrayFilters.push(arrayObject);
+
+        arrayObject = {
+            token: "Schedule",
+            jsCall: "getSchedules",
+            objectName: "ddlSchedule",
             required: false
         }
         arrayFilters.push(arrayObject);
@@ -466,11 +476,11 @@
         return false;
     }
     function loadResults(data, columns) {
-        var linkTargetOnHold = "#"; // will probably be a generic report of markets active but on hold for X-Ray
-        var linkTargetReminders = "xryreminders.html";
-        var linkTargetReformat = "revenue/xrydatacollection.html";
-        var linkTargetRank = "#"; // will probably be xryrank.html or something
-        var linkTargetRelease = "xryrelease.html";
+        var linkTargetOnHold = "#"; // will probably be a generic report of markets active but on hold for Market Revenue
+        var linkTargetReminders = "mrrreminders.html";
+        var linkTargetRank = "mrrrevenuedetail.html";
+        var linkTargetApprove = "mrrmarketapproval.html";
+        var linkTargetRelease = "mrrmarketdelivery.html";
 
         //data is the data from the ajax call
         //columns is the array that was built previously
@@ -505,15 +515,13 @@
                     "targets": [
                         0, // Year
                         1, // Month
-                        3, // On Hold
-                        4, // Incomplete
-                        5, // Unmatched
-                        6, // Unposted
-                        7, // Unprepared
-                        8, // Unapproved
-                        9, // Unranked
-                        10, // Ready to Release
-                        11 // Released
+                        4, // On Hold
+                        5, // Incomplete
+                        6, // Unranked
+                        7, // Unapproved
+                        8, // Partner Review
+                        9, // Ready to Release
+                        10 // Released
                     ],
                     "render": function (data, type, full, meta) {
                         var linkTarget = "";
@@ -526,39 +534,31 @@
                                 case 1:
                                     chartValueMonth = data;
                                     break;
-                                case 3:
+                                case 4:
                                     chartValueOnHold = data;
                                     linkTarget = linkTargetOnHold;
                                     break;
-                                case 4:
+                                case 5:
                                     chartValueIncomplete = data;
                                     linkTarget = linkTargetReminders;
                                     break;
-                                case 5:
-                                    chartValueUnmatched = data;
-                                    linkTarget = linkTargetReformat;
-                                    break;
                                 case 6:
-                                    chartValueUnposted = data;
-                                    linkTarget = linkTargetReformat;
-                                    break;
-                                case 7:
-                                    chartValueUnprepared = data;
-                                    linkTarget = linkTargetRank;
-                                    break;
-                                case 8:
-                                    chartValueUnapproved = data;
-                                    linkTarget = linkTargetRank;
-                                    break;
-                                case 9:
                                     chartValueUnranked = data;
                                     linkTarget = linkTargetRank;
                                     break;
-                                case 10:
+                                case 7:
+                                    chartValueUnapproved = data;
+                                    linkTarget = linkTargetApprove;
+                                    break;
+                                case 8:
+                                    chartValuePartnerReview = data;
+                                    linkTarget = linkTargetRelease;
+                                    break;
+                                case 9:
                                     chartValueReadyToRelease = data;
                                     linkTarget = linkTargetRelease;
                                     break;
-                                case 11:
+                                case 10:
                                     chartValueReleased = data;
                                     renderChart();
                                     break;
@@ -615,6 +615,7 @@
 
         inflationAmount = $("#chkInflate").prop("checked") ? 10 : 0; // temporary for color testing
         var ctx = $("#myChart");
+        
         var myChart = new Chart(ctx, {
             type: "horizontalBar",
             data: {
@@ -633,29 +634,19 @@
                         backgroundColor: "#f00"
                     },
                     {
-                        label: "Unmatched",
-                        data: [inflationAmount + chartValueUnmatched],
+                        label: "Unranked",
+                        data: [inflationAmount + chartValueUnranked],
                         backgroundColor: "#ff0"
-                    },
-                    {
-                        label: "Unposted",
-                        data: [inflationAmount + chartValueUnposted],
-                        backgroundColor: "#ee0"
-                    },
-                    {
-                        label: "Unprepared",
-                        data: [inflationAmount + chartValueUnprepared],
-                        backgroundColor: "#dd0"
                     },
                     {
                         label: "Unapproved",
                         data: [inflationAmount + chartValueUnapproved],
-                        backgroundColor: "#cc0"
+                        backgroundColor: "#ee0"
                     },
                     {
-                        label: "Unranked",
-                        data: [inflationAmount + chartValueUnranked],
-                        backgroundColor: "#bb0"
+                        label: "Partner review",
+                        data: [inflationAmount + chartValuePartnerReview],
+                        backgroundColor: "#dd0"
                     },
                     {
                         label: "Ready to release",
@@ -734,6 +725,49 @@
         });
 
     }
+    function getSchedules() {
+        var url = ServicePrefix + '/api/ReportingPeriod/GetScheduleList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getSchedulesSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+    function getSchedulesSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '';
+
+        str = '<option selected value="">-- All Schedules</option>';
+        $.each(data.report.rows, function (index) {
+
+            str = str + '<option value="' + data.report.rows[index]["Schedule ID"] + '">' + data.report.rows[index]["Schedule Description"] + '</option>';
+
+        });
+
+        $("#ddlSchedule").html(str);
+        convertToChosenSelect("ddlSchedule", false, false);
+
+    }
+
     function destroyDataTable() {
         if ($.fn.DataTable.isDataTable('#dtResults')) {
             var searchTable = $('#dtResults').DataTable();
