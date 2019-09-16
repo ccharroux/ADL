@@ -193,6 +193,18 @@
 
     </div>
 
+    <div id="emailNoteDialog" title="" style="display:none">
+        <center>
+            <textArea style="width:100%;overflow:auto" maxlength="250" id="txtEmailNote" placeholder="Enter email note here..."></textArea>
+            <hr />
+            <div style="margin-top:5px;margin-bottom:5px">
+                <input type="button" id="btnProcess" value="Process" onclick="sendReminder()" \>
+            </div>
+            <div style="margin-top:5px;margin-bottom:5px">
+                <input type="button" id="btnCancel" value="Cancel" onclick="closeEmailNoteDialog()" \>
+            </div>
+        </center>
+    </div>
 
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
@@ -244,6 +256,10 @@
     var previousMarketId = null;
     var previousContactId = null;
 
+    var currentMarketId = null;
+    var currentStationId = null;
+    var currentPersonnelId = null;
+
     $(document).ready(function () {
 
         buildXRYMenu("Revenue");
@@ -258,6 +274,14 @@
 
   
         buildQuickReports(['xry']);
+
+        $("#emailNoteDialog").dialog({
+            autoOpen: false,
+            resizable: false,
+            width: 600,
+            height: 300,
+            modal: true
+        });
 
     });
 
@@ -296,7 +320,7 @@
                     mRender: function (data, type, row) {
                         return (row["stations pending"] == 0)
                             ? ''
-                            : '<a href="#" onclick="sendReminder(' + row.marketId + ',' + row.stationId + ',' + row.personnelId + ')">Send</a>';
+                            : '<a href="#" onclick="sendReminderInitiate(' + row.marketId + ',' + row.stationId + ',' + row.personnelId + ')">Send</a>';
                     },
                     "orderable": false,
                     "searchable": false
@@ -830,7 +854,22 @@
         }
     }
 
-    function sendReminder(marketId, stationId, personnelId) {
+    function sendReminderInitiate(marketId, stationId, personnelId) {
+        currentMarketId = marketId;
+        currentStationId = stationId;
+        currentPersonnelId = personnelId;
+
+        $("#emailNoteDialog").dialog({ title: 'Enter email note (optional)' });
+        $("#emailNoteDialog").dialog("open");
+    }
+
+    function closeEmailNoteDialog() {
+        $("#emailNoteDialog").dialog("close");
+    }
+
+    function sendReminder() {
+        closeEmailNoteDialog();
+
         var url = ServicePrefix + '/api/XRAY/InsertRemindersIntoQueue';
 
         var settings = {
@@ -839,12 +878,12 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inMarketId": marketId,
-                "inStationId": stationId,
+                "inMarketId": currentMarketId,
+                "inStationId": currentStationId,
                 "inYear": currentYear(),
                 "inPeriod": currentPeriod(),
-                // "inEmailNote": null,
-                "inPersonnelId": personnelId
+                "inEmailNote": $("#txtEmailNote").val(),
+                "inPersonnelId": currentPersonnelId
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
