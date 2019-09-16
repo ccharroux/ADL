@@ -179,6 +179,10 @@ reportName.push("rptXRAYDataRetentionList");
 reportName.push("rptMRRComplimentaryMarketRevenueEntry");
 reportName.push("rptMRRModeUsageSummary");
 
+reportName.push("rptMRROutstandingStationList");
+reportName.push("rptTVBOutstandingStationList");
+
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -7552,6 +7556,126 @@ function getReportObject_MRRModeUsageSummary()
         columnsToDisplay: columnsToDisplay,
         product: ['mrr'],
         sortable: false
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRROutstandingStationList()
+{
+
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+ 
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_MRROutstandingStationList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Media Type");
+    columnsToDisplay.push("Contact Type");
+    columnsToDisplay.push("Name");
+    columnsToDisplay.push("Email");
+    columnsToDisplay.push("Phone");
+    columnsToDisplay.push("Position");
+
+    tempObject =
+    {
+        reportTitle: "MRR Outstanding Stations",
+        apiControllerAction: "/api/MRRReport/GetOutstandingStations",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['mrr'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+function getReportFilterArray_TVBOutstandingStationList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+ 
+
+    return arrayFilters;
+}
+
+function getReportObject_TVBOutstandingStationList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Media Type");
+    columnsToDisplay.push("Contact Type");
+    columnsToDisplay.push("Name");
+    columnsToDisplay.push("Email");
+    columnsToDisplay.push("Phone");
+    columnsToDisplay.push("Position");
+
+    tempObject =
+    {
+        reportTitle: "TVB Outstanding Stations",
+        apiControllerAction: "/api/TVBReport/GetOutstandingStations",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true
 
     }
 
