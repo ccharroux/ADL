@@ -182,6 +182,8 @@ reportName.push("rptMRRModeUsageSummary");
 reportName.push("rptMRROutstandingStationList");
 reportName.push("rptTVBOutstandingStationList");
 
+reportName.push("rptAgencyDisabledAndNotMergedList");
+reportName.push("rptAdvertiserDisabledAndNotMergedList");
 
 function buildReportArray()
 {
@@ -7625,6 +7627,7 @@ function getReportObject_MRROutstandingStationList() {
 
     return tempObject;
 }
+
 function getReportFilterArray_TVBOutstandingStationList() {
 
     var arrayFilters = new Array();
@@ -7652,7 +7655,6 @@ function getReportFilterArray_TVBOutstandingStationList() {
 
     return arrayFilters;
 }
-
 function getReportObject_TVBOutstandingStationList() {
     var tempObject = new Object();
 
@@ -7675,6 +7677,106 @@ function getReportObject_TVBOutstandingStationList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_AdvertiserDisabledAndNotMergedList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+
+    return arrayFilters;
+}
+function getReportObject_AdvertiserDisabledAndNotMergedList()
+{
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    //columnsToDisplay.push("Owner");
+    //columnsToDisplay.push("Market");
+    //columnsToDisplay.push("Station");
+    //columnsToDisplay.push("Media Type");
+    //columnsToDisplay.push("Contact Type");
+    //columnsToDisplay.push("Name");
+    //columnsToDisplay.push("Email");
+    //columnsToDisplay.push("Phone");
+    //columnsToDisplay.push("Position");
+
+    tempObject =
+    {
+        reportTitle: "Advertisers Disabled / Not Merged List",
+        apiControllerAction: "/api/XRayReport/GetAdvertisersDisabledWithoutMerge",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry', 'advertiser'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_AgencyDisabledAndNotMergedList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+ 
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+
+    return arrayFilters;
+}
+function getReportObject_AgencyDisabledAndNotMergedList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    //columnsToDisplay.push("Owner");
+    //columnsToDisplay.push("Market");
+    //columnsToDisplay.push("Station");
+    //columnsToDisplay.push("Media Type");
+    //columnsToDisplay.push("Contact Type");
+    //columnsToDisplay.push("Name");
+    //columnsToDisplay.push("Email");
+    //columnsToDisplay.push("Phone");
+    //columnsToDisplay.push("Position");
+
+    tempObject =
+    {
+        reportTitle: "Agencies Disabled / Not Merged List",
+        apiControllerAction: "/api/XRayReport/GetAgenciesDisabledWithoutMerge",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry', 'agency'],
         sortable: true
 
     }
