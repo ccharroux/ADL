@@ -457,8 +457,6 @@
                     $("#" + control).append(str);
                     convertToChosenSelect(control, false, false);
 
-                    //$("#" + control).val(stationId);
-
                 }
 
             },
@@ -468,9 +466,37 @@
         });
     }
 
-    function changeAvailability(stationId, marketId, ownerId, stationName, mediaType) {
+    //start action link functionality
+    function unpostRevenueProcess() {
+        //need to determine what the process for unposting revenue is
+        //didn't see anything in the dev-5400 case concerning this process
+        bootbox.alert(
+            "Functionality under development.",
+            function () {
+                return;
+            }
+        );
+    }
 
-        console.log("changeAvailability");
+    function enable() {
+        bootbox.alert(
+            "Functionality under development.",
+            function () {
+                return;
+            }
+        );
+    }
+
+    function disable() {
+        bootbox.alert(
+            "Functionality under development.",
+            function () {
+                return;
+            }
+        );
+    }
+
+    function changeAvailability(stationId, marketId, ownerId, stationName, mediaType) {
 
         setLocalStorage("tempStationMarketId", marketId);
         setLocalStorage("tempStationOwnerId", ownerId);
@@ -482,37 +508,19 @@
     }
 
     function postRevenueProcess(stationId, marketId, period, year) {
+        //add processing steps here for flow
 
         workingStationId = stationId;
         workingMarketId = marketId;
         workingPeriod = period;
         workingYear = year;
 
-        //this doesn't handle 3rd party data
-        //3rd party will probably go to a new page
-
-        //looks like most of the procs based on market, period, year
-        //can we do by market/station??
-
-        //check if released
-        //if released ask revision, correction or cancel
-        //has records is released, no records not released
-        //if not released ask if re-post
-        //can i re-post since posted flag has to be no for link to show
-
-
-        //off-season submission with revenue
-        //if not empty list and ask to clear
-        //if click cancel, do we stop posting process?
-
-        //off season revenue??
-
-
         getMarketPeriodYearLatestRevision(workingMarketId, workingPeriod, workingYear);
 
-
     }
+    //end action link functionality
 
+    //start posting functionality
     function getMarketPeriodYearLatestRevision(marketId, period, year) {
 
         var queryString = "";
@@ -539,16 +547,20 @@
 
                     var results = data["report"]["rows"];
 
-                    if (results.length > 0 && results["Release Date"] !== null) {
+                    //need to figure out this logic
+                    //the release date is coming back null
+                    //still figuring out this logic to make sure message displays properly
+                    //will need to work out this whole if/else logic
+                    if (results.length > 0 && results[0]["Release Date"] !== null) {
                         //prompt question revision, correction, cancel
                         //if not cancelled initiate revision
 
-                        workingRevisionNumber = results["Revision Number"];
+                        workingRevisionNumber = results[0]["Revision Number"];
 
                         var strMessage = "";
                         strMessage +=
-                            "The market has already been release. <br/> Is this a revision and want to notify recipents when re-release?";
-                        strMessage += "<br/>Is this a correction and should not notify recipients?";
+                            "The market has already been released. <br/> Is this a revision and want to notify recipients when re-release?";
+                        strMessage += "<br/>Or is this a correction and should not notify recipients?";
 
                         bootbox.dialog({
                             message: strMessage,
@@ -579,8 +591,8 @@
                             }
                         });
 
-                    } else if (results.length > 0 && results["Release Date"] === null) {
-                        workingRevisionNumber = results["Revision Number"];
+                    } else if (results.length > 0 && results[0]["Release Date"] === null) {
+                        workingRevisionNumber = results[0]["Revision Number"];
                         initiateRevision();
                     }
                     else {
@@ -784,6 +796,9 @@
                     if (postedFlag === false) {
                         //un-post station
                         updateStationYearPeriodPostedStatus(false);
+                    } else {
+                        //using this to update the datatable to show the station was posted
+                        getDataCollectionList();
                     }
                     //if true there shouldn't be any other steps
                     //but this could change based on any additional flow changes
@@ -798,6 +813,9 @@
     }
 
     function updateStationYearPeriodPostedStatus(postedFlag) {
+        //if the postedFlag is set to true, this is the second pass
+        //and saying that the station has been posted.
+        //At that point, start working on updating the status of the market.
 
         var updateStationYearPeriodPostedStatusApi = "/api/XRAYRevenue/UpdatePostedStatusByStationYearPeriod";
 
@@ -1028,14 +1046,17 @@
                         var strMessage = "";
 
                         //need to determine what the message and content should be
-                        strMessage = "There are unposted submissions for the market.";
+                        //do i need to let them know??
+                        strMessage = "The station has been posted. However, there are un-posted submissions for the market.";
 
                         bootbox.alert({
                             message: strMessage,
                             function() {
-                                return;
+                                //reloading the datatable
                             }
                         });
+
+                        getDataCollectionList();
 
                     } else {
                         //unpost revenue by station year and period
@@ -1086,14 +1107,17 @@
                         var strMessage = "";
 
                         //need to determine what the message and content should be
-                        strMessage = "There are unposted media types for the market.";
+                        //do i even need to let them know??
+                        strMessage = "The station has been posted. However, there are un-posted media types for the market.";
 
                         bootbox.alert({
                             message: strMessage,
                             function() {
-                                return;
+                                //reloading the datatable
                             }
                         });
+
+                        getDataCollectionList();
 
                     } else {
                         //reset the market posted status
@@ -1109,9 +1133,9 @@
         });
 
     }
+    //end posting functionality
 
-
-    //data table functionality
+    //start data table functionality
     //get datatable columns and load data functionality
     function getDataColumns() {
         var columnsToDisplay = new Array();
@@ -1374,6 +1398,7 @@
         //this code will only destroy it if the table is a datatable.
         if ($.fn.DataTable.isDataTable('#dtResults')) {
             searchTable = $('#dtResults').DataTable();
+            searchTable.clear().draw();
             searchTable.destroy();
         }
 
@@ -1385,7 +1410,7 @@
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
             "order": [],
-            "data": results,
+            //"data": results,
             "columns": columns,
             "select": true,
             language: {
@@ -1409,35 +1434,11 @@
                 //}
             ]
         });
+
+        searchTable.rows.add(results).draw();
+
     }
 
-    function unpostRevenueProcess() {
-        //need to determine what the process for unposting revenue is
-        //didn't see anything in the dev-5400 case concerning this process
-        bootbox.alert(
-            "Functionality under development.",
-            function () {
-                return;
-            }
-        );
-    }
-
-    function enable() {
-        bootbox.alert(
-            "Functionality under development.",
-            function() {
-                return;
-            }
-        );
-    }
-
-    function disable() {
-        bootbox.alert(
-            "Functionality under development.",
-            function () {
-                return;
-            }
-        );
-    }
+    //end datatable functionality
 
 </script>
