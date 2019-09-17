@@ -116,13 +116,25 @@
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-12 ">
+                        <div class="form-group rptView rptInternalUser">
+                            <label for="ddlInternalUser" class="dropdown-label rptView rptInternalUser">Internal User</label>
+                            <select id="ddlInternalUser" apiInput="inPersonnelId" class="dropdown-select rptView rptInternalUser"></select>
+                        </div>
                         <div class="form-group rptView rptEmailStatus">
                             <label for="ddlEmailStatus" class="dropdown-label rptView rptEmailStatus">Email<br />Status</label>
                             <select id="ddlEmailStatus" apiInput="inEmailStatusId" class="dropdown-select rptView rptEmailStatus"></select>
                         </div>
                         <div class="form-group rptView rptEmailDaysBack">
-                            <label for="ddlEmailDaysBack" class="dropdown-label rptView rptEmailDaysBack">Email<br />Days Back</label>
+                            <label for="ddlEmailDaysBack" class="dropdown-label rptView rptEmailDaysBack">Days Back</label>
                             <select id="ddlEmailDaysBack" apiInput="inDaysBack" class="dropdown-select rptView rptEmailDaysBack"></select>
+                        </div>
+                        <div class="form-group rptView rptAPIController">
+                            <label for="ddlAPIController" class="dropdown-label rptView rptAPIController">API Controller</label>
+                            <select id="ddlAPIController" apiInput="inController" class="dropdown-select rptView rptAPIController"></select>
+                        </div>
+                        <div class="form-group rptView rptAPIAction">
+                            <label for="ddlAPIAction" class="dropdown-label rptView rptAPIAction">API Action</label>
+                            <select id="ddlAPIAction" apiInput="inAction" class="dropdown-select rptView rptAPIAction"></select>
                         </div>
                         <div class="form-group rptView rptAsyncJobStatus">
                             <label for="ddlAsyncJobStatus" class="dropdown-label rptView rptAsyncJobStatus">Async Job<br />Status</label>
@@ -1748,8 +1760,132 @@
         });
 
     }
+    function getAPIControllerList()
+    {
+        $.ajax({
+            url: ServicePrefix + '/api/APIAccess/GetAPILogControllerList?inApiToken=' + getLocalStorage("APIToken"),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
 
-    
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    var str = '';
+
+                    $("#ddlAPIController").html("<option value=''> -- Select a Controller</option>");
+
+ 
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = str + "<option value='" + obj.AL_Controller + "'>" + obj.AL_Controller + "</option>";
+
+                    });
+
+                    $("#ddlAPIController").append(str);
+
+                    convertToChosenSelect("ddlAPIController", false, false);
+
+                    saveLoadedControlSelection("ddlAPIController");
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+    function getAPIActionList()
+    {
+        var controller = 'ddlAPIAction';
+        $.ajax({
+            url: ServicePrefix + '/api/APIAccess/GetAPILogActionList?inApiToken=' + getLocalStorage("APIToken"),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    var str = '';
+
+                    $("#" + controller).html("<option value=''> -- Select an Action --</option>");
+
+                    var holdOwnerID = "0";
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = str + "<option value='" + obj.AL_Action + "'>" + obj.AL_Action + "</option>";
+
+                    });
+
+                    $("#" + controller).append(str);
+
+                    convertToChosenSelect(controller, false, false);
+
+                    saveLoadedControlSelection(controller);
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+    function getInternalUserList() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/PersonnelReport/GetInternalUserList?inApiToken=' + getLocalStorage("APIToken"),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    var str = '';
+
+                    $("#ddlInternalUser").html("<option value=''> -- Select a User --</option>");
+
+                    var holdOwnerID = "0";
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = str + "<option value='" + obj.PersonnelId + "'>" + obj.User + "</option>";
+
+                    });
+
+                    $("#ddlInternalUser").append(str);
+
+                    convertToChosenSelect("ddlInternalUser", false, false);
+
+                    saveLoadedControlSelection("ddlInternalUser");
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
     function getAsyncJobTypeList() {
 
         $.ajax({
