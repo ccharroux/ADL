@@ -95,6 +95,15 @@
         select {
             max-width: 200px;
         }
+
+        .vertical-center {
+            /*margin: 0;
+            position: absolute;
+            top: 50%;
+            -ms-transform: translateY(-50%);
+            transform: translateY(-50%);*/
+            vertical-align: middle;
+        }
     </style>
 
 </head>
@@ -119,7 +128,7 @@
                 </div>
 
                 <div class="row search-section">
-                    <div class="col-md-12 ">
+                    <div class="col-md-12">
                         <!--
                         radio buttons market, owner
 
@@ -145,40 +154,42 @@
 
                         -->
                         <!-- fix spacing on the radio buttons instead of spaces -->
-                        <div class="form-group rptView">
+                        <div class="form-group rptView vertical-center">
                             <input type="radio" name="collectionType" id="rdoMarket" value="market"><label class="rdo-label rtpViewRight" for="rdoMarket">Market</label>
-                            <br/>
+                            <br />
                             <input type="radio" name="collectionType" id="rdoOwner" value="owner"><label class="rdo-label rtpViewRight" for="rdoOwner">Owner</label>
+                            <br />
+                            <input type="radio" name="collectionType" id="rdoThirdParty" value="thirdParty"><label class="rdo-label rtpViewRight" for="rdoThirdParty">Third Party</label>
                         </div>
 
-                        <div class="form-group rptView collection-market">
+                        <div class="form-group rptView collection-market vertical-center">
                             <label for="ddlMarket" class="dropdown-label rptView">Market</label>
                             <select id="ddlMarket" apiInput="inMarketId" onchange="" class="dropdown-select rptView"></select>
                         </div>
 
-                        <div class="form-group rptView collection-owner">
+                        <div class="form-group rptView collection-owner vertical-center">
                             <label for="ddlOwner" class="dropdown-label rptView">Owner</label>
                             <select id="ddlOwner" apiInput="inOwnerId" onchange="" class="dropdown-select rptView"></select>
                         </div>
 
-                        <div class="form-group rptView collection-station">
+                        <div class="form-group rptView collection-station vertical-center">
                             <label for="ddlStation" class="dropdown-label rptView">Station</label>
                             <select id="ddlStation" apiInput="inStationId" onchange="" class="dropdown-select rptView"></select>
                         </div>
 
-                        <div class="form-group rptView">
+                        <div class="form-group rptView vertical-center">
                             <label for="ddlYear" class="dropdown-label rptView">Year</label>
                             <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView"></select>
                         </div>
 
-                        <div class="form-group rptView">
+                        <div class="form-group rptView vertical-center">
                             <label for="ddlPeriod" class="dropdown-label rptView">Period</label>
                             <select id="ddlPeriod" apiInput="inPeriod" class="dropdown-select rptView"></select>
                         </div>
 
-                        <div class="form-group col-md-3 rptButton" style="text-align: right">
+                        <div class="form-group col-md-3 rptButton vertical-center" style="float:none;text-align:left">
                             <label for="btnReport" class="dropdown-label">&nbsp;</label>
-                            <input type="button" id="btnReport" class="search-button" value="Show" onclick="getDataCollectionList()"/>
+                            <input type="button" id="btnReport" class="search-button" value="Show" onclick="getDataCollectionList()" />
                         </div>
 
                     </div>
@@ -282,7 +293,15 @@
                 //hide market and stations
                 $(".collection-market").hide();
                 $(".collection-station").hide();
+            } else if (this.value == 'thirdParty') {
+                bootbox.alert(
+                    "Functionality under development.",
+                    function () {
+                        
+                    }
+                );
             }
+
         });
 
         $("#ddlMarket").change(function () {
@@ -434,7 +453,8 @@
                 "inProductId": product,
                 "inMarketId": $("#ddlMarket").val(),
                 "inOwnerId": $("#ddlOwner").val(),
-                "inActiveOnly": true
+                "inActiveOnly": true,
+                "inExcludeBaStations": true
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -473,7 +493,7 @@
         bootbox.alert(
             "Functionality under development.",
             function () {
-                return;
+
             }
         );
     }
@@ -482,7 +502,7 @@
         bootbox.alert(
             "Functionality under development.",
             function () {
-                return;
+
             }
         );
     }
@@ -491,7 +511,7 @@
         bootbox.alert(
             "Functionality under development.",
             function () {
-                return;
+
             }
         );
     }
@@ -508,7 +528,23 @@
     }
 
     function postRevenueProcess(stationId, marketId, period, year) {
-        //add processing steps here for flow
+    
+        //The overall flow of how the posting process works
+        //see if the market is already released for that period - getMarketPeriodYearLatestRevision
+        //get the latest revision number and initialize revision - initiateRevision
+        //determine if there are any off-season submissions with revenue - checkForOffSeasonSubmissionsWithRevenue
+        //if there are, list the stations and ask whether to delete. If deleted, continue posting process.
+        //set the market, period and year as not posted - updateMarketYearPeriodPostedStatus
+        //set the station, period and year as not posted - updateStationYearPeriodPostedStatus
+        //insert new owner revenue types - addNewOwnerRevenueTypesByStationYearPeriod
+        //check for owner revenue types that need mapping - getOwnerRevenueTypesRequiringMapping
+        //if there are any that need mapping, the posting process stops. Otherwise, the process will continue.
+        //un-post the station, period and year revenue - unpostRevenueByStationYearPeriod
+        //post the station, period and year revenue - postRevenueByStationYearPeriod
+        //set the station, period and year as posted - updateStationYearPeriodPostedStatus
+        //check if the market has un-posted submissions or un-posted media types - getUnpostedSubmissionsByMarketYearPeriod & getUnpostedMediaTypesByMarketYearPeriod
+        //if both of these come back with no records, set the market, period and year as posted - updateMarketYearPeriodPostedStatus
+        //Either way, let user know that the station has posted.
 
         workingStationId = stationId;
         workingMarketId = marketId;
@@ -547,10 +583,6 @@
 
                     var results = data["report"]["rows"];
 
-                    //need to figure out this logic
-                    //the release date is coming back null
-                    //still figuring out this logic to make sure message displays properly
-                    //will need to work out this whole if/else logic
                     if (results.length > 0 && results[0]["Release Date"] !== null) {
                         //prompt question revision, correction, cancel
                         //if not cancelled initiate revision
@@ -647,8 +679,6 @@
     }
 
     function checkForOffSeasonSubmissionsWithRevenue() {
-        //call api
-        //if some exists prompt to remove
 
         var queryString = "";
 
@@ -846,7 +876,7 @@
                         //look for new owner revenue types
                         addNewOwnerRevenueTypesByStationYearPeriod();
                     }
-                    
+
                 }
 
             },
@@ -1435,6 +1465,7 @@
             ]
         });
 
+        //re-drawing the table with the new data
         searchTable.rows.add(results).draw();
 
     }

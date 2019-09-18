@@ -185,6 +185,9 @@ reportName.push("rptTVBOutstandingStationList");
 reportName.push("rptAgencyDisabledAndNotMergedList");
 reportName.push("rptAdvertiserDisabledAndNotMergedList");
 
+reportName.push("rptAPILogList");
+reportName.push("rptImpersonationLogList");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -7777,6 +7780,130 @@ function getReportObject_AgencyDisabledAndNotMergedList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['xry', 'agency'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_APILogList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "APIController",
+        jsCall: "getAPIControllerList",
+        objectName: "ddlAPIController",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "APIAction",
+        jsCall: "getAPIActionList",
+        objectName: "ddlAPIAction",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "EmailDaysBack",
+        objectName: "ddlEmailDaysBack",
+        jsCall: "getEmailDaysBackList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "DaysBack",
+        jsCall: "getAPIActionList",
+        objectName: "ddlAction",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "InternalUser",
+        jsCall: "getInternalUserList",
+        objectName: "ddlInternalUser",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_APILogList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "API Log List",
+        apiControllerAction: "/api/APIAccess/GetAPILogList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['misc', 'personnel', 'tech'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_ImpersonationLogList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "InternalUser",
+        jsCall: "getInternalUserList",
+        objectName: "ddlInternalUser",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+
+    return arrayFilters;
+}
+function getReportObject_ImpersonationLogList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Impersonation Log List",
+        apiControllerAction: "/api/PersonnelReport/GetImpersonationLogList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['misc', 'personnel','tech'],
         sortable: true
 
     }
