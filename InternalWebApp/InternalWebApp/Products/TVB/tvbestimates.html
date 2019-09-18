@@ -85,7 +85,7 @@
                 <div class="row search-section">
                     <div class="col-md-12">
                         <div class="text-align-center">
-                            <div class="col-md-3 col-md-offset-3">
+                            <div class="col-md-3 col-md-offset-2">
                                 <label for="ddlYearPeriod">Year-Period</label><br />
                                 <select id="ddlYearPeriod" onchange="getData();"></select><br />
                             </div>
@@ -93,12 +93,65 @@
                                 <label for="chkOnlyPendingOwners">Only pending owners</label><br />
                                 <input type="checkbox" id="chkOnlyPendingOwners" checked="checked" onchange="getData();" /><br />
                             </div>
+                            <div class="col-md-2">
+                                (to add: Generate All, Re-Generate All, Discard All)
+                            </div>
                         </div>
                     </div>
                 </div>
                 <hr />
 
                 <!-- start datatable coding-->
+
+                <div class="dataTable-top-margin" id="divGenerated">
+                    <h3>Your most recent results</h3>
+                    <table id="dtGenerated" class="stripe">
+                        <thead>
+                            <tr>
+                                <th class="exportColumn">Market</th>
+                                <th class="exportColumn">Station</th>
+                                <th class="exportColumn">Affiliation</th>
+                                <th class="exportColumn">Year-Period</th>
+                                <th class="exportColumn">Local Non-Political</th>
+                                <th class="exportColumn">National Non-Political</th>
+                                <th class="exportColumn">Total Non-Political</th>
+                                <th class="exportColumn">Local Political</th>
+                                <th class="exportColumn">National Political</th>
+                                <th class="exportColumn">Total Political</th>
+                                <th class="exportColumn">Local Time Sales</th>
+                                <th class="exportColumn">National Time Sales</th>
+                                <th class="exportColumn">Total Time Sales</th>
+                                <th class="exportColumn">Local Digital</th>
+                                <th class="exportColumn">National Digital</th>
+                                <th class="exportColumn">Total Digital</th>
+                                <th class="exportColumn">Mobile</th>
+                                <th class="exportColumn">Total Revenues</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Market</th>
+                                <th>Station</th>
+                                <th>Affiliation</th>
+                                <th>Year-Period</th>
+                                <th>Local Non-Political</th>
+                                <th>National Non-Political</th>
+                                <th>Total Non-Political</th>
+                                <th>Local Political</th>
+                                <th>National Political</th>
+                                <th>Total Political</th>
+                                <th>Local Time Sales</th>
+                                <th>National Time Sales</th>
+                                <th>Total Time Sales</th>
+                                <th>Local Digital</th>
+                                <th>National Digital</th>
+                                <th>Total Digital</th>
+                                <th>Mobile</th>
+                                <th>Total Revenues</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
 
                 <div class="dataTable-top-margin">
                     <table id="dt" class="stripe">
@@ -177,6 +230,9 @@
 
         loadInitialData();
 
+        $("#divGenerated").hide();
+        loadGeneratedData();
+
         buildTechMenu("TechTools");
         getYearsPeriods();
 
@@ -231,13 +287,25 @@
                 { "data": 'Total Stations', "className": "stationCount" },
                 {
                     mRender: function (data, type, row) {
+                        var result = '';
+
+                        var ownerId = row['Owner ID'];
+                        var ownerName = "'" + row['Owner'].toString().replace(/'/g, "\\'") + "'";
+
                         if (row['Outstanding Stations'] > 0) {
-                            return '<a href="#" onclick="generateEstimates(' + row['Owner ID'] + ');">Generate</a>';
+                            result += '<a href="#" onclick="generateEstimates(' + ownerId + ',' + ownerName + ');">Generate</a>';
                         }
                         if (row['Outstanding Stations'] == 0 && row['Estimated Stations'] > 0) {
-                            return '<a href="#" onclick="generateEstimates(' + row['Owner ID'] + ');">Re-generate</a>';
+                            result += '<a href="#" onclick="reGenerateEstimates(' + ownerId + ',' + ownerName + ');">Re-generate</a>';
                         }
-                        return '';
+                        if (row['Estimated Stations'] > 0) {
+                            if (result != '') {
+                                result += "<br />";
+                            }
+                            result += '<a href="#" onclick="discardEstimates(' + ownerId + ',' + ownerName + ');">Discard</a>';
+                        }
+
+                        return result;
                     },
                     "orderable": false,
                     "searchable": false,
@@ -312,22 +380,24 @@
         });
     }
 
+    function currentYear() {
+        return $("#ddlYearPeriod").val().substr(0, 4);
+    }
 
-
-
-
+    function currentPeriod() {
+        return $("#ddlYearPeriod").val().substr(4, 2);
+    }
+    
     function getData() {
         if (gotYearsPeriods == false) {
             return;
         }
 
-        var yearPeriod = $("#ddlYearPeriod").val();
-
         //filling out url for ajax
         var url = ServicePrefix + '/api/TVBReport/GetOutstandingTimeSalesStationsSummaryByOwner'
             + '?inApiToken=' + getLocalStorage("APIToken")
-            + '&inYear=' + yearPeriod.substr(0, 4)
-            + '&inPeriod=' + yearPeriod.substr(4, 2)
+            + '&inYear=' + currentYear()
+            + '&inPeriod=' + currentPeriod()
             + '&inOnlyPendingOwners=' + $("#chkOnlyPendingOwners").prop("checked");
 
 
@@ -356,10 +426,193 @@
         MKAErrorMessageRtn(errorThrown);
     }
 
-    function generateEstimates(ownerId) {
-        bootbox.alert("Generation of estimates is still in development");
-        // prompt "Are you sure?"
-        // call /api/TVB/InsertTimeSalesEstimatesByOwner (ddlYear, ddlPeriod, ownerId)
-        // call /api/TVBReport/GetMostRecentTimeSalesEstimates and display it in a secondary grid
+    function generateEstimates(ownerId, ownerName) {
+        bootbox.confirm(
+            "Generate estimates for " + ownerName + "?",
+            function (confirmed) {
+                if (confirmed) {
+                    generateEstimates_InsertTimeSalesEstimatesByOwner(ownerId, "generate");
+                }
+            }
+        );
     }
+
+    function reGenerateEstimates(ownerId, ownerName) {
+        bootbox.confirm(
+            "Discard and re-generate estimates for " + ownerName + "?",
+            function (confirmed) {
+                if (confirmed) {
+                    generateEstimates_InsertTimeSalesEstimatesByOwner(ownerId, "regenerate");
+                }
+            }
+        );
+    }
+
+    function discardEstimates(ownerId, ownerName) {
+        bootbox.confirm(
+            "Discard estimates for " + ownerName + "?",
+            function (confirmed) {
+                if (confirmed) {
+                    generateEstimates_InsertTimeSalesEstimatesByOwner(ownerId, "discard");
+                }
+            }
+        );
+    }
+
+    function generateEstimates_InsertTimeSalesEstimatesByOwner(ownerId, mode) {
+        var url = ServicePrefix + '/api/TVB/InsertTimeSalesEstimatesByOwner';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inYear": currentYear(),
+                "inPeriod": currentPeriod(),
+                "inOwnerId": ownerId,
+                "inMode": mode
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                generateEstimates_InsertTimeSalesEstimatesByOwnerSuccess(data, textStatus, jQxhr, mode);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function generateEstimates_InsertTimeSalesEstimatesByOwnerSuccess(data, textStatus, jQxhr, mode) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        getData();
+
+        if (mode == "discard") {
+            $("#divGenerated").hide();
+        } else {
+            getGeneratedData();
+        }
+    }
+
+    function getGeneratedData() {
+        var url = ServicePrefix + '/api/TVBReport/GetMostRecentTimeSalesEstimates'
+            + '?inApiToken=' + getLocalStorage("APIToken");
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                populateDataTable("dtGenerated", data);
+                $("#divGenerated").show();
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        }
+
+        $.ajax(url, settings);
+    }
+
+    function loadGeneratedData() {
+        $("#dtGenerated").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                { "data": 'Market' },
+                { "data": 'Station' },
+                { "data": 'Affiliation' },
+                { "data": 'Year-Period' },
+                { "data": 'Local Non-Political' },
+                { "data": 'National Non-Political' },
+                { "data": 'Total Non-Political' },
+                { "data": 'Local Political' },
+                { "data": 'National Political' },
+                { "data": 'Total Political' },
+                { "data": 'Local Time Sales' },
+                { "data": 'National Time Sales' },
+                { "data": 'Total Time Sales' },
+                { "data": 'Local Digital' },
+                { "data": 'National Digital' },
+                { "data": 'Total Digital' },
+                { "data": 'Mobile' },
+                { "data": 'Total Revenues' },
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [
+               {
+                   extend: 'csv',
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtGenerated", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'excel',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtGenerated", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'pdf',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtGenerated", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtGenerated", data, columnIdx);
+                           }
+                       }
+                   }
+               }
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            initComplete: function () {
+                // main grid's initComplete already does the following for all DataTables on the page, so don't repeat it here
+                //$(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+    }
+
 </script>
