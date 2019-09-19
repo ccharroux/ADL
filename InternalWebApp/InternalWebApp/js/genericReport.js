@@ -188,6 +188,12 @@ reportName.push("rptAdvertiserDisabledAndNotMergedList");
 reportName.push("rptAPILogList");
 reportName.push("rptImpersonationLogList");
 
+//Corporate Reports
+reportName.push("rptTrafficSystemAdvertiser");
+reportName.push("rptCorporateAgency");
+
+
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -7910,3 +7916,77 @@ function getReportObject_ImpersonationLogList() {
 
     return tempObject;
 }
+
+
+//Corporate Reports 
+
+function getReportFilterArray_TrafficSystemAdvertiser() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_TrafficSystemAdvertiser() {
+    var tempObject = new Object();
+
+    tempObject = {
+        reportTitle: "Advertiser Translation",
+        apiControllerAction: "/api/CorporateReport/InsertTrafficSystemAdvertiserReportIntoQueue",
+        apiType: 'post',
+        product: ['corporate'],
+        reportPath: "/Products/XRY/reports/xrycorporatereport.html"
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_CorporateAgency() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "ToYearPeriod",
+        jsCall: "getPeriodList_YYYYMM",
+        objectName: "ddlToYYYYMM",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_CorporateAgency() {
+    var tempObject = new Object();
+
+    tempObject = {
+        reportTitle: "Corporate Agency",
+        apiControllerAction: "/api/CorporateReport/InsertCorporateAgencyReportIntoQueue",
+        apiType: 'post',
+        product: ['corporate'],
+        reportPath: "/Products/XRY/reports/xrycorporatereport.html"
+    }
+
+    return tempObject;
+}
+
