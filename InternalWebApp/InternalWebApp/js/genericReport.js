@@ -7730,6 +7730,18 @@ function getReportObject_AdvertiserDisabledAndNotMergedList()
     //columnsToDisplay.push("Phone");
     //columnsToDisplay.push("Position");
 
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Advertiser");
+    columnsToDisplay.push("Industry");
+    columnsToDisplay.push("Sub-Industry");
+    columnsToDisplay.push("Media Code");
+    columnsToDisplay.push("Parent Advertiser");
+    columnsToDisplay.push("Date Setup");
+    columnsToDisplay.push("Date Changed");
+    columnsToDisplay.push("Disable Date");
+    columnsToDisplay.push("Posted By");
+    columnsToDisplay.push("Has Revenue");
+
     tempObject =
     {
         reportTitle: "Advertisers Disabled / Not Merged List",
@@ -7778,6 +7790,16 @@ function getReportObject_AgencyDisabledAndNotMergedList() {
     //columnsToDisplay.push("Email");
     //columnsToDisplay.push("Phone");
     //columnsToDisplay.push("Position");
+
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Agency");
+    columnsToDisplay.push("Account Type");
+    columnsToDisplay.push("Parent Agency");
+    columnsToDisplay.push("Date Setup");
+    columnsToDisplay.push("Date Changed");
+    columnsToDisplay.push("Disable Date");
+    columnsToDisplay.push("Posted By");
+    columnsToDisplay.push("Has Revenue");
 
     tempObject =
     {
