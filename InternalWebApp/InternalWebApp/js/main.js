@@ -1083,6 +1083,7 @@ function buildMRRMenu(selectedItem) {
     menuItems += '        <li style="display:block"><a href="/products/mrr/mrrrelease.html">Release</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/mrr/mrrreminders.html">Reminders</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/mrr/mrrrevenuedetail.html">Revenue Detail</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrmarketdelivery.html">Report Delivery</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/mrr/mrrsnapshot.html">Snapshot</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
@@ -1124,6 +1125,7 @@ function buildTVBMenu(selectedItem) {
 
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbreminders.html">Reminders</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbdashboard.html">Report Status</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbmarketdelivery.html">Report Delivery</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += productDashboard('');
