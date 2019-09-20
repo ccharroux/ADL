@@ -195,7 +195,14 @@ reportName.push("rptMonthToMonth");
 
 // TVB
 reportName.push("rptTimeSalesVsRepBilling");
+reportName.push("rptRepBillingSubmissionStatusList");
+reportName.push("rptRepBillingStationList");
+reportName.push("rptTimeSalesStationList");
 
+reportName.push("rptRepBillingCompareList");
+reportName.push("rptTimeSalesCompareList");
+
+reportName.push("rptTimeSalesCompleteRevenueList");
 
 function buildReportArray()
 {
@@ -8068,6 +8075,7 @@ function getReportFilterArray_TimeSalesVsRepBilling() {
     var arrayFilters = new Array();
     var arrayObject = new Array();
 
+    arrayObject = new Object();
     arrayObject = {
         token: "Year",
         jsCall: "getYearList",
@@ -8116,6 +8124,410 @@ function getReportObject_TimeSalesVsRepBilling() {
     {
         reportTitle: "Time Sales vs Rep Billing",
         apiControllerAction: "/api/TVBReport/GetTimeSalesVersusRepBilling",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_RepBillingSubmissionStatusList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_RepBillingSubmissionStatusList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Rep Billing Submission Status List",
+        apiControllerAction: "/api/TVBReport/GetRepBillingSubmissionStatus",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_RepBillingStationList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "RepFirm",
+        objectName: "ddlRepFirm",
+        jsCall: "getRepFirmList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_RepBillingStationList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Rep Firm Station List",
+        apiControllerAction: "/api/TVBReport/GetRepBillingStationList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_TimeSalesStationList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_TimeSalesStationList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Time Sales Station List",
+        apiControllerAction: "/api/TVBReport/GetTimeSalesStationList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_RepBillingCompareList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "PriorYear",
+        jsCall: "getYearList",
+        objectName: "ddlPriorYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "PriorPeriod",
+        objectName: "ddlPriorPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "RepFirm",
+        objectName: "ddlRepFirm",
+        jsCall: "getRepFirmList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_RepBillingCompareList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Rep Billing Compare",
+        apiControllerAction: "/api/TVBReport/GetRepBillingCompare",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_TimeSalesCompareList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "PriorYear",
+        jsCall: "getYearList",
+        objectName: "ddlPriorYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "PriorPeriod",
+        objectName: "ddlPriorPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_TimeSalesCompareList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Time Sales Compare",
+        apiControllerAction: "/api/TVBReport/GetTimeSalesCompare",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_TimeSalesCompleteRevenueList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_TimeSalesCompleteRevenueList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Time Sales Complete Revenue List",
+        apiControllerAction: "/api/TVBReport/GetTimeSalesCompleteRevenue",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb'],

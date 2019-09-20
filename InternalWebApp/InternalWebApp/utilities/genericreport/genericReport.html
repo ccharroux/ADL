@@ -120,6 +120,10 @@
                             <label for="ddlTVBOutstandingStationMode" class="dropdown-label rptView rptTVBOutstandingStationMode">Mode</label>
                             <select id="ddlTVBOutstandingStationMode" apiInput="inMode" class="dropdown-select rptView rptTVBOutstandingStationMode"></select>
                         </div>
+                        <div class="form-group rptView rptRepFirm">
+                            <label for="ddlRepFirm" class="dropdown-label rptView rptRepFirm">Rep Firm</label>
+                            <select id="ddlRepFirm" apiInput="inRepFirmId" class="dropdown-select rptView rptRepFirm"></select>
+                        </div>
                         <div class="form-group rptView rptInternalUser">
                             <label for="ddlInternalUser" class="dropdown-label rptView rptInternalUser">Internal User</label>
                             <select id="ddlInternalUser" apiInput="inPersonnelId" class="dropdown-select rptView rptInternalUser"></select>
@@ -258,8 +262,16 @@
                             <label for="dtEndDate" class="dropdown-label rptEndDate rptView">End Date</label>
                             <input type="text" id="dtEndDate" class="rptEndDate rptView" style="max-width:100px;" apiInput="inEndDate">
                         </div>
+
+                        <div class="form-group rptView rptPriorYear">
+                            <label for="ddlPriorYear" class="dropdown-label rptView rptPriorYear">Prior Year</label>
+                            <select id="ddlPriorYear" apiInput="inPriorYear" class="dropdown-select rptView rptPriorYear"></select>
+                        </div>
                         
-                        
+                        <div class="form-group rptView rptPriorPeriod">
+                            <label for="ddlPriorPeriod" class="dropdown-label rptView rptPriorPeriod">Prior Period</label>
+                            <select id="ddlPriorPeriod" apiInput="inPriorPeriod" class="dropdown-select rptView rptPriorPeriod"></select>
+                        </div>
                         <div class="form-group rptView rptFromYearPeriod">
                             <label for="ddlFromYYYYMM" class="dropdown-label rptView rptFromYearPeriod">From Period</label>
                             <select id="ddlFromYYYYMM" apiInput="inFromPeriodYYYYMM" class="dropdown-select rptView rptFromYearPeriod"></select>
@@ -715,6 +727,10 @@
         str = str + '<option value="BlockingRanking">Blocking Ranking</option>';
         
         $("#ddlTVBOutstandingStationMode").html(str);
+        convertToChosenSelect("ddlTVBOutstandingStationMode", false, false);
+
+        saveLoadedControlSelection("ddlTVBOutstandingStationMode");
+
     }
 
     function getAffiliationList() {
@@ -906,14 +922,18 @@
         }
 
         $("#ddlYear").html(str);
+        $("#ddlPriorYear").html(str);
+
         $("#ddlFromYear").html(str);
         $("#ddlToYear").html(str);
 
         convertToChosenSelect("ddlYear", false, false);
+        convertToChosenSelect("ddlPriorYear", false, false);
         convertToChosenSelect("ddlFromYear", false, false);
         convertToChosenSelect("ddlToYear", false, false);
 
         saveLoadedControlSelection("ddlYear");
+        saveLoadedControlSelection("ddlPriorYear");
         saveLoadedControlSelection("ddlToYear");
         saveLoadedControlSelection("ddlFromYear");
     }
@@ -1154,14 +1174,60 @@
             }
         }
 
-
         $("#ddlPeriod").html(str);
 
         convertToChosenSelect("ddlPeriod", false, false);
 
         saveLoadedControlSelection("ddlPeriod");
-    }
 
+        $("#ddlPriorPeriod").html(str);
+
+        convertToChosenSelect("ddlPriorPeriod", false, false);
+
+        saveLoadedControlSelection("ddlPriorPeriod");
+    }
+    function getRepFirmList() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/RepFirm/GetRepFirmList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken") 
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Rep Firm --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].repFirmId + '">' + data.report.rows[index].repFirmName + '</option>';
+
+                    });
+
+                    $("#ddlRepFirm").html(str);
+
+                    convertToChosenSelect("ddlRepFirm", false, false);
+
+                    saveLoadedControlSelection("ddlRepFirm");
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
     function getProductList(inProduct)
     {
 
