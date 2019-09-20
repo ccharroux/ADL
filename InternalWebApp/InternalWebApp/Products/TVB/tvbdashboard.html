@@ -116,8 +116,8 @@
                     <div class="col-md-12">
                         <center>
                             <div class="form-group rptView rptYear">
-                                <label for="ddlYear" class="dropdown-label rptView rptYear">Year</label>
-                                <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView rptYear"></select>
+                                <label for="ddlYear" onchange="getReport();" class="dropdown-label rptView rptYear">Year</label>
+                                <select id="ddlYear" onchange="getReport();" apiInput="inYear" class="dropdown-select rptView rptYear"></select>
                             </div>
                             <div class="form-group rptView rptPeriod">
                                 <label for="ddlPeriod" class="dropdown-label rptView rptPeriod">Period</label>
@@ -131,6 +131,20 @@
                     </div>
                 </div>
                 <!-- data table html -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <center>
+                            <span>
+                                <input type="button" id="btnApprove" onclick="approveAllMarkets(true);" value='Approve' />
+                            </span>
+                            <span>
+                                <input type="button" id="btnUnapprove" onclick="approveAllMarkets(false);" value="Unapprove" />
+                            </span>
+                        </center>
+                    </div>
+                
+                </div>
+
                 <div class="dataTable-top-margin">
                     <table id="dtResults" class="stripe" ></table>
                     <div id="noDataFound" style="display:none; color: red">No data found</div>
@@ -191,6 +205,15 @@
     var columnsToDisplay = new Array();
 
     var columnsToExport = new Array();
+
+    //------------------------
+    // approval vars
+    //------------------------
+    var marketArray = new Array();
+    var canApproveCtr = 0;
+    var canUnapproveCtr = 0;
+    var approveErrorCtr = 0;
+    var approveErrorMessage = 0;
 
     $(document).ready(function () {
 
@@ -356,9 +379,9 @@
             return;
         }
 
-        $.each(reportFilterArray, function (objectName, objectValue) {
+        $.each(reportFilterArray, function (objectName, objectValue)
+        {
             var control = objectValue.objectName;
-
 
             var nameOfParm = $("#" + control).attr("apiInput");
             var item = "#" + control;
@@ -366,17 +389,20 @@
 
             //if ($(item).prop("tagName") == "SELECT") {
 
-            if ($(item).val() != "") {
+            if ($(item).val() != "")
+            {
                 if (reportObject.apiType.toLowerCase() == "post") {
                     apiParameters[nameOfParm] = $(item).val();
                 }
-                else {
+                else
+                {
                     api = api + "&" + nameOfParm + "=" + $(item).val();
                 }
 
             }
             else {
-                if (isRequired) {
+                if (isRequired)
+                {
                     var msg = "Please select a " + nameOfParm.toLowerCase().replace("in", "").replace("id", "");
                     bootbox.alert(msg, function () { });
                     return false;
@@ -392,16 +418,10 @@
 
         });
 
-
-
-
-
     }
-    function getTheReportAJAX() {
-
- 
-
-
+    function getTheReportAJAX()
+    {
+        
         $.ajax({
             url: ServicePrefix + api,
             dataType: 'json',
@@ -410,10 +430,9 @@
             data: JSON.stringify(apiParameters),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                if (data.response.status.toUpperCase() === "SUCCESS") {
-
+                if (data.response.status.toUpperCase() === "SUCCESS")
+                {
                     buildColumnsArray(data);
-
                 }
                 else {
                     var msg = data.response.errorMessage[0];
@@ -426,84 +445,130 @@
             }
         });
     }
-    function buildColumnsArray(dataObj) {
+    function buildColumnsArray(dataObj)
+    {
         columnsToExport = new Array();
 
-        if (!dataObj["report"]["rows"]) {
+        if (!dataObj["report"]["rows"])
+        {
             destroyDataTable();
             $("#noDataFound").show();
-
             return;
         }
 
-        if (dataObj["report"]["rows"].length == 0) {
+        if (dataObj["report"]["rows"].length == 0)
+        {
             destroyDataTable();
             $("#noDataFound").show();
             return;
         }
         $('#dtResults').show();
 
-        var data = dataObj["report"]["rows"][0];
-        var ctr = -1;
-
-        $.each(data, function (objectName, objectValue) {
 
 
-            if (reportObject.columnsToDisplay.length == 0 ||
-                IsInArray(reportObject.columnsToDisplay, objectName) == true) {
+        // reset this array
+        marketArray = new Array();
+        canUnapproveCtr = 0;
+        canApproveCtr = 0;
+        var rowCtr = 0;
 
-                var className = "";
+        // just the header...
+       
+        $.each(dataObj["report"]["rows"], function (index, rowData)
+        {
+            var data = rowData;
+            rowCtr++;
+            var ctr = -1;
+            $.each(data, function (objectName, objectValue)
+            {
 
 
-                if (objectValue === null) {
 
-                    className = "";
+                if (objectName.toLowerCase() == 'market id') {
+                    marketArray.push(objectValue);
                 }
-                else {
 
-                    if ((isNaN(objectValue) == false)) {
+                if (objectName.toLowerCase() == 'can approve')
+                {
+                    if (objectValue == "1") {
+                        canApproveCtr++;
+                    }
+                }
 
+                if (objectName.toLowerCase() == 'can unapprove')
+                {
+                    if (objectValue == "1")
+                    {
+                        canUnapproveCtr++;
+                    }
+                }
 
-                        if (objectValue.toString().length > 0) {
-                            className = "text-align-right";
+                if (rowCtr == 1)
+                {
+                    if (reportObject.columnsToDisplay.length == 0 || IsInArray(reportObject.columnsToDisplay, objectName) == true) {
+                        var className = "";
 
+                        if (objectValue === null) {
+                            className = "";
                         }
+                        else {
+                            if ((isNaN(objectValue) == false)) {
+                                if (objectValue.toString().length > 0) {
+                                    className = "text-align-right";
+                                }
+                            }
+                            else {
+                                className = "";
+                            }
+                        }
+
+                        ctr++;
+                        columnsToExport.push(ctr);
+
+                        var bSortable = true;
+                        if (reportObject.sortable == 'undefined')
+                        {
+                            bSortable = true;
+                        }
+                        else
+                        {
+                            bSortable = reportObject.sortable;
+                        }
+
+                        columns.push({
+                            "title": objectName,
+                            "visible": true,
+                            "mData": objectName,
+                            "orderable": bSortable,
+                            "className": className
+                        });
+
                     }
-                    else {
-                        className = "";
-                    }
                 }
-
-
-
-                ctr++;
-                columnsToExport.push(ctr);
-
-
-
-                var bSortable = true;
-                if (reportObject.sortable == 'undefined') {
-                    bSortable = true;
-
-                }
-                else {
-                    bSortable = reportObject.sortable;
-                }
-
-                columns.push({
-                    "title": objectName,
-                    "visible": true,
-                    "mData": objectName,
-                    "orderable": bSortable,
-                    "className": className
-                });
-
-
-            }
+            });
         });
+
+        //$("#btnApprove").hide();
+        //$("#btnUnapprove").hide();
+
+        //// show this button
+        //if (canApproveCtr == marketArray.length && marketArray.length > 0)
+        //{
+        //    $("#btnApprove").show();
+        //    $("#btnUnapprove").hide();
+        //}
+
+        //// show this button
+        //if (canUnapproveCtr == marketArray.length && marketArray.length > 0)
+        //{
+        //    $("#btnApprove").hide();
+        //    $("#btnUnapprove").show();
+        //}
+ 
 
         loadResults(dataObj, columns);
     }
+
     function IsInArray(arrayToSearch, valToFind) {
         for (var i = 0; i < arrayToSearch.length; i++) {
             if (arrayToSearch[i].toLowerCase() == valToFind.toLowerCase()) {
@@ -526,7 +591,8 @@
         //again with new results from the search.
         //if you try to destroy before it is a datatable, an error will occur.
         //this code will only destroy it if the table is a datatable.
-        if ($.fn.DataTable.isDataTable('#dtResults')) {
+        if ($.fn.DataTable.isDataTable('#dtResults'))
+        {
             searchTable = $('#dtResults').DataTable();
             searchTable.destroy();
         }
@@ -584,6 +650,74 @@
             searchTable.destroy();
             $('#dtResults').hide();
         }
+
+    }
+
+    function approveAllMarkets(bApproveFlag)
+    {
+        var processVerb = (bApproveFlag == true ? "APPROVE" : "UNAPPROVE");
+        approveErrorCtr = 0;
+        approveErrorMessage = "";
+
+        bootbox.confirm("Are you sure you want to " + processVerb + " ALL Markets? ", function (result)
+        {
+            if (result)
+            {
+                // loop
+                for (var i=0; i < marketArray.length; i++)
+                {
+                    approveMarket(marketArray[i], bApproveFlag);
+                }
+
+
+                getReport();
+            }
+            else {
+                return;
+            }
+
+        });
+    }
+    function approveMarket(marketId, bApproveFlag)
+    {
+
+        var url = ServicePrefix + '/api/TVB/UpdateMarketApproval';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId,
+                "inPeriod": $("#ddlPeriod").val(),
+                "inYear": $("#ddlYear").val(),
+                "inApproved": bApproveFlag
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS")
+                {
+                    approveErrorCtr++;
+                    approveErrorMessage = data.response.errorMessage[0];
+                    if (approveErrorCtr == 1) {
+                        bootbox.alert("Process failed due to - " + approveErrorMessage + ". Issue must be resolved and rerun");
+                    }
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+                return false;
+            }
+        };
+
+        $.ajax(url, settings);
 
     }
 </script>
