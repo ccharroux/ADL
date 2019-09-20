@@ -1016,14 +1016,18 @@ function buildXRYMenu(selectedItem) {
     menuItems += '        <li style="display:block"><a href="/products/xry/xryrelease.html">Release</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/xry/xryreminders.html">Reminders</a></li>';
     menuItems += '        <li style="display:block;"><a href="/products/xry/xryownershipmappinglist.html">Ownership Mapping</a></li>';
+    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrydatacollection.html">Data Collection</a></li>';
     menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=adv">Advertiser Matching</a></li>';
     menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=agy">Agency Matching</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
 
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "XRay Reports") + ' href="/utilities/genericreport/genericreportlist.html?tag=xry" role="button" aria-expanded="false">XRay Reports </span></a>';
-
-
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "XRay Reports") + ' href="" role="button" aria-expanded="false"> XRay Reports <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=xry" role="button" aria-expanded="false">Xray Reports </a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=corporate" role="button" aria-expanded="false">Corporate Reports </a></li>';
+    menuItems += '              </ul>';
+    menuItems += '       </li>';
 
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
@@ -1042,6 +1046,8 @@ function buildXRYMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/admin/industry/industrylist.html">Industry</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/subindustry/subindustrylist.html">Sub Industry</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/nielsenmarketname/nielsenmarketnamelist.html">Nielson Market</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/xry/xrydisablednotlinked.html?DisablePage=adv">Disabled Advertisers</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/xry/xrydisablednotlinked.html?DisablePage=agy">Disabled Agencies</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += productDashboard('');
@@ -1387,7 +1393,7 @@ function getYearList() {
         convertToChosenSelect("ddlYear", false, false);
     }
     catch (err) {
-        console.log("This page is not converted to use Choisen selects yet.");
+        console.log("This page is not converted to use Chosen selects yet.");
     }
 
     if (typeof paramRevenueYear == 'undefined' || paramRevenueYear == null)

@@ -172,6 +172,18 @@
 
     </div>
 
+    <div id="emailNoteDialog" title="" style="display:none">
+        <center>
+            <textArea style="width:100%;overflow:auto" maxlength="250" id="txtEmailNote" placeholder="Enter email note here..."></textArea>
+            <hr />
+            <div style="margin-top:5px;margin-bottom:5px">
+                <input type="button" id="btnProcess" value="Process" onclick="sendReminder()" \>
+            </div>
+            <div style="margin-top:5px;margin-bottom:5px">
+                <input type="button" id="btnCancel" value="Cancel" onclick="closeEmailNoteDialog()" \>
+            </div>
+        </center>
+    </div>
 
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
@@ -222,6 +234,10 @@
     var previousMarketId = null;
     var previousContactId = null;
 
+    var currentMarketId = null;
+    var currentStationId = null;
+    var currentPersonnelId = null;
+
     $(document).ready(function ()
     {
 
@@ -245,6 +261,14 @@
 
         //setLocalStorage("search", $("#searchText").val().trim() + '|' + $("#searchTextNumber").val().trim() + '|' + $("#ddlMediaType").val()  );
         //setLocalStorage("searchPage", window.location);
+
+        $("#emailNoteDialog").dialog({
+            autoOpen: false,
+            resizable: false,
+            width: 600,
+            height: 300,
+            modal: true
+        });
 
     });
 
@@ -280,7 +304,7 @@
                 { "data": 'on hold' },
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="#" onclick="sendReminder(' + row.marketId + ',' + row.stationId + ',' + row.personnelId + ')">Send</a>';
+                        return '<a href="#" onclick="sendReminderInitiate(' + row.marketId + ',' + row.stationId + ',' + row.personnelId + ')">Send</a>';
 
                     },
                     "orderable": false,
@@ -646,6 +670,16 @@
 
     }
 
+    function currentYear() {
+        var yp = $("#ddlYearPeriod").val().toString();
+        return yp.substr(0, 4);
+    }
+
+    function currentPeriod() {
+        var yp = $("#ddlYearPeriod").val().toString();
+        return yp.substr(4, 2);
+    }
+
     function getReminders() {
         if (!gotContacts || !gotYearsPeriods) {
             return;
@@ -654,13 +688,10 @@
         //setLocalStorage("search", $("#searchText").val().trim() + '|' + $("#searchTextNumber").val().trim() + '|' + $("#ddlMediaType").val());
         //setLocalStorage("searchPage", window.location);
 
-        var yp = $("#ddlYearPeriod").val().toString();
-        var y = yp.substring(0, 4);
-        var p = yp.substring(4, 6); // second argument is also index, not length like .NET
         var url = ServicePrefix + '/api/TVBReport/GetMarketRelease'
                 + '?inApiToken=' + getLocalStorage("APIToken")
-                + '&inYear=' + y
-                + '&inPeriod=' + p;
+                + '&inYear=' + currentYear()
+                + '&inPeriod=' + currentPeriod();
         var marketId = $("#ddlMarket").val();
         if (marketId != -1) {
             url += '&inMarketId=' + marketId;
@@ -727,8 +758,57 @@
         }
     }
 
-    function sendReminder(marketId, stationId, personnelId) {
-        bootbox.alert('Send functionality is still under development. MarketID = ' + marketId + ' / StationID = ' + stationId + ' / PersonnelID = ' + personnelId);
+    function sendReminderInitiate(marketId, stationId, personnelId) {
+        currentMarketId = marketId;
+        currentStationId = stationId;
+        currentPersonnelId = personnelId;
+
+        $("#emailNoteDialog").dialog({ title: 'Enter email note (optional)' });
+        $("#emailNoteDialog").dialog("open");
+    }
+
+    function closeEmailNoteDialog() {
+        $("#emailNoteDialog").dialog("close");
+    }
+
+    function sendReminder() {
+        closeEmailNoteDialog();
+
+        var url = ServicePrefix + '/api/TVB/InsertRemindersIntoQueue';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": currentMarketId,
+                "inStationId": currentStationId,
+                "inYear": currentYear(),
+                "inPeriod": currentPeriod(),
+                "inEmailNote": $("#txtEmailNote").val(),
+                "inPersonnelId": currentPersonnelId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                sendReminderSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function sendReminderSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        getReminders();
     }
 
 </script>
