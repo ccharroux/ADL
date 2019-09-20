@@ -191,6 +191,7 @@ reportName.push("rptImpersonationLogList");
 //Corporate Reports
 reportName.push("rptTrafficSystemAdvertiser");
 reportName.push("rptCorporateAgency");
+reportName.push("rptMonthToMonth");
 
 
 
@@ -8005,6 +8006,45 @@ function getReportObject_CorporateAgency() {
         reportTitle: "Corporate Agency",
         apiControllerAction: "/api/CorporateReport/InsertCorporateAgencyReportIntoQueue",
         apiType: 'post',
+        product: ['corporate'],
+        reportPath: "/Products/XRY/reports/xrycorporatereport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MonthToMonth() {
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject)
+
+    arrayObject = {
+        token: "Period",
+        jsCall: "getPeriodList",
+        objectName: "ddlPeriod",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject)
+
+    return arrayFilters;
+}
+
+function getReportObject_MonthToMonth() {
+    var rempObject = new Object();
+
+    tempObject = {
+        reportTitle: "Month to Month",
+        apiControllerAction: "/api/CorporateReport/InsertMonthToMonthReportIntoQueue",
+        apiType: "post",
         product: ['corporate'],
         reportPath: "/Products/XRY/reports/xrycorporatereport.html"
     }
