@@ -193,6 +193,8 @@ reportName.push("rptTrafficSystemAdvertiser");
 reportName.push("rptCorporateAgency");
 reportName.push("rptMonthToMonth");
 
+// TVB
+reportName.push("rptTimeSalesVsRepBilling");
 
 
 function buildReportArray()
@@ -7661,7 +7663,15 @@ function getReportFilterArray_TVBOutstandingStationList() {
     }
     arrayFilters.push(arrayObject);
 
- 
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "TVBOutstandingStationMode",
+        objectName: "ddlTVBOutstandingStationMode",
+        jsCall: "getTVBOutstandingStationMode",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
 
     return arrayFilters;
 }
@@ -8052,3 +8062,66 @@ function getReportObject_MonthToMonth() {
     return tempObject;
 }
 
+
+function getReportFilterArray_TimeSalesVsRepBilling() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Array();
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_TimeSalesVsRepBilling() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Time Sales vs Rep Billing",
+        apiControllerAction: "/api/TVBReport/GetTimeSalesVersusRepBilling",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
