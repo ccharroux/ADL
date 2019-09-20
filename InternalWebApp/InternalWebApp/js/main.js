@@ -1117,6 +1117,7 @@ function buildTVBMenu(selectedItem) {
     menuItems += '<ul class="dropdown-menu" role="menu">';
 
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbreminders.html">Reminders</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbdashboard.html">Report Status</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += productDashboard('');
