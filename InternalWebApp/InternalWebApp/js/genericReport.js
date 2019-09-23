@@ -195,7 +195,18 @@ reportName.push("rptMonthToMonth");
 
 // TVB
 reportName.push("rptTimeSalesVsRepBilling");
+reportName.push("rptRepBillingSubmissionStatusList");
+reportName.push("rptRepBillingStationList");
+reportName.push("rptTimeSalesStationList");
 
+reportName.push("rptRepBillingCompareList");
+reportName.push("rptTimeSalesCompareList");
+
+reportName.push("rptTimeSalesCompleteRevenueList");
+
+reportName.push("rptTimeSalesPersonnelContactList");
+reportName.push("rptPersonnelContactListForEstimates");
+reportName.push("rptPersonnelContactListByRepFirm");
 
 function buildReportArray()
 {
@@ -5603,7 +5614,7 @@ function getReportObject_RevenueComparisonMarket() {
 function getReportFilterArray_RevenueComparisonMarket() {
 
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "ParentMarket",
@@ -5698,7 +5709,7 @@ function getReportObject_RevenueComparisonStation() {
 
 function getReportFilterArray_RevenueComparisonStation() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "ParentMarket",
@@ -5785,7 +5796,7 @@ function getReportObject_RevenueComparisonStationDetail() {
 
 function getReportFilterArray_RevenueComparisonStationDetail() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     //parent market
     arrayObject = {
@@ -5890,7 +5901,7 @@ function getReportObject_Advertisers() {
 
 function getReportFilterArray_Advertisers() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Market",
@@ -5998,7 +6009,7 @@ function getReportObject_MediaAdvertisers() {
 
 function getReportFilterArray_MediaAdvertisers() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Market",
@@ -6078,7 +6089,7 @@ function getReportObject_StationAdvertisers() {
 
 function getReportFilterArray_StationAdvertisers() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Market",
@@ -6206,7 +6217,7 @@ function getReportObject_NewAdvertisers() {
 
 function getReportFilterArray_NewAdvertisers() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Market",
@@ -6256,7 +6267,7 @@ function getReportObject_Agencies() {
 
 function getReportFilterArray_Agencies() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Market",
@@ -6332,7 +6343,7 @@ function getReportObject_StationAgencies() {
 
 function getReportFilterArray_StationAgencies() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Market",
@@ -6431,7 +6442,7 @@ function getReportObject_NewAgencies() {
 
 function getReportFilterArray_NewAgencies() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Market",
@@ -6466,7 +6477,7 @@ function getReportObject_MarketStationSummary() {
 
 function getReportFilterArray_MarketStationSummary() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     //media type
     //load markets
@@ -6564,7 +6575,7 @@ function getReportObject_AdvertisersRevenueResearch() {
 
 function getReportFilterArray_AdvertisersRevenueResearch() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Market",
@@ -6703,7 +6714,7 @@ function getReportObject_MediaRevenueResearch() {
 
 function getReportFilterArray_MediaRevenueResearch() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Market",
@@ -6750,7 +6761,7 @@ function getReportFilterArray_MediaRevenueResearch() {
 
 function getReportFilterArray_AEStatusList() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "FirstName",
@@ -6813,7 +6824,7 @@ function getReportObject_AEStatusList() {
 
 function getReportFilterArray_AdvertisersList() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Market",
@@ -6886,7 +6897,7 @@ function getReportObject_AdvertisersList() {
 
 function getReportFilterArray_AdvertisersAgenciesList() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Market",
@@ -6931,7 +6942,7 @@ function getReportObject_AdvertisersAgenciesList() {
 
 function getReportFilterArray_DisabledAdvertisersList() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     //Currently no filters
 
@@ -6962,7 +6973,7 @@ function getReportObject_DisabledAdvertisersList() {
 
 function getReportFilterArray_MediaAdvertisersList() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Market",
@@ -7044,7 +7055,7 @@ function getReportObject_MediaAdvertisersList() {
 
 function getReportFilterArray_ParentAdvertiserList() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "ParentAdvertiserName",
@@ -7080,7 +7091,7 @@ function getReportObject_ParentAdvertiserList() {
 
 function getReportFilterArray_ParentAdvertiserAdvertiserList() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "ParentAdvertiserName",
@@ -7116,7 +7127,7 @@ function getReportObject_ParentAdvertiserAdvertiserList() {
 
 function getReportFilterArray_StationAdvertisersList() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Market",
@@ -7182,7 +7193,7 @@ function getReportObject_StationAdvertisersList() {
 
 function getReportFilterArray_AgencyList() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Market",
@@ -7229,7 +7240,7 @@ function getReportObject_AgencyList() {
 
 function getReportFilterArray_AgencyAdvertiserAccountsList() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Market",
@@ -7274,7 +7285,7 @@ function getReportObject_AgencyAdvertiserAccountsList() {
 
 function getReportFilterArray_DisabledAgencyList() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     //no filters at this time
 
@@ -7305,7 +7316,7 @@ function getReportObject_DisabledAgencyList() {
 
 function getReportFilterArray_ParentAgencyList() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "ParentAgencyName",
@@ -7341,7 +7352,7 @@ function getReportObject_ParentAgencyList() {
 
 function getReportFilterArray_ParentAgencyAgencyList() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "ParentAgencyName",
@@ -7377,7 +7388,7 @@ function getReportObject_ParentAgencyAgencyList() {
 
 function getReportFilterArray_StationAgencyList() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Market",
@@ -7443,7 +7454,7 @@ function getReportObject_StationAgencyList() {
 
 function getReportFilterArray_UsersNotSetupInSystem() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
  
 
     return arrayFilters;
@@ -7471,7 +7482,7 @@ function getReportObject_UsersNotSetupInSystem()
  
 function getReportFilterArray_XRAYDataRetentionList() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
 
     return arrayFilters;
@@ -7498,7 +7509,7 @@ function getReportObject_XRAYDataRetentionList() {
 
 function getReportFilterArray_MRRComplimentaryMarketRevenueEntry() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
 
     return arrayFilters;
@@ -7526,7 +7537,7 @@ function getReportObject_MRRComplimentaryMarketRevenueEntry()
 //
 function getReportFilterArray_MRRModeUsageSummary() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
     arrayObject = {
         token: "StartDate",
         jsCall: null,
@@ -7580,7 +7591,7 @@ function getReportFilterArray_MRROutstandingStationList()
 {
 
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
  
     arrayObject = {
@@ -7643,7 +7654,7 @@ function getReportObject_MRROutstandingStationList() {
 function getReportFilterArray_TVBOutstandingStationList() {
 
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
 
     arrayObject = {
@@ -7707,7 +7718,7 @@ function getReportObject_TVBOutstandingStationList() {
 function getReportFilterArray_AdvertiserDisabledAndNotMergedList() {
 
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
 
     arrayObject = new Object();
@@ -7770,7 +7781,7 @@ function getReportObject_AdvertiserDisabledAndNotMergedList()
 function getReportFilterArray_AgencyDisabledAndNotMergedList() {
 
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
  
     arrayObject = new Object();
     arrayObject = {
@@ -7829,7 +7840,7 @@ function getReportObject_AgencyDisabledAndNotMergedList() {
 function getReportFilterArray_APILogList() {
 
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = new Object();
     arrayObject = {
@@ -7900,7 +7911,7 @@ function getReportObject_APILogList() {
 function getReportFilterArray_ImpersonationLogList() {
 
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = new Object();
     arrayObject = {
@@ -7955,7 +7966,7 @@ function getReportObject_ImpersonationLogList() {
 
 function getReportFilterArray_TrafficSystemAdvertiser() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Owner",
@@ -7986,7 +7997,7 @@ function getReportObject_TrafficSystemAdvertiser() {
 
 function getReportFilterArray_CorporateAgency() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Owner",
@@ -8025,7 +8036,7 @@ function getReportObject_CorporateAgency() {
 
 function getReportFilterArray_MonthToMonth() {
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
     arrayObject = {
         token: "Year",
@@ -8066,8 +8077,9 @@ function getReportObject_MonthToMonth() {
 function getReportFilterArray_TimeSalesVsRepBilling() {
 
     var arrayFilters = new Array();
-    var arrayObject = new Array();
+    var arrayObject = new Object();
 
+    arrayObject = new Object();
     arrayObject = {
         token: "Year",
         jsCall: "getYearList",
@@ -8116,6 +8128,617 @@ function getReportObject_TimeSalesVsRepBilling() {
     {
         reportTitle: "Time Sales vs Rep Billing",
         apiControllerAction: "/api/TVBReport/GetTimeSalesVersusRepBilling",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_RepBillingSubmissionStatusList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_RepBillingSubmissionStatusList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Rep Billing Submission Status List",
+        apiControllerAction: "/api/TVBReport/GetRepBillingSubmissionStatus",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_RepBillingStationList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "RepFirm",
+        objectName: "ddlRepFirm",
+        jsCall: "getRepFirmList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_RepBillingStationList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Rep Firm Station List",
+        apiControllerAction: "/api/TVBReport/GetRepBillingStationList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_TimeSalesStationList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_TimeSalesStationList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Time Sales Station List",
+        apiControllerAction: "/api/TVBReport/GetTimeSalesStationList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_RepBillingCompareList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "PriorYear",
+        jsCall: "getYearList",
+        objectName: "ddlPriorYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "PriorPeriod",
+        objectName: "ddlPriorPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "RepFirm",
+        objectName: "ddlRepFirm",
+        jsCall: "getRepFirmList",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_RepBillingCompareList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Rep Billing Compare",
+        apiControllerAction: "/api/TVBReport/GetRepBillingCompare",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_TimeSalesCompareList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "PriorYear",
+        jsCall: "getYearList",
+        objectName: "ddlPriorYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "PriorPeriod",
+        objectName: "ddlPriorPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_TimeSalesCompareList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Time Sales Compare",
+        apiControllerAction: "/api/TVBReport/GetTimeSalesCompare",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_TimeSalesCompleteRevenueList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_TimeSalesCompleteRevenueList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Time Sales Complete Revenue List",
+        apiControllerAction: "/api/TVBReport/GetTimeSalesCompleteRevenue",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_TimeSalesPersonnelContactList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: new Array('TVB'),
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: new Array('TVB'),
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationListByGeneralFilters",
+        objectName: "ddlStation",
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Personnel",
+        jsCall: null,
+        objectName: "hidPersonnel",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_TimeSalesPersonnelContactList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Time Sales Contact List",
+        apiControllerAction: "/api/TVBReport/GetPersonnelContactList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_PersonnelContactListForEstimates() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: new Array('TVB'),
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: new Array('TVB'),
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationListByGeneralFilters",
+        objectName: "ddlStation",
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Personnel",
+        jsCall: null,
+        objectName: "hidPersonnel",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_PersonnelContactListForEstimates() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Estimated Contact List",
+        apiControllerAction: "/api/TVBReport/GetPersonnelContactListForEstimates",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_PersonnelContactListByRepFirm() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: new Array('TVB'),
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: new Array('TVB'),
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationListByGeneralFilters",
+        objectName: "ddlStation",
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Personnel",
+        jsCall: null,
+        objectName: "hidPersonnel",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "RepFirm",
+        jsCall: "getRepFirmList",
+        objectName: "ddlRepFirm",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_PersonnelContactListByRepFirm() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Rep Firm Contact List",
+        apiControllerAction: "/api/TVBReport/GetPersonnelContactListByRepFirm",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb'],

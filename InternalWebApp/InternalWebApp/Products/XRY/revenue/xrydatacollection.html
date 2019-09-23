@@ -195,11 +195,6 @@
                     </div>
                 </div>
 
-                <!--
-
-                datatable goes here
-
-                -->
                 <!-- datatable -->
                 <div class="dataTable-top-margin">
                     <table id="dtResults" class="stripe"></table>
@@ -486,48 +481,228 @@
         });
     }
 
-    //start action link functionality
-    function unpostRevenueProcess() {
-        //need to determine what the process for unposting revenue is
-        //didn't see anything in the dev-5400 case concerning this process
-        bootbox.alert(
-            "Functionality under development.",
-            function () {
+    //unpost revenue process
+    function unpostRevenueProcess(stationId, marketId, period, year, stationName) {
+       
+        workingStationId = stationId;
+        workingMarketId = marketId;
+        workingPeriod = period;
+        workingYear = year;
 
+        //getMarketPeriodYearLatestRevision
+        //may need to create a new version for unposting
+        //if ask if want to re-post
+        //what needs to happen??
+        //reset market status
+        //reset station status
+        //delete station revenue
+
+        getMarketPeriodYearLatestRevisionForUnposting(workingMarketId, workingPeriod, workingYear, stationName);
+    }
+
+    function getMarketPeriodYearLatestRevisionForUnposting(marketId, period, year, stationName) {
+
+        var queryString = "";
+
+        queryString += "?inApiToken=" + getLocalStorage("APIToken");
+        queryString += "&inMarketId=" + marketId;
+        queryString += "&inPeriod=" + period;
+        queryString += "&inYear=" + year;
+
+        var latestRevisionApi = "/api/XRAYRevenue/GetLatestRevisionByMarketYearPeriod" + queryString;
+
+        $.ajax({
+            url: ServicePrefix + latestRevisionApi,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var results = data["report"]["rows"];
+
+                    if (results.length > 0 && results[0]["Release Date"] !== null) {
+
+                        var strMessage = "";
+                        strMessage +=
+                            "The market has already been released and " + stationName + " cannot be re-posted.";
+
+                        bootbox.alert(strMessage,
+                            function () {
+
+                            });
+                        
+                        return;
+
+                    } else if (results.length > 0 && results[0]["Release Date"] === null) {
+                       
+                        //display dialog to reformat
+                        var strMessage = "";
+                        strMessage += "Do you want to un-post this station - " + stationName + "?";
+
+                        bootbox.dialog({
+                            message: strMessage,
+                            title: "Un-post Station",
+                            buttons:
+                            {
+                                btnRevision: {
+                                    label: "Un-Post",
+                                    className: "btn-primary",
+                                    callback: function () {
+
+                                        workingRevisionNumber = results[0]["Revision Number"];
+
+                                        updateMarketYearPeriodPostedStatusForUnposting();
+
+                                    }
+                                },
+                                btnCancel: {
+                                    label: "Cancel",
+                                    callback: function () {
+                                        return;
+                                    }
+                                }
+                            }
+                        });
+
+                    }
+                    else {
+                        return;
+                    }
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
             }
-        );
+        });
     }
 
-    function enable() {
-        bootbox.alert(
-            "Functionality under development.",
-            function () {
+    function updateMarketYearPeriodPostedStatusForUnposting() {
 
+        var updateMarketYearPeriodPostedStatusApi = "/api/XRAYRevenue/UpdatePostedStatusByMarketYearPeriod";
+
+        $.ajax({
+            url: ServicePrefix + updateMarketYearPeriodPostedStatusApi,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": workingMarketId,
+                "inPeriod": workingPeriod,
+                "inYear": workingYear,
+                "inRevisionNumber": workingRevisionNumber,
+                "inPosted": false
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    //un-post station
+                    updateStationYearPeriodPostedStatusForUnposting();
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
             }
-        );
+        });
     }
 
-    function disable() {
-        bootbox.alert(
-            "Functionality under development.",
-            function () {
+    function updateStationYearPeriodPostedStatusForUnposting() {
+        //if the postedFlag is set to true, this is the second pass
+        //and saying that the station has been posted.
+        //At that point, start working on updating the status of the market.
 
+        var updateStationYearPeriodPostedStatusApi = "/api/XRAYRevenue/UpdatePostedStatusByStationYearPeriod";
+
+        $.ajax({
+            url: ServicePrefix + updateStationYearPeriodPostedStatusApi,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": workingStationId,
+                "inPeriod": workingPeriod,
+                "inYear": workingYear,
+                "inPosted": false
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    //delete the revenue
+                    unpostRevenueByStationYearPeriodForUnposting();
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
             }
-        );
+        });
     }
 
-    function changeAvailability(stationId, marketId, ownerId, stationName, mediaType) {
+    function unpostRevenueByStationYearPeriodForUnposting() {
 
-        setLocalStorage("tempStationMarketId", marketId);
-        setLocalStorage("tempStationOwnerId", ownerId);
-        setLocalStorage("tempStationName", stationName);
-        setLocalStorage("tempStationMedia", mediaType);
+        var unpostRevenueByStationYearPeriodApi = "/api/XRAYRevenue/UnpostRevenueByStationYearPeriod";
 
-        window.location = "/products/xry/xrystationproduct.html?StationID=" + stationId;
+        $.ajax({
+            url: ServicePrefix + unpostRevenueByStationYearPeriodApi,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": workingStationId,
+                "inPeriod": workingPeriod,
+                "inYear": workingYear
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    
+                    bootbox.alert(
+                        "The station has been un-posted.",
+                        function () {
+
+                        }
+                    );
+
+                    //reload the page.
+                    getDataCollectionList();
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
 
     }
+    //end unpost revenue process
 
-    function postRevenueProcess(stationId, marketId, period, year) {
+    //start post revenue functionality
+    function postRevenueProcess(stationId, marketId, period, year, stationName) {
     
         //The overall flow of how the posting process works
         //see if the market is already released for that period - getMarketPeriodYearLatestRevision
@@ -551,12 +726,36 @@
         workingPeriod = period;
         workingYear = year;
 
-        getMarketPeriodYearLatestRevision(workingMarketId, workingPeriod, workingYear);
+        var strMessage = "";
+        strMessage += "Would you like to post the revenue for the station - " + stationName + "?";
+
+        bootbox.dialog({
+            message: strMessage,
+            title: "Post Station",
+            buttons:
+            {
+                btnRevision: {
+                    label: "Post",
+                    className: "btn-primary",
+                    callback: function () {
+                     
+                        getMarketPeriodYearLatestRevision(workingMarketId, workingPeriod, workingYear);
+
+                    }
+                },
+                btnCancel: {
+                    label: "Cancel",
+                    callback: function () {
+
+                        return;
+
+                    }
+                }
+            }
+        });
 
     }
-    //end action link functionality
 
-    //start posting functionality
     function getMarketPeriodYearLatestRevision(marketId, period, year) {
 
         var queryString = "";
@@ -1165,6 +1364,36 @@
     }
     //end posting functionality
 
+    //other action links
+    function enable() {
+        bootbox.alert(
+            "Functionality under development.",
+            function () {
+
+            }
+        );
+    }
+
+    function disable() {
+        bootbox.alert(
+            "Functionality under development.",
+            function () {
+
+            }
+        );
+    }
+
+    function changeAvailability(stationId, marketId, ownerId, stationName, mediaType) {
+
+        setLocalStorage("tempStationMarketId", marketId);
+        setLocalStorage("tempStationOwnerId", ownerId);
+        setLocalStorage("tempStationName", stationName);
+        setLocalStorage("tempStationMedia", mediaType);
+
+        window.location = "/products/xry/xrystationproduct.html?StationID=" + stationId;
+
+    }
+
     //start data table functionality
     //get datatable columns and load data functionality
     function getDataColumns() {
@@ -1284,6 +1513,7 @@
             "mRender": function (data, type, row) {
                 //create the list of actions
                 var actions = "";
+                var parameters = "";
 
                 if (row["enabled"] === true &&
                     row["Number of Records"] > 0 &&
@@ -1291,17 +1521,25 @@
                     row["Agencies Matched"] === row["Number of Records"] &&
                     row["Posted"].toLowerCase() === "no") {
 
-                    var parameters = "";
+                    parameters = "";
                     parameters += row["stationId"] + "," + row["marketId"];
                     parameters += ",\"" + $("#ddlPeriod").val() + "\"";
                     parameters += ",\"" + $("#ddlYear").val() + "\"";
+                    parameters += ",\"" + row["Station"] + "\"";
 
                     actions += "<a href='#' onclick='postRevenueProcess(" + parameters + ");'>Post</a><br/>";
 
                 }
 
                 if (row["enabled"] === true && row["Posted"].toLowerCase() === "yes") {
-                    actions += "<a href='#' onclick='unpostRevenueProcess();'>Un-Post</a><br/>";
+
+                    parameters = "";
+                    parameters += row["stationId"] + "," + row["marketId"];
+                    parameters += ",\"" + $("#ddlPeriod").val() + "\"";
+                    parameters += ",\"" + $("#ddlYear").val() + "\"";
+                    parameters += ",\"" + row["Station"] + "\"";
+
+                    actions += "<a href='#' onclick='unpostRevenueProcess(" + parameters + ");'>Un-Post</a><br/>";
                 }
 
                 var link = "";
@@ -1342,7 +1580,8 @@
                 //page uses local storage
                 //use onclick and pass variables
                 //set local storage as part of the function
-                var availabilityParameters = row["stationId"] +
+                parameters = "";
+                parameters = row["stationId"] +
                     ',' +
                     row["marketId"] +
                     ',' +
@@ -1354,13 +1593,14 @@
                     '","' +
                     row["Media Type"] +
                     '"';
-                actions += '<a href="#" onclick=changeAvailability(' + availabilityParameters + ');>Change&nbsp;Availability</a>';
+                actions += '<a href="#" onclick=changeAvailability(' + parameters + ');>Change&nbsp;Availability</a>';
 
                 return actions;
             },
+            "orderable": false,
+            "searchable": false,
             "visible": true
         });
-
 
         return columnsToDisplay;
     }
