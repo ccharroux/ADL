@@ -121,8 +121,10 @@
                                         <option value='RepFirm'>Rep Firm</option>
                                         <option value='Estimates'>Estimate (Kantar)</option>
                                     </select>
-                                    <br />
+                                </div>
+                                <div class="col-md-2">
                                     <div class="repFirm">
+                                        <label for="ddlRepFirm">Rep Firm</label><br />
                                         <select id="ddlRepFirm" class="dropdown-select" onchange="getMarkets();"></select>
                                     </div>
                                 </div>
@@ -174,7 +176,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6" style="text-align:center">
+                    <div class="col-md-6 hidden" style="text-align:center">
                         <div style="padding-top:5px">
                             <input type="button" style="width:200px" class="marketHistoryButton" onclick="rankYearPeriod();" value="Rank Market" />
                         </div>
@@ -200,9 +202,14 @@
                                     <a href="#" onclick="moveToPreviousStation();">Previous Station</a> | <a href="#" onclick="moveToNextStation();">Next Station</a>
                                 </div>
                             </div>
-                            <div class="col-md-6 saveChanges" style="padding-top: 20px;height: 62px;vertical-align: middle;">
+                            <div class="col-md-6" style="padding-top: 20px;height: 62px;vertical-align: middle;">
                                 <center>
-                                    <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" value="Save Changes" />
+                                    <div class="saveChanges">
+                                        <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" value="Save Changes" />
+                                    </div>
+                                    <div class="cannotSaveChanges">
+                                        To edit, go to the <a href="tvbrevenuedetail.html">Time Sales page</a>
+                                    </div>
                                 </center>
                             </div>
                         </div>
@@ -233,9 +240,14 @@
                                         <a href="#" onclick="moveToPreviousStation();">Previous Station</a> | <a href="#" onclick="moveToNextStation();">Next Station</a>
                                     </div>
                                 </div>
-                                <div class="col-md-6 saveChanges" style="padding-top: 20px;height: 62px;vertical-align: middle;">
+                                <div class="col-md-6" style="padding-top: 20px;height: 62px;vertical-align: middle;">
                                     <center>
-                                        <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" value="Save Changes" />
+                                        <div class="saveChanges">
+                                            <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" value="Save Changes" />
+                                        </div>
+                                        <div class="cannotSaveChanges">
+                                            To edit, go to the <a href="tvbrevenuedetail.html">Time Sales page</a>
+                                        </div>
                                     </center>
                                 </div>
                             </div>
@@ -356,8 +368,10 @@
 
         if (source == "TimeSales") {
             $(".saveChanges").hide();
+            $(".cannotSaveChanges").show();
         } else {
             $(".saveChanges").show();
+            $(".cannotSaveChanges").hide();
         }
 
         if (source == "RepFirm") {
@@ -974,6 +988,12 @@
         }
         revenueDetailChanged = false;
 
+        if (currentSource() == "TimeSales") {
+            $(".revenue-detail").prop("disabled", true);
+        } else {
+            $(".revenue-detail").prop("disabled", false);
+        }
+
         showStationEnteredStatus();
         showStationContactInfo();
         showStationComment();
@@ -1548,28 +1568,24 @@
     }
 
     function saveChanges_updateRevenueDetailInternalEdit() {
-        var repFirmId = currentRepFirmId();
-        var estimate = currentEstimate();
-        if (repFirmId == null && estimate == null) {
-            bootbox.alert("Time sales cannot be updated from this page");
-            return;
+        var source = currentSource();
+        var url = ServicePrefix + '/api/TVB/UpdateRepBillingRevenueDetail' + source + 'InternalEdit';
+        var data = {
+            "inApiToken": getLocalStorage("APIToken"),
+            "inStationId": $("#ddlStation").val(),
+            "inYear": currentRevenueYear(),
+            "inPeriod": currentRevenuePeriod(),
+            "inRevenueDetail": getRevenueDetailFromPage()
+        };
+        if (source == "RepFirm") {
+            data["inRepFirmId"] = currentRepFirmId();
         }
-
-        var url = ServicePrefix + '/api/TVB/UpdateRepBillingRevenueDetailInternalEdit';
 
         var settings = {
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inStationId": $("#ddlStation").val(),
-                "inYear": currentRevenueYear(),
-                "inPeriod": currentRevenuePeriod(),
-                "inRepFirmId": currentRepFirmId(),
-                "inEstimate": currentEstimate(),
-                "inRevenueDetail": getRevenueDetailFromPage()
-            }),
+            data: JSON.stringify(data),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 saveChanges_updateRevenueDetailInternalEditSuccess(data, textStatus, jQxhr);
@@ -1589,20 +1605,23 @@
             return;
         }
 
-        var url = ServicePrefix + '/api/TVB/GetRepBillingRevenueDetailWarningsInternalEdit';
+        var source = currentSource();
+        var url = ServicePrefix + '/api/TVB/GetRepBillingRevenueDetail' + source + 'WarningsInternalEdit';
+        var data = {
+            "inApiToken": getLocalStorage("APIToken"),
+            "inStationId": $("#ddlStation").val(),
+            "inYear": currentRevenueYear(),
+            "inPeriod": currentRevenuePeriod()
+        };
+        if (source == "RepFirm") {
+            data["inRepFirmId"] = currentRepFirmId();
+        }
 
         var settings = {
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inStationId": $("#ddlStation").val(),
-                "inYear": currentRevenueYear(),
-                "inPeriod": currentRevenuePeriod(),
-                "inRepFirmId": currentRepFirmId(),
-                "inEstimate": currentEstimate()
-            }),
+            data: JSON.stringify(data),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 saveChanges_getWarningsSuccess(data, textStatus, jQxhr);
@@ -1637,21 +1656,23 @@
     }
 
     function saveChanges_saveRevenueDetail() {
-        var url = ServicePrefix + '/api/TVB/UpdateRepBillingRevenueDetail';
+        var source = currentSource();
+        var url = ServicePrefix + '/api/TVB/UpdateRepBillingRevenueDetail' + source;
+        var data = {
+            "inApiToken": getLocalStorage("APIToken"),
+            "inStationId": $("#ddlStation").val(),
+            "inYear": currentRevenueYear(),
+            "inPeriod": currentRevenuePeriod()
+        };
+        if (source == "RepFirm") {
+            data["inRepFirmId"] = currentRepFirmId();
+        }
 
         var settings = {
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inStationId": $("#ddlStation").val(),
-                "inYear": currentRevenueYear(),
-                "inPeriod": currentRevenuePeriod(),
-                "inRepFirmId": currentRepFirmId(),
-                "inEstimate": currentEstimate(),
-                "inStationComment": $("#txtStationComment").val()
-            }),
+            data: JSON.stringify(data),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 saveChanges_saveRevenueDetailSuccess(data, textStatus, jQxhr);
