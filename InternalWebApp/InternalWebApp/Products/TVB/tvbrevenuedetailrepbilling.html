@@ -115,8 +115,16 @@
                         <center>
                             <div>
                                 <div class="col-md-3">
-                                    <label for="ddlProvider">Provider</label><br />
-                                    <select id="ddlProvider" class="dropdown-select" onchange="getMarkets();"></select>
+                                    <label for="ddlSource">Source</label><br />
+                                    <select id="ddlSource" class="dropdown-select" onchange="sourceChanged(); getMarkets();">
+                                        <option value='TimeSales'>Time Sales</option>
+                                        <option value='RepFirm'>Rep Firm</option>
+                                        <option value='Estimates'>Estimate (Kantar)</option>
+                                    </select>
+                                    <br />
+                                    <div class="repFirm">
+                                        <select id="ddlRepFirm" class="dropdown-select" onchange="getMarkets();"></select>
+                                    </div>
                                 </div>
                                 <div class="col-md-3">
                                     <label for="ddlMarket">Market</label><br />
@@ -192,7 +200,7 @@
                                     <a href="#" onclick="moveToPreviousStation();">Previous Station</a> | <a href="#" onclick="moveToNextStation();">Next Station</a>
                                 </div>
                             </div>
-                            <div class="col-md-6" style="padding-top: 20px;height: 62px;vertical-align: middle;">
+                            <div class="col-md-6 saveChanges" style="padding-top: 20px;height: 62px;vertical-align: middle;">
                                 <center>
                                     <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" value="Save Changes" />
                                 </center>
@@ -225,7 +233,7 @@
                                         <a href="#" onclick="moveToPreviousStation();">Previous Station</a> | <a href="#" onclick="moveToNextStation();">Next Station</a>
                                     </div>
                                 </div>
-                                <div class="col-md-6" style="padding-top: 20px;height: 62px;vertical-align: middle;">
+                                <div class="col-md-6 saveChanges" style="padding-top: 20px;height: 62px;vertical-align: middle;">
                                     <center>
                                         <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" value="Save Changes" />
                                     </center>
@@ -304,7 +312,7 @@
 
     var gotMarkets = false;
     var gotYearsPeriods = false;
-    var gotProviders = false;
+    var gotRepFirms = false;
     var gotStations = false;
     var initializedRevenueDetail = false;
     var revenueDetailChanged = false;
@@ -314,15 +322,16 @@
 
     $(document).ready(function () {
 
+        sourceChanged();
         $(".marketStatus").hide();
         $(".marketStatusEmpty").hide();
         $(".marketSelected").hide();
         $(".stationNavigation").hide();
 
         buildTVBMenu('Revenue');
-        getProviders();
-        // markets will be loaded once provider is selected
-        // stations will be loaded once market and provider are selected
+        getRepFirms();
+        getMarkets();
+        // stations will be loaded once market is selected
         getYearsPeriods();
         getRevenueDetail(); // just to initialize table
 
@@ -341,6 +350,23 @@
         //setLocalStorage("searchPage", window.location);
 
     });
+
+    function sourceChanged() {
+        var source = currentSource();
+
+        if (source == "TimeSales") {
+            $(".saveChanges").hide();
+        } else {
+            $(".saveChanges").show();
+        }
+
+        if (source == "RepFirm") {
+            $(".repFirm").show();
+        } else {
+            $(".repFirm").hide();
+        }
+    }
+
     function cancelIt()
     {
         $("#internalCommentDialog").dialog("close");
@@ -547,8 +573,8 @@
         });
     }
 
-    function getProviders() {
-        var url = ServicePrefix + '/api/TVB/GetRepBillingRevenueProviders';
+    function getRepFirms() {
+        var url = ServicePrefix + '/api/RepFirm/GetRepFirmList';
 
         var settings = {
             dataType: 'json',
@@ -560,7 +586,7 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getProvidersSuccess(data, textStatus, jQxhr);
+                getRepFirmsSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -571,59 +597,65 @@
 
     }
 
-    function getProvidersSuccess(data, textStatus, jQxhr) {
+    function getRepFirmsSuccess(data, textStatus, jQxhr) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
-        var previousProviderId = gotProviders ? $("#ddlProvider").val() : "-1";
+        var previousRepFirmId = gotRepFirms ? currentRepFirmId() : "-1";
         var str = '';
 
-        str = '<option value="-1">-- Select a Provider</option>';
+        str = '<option value="-1">-- Select a Rep Firm</option>';
         $.each(data.report.rows, function (index) {
 
-            str = str + '<option value="' + data.report.rows[index].repBillingRevenueProviderId + '">' + data.report.rows[index].repBillingRevenueProviderName + '</option>';
+            str = str + '<option value="' + data.report.rows[index].repFirmId + '">' + data.report.rows[index].repFirmName + '</option>';
 
         });
 
-        $("#ddlProvider").html(str);
-        convertToChosenSelect("ddlProvider", false, false);
+        $("#ddlRepFirm").html(str);
+        convertToChosenSelect("ddlRepFirm", false, false);
 
-        var previousProviderIdStillInList = false;
-        $("#ddlProvider option").each(function () {
-            if (this.value == previousProviderId) {
-                previousProviderIdStillInList = true;
+        var previousRepFirmIdStillInList = false;
+        $("#ddlRepFirm option").each(function () {
+            if (this.value == previousRepFirmId) {
+                previousRepFirmIdStillInList = true;
                 return false;
             }
         });
-        $("#ddlProvider").val(previousProviderIdStillInList ? previousProviderId : "-1");
+        $("#ddlRepFirm").val(previousRepFirmIdStillInList ? previousRepFirmId : "-1");
 
-        gotProviders = true;
+        gotRepFirms = true;
         getMarkets();
 
     }
 
     function getMarkets() {
-        if ($("#ddlProvider").val() == -1) {
-            var str = '<option value="-1">-- Provider not yet selected</option>';
-            $("#ddlMarket").html(str);
-            convertToChosenSelect("ddlMarket", false, false);
-            return;
+        var source = currentSource();
+        var url = ServicePrefix + '/api/TVB/GetRepBillingMarketList' + source;
+        var data = {
+            "inApiToken": getLocalStorage("APIToken"),
+            "inActiveOnly": true
+        };
+        if (source == "RepFirm") {
+            var repFirmId = currentRepFirmId();
+            if (repFirmId == -1) {
+                var str = '<option value="-1">-- Rep firm not yet selected</option>';
+                $("#ddlMarket").html(str);
+                convertToChosenSelect("ddlMarket", false, false);
+                getStations(); // hide relevant elements
+                return;
+            } else {
+                data["inRepFirmId"] = repFirmId;
+            }
         }
-
-        var url = ServicePrefix + '/api/TVB/GetRepBillingMarketListByProvider';
 
         var settings = {
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inRepBillingRevenueProviderId": $("#ddlProvider").val(),
-                "inActiveOnly": true
-            }),
+            data: JSON.stringify(data),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 getMarketsSuccess(data, textStatus, jQxhr);
@@ -714,14 +746,13 @@
     function getStations() {
 
         var marketId = $("#ddlMarket").val();
-        var providerId = $("#ddlProvider").val();
         $(".marketStatus").hide();
         $(".marketStatusEmpty").hide();
         $(".marketSelected").hide();
         $(".stationNavigation").hide();
         $("#dtRevenueDetail").hide();
 
-        if (marketId == -1 || providerId == "-1")
+        if (marketId == -1)
         {
             var str = '<option value="-1">-- Market not yet selected</option>';
             $("#ddlStation").html(str);
@@ -731,17 +762,21 @@
         //$(".marketStatus").show();
         //$(".marketSelected").show();
 
-        var url = ServicePrefix + '/api/TVB/GetRepBillingStationListByMarketProvider';
+        var source = currentSource();
+        var url = ServicePrefix + '/api/TVB/GetRepBillingStationListByMarket' + source;
+        var data = {
+            "inApiToken": getLocalStorage("APIToken"),
+            "inMarketId": marketId
+        };
+        if (source == "RepFirm") {
+            data["inRepFirmId"] = $("#ddlRepFirm").val();
+        }
 
         var settings = {
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inMarketId": marketId,
-                "inRepBillingRevenueProviderId": providerId
-            }),
+            data: JSON.stringify(data),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 getStationsSuccess(data, textStatus, jQxhr);
@@ -855,26 +890,12 @@
         return $("#ddlYearPeriod").val().toString().substr(4, 2);
     }
 
+    function currentSource() {
+        return $("#ddlSource").val();
+    }
+
     function currentRepFirmId() {
-        var providerId = $("#ddlProvider").val().toString();
-        return providerId.startsWith("RepFirm") ? providerId.substr(7) : null;
-    }
-
-    function currentEstimate() {
-        return $("#ddlProvider").val().toString() == "Estimate";
-    }
-
-    function urlProviderParameters() {
-        var urlParams = '';
-        var repFirmId = currentRepFirmId();
-        var estimate = currentEstimate();
-        if (repFirmId != null) {
-            urlParams = urlParams + '&inRepFirmId=' + repFirmId;
-        }
-        if (estimate) {
-            urlParams = urlParams + '&inEstimate=' + estimate;
-        }
-        return urlParams;
+        return $("#ddlRepFirm").val();
     }
 
     function getRevenueDetail()
@@ -913,12 +934,15 @@
         //setLocalStorage("search", $("#searchText").val().trim() + '|' + $("#searchTextNumber").val().trim() + '|' + $("#ddlMediaType").val());
         //setLocalStorage("searchPage", window.location);
 
-        var url = ServicePrefix + '/api/TVB/GetRepBillingRevenueDetail'
+        var source = currentSource();
+        var url = ServicePrefix + '/api/TVB/GetRepBillingRevenueDetail' + source
                 + '?inApiToken=' + getLocalStorage("APIToken")
                 + '&inYear=' + currentRevenueYear()
                 + '&inPeriod=' + currentRevenuePeriod()
-                + '&inStationId=' + stationId
-                + '&inRepBillingRevenueProviderId=' + $("#ddlProvider").val();
+                + '&inStationId=' + stationId;
+        if (source == "RepFirm") {
+            url += '&inRepFirmId=' + currentRepFirmId();
+        }
 
         $.ajax({
             url: url,
@@ -959,21 +983,24 @@
 
     function showStationEnteredStatus()
     {
+        var source = currentSource();
+        var data = {
+            "inApiToken": getLocalStorage("APIToken"),
+            "inStationId": $("#ddlStation").val(),
+            "inYear": currentRevenueYear(),
+            "inPeriod": currentRevenuePeriod()
+        };
+        if (source == "RepFirm") {
+            data["inRepFirmId"] = currentRepFirmId();
+        }
 
-
-        var url = ServicePrefix + '/api/TVB/GetRepBillingStationYearPeriodEntered';
+        var url = ServicePrefix + '/api/TVB/GetRepBillingStationYearPeriodEntered' + source;
 
         var settings = {
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inRepBillingRevenueProviderId": $("#ddlProvider").val(),
-                "inStationId": $("#ddlStation").val(),
-                "inYear": currentRevenueYear(),
-                "inPeriod": currentRevenuePeriod()
-            }),
+            data: JSON.stringify(data),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 showRepBillingStationEnteredStatusSuccess(data, textStatus, jQxhr);
@@ -1012,10 +1039,28 @@
     }
 
     function showStationContactInfo() {
-        var url = ServicePrefix + '/api/TVBReport/GetPersonnelContactList'
-            + '?inApiToken=' + getLocalStorage("APIToken")
-            + '&inStationId=' + $("#ddlStation").val()
-            + urlProviderParameters();
+        var url;
+        switch (currentSource()) {
+            case "TimeSales":
+                url = ServicePrefix + '/api/TVBReport/GetPersonnelContactList'
+                    + '?inApiToken=' + getLocalStorage("APIToken")
+                    + '&inStationId=' + $("#ddlStation").val();
+                break;
+            case "RepFirm":
+                url = ServicePrefix + '/api/TVBReport/GetPersonnelContactListByRepFirm'
+                    + '?inApiToken=' + getLocalStorage("APIToken")
+                    + '&inStationId=' + $("#ddlStation").val()
+                    + '&inRepFirmId=' + currentRepFirmId();
+                break;
+            case "Estimates":
+                url = ServicePrefix + '/api/TVBReport/GetPersonnelContactListForEstimates'
+                    + '?inApiToken=' + getLocalStorage("APIToken")
+                    + '&inStationId=' + $("#ddlStation").val();
+                break;
+            default: // should never happen
+                bootbox.alert("Invalid source " + currentSource());
+                break;
+        }
 
         var settings = {
             dataType: 'json',
@@ -1195,18 +1240,22 @@
     }
 
     function showRepBillingStationsSubmitted() {
-        var url = ServicePrefix + '/api/TVB/GetRepBillingStationsSubmitted';
+        var source = currentSource();
+        var url = ServicePrefix + '/api/TVB/GetRepBillingStationsSubmitted' + source;
+        var data = {
+            "inApiToken": getLocalStorage("APIToken"),
+            "inYear": currentRevenueYear(),
+            "inPeriod": currentRevenuePeriod()
+        };
+        if (source == "RepFirm") {
+            data["inRepFirmId"] = currentRepFirmId();
+        }
 
         var settings = {
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inRepBillingRevenueProviderId": $("#ddlProvider").val(),
-                "inYear": currentRevenueYear(),
-                "inPeriod": currentRevenuePeriod()
-            }),
+            data: JSON.stringify(data),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 showRepBillingStationsSubmittedSuccess(data, textStatus, jQxhr);
