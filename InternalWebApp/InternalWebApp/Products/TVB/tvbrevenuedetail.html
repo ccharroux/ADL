@@ -168,9 +168,6 @@
                         <div style="display:none;padding-top:5px" id="revisionSection">
                             <input type="button" style="width:200px" class="marketHistoryButton" onclick="unrankYearPeriod();" value="Un-rank market (revision)" />
                         </div>
-                        <div style="padding-top:5px">
-                            <input type="button" style="width:200px" class="marketHistoryButton" onclick="generateSnapshotReport();" value="Generate Snapshot" />
-                        </div>
                     </div>
                 </div>
 
@@ -1872,54 +1869,6 @@
         else {
             bootbox.alert("Station Comment Updated");
         }
-    }
-    function generateSnapshotReport()
-    {
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inMarketId": $("#ddlMarket").val(),
-                "inYear": currentRevenueYear(),
-                "inPeriod": currentRevenuePeriod()
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                generateSnapshotReport_getMarketRankStatusSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
-    }
-
-    function generateSnapshotReport_getMarketRankStatusSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        if (data.report.rows.length == 0) {
-            MKAErrorMessageRtn("Failed to get market rank status");
-            return;
-        }
-
-        if (data.report.rows[0].marketRankingInProgress) {
-            bootbox.alert("Market ranking is still in progress");
-            return;
-        }
-
-        if (!data.report.rows[0].marketRanked) {
-            bootbox.alert("Market is not yet ranked");
-            return;
-        }
-
-        bootbox.alert("Snapshot report is not yet implemented");
     }
 
 </script>
