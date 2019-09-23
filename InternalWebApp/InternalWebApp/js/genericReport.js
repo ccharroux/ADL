@@ -5068,7 +5068,8 @@ function getReportFilterArray_MRRNationwideTVByRegion() {
     arrayObject = {
         token: "Region",
         objectName: "ddlRegion",
-        jsCall: null,
+        jsCall: "getRegionListByMediaType",
+        jsCallParameters: ["2"],
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -5212,7 +5213,8 @@ function getReportFilterArray_MRRNationwideRadioByFormat() {
     arrayObject = {
         token: "Format",
         objectName: "ddlFormat",
-        jsCall: null,
+        jsCall: "getFormatListByMediaType",
+        jsCallParameters: ["1"],
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -5284,7 +5286,8 @@ function getReportFilterArray_MRRNationwideRadioByRegion() {
     arrayObject = {
         token: "Region",
         objectName: "ddlRegion",
-        jsCall: null,
+        jsCall: "getRegionListByMediaType",
+        jsCallParameters: ["1"],
         required: false
     }
     arrayFilters.push(arrayObject);
