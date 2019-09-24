@@ -85,7 +85,7 @@
                 <div class="row search-section">
                     <div class="col-md-12">
                         <div class="text-align-center">
-                            <div class="col-md-3 col-md-offset-2">
+                            <div class="col-md-3">
                                 <label for="ddlYearPeriod">Year-Period</label><br />
                                 <select id="ddlYearPeriod" onchange="getData();"></select><br />
                             </div>
@@ -93,8 +93,14 @@
                                 <label for="chkOnlyPendingOwners">Only pending owners</label><br />
                                 <input type="checkbox" id="chkOnlyPendingOwners" checked="checked" onchange="getData();" /><br />
                             </div>
-                            <div class="col-md-2">
-                                (to add: Generate All, Re-Generate All, Discard All)
+                            <div class="col-md-5">
+                                <span style="margin-top:5px;margin-bottom:5px">
+                                    <input type="button" id="btnGenerateAll" value="Generate All" onclick="generateAll();" />
+                                    &nbsp; &nbsp;
+                                    <input type="button" id="btnReGenerateAll" value="Re-generate All" onclick="reGenerateAll();" />
+                                    &nbsp; &nbsp;
+                                    <input type="button" id="btnDiscardAll" value="Discard All" onclick="discardAll();" />
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -475,7 +481,7 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                generateEstimates_InsertTimeSalesEstimatesByOwnerSuccess(data, textStatus, jQxhr, mode);
+                generateEstimates_InsertTimeSalesEstimatesSuccess(data, textStatus, jQxhr, mode);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -485,7 +491,7 @@
         $.ajax(url, settings);
     }
 
-    function generateEstimates_InsertTimeSalesEstimatesByOwnerSuccess(data, textStatus, jQxhr, mode) {
+    function generateEstimates_InsertTimeSalesEstimatesSuccess(data, textStatus, jQxhr, mode) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -501,7 +507,7 @@
     }
 
     function getGeneratedData() {
-        var url = ServicePrefix + '/api/TVBReport/GetMostRecentTimeSalesEstimates'
+        var url = ServicePrefix + '/api/TVBReport/GetTimeSalesEstimatesMostRecent'
             + '?inApiToken=' + getLocalStorage("APIToken");
 
         var settings = {
@@ -613,6 +619,64 @@
                 search: "Filter Results:"
             }
         });
+    }
+
+    function generateAll() {
+        bootbox.confirm(
+            "Generate estimates for all owners?",
+            function (confirmed) {
+                if (confirmed) {
+                    generateEstimates_InsertTimeSalesEstimatesAllOwners("generate");
+                }
+            }
+        );
+    }
+
+    function reGenerateAll() {
+        bootbox.confirm(
+            "Discard and re-generate estimates for all owners?",
+            function (confirmed) {
+                if (confirmed) {
+                    generateEstimates_InsertTimeSalesEstimatesAllOwners("regenerate");
+                }
+            }
+        );
+    }
+
+    function discardAll() {
+        bootbox.confirm(
+            "Discard estimates for all owners?",
+            function (confirmed) {
+                if (confirmed) {
+                    generateEstimates_InsertTimeSalesEstimatesAllOwners("discard");
+                }
+            }
+        );
+    }
+
+    function generateEstimates_InsertTimeSalesEstimatesAllOwners(mode) {
+        var url = ServicePrefix + '/api/TVB/InsertTimeSalesEstimatesByOwner'; // omit inOwnerId = all owners
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inYear": currentYear(),
+                "inPeriod": currentPeriod(),
+                "inMode": mode
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                generateEstimates_InsertTimeSalesEstimatesSuccess(data, textStatus, jQxhr, mode);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
     }
 
 </script>
