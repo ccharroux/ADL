@@ -131,8 +131,8 @@
                 <div class="row marketStatusEmpty" style="display:none;border:silver solid 1px;background:#F7F1F1;border-radius:15px;padding-bottom:5px">
                     <div class="col-md-12">
                         <div>
-                            <label for="MarketRankedEmpty"><u>Market Status</u> </label><br />
-                            <div id="MarketRankedEmpty">No data for selected Market and Period.</div>
+                            <label for="MarketStatusEmpty"><u>Market Status</u> </label><br />
+                            <div id="MarketStatusEmpty">No data for selected Market and Period.</div>
                         </div>
 
                     </div>
@@ -141,8 +141,8 @@
                     <div class="col-md-6">
                         <div>
                             <input type="hidden" id="revision" value="0" />
-                            <label for="MarketRanked"><u>Market Status</u> </label><br />
-                            <div id="MarketRanked"></div>
+                            <label for="MarketStatus"><u>Market Status</u> </label><br />
+                            <div id="MarketStatus"></div>
                             <br />
                             <label for="TimeSalesStationsSubmitted"><u>Time Sales Stations Submitted</u></label><br />
                             <div id="TimeSalesStationsSubmitted"></div>
@@ -162,10 +162,10 @@
                     </div>
 
                     <div class="col-md-6" style="text-align:center">
-                        <div style="padding-top:5px">
+                        <div style="padding-top:5px" id="rankSection">
                             <input type="button" style="width:200px" class="marketHistoryButton" onclick="rankYearPeriod();" value="Rank Market" />
                         </div>
-                        <div style="display:none;padding-top:5px" id="revisionSection">
+                        <div style="display:none;padding-top:5px" id="unrankSection">
                             <input type="button" style="width:200px" class="marketHistoryButton" onclick="unrankYearPeriod();" value="Un-rank market (revision)" />
                         </div>
                     </div>
@@ -186,7 +186,7 @@
                             </div>
                             <div class="col-md-6" style="padding-top: 20px;height: 62px;vertical-align: middle;">
                                 <center>
-                                    <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" value="Save Changes" />
+                                    <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" class="saveChanges" value="Save Changes" />
                                 </center>
                             </div>
                         </div>
@@ -219,7 +219,7 @@
                                 </div>
                                 <div class="col-md-6" style="padding-top: 20px;height: 62px;vertical-align: middle;">
                                     <center>
-                                        <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" value="Save Changes" />
+                                        <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" class="saveChanges" value="Save Changes" />
                                     </center>
                                 </div>
                             </div>
@@ -847,7 +847,7 @@
         showStationEnteredStatus();
         showStationContactInfo();
         showStationComment();
-        showMarketRankedStatus();
+        showMarketStatus();
         showTimeSalesStationsSubmitted();
     }
 
@@ -994,13 +994,16 @@
 
     }
 
-    function showMarketRankedStatus()
+    function showMarketStatus()
     {
+        $("#rankSection").hide();
+        $("#unrankSection").hide();
+        $(".saveChanges").hide();
+        $(".revenue-detail").prop("disabled", true);
         $(".divInternalComment").hide();
         $(".divExternalComment").hide();
 
-
-        var url = ServicePrefix + '/api/TVB/GetYearPeriodRanked';
+        var url = ServicePrefix + '/api/TVB/GetYearPeriodReleasedOrRanked';
 
         var settings = {
             dataType: 'json',
@@ -1013,7 +1016,7 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                showMarketRankedStatusSuccess(data, textStatus, jQxhr);
+                showMarketStatusSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -1023,68 +1026,56 @@
         $.ajax(url, settings);
     }
 
-    function showMarketRankedStatusSuccess(data, textStatus, jQxhr)
-    {
-
-        $("#revisionSection").hide();
-
+    function showMarketStatusSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
         if (data.report.rows.length == 0) {
-            MKAErrorMessageRtn("Failed to get market ranked status");
+            MKAErrorMessageRtn("Failed to get market status");
             return;
         }
 
+        // null means no MarketHistory record created yet
         var message = (data.report.rows[0].revision === null ? '' : "<strong>Revision:</strong> " + data.report.rows[0].revision + ', ');
-
-        // This means a no market history record created yet...
-
 
         if (message.length == 0) {
             message = "Preparing";
-        }
-        else {
-            message = message + (data.report.rows[0].isRanked
-                                                                ? " RANKED <br><strong>by:</strong> " + data.report.rows[0].rankUser + " <strong>on:</strong> " + data.report.rows[0].rankDateTime
-                                                                : " NOT RANKED"
-                );
+        } else if (data.report.rows[0].isReleased) {
+            message = message + " RELEASED <br><strong>by:</strong> " + data.report.rows[0].releaseUser + " <strong>on:</strong> " + data.report.rows[0].releaseDateTime;
+        } else if (data.report.rows[0].isRanked) {
+            message = message + " RANKED <br><strong>by:</strong> " + data.report.rows[0].rankUser + " <strong>on:</strong> " + data.report.rows[0].rankDateTime;
+        } else {
+            message = message + " NOT RANKED";
         }
 
-        $(".divInternalComment").hide();
-        $(".divExternalComment").hide();
+        $("#MarketStatus").html("<div>" + message + "</div>");
 
         $("#revision").val((data.report.rows[0].revision || 0));
+
         $("#InternalCommentText").html("");
-
-
-        if (data.report.rows[0].internalMessage.length > 0)
-        {
+        if (data.report.rows[0].internalMessage.length > 0) {
             $("#InternalCommentText").html(data.report.rows[0].internalMessage);
             $("#comments").val(data.report.rows[0].internalMessage);
             $(".divInternalComment").show();
         }
 
+        $("#ExternalCommentText").html("");
         if (data.report.rows[0].externalMessage.length > 0) {
             $("#ExternalCommentText").html(data.report.rows[0].externalMessage);
             $(".divExternalComment").show();
         }
 
-        $("#MarketRanked").html( "<div>" +message+ "</div>");
-
-
+        if (data.report.rows[0].isReleased == false) {
+            $(".saveChanges").show();
+            $(".revenue-detail").prop("disabled", false);
+        }
 
         if (data.report.rows[0].isRanked == true) {
-            $("#revisionSection").show();
-        }
-        else
-
-        {
-            // *** TVB doesn't work this way, see above
-            //$("#revisionSection").hide();
-
+            $("#unrankSection").show();
+        } else {
+            $("#rankSection").show();
         }
     }
 
@@ -1817,7 +1808,7 @@
 
         bootbox.alert("Market History Comment Updated");
         $("#internalCommentDialog").dialog('close');
-        showMarketRankedStatus();
+        showMarketStatus();
 
     }
 
