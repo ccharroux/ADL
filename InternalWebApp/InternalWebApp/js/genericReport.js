@@ -192,6 +192,7 @@ reportName.push("rptImpersonationLogList");
 reportName.push("rptTrafficSystemAdvertiser");
 reportName.push("rptCorporateAgency");
 reportName.push("rptMonthToMonth");
+reportName.push("rptLAIndSummary");
 
 // TVB
 reportName.push("rptTimeSalesVsRepBilling");
@@ -5067,7 +5068,8 @@ function getReportFilterArray_MRRNationwideTVByRegion() {
     arrayObject = {
         token: "Region",
         objectName: "ddlRegion",
-        jsCall: null,
+        jsCall: "getRegionListByMediaType",
+        jsCallParameters: ["2"],
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -5211,7 +5213,8 @@ function getReportFilterArray_MRRNationwideRadioByFormat() {
     arrayObject = {
         token: "Format",
         objectName: "ddlFormat",
-        jsCall: null,
+        jsCall: "getFormatListByMediaType",
+        jsCallParameters: ["1"],
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -5283,7 +5286,8 @@ function getReportFilterArray_MRRNationwideRadioByRegion() {
     arrayObject = {
         token: "Region",
         objectName: "ddlRegion",
-        jsCall: null,
+        jsCall: "getRegionListByMediaType",
+        jsCallParameters: ["1"],
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -8060,7 +8064,7 @@ function getReportFilterArray_MonthToMonth() {
 }
 
 function getReportObject_MonthToMonth() {
-    var rempObject = new Object();
+    var tempObject = new Object();
 
     tempObject = {
         reportTitle: "Month to Month",
@@ -8072,6 +8076,49 @@ function getReportObject_MonthToMonth() {
 
     return tempObject;
 }
+
+function getReportFilterArray_LAIndSummary() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+    arrayObject = new Object();
+
+    arrayObject = {
+        token: "ToYearPeriod",
+        jsCall: "getPeriodList_YYYYMM",
+        objectName: "ddlToYYYYMM",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_LAIndSummary() {
+    var tempObject = new Object();
+
+    tempObject = {
+        reportTitle: "LA Ind Summary",
+        apiControllerAction: "/api/CorporateReport/InsertLAIndSummaryReportIntoQueue",
+        apiType: "post",
+        product: ['corporate'],
+        reportPath: "/Products/XRY/reports/xrycorporatereport.html"
+    }
+
+    return tempObject;
+}
+
+//End Of Corporate Reports
 
 
 function getReportFilterArray_TimeSalesVsRepBilling() {

@@ -130,6 +130,11 @@
                             <select id="ddlPeriod" apiInput="inPeriod" class="dropdown-select rptView rptPeriod"></select>
                         </div>
 
+                        <div class="form-group rptView rptMarket">
+                            <label for="ddlMarket" class="dropdown-label rptView rptMarket">Market</label>
+                            <select id="ddlMarket" apiInput="inMarketId" class="dropdown-select rptView rptMarket"></select>
+                        </div>
+
                         <div class="form-group col-md-3 rptButton" style="text-align: right;">
                             <label for="btnReport" class="dropdown-label">&nbsp;</label>
                             <input type="button" id="btnReport" class="search-button" value="Run Report" onclick="runReport()" />
@@ -138,13 +143,8 @@
                     </div>
                 </div>
 
-
-
             </div>
         </div>
-
-
-
 
 
     </div>
@@ -579,6 +579,52 @@
 
     }
 
+    function getMarketListByProduct(inProduct) {
 
+        var url = ServicePrefix + '/api/Market/GetMarketListByProduct';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": inProduct,
+                "inActiveOnly": true 
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketListByProductSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        }
+
+        $.ajax(url, settings);
+    }
+
+    function getMarketListByProductSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+
+            var str = '';
+            str = '<option value="">-- Select a Market --</option>';
+            $.each(data.report.rows, function (index) {
+
+                str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
+
+            });
+
+            $("#ddlMarket").html(str);
+
+            convertToChosenSelect('ddlMarket', false, false);
+            saveLoadedControlSelection("ddlMarket");
+            //preSelectItem('quickReportQS');
+
+        }
+    }
 
 </script>
