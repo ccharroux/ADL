@@ -1126,6 +1126,9 @@ function buildTVBMenu(selectedItem) {
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbreminders.html">Reminders</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbdashboard.html">Report Status</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbmarketdelivery.html">Report Delivery</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetailrepbilling.html">Edit Rep Billing</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetail.html">Edit Time Sales</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbestimates.html">Estimates</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += productDashboard('');
