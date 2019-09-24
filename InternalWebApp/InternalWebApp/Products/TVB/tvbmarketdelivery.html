@@ -1,0 +1,830 @@
+﻿
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>MKA Internal Media Site</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+    <!-- Facebook and Twitter integration -->
+    <meta property="og:title" content="" />
+    <meta property="og:image" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:site_name" content="" />
+    <meta property="og:description" content="" />
+    <meta name="twitter:title" content="" />
+    <meta name="twitter:image" content="" />
+    <meta name="twitter:url" content="" />
+    <meta name="twitter:card" content="" />
+
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="shortcut icon" href="favicon.ico">
+
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
+
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700" rel="stylesheet">
+
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="/css/animate.css">
+    <!-- Icomoon Icon Fonts-->
+    <link rel="stylesheet" href="/css/icomoon.css">
+    <!-- Simple Line Icons -->
+    <link rel="stylesheet" href="/css/simple-line-icons.css">
+    <!-- Bootstrap  -->
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <!-- Theme style  -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
+
+    <style type="text/css">
+    </style>
+
+    <!--Chosen Dropdown-->
+    <link rel="stylesheet" href="/css/chosen.min.css" />
+
+    <!-- Modernizr JS -->
+    <script src="/js/modernizr-2.6.2.min.js"></script>
+
+    <!-- FOR IE9 below -->
+    <!--[if lt IE 9]>
+    <script src="js/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+<body>
+
+
+    <div id="fh5co-page">
+        <header id="fh5co-header" role="banner">
+            <div class="container">
+                <div class="header-inner" id="menu"></div>
+            </div>
+        </header>
+        <div id="fh5co-contact-section" class="contact-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
+                        <h2 id="pageTitle">Market Delivery - TVB</h2>
+                    </div>
+                </div>
+                <div id="divQuickReport" style="float:right;padding-right:25px;padding-bottom:10px;margin-top: -100px">
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>
+                <!-- search / filter area -->
+                <div class="row search-section">
+                    <div class="col-md-12">
+                        <center>
+                            <div>
+                                <div class="col-md-6">
+                                    &nbsp;
+                                </div>
+                                <div class="col-md-6" style="color:green;font-style:italic">
+                                    additional filters
+                                </div>
+
+                            </div>
+                            <div>
+                                <div class="col-md-6">
+                                    <label for="ddlYearPeriod">Year-Period</label><br />
+                                    <select id="ddlYearPeriod" onchange="getMarketDeliveryList();"></select><br />
+                                    <a href="#" onclick="moveToPreviousPeriod();">Previous Period</a> | <a href="#" onclick="moveToNextPeriod();">Next Period</a>
+                                </div>
+                                <!-- possible future addition -->
+                                <!--<div class="col-md-3">
+                                    <label for="ddlSchedule">Schedule</label><br />
+                                    <select id="ddlSchedule" onchange="getMarketDeliveryList();"></select>
+                                </div>-->
+                                <div class="col-md-6">
+                                    <label for="chkShowDelivered">Show Delivered</label><br />
+                                    <input id="chkShowDelivered" type="checkbox" onchange="getMarketDeliveryList();" />
+                                </div>
+                            </div>
+                            <div>
+                                <div class="col-md-6 col-offset-6">
+                                    <div class="divExternalComment">
+                                        <label for="externalComments"><u>Client Comment</u></label>
+                                        <textArea style="width:100%;overflow:auto" maxlength="250" id="externalComments" placeholder="Enter external comments here..."></textArea>
+                                    </div>
+                                </div>
+                            </div>
+                        </center>
+                        <hr />
+                    </div>
+                </div>
+
+                <!-- start datatable-->
+                <div class="dataTable-top-margin">
+
+                    <div class="col-md-12">
+                        <table id="dtMarketDeliveryList" class="stripe">
+                            <thead>
+                                <tr>
+                                    <th class="exportColumn">Market</th>
+                                    <th class="exportColumn">Ranked On</th>
+                                    <th class="exportColumn">Approved On</th>
+                                    <th class="exportColumn">Delivered On</th>
+                                    <th class="exportColumn text-align-right">Revision</th>
+                                    <th class="exportColumn">Client Blurb</th>
+
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th class="exportColumn">Market</th>
+                                    <th class="exportColumn">Ranked On</th>
+                                    <th class="exportColumn">Approved On</th>
+                                    <th class="exportColumn">Delivered On</th>
+                                    <th class="exportColumn text-align-right">Revision</th>
+                                    <th class="exportColumn">Client Blurb</th>
+
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <!-- end datatable -->
+
+                <div id="divPartnerReview">
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-3 text-center fh5co-heading margin-top-50">
+                            <h3>Awaiting Partner Review</h3>
+                        </div>
+                    </div>
+
+                    <!-- start datatable-->
+                    <div class="dataTable-top-margin">
+
+                        <div class="col-md-12">
+                            <table id="dtMarketDeliveryListPartnerReview" class="stripe">
+                                <thead>
+                                    <tr>
+                                        <th class="exportColumn">Market</th>
+                                        <th class="exportColumn">Ranked On</th>
+                                        <th class="exportColumn">Approved On</th>
+                                        <th class="exportColumn">Delivered On</th>
+                                        <th class="exportColumn text-align-right">Revision</th>
+                                        <th class="exportColumn">Client Blurb</th>
+
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th class="exportColumn">Market</th>
+                                        <th class="exportColumn">Ranked On</th>
+                                        <th class="exportColumn">Approved On</th>
+                                        <th class="exportColumn">Delivered On</th>
+                                        <th class="exportColumn text-align-right">Revision</th>
+                                        <th class="exportColumn">Client Blurb</th>
+
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- end datatable -->
+                </div>
+            </div>
+        </div>
+        <!--<div id="map" data-animate-effect="fadeIn"></div>-->
+
+    </div>
+
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+    <!-- jQuery Easing -->
+    <script src="/js/jquery.easing.1.3.js"></script>
+    <!-- Bootstrap -->
+    <script src="/js/bootstrap.min.js"></script>
+    <!-- Bootbox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+    <!-- Waypoints -->
+    <script src="/js/jquery.waypoints.min.js"></script>
+    <!-- BlockUI JS -->
+    <script src="/js/blockUI.js"></script>
+    <!-- Config JS -->
+    <script src="/js/config.js"></script>
+    <!-- MAIN JS -->
+    <script src="/js/main.js"></script>
+    <!-- genericReport JS -->
+    <script src="/js/genericReport.js"></script>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+
+    <!--Chosen Dropdown-->
+    <script src="/js/chosen.jquery.min.js"></script>
+
+</body>
+</html>
+
+<script>
+
+
+    // possible future addition
+    //var gotSchedules = false;
+    var gotYearsPeriods = false;
+    var initializedDataTable = false;
+    var initializedDataTablePartnerReview = false;
+    var currentMarketId = null;
+    var currentRevision = null;
+    var currentMarketName = null;
+    var currentEmailRecipients = false;
+
+    $(document).ready(function () {
+
+
+        buildTVBMenu('Revenue');
+
+        // possible future addition
+        //getSchedules();
+        getYearsPeriods();
+
+        //setEventListeners();
+
+        clearSearchButtonSetup();
+
+        buildQuickReports(['TVB']);
+
+        // Reset this variable
+        //setLocalStorage("quickReportQS", null);
+
+        //setTimeout(loadLastSearch, 1000);
+        //setLocalStorage("searchPage", window.location);
+
+    });
+
+    function clearSearchButtonSetup()
+    {
+        $("body").on("click", "#clear_search_button", function () {
+            var table = $("#dtMarketList").DataTable();
+            table.search('').draw();
+        });
+
+    }
+
+    function dtMarketDeliveryListId(partnerReview)
+    {
+        return partnerReview ? "dtMarketDeliveryListPartnerReview" : "dtMarketDeliveryList";
+    }
+
+    function setUpDataTable(partnerReview) {
+        var dtMarketDeliveryList = dtMarketDeliveryListId(partnerReview);
+
+        $("#" + dtMarketDeliveryList).DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "columns": [
+                { "data": 'Market' },
+                { "data": 'Ranked On' },
+                { "data": 'Approved On' },
+                { "data": 'Delivered On' },
+                { "data": 'Revision' },
+                { "data": 'Client Blurb' },
+                {
+                    mRender: partnerReview ? function (data, type, row) {
+                        return '';
+                    } : function (data, type, row) {
+                        if (row["Delivered On"] != null) {
+                            return '';
+                        }
+                        var text = '<a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', true)">Release</a>';
+                        if (row["Revision"] > 0) {
+                            text += ' | <a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', false)">Release without email</a>';
+                        }
+                        return text;
+                    },
+                    "orderable": false,
+                    "searchable": false
+                }
+            ],
+            "columnDefs": [
+                {
+                    "targets": [
+                        4 // Revision
+                    ],
+                    "className": "text-align-right"
+                }
+            ],
+            "ordering": false,
+            "paging": false,
+            "info": false,
+            "searching": false,
+            "pagingType": "full_numbers",
+            "buttons": [],
+            //"buttons": [
+            //   {
+            //       extend: 'csv',
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtRevenueDetail", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   },
+            //   {
+            //       extend: 'excel',
+            //       title: reportTitle,
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtRevenueDetail", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   },
+            //   {
+            //       extend: 'pdf',
+            //       title: reportTitle,
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtRevenueDetail", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   },
+            //   {
+            //       extend: 'print',
+            //       title: reportTitle,
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtRevenueDetail", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   }
+            //   //,
+            //   //this button is supposed to handle column visibility
+            //   //however it isn't working on our site
+            //   //'colvis'
+            //],
+            initComplete: setUpDataTableSuccess,
+            //createdRow: function (row, data, index) {
+            //    //this adds the class to every row
+            //    $(row).addClass('single-line-height');
+            //    //this adds the class to total rows
+            //    if (data["isTotal"]) {
+            //        // need to target td's because tr's already have background colors, with or without striping
+            //        $(row).find("td").addClass("total-category");
+            //    }
+            //},
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+
+        if (partnerReview) {
+            initializedDataTablePartnerReview = true;
+        } else {
+            initializedDataTable = true;
+        }
+    }
+
+    function setUpDataTableSuccess() {
+        if ((initializedDataTable == false) || (initializedDataTablePartnerReview == false)) {
+            return;
+        }
+
+        $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+    }
+
+    function getMarketDeliveryList()
+    {
+        getMarketDeliveryList_PerGrid(false);
+        getMarketDeliveryList_PerGrid(true);
+    }
+
+    function getMarketDeliveryList_PerGrid(partnerReview)
+    {
+        // possible future addition
+        if ((gotYearsPeriods == false)) {
+            return;
+        }
+
+        var reportTitle = "Market Delivery List";
+        var exportColumns = returnTableColumnsByClass("dtMarketDeliveryList", "exportColumn");
+
+        if ((initializedDataTable == false) || (initializedDataTablePartnerReview == false)) {
+            setUpDataTable(partnerReview);
+        }
+
+
+        var url = ServicePrefix + '/api/TVB/GetMarketDeliveryList';
+
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPeriod": currentRevenuePeriod(),
+                "inYear": currentRevenueYear(),
+                "inShowDelivered": $("#chkShowDelivered").prop('checked'),
+                "inPartnerReview": partnerReview
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketDeliveryListSuccess(data, textStatus, jQxhr, partnerReview);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function getMarketDeliveryListSuccess(data, textStatus, jQxhr, partnerReview) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var dtMarketDeliveryList = dtMarketDeliveryListId(partnerReview);
+        populateDataTable(dtMarketDeliveryList, data);
+
+        if (partnerReview) {
+            if (data.report.rows.length == 0) {
+                $("#divPartnerReview").hide();
+            } else {
+                $("#divPartnerReview").show();
+            }
+        }
+
+    }
+
+    function setEventListeners()
+    {
+        var input = document.getElementById("searchTextNumber");
+        input.addEventListener("keyup", function (event) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Number 13 is the "Enter" key on the keyboard
+            if (event.keyCode === 13) {
+                setLocalStorage("search", "");
+                editMarket(document.getElementById("searchTextNumber").value);
+            }
+        });
+
+        var input = document.getElementById("searchText");
+        input.addEventListener("keyup", function (event) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Number 13 is the "Enter" key on the keyboard
+            if (event.keyCode === 13) {
+
+                getMarkets();
+            }
+        });
+    }
+
+    //--------------
+    // Filters
+    //--------------
+
+    // possible future addition
+    //function getSchedules() {
+    //    var url = ServicePrefix + '/api/ReportingPeriod/GetScheduleList';
+
+    //    var settings = {
+    //        dataType: 'json',
+    //        type: 'post',
+    //        contentType: 'application/json',
+    //        data: JSON.stringify({
+    //            "inApiToken": getLocalStorage("APIToken")
+    //        }),
+    //        processData: false,
+    //        success: function (data, textStatus, jQxhr) {
+    //            getSchedulesSuccess(data, textStatus, jQxhr);
+    //        },
+    //        error: function (jqXhr, textStatus, errorThrown) {
+    //            genericAjaxError(jqXhr, textStatus, errorThrown);
+    //        }
+    //    };
+
+    //    $.ajax(url, settings);
+
+    //}
+
+    //function getSchedulesSuccess(data, textStatus, jQxhr) {
+
+    //    if (data.response.status != "SUCCESS") {
+    //        MKAErrorMessageRtn(data.response.errorMessage[0]);
+    //        return;
+    //    }
+
+    //    var str = '';
+
+    //    str = '<option selected value="">-- All Schedules</option>';
+    //    $.each(data.report.rows, function (index) {
+
+    //        str = str + '<option value="' + data.report.rows[index]["Schedule ID"] + '">' + data.report.rows[index]["Schedule Description"] + '</option>';
+
+    //    });
+
+    //    $("#ddlSchedule").html(str);
+
+    //    gotSchedules = true;
+    //    getMarketDeliveryList();
+
+    //}
+
+    function getYearsPeriods() {
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        var d = new Date();
+        var thisYear = d.getFullYear();
+        var thisMonth = d.getMonth() + 1; // getMonth() returns 0 to 11
+        var priorYear = thisYear;
+        var priorMonth = thisMonth - 1;
+        if (priorMonth < 1) {
+            priorMonth = 12;
+            priorYear -= 1;
+        }
+
+        var str = '';
+
+        for (var y = thisYear - 1; y <= thisYear; y++) {
+            for (var m = 1; m <= 12; m++) {
+                str = str + '<option ';
+                if (y == priorYear && m == priorMonth) {
+                    str = str + " selected ";
+                }
+                str = str + ' value="' + y.toString() + (m < 10 ? '0' + m.toString() : m.toString()) + '">' + y.toString() + '-' + monthNames[m - 1] + '</option>';
+            }
+        }
+
+        $("#ddlYearPeriod").html(str);
+        convertToChosenSelect("ddlYearPeriod", false, false);
+
+        gotYearsPeriods = true;
+        getMarketDeliveryList();
+
+    }
+
+    //--------------
+    // Filters END
+    //--------------
+
+    function loadLastSearch() {
+
+        var search = getParameterByName("search");
+
+        if (!search == false) {
+            if (search.length > 0) {
+                var sArray = new Array();
+                sArray = search.split("|");
+
+                $("#searchText").val(sArray[0].toString());
+                $("#searchTextNumber").val(sArray[1].toString());
+
+                getMarkets();
+            }
+        }
+
+    }
+
+    function currentRevenueYear() {
+        return $("#ddlYearPeriod").val().toString().substring(0, 4);
+    }
+
+    function currentRevenuePeriod() {
+        return $("#ddlYearPeriod").val().toString().substring(4, 6); // second argument is also index, not length like .NET
+    }
+
+    function currentYearPeriodText() {
+        return $("#ddlYearPeriod option:selected").text();
+    }
+
+    function moveToPreviousPeriod() {
+        if ($("#ddlYearPeriod option:selected").index() == 0) {
+            bootbox.alert("Already on first period");
+            return;
+        }
+        postSaveCallback = moveToPreviousPeriodSuccess;
+        saveChanges();
+    }
+
+    function moveToPreviousPeriodSuccess() {
+        var previousIndex = $("#ddlYearPeriod option:selected").index() - 1;
+        $("#ddlYearPeriod").get(0).selectedIndex = previousIndex;
+        $("#ddlYearPeriod").trigger("change");
+    }
+
+    function moveToNextPeriod()
+    {
+
+        if ($("#ddlYearPeriod option:selected").index() == $("#ddlYearPeriod option").length - 1) {
+            bootbox.alert("Already on last period");
+            return;
+        }
+
+        postSaveCallback = moveToNextPeriodSuccess;
+        saveChanges();
+    }
+
+    function moveToNextPeriodSuccess() {
+        var nextIndex = $("#ddlYearPeriod option:selected").index() + 1;
+        $("#ddlYearPeriod").get(0).selectedIndex = nextIndex;
+        $("#ddlYearPeriod").trigger("change");
+    }
+
+    function releaseMarket(marketId, revision, marketName, emailRecipients) {
+        currentMarketId = marketId;
+        currentRevision = revision;
+        currentMarketName = marketName;
+        currentEmailRecipients = emailRecipients;
+
+        bootbox.confirm({
+            message: "Release " + currentMarketName + " for " + currentYearPeriodText() + (currentEmailRecipients ? " and email recipients" : "") + "?",
+            callback: function (confirmed) {
+                if (confirmed) {
+                    releaseMarketConfirm();
+                } else {
+                    clearCurrentSettings();
+                }
+            }
+        });
+    }
+
+    function releaseMarketConfirm() {
+        var url = ServicePrefix + '/api/TVB/UpdateMarketYearPeriodRelease';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": currentMarketId,
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod(),
+                "inRevision": currentRevision
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                releaseMarketSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function releaseMarketSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert(
+            currentMarketName + " is released for " + currentYearPeriodText(),
+            function () {
+                if (currentEmailRecipients) {
+                    prepToSendEmailToRecipients();
+                } else {
+                    postSendEmailToRecipients();
+                }
+            }
+        );
+    }
+
+    function prepToSendEmailToRecipients() {
+        var externalComments = $("#externalComments").val().trim();
+        if (externalComments == "") {
+            sendEmailToRecipients();
+            return;
+        }
+
+        var url = ServicePrefix + '/api/TVB/UpdateMarketYearPeriodClientRevisionMessage';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": currentMarketId,
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod(),
+                "inClientRevisionMessage": externalComments
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                prepToSendEmailToRecipientsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function prepToSendEmailToRecipientsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        sendEmailToRecipients();
+    }
+
+    function sendEmailToRecipients() {
+        bootbox.alert(
+            "NOT YET IMPLEMENTED: Market Recipients have been notified that " + currentMarketName + " is released for " + currentYearPeriodText(),
+            function () {
+                checkOwnerGroupsOkayToRelease();
+            }
+        );
+    }
+
+    function checkOwnerGroupsOkayToRelease() {
+
+
+        var url = ServicePrefix + '/api/TVB/GetOwnerGroupsOkayToRelease';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                checkOwnerGroupsOkayToReleaseSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function checkOwnerGroupsOkayToReleaseSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("checkOwnerGroupsOkayToReleaseSuccess failed to get result");
+            return;
+        }
+
+        postSendEmailToRecipients();
+    }
+
+    function postSendEmailToRecipients() {
+        clearCurrentSettings();
+        $("#externalComments").val("");
+        getMarketDeliveryList();
+    }
+
+    function clearCurrentSettings() {
+        currentMarketId = null;
+        currentRevision = null;
+        currentMarketName = null;
+        currentEmailRecipients = null;
+    }
+
+</script>
