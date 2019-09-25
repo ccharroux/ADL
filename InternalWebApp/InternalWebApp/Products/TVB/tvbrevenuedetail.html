@@ -299,6 +299,7 @@
     var gotStations = false;
     var initializedRevenueDetail = false;
     var revenueDetailChanged = false;
+    var needUnrank = false;
     var revenueAmountsAllValid = true;
     var postSaveCallback = null;
     var minimumPercentSubmittedBeforeRank = 80;
@@ -845,6 +846,7 @@
             bootbox.alert("Changes were not saved");
         }
         revenueDetailChanged = false;
+        needUnrank = false; // will be checked when changes are saved
 
         showStationEnteredStatus();
         showStationContactInfo();
@@ -1375,8 +1377,9 @@
             return;
         }
 
+        needUnrank = data.report.rows[0].ranked;
         confirmIfNeeded(
-            data.report.rows[0].ranked,
+            needUnrank,
             "Year/period will be flagged as unranked",
             saveChanges_updateRevenueDetailInternalEdit
         );
@@ -1492,12 +1495,51 @@
             return;
         }
 
+        if (needUnrank) {
+            saveChanges_unrank();
+        } else {
+            saveChanges_postSaveChanges();
+        }
+    }
+
+    function saveChanges_unrank() {
+        var url = ServicePrefix + '/api/TVB/UpdateYearPeriodUnrank';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inRevenueYear": currentRevenueYear(),
+                "inRevenuePeriod": currentRevenuePeriod()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                saveChanges_unrankSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function saveChanges_unrankSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        showMarketStatus();
         saveChanges_postSaveChanges();
     }
 
     function saveChanges_postSaveChanges()
     {
         revenueDetailChanged = false;
+        needUnrank = false;
 
         if (postSaveCallback != null)
         {
