@@ -7952,7 +7952,8 @@ function getReportFilterArray_TrafficSystemAdvertiser() {
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
         objectName: "ddlOwner",
         required: true
     }
@@ -7983,7 +7984,8 @@ function getReportFilterArray_CorporateAgency() {
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
         objectName: "ddlOwner",
         required: true
     }
@@ -8102,7 +8104,8 @@ function getReportFilterArray_IRMktbyIndAnalysis() {
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
         objectName: "ddlOwner",
         required: true
     }

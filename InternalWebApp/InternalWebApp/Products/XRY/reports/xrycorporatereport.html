@@ -590,7 +590,7 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inProductId": inProduct,
-                "inActiveOnly": true 
+                "inActiveOnly": true
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -627,4 +627,48 @@
         }
     }
 
+    function getOwnerListByProduct(inProduct) {
+
+        var url = ServicePrefix + '/api/Owner/GetOwnerListByProduct';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": inProduct
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOwnerListByProductSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        }
+
+        $.ajax(url, settings);
+
+    }
+
+    function getOwnerListByProductSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+
+            var str = '';
+
+            str = "<option value=''>-- Select an Owner --</option>";
+
+            $.each(data.report.rows, function (index) {
+                var obj = data.report.rows[index];
+                str = str + "<option value='" + obj.ownerid + "'>" + obj.ownername + "</option>";
+
+            });
+            $("#ddlOwner").html(str);
+            convertToChosenSelect("ddlOwner", false, false);
+        }
+    }
 </script>
