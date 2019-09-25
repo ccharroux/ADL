@@ -141,7 +141,7 @@
                     <div class="col-md-6">
                         <div>
                             <input type="hidden" id="revision" value="0" />
-                            <label for="MarketStatus"><u>Market Status</u> </label><br />
+                            <label for="MarketStatus"><u>Year/Period Status</u> </label><br />
                             <div id="MarketStatus"></div>
                             <br />
                             <label for="TimeSalesStationsSubmitted"><u>Time Sales Stations Submitted</u></label><br />
@@ -404,11 +404,10 @@
                     ],
                     "className": "text-align-right",
                     "render": function (data, type, row) {
-                        return '$<input type="text" onFocus="this.select()" class="revenue-detail text-align-right"'
+                        return '$<input type="text" onFocus="this.select()" class="revenue-detail' + (row['isTotal'] ? ' revenue-detail-total' : '') + ' text-align-right"'
                             + ' id="revenue-detail-' + row['categoryId'] + '"'
                             + ' data-category-id="' + row['categoryId'] + '"'
                             + ' data-contributes-to-category-id="' + row['contributesToCategoryId'] + '"'
-                            + (row['isTotal'] ? ' disabled' : '')
                             + ' onchange="recalculateTotals();"'
                             + ' value="' + data + '"></input><span class="implicit-thousands">,000</span>';
                     }
@@ -1074,6 +1073,7 @@
         if (data.report.rows[0].isReleased == false) {
             $(".saveChanges").show();
             $(".revenue-detail").prop("disabled", false);
+            $(".revenue-detail-total").prop("disabled", true);
         }
 
         if (data.report.rows[0].isRanked == true) {
@@ -1451,7 +1451,7 @@
 
         var warningMessage = null;
         if (data.report.rows.length == 1) {
-            warningMessage = data.report.row[0].WarningMessage;
+            warningMessage = data.report.rows[0].WarningMessage;
         }
         if (data.report.rows.length > 1) {
             warningMessage = "Large changes in revenue";
