@@ -209,6 +209,17 @@ reportName.push("rptTimeSalesPersonnelContactList");
 reportName.push("rptPersonnelContactListForEstimates");
 reportName.push("rptPersonnelContactListByRepFirm");
 
+reportName.push("rptAEStatusList");
+reportName.push("rptAdvertisers");
+reportName.push("rptMediaAdvertisers");
+reportName.push("rptStationAdvertisers");
+reportName.push("rptAgencies");
+reportName.push("rptStationAgencies");
+ 
+reportName.push("rptAdvertisersRevenueResearch");
+reportName.push("rptMediaRevenueResearch");
+ 
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -372,7 +383,6 @@ function getReportObject_ParentOwnershipList() {
 
     tempObject =
     {
-        // id: rptParentOwnershipList,
         reportTitle: "Parent Ownership List",
         apiControllerAction: "/api/ParentOwnershipReport/GetParentOwnershipReportList",
         apiType: "get",
@@ -468,7 +478,7 @@ function getReportObject_MRRMarketSummary()
         apiControllerAction:  "/api/MRRReport/GetMarketSummary",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-         product: ['mrr']
+        product: ['mrr']
     }
 
     return tempObject;
@@ -539,7 +549,7 @@ function getReportObject_XRAYUsage() {
         apiControllerAction:  "/api/XRAYReport/GetXRayUsage",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-         product: ['xry']
+        product: ['xry']
     }
 
     return tempObject;
@@ -609,7 +619,7 @@ function getReportObject_MRRUsage() {
         apiControllerAction:  "/api/MRRReport/GetMRRUsage",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-         product: ['mrr']
+        product: ['mrr']
     }
 
     return tempObject;
@@ -679,7 +689,7 @@ function getReportObject_TVBUsage() {
         apiControllerAction:  "/api/TVBReport/GetTVBUsage",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-         product: ['tvb']
+        product: ['tvb']
     }
 
     return tempObject;
@@ -750,7 +760,7 @@ function getReportObject_MarketRevenueHourlyActivity() {
         apiControllerAction:  "/api/MRRReport/GetHourlyActivity",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-         product: ['mrr']
+        product: ['mrr']
     }
 
     return tempObject;
@@ -821,7 +831,7 @@ function getReportObject_UserActivity() {
         apiControllerAction:  "/api/XRAYReport/GetUserActivity",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-         product: ['xry']
+        product: ['xry']
     }
 
     return tempObject;
@@ -891,7 +901,7 @@ function getReportObject_UserActivityDetail() {
         apiControllerAction:  "/api/XRAYReport/GetUserActivityDetail",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-         product: ['xry']
+        product: ['xry']
     }
 
     return tempObject;
@@ -955,7 +965,7 @@ function getReportObject_UserQuerySummary() {
         apiControllerAction:  "/api/XRAYReport/GetUserQuerySummary",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-         product: ['xry']
+        product: ['xry']
     }
 
     return tempObject;
@@ -1025,7 +1035,7 @@ function getReportObject_UserQuerySummaryByOwner() {
         apiControllerAction:  "/api/XRAYReport/GetUserQuerySummaryByOwner",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-         product: ['xry']
+       product: ['xry']
     }
 
     return tempObject;
@@ -1084,7 +1094,7 @@ function getReportObject_UserListing() {
         apiControllerAction:  "/api/PersonnelReport/GetUserListing",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product: ['personnel']
+       product: ['personnel']
     }
 
     return tempObject;
@@ -1112,14 +1122,14 @@ function getReportObject_AEStatus() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("AE_AEID");
-    columnsToDisplay.push("AE Name");
-    columnsToDisplay.push("SA_PersonnelID");
-    columnsToDisplay.push("SA_Primary");
-    columnsToDisplay.push("AE Status");
-    columnsToDisplay.push("User_Name");
-    columnsToDisplay.push("User Status");
-    columnsToDisplay.push("Last Activity");
+    //columnsToDisplay.push("AE_AEID");
+    //columnsToDisplay.push("AE Name");
+    //columnsToDisplay.push("SA_PersonnelID");
+    //columnsToDisplay.push("SA_Primary");
+    //columnsToDisplay.push("AE Status");
+    //columnsToDisplay.push("User_Name");
+    //columnsToDisplay.push("User Status");
+    //columnsToDisplay.push("Last Activity");
 
     tempObject =
     {
@@ -1128,7 +1138,7 @@ function getReportObject_AEStatus() {
         apiControllerAction:  "/api/AccountExecutiveReport/GetAEStatus",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-         product: ['xry']
+        product: ['xry', 'account executive']
     }
 
     return tempObject;
@@ -1201,7 +1211,7 @@ function getReportObject_MarketDelivery() {
         apiControllerAction:  "/api/MarketReport/GetMarketDelivery",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-         product: ['market']
+        product: ['market']
     }
 
     return tempObject;
@@ -1255,7 +1265,7 @@ function getReportObject_TVBUserListing() {
         apiControllerAction:  "/api/TVBReport/GetTVBUserListing",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-         product: ['tvb']
+        product: ['tvb']
     }
 
     return tempObject;
@@ -1398,7 +1408,7 @@ function getReportObject_StationListing() {
         apiControllerAction:  "/api/StationReport/GetStationListing",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-         product: ['station']
+        product: ['station']
     }
 
     return tempObject;
@@ -1468,7 +1478,7 @@ function getReportObject_Training() {
         apiControllerAction:  "/api/Report/GetTraining",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-         product: ['training']
+        product: ['training']
     }
 
     return tempObject;
@@ -1540,7 +1550,7 @@ function getReportObject_StationChangeHistory() {
         apiControllerAction:  "/api/StationReport/GetStationChangeHistory",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-         product: ['station']
+        product: ['station']
     }
 
     return tempObject;
@@ -1600,7 +1610,7 @@ function getReportObject_NationwideRecipients() {
         apiControllerAction:  "/api/XRAYReport/GetNationwideRecipients",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-         product: ['xry']
+        product: ['xry']
     }
 
     return tempObject;
@@ -1732,7 +1742,7 @@ function getReportObject_ActiveStationList() {
         apiControllerAction: "/api/StationReport/GetActiveStationListing",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['station']
+        product: ['station']
     }
 
     return tempObject;
@@ -1793,7 +1803,7 @@ function getReportObject_DisabledStationList() {
         apiControllerAction: "/api/StationReport/GetDisabledStationListing",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['station']
+        product: ['station']
     }
 
     return tempObject;
@@ -1888,7 +1898,7 @@ function getReportObject_StationChanges() {
         apiControllerAction: "/api/StationReport/GetStationChanges",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['station']
+        product: ['station']
     }
 
     return tempObject;
@@ -2017,7 +2027,7 @@ function getReportObject_DetailedStationSetup() {
         apiControllerAction: "/api/StationReport/GetDetailedStationSetup",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['station']
+        product: ['station']
     }
 
     return tempObject;
@@ -2127,7 +2137,7 @@ function getReportObject_OwnershipGroupList() {
         apiControllerAction: "/api/OwnerGroupReport/GetOwnershipGroupList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['owner group']
+        product: ['owner group']
     }
 
     return tempObject;
@@ -2169,7 +2179,7 @@ function getReportObject_OwnershipGroupDistributionList() {
         apiControllerAction: "/api/OwnerGroupReport/GetOwnershipGroupDistributionList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['owner group']
+        product: ['owner group']
     }
 
     return tempObject;
@@ -2223,7 +2233,7 @@ function getReportObject_MarketOwnershipGroup() {
         apiControllerAction: "/api/OwnerGroupReport/GetMarketOwnershipGroup",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['owner group']
+        product: ['owner group']
     }
 
     return tempObject;
@@ -2265,7 +2275,7 @@ function getReportObject_DetailedOwnerGroupSetup() {
         apiControllerAction: "/api/OwnerGroupReport/GetDetailedOwnerGroupSetup",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['owner group'],
+        product: ['owner group'],
         sortable: false
     }
 
@@ -2944,7 +2954,7 @@ function getReportObject_MarketReleaseList() {
         apiControllerAction: "/api/MarketReport/GetMarketReleaseList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['market'],
+        product: ['market'],
         sortable: true
     }
 
@@ -3103,7 +3113,7 @@ function getReportObject_XRYMarketRelease() {
         apiControllerAction: "/api/XRAYReport/GetMarketRelease",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['xry'],
+        product: ['xry'],
         sortable: true
     }
 
@@ -3156,7 +3166,7 @@ function getReportObject_XRYMarketStationRelease() {
         apiControllerAction: "/api/XRAYReport/GetMarketRelease",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['xry'],
+        product: ['xry'],
         sortable: true
     }
 
@@ -3200,7 +3210,7 @@ function getReportObject_TVBMarketRelease() {
         apiControllerAction: "/api/TVBReport/GetMarketRelease",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['tvb'],
+        product: ['tvb'],
         sortable: true
     }
 
@@ -3253,7 +3263,7 @@ function getReportObject_TVBMarketStationRelease() {
         apiControllerAction: "/api/TVBReport/GetMarketRelease",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['tvb'],
+        product: ['tvb'],
         sortable: true
     }
 
@@ -3282,7 +3292,7 @@ function getReportObject_FeatureImplementationList() {
         apiControllerAction: "/api/Feature/GetFeatureImplementationList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['tech']
+        product: ['tech']
     }
 
     return tempObject;
@@ -3365,7 +3375,7 @@ function getReportObject_TVBMRRCompare() {
         apiControllerAction: "/api/TVBReport/GetMRRTVBCompare",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['tvb']
+        product: ['tvb']
     }
 
     return tempObject;
@@ -3473,7 +3483,7 @@ function getReportObject_TVBRepBillingStationList() {
         apiControllerAction: "/api/TVBReport/GetTVBRepBillingStationList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['tvb']
+        product: ['tvb']
     }
 
     return tempObject;
@@ -3499,7 +3509,7 @@ function getReportObject_TVBTimeSalesStationList() {
         apiControllerAction: "/api/TVBReport/GetTVBTimeSalesStationList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['tvb']
+        product: ['tvb']
     }
 
     return tempObject;
@@ -3525,7 +3535,7 @@ function getReportObject_TVBMarketNielsenRankingList() {
         apiControllerAction: "/api/TVBReport/GetTVBMarketNielsenRankingList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['tvb']
+        product: ['tvb']
     }
 
     return tempObject;
@@ -3551,7 +3561,7 @@ function getReportObject_GeneralStationData() {
         apiControllerAction: "/api/Report/GetGeneralStationData",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['station']
+        product: ['station']
     }
 
     return tempObject;
@@ -3577,7 +3587,7 @@ function getReportObject_OwnerStationGrid() {
         apiControllerAction: "/api/Report/GetOwnerStationGrid",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['station']
+        product: ['station']
     }
 
     return tempObject;
@@ -3603,7 +3613,7 @@ function getReportObject_APIAccessList() {
         apiControllerAction: "/api/APIAccess/GetAPIAccessList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['tech']
+        product: ['tech']
     }
 
     return tempObject;
@@ -3637,7 +3647,7 @@ function getReportObject_APIActivityList() {
         apiControllerAction: "/api/APIAccess/GetAPIActivityList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['tech']
+        product: ['tech']
     }
 
     return tempObject;
@@ -3674,7 +3684,7 @@ function getReportObject_DMAMRRCategoryMappingList() {
         apiControllerAction: "/api/DMAReport/GetDMAMRRCategoryMappingList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['dma']
+        product: ['dma']
     }
 
     return tempObject;
@@ -3736,7 +3746,7 @@ function getReportObject_KeywordIndustryList() {
         apiControllerAction: "/api/XRAYReport/GetKeywordList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['xry']
+        product: ['xry']
     }
 
     return tempObject;
@@ -3765,7 +3775,7 @@ function getReportObject_AdminDeviceList() {
         apiControllerAction: "/api/XRAYReport/GetAdminDeviceList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['tech']
+        product: ['tech']
     }
 
     return tempObject;
@@ -3801,7 +3811,7 @@ function getReportObject_ParentMarketCategoryTemplateList() {
         apiControllerAction: "/api/ParentMarketCategoryTemplate/GetParentMarketCategoryTemplateByTemplateId",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['dma']
+        product: ['dma']
     }
 
     return tempObject;
@@ -3829,7 +3839,7 @@ function getReportObject_SAMLOwnerList() {
         apiControllerAction: "/api/Report/GetSAMLOwnerList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['tech']
+        product: ['tech']
     }
 
     return tempObject;
@@ -3857,7 +3867,7 @@ function getReportObject_SAMLUserExceptionList() {
         apiControllerAction: "/api/Report/GetSAMLUserExceptionList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['tech']
+        product: ['tech']
     }
 
     return tempObject;
@@ -3886,7 +3896,7 @@ function getReportObject_AdvertiserRevenueInWrongMarket() {
         apiControllerAction: "/api/XRAYReport/GetAdvertiserRevenueInWrongMarketList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['xry']
+        product: ['xry']
     }
 
     return tempObject;
@@ -3915,7 +3925,7 @@ function getReportObject_AgencyRevenueInWrongMarket() {
         apiControllerAction: "/api/XRAYReport/GetAgencyRevenueInWrongMarketList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['xry']
+        product: ['xry']
     }
 
     return tempObject;
@@ -3943,7 +3953,7 @@ function getReportObject_DisabledUserAccountExecutive() {
         apiControllerAction: "/api/XRAYReport/GetDisabledUserAccountExecutiveList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['xry']
+        product: ['xry', 'account executive']
     }
 
     return tempObject;
@@ -4072,14 +4082,11 @@ function getReportObject_OwnerGroupReportingEntityIssues() {
         apiControllerAction: "/api/OwnerGroupReport/GetOwnerGroupReportingEntityIssuesList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['owner group']
+        product: ['owner group']
     }
 
     return tempObject;
 }
-
-/*
-reportName.push("rptOwnerGroupReportingEntityIssues");*/
 
 function getReportFilterArray_MultipleOwnersPerUser() {
 
@@ -4244,7 +4251,7 @@ function getReportObject_XRAYImportScript() {
         apiControllerAction: "/api/XRAYReport/GetXRAYImportScriptList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['xry']
+        product: ['xry']
     }
 
     return tempObject;
@@ -4272,7 +4279,7 @@ function getReportObject_XRYAccountAndRevenueAssignment() {
         apiControllerAction: "/api/XRAYReport/GetXRYAccountAndRevenueAssignmentList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['xry']
+        product: ['xry']
     }
 
     return tempObject;
@@ -4380,7 +4387,7 @@ function getReportObject_MarketProductStationSummary() {
         apiControllerAction: "/api/MarketReport/GetMarketProductStationSummary",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['market']
+        product: ['market']
     }
 
     return tempObject;
@@ -4432,7 +4439,7 @@ function getReportObject_AsyncJobQueueStatus() {
         apiControllerAction: "/api/Async/GetAsyncJobQueueStatusList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['tech'],
+        product: ['tech'],
         autoUpdate: true
     }
 
@@ -4471,7 +4478,7 @@ function getReportObject_DisabledAEList() {
         apiControllerAction: "/api/AccountExecutiveReport/GetDisabledAEList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['xry'],
+        product: ['xry'],
         autoUpdate: false
     }
 
@@ -4652,7 +4659,7 @@ function getReportObject_AdvertiserAgencyRevenueList() {
         apiControllerAction: "/api/XRAYReport/GetAdvertiserAgencyRevenueList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['xry'],
+        product: ['xry'],
         autoUpdate: false
     }
 
@@ -4737,7 +4744,6 @@ function getReportObject_MRRMarketDistributionList() {
     return tempObject;
 }
 
-//reportName.push("rptOwnershipProductList");
 function getReportFilterArray_OwnershipProductList() {
 
     var arrayFilters = new Array();
@@ -4823,7 +4829,7 @@ function getReportObject_EmailStatusList() {
         apiControllerAction: "/api/Email/GetEmailStatus",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['tech'],
+        product: ['tech'],
         autoUpdate: false
     }
 
@@ -5434,7 +5440,7 @@ function getReportObject_StationOutOfSyncList() {
         apiControllerAction: "/api/StationReport/GetStationOutOfSyncList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['station'],
+        product: ['station'],
         autoUpdate: false
     }
 
@@ -5496,7 +5502,7 @@ function getReportObject_StationProductSetupList() {
         apiControllerAction: "/api/StationReport/GetStationProductSetupList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['station'],
+        product: ['station'],
         autoUpdate: false
     }
 
@@ -5552,7 +5558,7 @@ function getReportObject_StationMissingDataList() {
         apiControllerAction: "/api/StationReport/GetStationMissingDataList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['station'],
+        product: ['station'],
         autoUpdate: false
     }
 
@@ -5606,7 +5612,7 @@ function getReportObject_RevenueComparisonMarket() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         reportPath: "/Products/DMA/reports/dmagenericreport.html",
-         product: ['dma'],
+        product: ['dma'],
         showBackNav: false,
         reportToken: "dmaMarket",
         reportIndex: ""
@@ -5701,7 +5707,7 @@ function getReportObject_RevenueComparisonStation() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         reportPath: "/Products/DMA/reports/dmagenericreport.html",
-         product: ['dma'],
+        product: ['dma'],
         showBackNav: true,
         backNavButtons: arrButtons,
         reportToken: "dmaStation",
@@ -5781,7 +5787,7 @@ function getReportObject_RevenueComparisonStationDetail() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         reportPath: "/Products/DMA/reports/dmagenericreport.html",
-         product: ['dma'],
+        product: ['dma'],
         sortable: false,
         showBackNav: true,
         backNavButtons: arrButtons,
@@ -5896,7 +5902,7 @@ function getReportObject_Advertisers() {
         apiControllerAction: "/api/AdvertiserAudit/GetAdvertiserAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['advertiser', 'xry'],
+        product: ['advertiser', 'xry'],
         reportPath: "/Products/XRY/reports/xrygenericreport.html"
     }
 
@@ -6004,7 +6010,7 @@ function getReportObject_MediaAdvertisers() {
         apiControllerAction: "/api/MediaAdvertiserAudit/GetMediaAdvertiserAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['advertiser', 'xry'],
+        product: ['advertiser', 'xry'],
         reportPath: "/Products/XRY/reports/xrygenericreport.html"
     }
 
@@ -6084,7 +6090,7 @@ function getReportObject_StationAdvertisers() {
         apiControllerAction: "/api/StationAdvertiserAudit/GetStationAdvertiserAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['advertiser', 'xry'],
+        product: ['advertiser', 'xry'],
         reportPath: "/Products/XRY/reports/xrygenericreport.html"
     }
 
@@ -6212,7 +6218,7 @@ function getReportObject_NewAdvertisers() {
         apiControllerAction: "/api/AdvertiserAudit/GetNewAdvertiserAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['xry'],
+        product: ['xry'],
         reportPath: "/Products/XRY/reports/xrygenericreport.html"
     }
 
@@ -6262,7 +6268,7 @@ function getReportObject_Agencies() {
         apiControllerAction: "/api/AgencyAudit/GetAgencyAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'agencies',
+        product: ['agency'],
         reportPath: "/Products/XRY/reports/xrygenericreport.html"
     }
 
@@ -6338,7 +6344,7 @@ function getReportObject_StationAgencies() {
         apiControllerAction: "/api/StationAgencyAudit/GetStationAgencyAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: 'agencies',
+        product: ['agency'],
         reportPath: "/Products/XRY/reports/xrygenericreport.html"
     }
 
@@ -6437,7 +6443,7 @@ function getReportObject_NewAgencies() {
         apiControllerAction: "/api/AgencyAudit/GetNewAgencyAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['xry'],
+        product: ['xry'],
         reportPath: "/Products/XRY/reports/xrygenericreport.html"
     }
 
@@ -6459,37 +6465,7 @@ function getReportFilterArray_NewAgencies() {
     return arrayFilters;
 }
 
-function getReportObject_MarketStationSummary() {
-    var tempObject = new Object();
-
-    var columnsToDisplay = new Array();
-
-
-    tempObject =
-    {
-        reportTitle: "Market Station Summary",
-        apiControllerAction: "",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: ['xry'],
-        reportPath: "/Products/XRY/reports/xrygenericreport.html"
-    }
-
-    return tempObject;
-
-}
-
-function getReportFilterArray_MarketStationSummary() {
-    var arrayFilters = new Array();
-    var arrayObject = new Object();
-
-    //media type
-    //load markets
-    //period
-    //years
-
-    return arrayFilters;
-}
+ 
 
 function getReportObject_AdvertisersRevenueResearch() {
     var tempObject = new Object();
@@ -6787,6 +6763,7 @@ function getReportFilterArray_AEStatusList() {
 }
 
 function getReportObject_AEStatusList() {
+
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
@@ -6819,7 +6796,7 @@ function getReportObject_AEStatusList() {
         apiControllerAction: "/api/AccountExecutiveReport/GetAEStatusList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-         product: ['account executive'],
+        product: ['account executive'],
         reportPath: "/Products/XRY/reports/xrygenericreport.html"
     }
 
@@ -6933,7 +6910,7 @@ function getReportObject_AdvertisersAgenciesList() {
 
     tempObject =
     {
-        reportTitle: "Market Advertiser / Market Agency List",
+        reportTitle: "Market Advertiser / Agency List",
         apiControllerAction: "/api/Advertiser/GetMarketAdvertiserMarketAgencyList",
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
@@ -7276,7 +7253,7 @@ function getReportObject_AgencyAdvertiserAccountsList() {
 
     tempObject =
     {
-        reportTitle: "Market Agency / Market Advertiser List",
+        reportTitle: "Market Agency / Advertiser List",
         apiControllerAction: "/api/Agency/GetMarketAgencyMarketAdvertiserList",
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
