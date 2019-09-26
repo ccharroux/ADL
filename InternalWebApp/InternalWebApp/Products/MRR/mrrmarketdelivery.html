@@ -825,12 +825,82 @@
             return;
         }
 
+        validateRecipients();
+    }
+
+    function validateRecipients() {
+        var url = ServicePrefix + '/api/MRR/InsertMarketDeliveryNotificationsIntoQueue';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": currentMarketId,
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod(),
+                "inIsRevision": currentRevision > 0,
+                "inValidateOnly": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                validateRecipientsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function validateRecipientsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
         sendEmailToRecipients();
     }
 
     function sendEmailToRecipients() {
+        var url = ServicePrefix + '/api/MRR/InsertMarketDeliveryNotificationsIntoQueue';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": currentMarketId,
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod(),
+                "inIsRevision": currentRevision > 0,
+                "inValidateOnly": false
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                sendEmailToRecipientsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function sendEmailToRecipientsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
         bootbox.alert(
-            "NOT YET IMPLEMENTED: Market Recipients have been notified that " + currentMarketName + " is released for " + currentYearPeriodText(),
+            "Market Recipients have been notified that " + currentMarketName + " is released for " + currentYearPeriodText(),
             function () {
                 checkOwnerGroupsOkayToRelease();
             }
