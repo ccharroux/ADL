@@ -256,7 +256,9 @@
     var currentMarketId = null;
     var currentRevision = null;
     var currentMarketName = null;
-    var currentEmailRecipients = false;
+    var currentMode = "";
+    var modeSilent = "silent";
+    var modeReDeliver = "redeliver";
 
     $(document).ready(function () {
 
@@ -316,11 +318,11 @@
                         return '';
                     } : function (data, type, row) {
                         if (row["Delivered On"] != null) {
-                            return '';
+                            return '<a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', \'' + modeReDeliver + '\')">Re-send emails</a>';
                         }
-                        var text = '<a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', true)">Release</a>';
+                        var text = '<a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', \'\')">Release</a>';
                         if (row["Revision"] > 0) {
-                            text += ' | <a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', false)">Release without email</a>';
+                            text += ' | <a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', \'' + modeSilent + '\')">Release without email</a>';
                         }
                         return text;
                     },
@@ -695,11 +697,7 @@
             bootbox.alert("Already on first period");
             return;
         }
-        postSaveCallback = moveToPreviousPeriodSuccess;
-        saveChanges();
-    }
 
-    function moveToPreviousPeriodSuccess() {
         var previousIndex = $("#ddlYearPeriod option:selected").index() - 1;
         $("#ddlYearPeriod").get(0).selectedIndex = previousIndex;
         $("#ddlYearPeriod").trigger("change");
@@ -713,27 +711,30 @@
             return;
         }
 
-        postSaveCallback = moveToNextPeriodSuccess;
-        saveChanges();
-    }
-
-    function moveToNextPeriodSuccess() {
         var nextIndex = $("#ddlYearPeriod option:selected").index() + 1;
         $("#ddlYearPeriod").get(0).selectedIndex = nextIndex;
         $("#ddlYearPeriod").trigger("change");
     }
 
-    function releaseMarket(marketId, revision, marketName, emailRecipients) {
+    function releaseMarket(marketId, revision, marketName, mode) {
         currentMarketId = marketId;
         currentRevision = revision;
         currentMarketName = marketName;
-        currentEmailRecipients = emailRecipients;
+        currentMode = mode;
+
+        var currentMessage = "Release " + currentMarketName + " for " + currentYearPeriodText() + " and email recipients?"
+        if (mode == modeSilent) {
+            var currentMessage = "Release " + currentMarketName + " for " + currentYearPeriodText() + " WITHOUT emailing recipients?"
+        }
+        if (mode == modeReDeliver) {
+            var currentMessage = "Re-send email to recipients for " + currentMarketName + " for " + currentYearPeriodText() + "?"
+        }
 
         bootbox.confirm({
-            message: "Release " + currentMarketName + " for " + currentYearPeriodText() + (currentEmailRecipients ? " and email recipients" : "") + "?",
+            message: currentMessage,
             callback: function (confirmed) {
                 if (confirmed) {
-                    releaseMarketConfirm();
+                    validateRecipients();
                 } else {
                     clearCurrentSettings();
                 }
@@ -741,7 +742,54 @@
         });
     }
 
-    function releaseMarketConfirm() {
+    function validateRecipients() {
+        if (currentMode == modeSilent) {
+            updateMarketYearPeriodAsReleased();
+            return;
+        }
+
+        var url = ServicePrefix + '/api/MRR/InsertMarketDeliveryNotificationsIntoQueue';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": currentMarketId,
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod(),
+                "inIsRevision": currentRevision > 0,
+                "inValidateOnly": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                validateRecipientsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function validateRecipientsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        updateMarketYearPeriodAsReleased();
+    }
+
+    function updateMarketYearPeriodAsReleased() {
+        if (currentMode == modeReDeliver) {
+            prepToSendEmailToRecipients();
+            return;
+        }
+
         var url = ServicePrefix + '/api/MRR/UpdateMarketYearPeriodRelease';
 
         var settings = {
@@ -757,7 +805,7 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                releaseMarketSuccess(data, textStatus, jQxhr);
+                updateMarketYearPeriodAsReleasedSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -767,7 +815,7 @@
         $.ajax(url, settings);
     }
 
-    function releaseMarketSuccess(data, textStatus, jQxhr) {
+    function updateMarketYearPeriodAsReleasedSuccess(data, textStatus, jQxhr) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
@@ -777,16 +825,17 @@
         bootbox.alert(
             currentMarketName + " is released for " + currentYearPeriodText(),
             function () {
-                if (currentEmailRecipients) {
-                    prepToSendEmailToRecipients();
-                } else {
-                    postSendEmailToRecipients();
-                }
+                prepToSendEmailToRecipients();
             }
         );
     }
 
     function prepToSendEmailToRecipients() {
+        if (currentMode == modeSilent) {
+            checkOwnerGroupsOkayToRelease();
+            return;
+        }
+
         var externalComments = $("#externalComments").val().trim();
         if (externalComments == "") {
             sendEmailToRecipients();
@@ -819,43 +868,6 @@
     }
 
     function prepToSendEmailToRecipientsSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        validateRecipients();
-    }
-
-    function validateRecipients() {
-        var url = ServicePrefix + '/api/MRR/InsertMarketDeliveryNotificationsIntoQueue';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inMarketId": currentMarketId,
-                "inYear": currentRevenueYear(),
-                "inPeriod": currentRevenuePeriod(),
-                "inIsRevision": currentRevision > 0,
-                "inValidateOnly": true
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                validateRecipientsSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
-    }
-
-    function validateRecipientsSuccess(data, textStatus, jQxhr) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
@@ -908,6 +920,11 @@
     }
 
     function checkOwnerGroupsOkayToRelease() {
+        if (currentMode == modeReDeliver) {
+            postSendEmailToRecipients();
+            return;
+        }
+
         var mediaTypeId = $("#ddlMediaType").val();
         if (mediaTypeId == -1) {
             mediaTypeId = "";
