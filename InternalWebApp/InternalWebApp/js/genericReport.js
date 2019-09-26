@@ -193,6 +193,8 @@ reportName.push("rptTrafficSystemAdvertiser");
 reportName.push("rptCorporateAgency");
 reportName.push("rptMonthToMonth");
 reportName.push("rptLAIndSummary");
+reportName.push("rptIRMktbyIndAnalysis");
+reportName.push("rptTop50Advertisers")
 
 // TVB
 reportName.push("rptTimeSalesVsRepBilling");
@@ -7951,7 +7953,8 @@ function getReportFilterArray_TrafficSystemAdvertiser() {
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
         objectName: "ddlOwner",
         required: true
     }
@@ -7982,7 +7985,8 @@ function getReportFilterArray_CorporateAgency() {
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerList",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
         objectName: "ddlOwner",
         required: true
     }
@@ -8087,6 +8091,88 @@ function getReportObject_LAIndSummary() {
     tempObject = {
         reportTitle: "LA Ind Summary",
         apiControllerAction: "/api/CorporateReport/InsertLAIndSummaryReportIntoQueue",
+        apiType: "post",
+        product: ['corporate'],
+        reportPath: "/Products/XRY/reports/xrycorporatereport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_IRMktbyIndAnalysis() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+    arrayObject = new Object();
+
+    arrayObject = {
+        token: "ToYearPeriod",
+        jsCall: "getPeriodList_YYYYMM",
+        objectName: "ddlToYYYYMM",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_IRMktbyIndAnalysis() {
+    var tempObject = new Object();
+
+    tempObject = {
+        reportTitle: "Market Ind Analysis",
+        apiControllerAction: "/api/CorporateReport/InsertIRMktbyIndAnalysisReportIntoQueue",
+        apiType: "post",
+        product: ['corporate'],
+        reportPath: "/Products/XRY/reports/xrycorporatereport.html"
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_Top50Advertisers() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+    arrayObject = new Object();
+
+    arrayObject = {
+        token: "ToYearPeriod",
+        jsCall: "getPeriodList_YYYYMM",
+        objectName: "ddlToYYYYMM",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_Top50Advertisers() {
+    var tempObject = new Object();
+
+    tempObject = {
+        reportTitle: "Top 50 Advertisers",
+        apiControllerAction: "/api/CorporateReport/InsertTop50AdvertisersReportIntoQueue",
         apiType: "post",
         product: ['corporate'],
         reportPath: "/Products/XRY/reports/xrycorporatereport.html"
