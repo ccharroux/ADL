@@ -188,6 +188,8 @@ reportName.push("rptAdvertiserDisabledAndNotMergedList");
 reportName.push("rptAPILogList");
 reportName.push("rptImpersonationLogList");
 
+reportName.push("rptPostedData");
+
 //Corporate Reports
 reportName.push("rptTrafficSystemAdvertiser");
 reportName.push("rptCorporateAgency");
@@ -7435,6 +7437,90 @@ function getReportObject_StationAgencyList() {
 
     return tempObject;
 }
+
+function getReportFilterArray_PostedData() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: false        
+    }
+
+    arrayFilters.push(arrayObject);
+    arrayObject = new Object();
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: false
+    }
+
+    arrayFilters.push(arrayObject);
+    arrayObject = new Object();
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationListByGeneralFilters",
+        objectName: "ddlStation",
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+    arrayObject = new Object();
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true 
+    }
+
+    arrayFilters.push(arrayObject);
+    arrayObject = new Object();
+
+    arrayObject = {
+        token: "Period",
+        jsCall: "getPeriodList",
+        objectName: "ddlPeriod",
+        required: true 
+    }
+
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+
+}
+
+function getReportObject_PostedData() {
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Advertiser");
+    columnsToDisplay.push("Agency");
+    columnsToDisplay.push("Account Type");
+    columnsToDisplay.push("Revenue");
+
+    tempObject = {
+        reportTitle: "Posted Data",
+        apiControllerAction: "/api/XRayReport/GetPostedData",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry']        
+    }
+
+    return tempObject;
+
+}
+
+
 // XRY Reports end here
 
 function getReportFilterArray_UsersNotSetupInSystem() {
