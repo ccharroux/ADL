@@ -127,6 +127,18 @@
                         </center>
                         <hr />
                     </div>
+                    <div class="col-md-12 releaseOwnerGroups">
+                        <center>
+                            <div>
+                                <div class="col-md-6">
+                                    &nbsp;
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="button" id="btnReleaseOwnerGroups" onclick="releaseOwnerGroups()" value="Deliver Ownership Groupings" />
+                                </div>
+                            </div>
+                        </center>
+                    </div>
                 </div>
 
                 <!-- start datatable-->
@@ -257,6 +269,7 @@
     var currentRevision = null;
     var currentMarketName = null;
     var currentMode = "";
+    var modeRelease = "release";
     var modeSilent = "silent";
     var modeReDeliver = "redeliver";
 
@@ -320,7 +333,7 @@
                         if (row["Delivered On"] != null) {
                             return '<a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', \'' + modeReDeliver + '\')">Re-send emails</a>';
                         }
-                        var text = '<a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', \'\')">Release</a>';
+                        var text = '<a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', \'' + modeRelease + '\')">Release</a>';
                         if (row["Revision"] > 0) {
                             text += ' | <a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', \'' + modeSilent + '\')">Release without email</a>';
                         }
@@ -432,6 +445,7 @@
     {
         getMarketDeliveryList_PerGrid(false);
         getMarketDeliveryList_PerGrid(true);
+        checkOwnerGroupsOkayToRelease();
     }
 
     function getMarketDeliveryList_PerGrid(partnerReview)
@@ -692,6 +706,13 @@
         return $("#ddlYearPeriod option:selected").text();
     }
 
+    function mediaTypeQualifier() {
+        var mediaTypeId = $("#ddlMediaType").val();
+        return (mediaTypeId == -1)
+            ? ""
+            : $("#ddlMediaType option:selected").text() + " ";
+    }
+
     function moveToPreviousPeriod() {
         if ($("#ddlYearPeriod option:selected").index() == 0) {
             bootbox.alert("Already on first period");
@@ -786,7 +807,7 @@
 
     function updateMarketYearPeriodAsReleased() {
         if (currentMode == modeReDeliver) {
-            prepToSendEmailToRecipients();
+            prepToSendEmailToMarketRecipients();
             return;
         }
 
@@ -825,12 +846,12 @@
         bootbox.alert(
             currentMarketName + " is released for " + currentYearPeriodText(),
             function () {
-                prepToSendEmailToRecipients();
+                prepToSendEmailToMarketRecipients();
             }
         );
     }
 
-    function prepToSendEmailToRecipients() {
+    function prepToSendEmailToMarketRecipients() {
         if (currentMode == modeSilent) {
             checkOwnerGroupsOkayToRelease();
             return;
@@ -838,7 +859,7 @@
 
         var externalComments = $("#externalComments").val().trim();
         if (externalComments == "") {
-            sendEmailToRecipients();
+            sendEmailToMarketRecipients();
             return;
         }
 
@@ -857,7 +878,7 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                prepToSendEmailToRecipientsSuccess(data, textStatus, jQxhr);
+                prepToSendEmailToMarketRecipientsSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -867,17 +888,17 @@
         $.ajax(url, settings);
     }
 
-    function prepToSendEmailToRecipientsSuccess(data, textStatus, jQxhr) {
+    function prepToSendEmailToMarketRecipientsSuccess(data, textStatus, jQxhr) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
-        sendEmailToRecipients();
+        sendEmailToMarketRecipients();
     }
 
-    function sendEmailToRecipients() {
+    function sendEmailToMarketRecipients() {
         var url = ServicePrefix + '/api/MRR/InsertMarketDeliveryNotificationsIntoQueue';
 
         var settings = {
@@ -894,7 +915,7 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                sendEmailToRecipientsSuccess(data, textStatus, jQxhr);
+                sendEmailToMarketRecipientsSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -904,7 +925,7 @@
         $.ajax(url, settings);
     }
 
-    function sendEmailToRecipientsSuccess(data, textStatus, jQxhr) {
+    function sendEmailToMarketRecipientsSuccess(data, textStatus, jQxhr) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
@@ -921,7 +942,7 @@
 
     function checkOwnerGroupsOkayToRelease() {
         if (currentMode == modeReDeliver) {
-            postSendEmailToRecipients();
+            postSendEmailToMarketRecipients();
             return;
         }
 
@@ -966,19 +987,25 @@
         }
 
         if (data.report.rows[0]["Okay to Release Owner Groups"]) {
-            var mediaTypeId = $("#ddlMediaType").val();
-            var mediaTypeQualifier = "";
-            if (mediaTypeId != -1) {
-                mediaTypeQualifier = $("#ddlMediaType option:selected").text() + " ";
-            }
+            $(".releaseOwnerGroups").show();
 
-            bootbox.alert(mediaTypeQualifier + "Ownership Groupings may be delivered for " + currentYearPeriodText());
+            var qualifier = mediaTypeQualifier();
+
+            $("#btnReleaseOwnerGroups").prop("value", "Deliver " + qualifier + "Ownership Groupings");
+
+            if (currentMode == modeRelease || currentMode == modeSilent) {
+                bootbox.alert(qualifier + "Ownership Groupings may now be delivered for " + currentYearPeriodText());
+            }
+        } else {
+            $(".releaseOwnerGroups").hide();
         }
 
-        postSendEmailToRecipients();
+        if (currentMode != "") {
+            postSendEmailToMarketRecipients();
+        }
     }
 
-    function postSendEmailToRecipients() {
+    function postSendEmailToMarketRecipients() {
         clearCurrentSettings();
         $("#externalComments").val("");
         getMarketDeliveryList();
@@ -988,7 +1015,67 @@
         currentMarketId = null;
         currentRevision = null;
         currentMarketName = null;
-        currentEmailRecipients = null;
+        currentMode = "";
+    }
+
+    function releaseOwnerGroups() {
+        bootbox.confirm({
+            message: "Email " + mediaTypeQualifier() + "owner group recipients for " + currentYearPeriodText() + "?",
+            callback: function (confirmed) {
+                if (confirmed) {
+                    sendEmailToGroupRecipients();
+                }
+            }
+        });
+    }
+
+    function sendEmailToGroupRecipients() {
+        var url = ServicePrefix + '/api/MRR/InsertGroupDeliveryNotificationsIntoQueue';
+
+        // this has an option "inValidateOnly", same as market level,
+        // but it's only needed if we might do something else in between validation and sending emails,
+        // and MRR doesn't have a separate control table with owner/group level release dates like XRY does
+
+        var data = {
+            "inApiToken": getLocalStorage("APIToken"),
+            "inYear": currentRevenueYear(),
+            "inPeriod": currentRevenuePeriod()
+        };
+
+        var mediaTypeId = $("#ddlMediaType").val();
+        if (mediaTypeId != -1) {
+            data["inMediaTypeId"] = mediaTypeId;
+        } else {
+            data["inMediaTypeId"] = null;
+        }
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                sendEmailToGroupRecipientsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function sendEmailToGroupRecipientsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert(
+            mediaTypeQualifier() + "Owner Group Recipients have been notified that reports are released for " + currentYearPeriodText()
+        );
     }
 
 </script>
