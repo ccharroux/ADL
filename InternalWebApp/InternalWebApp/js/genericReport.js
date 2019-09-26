@@ -219,8 +219,10 @@ reportName.push("rptAgencies");
 reportName.push("rptStationAgencies");
  
 reportName.push("rptAdvertisersRevenueResearch");
+
 reportName.push("rptMediaRevenueResearch");
  
+reportName.push("rptMarketStationProductCountList");
 
 function buildReportArray()
 {
@@ -8852,6 +8854,43 @@ function getReportObject_PersonnelContactListByRepFirm() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+//
+function getReportFilterArray_MarketStationProductCountList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MarketStationProductCountList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Market Product Station Count List",
+        apiControllerAction: "/api/MarketReport/GetMarketStationProductCountList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['market', 'station'],
         sortable: true
 
     }

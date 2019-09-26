@@ -65,6 +65,7 @@
             background: lightblue;
             border-radius: 10px;
             padding: 3px 3px 3px 3px;
+            margin: 1px 1px 1px 1px;
         }
 
         .secondary-contact {
@@ -72,6 +73,7 @@
             background: none;
             border-radius: 10px;
             padding: 3px 3px 3px 3px;
+            margin: 1px 1px 1px 1px;
         }
 
         .search-section {
@@ -179,7 +181,7 @@
 
                     <div class="col-md-6 hidden" style="text-align:center">
                         <div style="padding-top:5px">
-                            <input type="button" style="width:200px" class="marketHistoryButton" onclick="rankYearPeriod();" value="Rank Market" />
+                            <input type="button" style="width:200px" class="marketHistoryButton" onclick="rankYearPeriod();" value="Rank All Markets" />
                         </div>
                         <div style="display:none;padding-top:5px" id="revisionSection">
                             <input type="button" style="width:200px" class="marketHistoryButton" onclick="unrankYearPeriod();" value="Un-rank market (revision)" />
@@ -914,7 +916,7 @@
     {
         $("#dtRevenueDetail").hide();
         setStationLabels();
-        $("#txtStationComment").html("");
+        $("#txtStationComment").val("");
 
         if (!initializedRevenueDetail)
         {
@@ -1157,7 +1159,7 @@
         }
         else
         {
-            $("#txtStationComment").html(data.report.rows[0].comment);
+            $("#txtStationComment").val(data.report.rows[0].comment);
         }
 
 
@@ -1815,8 +1817,16 @@
             return;
         }
 
-        if (!data.report.rows[0].okayToRank) {
-            bootbox.alert(data.report.rows[0].reasonNotOkayToRank);
+        //if (!data.report.rows[0].okayToRank) {
+        //    bootbox.alert(data.report.rows[0].reasonNotOkayToRank);
+        //    return;
+        //}
+        if (data.report.rows[0].ranked == true) {
+            bootbox.alert("Ranking has already been done.");
+            return;
+        }
+        if (data.report.rows[0].rankingInProgress == true) {
+            bootbox.alert("Ranking already in process. You will be notified when it is complete.");
             return;
         }
 
@@ -1984,7 +1994,8 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inRevenueYear": $("#ddlYearPeriod").val().toString().substr(0, 4),
                 "inRevenuePeriod": $("#ddlYearPeriod").val().toString().substr(4, 2),
-                "inDescription": $("#comments").val()
+                "inDescription": $("#comments").val(),
+                "inRevision": $("#revision").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
