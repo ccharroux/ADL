@@ -27,11 +27,11 @@ reportName.push("rptMarketRevenueXRay");
 reportName.push("rptStationListing");
 reportName.push("rptMarketDelivery");
 reportName.push("rptTVBUserListing");
-// -- Parent Ownership
+ 
 reportName.push("rptParentOwnershipList");
-// -- Ownership
+ 
 reportName.push("rptOwnershipList");
-// -- Stations
+ 
 reportName.push("rptActiveStationList");
 reportName.push("rptDisabledStationList");
 reportName.push("rptStationChanges");
@@ -39,7 +39,7 @@ reportName.push("rptMRREstimatedStationList");
 reportName.push("rptMRRStationManagerList");
 reportName.push("rptDetailedStationSetup");
 
-// owner groups
+ 
 reportName.push("rptOwnershipGroupList");
 reportName.push("rptOwnershipGroupDistributionList");
 reportName.push("rptMarketOwnershipGroup");
@@ -188,15 +188,7 @@ reportName.push("rptAdvertiserDisabledAndNotMergedList");
 reportName.push("rptAPILogList");
 reportName.push("rptImpersonationLogList");
 
-reportName.push("rptPostedData");
 
-//Corporate Reports
-reportName.push("rptTrafficSystemAdvertiser");
-reportName.push("rptCorporateAgency");
-reportName.push("rptMonthToMonth");
-reportName.push("rptLAIndSummary");
-reportName.push("rptIRMktbyIndAnalysis");
-reportName.push("rptTop50Advertisers")
 
 // TVB
 reportName.push("rptTimeSalesVsRepBilling");
@@ -225,6 +217,16 @@ reportName.push("rptAdvertisersRevenueResearch");
 reportName.push("rptMediaRevenueResearch");
  
 reportName.push("rptMarketStationProductCountList");
+
+
+ 
+reportName.push("rptTrafficSystemAdvertiser");
+reportName.push("rptCorporateAgency");
+reportName.push("rptMonthToMonth");
+reportName.push("rptLAIndSummary");
+reportName.push("rptIRMktbyIndAnalysis");
+reportName.push("rptTop50Advertisers")
+reportName.push("rptPostedData");
 
 function buildReportArray()
 {
