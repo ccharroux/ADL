@@ -228,6 +228,9 @@ reportName.push("rptIRMktbyIndAnalysis");
 reportName.push("rptTop50Advertisers")
 reportName.push("rptPostedData");
 
+reportName.push("rptActiveMarketLog");
+reportName.push("rptActiveMarketLogSummary");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -7491,6 +7494,7 @@ function getReportFilterArray_PostedData() {
     arrayObject = {
         token: "Period",
         jsCall: "getPeriodList",
+        jsCallParameters: ['months'],
         objectName: "ddlPeriod",
         required: true 
     }
@@ -7520,6 +7524,129 @@ function getReportObject_PostedData() {
 
     return tempObject;
 
+}
+
+function getReportFilterArray_ActiveMarketLog() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+    arrayObject = new Object();
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+    arrayObject = new Object();
+
+    arrayObject = {
+        token: "Period",
+        jsCall: "getPeriodList",
+        jsCallParameters: ['months'],
+        objectName: "ddlPeriod",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_ActiveMarketLog() {
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Client ID");
+    columnsToDisplay.push("Input Date");
+    columnsToDisplay.push("Balance");
+    columnsToDisplay.push("Phone");
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Script");
+    columnsToDisplay.push("Contact");
+    columnsToDisplay.push("Email");
+
+    tempObject = {
+        reportTitle: "Active Market Log",
+        apiControllerAction: "/api/XRayReport/GetActiveMarketLog",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry']
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_ActiveMarketLogSummary() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+    arrayObject = new Object();
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject),
+    arrayObject = new Object();
+
+    arrayObject = {
+        token: "Period",
+        jsCall: "getPeriodList",
+        jsCallParameters: ['months'],
+        objectName: "ddlPeriod",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_ActiveMarketLogSummary() {
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Radio Total");
+    columnsToDisplay.push("Television Total");
+    columnsToDisplay.push("Newspaperss Total");
+    columnsToDisplay.push("System Total");
+    columnsToDisplay.push("Radio Adjustment");
+    columnsToDisplay.push("Book Radio");
+
+    tempObject = {
+        reportTitle: "Active Market Log Summary",
+        apiControllerAction: "/api/XRayReport/GetActiveMarketLogSummary",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry']
+    }
+
+    return tempObject;
 }
 
 
