@@ -198,10 +198,39 @@
             <textArea style="width:100%;overflow:auto" maxlength="250" id="txtEmailNote" placeholder="Enter email note here..."></textArea>
             <hr />
             <div style="margin-top:5px;margin-bottom:5px">
-                <input type="button" id="btnProcess" value="Process" onclick="sendReminder()" \>
+                <input type="button" id="btnProcess" value="Process" onclick="sendReminders()" \>
             </div>
             <div style="margin-top:5px;margin-bottom:5px">
                 <input type="button" id="btnCancel" value="Cancel" onclick="closeEmailNoteDialog()" \>
+            </div>
+        </center>
+    </div>
+
+    <div id="outstandingSubmissionsWithoutContactsDialog" title="" style="display:none">
+        <center>
+            <p>
+                Cannot send reminders. One or more outstanding submissions has no contact to receive a reminder.
+            </p>
+            <!-- start datatable-->
+            <div class="dataTable-top-margin">
+                <table id="dtOutstandingSubmissionsWithoutContacts" class="stripe">
+                    <thead>
+                        <tr>
+                            <th class="exportColumn">Station</th>
+                            <th class="exportColumn">Submission</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Station</th>
+                            <th>Submission</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <!-- end datatable -->
+            <div style="margin-top:5px;margin-bottom:5px">
+                <input type="button" id="btnCancelOutstandingSubmissionsWithoutContacts" value="Cancel" onclick="closeOutstandingSubmissionsWithoutContactsDialog()" \>
             </div>
         </center>
     </div>
@@ -274,14 +303,6 @@
 
   
         buildQuickReports(['xry']);
-
-        $("#emailNoteDialog").dialog({
-            autoOpen: false,
-            resizable: false,
-            width: 600,
-            height: 300,
-            modal: true
-        });
 
     });
 
@@ -473,6 +494,88 @@
             initComplete: function () {
                 $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+
+    }
+
+    function setDataTable_OutstandingSubmissionsWithoutContacts() {
+        var reportTitle = "Outstanding Submissions Without Contacts";
+        var exportColumns = returnTableColumnsByClass("dtOutstandingSubmissionsWithoutContacts", "exportColumn");
+
+
+        $("#dtOutstandingSubmissionsWithoutContacts").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "columns": [
+                { "data": 'Station' },
+                { "data": 'Submission' }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [
+               {
+                   extend: 'csv',
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtOutstandingSubmissionsWithoutContacts", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'excel',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtOutstandingSubmissionsWithoutContacts", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'pdf',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtOutstandingSubmissionsWithoutContacts", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtOutstandingSubmissionsWithoutContacts", data, columnIdx);
+                           }
+                       }
+                   }
+               }
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            initComplete: function () {
+                // setDataTable() covers this for everything on the page, don't repeat it
+                // $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            },
             createdRow: function (row, data, index) {
                 //this adds the class to every row
                 $(row).addClass('single-line-height');
@@ -820,6 +923,7 @@
                 }
                 if (!initializedReminders) {
                     setDataTable();
+                    setDataTable_OutstandingSubmissionsWithoutContacts();
                     initializedReminders = true;
                 }
                 populateDataTable("dtReminders", data);
@@ -859,7 +963,14 @@
         currentStationId = stationId;
         currentPersonnelId = personnelId;
 
-        $("#emailNoteDialog").dialog({ title: 'Enter email note (optional)' });
+        $("#emailNoteDialog").dialog({
+            autoOpen: false,
+            resizable: false,
+            width: 600,
+            height: 300,
+            modal: true,
+            title: 'Enter email note (optional)'
+        });
         $("#emailNoteDialog").dialog("open");
     }
 
@@ -867,9 +978,66 @@
         $("#emailNoteDialog").dialog("close");
     }
 
-    function sendReminder() {
+    function sendReminders() {
         closeEmailNoteDialog();
+        getOutstandingSubmissionsWithoutContacts();
+    }
 
+    function getOutstandingSubmissionsWithoutContacts() {
+        var url = ServicePrefix + '/api/XRAY/GetOutstandingSubmissionsWithoutContacts';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": currentMarketId,
+                "inStationId": currentStationId,
+                "inYear": currentYear(),
+                "inPeriod": currentPeriod()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOutstandingSubmissionsWithoutContactsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function getOutstandingSubmissionsWithoutContactsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length > 0) {
+            populateDataTable("dtOutstandingSubmissionsWithoutContacts", data);
+            $("#outstandingSubmissionsWithoutContactsDialog").dialog({
+                autoOpen: false,
+                resizable: false,
+                width: 800,
+                height: 600,
+                modal: true,
+                title: 'Outstanding submissions without contacts'
+            });
+            $("#outstandingSubmissionsWithoutContactsDialog").dialog("open");
+            return;
+        }
+
+        insertRemindersIntoQueue();
+    }
+
+    function closeOutstandingSubmissionsWithoutContactsDialog() {
+        $("#outstandingSubmissionsWithoutContactsDialog").dialog("close");
+    }
+
+    function insertRemindersIntoQueue() {
         var url = ServicePrefix + '/api/XRAY/InsertRemindersIntoQueue';
 
         var settings = {

@@ -922,11 +922,6 @@ function MKAErrorMessageRtn(message, url)
   
         bootbox.alert(newMessage, function () {});
     }
-    else if (message.indexOf('Expected condition: ') == 0) {
-        newMessage = message.replace("Expected condition: ", "");
-
-        bootbox.alert(newMessage, function () { });
-    }
     else
     {
         bootbox.alert('Process Failed.\n\r\n\r' + message + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () { });
