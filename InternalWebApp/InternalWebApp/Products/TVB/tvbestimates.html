@@ -105,59 +105,8 @@
                         </div>
                     </div>
                 </div>
-                <hr />
 
                 <!-- start datatable coding-->
-
-                <div class="dataTable-top-margin" id="divGenerated">
-                    <h3>Your most recent results</h3>
-                    <table id="dtGenerated" class="stripe">
-                        <thead>
-                            <tr>
-                                <th class="exportColumn">Market</th>
-                                <th class="exportColumn">Station</th>
-                                <th class="exportColumn">Affiliation</th>
-                                <th class="exportColumn">Year-Period</th>
-                                <th class="exportColumn">Local Non-Political</th>
-                                <th class="exportColumn">National Non-Political</th>
-                                <th class="exportColumn">Total Non-Political</th>
-                                <th class="exportColumn">Local Political</th>
-                                <th class="exportColumn">National Political</th>
-                                <th class="exportColumn">Total Political</th>
-                                <th class="exportColumn">Local Time Sales</th>
-                                <th class="exportColumn">National Time Sales</th>
-                                <th class="exportColumn">Total Time Sales</th>
-                                <th class="exportColumn">Local Digital</th>
-                                <th class="exportColumn">National Digital</th>
-                                <th class="exportColumn">Total Digital</th>
-                                <th class="exportColumn">Mobile</th>
-                                <th class="exportColumn">Total Revenues</th>
-                            </tr>
-                        </thead>
-                        <tfoot>
-                            <tr>
-                                <th>Market</th>
-                                <th>Station</th>
-                                <th>Affiliation</th>
-                                <th>Year-Period</th>
-                                <th>Local Non-Political</th>
-                                <th>National Non-Political</th>
-                                <th>Total Non-Political</th>
-                                <th>Local Political</th>
-                                <th>National Political</th>
-                                <th>Total Political</th>
-                                <th>Local Time Sales</th>
-                                <th>National Time Sales</th>
-                                <th>Total Time Sales</th>
-                                <th>Local Digital</th>
-                                <th>National Digital</th>
-                                <th>Total Digital</th>
-                                <th>Mobile</th>
-                                <th>Total Revenues</th>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
 
                 <div class="dataTable-top-margin">
                     <table id="dt" class="stripe">
@@ -190,6 +139,64 @@
         </div>
     </div>
 
+    <div id="mostRecentResultsDialog" title="" style="display:none">
+        <center>
+            <!-- start datatable-->
+            <div class="dataTable-top-margin">
+                <h3>Your most recent results</h3>
+                <table id="dtGenerated" class="stripe">
+                    <thead>
+                        <tr>
+                            <th class="exportColumn">Market</th>
+                            <th class="exportColumn">Station</th>
+                            <th class="exportColumn">Affiliation</th>
+                            <th class="exportColumn">Year-Period</th>
+                            <th class="exportColumn">Local Non-Political</th>
+                            <th class="exportColumn">National Non-Political</th>
+                            <th class="exportColumn">Total Non-Political</th>
+                            <th class="exportColumn">Local Political</th>
+                            <th class="exportColumn">National Political</th>
+                            <th class="exportColumn">Total Political</th>
+                            <th class="exportColumn">Local Time Sales</th>
+                            <th class="exportColumn">National Time Sales</th>
+                            <th class="exportColumn">Total Time Sales</th>
+                            <th class="exportColumn">Local Digital</th>
+                            <th class="exportColumn">National Digital</th>
+                            <th class="exportColumn">Total Digital</th>
+                            <th class="exportColumn">Mobile</th>
+                            <th class="exportColumn">Total Revenues</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Market</th>
+                            <th>Station</th>
+                            <th>Affiliation</th>
+                            <th>Year-Period</th>
+                            <th>Local Non-Political</th>
+                            <th>National Non-Political</th>
+                            <th>Total Non-Political</th>
+                            <th>Local Political</th>
+                            <th>National Political</th>
+                            <th>Total Political</th>
+                            <th>Local Time Sales</th>
+                            <th>National Time Sales</th>
+                            <th>Total Time Sales</th>
+                            <th>Local Digital</th>
+                            <th>National Digital</th>
+                            <th>Total Digital</th>
+                            <th>Mobile</th>
+                            <th>Total Revenues</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <!-- end datatable -->
+            <div style="margin-top:5px;margin-bottom:5px">
+                <input type="button" id="btnCloseMostRecent" value="Close" onclick="closeMostRecent()" \>
+            </div>
+        </center>
+    </div>
 
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
@@ -236,7 +243,6 @@
 
         loadInitialData();
 
-        $("#divGenerated").hide();
         loadGeneratedData();
 
         buildTVBMenu("Revenue");
@@ -500,7 +506,7 @@
         getData();
 
         if (mode == "discard") {
-            $("#divGenerated").hide();
+            closeMostRecent();
         } else {
             getGeneratedData();
         }
@@ -517,7 +523,15 @@
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 populateDataTable("dtGenerated", data);
-                $("#divGenerated").show();
+                $("#mostRecentResultsDialog").dialog({
+                    autoOpen: false,
+                    resizable: false,
+                    width: $(window).width() * 0.9,
+                    height: $(window).height() * 0.9,
+                    modal: true,
+                    title: 'Your most recent results'
+                });
+                $("#mostRecentResultsDialog").dialog("open");
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -619,6 +633,10 @@
                 search: "Filter Results:"
             }
         });
+    }
+
+    function closeMostRecent() {
+        $("#mostRecentResultsDialog").dialog("close");
     }
 
     function generateAll() {
