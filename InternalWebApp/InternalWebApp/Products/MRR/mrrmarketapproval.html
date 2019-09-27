@@ -86,16 +86,16 @@
                     <div class="col-md-12">
                         <center>
                             <div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     &nbsp;
                                 </div>
-                                <div class="col-md-6" style="color:green;font-style:italic">
+                                <div class="col-md-8" style="color:green;font-style:italic">
                                     additional filters
                                 </div>
 
                             </div>
                             <div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label for="ddlYearPeriod">Year-Period</label><br />
                                     <select id="ddlYearPeriod" onchange="getMarketApprovalList();"></select><br />
                                     <a href="#" onclick="moveToPreviousPeriod();">Previous Period</a> | <a href="#" onclick="moveToNextPeriod();">Next Period</a>
@@ -108,6 +108,10 @@
                                 <div class="col-md-3">
                                     <label for="ddlSchedule">Schedule</label><br />
                                     <select id="ddlSchedule" onchange="getMarketApprovalList();"></select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="chkOnlyActionableMarkets">Only markets ready to approve or unapprove</label>
+                                    <input type="checkbox" id="chkOnlyActionableMarkets" onclick="showOrHideActionableMarkets()" checked="checked" />
                                 </div>
                             </div>
                         </center>
@@ -203,6 +207,7 @@
     var gotSchedules = false;
     var gotYearsPeriods = false;
     var initializedDataTable = false;
+    var currentMarketName = "";
 
     $(document).ready(function () {
 
@@ -258,10 +263,10 @@
                     mRender: function (data, type, row) {
                         // these should never both be true, but they may both be false
                         if (row["Can Approve"]) {
-                            return '<a href="#" onclick="approveOrUnapproveMarket(' + row["Market ID"] + ', true)">Approve</a>';
+                            return '<a href="#" onclick="approveOrUnapproveMarket(' + row["Market ID"] + ', \'' + row["Market"] + '\', true)">Approve</a>';
                         }
                         if (row["Can Unapprove"]) {
-                            return '<a href="#" onclick="approveOrUnapproveMarket(' + row["Market ID"] + ', false)">Unapprove</a>';
+                            return '<a href="#" onclick="approveOrUnapproveMarket(' + row["Market ID"] + ', \'' + row["Market"] + '\', false)">Unapprove</a>';
                         }
                         return '';
                     },
@@ -341,7 +346,10 @@
             initComplete: function () {
                 $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
             },
-            //createdRow: function (row, data, index) {
+            createdRow: function (row, data, index) {
+                if (data["Can Approve"] == false && data["Can Unapprove"] == false) {
+                    $(row).addClass('non-actionable-market');
+                }
             //    //this adds the class to every row
             //    $(row).addClass('single-line-height');
             //    //this adds the class to total rows
@@ -349,7 +357,7 @@
             //        // need to target td's because tr's already have background colors, with or without striping
             //        $(row).find("td").addClass("total-category");
             //    }
-            //},
+            },
             language: {
                 //this changes search box label from Search: to Filter Results:
                 search: "Filter Results:"
@@ -410,7 +418,15 @@
         }
 
         populateDataTable("dtMarketApprovalList", data);
+        showOrHideActionableMarkets();
+    }
 
+    function showOrHideActionableMarkets() {
+        if ($("#chkOnlyActionableMarkets").prop("checked")) {
+            $(".non-actionable-market").hide();
+        } else {
+            $(".non-actionable-market").show();
+        }
     }
 
     function setEventListeners()
@@ -599,40 +615,36 @@
         return $("#ddlYearPeriod").val().toString().substring(4, 6); // second argument is also index, not length like .NET
     }
 
+    function currentYearPeriodText() {
+        return $("#ddlYearPeriod option:selected").text();
+    }
+
     function moveToPreviousPeriod() {
         if ($("#ddlYearPeriod option:selected").index() == 0) {
             bootbox.alert("Already on first period");
             return;
         }
-        postSaveCallback = moveToPreviousPeriodSuccess;
-        saveChanges();
-    }
 
-    function moveToPreviousPeriodSuccess() {
         var previousIndex = $("#ddlYearPeriod option:selected").index() - 1;
         $("#ddlYearPeriod").get(0).selectedIndex = previousIndex;
         $("#ddlYearPeriod").trigger("change");
     }
 
-    function moveToNextPeriod()
-    {
+    function moveToNextPeriod() {
 
         if ($("#ddlYearPeriod option:selected").index() == $("#ddlYearPeriod option").length - 1) {
             bootbox.alert("Already on last period");
             return;
         }
 
-        postSaveCallback = moveToNextPeriodSuccess;
-        saveChanges();
-    }
-
-    function moveToNextPeriodSuccess() {
         var nextIndex = $("#ddlYearPeriod option:selected").index() + 1;
         $("#ddlYearPeriod").get(0).selectedIndex = nextIndex;
         $("#ddlYearPeriod").trigger("change");
     }
 
-    function approveOrUnapproveMarket(marketId, approveMarket) {
+    function approveOrUnapproveMarket(marketId, marketName, approveMarket) {
+        currentMarketName = marketName;
+
         var url = ServicePrefix + '/api/MRR/UpdateMarketApproval';
 
         var settings = {
@@ -647,9 +659,12 @@
                 "inApproved": approveMarket
             }),
             processData: false,
-            success: function (data, textStatus, jQxhr) {
-                approveOrUnapproveMarketSuccess(data, textStatus, jQxhr);
-            },
+            success: approveMarket
+                ? function (data, textStatus, jQxhr) {
+                    approveMarketSuccess(data, textStatus, jQxhr);
+                } : function (data, textStatus, jQxhr) {
+                    unapproveMarketSuccess(data, textStatus, jQxhr);
+                },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
@@ -658,13 +673,32 @@
         $.ajax(url, settings);
     }
 
-    function approveOrUnapproveMarketSuccess(data, textStatus, jQxhr) {
+    function approveMarketSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
-        getMarketApprovalList();
+        bootbox.alert(
+            currentMarketName + " is now approved for " + currentYearPeriodText() + " - partner notification has been sent",
+            function () {
+                getMarketApprovalList();
+            }
+        );
+    }
+
+    function unapproveMarketSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert(
+            currentMarketName + " is now unapproved for " + currentYearPeriodText(),
+            function () {
+                getMarketApprovalList();
+            }
+        );
     }
 
 </script>
