@@ -193,7 +193,7 @@
                             <input type="button" style="width:200px" class="marketHistoryButton" onclick="rankMarket();" value="Rank Market" />
                         </div>
                         <div style="display:none;padding-top:5px" id="revisionSection">
-                            <input type="button" style="width:200px"class="marketHistoryButton" onclick="openRevisionDialog()" value="Un-rank market (revision)" />
+                            <input type="button" style="width:200px"class="marketHistoryButton" onclick="openRevisionDialog()" id="btnUnrank" value="Un-rank market (revision)" />
                         </div>
                         <div style="padding-top:5px" class="rankSection">
                             <input type="button" style="width:200px"class="marketHistoryButton" onclick="generateSnapshotReport();" value="Generate Snapshot" />
@@ -1317,23 +1317,26 @@
             // hide all market history functionality
             $(".marketHistoryButton").hide();
         }
+        else if (data.report.rows[0].isReleased) {
+            message = message + "RELEASED";
+            $(".marketHistoryButton").hide();
+            $("#btnUnrank").show();
+        }
+        else if (data.report.rows[0].rankingInProgress) {
+            var d = new Date();
+            message = message + "RANKING IN PROGRESS as of " + d.toString() + " (will re-check every 60 seconds)";
+            timeoutObject = setTimeout(showMarketRankedStatus, 60000);
+            $(".marketHistoryButton").hide();
+        }
         else {
-            if (data.report.rows[0].rankingInProgress) {
-                var d = new Date();
-                message = message + "RANKING IN PROGRESS as of " + d.toString() + " (will re-check every 60 seconds)";
-                timeoutObject = setTimeout(showMarketRankedStatus, 60000);
-                $(".marketHistoryButton").hide();
-            }
-            else {
-                // show it, all market history functionality
-                // but if not ranked, we will hide the revision button later in this 
-                // routine
-                $(".marketHistoryButton").show();
-                message = message + (data.report.rows[0].isRanked
-                    ? " RANKED <br><strong>by:</strong> " + data.report.rows[0].rankUser + " <strong>on:</strong> " + data.report.rows[0].rankDateTime
-                    : " NOT RANKED"
-                );
-            }
+            // show it, all market history functionality
+            // but if not ranked, we will hide the revision button later in this 
+            // routine
+            $(".marketHistoryButton").show();
+            message = message + (data.report.rows[0].isRanked
+                ? " RANKED <br><strong>by:</strong> " + data.report.rows[0].rankUser + " <strong>on:</strong> " + data.report.rows[0].rankDateTime
+                : " NOT RANKED"
+            );
         }
 
         $(".divInternalComment").hide();
