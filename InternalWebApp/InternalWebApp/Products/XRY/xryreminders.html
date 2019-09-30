@@ -42,7 +42,7 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
-
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
@@ -58,7 +58,10 @@
         .chosen-container {
             margin-right: 0px;
         }
-
+        .ui-dialog-titlebar-close
+        {
+            display: none;
+        }
     </style>
 
     <!-- Modernizr JS -->
@@ -208,9 +211,12 @@
 
     <div id="outstandingSubmissionsWithoutContactsDialog" title="" style="display:none">
         <center>
-            <p>
+            <div style="text-align:left">
                 Cannot send reminders. One or more outstanding submissions has no contact to receive a reminder.
-            </p>
+            </div>
+            <div style="margin-top:5px;margin-bottom:5px">
+                <input type="button" id="btnCancelOutstandingSubmissionsWithoutContactsTop" value="Close" onclick="closeOutstandingSubmissionsWithoutContactsDialog()" \>
+            </div>
             <!-- start datatable-->
             <div class="dataTable-top-margin">
                 <table id="dtOutstandingSubmissionsWithoutContacts" class="stripe">
@@ -220,12 +226,12 @@
                             <th class="exportColumn">Submission</th>
                         </tr>
                     </thead>
-                    <tfoot>
+                    <!--<tfoot>
                         <tr>
                             <th>Station</th>
                             <th>Submission</th>
                         </tr>
-                    </tfoot>
+                    </tfoot>-->
                 </table>
             </div>
             <!-- end datatable -->
@@ -237,6 +243,7 @@
 
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <!-- jQuery Easing -->
     <script src="/js/jquery.easing.1.3.js"></script>
     <!-- Bootstrap -->
@@ -262,7 +269,7 @@
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>-->
 
     <!--Chosen Dropdown-->
     <script src="/js/chosen.jquery.min.js"></script>
@@ -292,6 +299,7 @@
     $(document).ready(function () {
 
         buildXRYMenu("Revenue");
+        buildUIDialogs();
 
         getMediaTypes();
         // markets will be loaded once media types are loaded
@@ -301,11 +309,39 @@
 
         clearSearchButtonSetup();
 
-  
         buildQuickReports(['xry']);
 
     });
 
+    function buildUIDialogs()
+    {
+        $(function () {
+            $("#emailNoteDialog").dialog({
+                autoOpen: false,
+                resizable: false,
+                width: 600,
+                height: 300,
+                modal: true,
+                title: 'Enter email note (optional)',
+                create: function (event, ui) {
+                    $(event.target).parent().css('position', 'fixed');
+                }
+            });
+        });
+
+        $("#outstandingSubmissionsWithoutContactsDialog").dialog({
+            autoOpen: false,
+            resizable: false,
+            width: 800,
+            height: 600,
+            modal: true,
+            title: 'Outstanding submissions without contacts',
+            create: function (event, ui) {
+                $(event.target).parent().css('position', 'fixed');
+            }
+        });
+
+    }
     function clearSearchButtonSetup()
     {
         $("body").on("click", "#clear_search_button", function () {
@@ -375,8 +411,9 @@
                     "className": "singleMarketOrContactColumn",
                     //"render": $.fn.dataTable.render.moment('MM/DD/YYYY h:mm a') // returns "Invalid data" even on non-null input
                     "render": function (data) {
-                        var m = moment(data);
-                        return m.isValid() ? m.format('MM/DD/YY h:mm a') : data;
+                        //var m = moment(data);
+                        //return m.isValid() ? m.format('MM/DD/YY h:mm a') : data;
+                        return data;
                     }
                 },
                 {
@@ -384,8 +421,9 @@
                         8 // Reminder Sent On
                     ],
                     "render": function (data) {
-                        var m = moment(data);
-                        return m.isValid() ? m.format('MM/DD/YY h:mm a') : data;
+                        //var m = moment(data);
+                        //return m.isValid() ? m.format('MM/DD/YY h:mm a') : data;
+                        return data;
                     }
                 },
                 {
@@ -439,17 +477,17 @@
             },
             "pagingType": "full_numbers",
             "buttons": [
-               {
-                   extend: 'csv',
-                   exportOptions: {
-                       columns: exportColumns,
-                       format: {
-                           header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtReminders", data, columnIdx);
-                           }
-                       }
-                   }
-               },
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtReminders", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
                {
                    extend: 'excel',
                    title: reportTitle,
@@ -473,19 +511,20 @@
                            }
                        }
                    }
-               },
-               {
-                   extend: 'print',
-                   title: reportTitle,
-                   exportOptions: {
-                       columns: exportColumns,
-                       format: {
-                           header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtReminders", data, columnIdx);
-                           }
-                       }
-                   }
                }
+               //,
+               //{
+               //    extend: 'print',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtReminders", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //}
                //,
                //this button is supposed to handle column visibility
                //however it isn't working on our site
@@ -520,17 +559,17 @@
             ],
             "pagingType": "full_numbers",
             "buttons": [
-               {
-                   extend: 'csv',
-                   exportOptions: {
-                       columns: exportColumns,
-                       format: {
-                           header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtOutstandingSubmissionsWithoutContacts", data, columnIdx);
-                           }
-                       }
-                   }
-               },
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOutstandingSubmissionsWithoutContacts", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
                {
                    extend: 'excel',
                    title: reportTitle,
@@ -554,19 +593,20 @@
                            }
                        }
                    }
-               },
-               {
-                   extend: 'print',
-                   title: reportTitle,
-                   exportOptions: {
-                       columns: exportColumns,
-                       format: {
-                           header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtOutstandingSubmissionsWithoutContacts", data, columnIdx);
-                           }
-                       }
-                   }
                }
+               //,
+               //{
+               //    extend: 'print',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOutstandingSubmissionsWithoutContacts", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //}
                //,
                //this button is supposed to handle column visibility
                //however it isn't working on our site
@@ -591,6 +631,7 @@
     function setEventListeners()
     {
         var input = document.getElementById("searchTextNumber");
+
         input.addEventListener("keyup", function (event) {
             // Cancel the default action, if needed
             event.preventDefault();
@@ -958,23 +999,18 @@
         }
     }
 
-    function sendReminderInitiate(marketId, stationId, personnelId) {
+    function sendReminderInitiate(marketId, stationId, personnelId)
+    {
+
         currentMarketId = marketId;
         currentStationId = stationId;
         currentPersonnelId = personnelId;
 
-        $("#emailNoteDialog").dialog({
-            autoOpen: false,
-            resizable: false,
-            width: 600,
-            height: 300,
-            modal: true,
-            title: 'Enter email note (optional)'
-        });
         $("#emailNoteDialog").dialog("open");
     }
 
-    function closeEmailNoteDialog() {
+    function closeEmailNoteDialog()
+    {
         $("#emailNoteDialog").dialog("close");
     }
 
@@ -1018,14 +1054,8 @@
 
         if (data.report.rows.length > 0) {
             populateDataTable("dtOutstandingSubmissionsWithoutContacts", data);
-            $("#outstandingSubmissionsWithoutContactsDialog").dialog({
-                autoOpen: false,
-                resizable: false,
-                width: 800,
-                height: 600,
-                modal: true,
-                title: 'Outstanding submissions without contacts'
-            });
+
+
             $("#outstandingSubmissionsWithoutContactsDialog").dialog("open");
             return;
         }
