@@ -231,6 +231,8 @@ reportName.push("rptPostedData");
 reportName.push("rptActiveMarketLog");
 reportName.push("rptActiveMarketLogSummary");
 
+reportName.push("rptMRRStationSubmissionStatus");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -9076,7 +9078,7 @@ function getReportObject_PersonnelContactListByRepFirm() {
     return tempObject;
 }
 
-//
+ 
 function getReportFilterArray_MarketStationProductCountList() {
 
     var arrayFilters = new Array();
@@ -9106,6 +9108,44 @@ function getReportObject_MarketStationProductCountList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['market', 'station'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+ 
+function getReportFilterArray_MRRStationSubmissionStatus() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['MRR'],
+        objectName: "ddlMarket",
+        required: true
+     }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MRRStationSubmissionStatus() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "MRR Station Submission Status",
+        apiControllerAction: "/api/MRRReport/GetMRRStationSubmissionStatusByMarket",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['market', 'station', 'mrr'],
         sortable: true
 
     }
