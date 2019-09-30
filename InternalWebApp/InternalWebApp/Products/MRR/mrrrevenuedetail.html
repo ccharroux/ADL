@@ -386,6 +386,7 @@
     var revenueDetailChanged = false;
     var revenueAmountsAllValid = true;
     var postSaveCallback = null;
+    var timeoutObject = null;
 
     $(document).ready(function () {
 
@@ -1310,20 +1311,29 @@
         // This means a no market history record created yet...
 
 
+        clearTimeoutIfAny();
         if (message.length == 0) {
             message = "Preparing";
             // hide all market history functionality
             $(".marketHistoryButton").hide();
         }
         else {
-            // show it, all market history functionality
-            // but if not ranked, we will hide the revision button later in this 
-            // routine
-            $(".marketHistoryButton").show();
-            message = message + (data.report.rows[0].isRanked
-                                                                ? " RANKED <br><strong>by:</strong> " + data.report.rows[0].rankUser + " <strong>on:</strong> " + data.report.rows[0].rankDateTime
-                                                                : " NOT RANKED"
+            if (data.report.rows[0].rankingInProgress) {
+                var d = new Date();
+                message = message + "RANKING IN PROGRESS as of " + d.toString() + " (will re-check every 60 seconds)";
+                timeoutObject = setTimeout(showMarketRankedStatus, 60000);
+                $(".marketHistoryButton").hide();
+            }
+            else {
+                // show it, all market history functionality
+                // but if not ranked, we will hide the revision button later in this 
+                // routine
+                $(".marketHistoryButton").show();
+                message = message + (data.report.rows[0].isRanked
+                    ? " RANKED <br><strong>by:</strong> " + data.report.rows[0].rankUser + " <strong>on:</strong> " + data.report.rows[0].rankDateTime
+                    : " NOT RANKED"
                 );
+            }
         }
 
         $(".divInternalComment").hide();
@@ -1366,6 +1376,12 @@
         rankMarket(true);
     }
 
+    function clearTimeoutIfAny() {
+        if (timeoutObject != null) {
+            clearTimeout(timeoutObject);
+            timeoutObject = null;
+        }
+    }
 
     function validRevenueAmount(revenueAmount)
     {
@@ -1961,6 +1977,7 @@
         // Close Rank Dialog
         cancelItRank();
 
+        showMarketRankedStatus();
         bootbox.alert("Market scheduled for ranking - you should receive an e-mail when it is complete")
     }
 
