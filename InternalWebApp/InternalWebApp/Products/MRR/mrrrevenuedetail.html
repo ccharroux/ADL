@@ -217,7 +217,7 @@
                                 </div>
                                 <div class="col-md-6" style="padding-top: 20px;height: 62px;vertical-align: middle;">
                                     <center>
-                                        <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" value="Save Changes" />
+                                        <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" class="saveChanges" value="Save Changes" />
                                     </center>
                                 </div>
 
@@ -251,7 +251,7 @@
                                     </div>
                                     <div class="col-md-6" style="padding-top: 20px;height: 62px;vertical-align: middle;">
                                         <center>
-                                            <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" value="Save Changes" />
+                                            <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" class="saveChanges" value="Save Changes" />
                                         </center>
                                     </div>
                                 </div>
@@ -559,12 +559,11 @@
                     ],
                     "className": "text-align-right",
                     "render": function (data, type, row) {
-                        return '$<input type="text" onFocus="this.select()" class="revenue-detail text-align-right"'
+                        return '$<input type="text" onFocus="this.select()" class="revenue-detail' + (row['isTotal'] ? ' revenue-detail-total' : '') + ' text-align-right"'
                             + ' id="revenue-detail-' + row['marketCategoryId'] + '"'
                             + ' data-category-id="' + row['marketCategoryId'] + '"'
                             + ' data-contributes-to-category-id="' + row['contributesToMarketCategoryId'] + '"'
                             + ' data-adds-or-subtracts="' + row['addsOrSubtractsRevenue'] + '"'
-                            + (row['isTotal'] ? ' disabled' : '')
                             + ' onchange="recalculateTotals();"'
                             + ' value="' + data + '"></input><span class="implicit-thousands">,000</span>';
                     }
@@ -1312,6 +1311,9 @@
 
 
         clearTimeoutIfAny();
+        $(".saveChanges").show();
+        $(".revenue-detail").prop("disabled", false);
+        $(".revenue-detail-total").prop("disabled", true);
         if (message.length == 0) {
             message = "Preparing";
             // hide all market history functionality
@@ -1321,6 +1323,8 @@
             message = message + "RELEASED";
             $(".marketHistoryButton").hide();
             $("#btnUnrank").show();
+            $(".revenue-detail").prop("disabled", true);
+            $(".saveChanges").hide();
         }
         else if (data.report.rows[0].rankingInProgress) {
             var d = new Date();
