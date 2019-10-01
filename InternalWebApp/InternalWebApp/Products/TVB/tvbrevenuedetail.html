@@ -307,6 +307,7 @@
     var revenueAmountsAllValid = true;
     var postSaveCallback = null;
     var minimumPercentSubmittedBeforeRank = 80;
+    var timeoutObject = null;
 
     $(document).ready(function () {
 
@@ -1045,6 +1046,8 @@
             return;
         }
 
+        clearTimeoutIfAny();
+
         // null means no MarketHistory record created yet
         var message = (data.report.rows[0].revision === null ? '' : "<strong>Revision:</strong> " + data.report.rows[0].revision + ', ');
 
@@ -1052,6 +1055,10 @@
             message = "Preparing";
         } else if (data.report.rows[0].isReleased) {
             message = message + " RELEASED <br><strong>by:</strong> " + data.report.rows[0].releaseUser + " <strong>on:</strong> " + data.report.rows[0].releaseDateTime;
+        } else if (data.report.rows[0].rankingInProgress) {
+            var d = new Date();
+            message = message + "RANKING IN PROGRESS as of " + d.toString() + " (will re-check every 60 seconds)";
+            timeoutObject = setTimeout(showMarketRankedStatus, 60000);
         } else if (data.report.rows[0].isRanked) {
             message = message + " RANKED <br><strong>by:</strong> " + data.report.rows[0].rankUser + " <strong>on:</strong> " + data.report.rows[0].rankDateTime;
         } else {
@@ -1075,16 +1082,25 @@
             $(".divExternalComment").show();
         }
 
-        if (data.report.rows[0].isReleased == false) {
+        if (data.report.rows[0].isReleased == false && data.report.rows[0].rankingInProgress == false) {
             $(".saveChanges").show();
             $(".revenue-detail").prop("disabled", false);
             $(".revenue-detail-total").prop("disabled", true);
         }
 
-        if (data.report.rows[0].isRanked == true) {
-            $("#unrankSection").show();
-        } else {
-            $("#rankSection").show();
+        if (data.report.rows[0].rankingInProgress == false) {
+            if (data.report.rows[0].isRanked == true) {
+                $("#unrankSection").show();
+            } else if (data.report.rows[0].isReleased == false) {
+                $("#rankSection").show();
+            }
+        }
+    }
+
+    function clearTimeoutIfAny() {
+        if (timeoutObject != null) {
+            clearTimeout(timeoutObject);
+            timeoutObject = null;
         }
     }
 
@@ -1678,7 +1694,35 @@
             return;
         }
 
- 
+        var whatToRank = "";
+        switch (currentRevenuePeriod()) {
+            case "03": case "06": case "09": case "12":
+                whatToRank = "time sales and rep billing";
+                break;
+            default:
+                whatToRank = "time sales";
+                break;
+        }
+        var confirmMessage = "Rank " + whatToRank + " data for " + $("#ddlYearPeriod option:selected").text() + "?";
+        bootbox.confirm({
+            message: confirmMessage,
+            buttons: {
+                confirm: {
+                    label: "Proceed"
+                },
+                cancel: {
+                    label: "Cancel"
+                }
+            },
+            callback: function (result) {
+                if (result) {
+                    rankMarket_insertRankIntoQueue();
+                }
+            }
+        });
+    }
+
+    function rankMarket_insertRankIntoQueue() {
 
         var url = ServicePrefix + '/api/TVB/InsertRankIntoQueue';
 

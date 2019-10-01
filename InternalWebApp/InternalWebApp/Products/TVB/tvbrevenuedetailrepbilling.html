@@ -179,15 +179,6 @@
                             <div id="divExternalCommentText"></div>
                         </div>
                     </div>
-
-                    <div class="col-md-6 hidden" style="text-align:center">
-                        <div style="padding-top:5px">
-                            <input type="button" style="width:200px" class="marketHistoryButton" onclick="rankYearPeriod();" value="Rank All Markets" />
-                        </div>
-                        <div style="display:none;padding-top:5px" id="revisionSection">
-                            <input type="button" style="width:200px" class="marketHistoryButton" onclick="unrankYearPeriod();" value="Un-rank market (revision)" />
-                        </div>
-                    </div>
                 </div>
 
                 <!-- start datatable-->
@@ -206,7 +197,7 @@
                             <div class="col-md-6" style="padding-top: 20px;height: 62px;vertical-align: middle;">
                                 <center>
                                     <div class="saveChanges">
-                                        <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" value="Save Changes" />
+                                        <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" class="saveChanges" value="Save Changes" />
                                     </div>
                                     <div class="cannotSaveChanges">
                                         To edit, go to the <a href="tvbrevenuedetail.html">Time Sales page</a>
@@ -244,7 +235,7 @@
                                 <div class="col-md-6" style="padding-top: 20px;height: 62px;vertical-align: middle;">
                                     <center>
                                         <div class="saveChanges">
-                                            <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" value="Save Changes" />
+                                            <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" class="saveChanges" value="Save Changes" />
                                         </div>
                                         <div class="cannotSaveChanges">
                                             To edit, go to the <a href="tvbrevenuedetail.html">Time Sales page</a>
@@ -332,6 +323,7 @@
     var revenueAmountsAllValid = true;
     var postSaveCallback = null;
     var minimumPercentSubmittedBeforeRank = 0;
+    var timeoutObject = null;
 
     $(document).ready(function () {
 
@@ -456,11 +448,10 @@
                     ],
                     "className": "text-align-right",
                     "render": function (data, type, row) {
-                        return '$<input type="text" onFocus="this.select()" class="revenue-detail text-align-right"'
+                        return '$<input type="text" onFocus="this.select()" class="revenue-detail' + (row['isTotal'] ? ' revenue-detail-total' : '') + ' text-align-right"'
                             + ' id="revenue-detail-' + row['categoryId'] + '"'
                             + ' data-category-id="' + row['categoryId'] + '"'
                             + ' data-contributes-to-category-id="' + row['contributesToCategoryId'] + '"'
-                            + (row['isTotal'] ? ' disabled' : '')
                             + ' onchange="recalculateTotals();"'
                             + ' value="' + data + '"></input><span class="implicit-thousands">,000</span>';
                     }
@@ -1166,9 +1157,10 @@
 
     function showMarketRankedStatus()
     {
+        $(".saveChanges").hide();
+        $(".revenue-detail").prop("disabled", true);
         $(".divInternalComment").hide();
         $(".divExternalComment").hide();
-
 
         var url = ServicePrefix + '/api/TVB/GetYearPeriodRanked';
 
@@ -1196,8 +1188,6 @@
     function showMarketRankedStatusSuccess(data, textStatus, jQxhr)
     {
 
-        $("#revisionSection").hide();
-
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -1208,23 +1198,24 @@
             return;
         }
 
+        clearTimeoutIfAny();
+
+        // null means no MarketHistory record created yet
         var message = (data.report.rows[0].revision === null ? '' : "<strong>Revision:</strong> " + data.report.rows[0].revision + ', ');
-
-        // This means a no market history record created yet...
-
 
         if (message.length == 0) {
             message = "Preparing";
+        } else if (data.report.rows[0].isReleased) {
+            message = message + " RELEASED <br><strong>by:</strong> " + data.report.rows[0].releaseUser + " <strong>on:</strong> " + data.report.rows[0].releaseDateTime;
+        } else if (data.report.rows[0].rankingInProgress) {
+            var d = new Date();
+            message = message + "RANKING IN PROGRESS as of " + d.toString() + " (will re-check every 60 seconds)";
+            timeoutObject = setTimeout(showMarketRankedStatus, 60000);
+        } else if (data.report.rows[0].isRanked) {
+            message = message + " RANKED <br><strong>by:</strong> " + data.report.rows[0].rankUser + " <strong>on:</strong> " + data.report.rows[0].rankDateTime;
+        } else {
+            message = message + " NOT RANKED";
         }
-        else {
-            message = message + (data.report.rows[0].isRanked
-                                                                ? " RANKED <br><strong>by:</strong> " + data.report.rows[0].rankUser + " <strong>on:</strong> " + data.report.rows[0].rankDateTime
-                                                                : " NOT RANKED"
-                );
-        }
-
-        $(".divInternalComment").hide();
-        $(".divExternalComment").hide();
 
         $("#revision").val((data.report.rows[0].revision || 0));
         $("#InternalCommentText").html("");
@@ -1244,17 +1235,10 @@
 
         $("#MarketRanked").html( "<div>" +message+ "</div>");
 
-
-
-        if (data.report.rows[0].isRanked == true) {
-            $("#revisionSection").show();
-        }
-        else
-
-        {
-            // *** TVB doesn't work this way, see above
-            //$("#revisionSection").hide();
-
+        if (data.report.rows[0].isReleased == false && data.report.rows[0].rankingInProgress == false) {
+            $(".saveChanges").show();
+            $(".revenue-detail").prop("disabled", false);
+            $(".revenue-detail-total").prop("disabled", true);
         }
     }
 

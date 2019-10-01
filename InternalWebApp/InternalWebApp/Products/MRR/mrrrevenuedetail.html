@@ -193,7 +193,7 @@
                             <input type="button" style="width:200px" class="marketHistoryButton" onclick="rankMarket();" value="Rank Market" />
                         </div>
                         <div style="display:none;padding-top:5px" id="revisionSection">
-                            <input type="button" style="width:200px"class="marketHistoryButton" onclick="openRevisionDialog()" value="Un-rank market (revision)" />
+                            <input type="button" style="width:200px"class="marketHistoryButton" onclick="openRevisionDialog()" id="btnUnrank" value="Un-rank market (revision)" />
                         </div>
                         <div style="padding-top:5px" class="rankSection">
                             <input type="button" style="width:200px"class="marketHistoryButton" onclick="generateSnapshotReport();" value="Generate Snapshot" />
@@ -217,7 +217,7 @@
                                 </div>
                                 <div class="col-md-6" style="padding-top: 20px;height: 62px;vertical-align: middle;">
                                     <center>
-                                        <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" value="Save Changes" />
+                                        <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" class="saveChanges" value="Save Changes" />
                                     </center>
                                 </div>
 
@@ -251,7 +251,7 @@
                                     </div>
                                     <div class="col-md-6" style="padding-top: 20px;height: 62px;vertical-align: middle;">
                                         <center>
-                                            <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" value="Save Changes" />
+                                            <input type="button" href="#" onclick="postSaveCallback = null; saveChanges();" class="saveChanges" value="Save Changes" />
                                         </center>
                                     </div>
                                 </div>
@@ -559,12 +559,11 @@
                     ],
                     "className": "text-align-right",
                     "render": function (data, type, row) {
-                        return '$<input type="text" onFocus="this.select()" class="revenue-detail text-align-right"'
+                        return '$<input type="text" onFocus="this.select()" class="revenue-detail' + (row['isTotal'] ? ' revenue-detail-total' : '') + ' text-align-right"'
                             + ' id="revenue-detail-' + row['marketCategoryId'] + '"'
                             + ' data-category-id="' + row['marketCategoryId'] + '"'
                             + ' data-contributes-to-category-id="' + row['contributesToMarketCategoryId'] + '"'
                             + ' data-adds-or-subtracts="' + row['addsOrSubtractsRevenue'] + '"'
-                            + (row['isTotal'] ? ' disabled' : '')
                             + ' onchange="recalculateTotals();"'
                             + ' value="' + data + '"></input><span class="implicit-thousands">,000</span>';
                     }
@@ -1312,28 +1311,36 @@
 
 
         clearTimeoutIfAny();
+        $(".saveChanges").show();
+        $(".revenue-detail").prop("disabled", false);
+        $(".revenue-detail-total").prop("disabled", true);
         if (message.length == 0) {
             message = "Preparing";
             // hide all market history functionality
             $(".marketHistoryButton").hide();
         }
+        else if (data.report.rows[0].isReleased) {
+            message = message + "RELEASED";
+            $(".marketHistoryButton").hide();
+            $("#btnUnrank").show();
+            $(".revenue-detail").prop("disabled", true);
+            $(".saveChanges").hide();
+        }
+        else if (data.report.rows[0].rankingInProgress) {
+            var d = new Date();
+            message = message + "RANKING IN PROGRESS as of " + d.toString() + " (will re-check every 60 seconds)";
+            timeoutObject = setTimeout(showMarketRankedStatus, 60000);
+            $(".marketHistoryButton").hide();
+        }
         else {
-            if (data.report.rows[0].rankingInProgress) {
-                var d = new Date();
-                message = message + "RANKING IN PROGRESS as of " + d.toString() + " (will re-check every 60 seconds)";
-                timeoutObject = setTimeout(showMarketRankedStatus, 60000);
-                $(".marketHistoryButton").hide();
-            }
-            else {
-                // show it, all market history functionality
-                // but if not ranked, we will hide the revision button later in this 
-                // routine
-                $(".marketHistoryButton").show();
-                message = message + (data.report.rows[0].isRanked
-                    ? " RANKED <br><strong>by:</strong> " + data.report.rows[0].rankUser + " <strong>on:</strong> " + data.report.rows[0].rankDateTime
-                    : " NOT RANKED"
-                );
-            }
+            // show it, all market history functionality
+            // but if not ranked, we will hide the revision button later in this 
+            // routine
+            $(".marketHistoryButton").show();
+            message = message + (data.report.rows[0].isRanked
+                ? " RANKED <br><strong>by:</strong> " + data.report.rows[0].rankUser + " <strong>on:</strong> " + data.report.rows[0].rankDateTime
+                : " NOT RANKED"
+            );
         }
 
         $(".divInternalComment").hide();

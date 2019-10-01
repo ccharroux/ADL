@@ -42,12 +42,22 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
-
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
 
     <style type="text/css">
+        .wide-table-container {
+            margin-left: 25px;
+            margin-right: 25px;
+        }
+        .marketNameColumn { min-width: 150px; }
+        .dateColumn { max-width: 150px; }
+        .revisionColumn { max-width: 100px; }
+        .mediaTypeColumn { max-width: 100px; }
+        .clientCommentColumn { min-width: 150px; }
+        .actionColumn { min-width: 150px; }
     </style>
 
     <!--Chosen Dropdown-->
@@ -116,14 +126,6 @@
                                     <input id="chkShowDelivered" type="checkbox" onchange="getMarketDeliveryList();" />
                                 </div>
                             </div>
-                            <div>
-                                <div class="col-md-6 col-offset-6">
-                                    <div class="divExternalComment">
-                                        <label for="externalComments"><u>Client Comment</u></label>
-                                        <textArea style="width:100%;overflow:auto" maxlength="250" id="externalComments" placeholder="Enter external comments here..."></textArea>
-                                    </div>
-                                </div>
-                            </div>
                         </center>
                         <hr />
                     </div>
@@ -140,6 +142,9 @@
                         </center>
                     </div>
                 </div>
+            </div>
+
+            <div class="wide-table-container">
 
                 <!-- start datatable-->
                 <div class="dataTable-top-margin">
@@ -148,14 +153,14 @@
                         <table id="dtMarketDeliveryList" class="stripe">
                             <thead>
                                 <tr>
-                                    <th class="exportColumn">Market</th>
-                                    <th class="exportColumn">Ranked On</th>
-                                    <th class="exportColumn">Approved On</th>
-                                    <th class="exportColumn">Delivered On</th>
-                                    <th class="exportColumn text-align-right">Revision</th>
-                                    <th class="exportColumn">Client Blurb</th>
-                                    <th class="exportColumn">Media</th>
-                                    <th></th>
+                                    <th class="exportColumn marketNameColumn">Market</th>
+                                    <th class="exportColumn dateColumn">Ranked On</th>
+                                    <th class="exportColumn dateColumn">Approved On</th>
+                                    <th class="exportColumn dateColumn">Delivered On</th>
+                                    <th class="exportColumn text-align-right revisionColumn">Revision</th>
+                                    <th class="exportColumn clientCommentColumn">Client Comment</th>
+                                    <th class="exportColumn mediaTypeColumn">Media</th>
+                                    <th class="actionColumn"></th>
                                 </tr>
                             </thead>
                             <tfoot>
@@ -165,7 +170,7 @@
                                     <th class="exportColumn">Approved On</th>
                                     <th class="exportColumn">Delivered On</th>
                                     <th class="exportColumn text-align-right">Revision</th>
-                                    <th class="exportColumn">Client Blurb</th>
+                                    <th class="exportColumn">Client Comment</th>
                                     <th class="exportColumn">Media</th>
                                     <th></th>
                                 </tr>
@@ -189,14 +194,14 @@
                             <table id="dtMarketDeliveryListPartnerReview" class="stripe">
                                 <thead>
                                     <tr>
-                                        <th class="exportColumn">Market</th>
-                                        <th class="exportColumn">Ranked On</th>
-                                        <th class="exportColumn">Approved On</th>
-                                        <th class="exportColumn">Delivered On</th>
-                                        <th class="exportColumn text-align-right">Revision</th>
-                                        <th class="exportColumn">Client Blurb</th>
-                                        <th class="exportColumn">Media</th>
-                                        <th></th>
+                                        <th class="exportColumn marketNameColumn">Market</th>
+                                        <th class="exportColumn dateColumn">Ranked On</th>
+                                        <th class="exportColumn dateColumn">Approved On</th>
+                                        <th class="exportColumn dateColumn">Delivered On</th>
+                                        <th class="exportColumn text-align-right revisionColumn">Revision</th>
+                                        <th class="exportColumn clientCommentColumn">Client Comment</th>
+                                        <th class="exportColumn mediaTypeColumn">Media</th>
+                                        <th class="actionColumn"></th>
                                     </tr>
                                 </thead>
                                 <tfoot>
@@ -206,7 +211,7 @@
                                         <th class="exportColumn">Approved On</th>
                                         <th class="exportColumn">Delivered On</th>
                                         <th class="exportColumn text-align-right">Revision</th>
-                                        <th class="exportColumn">Client Blurb</th>
+                                        <th class="exportColumn">Client Comment</th>
                                         <th class="exportColumn">Media</th>
                                         <th></th>
                                     </tr>
@@ -216,14 +221,35 @@
                     </div>
                     <!-- end datatable -->
                 </div>
+
+                <!-- force some white space between table(s) and bottom of browser window, adding margin-bottom or padding-bottom didn't work for some reason -->
+                <div>
+                    &nbsp;
+                </div>
+
             </div>
+
         </div>
         <!--<div id="map" data-animate-effect="fadeIn"></div>-->
+
+        <div id="clientCommentDialog" title="" style="display:none">
+            <center>
+                <textArea style="width:100%;overflow:auto" maxlength="250" id="clientComment" placeholder="Enter client comment here..."></textArea>
+                <hr />
+                <div style="margin-top:5px;margin-bottom:5px">
+                    <input type="button" id="btnProcess" value="Process" onclick="clientCommentProcess()" \>
+                </div>
+                <div style="margin-top:5px;margin-bottom:5px">
+                    <input type="button" id="btnCancel" value="Cancel" onclick="clientCommentCancel()" \>
+                </div>
+            </center>
+        </div>
 
     </div>
 
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <!-- jQuery Easing -->
     <script src="/js/jquery.easing.1.3.js"></script>
     <!-- Bootstrap -->
@@ -276,6 +302,7 @@
 
 
         buildMRRMenu('Revenue');
+        buildUIDialogs();
         getMediaTypes();
         // possible future addition
         //getSchedules();
@@ -296,6 +323,22 @@
         //setLocalStorage("searchPage", window.location);
 
     });
+
+    function buildUIDialogs() {
+        $(function () {
+            $("#clientCommentDialog").dialog({
+                autoOpen: false,
+                resizable: false,
+                width: 600,
+                height: 300,
+                modal: true,
+                title: "Enter Client Comment to include in notifications (optional)",
+                create: function (event, ui) {
+                    $(event.target).parent().css('position', 'fixed');
+                }
+            });
+        });
+    }
 
     function clearSearchButtonSetup()
     {
@@ -323,7 +366,7 @@
                 { "data": 'Approved On' },
                 { "data": 'Delivered On' },
                 { "data": 'Revision' },
-                { "data": 'Client Blurb' },
+                { "data": 'Client Comment' },
                 { "data": 'Media' },
                 {
                     mRender: partnerReview ? function (data, type, row) {
@@ -856,11 +899,56 @@
             return;
         }
 
-        var externalComments = $("#externalComments").val().trim();
-        if (externalComments == "") {
-            sendEmailToMarketRecipients();
+        getClientComment();
+    }
+
+    function getClientComment() {
+        var url = ServicePrefix + '/api/MRR/GetMarketYearPeriodClientRevisionMessage';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": currentMarketId,
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getClientCommentSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function getClientCommentSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
+
+        $("#clientComment").val(data.report.rows[0]["clientRevisionMessage"]);
+
+        $("#clientCommentDialog").dialog("open");
+    }
+
+    function clientCommentCancel() {
+        $("#clientCommentDialog").dialog("close");
+    }
+
+    function clientCommentProcess() {
+        $("#clientCommentDialog").dialog("close");
+        updateClientComment();
+    }
+
+    function updateClientComment() {
 
         var url = ServicePrefix + '/api/MRR/UpdateMarketYearPeriodClientRevisionMessage';
 
@@ -873,11 +961,11 @@
                 "inMarketId": currentMarketId,
                 "inYear": currentRevenueYear(),
                 "inPeriod": currentRevenuePeriod(),
-                "inClientRevisionMessage": externalComments
+                "inClientRevisionMessage": $("#clientComment").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                prepToSendEmailToMarketRecipientsSuccess(data, textStatus, jQxhr);
+                updateClientCommentSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -887,7 +975,7 @@
         $.ajax(url, settings);
     }
 
-    function prepToSendEmailToMarketRecipientsSuccess(data, textStatus, jQxhr) {
+    function updateClientCommentSuccess(data, textStatus, jQxhr) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
