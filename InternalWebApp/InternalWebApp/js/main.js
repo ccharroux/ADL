@@ -1340,7 +1340,18 @@ function buildTechMenu(selectedItem) {
 
     menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
+
     menuItems += '<ul>';
+    menuItems += buildGenericReportsLink2(selectedItem);
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += productDashboard('mrr');
+    menuItems += productDashboard('xry');
+    menuItems += productDashboard('tvb');
+    menuItems += productDashboard('mss');
+    menuItems += productDashboard('dma');
+    menuItems += '              </ul>';
+    menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "TechTools") + ' role="button" aria-expanded="false">Tools <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html">Tech Tools</a></li>';
