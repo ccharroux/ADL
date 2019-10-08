@@ -234,6 +234,7 @@ reportName.push("rptActiveMarketLogSummary");
 reportName.push("rptMRRStationSubmissionStatus");
 
 reportName.push("rptExclusiveAdvertiserChanges");
+reportName.push("rptMRRMarketTotalsForNAB");
 
 function buildReportArray()
 {
@@ -9203,6 +9204,44 @@ function getReportObject_ExclusiveAdvertiserChanges() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['market', 'advertiser', 'xry', 'qa'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+function getReportFilterArray_MRRMarketTotalsForNAB() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+ 
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+ 
+
+    return arrayFilters;
+}
+function getReportObject_MRRMarketTotalsForNAB() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "MRR Market Totals for NAB",
+        apiControllerAction: "/api/SurveyReport/GetMRRMarketTotals",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['mrr', 'NAB', 'survey'],
         sortable: true
 
     }
