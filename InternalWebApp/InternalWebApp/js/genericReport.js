@@ -233,6 +233,8 @@ reportName.push("rptActiveMarketLogSummary");
 
 reportName.push("rptMRRStationSubmissionStatus");
 
+reportName.push("rptExclusiveAdvertiserChanges");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -9146,6 +9148,61 @@ function getReportObject_MRRStationSubmissionStatus() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['market', 'station', 'mrr'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_ExclusiveAdvertiserChanges() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_ExclusiveAdvertiserChanges() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "XRay Exclusive Advertiser Changes",
+        apiControllerAction: "/api/XRAYReport/GetExclusiveAdvertiserChanges",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['market', 'advertiser', 'xry', 'qa'],
         sortable: true
 
     }
