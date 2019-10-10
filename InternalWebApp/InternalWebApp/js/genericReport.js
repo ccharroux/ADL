@@ -225,7 +225,7 @@ reportName.push("rptCorporateAgency");
 reportName.push("rptMonthToMonth");
 reportName.push("rptLAIndSummary");
 reportName.push("rptIRMktbyIndAnalysis");
-reportName.push("rptTop50Advertisers")
+reportName.push("rptTop50Advertisers");
 reportName.push("rptPostedData");
 
 reportName.push("rptActiveMarketLog");
