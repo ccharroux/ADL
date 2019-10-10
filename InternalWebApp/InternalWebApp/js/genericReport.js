@@ -235,6 +235,7 @@ reportName.push("rptMRRStationSubmissionStatus");
 
 reportName.push("rptExclusiveAdvertiserChanges");
 reportName.push("rptMRRMarketTotalsForNAB");
+reportName.push("rptSweeperLogMRRRevenue");
 
 function buildReportArray()
 {
@@ -9244,6 +9245,41 @@ function getReportObject_MRRMarketTotalsForNAB() {
         product: ['mrr', 'NAB', 'survey'],
         sortable: true
 
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_SweeperLogMRRRevenue() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "AsyncJobDaysBack",
+        objectName: "ddlAsyncJobDaysBack",
+        jsCall: "getAsyncJobDaysBackList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_SweeperLogMRRRevenue() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "MRR Revenue Sweeper Log",
+        apiControllerAction: "/api/MRRReport/GetSweeperLogMRRRevenue",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tech', 'mrr'],
+        autoUpdate: false
     }
 
     return tempObject;
