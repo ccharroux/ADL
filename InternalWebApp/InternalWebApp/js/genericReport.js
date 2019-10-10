@@ -4495,7 +4495,7 @@ function getReportObject_DisabledAEList() {
         apiControllerAction: "/api/AccountExecutiveReport/GetDisabledAEList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry'],
+        product: ['xry', 'account executive'],
         autoUpdate: false
     }
 
