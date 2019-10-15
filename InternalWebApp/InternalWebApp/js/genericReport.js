@@ -1681,13 +1681,13 @@ function getReportObject_MarketRevenueXRay() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("RowName");
-    columnsToDisplay.push("RevenueClusterMRR");
-    columnsToDisplay.push("RevenueClusterXRY");
-    columnsToDisplay.push("RevenueClusterDifference");
-    columnsToDisplay.push("RevenueMarketMRR");
-    columnsToDisplay.push("RevenueMarketXRY");
-    columnsToDisplay.push("RevenueMarketDifference");
+    columnsToDisplay.push("Category");
+    columnsToDisplay.push("Cluster MRR");
+    columnsToDisplay.push("Cluster XRY");
+    columnsToDisplay.push("Cluster Diff %");
+    columnsToDisplay.push("Market MRR");
+    columnsToDisplay.push("Market XRY");
+    columnsToDisplay.push("Market Diff %");
 
     tempObject =
     {
