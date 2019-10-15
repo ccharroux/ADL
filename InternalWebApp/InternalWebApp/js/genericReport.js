@@ -9174,6 +9174,16 @@ function getReportFilterArray_ExclusiveAdvertiserChanges() {
 
     arrayObject = new Object();
     arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: false
+    }
+
+    arrayFilters.push(arrayObject);
+    arrayObject = new Object();
+    arrayObject = {
         token: "Year",
         jsCall: "getYearList",
         objectName: "ddlYear",
