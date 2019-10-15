@@ -237,6 +237,10 @@ reportName.push("rptExclusiveAdvertiserChanges");
 reportName.push("rptMRRMarketTotalsForNAB");
 reportName.push("rptSweeperLogMRRRevenue");
 
+reportName.push("rptRABSummaryByRegion");
+
+
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -8403,6 +8407,48 @@ function getReportObject_Top50Advertisers() {
 
     return tempObject;
 }
+
+function getReportFilterArray_RABSummaryByRegion() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+    arrayObject = new Object();
+
+    arrayObject = {
+        token: "Period",
+        jsCall: "getPeriodList",
+        jsCallParameters: ["quarters"],
+        objectName: "ddlPeriod",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+
+}
+
+function getReportObject_RABSummaryByRegion() {
+    var tempObject = new Object();
+
+    tempObject = {
+        reportTitle: "RAB Summary By Region",
+        apiControllerAction: "/api/CorporateReport/InsertRABReportSummaryByRegionIntoQueue",
+        apiType: "post",
+        product: ['corporate'],
+        reportPath: "/Products/XRY/reports/xrycorporatereport.html"
+    }
+
+    return tempObject;
+}
+
 
 //End Of Corporate Reports
 
