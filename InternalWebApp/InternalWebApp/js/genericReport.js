@@ -8163,8 +8163,8 @@ function getReportObject_ImpersonationLogList() {
         apiControllerAction: "/api/PersonnelReport/GetImpersonationLogList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['misc', 'personnel','tech'],
-        sortable: true
+        product: ['misc', 'personnel','tech', 'qa'],
+        sortable: false
 
     }
 
