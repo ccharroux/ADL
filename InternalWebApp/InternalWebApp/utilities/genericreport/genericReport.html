@@ -57,6 +57,29 @@
     <![endif]-->
 
     <style>
+
+        table 
+        {
+            border-left: solid 1px #566573!important;
+            border-bottom: solid 1px #566573!important;
+                                    
+        }
+
+        th
+        {            
+ 
+            /*border-bottom: solid 1px black!important;*/
+            border-right: solid 1px black!important;
+            color:white!important;
+            background-color:#566573!important;
+            border-top: solid 1px black!important;
+        }
+        td
+        {
+            border-right: solid 1px #566573!important;
+            border-top: solid 1px #566573!important;
+        }
+
         .rptView
         {
             margin-left: 5px;
@@ -293,7 +316,7 @@
                 <!-- start datatable coding-->
 
                 <div class="dataTable-top-margin">
-                    <table id="dtResults" class="stripe"></table>
+                    <table id="dtResults" class="cell-border"  ></table>
                     <div id="noDataFound" style="display:none; color: red">No data found</div>
                 </div>
 
@@ -344,6 +367,7 @@
     var autoRerunHandle = null;
     var reportObject = new Object();
     var reportFilterArray = new Array();
+    var gMessageSubTitle = '';
 
     var api = "";
     var apiParameters = new Object();
@@ -2204,6 +2228,7 @@
         }
 
         var anyRequiredFilters = false;
+        gMessageSubTitle = "";
 
         $.each(reportFilterArray, function (objectName, objectValue)
         {
@@ -2220,14 +2245,22 @@
             }
 
             var val = $(item).val();
+            var text = $(item).val();
  
             if (control.toString().toLowerCase().indexOf("chk") > -1)
             {
                 val = $(item).is(':checked').toString();
+
+                text = (val == true ? "selected" : "not-selected");
             }
 
-            if (val != null && val.length > 0) {
+            if (control.toString().toLowerCase().indexOf("ddl") > -1) {
+                text = $(item + " option:selected").text();
+            }
 
+
+            if (val != null && val.length > 0)
+            {
  
                 if (reportObject.apiType.toLowerCase() == "post")
                 {
@@ -2249,6 +2282,18 @@
                 }
             }
 
+            if (val.length > 0 && val != "-1")
+            {
+                if (gMessageSubTitle.length > 0)
+                {
+                    gMessageSubTitle = gMessageSubTitle + ",&nbsp;&nbsp;";
+                }
+
+                gMessageSubTitle = gMessageSubTitle + "<b>" + nameOfParm.toLowerCase().replace("in", "").replace("id", "").toUpperCase() + ":</b>&nbsp;";
+                gMessageSubTitle = gMessageSubTitle + text; 
+            }
+
+
             // when done with the loop
             // get the report
             if (objectName == (itemsToCheckLength - 1)) {
@@ -2259,7 +2304,10 @@
         });
 
 
-
+        if (gMessageSubTitle.length > 0)
+        {
+            gMessageSubTitle = gMessageSubTitle + "<br>";
+        }
 
 
     }
@@ -2456,7 +2504,7 @@
                {
                    extend: 'print',
                    title: reportObject.reportTitle,
-                 
+                   messageTop: gMessageSubTitle,
                    customize: function (win) {
                        $(win.document.body)
                            .css('font-size', '12pt')
@@ -2464,7 +2512,7 @@
 
                        $(win.document.body).find('table')
                            .addClass('compact')
-                           .css('font-size', '10pt');
+                           .css('font-size', '8pt');
                    },
                    exportOptions: {
                        columns: columnsToExport
@@ -2475,7 +2523,7 @@
         });
 
     }
-
+ 
     function getEmailDaysBackList()
     {
         var str = "<option value='-30'>All</option>";
