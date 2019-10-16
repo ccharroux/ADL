@@ -1373,7 +1373,7 @@ function getReportFilterArray_StationListing() {
         token:  "Product",
         jsCall:  "getProductList",
         objectName:  "ddlProduct",
-        required:  false
+        required:  true
     }
     arrayFilters.push(arrayObject);
 
@@ -1410,17 +1410,17 @@ function getReportObject_StationListing() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("ProductID");
-    columnsToDisplay.push("MarketID");
-    columnsToDisplay.push("MarketName");
-    columnsToDisplay.push("OwnerID");
-    columnsToDisplay.push("OwnerName");
-    columnsToDisplay.push("StationID");
-    columnsToDisplay.push("StationName");
-    columnsToDisplay.push("FormatName");
-    columnsToDisplay.push("ActiveDate");
-    columnsToDisplay.push("DisableDate");
-    columnsToDisplay.push("ClientID");
+    //columnsToDisplay.push("ProductID");
+    //columnsToDisplay.push("MarketID");
+    //columnsToDisplay.push("MarketName");
+    //columnsToDisplay.push("OwnerID");
+    //columnsToDisplay.push("OwnerName");
+    //columnsToDisplay.push("StationID");
+    //columnsToDisplay.push("StationName");
+    //columnsToDisplay.push("FormatName");
+    //columnsToDisplay.push("ActiveDate");
+    //columnsToDisplay.push("DisableDate");
+    //columnsToDisplay.push("ClientID");
 
     tempObject =
     {
@@ -1700,7 +1700,7 @@ function getReportObject_MarketRevenueXRay() {
         apiControllerAction:  "/api/Report/GetMarketRevenueRevenueXRay",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product: ['mrr','xry']
+        product: ['mrr','xry', 'xray monthly']
     }
 
     return tempObject;
@@ -6239,7 +6239,7 @@ function getReportObject_NewAdvertisers() {
         apiControllerAction: "/api/AdvertiserAudit/GetNewAdvertiserAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry'],
+        product: ['xry', 'advertiser', 'xray monthly'],
         reportPath: "/Products/XRY/reports/xrygenericreport.html"
     }
 
@@ -6464,7 +6464,7 @@ function getReportObject_NewAgencies() {
         apiControllerAction: "/api/AgencyAudit/GetNewAgencyAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry'],
+        product: ['xry', 'agency', 'xray monthly'],
         reportPath: "/Products/XRY/reports/xrygenericreport.html"
     }
 

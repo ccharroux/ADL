@@ -1024,6 +1024,8 @@ function buildXRYMenu(selectedItem) {
 
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "XRay Reports") + ' href="" role="button" aria-expanded="false"> XRay Reports <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=xray monthly" role="button" aria-expanded="false">Xray Monthly Reports </a></li>';
+
     menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=xry" role="button" aria-expanded="false">Xray Reports </a></li>';
     menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=corporate" role="button" aria-expanded="false">Corporate Reports </a></li>';
     menuItems += '              </ul>';
