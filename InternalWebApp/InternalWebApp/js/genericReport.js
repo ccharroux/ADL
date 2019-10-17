@@ -960,8 +960,7 @@ function getReportObject_UserQuerySummary() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("QueryName");
-    columnsToDisplay.push("NumberRequests");
+ 
 
     tempObject =
     {
