@@ -835,15 +835,7 @@ function getReportObject_UserActivity() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("MarketID");
-    columnsToDisplay.push("MarketName");
-    columnsToDisplay.push("OwnerID");
-    columnsToDisplay.push("OwnerName");
-    columnsToDisplay.push("NumberUsers");
-    columnsToDisplay.push("NumberInactiveUsers");
-    columnsToDisplay.push("PercentInactiveUsers");
-    columnsToDisplay.push("NumberActiveUsers");
-    columnsToDisplay.push("PercentActiveUsers");
+ 
 
     tempObject =
     {
@@ -906,14 +898,6 @@ function getReportObject_UserActivityDetail() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("PersonnelID");
-    columnsToDisplay.push("Name");
-    columnsToDisplay.push("AccessLevel");
-    columnsToDisplay.push("HasWEbLogin");
-    columnsToDisplay.push("NumberQueries");
-    columnsToDisplay.push("Position");
-    columnsToDisplay.push("Title");
-    columnsToDisplay.push("MarketName");
 
     tempObject =
     {
