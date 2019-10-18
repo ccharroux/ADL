@@ -2103,11 +2103,12 @@ function getReportObject_OwnershipGroupList() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("ownerGroupID");
-    columnsToDisplay.push("ownerGroupName");
-    columnsToDisplay.push("ownerGroupProductID");
-    columnsToDisplay.push("ownerGroupProductActiveDate");
-    columnsToDisplay.push("ownerGroupProductDisableDate");
+ 
+    columnsToDisplay.push("Owner Group");
+    columnsToDisplay.push("Product");
+    columnsToDisplay.push("Active");
+    columnsToDisplay.push("Active Date");
+    columnsToDisplay.push("Disabled Date");
  
 
     tempObject =
@@ -2240,14 +2241,13 @@ function getReportObject_DetailedOwnerGroupSetup() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("ownerGroupName");
-    columnsToDisplay.push("ownerName");
-    columnsToDisplay.push("productID");
-    columnsToDisplay.push("productActive");
-    columnsToDisplay.push("productActiveDate");
-    columnsToDisplay.push("productDisableDate");
-    columnsToDisplay.push("misc");
-
+    columnsToDisplay.push("Owner Group");
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Product");
+    columnsToDisplay.push("Product Active");
+    columnsToDisplay.push("Active Date");
+    columnsToDisplay.push("Disable Date");
+    columnsToDisplay.push("Misc");
     tempObject =
     {
 
