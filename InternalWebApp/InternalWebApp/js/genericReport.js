@@ -3618,7 +3618,7 @@ function getReportFilterArray_APIActivityList() {
         token: "Personnel",
         jsCall: null,
         objectName: "hidPersonnel",
-        required: true
+        required: false
     }
     arrayFilters.push(arrayObject);
 
