@@ -1023,14 +1023,7 @@ function getReportObject_UserQuerySummaryByOwner() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("MarketID");
-    columnsToDisplay.push("MarketName");
-    columnsToDisplay.push("OwnerID");
-    columnsToDisplay.push("OwnerName");
-    columnsToDisplay.push("NumberUsers");
-    columnsToDisplay.push("QueryName");
-    columnsToDisplay.push("NumberUsersThisQuery");
-    columnsToDisplay.push("NumberRequests");
+ 
 
     tempObject =
     {
@@ -1598,14 +1591,7 @@ function getReportObject_NationwideRecipients() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("OwnerGroupID");
-    columnsToDisplay.push("OwnerGroupName");
-    columnsToDisplay.push("PersonnelID");
-    columnsToDisplay.push("Email");
-    columnsToDisplay.push("FirstName");
-    columnsToDisplay.push("LastName");
-    columnsToDisplay.push("FirstNationwideQuery");
-    columnsToDisplay.push("NationwideQueryCount");
+ 
 
     tempObject =
     {
@@ -3647,7 +3633,7 @@ function getReportObject_APIActivityList() {
 
     tempObject =
     {
-        reportTitle: "API Activity List",
+        reportTitle: "External User API Activity List",
         apiControllerAction: "/api/APIAccess/GetAPIActivityList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
