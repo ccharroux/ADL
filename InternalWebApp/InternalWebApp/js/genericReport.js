@@ -1457,16 +1457,6 @@ function getReportObject_Training() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("TrainingDateTimeMarketID");
-    columnsToDisplay.push("MarketName");
-    columnsToDisplay.push("OwnerName");
-    columnsToDisplay.push("PersonnelID");
-    columnsToDisplay.push("UserName");
-    columnsToDisplay.push("Trainer");
-    columnsToDisplay.push("Topic");
-    columnsToDisplay.push("Method");
-    columnsToDisplay.push("Notes");
-    columnsToDisplay.push("DisplayName");
 
     tempObject =
     {
