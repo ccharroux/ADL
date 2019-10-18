@@ -311,6 +311,7 @@ var navTool = {
 
 $( document ).ready(function() 
 {
+
     environment = getEnvironment();
 
     if (environment.length > 0) {
