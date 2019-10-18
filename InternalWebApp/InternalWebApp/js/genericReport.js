@@ -5579,7 +5579,7 @@ function getReportObject_RevenueComparisonMarket() {
                         "&direct=false";
             }
 
-            return '<a onclick="determineLocationOfDMAReport(' + "'" + action + "','" + 'DMA/MRR Data Comparison - Station Level' + "'" + ');">Stations</a>';
+            return '<a onclick="determineLocationOfDMAReport(' + "'" + action + "','" + 'DMA / MRR Data Comparison - Station Level' + "'" + ');">Stations</a>';
         },
         "orderable": false,
         "searchable": false,
@@ -5587,7 +5587,7 @@ function getReportObject_RevenueComparisonMarket() {
     });
 
     tempObject = {
-        reportTitle: "DMA/MRR Data Comparison - Market Level",
+        reportTitle: "DMA / MRR Data Comparison - Market Level",
         apiControllerAction: "/api/DMAReport/GetDMARevenueReviewByMarket",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -5670,7 +5670,7 @@ function getReportObject_RevenueComparisonStation() {
 
             //return '<a href="' + action + '">Details</a>';
 
-            return '<a onclick="determineLocationOfDMAReport(' + "'" + action + "','" + 'DMA/MRR Data Comparison - Detail Level' + "'" + ');">Details</a>';
+            return '<a onclick="determineLocationOfDMAReport(' + "'" + action + "','" + 'DMA / MRR Data Comparison - Detail Level' + "'" + ');">Details</a>';
 
         },
         "orderable": false,
@@ -5682,7 +5682,7 @@ function getReportObject_RevenueComparisonStation() {
     arrButtons.push({ name: "Market", title: "Back to Market Level" });
 
     tempObject = {
-        reportTitle: "DMA/MRR Data Comparison - Station Level",
+        reportTitle: "DMA / MRR Data Comparison - Station Level",
         apiControllerAction: "/api/DMAReport/GetDMARevenueReviewByStation",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -5762,7 +5762,7 @@ function getReportObject_RevenueComparisonStationDetail() {
     arrButtons.push({ name: "Station", title: "Back to Station Level" });
 
     tempObject = {
-        reportTitle: "DMA/MRR Data Comparison - MRR Level",
+        reportTitle: "DMA / MRR Data Comparison - MRR Level",
         apiControllerAction: "/api/DMAReport/GetDMARevenueReviewByStationDetails",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,

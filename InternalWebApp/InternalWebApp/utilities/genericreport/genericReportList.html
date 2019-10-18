@@ -63,20 +63,23 @@
             </div>
         </header>
         <div id="fh5co-contact-section" class="contact-section">
-            <div class="container">
+            <div class="container" style="width:90%;margin-top:-30px">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
                         <h2 id="reportTitle">Media Reports</h2>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-3" id="rptTagCol">
-                        <h4>Report Categories</h4>
-                        <div id="rptTags"style="border-right:solid 1px silver">
+                    <div id="rptTagCol">
+                        <!--<h4>REPORT GROUPS</h4>-->
+                        <div id="rptTags"style="border-right:solid 1px silver;">
 
                         </div> 
                     </div>
-                    <div id="rptCol" class="col-md-9">
+                </div>
+                <div class="row">
+                    <div id="rptCol">
+                        <hr />
                         <h4 id="tagReportTitle"></h4>
                         <div id="rptList" class="row"  ></div>
                     </div>
@@ -166,61 +169,69 @@
 
         for (var i = 0; i < rptArray.length; i++)
         {
- 
             for (var v = 0; v < rptArray[i].product.length; v++)
             {
- 
                 if (tagArray.indexOf(rptArray[i].product[v].toLowerCase()) === -1)
                 {
                     tagArray.push(rptArray[i].product[v].toLowerCase());
                 }
- 
             }
- 
-        }
+         }
  
         tagArray = tagArray.sort();
  
         for (var i = 0; i < tagArray.length; i++) 
         {
-            $("#rptTags").append("<div><a style='font-size:14px'; href='#' onclick='loadReports(" + '"' + tagArray[i] + '"' + ");'>" + tagArray[i].toString().toUpperCase() + "</a></div>")
+ 
+            $("#rptTags").append("<div class='col-md-3'><a style='font-size:16px'; href='#' onclick='loadReports(" + '"' + tagArray[i] + '"' + ");'>" + tagArray[i].toString().toUpperCase() + "</a></div>")
         }
     }
 
     function loadReports(product)
     {
         $("#rptList").html("");
-        $("#tagReportTitle").html(product.toUpperCase() + " Reports");
+        $("#tagReportTitle").html(product.toUpperCase() + " REPORTS");
         buildReportList(product, "rptList", null, outReportArray);
     }
+
     function destroySearchCriteria()
     {
         setLocalStorage("gSearchCriteria", null);
         setLocalStorage("gSearchResults", null);
     }
 
-
     function buildReportList(productId, control, title, reportArray)    
     {
- 
-       
+
         if (title != null)
         {
             $("#" + control).append("<h3 style='padding-top: 10px;padding-bottom: 10px; margin-bottom: 0px; margin-top: 15px;'>" + title + "</h3>");
         }
 
+        var matchObject = new Object();
+        var matchTitleObjectArray = new Array();
+
         // report loop 
         for (var i = 0; i < reportArray.length; i++)
         {
-
             for (var v = 0; v < reportArray[i].product.length; v++)
             {
-                if (reportArray[i].product[v].toLowerCase() == productId.toLowerCase()) {
-                    buildReportString(reportArray[i], control, i);
+                if (reportArray[i].product[v].toLowerCase() == productId.toLowerCase())
+                {
+                    matchTitleObjectArray.push(reportArray[i].reportTitle + '|' + i);
                 }
             }
+        }  
 
+        var sorted = matchTitleObjectArray.sort();
+ 
+        for (var v=0; v < sorted.length; v++)
+        {
+            var itemArray = sorted[v].split('|');
+            var i = itemArray[1];
+            buildReportString(reportArray[i], control, i);
         }
+
     }
     function buildReportString(reportArray, control, i)
     {
@@ -231,9 +242,9 @@
             reportPath = reportArray.reportPath;
         }
 
-        var str = "<div class='col-md-4'>";
+        var str = "<div class='col-md-3'>";
 
-        str = str + "<a style='font-size:14px'; href='" + reportPath + "?reportId=" + i + "'>" + reportArray.reportTitle + "</a>";
+        str = str + "<a style='font-size:16px'; href='" + reportPath + "?reportId=" + i + "'>" + reportArray.reportTitle + "</a>";
         str = str + "</div>";
 
         $("#" + control).append(str);
