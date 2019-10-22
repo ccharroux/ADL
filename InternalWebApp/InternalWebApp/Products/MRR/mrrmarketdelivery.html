@@ -737,11 +737,29 @@
     }
 
     function currentRevenueYear() {
-        return $("#ddlYearPeriod").val().toString().substring(0, 4);
+        return $("#ddlYearPeriod").val().toString().substr(0, 4);
     }
 
     function currentRevenuePeriod() {
-        return $("#ddlYearPeriod").val().toString().substring(4, 6); // second argument is also index, not length like .NET
+        return $("#ddlYearPeriod").val().toString().substr(4, 2);
+    }
+
+    function nextRevenuePeriod() {
+        var currentPeriod = parseInt(currentRevenuePeriod(), 10);
+        var nextPeriod = currentPeriod + 1;
+        if (nextPeriod > 12) {
+            nextPeriod = 1;
+        }
+        return ((nextPeriod > 9) ? "" : "0") + nextPeriod.toString();
+    }
+
+    function nextRevenueYear() {
+        var currentYear = parseInt(currentRevenueYear(), 10);
+        var nextYear = currentYear;
+        if (nextRevenuePeriod() > currentRevenuePeriod()) {
+            nextYear += 1;
+        }
+        return nextYear.toString();
     }
 
     function currentYearPeriodText() {
@@ -1161,7 +1179,55 @@
         }
 
         bootbox.alert(
-            mediaTypeQualifier() + "Owner Group Recipients have been notified that reports are released for " + currentYearPeriodText()
+            mediaTypeQualifier() + "Owner Group Recipients have been notified that reports are released for " + currentYearPeriodText(),
+            function () {
+                insertRevenueStatusAllStations();
+            }
+        );
+    }
+
+    function insertRevenueStatusAllStations() {
+        var url = ServicePrefix + '/api/MRR/InsertRevenueStatusAllStations';
+
+        var data = {
+            "inApiToken": getLocalStorage("APIToken"),
+            "inYear": nextRevenueYear(),
+            "inPeriod": nextRevenuePeriod()
+        };
+
+        var mediaTypeId = $("#ddlMediaType").val();
+        if (mediaTypeId != -1) {
+            data["inMediaTypeId"] = mediaTypeId;
+        } else {
+            data["inMediaTypeId"] = null;
+        }
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                insertRevenueStatusAllStationsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function insertRevenueStatusAllStationsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert(
+            mediaTypeQualifier() + "stations are ready for next submission cycle"
         );
     }
 
