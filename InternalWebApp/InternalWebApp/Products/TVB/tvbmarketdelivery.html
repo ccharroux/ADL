@@ -638,15 +638,33 @@
     }
 
     function currentRevenueYear() {
-        return $("#ddlYearPeriod").val().toString().substring(0, 4);
+        return $("#ddlYearPeriod").val().toString().substr(0, 4);
     }
 
     function currentRevenuePeriod() {
-        return $("#ddlYearPeriod").val().toString().substring(4, 6); // second argument is also index, not length like .NET
+        return $("#ddlYearPeriod").val().toString().substr(4, 2);
     }
 
     function currentYearPeriodText() {
         return $("#ddlYearPeriod option:selected").text();
+    }
+
+    function nextRevenuePeriod() {
+        var currentPeriod = parseInt(currentRevenuePeriod(), 10);
+        var nextPeriod = currentPeriod + 1;
+        if (nextPeriod > 12) {
+            nextPeriod = 1;
+        }
+        return ((nextPeriod > 9) ? "" : "0") + nextPeriod.toString();
+    }
+
+    function nextRevenueYear() {
+        var currentYear = parseInt(currentRevenueYear(), 10);
+        var nextYear = currentYear;
+        if (nextRevenuePeriod() > currentRevenuePeriod()) {
+            nextYear += 1;
+        }
+        return nextYear.toString();
     }
 
     function moveToPreviousPeriod() {
@@ -831,28 +849,28 @@
         bootbox.alert(
             "NOT YET IMPLEMENTED: Market Recipients have been notified that " + currentMarketName + " is released for " + currentYearPeriodText(),
             function () {
-                checkOwnerGroupsOkayToRelease();
+                insertRevenueStatusAllStations();
             }
         );
     }
 
-    function checkOwnerGroupsOkayToRelease() {
+    function insertRevenueStatusAllStations() {
+        var url = ServicePrefix + '/api/TVB/InsertRevenueStatusAllStations';
 
-
-        var url = ServicePrefix + '/api/TVB/GetOwnerGroupsOkayToRelease';
+        var data = {
+            "inApiToken": getLocalStorage("APIToken"),
+            "inYear": nextRevenueYear(),
+            "inPeriod": nextRevenuePeriod()
+        };
 
         var settings = {
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inYear": currentRevenueYear(),
-                "inPeriod": currentRevenuePeriod()
-            }),
+            data: JSON.stringify(data),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                checkOwnerGroupsOkayToReleaseSuccess(data, textStatus, jQxhr);
+                insertRevenueStatusAllStationsSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -862,18 +880,19 @@
         $.ajax(url, settings);
     }
 
-    function checkOwnerGroupsOkayToReleaseSuccess(data, textStatus, jQxhr) {
+    function insertRevenueStatusAllStationsSuccess(data, textStatus, jQxhr) {
+
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
-        if (data.report.rows.length == 0) {
-            MKAErrorMessageRtn("checkOwnerGroupsOkayToReleaseSuccess failed to get result");
-            return;
-        }
-
-        postSendEmailToRecipients();
+        bootbox.alert(
+            "Stations are ready for next submission cycle",
+            function () {
+                postSendEmailToRecipients();
+            }
+        );
     }
 
     function postSendEmailToRecipients() {
