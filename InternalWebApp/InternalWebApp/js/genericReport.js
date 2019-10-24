@@ -5579,7 +5579,7 @@ function getReportObject_RevenueComparisonMarket() {
                         "&direct=false";
             }
 
-            return '<a onclick="determineLocationOfDMAReport(' + "'" + action + "','" + 'DMA / MRR Data Comparison - Station Level' + "'" + ');">Stations</a>';
+            return '<a href="#" onclick="determineLocationOfDMAReport(' + "'" + action + "','" + 'DMA / MRR Data Comparison - Station Level' + "'" + ');">Stations</a>';
         },
         "orderable": false,
         "searchable": false,
@@ -5670,7 +5670,7 @@ function getReportObject_RevenueComparisonStation() {
 
             //return '<a href="' + action + '">Details</a>';
 
-            return '<a onclick="determineLocationOfDMAReport(' + "'" + action + "','" + 'DMA / MRR Data Comparison - Detail Level' + "'" + ');">Details</a>';
+            return '<a href="#" onclick="determineLocationOfDMAReport(' + "'" + action + "','" + 'DMA / MRR Data Comparison - Detail Level' + "'" + ');">Details</a>';
 
         },
         "orderable": false,
