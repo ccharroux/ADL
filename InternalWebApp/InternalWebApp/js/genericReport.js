@@ -5554,7 +5554,7 @@ function getReportObject_RevenueComparisonMarket() {
     columnsToDisplay.push("Parent Market");
     //columnsToDisplay.push("Revenue Year");
     columnsToDisplay.push("Revenue Period");
-    columnsToDisplay.push("DMA Cat Id");
+    columnsToDisplay.push("DMA Cat");
     columnsToDisplay.push("Market");
     columnsToDisplay.push("DMA Revenue");
     columnsToDisplay.push("MRR Revenue");
@@ -5642,7 +5642,7 @@ function getReportObject_RevenueComparisonStation() {
     columnsToDisplay.push("Market");
     //columnsToDisplay.push("Revenue Year");
     columnsToDisplay.push("Revenue Period");
-    columnsToDisplay.push("DMA Cat Id");
+    columnsToDisplay.push("DMA Cat");
     columnsToDisplay.push("Station");
     columnsToDisplay.push("DMA Revenue");
     columnsToDisplay.push("MRR Revenue");
@@ -5750,8 +5750,8 @@ function getReportObject_RevenueComparisonStationDetail() {
     columnsToDisplay.push("Desc");
     //columnsToDisplay.push("Revenue Year");
     columnsToDisplay.push("Revenue Period");
-    columnsToDisplay.push("DMA Cat Id");
-    columnsToDisplay.push("MRR Cat Id");
+    columnsToDisplay.push("DMA Cat");
+    columnsToDisplay.push("MRR Cat");
     columnsToDisplay.push("Station");
     columnsToDisplay.push("Market");
     columnsToDisplay.push("DMA Revenue");
