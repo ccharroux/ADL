@@ -114,19 +114,19 @@
                         </div>
                     </div>
 
-                    <!--Recieve All Periods-->
+                    <!--Receive All Periods-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="chkRecieveAllPeriods">Recieve All Periods</label>
+                            <label for="chkReceiveAllPeriods">Receive All Periods</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="checkbox" id="chkRecieveAllPeriods" onchange="hideShowMonths();" />
+                            <input type="checkbox" id="chkReceiveAllPeriods" onchange="checkIfSelectAll();" />
                         </div>
                     </div>
 
 
                     <!--Months-->
-                    <div id="divMonths" class="hidden">
+                    <div id="divMonths">
                         <div class="row input-row">
 
                             <div class="col-md-3 text-align-left">
@@ -201,7 +201,46 @@
         setStationLabel();
         loadMonths();
 
+
+        $("#divSelectMonths input[type=checkbox]").click(function () {
+            if ($(this).prop('checked') == false) {
+                $("#chkReceiveAllPeriods").prop('checked', false);
+            } else {
+                var allMonthsSelected = true;
+                $("#divSelectMonths input[type=checkbox]").each(function () {
+                    if ($(this).prop('checked') == false) {
+                        allMonthsSelected = false;
+                    }
+                });
+
+                if (allMonthsSelected == true) {
+                    $("#chkReceiveAllPeriods").prop('checked', true);
+                }
+            }
+        });
+
     });
+
+    function checkIfSelectAll() {
+
+        if ($("#chkReceiveAllPeriods").prop("checked")) {
+            selectAllMonths();
+        } else {
+            deselectAllMonths();
+        }
+    }
+
+    function selectAllMonths() {
+        $("#divSelectMonths input[type=checkbox]").each(function () {
+            $(this).prop('checked', true);
+        });
+    }
+
+    function deselectAllMonths() {
+        $("#divSelectMonths input[type=checkbox]").each(function () {
+            $(this).prop('checked', false);
+        });
+    }
 
     function checkIfNewProduct() {
         if (isNewProduct == 1) {
@@ -282,7 +321,7 @@
 
             $.each(data.report.rows, function (index) {
                 str = str + '<option value="' + data.report.rows[index].dataInputId + '">' + data.report.rows[index].inputSystem + '</option>';
-            })
+            });
 
             $("#ddlInputScript").html(str);
             convertToChosenSelect("ddlInputScript", false, false);
@@ -295,7 +334,8 @@
     function getSubmission() {
 
         if (submissionId <= 0) {
-            $("#chkRecieveAllPeriods").prop("checked", true);
+            $("#chkReceiveAllPeriods").prop("checked", true);
+            selectAllMonths();
             return;
         }
 
@@ -336,14 +376,15 @@
                 $("#txtSubmissionDesc").val(obj["description"]);
                 $("#txtAltCallLetters").val(obj["altCallLetters"]);
                 $("#ddlInputScript").val(obj["dataInputId"]);
-                $("#chkRecieveAllPeriods").prop("checked", (obj["seasonal"]) == false ? true : false);
+                $("#chkReceiveAllPeriods").prop("checked", (obj["seasonal"]) == false ? true : false);
 
             });
 
 
-            if ($("#chkRecieveAllPeriods").prop("checked") == false) {
+            if ($("#chkReceiveAllPeriods").prop("checked") == false) {
                 getSubmissionSeasonalList();
-                $("#divMonths").removeClass("hidden");
+            } else {
+                selectAllMonths();
             }
         }
     }
@@ -390,18 +431,6 @@
         }
     }
 
-    function hideShowMonths() {
-
-        if ($("#chkRecieveAllPeriods").prop("checked")) {
-            if ($("#divMonths").hasClass("hidden") == false) {
-                $("#divMonths").addClass("hidden");
-            }
-        } else {
-            if ($("#divMonths").hasClass("hidden") == true) {
-                $("#divMonths").removeClass("hidden");
-            }
-        }
-    }
 
     function goBackToStationProductXRY() {
 
@@ -434,7 +463,7 @@
                 "inStationId": stationId,
                 "inSubmissionId": submissionId,
                 "inDescription": $("#txtSubmissionDesc").val(),
-                "inSeasonal": ($("#chkRecieveAllPeriods").prop("checked") == true ? false : true),
+                "inSeasonal": ($("#chkReceiveAllPeriods").prop("checked") == true ? false : true),
                 "inAltCallLetters": $("#txtAltCallLetters").val(),
                 "inDataInputId": $("#ddlInputScript").val()
             }),
@@ -499,7 +528,7 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inStationId": stationId,
                 "inSubmissionId": $("#hdnSubmissionId").val(),
-                "inSeasonal": ($("#chkRecieveAllPeriods").prop("checked") == true ? false : true),
+                "inSeasonal": ($("#chkReceiveAllPeriods").prop("checked") == true ? false : true),
                 "inSeasonalPeriodList": seasonalList
             }),
             processData: false,
@@ -533,12 +562,12 @@
                     }
                 });
             }
-           
+
         }
     }
 
     function enableProductForStation() {
-        
+
         var url = ServicePrefix + '/api/Station/UpdateStationProduct';
 
         var settings = {
@@ -577,7 +606,7 @@
 
     function validationPassed() {
 
-        if ($("#chkRecieveAllPeriods").prop("checked") == false) {
+        if ($("#chkReceiveAllPeriods").prop("checked") == false) {
 
             var periodCheck = false;
 
@@ -588,7 +617,7 @@
             });
 
             if (periodCheck == false) {
-                bootbox.alert("If the Recieve All Periods checkbox is not checked, you must select at least one Month in the Select Month(s) area.", function () { });
+                bootbox.alert("If the Receive All Periods checkbox is not checked, you must select at least one Month in the Select Month(s) area.", function () { });
                 return false;
             }
         }
