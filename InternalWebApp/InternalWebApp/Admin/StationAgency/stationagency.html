@@ -254,6 +254,8 @@
 </body>
 </html>
 <script>
+
+    var marketId = 0;
     var stationAgencyId = 0;
     var bLinkStationAgencyRevenues = false;
     var bIsNew = false;
@@ -275,6 +277,7 @@
     function setupUIFields()
     {
 
+        marketId = (getParameterByName("MarketID") == null ? 0 : getParameterByName("MarketID"));
         stationAgencyId = (getParameterByName("StationAgencyID") == null ? 0 : getParameterByName("StationAgencyID"));
         $("#txtStationAgencyId").val(stationAgencyId);
         bIsNew = stationAgencyId <= 0;
@@ -291,17 +294,33 @@
             });
     }
 
-    function getStationList() {
-        //api ServicePrefix + '/api/Station/GetStationListByProduct'
+    function getStationList()
+    {
+        var bMarketVersion = false;
+
+        var url = '/api/Station/GetStationListByProduct';
+        var inObject = {
+            "inApiToken": getLocalStorage("APIToken"),
+            "inProductId": 'XRY'
+        };
+
+        if (marketId > 0 && stationAgencyId == 0)
+        {
+            bMarketVersion = true;
+            url = '/api/Station/GetStationListByMarketProduct';
+            var inObject = {
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": 'XRY',
+                "inMarketId" : marketId
+            };
+        }
+
         $.ajax({
-            url: ServicePrefix + '/api/Station/GetStationListByProduct',
+            url: ServicePrefix + url,
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inProductId": 'XRY'
-            }),
+            data: JSON.stringify(inObject),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 if (data.response.status.toUpperCase() === "SUCCESS") {
@@ -310,11 +329,22 @@
                     $stationList.append("<option value='-1' data-market-id='-1'> -- Select a Station</option>");
 
                     $.each(data.report.rows,
-                        function () {
-                            var element = $('<option></option>');
-                            element.val(this.reid).html(this.fullName);
-                            element.attr("data-market-id", this.primaryMarketId);
-                            $stationList.append(element);
+                        function ()
+                        {
+                            if (bMarketVersion == false)
+                            {
+                                var element = $('<option></option>');
+                                element.val(this.reid).html(this.fullName);
+                                element.attr("data-market-id", this.primaryMarketId);
+                                $stationList.append(element);
+                            }
+                            else
+                            {
+                                var element = $('<option></option>');
+                                element.val(this["Station Id"]).html(this["Station Name"]);
+                                element.attr("data-market-id", marketId);
+                                $stationList.append(element);
+                            }
                         });
 
                     convertToChosenSelect("ddlStations");

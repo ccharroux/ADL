@@ -6390,9 +6390,9 @@ function getReportObject_NewAgencies() {
 
     var columnsToDisplay = new Array();
 
-    columnsToDisplay.push("station agency name");
-    columnsToDisplay.push("agency name");
-    columnsToDisplay.push("station name");
+    columnsToDisplay.push("station agency");
+    columnsToDisplay.push("agency");
+    columnsToDisplay.push("station");
     columnsToDisplay.push("action code");
     columnsToDisplay.push("comment");
 
@@ -6401,7 +6401,8 @@ function getReportObject_NewAgencies() {
     columnsToDisplay.push({
         "action": "edit",
         "mRender": function (data, type, row) {
-            if ($("#header-summary-section").is(":visible") == false || $("#header-summary").html() == "") {
+            if ($("#header-summary-section").is(":visible") == false || $("#header-summary").html() == "")
+            {
                 $("#header-summary-section").show();
                 $("#header-summary").html(
                     'Market last released ' + new Date(row.releaseDate).toLocaleString('en-US')
@@ -6409,8 +6410,12 @@ function getReportObject_NewAgencies() {
             }
 
             var action = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/Admin/agency/agency.html?AgencyID=",' + row.agencyId + ')\'>Edit&nbsp;Agency</a>';
-            var action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/stationagency/stationagency.html?StationAgencyID=",' + row.stationAgencyId + ')\'>Edit&nbsp;Station&nbsp;Agency</a>';
-            return action + '<br />' + action2;
+            var action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/stationagency/stationagency.html?StationAgencyID=",' + (row.stationAgencyId == null ? '0' : row.stationAgencyId) + ')\'>Edit&nbsp;Station&nbsp;Agency</a>';
+            //if (row.stationAgencyId == null)
+            //{
+            //    action2 = "";
+            //}
+            return action + (action2.length > 0 ? '<br />' + action2: "");
         },
         "orderable": false,
         "searchable": false,
