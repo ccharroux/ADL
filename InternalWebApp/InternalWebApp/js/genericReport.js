@@ -239,7 +239,7 @@ reportName.push("rptSweeperLogMRRRevenue");
 
 reportName.push("rptRABSummaryByRegion");
 reportName.push("rptRAB");
-
+reportName.push("rptProductMarketOwnerActivationList")
 
 function buildReportArray()
 {
@@ -9363,4 +9363,59 @@ function getReportObject_SweeperLogMRRRevenue() {
     }
 
     return tempObject;
+}
+
+function getReportFilterArray_ProductMarketOwnerActivationList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: new Array(),
+        objectName: "ddlMarket",
+        required: false,
+        reloadBasedProduct: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        objectName: "ddlOwner",
+        required: false,
+        reloadBasedProduct: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_ProductMarketOwnerActivationList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+ 
+        reportTitle: "Product Market/Owner Activation List",
+        apiControllerAction: "/api/ProductReport/GetProductMarketOwnerActivationList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['product', 'owner', 'market']
+    }
+
+    return tempObject;
+
 }
