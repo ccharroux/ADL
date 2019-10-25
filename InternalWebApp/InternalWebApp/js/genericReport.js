@@ -238,7 +238,7 @@ reportName.push("rptMRRMarketTotalsForNAB");
 reportName.push("rptSweeperLogMRRRevenue");
 
 reportName.push("rptRABSummaryByRegion");
-
+reportName.push("rptRAB");
 
 
 function buildReportArray()
@@ -8413,6 +8413,66 @@ function getReportObject_RABSummaryByRegion() {
     return tempObject;
 }
 
+function getReportFilterArray_RAB() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+    arrayObject = new Object();
+
+    arrayObject = {
+        token: "Period",
+        jsCall: "getPeriodList",
+        jsCallParameters: ["quarters"],
+        objectName: "ddlPeriod",
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+    arrayObject = new Object();
+
+    arrayObject = {
+        token: "InternalReport",
+        objectName: "ddlInternalReport",
+        jsCall: null,
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+    arrayObject = new Object();
+
+    arrayObject = {
+        token: "YTDReport",
+        objectName: "ddlYTDReport",
+        jsCall: null,
+        required: true
+    }
+
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+
+}
+
+function getReportObject_RAB() {
+    var tempObject = new Object();
+
+    tempObject = {
+        reportTitle: "RAB",
+        apiControllerAction: "/api/CorporateReport/InsertRABReportIntoQueue",
+        apiType: "post",
+        product: ['corporate'],
+        reportPath: "/Products/XRY/reports/xrycorporatereport.html"
+    }
+
+    return tempObject;
+}
 
 //End Of Corporate Reports
 
