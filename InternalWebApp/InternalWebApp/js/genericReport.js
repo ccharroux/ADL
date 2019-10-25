@@ -5965,11 +5965,11 @@ function getReportObject_MediaAdvertisers() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("market");
-    columnsToDisplay.push("media Advertiser");
-    columnsToDisplay.push("media Advertiser Code");
-    columnsToDisplay.push("market Advertiser");
-    columnsToDisplay.push("mediaType");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Media Advertiser");
+    columnsToDisplay.push("Media Advertiser Code");
+    columnsToDisplay.push("Market Advertiser");
+    columnsToDisplay.push("Media Type");
 
     //this column is used to create the edit link
     //for each result row
