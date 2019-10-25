@@ -6411,10 +6411,10 @@ function getReportObject_NewAgencies() {
 
             var action = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/Admin/agency/agency.html?AgencyID=",' + row.agencyId + ')\'>Edit&nbsp;Agency</a>';
             var action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/stationagency/stationagency.html?StationAgencyID=",' + (row.stationAgencyId == null ? '0' : row.stationAgencyId) + ')\'>Edit&nbsp;Station&nbsp;Agency</a>';
-            //if (row.stationAgencyId == null)
-            //{
-            //    action2 = "";
-            //}
+            if (row.stationAgencyId == null)
+            {
+                action2 = "";
+            }
             return action + (action2.length > 0 ? '<br />' + action2: "");
         },
         "orderable": false,
