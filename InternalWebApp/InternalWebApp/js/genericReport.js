@@ -6048,7 +6048,7 @@ function getReportObject_StationAdvertisers() {
     columnsToDisplay.push("station Advertiser");
     columnsToDisplay.push("station Code");
     columnsToDisplay.push("market Advertiser");
-    columnsToDisplay.push("industry Name");
+    columnsToDisplay.push("industry");
     columnsToDisplay.push("sub Industry");
 
     //this column is used to create the edit link
