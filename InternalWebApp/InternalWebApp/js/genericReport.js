@@ -3690,8 +3690,12 @@ function getReportObject_CorporateGroupUserList() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Email");
+    columnsToDisplay.push("User");
+    columnsToDisplay.push("MRR");
+    columnsToDisplay.push("XRAY");
  
-
     tempObject =
     {
         reportTitle: "Corporate / Group User List",
