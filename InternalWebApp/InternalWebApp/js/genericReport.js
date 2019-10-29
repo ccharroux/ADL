@@ -1075,14 +1075,14 @@ function getReportObject_UserListing() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("AccessLevel");
-    columnsToDisplay.push("FirstName");
-    columnsToDisplay.push("LastName");
+    columnsToDisplay.push("Access Level");
+    columnsToDisplay.push("First Name");
+    columnsToDisplay.push("Last Name");
     columnsToDisplay.push("Email");
     columnsToDisplay.push("Phone");
     columnsToDisplay.push("Position");
-    columnsToDisplay.push("MarketName");
-    columnsToDisplay.push("OwnerName");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Owner");
 
     tempObject =
     {
