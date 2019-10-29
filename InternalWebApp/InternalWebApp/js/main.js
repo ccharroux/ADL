@@ -1584,3 +1584,23 @@ function scrollToAnchor(aid) {
     var aTag = $("a[name='" + aid + "']");
     $('html,body').animate({ scrollTop: aTag.offset().top }, 'slow');
 }
+
+function resetDataTableDOM(tableToDestroyId, divOfTableId, classOfTable)
+{
+
+    if (!classOfTable)
+    {
+        classOfTable = "stripe";
+    }
+
+    //If you want to repopulate the datatable with new columns and data,
+    //you need to remove the datatable from the DOM. 
+    //The .remove function will remove it.
+    $("#" + tableToDestroyId).remove();
+
+    //Once you remove the datatable from the DOM, you need add the HTML back to the page.
+    //I added a name to the DIV that has the table html. I used the datatable name plus added "Holder".
+    //The following coding adds the table back.
+    $("#" + divOfTableId).html('<table id="' + tableToDestroyId + '" class="' + classOfTable + '"></table>');
+
+}
