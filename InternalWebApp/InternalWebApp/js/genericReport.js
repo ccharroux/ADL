@@ -1312,18 +1312,14 @@ function getReportObject_NewUserListing() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("PersonnelID");
-    columnsToDisplay.push("DateAdded");
-    columnsToDisplay.push("FirstName");
-    columnsToDisplay.push("LastName");
+    columnsToDisplay.push("Date Added");
+    columnsToDisplay.push("User");
     columnsToDisplay.push("Email");
-    columnsToDisplay.push("PositionName");
-    columnsToDisplay.push("MarketID");
-    columnsToDisplay.push("MarketName");
-    columnsToDisplay.push("OwnerID");
-    columnsToDisplay.push("OwnerName");
-    columnsToDisplay.push("LoggedIn");
-    columnsToDisplay.push("QueriesRun");
+    columnsToDisplay.push("Position Name");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Logged In");
+    columnsToDisplay.push("Queries Run");
 
 
     tempObject =
