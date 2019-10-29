@@ -1610,7 +1610,7 @@ function buildMarketWrapper(inData) {
     var ret = inData;
 
     // find parens
-    var bPIDIncluded = false;
+    var bIDIncluded = false;
 
     if ((inData.indexOf("(") > -1) &&
         (inData.indexOf(")") > -1)) {
@@ -1677,7 +1677,7 @@ function buildStationWrapper(inData) {
     var ret = inData;
 
     // find parens
-    var bPIDIncluded = false;
+    var bIDIncluded = false;
 
     if ((inData.indexOf("(") > -1) &&
         (inData.indexOf(")") > -1)) {
@@ -1709,7 +1709,7 @@ function buildOwnerWrapper(inData) {
     var ret = inData;
 
     // find parens
-    var bPIDIncluded = false;
+    var bIDIncluded = false;
 
     if ((inData.indexOf("(") > -1) &&
         (inData.indexOf(")") > -1)) {
