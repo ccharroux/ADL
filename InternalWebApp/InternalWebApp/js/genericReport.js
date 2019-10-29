@@ -4115,7 +4115,11 @@ function getReportObject_UserMissingGroup()
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-
+    columnsToDisplay.push("User");
+    columnsToDisplay.push("Email");
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Owner Group");
+    columnsToDisplay.push("Report");
 
     tempObject =
     {
