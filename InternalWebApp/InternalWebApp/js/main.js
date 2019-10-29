@@ -1741,6 +1741,22 @@ function buildCustomLink(objectName, data, bSortable, className )
 {
     var column = new Object();
 
+    var hideHeader = getParameterByName("hideHeader");
+
+    if (!hideHeader == false && hideHeader.toLowerCase() == "true")
+    {
+        column = {
+            "title": objectName,
+            "visible": true,
+            "mData": objectName,
+            "orderable": bSortable,
+            "className": className
+        };
+        return column;
+    }
+
+
+ 
 
     if (objectName == "User") {
         column = {
