@@ -4171,7 +4171,7 @@ function getReportObject_UsersAssignedInvalidMarket() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("Personnel ID");
+    columnsToDisplay.push("User");
     columnsToDisplay.push("Email");
     columnsToDisplay.push("Report Title");
     columnsToDisplay.push("Report Market Wide");
