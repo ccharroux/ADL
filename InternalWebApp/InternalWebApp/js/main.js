@@ -1604,3 +1604,206 @@ function resetDataTableDOM(tableToDestroyId, divOfTableId, classOfTable)
     $("#" + divOfTableId).html('<table id="' + tableToDestroyId + '" class="' + classOfTable + '"></table>');
 
 }
+
+function buildMarketWrapper(inData) {
+
+    var ret = inData;
+
+    // find parens
+    var bPIDIncluded = false;
+
+    if ((inData.indexOf("(") > -1) &&
+        (inData.indexOf(")") > -1)) {
+        bIDIncluded = true;
+    }
+
+    if (bIDIncluded == true) {
+        var ID = '';
+
+        var init = inData.indexOf('(');
+        var fin = inData.indexOf(')');
+
+        ID = inData.substr(init + 1, fin - init - 1);
+
+        if (ID.length > 0) {
+            if (isNaN(ID) == false) {
+                ret = "<a href='#' onclick='window.location=\"/admin/market/market.html?marketId=" + ID + "\"'>";
+                ret = ret + inData
+                ret = ret + "</a>";
+            }
+        }
+
+    }
+
+    return ret;
+}
+function buildUserWrapper(inData)
+{
+
+    var bIDIncluded = false;
+
+    var ret = inData;
+
+    // find parens
+    var bIDIncluded = false;
+
+    if ((inData.indexOf("(") > -1) &&
+        (inData.indexOf(")") > -1)) {
+        bIDIncluded = true;
+    }
+
+    if (bIDIncluded == true) {
+        var ID = '';
+
+        var init = inData.indexOf('(');
+        var fin = inData.indexOf(')');
+
+        ID = inData.substr(init + 1, fin - init - 1);
+
+        if (ID.length > 0) {
+            if (isNaN(ID) == false) {
+                ret = "<a href='#' onclick='window.location=\"/admin/personnel/personnel.html?personnelID=" + ID + "\"'>";
+                ret = ret + inData
+                ret = ret + "</a>";
+            }
+        }
+
+    }
+
+    return ret;
+}
+function buildStationWrapper(inData) {
+
+    var ret = inData;
+
+    // find parens
+    var bPIDIncluded = false;
+
+    if ((inData.indexOf("(") > -1) &&
+        (inData.indexOf(")") > -1)) {
+        bIDIncluded = true;
+    }
+
+    if (bIDIncluded == true) {
+        var ID = '';
+        inData = inData.replace("REID ", "")
+        var init = inData.indexOf('(');
+        var fin = inData.indexOf(')');
+
+        ID = inData.substr(init + 1, fin - init - 1);
+
+        if (ID.length > 0) {
+            if (isNaN(ID) == false) {
+                ret = "<a href='#' onclick='window.location=\"/admin/station/station.html?stationId=" + ID + "\"'>";
+                ret = ret + inData
+                ret = ret + "</a>";
+            }
+        }
+
+    }
+
+    return ret;
+}
+function buildOwnerWrapper(inData) {
+
+    var ret = inData;
+
+    // find parens
+    var bPIDIncluded = false;
+
+    if ((inData.indexOf("(") > -1) &&
+        (inData.indexOf(")") > -1)) {
+        bIDIncluded = true;
+    }
+
+    if (bIDIncluded == true) {
+        var ID = '';
+
+        var init = inData.indexOf('(');
+        var fin = inData.indexOf(')');
+
+        ID = inData.substr(init + 1, fin - init - 1);
+
+        if (ID.length > 0) {
+            if (isNaN(ID) == false) {
+                ret = "<a href='#' onclick='window.location=\"/admin/ownership/ownership.html?ownerId=" + ID + "\"'>";
+                ret = ret + inData
+                ret = ret + "</a>";
+            }
+        }
+
+    }
+
+    return ret;
+}
+
+function buildCustomLink(objectName, data, bSortable, className )
+{
+    var column = new Object();
+
+
+    if (objectName == "User") {
+        column = {
+            "title": objectName,
+            "visible": true,
+            "mRender": function (data, type, row) {
+
+                return buildUserWrapper(row.User);
+            },
+            "orderable": bSortable,
+            "className": className
+        };
+
+    }
+    else if (objectName == "Market") {
+        column = {
+            "title": objectName,
+            "visible": true,
+            "mRender": function (data, type, row) {
+
+                return buildMarketWrapper(row.Market);
+            },
+            "orderable": bSortable,
+            "className": className
+        };
+
+    }
+    else if (objectName == "Owner") {
+        column = {
+            "title": objectName,
+            "visible": true,
+            "mRender": function (data, type, row) {
+
+                return buildOwnerWrapper(row.Owner);
+            },
+            "orderable": bSortable,
+            "className": className
+        };
+
+    }
+    else if (objectName == "Station") {
+        column = {
+            "title": objectName,
+            "visible": true,
+            "mRender": function (data, type, row) {
+
+                return buildStationWrapper(row.Station);
+            },
+            "orderable": bSortable,
+            "className": className
+        };
+
+    }
+    else {
+ 
+        column = {
+            "title": objectName,
+            "visible": true,
+            "mData": objectName,
+            "orderable": bSortable,
+            "className": className
+        };
+    }
+
+    return column;
+}
