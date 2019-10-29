@@ -1076,8 +1076,7 @@ function getReportObject_UserListing() {
 
     columnsToDisplay = new Array();
     columnsToDisplay.push("Access Level");
-    columnsToDisplay.push("First Name");
-    columnsToDisplay.push("Last Name");
+    columnsToDisplay.push("User")
     columnsToDisplay.push("Email");
     columnsToDisplay.push("Phone");
     columnsToDisplay.push("Position");
