@@ -650,7 +650,8 @@ function buildFavoritesDialog()
                 width: 600,
                 height: 300,
                 modal: true
-            });
+             });
+             break;
             // break out of loop, or return, on success
         } catch (e) {
             // handle exception
