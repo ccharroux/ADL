@@ -500,7 +500,7 @@ function addDialogComponents()
     d = d + '</center>';
     d = d + '</div>';
 
-    d = d + '<div class="favoriteButtonClass" style="position:absolute;top:5px; right:10px;z-index:1000"><input type="button"  value="Add as Favorite" onclick="showFavoriteDialog();"/>';
+    d = d + '<div class="favoriteButtonClass" style="position:absolute;top:5px; right:10px;z-index:1000"><input id="btnAddAsFavorite" type="button"  value="Add as Favorite" onclick="showFavoriteDialog();"/>';
     d = d + '&nbsp;<input class="favoriteButtonClass" type="button" value="My Favorites" onclick="window.location=\'/admin/login/dashboard.html\'"/></div>';
 
     $("body").append(d)
@@ -632,17 +632,38 @@ function deleteFavorite(id) {
     });
 
 }
-
+//function sleepForRetry()
+//{
+//    console.log("Retrying");
+//    return;
+//}
 function buildFavoritesDialog()
 {
+    var count = 0;
+    var maxTries = 10;
 
-        $("#favoritesDialog").dialog({
-            autoOpen: false,
-            resizable: false,
-            width: 600,
-            height: 300,
-            modal: true
-        });
+    while(true) {
+        try {
+             $("#favoritesDialog").dialog({
+                autoOpen: false,
+                resizable: false,
+                width: 600,
+                height: 300,
+                modal: true
+            });
+            // break out of loop, or return, on success
+        } catch (e) {
+            // handle exception
+           // console.log(e);
+            if (++count == maxTries)
+            {
+                $("#btnAddAsFavorite").hide();
+                break;
+            }
+        }
+    }
+
+
  
 }
 
