@@ -433,9 +433,11 @@
             getReport();
             $("#btnReport").hide();
         }
-        else {
+        else
+        {
             $("#btnReport").show();
-            loadAdvancedSearch();
+            //loadAdvancedSearch();
+            setTimeout('loadAdvancedSearch()', 1000);
         }
     }
 
@@ -484,11 +486,16 @@
         $("#hid" + control).val("");
     }
 
-    function loadAdvancedSearch() {
+    function loadAdvancedSearch()
+    {
+
+        $.blockUI;
 
         var searchResults = getLocalStorage("gSearchResults");
 
-        if (!searchResults) {
+        if (!searchResults)
+        {
+            runReportFromAdvancedSearch();
             return;
         }
 
@@ -536,6 +543,21 @@
 
         }
 
+        runReportFromAdvancedSearch();
+
+    }
+
+    function runReportFromAdvancedSearch()
+    {
+        setTimeout('getReport(true)', 500);
+
+        //if (getRequiredFiltersCount() == 0) {
+        //    //getReport();
+        //    setTimeout('getReport(true)', 500);
+        //}
+        //else {
+        //    setTimeout('getReport(true)', 500);
+        //}
     }
 
     function preSelectItem(whatToCheckFor) {
@@ -986,7 +1008,12 @@
     //////----------------------
     ////// BEGIN: load of the reports and supporting routines
     //////---------------------
-    function getReport() {
+    function getReport(bSilent) {
+
+        if (!bSilent)
+        {
+            bSilent = false;
+        }
 
         hideHeader();
 
@@ -1061,7 +1088,10 @@
             else {
                 if (isRequired) {
                     var msg = "Please select a " + nameOfParm.toLowerCase().replace("in", "").replace("id", "");
-                    bootbox.alert(msg, function () { });
+                    if (bSilent == false) {
+                        bootbox.alert(msg, function () { });
+                    }
+                    //bootbox.alert(msg, function () { });
                     return false;
                 }
             }
@@ -1072,7 +1102,10 @@
 
                 if (hasMultiField && oneMultiFieldCompleted == false) {
                     var msg = "Please complete at least one field with **.";
-                    bootbox.alert(msg, function () { });
+                    if (bSilent == false) {
+                        bootbox.alert(msg, function () { });
+                    }
+                    //bootbox.alert(msg, function () { });
                     return false;
                 }
 
