@@ -1315,7 +1315,7 @@ function getReportObject_NewUserListing() {
     columnsToDisplay.push("Date Added");
     columnsToDisplay.push("User");
     columnsToDisplay.push("Email");
-    columnsToDisplay.push("Position Name");
+    columnsToDisplay.push("Position");
     columnsToDisplay.push("Market");
     columnsToDisplay.push("Owner");
     columnsToDisplay.push("Logged In");
