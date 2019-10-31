@@ -500,23 +500,66 @@ function addDialogComponents()
     d = d + '</center>';
     d = d + '</div>';
 
-    d = d + '<div class="favoriteButtonClass" style="position:absolute;top:5px; right:10px;z-index:1000"><input id="btnAddAsFavorite" type="button"  value="Add as Favorite" onclick="showFavoriteDialog();"/>';
-    d = d + '&nbsp;<input class="favoriteButtonClass" type="button" value="My Favorites" onclick="window.location=\'/admin/login/dashboard.html\'"/>';
-    d = d + '&nbsp;<div class="dropdown inline-block linkdropdown">';
-    d = d + '           <a role="button" aria=expanded="false">Favorites Menu <span style="margin-right:10px;" class="caret"></span></a>';
-    d = d + '          <ul class="dropdown-menu linkdropdown-menu" role="menu">';
-    d = d + '              <li class="display-block"><a href="#"> Favorite 1 </a></li>';
-    d = d + '              <li class="display-block"><a href="#"> Favorite 2 </a></li>';
-    d = d + '              <li class="display-block"><a href="#"> Favorite 3 </a></li>';
+    d = d + '<div class="favoriteButtonClass" style="position:absolute;top:5px; right:10px;z-index:1000">';
+    d = d + '<div class="dropdown inline-block linkdropdown">';
+    d = d + '           <a class="favoritesButtonFromLink" role="button" aria=expanded="false">&nbsp;&nbsp;&nbsp;Favorites&nbsp;&nbsp;</span></a>';
+    d = d + '          <ul id="favoritesQuickList" class="dropdown-menu linkdropdown-menu" role="menu">';
+
+
     d = d + '          </ul>';
     d = d + '      </div>';
+    d = d + '&nbsp;<span><input id="btnAddAsFavorite" type="button"  value="Add as Favorite" onclick="showFavoriteDialog();"/></span>';
     d = d + '</div>';
+    //d = d + '&nbsp;<input class="favoriteButtonClass" type="button" value="My Favorites" onclick="window.location=\'/admin/login/dashboard.html\'"/>';
     $("body").append(d)
-
+    getFavoritesForQuickList();
     setTimeout(buildFavoritesDialog, 250);
 
     buildPopupComponent();
  
+}
+function getFavoritesForQuickList()
+{
+    $("#favoritesQuickList").append('<li class="display-block"><a href="/admin/login/dashboard.html">Favorites Page</a></li>');
+
+    $.ajax({
+        url: ServicePrefix + '/api/InternalFavorite/GetInternalFavoriteList',
+        dataType: 'json',
+        type: 'post',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken")
+        }),
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+
+            if (data.response.status != "SUCCESS") {
+                MKAErrorMessageRtn(data.response.errorMessage[0]);
+            }
+            else {
+
+                $.each(data.report.rows, function (index)
+                {
+                    var title = data.report.rows[index].Title;
+                    var url = data.report.rows[index].URL;
+
+                    $("#favoritesQuickList").append('<li class="display-block"><a href="' + url + '">' + title + '</a></li>');
+                });
+
+
+
+            }
+
+
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    });
+ 
+
+
+
 }
 function cancelFavorite()
 {
