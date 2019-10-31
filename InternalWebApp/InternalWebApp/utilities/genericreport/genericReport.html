@@ -644,11 +644,11 @@
 
             // load newly found data
             $("#txtPersonnel").val(searchCriteria["txtPersonnel"]);
-            $("#hidPersonnel").val(searchCriteria["personnelId"]);
+            $("#hidPersonnel").val(searchCriteria["hidPersonnelId"]);
 
             // clear out the storage
             searchCriteria["txtPersonnel"] = "";
-            searchCriteria["personnelId"] = "";
+            searchCriteria["hidPersonnelId"] = "";
 
             // save it
             setLocalStorage("gSearchResults", JSON.stringify(searchCriteria));
@@ -693,7 +693,7 @@
     function saveLoadedControlSelection(control)
     {
 
- 
+        
 
         var searchResults = getLocalStorage("gSearchResults");
 
@@ -1109,20 +1109,81 @@
     function getPersonnel()
     {
 
-
+        //"ddlProduct": $("#ddlProduct").val(),
+        //"ddlMarket": $("#ddlMarket").val(),
+        //"ddlStation": $("#ddlStation").val(),
+        //"ddlOwner": $("#ddlOwner").val(),
+        //"ddlYear": $("#ddlYear").val(),
+        //"ddlPeriod": $("#ddlPeriod").val(),
+        //"ddl"
+        //"dtStartDate": $("#dtStartDate").val(),
+        //"dtEndDate": $("#dtEndDate").val(),
+        //"txtPersonnel": $("#txtPersonnel").html(),
         var searchCriteriaObj = {
             "searchToken": "PERSONNEL",
-            "ddlProduct": $("#ddlProduct").val(),
-            "ddlMarket": $("#ddlMarket").val(),
-            "ddlStation": $("#ddlStation").val(),
-            "ddlOwner": $("#ddlOwner").val(),
-            "ddlYear": $("#ddlYear").val(),
-            "ddlPeriod": $("#ddlPeriod").val(),
-            "dtStartDate": $("#dtStartDate").val(),
-            "dtEndDate": $("#dtEndDate").val(),
-            "txtPersonnel": $("#txtPersonnel").html(),
+
             "searchPage": window.location
         }
+
+        $.each(reportFilterArray, function (objectName, objectValue)
+        {
+            var control = objectValue.objectName;
+
+
+            var nameOfParm = $("#" + control).attr("apiInput");
+            var item = "#" + control;
+
+            var val = $(item).val();
+            var text = $(item).val();
+
+            if (control.toString().toLowerCase().indexOf("chk") > -1)
+            {
+                val = $(item).is(':checked').toString();
+                text = (val == true ? "selected" : "not-selected");
+            }
+
+            if (control.toString().toLowerCase().indexOf("ddl") > -1) {
+                text = $(item + " option:selected").text();
+            }
+            
+            if (val != null && val.length > 0) {
+                searchCriteriaObj[control] = val;
+            }
+            else
+            {
+                searchCriteriaObj[control] = "";
+            }
+
+            //}
+            //else {
+            //    if (isRequired) {
+            //        var msg = "Please select a " + nameOfParm.toLowerCase().replace("in", "").replace("id", "");
+            //        if (bSilent == false) {
+            //            bootbox.alert(msg, function () { });
+            //        }
+            //        return false;
+            //    }
+            //}
+
+            //if (!val == false) {
+            //    if (val.length > 0 && val != "-1") {
+            //        if (gMessageSubTitle.length > 0) {
+            //            gMessageSubTitle = gMessageSubTitle + ",&nbsp;&nbsp;";
+            //        }
+
+            //        gMessageSubTitle = gMessageSubTitle + "<b>" + nameOfParm.toLowerCase().replace("in", "").replace("id", "").toUpperCase() + ":</b>&nbsp;";
+            //        gMessageSubTitle = gMessageSubTitle + text;
+            //    }
+            //}
+
+            //// when done with the loop
+            //// get the report
+            //if (objectName == (itemsToCheckLength - 1)) {
+
+            //    getTheReportAJAX();
+
+            //}
+        });
 
         setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
 
@@ -2232,7 +2293,6 @@
             }
         }
 
-
         //-------------------------------
         // This is the no filter use case
         //-------------------------------
@@ -2310,10 +2370,10 @@
 
             // when done with the loop
             // get the report
-            if (objectName == (itemsToCheckLength - 1)) {
-
+            if (objectName == (itemsToCheckLength - 1))
+            {
                 getTheReportAJAX();
-                
+          
             }
         });
 

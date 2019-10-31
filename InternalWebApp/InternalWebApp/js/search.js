@@ -115,10 +115,16 @@ function cancelSearch() {
 
     setLocalStorage("gSearchResults", JSON.stringify(searchResults));
 
-    //sends user back to page that called the search page
-    var searchPage = searchCriteria["searchPage"]["href"];
-    window.location = searchPage;
-
+    if (!searchCriteria)
+    {
+        window.location = "/admin/login/dashboard.html";
+    }
+    else
+    {
+        //sends user back to page that called the search page
+        var searchPage = searchCriteria["searchPage"]["href"];
+        window.location = searchPage;
+    }
 }
 
 function linkAdvertiserByLink(advertiserId) {
@@ -372,7 +378,7 @@ function linkPersonnel() {
         searchResults[key] = searchCriteria[key];
     }
 
-    searchResults["personnelId"] = rowData[0].personnelId;
+    searchResults["hidPersonnelId"] = rowData[0].personnelId;
     searchResults["txtPersonnel"] = rowData[0].name;
 
     setLocalStorage("gSearchResults", JSON.stringify(searchResults));
@@ -832,11 +838,13 @@ function buildPersonnelSearch(searchCriteria) {
 
 
 
-    if ($('.search-text:visible').val().length > 0) {
+    if ($('.search-text:visible').val().length > 0)
+    {
         searchText = $('.search-text:visible').val();
     }
-    else {
-        searchText = searchCriteria["txtPersonnel"].length > 0 ? searchCriteria["txtPersonnel"] : "";
+    else
+    {
+        searchText = searchCriteria["hidPersonnel"].length > 0 ? searchCriteria["hidPersonnel"] : "";
     }
 
     //setup the parameters for the API
