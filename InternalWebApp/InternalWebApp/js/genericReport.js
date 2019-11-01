@@ -3424,7 +3424,10 @@ function getReportObject_MRROwnerReportList() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Owner Group");
+    columnsToDisplay.push("Includes Monthly");
+    columnsToDisplay.push("Includes Quarterly");
 
     tempObject =
     {
