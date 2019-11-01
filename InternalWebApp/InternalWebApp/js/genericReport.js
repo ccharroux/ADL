@@ -623,15 +623,15 @@ function getReportObject_MRRUsage() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("QueryDateTime");
-    columnsToDisplay.push("PersonnelId");
-    columnsToDisplay.push("ReportTitle");
-    columnsToDisplay.push("LoginDateTime");
+    columnsToDisplay.push("Report Date Time");
+    columnsToDisplay.push("User");
+    columnsToDisplay.push("Report Title");
+    columnsToDisplay.push("Login Date Time");
     columnsToDisplay.push("Browser");
-    columnsToDisplay.push("MarketId");
-    columnsToDisplay.push("MarketName");
-    columnsToDisplay.push("OwnerGroupName");
-    columnsToDisplay.push("UserName");
+    //columnsToDisplay.push("MarketId");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Owner Group");
+    columnsToDisplay.push("Email");
 
     tempObject =
     {

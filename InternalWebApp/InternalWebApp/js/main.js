@@ -1836,8 +1836,13 @@ function buildCustomLink(objectName, data, bSortable, className )
             "title": objectName,
             "visible": true,
             "mRender": function (data, type, row) {
-
-                return buildUserWrapper(row.User);
+                if (row.User != null)
+                {
+                    return buildUserWrapper(row.User);
+                } else
+                {
+                    return '';
+                }
             },
             "orderable": bSortable,
             "className": className
@@ -1848,9 +1853,15 @@ function buildCustomLink(objectName, data, bSortable, className )
         column = {
             "title": objectName,
             "visible": true,
-            "mRender": function (data, type, row) {
-
-                return buildMarketWrapper(row.Market);
+            "mRender": function (data, type, row)
+            {
+                if (row.Market != null)
+                {
+                    return buildMarketWrapper(row.Market);
+                } else
+                {
+                    return "";
+                }
             },
             "orderable": bSortable,
             "className": className
@@ -1862,8 +1873,13 @@ function buildCustomLink(objectName, data, bSortable, className )
             "title": objectName,
             "visible": true,
             "mRender": function (data, type, row) {
-
-                return buildOwnerWrapper(row.Owner);
+                if (row.Owner != null)
+                {
+                    return buildOwnerWrapper(row.Owner);
+                } else
+                {
+                    return '';
+                }
             },
             "orderable": bSortable,
             "className": className
@@ -1875,8 +1891,13 @@ function buildCustomLink(objectName, data, bSortable, className )
             "title": objectName,
             "visible": true,
             "mRender": function (data, type, row) {
-
-                return buildStationWrapper(row.Station);
+                if (row.Station != null)
+                {
+                    return buildStationWrapper(row.Station);
+                } else
+                {
+                    return '';
+                }
             },
             "orderable": bSortable,
             "className": className
