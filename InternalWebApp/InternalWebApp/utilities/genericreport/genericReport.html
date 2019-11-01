@@ -2239,6 +2239,78 @@
         });
     }
 
+    function deleteDisabledAdvertiser(advertiserId, advertiserName)
+    {
+        
+        $.ajax({
+            url: ServicePrefix + '/api/Advertiser/DeleteDisabledAdvertisersNotMerged',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inAdvertiserId": advertiserId
+            }),
+            processData: false,
+            success: function (data, textType, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else
+                {
+                    var msg = "The advertiser: " + advertiserName + " has been deleted.";
+                    bootbox.alert(msg, function()
+                    {
+                        getReport();
+                    });
+                }
+
+            },
+            error: function (jqXhr, textType, errorThrown) {
+                genericAjaxError(jqXhr, textType, errorThrown);
+            }
+        });
+
+
+    }
+
+    function deleteDisabledAgency(agencyId, agencyName)
+    {
+        
+        $.ajax({
+            url: ServicePrefix + '/api/Agency/DeleteDisabledAgenciesNotMerged',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inAgencyId": agencyId
+            }),
+            processData: false,
+            success: function (data, textType, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+                    var msg = "The agency: " + agencyName + " has been deleted.";
+                    bootbox.alert(msg, function () {
+                        getReport();
+                    });
+                }
+
+            },
+            error: function (jqXhr, textType, errorThrown) {
+                genericAjaxError(jqXhr, textType, errorThrown);
+            }
+        });
+
+
+    }
+
     //--------------------------------
     // Filters get loaded end here
     //--------------------------------
@@ -2501,6 +2573,14 @@
 
             }
         });
+
+        for (var i = 0; i < reportActionsArray.length; i++) {
+            var actionIndex = GetActionColumnIndex(reportObject, reportActionsArray[i]);
+            //a -1 means the item wasn't found in the array
+            if (actionIndex > -1) {
+                columns.push(reportObject.columnsToDisplay[actionIndex]);
+            }
+        }
  
         var width = 95;
 
@@ -2518,11 +2598,20 @@
 
         loadResults(dataObj, columns);
     }
+
+    function GetActionColumnIndex(reportObject, actionName) {
+        return reportObject.columnsToDisplay.map(
+            function (x) {
+                return x.action;
+            }).indexOf(actionName);
+    }
+
     function IsInArray(arrayToSearch, valToFind)
     {
         for (var i=0; i < arrayToSearch.length; i++)
         {
-            if (arrayToSearch[i].toLowerCase() == valToFind.toLowerCase())
+            //if (arrayToSearch[i].toLowerCase() == valToFind.toLowerCase())
+            if (typeof arrayToSearch[i] !== "object" && arrayToSearch[i].toLowerCase() == valToFind.toLowerCase())
             {
                 return true;
             }

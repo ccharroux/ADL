@@ -7925,16 +7925,6 @@ function getReportObject_AdvertiserDisabledAndNotMergedList()
 
     var columnsToDisplay = new Array();
 
-    //columnsToDisplay.push("Owner");
-    //columnsToDisplay.push("Market");
-    //columnsToDisplay.push("Station");
-    //columnsToDisplay.push("Media Type");
-    //columnsToDisplay.push("Contact Type");
-    //columnsToDisplay.push("Name");
-    //columnsToDisplay.push("Email");
-    //columnsToDisplay.push("Phone");
-    //columnsToDisplay.push("Position");
-
     columnsToDisplay.push("Market");
     columnsToDisplay.push("Advertiser");
     columnsToDisplay.push("Industry");
@@ -7946,6 +7936,28 @@ function getReportObject_AdvertiserDisabledAndNotMergedList()
     columnsToDisplay.push("Disable Date");
     columnsToDisplay.push("Posted By");
     columnsToDisplay.push("Has Revenue");
+    columnsToDisplay.push("Has Links");
+
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+
+            //still need to determine what the delete functionality is
+            var actionParameters = "";
+            actionParameters = row["Advertiser Id"] + ",'" + row["Advertiser"] + "'";
+
+            if (row["Has Revenue"].toLowerCase() == "no" && row["Has Links"].toLowerCase() == "no") {
+                return "<a href=\"#\" onclick=\"deleteDisabledAdvertiser(" + actionParameters + ")\">Delete</a>";
+            } else {
+                return '';
+            }
+
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
 
     tempObject =
     {
@@ -7986,16 +7998,6 @@ function getReportObject_AgencyDisabledAndNotMergedList() {
 
     var columnsToDisplay = new Array();
 
-    //columnsToDisplay.push("Owner");
-    //columnsToDisplay.push("Market");
-    //columnsToDisplay.push("Station");
-    //columnsToDisplay.push("Media Type");
-    //columnsToDisplay.push("Contact Type");
-    //columnsToDisplay.push("Name");
-    //columnsToDisplay.push("Email");
-    //columnsToDisplay.push("Phone");
-    //columnsToDisplay.push("Position");
-
     columnsToDisplay.push("Market");
     columnsToDisplay.push("Agency");
     columnsToDisplay.push("Account Type");
@@ -8005,6 +8007,27 @@ function getReportObject_AgencyDisabledAndNotMergedList() {
     columnsToDisplay.push("Disable Date");
     columnsToDisplay.push("Posted By");
     columnsToDisplay.push("Has Revenue");
+    columnsToDisplay.push("Has Links");
+
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+
+            //still need to determine what the delete functionality is
+            var actionParameters = "";
+            actionParameters = row["Agency Id"] + ",'" + row["Agency"] + "'";
+
+            if (row["Has Revenue"].toLowerCase() == "no" && row["Has Links"].toLowerCase() == "no") {
+                return "<a href=\"#\" onclick=\"deleteDisabledAgency(" + actionParameters + ")\">Delete</a>";
+            } else {
+                return '';
+            }
+
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
 
     tempObject =
     {
