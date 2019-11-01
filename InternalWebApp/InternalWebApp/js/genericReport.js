@@ -765,14 +765,14 @@ function getReportObject_MarketRevenueHourlyActivity() {
 
     columnsToDisplay = new Array();
     columnsToDisplay.push("Hour");
-    columnsToDisplay.push("NumberLogins");
-    columnsToDisplay.push("NumberReportSessions");
-    columnsToDisplay.push("NumberReportSessionsWeighted");
-    columnsToDisplay.push("AverageGenerationTime");
-    columnsToDisplay.push("MaximumGenerationTime");
+    columnsToDisplay.push("Number Logins");
+    columnsToDisplay.push("Number Report Sessions");
+    columnsToDisplay.push("Number Report Sessions Weighted");
+    columnsToDisplay.push("Average Generation Time");
+    columnsToDisplay.push("Maximum Generation Time");
 
-    columnsToDisplay.push("NumberIncompleteReportSessions");
-    columnsToDisplay.push("NumberSubmissions");
+    columnsToDisplay.push("Number Incomplete Report Sessions");
+    columnsToDisplay.push("Number Submissions");
 
     tempObject =
     {
