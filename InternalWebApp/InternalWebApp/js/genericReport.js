@@ -4848,7 +4848,12 @@ function getReportObject_MRRUploadTemplateByOwner() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-
+    columnsToDisplay.push("Period");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Category");
+    columnsToDisplay.push("Category Description");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Revenue");
 
     tempObject =
     {
