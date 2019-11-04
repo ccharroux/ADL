@@ -7912,7 +7912,7 @@ function getReportFilterArray_AdvertiserDisabledAndNotMergedList() {
         jsCall: "getMarketListByProduct",
         jsCallParameters: ['XRY'],
         objectName: "ddlMarket",
-        required: false
+        required: true
     }
     arrayFilters.push(arrayObject);
 
@@ -7986,7 +7986,7 @@ function getReportFilterArray_AgencyDisabledAndNotMergedList() {
         jsCall: "getMarketListByProduct",
         jsCallParameters: ['XRY'],
         objectName: "ddlMarket",
-        required: false
+        required: true
     }
     arrayFilters.push(arrayObject);
 
