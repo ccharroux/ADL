@@ -1122,8 +1122,8 @@ function buildXRYMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/admin/industry/industrylist.html">Industry</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/subindustry/subindustrylist.html">Sub Industry</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/nielsenmarketname/nielsenmarketnamelist.html">Nielson Market</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/xry/xrydisablednotlinked.html?DisablePage=adv">Disabled Advertisers</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/xry/xrydisablednotlinked.html?DisablePage=agy">Disabled Agencies</a></li>';
+    //menuItems += '                  <li style="display:block;"><a href="/products/xry/xrydisablednotlinked.html?DisablePage=adv">Disabled Advertisers</a></li>';
+    //menuItems += '                  <li style="display:block;"><a href="/products/xry/xrydisablednotlinked.html?DisablePage=agy">Disabled Agencies</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += productDashboard('');
