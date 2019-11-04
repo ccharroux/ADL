@@ -2876,8 +2876,9 @@ function getReportFilterArray_MarketReleaseList() {
 
     arrayObject = {
         token: "Product",
-        jsCall: "getProductList",
         objectName: "ddlProduct",
+        jsCall: "getProductList",
+        jsCallParameters: ['MRR'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -2909,11 +2910,11 @@ function getReportObject_MarketReleaseList() {
     tempObject =
     {
 
-        reportTitle: "Market Release List",
+        reportTitle: "MRR Market Release List",
         apiControllerAction: "/api/MarketReport/GetMarketReleaseList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['market'],
+        product: ['mrr'],
         sortable: true
     }
 
