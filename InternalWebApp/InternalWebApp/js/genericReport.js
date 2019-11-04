@@ -4383,10 +4383,10 @@ function getReportObject_MarketProductStationSummary() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("market");
-    columnsToDisplay.push("primary market");
-    columnsToDisplay.push("product");
-    columnsToDisplay.push("active stations");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Primary Market");
+    columnsToDisplay.push("Product");
+    columnsToDisplay.push("Active Stations");
  
 
     tempObject =
