@@ -1685,16 +1685,16 @@ function buildMarketWrapper(inData) {
     // find parens
     var bIDIncluded = false;
 
-    if ((inData.indexOf("(") > -1) &&
-        (inData.indexOf(")") > -1)) {
+    if ((inData.lastIndexOf("(") > -1) &&
+        (inData.lastIndexOf(")") > -1)) {
         bIDIncluded = true;
     }
 
     if (bIDIncluded == true) {
         var ID = '';
 
-        var init = inData.indexOf('(');
-        var fin = inData.indexOf(')');
+        var init = inData.lastIndexOf('(');
+        var fin = inData.lastIndexOf(')');
 
         ID = inData.substr(init + 1, fin - init - 1);
 
@@ -1720,16 +1720,16 @@ function buildUserWrapper(inData)
     // find parens
     var bIDIncluded = false;
 
-    if ((inData.indexOf("(") > -1) &&
-        (inData.indexOf(")") > -1)) {
+    if ((inData.lastIndexOf("(") > -1) &&
+        (inData.lastIndexOf(")") > -1)) {
         bIDIncluded = true;
     }
 
     if (bIDIncluded == true) {
         var ID = '';
 
-        var init = inData.indexOf('(');
-        var fin = inData.indexOf(')');
+        var init = inData.lastIndexOf('(');
+        var fin = inData.lastIndexOf(')');
 
         ID = inData.substr(init + 1, fin - init - 1);
 
@@ -1752,16 +1752,16 @@ function buildStationWrapper(inData) {
     // find parens
     var bIDIncluded = false;
 
-    if ((inData.indexOf("(") > -1) &&
-        (inData.indexOf(")") > -1)) {
+    if ((inData.lastIndexOf("(") > -1) &&
+        (inData.lastIndexOf(")") > -1)) {
         bIDIncluded = true;
     }
 
     if (bIDIncluded == true) {
         var ID = '';
         inData = inData.replace("REID ", "")
-        var init = inData.indexOf('(');
-        var fin = inData.indexOf(')');
+        var init = inData.lastIndexOf('(');
+        var fin = inData.lastIndexOf(')');
 
         ID = inData.substr(init + 1, fin - init - 1);
 
@@ -1784,16 +1784,16 @@ function buildOwnerWrapper(inData) {
     // find parens
     var bIDIncluded = false;
 
-    if ((inData.indexOf("(") > -1) &&
-        (inData.indexOf(")") > -1)) {
+    if ((inData.lastIndexOf("(") > -1) &&
+        (inData.lastIndexOf(")") > -1)) {
         bIDIncluded = true;
     }
 
     if (bIDIncluded == true) {
         var ID = '';
 
-        var init = inData.indexOf('(');
-        var fin = inData.indexOf(')');
+        var init = inData.lastIndexOf('(');
+        var fin = inData.lastIndexOf(')');
 
         ID = inData.substr(init + 1, fin - init - 1);
 

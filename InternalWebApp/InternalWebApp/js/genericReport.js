@@ -240,6 +240,7 @@ reportName.push("rptSweeperLogMRRRevenue");
 reportName.push("rptRABSummaryByRegion");
 reportName.push("rptRAB");
 reportName.push("rptProductMarketOwnerActivationList")
+reportName.push("rptXRYMarketExclusivitySettings")
 
 function buildReportArray()
 {
@@ -7711,7 +7712,7 @@ function getReportObject_XRAYDataRetentionList() {
 
     tempObject =
     {
-        reportTitle: "XRAY Data Retention Exceptions",
+        reportTitle: "XRay Data Retention Exceptions",
         apiControllerAction: "/api/XRAYReport/GetDataRetentionList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -9479,6 +9480,33 @@ function getReportObject_ProductMarketOwnerActivationList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['product', 'owner', 'market']
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_XRYMarketExclusivitySettings() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+    return arrayFilters;
+}
+function getReportObject_XRYMarketExclusivitySettings() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+
+        reportTitle: "XRay Market Exclusivity Settings",
+        apiControllerAction: "/api/XRAYReport/GetMarketExclusionSettings",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry', 'advertiser', 'agency']
     }
 
     return tempObject;
