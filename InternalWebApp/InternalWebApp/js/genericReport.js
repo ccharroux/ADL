@@ -7848,7 +7848,7 @@ function getReportObject_MRROutstandingStationList() {
     columnsToDisplay.push("Station");
     columnsToDisplay.push("Media Type");
     columnsToDisplay.push("Contact Type");
-    columnsToDisplay.push("Name");
+    columnsToDisplay.push("User");
     columnsToDisplay.push("Email");
     columnsToDisplay.push("Phone");
     columnsToDisplay.push("Position");
