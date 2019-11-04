@@ -718,7 +718,6 @@ function getReportObject_TVBUsage() {
 
 }
 
-// rptMarketRevenueHourlyActivity
 function getReportFilterArray_MarketRevenueHourlyActivity() {
 
     var arrayFilters = new Array();
@@ -740,23 +739,7 @@ function getReportFilterArray_MarketRevenueHourlyActivity() {
     }
     arrayFilters.push(arrayObject);
 
-    arrayObject = {
-        token:  "Market",
-        jsCall: "getMarketListByProduct",
-        jsCallParameters: ['MRR'],
-        objectName:  "ddlMarket",
-        required:  false
-    }
-    arrayFilters.push(arrayObject);
-
-    arrayObject = {
-        token:  "Owner",
-        jsCall: "getOwnerListByProduct",
-        jsCallParameters: ['MRR'],
-        objectName:  "ddlOwner",
-        required:  false
-    }
-    arrayFilters.push(arrayObject);
+ 
 
     return arrayFilters;
 }
