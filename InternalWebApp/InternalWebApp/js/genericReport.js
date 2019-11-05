@@ -5884,11 +5884,11 @@ function getReportObject_Advertisers() {
 
     var columnsToDisplay = new Array();
 
-    columnsToDisplay.push("market");
-    columnsToDisplay.push("advertiser");
-    columnsToDisplay.push("industry Name");
-    columnsToDisplay.push("sub Industry");
-    columnsToDisplay.push("parent Advertiser");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Advertiser");
+    columnsToDisplay.push("Industry");
+    columnsToDisplay.push("Sub Industry");
+    columnsToDisplay.push("Parent Advertiser");
 
     //this column is used to create the edit link
     //for each result row
