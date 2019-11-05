@@ -332,7 +332,7 @@ function buildQuickReports(rptType, control, container, postfix)
         $("#" + container).show();
 
         try {
-            convertToChosenSelect(control, false, false);
+            convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
         }
         catch (err) {
             console.log("This page is not converted to use Chosen selects yet.");

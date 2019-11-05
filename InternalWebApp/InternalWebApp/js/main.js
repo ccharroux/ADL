@@ -6,6 +6,11 @@ const gMediaTypeOutOfHome = "OUT OF HOME";
 const gMediaTypeNetwork = "NETWORK";
 const gMediaTypeSurvey = "SURVEY";
 
+const gChosenParams = {
+    allowSearchContains: true, 
+    allowSplitWordSearch: false
+}
+
 ; (function () {
 	
 	'use strict';
@@ -1482,7 +1487,7 @@ function getYearList() {
     $("#ddlYear").html(str);
 
     try {
-        convertToChosenSelect("ddlYear", false, false);
+        convertToChosenSelect("ddlYear", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
     }
     catch (err) {
         console.log("This page is not converted to use Chosen selects yet.");
@@ -1541,7 +1546,7 @@ function getPeriodList(inType)
     $("#ddlPeriod").html(str);
  
     try {
-        convertToChosenSelect("ddlPeriod", false, false);
+        convertToChosenSelect("ddlPeriod", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
     }
     catch (err) {
         console.log("This page is not converted to use Chosen selects yet.");
