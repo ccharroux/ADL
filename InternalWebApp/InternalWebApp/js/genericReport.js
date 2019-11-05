@@ -6176,14 +6176,14 @@ function getReportObject_NewAdvertisers() {
 
     var columnsToDisplay = new Array();
 
-    columnsToDisplay.push("station advertiser name");
-    columnsToDisplay.push("advertiser name");
-    columnsToDisplay.push("industry name");
-    columnsToDisplay.push("sub industry name");
+    columnsToDisplay.push("Station Advertiser");
+    columnsToDisplay.push("Advertiser");
+    columnsToDisplay.push("Industry");
+    columnsToDisplay.push("Sub Industry");
     //columnsToDisplay.push("media code id");
-    columnsToDisplay.push("station name");
-    columnsToDisplay.push("action code");
-    columnsToDisplay.push("comment");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Action Code");
+    columnsToDisplay.push("Comment");
 
     //this column is used to create the edit links
     //for each result row
@@ -6195,7 +6195,7 @@ function getReportObject_NewAdvertisers() {
             {
                 $("#header-summary-section").show();
                 $("#header-summary").html(
-                    'Market last released ' + new Date(row.releaseDate).toLocaleString('en-US')
+                    'Market last released ' + row["Release Date"]
                 );
             }
 
