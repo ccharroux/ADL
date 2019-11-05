@@ -6325,12 +6325,12 @@ function getReportObject_StationAgencies() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("market");
-    columnsToDisplay.push("station");
-    columnsToDisplay.push("station Agency");
-    columnsToDisplay.push("station Agency Code");
-    columnsToDisplay.push("market Agency");
-    columnsToDisplay.push("account Type");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Station Agency");
+    columnsToDisplay.push("Station Agency Code");
+    columnsToDisplay.push("Market Agency");
+    columnsToDisplay.push("Account Type");
 
     //this column is used to create the edit link
     //for each result row
