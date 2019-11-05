@@ -6251,10 +6251,10 @@ function getReportObject_Agencies() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("market");
-    columnsToDisplay.push("agency");
-    columnsToDisplay.push("parent Agency");
-    columnsToDisplay.push("account Type");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Agency");
+    columnsToDisplay.push("Parent Agency");
+    columnsToDisplay.push("Account Type");
 
     //this column is used to create the edit link
     //for each result row
