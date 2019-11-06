@@ -1837,18 +1837,18 @@ function getReportObject_StationChanges() {
 
     columnsToDisplay = new Array();
     //columnsToDisplay.push("marketID");
-    columnsToDisplay.push("marketName");
-    columnsToDisplay.push("marketReleaseDate");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Market Release Date");
     //columnsToDisplay.push("stationID");
-    columnsToDisplay.push("stationFullName");
-    columnsToDisplay.push("ownerName");
-    columnsToDisplay.push("activityType");
-    columnsToDisplay.push("activityDate");
-    columnsToDisplay.push("stationAddress");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Activity Type");
+    columnsToDisplay.push("Activity Date");
+    columnsToDisplay.push("Station Address");
     //columnsToDisplay.push("stationAddress2");
     //columnsToDisplay.push("stationState");
     //columnsToDisplay.push("stationZIP");
-    columnsToDisplay.push("stationComment");
+    columnsToDisplay.push("Station Comment");
 
     tempObject =
     {
