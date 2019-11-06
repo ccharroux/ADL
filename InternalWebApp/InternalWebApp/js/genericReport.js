@@ -1498,7 +1498,7 @@ function getReportObject_StationChangeHistory() {
     columnsToDisplay = new Array();
     columnsToDisplay.push("Change Date");
     columnsToDisplay.push("Station");
-    columnsToDisplay.push("Product ID");
+    columnsToDisplay.push("Product");
     columnsToDisplay.push("Active");
     columnsToDisplay.push("Change Types");
     columnsToDisplay.push("Owner");
