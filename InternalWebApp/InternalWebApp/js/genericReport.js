@@ -1496,17 +1496,17 @@ function getReportObject_StationChangeHistory() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("ChangeDate");
-    columnsToDisplay.push("FullName");
-    columnsToDisplay.push("ProductID");
+    columnsToDisplay.push("Change Date");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Product ID");
     columnsToDisplay.push("Active");
-    columnsToDisplay.push("ChangeTypes");
-    columnsToDisplay.push("OwnerName");
-    columnsToDisplay.push("FormatName");
-    columnsToDisplay.push("IsActive");
-    columnsToDisplay.push("MarketName");
-    columnsToDisplay.push("BillingNote");
-    columnsToDisplay.push("ClientID");
+    columnsToDisplay.push("Change Types");
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Format");
+    columnsToDisplay.push("Is Active");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Billing Note");
+    columnsToDisplay.push("Client ID");
 
 
     tempObject =
