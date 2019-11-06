@@ -57,6 +57,29 @@
     <![endif]-->
 
     <style>
+        table 
+        {
+            border-left: solid 1px #566573!important;
+            border-bottom: solid 1px #566573!important;
+                                    
+        }
+
+        th
+        {            
+ 
+            /*border-bottom: solid 1px black!important;*/
+            border-right: solid 1px black!important;
+            color:white!important;
+            background-color:#566573!important;
+            border-top: solid 1px black!important;
+        }
+
+        td
+        {
+            border-right: solid 1px #566573!important;
+            border-top: solid 1px #566573!important;
+        }
+
         .rptView {
             margin-left: 5px;
             vertical-align: top;
@@ -155,8 +178,12 @@
                 <div class="row" style="display:none" id="autoRerun"></div>
 
                 <div class="dataTable-top-margin">
-                    <table id="dtResults" class="stripe"></table>
-                    <div id="noDataFound" style="display:none; color: red">No data found</div>
+                    <center>
+                        <div id="dtResultsHolder">
+                            <table id="dtResults" class="cell-border"></table>
+                        </div>
+                        <div id="noDataFound" style="display:none; color: red">No data found</div>
+                    </center>
                 </div>
 
             </div>
@@ -228,6 +255,7 @@
     var hideHeader = "";
     var bRunReport = true;
     var gHideHeader = "";
+    var gMessageSubTitle = '';
 
     $(document).ready(function () {
 
@@ -737,6 +765,8 @@
             }
         }
 
+        gMessageSubTitle = "";
+
         $.each(reportFilterArray, function (objectName, objectValue) {
             var control = objectValue.objectName;
 
@@ -747,14 +777,25 @@
 
             var isMultiField = objectValue.multiFieldOption !== undefined ? objectValue.multiFieldOption : false;
 
-            //if ($(item).prop("tagName") == "SELECT") {
+            var val = $(item).val();
+            var text = $(item).val();
 
-            if ($(item).val() != "") {
+            if (control.toString().toLowerCase().indexOf("chk") > -1) {
+                val = $(item).is(':checked').toString();
+
+                text = (val == true ? "selected" : "not-selected");
+            }
+
+            if (control.toString().toLowerCase().indexOf("ddl") > -1) {
+                text = $(item + " option:selected").text();
+            }
+
+            if (val != null && val.length > 0) {
                 if (reportObject.apiType.toLowerCase() == "post") {
-                    apiParameters[nameOfParm] = $(item).val();
+                    apiParameters[nameOfParm] = val;
                 }
                 else {
-                    api = api + "&" + nameOfParm + "=" + $(item).val();
+                    api = api + "&" + nameOfParm + "=" + val;
                 }
 
                 if (isMultiField) {
@@ -767,6 +808,17 @@
                     var msg = "Please select a " + nameOfParm.toLowerCase().replace("in", "").replace("id", "");
                     bootbox.alert(msg, function () { });
                     return false;
+                }
+            }
+
+            if (!val == false) {
+                if (val.length > 0 && val != "-1") {
+                    if (gMessageSubTitle.length > 0) {
+                        gMessageSubTitle = gMessageSubTitle + ",&nbsp;&nbsp;";
+                    }
+
+                    gMessageSubTitle = gMessageSubTitle + "<b>" + nameOfParm.toLowerCase().replace("in", "").replace("id", "").toUpperCase() + ":</b>&nbsp;";
+                    gMessageSubTitle = gMessageSubTitle + text;
                 }
             }
 
@@ -784,6 +836,11 @@
             }
 
         });
+
+        if (gMessageSubTitle.length > 0) {
+            gMessageSubTitle = gMessageSubTitle + "<br>";
+        }
+
     }
 
     function getTheReportAJAX() {
@@ -917,6 +974,18 @@
             }
         }
 
+        var width = 95;
+
+        if (ctr <= 3) {
+            width = ctr * 30;
+        }
+
+        if (width < 50) {
+            width = 50;
+        }
+
+        $("#dtResults").width(width + '%');
+
         loadResults(dataObj, columns);
     }
 
@@ -963,6 +1032,8 @@
             searchTable.destroy();
         }
 
+        resetDataTableDOM("dtResults", "dtResultsHolder", "cell-border");
+
         //this code rebuilds the datatable with the updated data from the search
         //or initial load.
 
@@ -1000,6 +1071,16 @@
                {
                    extend: 'print',
                    title: reportObject.reportTitle,
+                   messageTop: gMessageSubTitle,
+                   customize: function (win) {
+                       $(win.document.body)
+                           .css('font-size', '12pt');
+
+
+                       $(win.document.body).find('table')
+                           .addClass('compact')
+                           .css('font-size', '8pt');
+                   },
                    exportOptions: {
                        columns: columnsToExport
 

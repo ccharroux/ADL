@@ -11,6 +11,8 @@ const gChosenParams = {
     allowSplitWordSearch: false
 }
 
+const gMonths = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
 ; (function () {
 	
 	'use strict';
