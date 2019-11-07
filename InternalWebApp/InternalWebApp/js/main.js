@@ -671,7 +671,9 @@ function deleteFavorite(id) {
                 processData: false,
                 success: function (data, textStatus, jQxhr) {
                     $("#favoritesDialog").dialog("close");
-                    bootbox.alert('Favorite has been deleted.', function () { window.location = "/admin/login/dashboard.html"; });
+                    //bootbox.alert('Favorite has been deleted.', function () {
+                        window.location = "/admin/login/dashboard.html";
+                    //});
                     
 
                 },

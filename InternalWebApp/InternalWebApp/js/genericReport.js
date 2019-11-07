@@ -242,6 +242,8 @@ reportName.push("rptRAB");
 reportName.push("rptProductMarketOwnerActivationList")
 reportName.push("rptXRYMarketExclusivitySettings")
 
+reportName.push("rptAEWebUserMatches")
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -9491,6 +9493,68 @@ function getReportObject_XRYMarketExclusivitySettings() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['xry', 'advertiser', 'agency']
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_AEWebUserMatches() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+    return arrayFilters;
+}
+function getReportObject_AEWebUserMatches() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("User");
+    columnsToDisplay.push("Email");
+    columnsToDisplay.push("Account Executive");
+    columnsToDisplay.push("Status");
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+            var linkType = 'primary';
+            var link = '';
+            if (row.Status.indexOf('secondary') > -1 )
+            {
+                linkType = 'primary';
+            }
+
+            if (row.Status.indexOf('none') > -1 )
+            {
+                linkType = 'primary';
+                link = '<a href="#" onclick=\'linkAE(' + row.personnelId + ',' + row.aeId + ')\'>link</a>';;
+            }
+
+            if (link.length > 0)
+            {
+                return link;
+            }
+            else
+            {
+                return "";
+            }
+            return
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject =
+    {
+
+        reportTitle: "Account Executive Web Matches",
+        apiControllerAction: "/api/AccountExecutiveReport/GetAEWebUserMatches",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry', 'account executive']
     }
 
     return tempObject;
