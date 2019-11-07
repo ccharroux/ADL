@@ -2784,9 +2784,42 @@
 
     }
 
-    function linkAE(personnelId, aeID)
+    function linkAE(personnelId, aeID, primary)
     {
-        alert('Functionality on the way...');
-        window.location = window.location;
+
+        if (!primary)
+        {
+            primary = true;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/AccountExecutive/LinkUserAccountExecutive',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelId,
+                "inAccountExecutiveId": aeID,
+                "inPrimary": primary
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    bootbox.alert("User sucessfully linked!", function () { getReport(); });
+                   
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
     }
 </script>
