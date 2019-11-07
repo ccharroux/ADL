@@ -3521,7 +3521,8 @@ function getReportObject_TVBMarketNielsenRankingList() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Market Rank");
 
     tempObject =
     {
