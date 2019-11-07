@@ -3523,7 +3523,8 @@ function getReportObject_TVBMarketNielsenRankingList() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Market Rank");
 
     tempObject =
     {
@@ -7899,7 +7900,7 @@ function getReportObject_TVBOutstandingStationList() {
     columnsToDisplay.push("Station");
     columnsToDisplay.push("Media Type");
     columnsToDisplay.push("Contact Type");
-    columnsToDisplay.push("Name");
+    columnsToDisplay.push("User");
     columnsToDisplay.push("Email");
     columnsToDisplay.push("Phone");
     columnsToDisplay.push("Position");
