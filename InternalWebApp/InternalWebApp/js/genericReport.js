@@ -9530,7 +9530,8 @@ function getReportObject_AEWebUserMatches() {
             if (row.Status.indexOf('none') > -1 )
             {
                 linkType = 'primary';
-                link = '<a href="#" onclick=\'linkAE(' + row.personnelId + ',' + row.aeId + ')\'>link</a>';;
+                link = '<a href="#" onclick=\'linkAE(' + row.personnelId + ',' + row.aeId + ',' + 'true);\'>link as primary</a>';;
+                link = link + '<br><a href="#" onclick=\'linkAE(' + row.personnelId + ',' + row.aeId + ',' + 'false);\'>link as secondary</a>';;
             }
 
             if (link.length > 0)
