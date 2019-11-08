@@ -1858,6 +1858,23 @@ function buildCustomLink(objectName, data, bSortable, className )
         };
 
     }
+    else if (objectName == "Contact") {
+        column = {
+            "title": objectName,
+            "visible": true,
+            "mRender": function (data, type, row) {
+                if (row.Contact != null)
+                {
+                    return buildUserWrapper(row.Contact);
+                } else {
+                    return '';
+                }
+            },
+            "orderable": bSortable,
+            "className": className
+        };
+
+    }
     else if (objectName == "Market") {
         column = {
             "title": objectName,
