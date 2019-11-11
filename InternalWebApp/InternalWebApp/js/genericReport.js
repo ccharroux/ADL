@@ -3262,6 +3262,13 @@ function getReportObject_TVBMarketStationRelease() {
     var tempObject = new Object();
     var columnsToDisplay = new Array();
 
+    columnsToDisplay.push("Contact");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Reminders");
+    columnsToDisplay.push("Input On");
+    columnsToDisplay.push("Reminder Sent On");
+
     tempObject =
     {
 
