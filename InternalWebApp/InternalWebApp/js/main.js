@@ -697,6 +697,13 @@ function deleteFavorite(id) {
 //    console.log("Retrying");
 //    return;
 //}
+
+function clearTimeoutIfAny() {
+    if (timeoutObject != null) {
+        clearTimeout(timeoutObject);
+        timeoutObject = null;
+    }
+}
 function buildFavoritesDialog()
 {
     var count = 0;
