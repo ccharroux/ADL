@@ -304,7 +304,10 @@
                             <label for="ddlToYYYYMM" class="dropdown-label rptView rptToYearPeriod">To Period</label>
                             <select id="ddlToYYYYMM" apiInput="inToPeriodYYYYMM" class="dropdown-select rptView rptToYearPeriod"></select>
                         </div>
-
+                        <div class="form-group rptView rptPosition">
+                            <label for="ddlPosition" class="dropdown-label rptView rptPosition">Position</label>
+                            <select id="ddlPosition" apiInput="inPositionCode" class="dropdown-select rptView rptPosition"></select>
+                        </div>
                         <div class="form-group col-md-3 rptButton" style="text-align:right">
                             <label for="btnReport" class="dropdown-label">&nbsp;</label>
                             <input type="button" id="btnReport" class="search-button" value="Show" onclick="getReport()" />
@@ -2733,7 +2736,47 @@
         });
 
     }
+    function getPositionList() {
+        var url = ServicePrefix + '/api/Position/GetPositionList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getPositionListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        }
+
+        $.ajax(url, settings);
+
+    }
+
+    function getPositionListSuccess(data, textStatus, jQxhr)
+    {
+        if (data.response.status != "SUCCESS")
+        {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
+            });
+        } else {
+            var str = '';
+            str = '<option value="-1">-- Select Position</option>';
+            $.each(data.report.rows, function (index) {
+                str = str + '<option value="' + data.report.rows[index]["Position Code"] + '">' + data.report.rows[index]["Position Title"] + '</option>';
+            });
+
+            $("#ddlPosition").html(str);
+            convertToChosenSelect("ddlPosition", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
  
+        }
+    }
     function getEmailDaysBackList()
     {
         var str = "<option value='-30'>All</option>";

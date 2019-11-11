@@ -1053,7 +1053,13 @@ function getReportFilterArray_UserListing() {
         required:  false
     }
     arrayFilters.push(arrayObject);
-
+    arrayObject = {
+        token: "Position",
+        jsCall: "getPositionList",
+        objectName: "ddlPosition",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
     return arrayFilters;
 }
 function getReportObject_UserListing() {
