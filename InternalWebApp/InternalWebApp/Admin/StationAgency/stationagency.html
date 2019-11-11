@@ -260,6 +260,7 @@
     var bLinkStationAgencyRevenues = false;
     var bIsNew = false;
     var bIsAgyMatch = false;
+    var bIsFromReport = false;
 
     $(document).ready(function ()
     {
@@ -283,6 +284,8 @@
         bIsNew = stationAgencyId <= 0;
 
         bIsAgyMatch = getParameterByName("AgyMatch") == null ? false : getParameterByName("AgyMatch").toLowerCase() == "true";
+        bIsFromReport = getParameterByName("FromReport") == null ? false : getParameterByName("FromReport");
+
     }
 
     function setupUI()
@@ -856,11 +859,32 @@
 
     }
 
+    //function determineGoBack() {
+
+    //    if (bIsAgyMatch) {
+    //        window.location = $("#txtPreviousPageLocation").val();
+    //    } else {
+    //        goBackToDashboard();
+    //    }
+
+    //}
+
     function determineGoBack() {
 
-        if (bIsAgyMatch) {
+        if (bIsAgyMatch || getLocalStorage("newAgencyMatch").length > 0) {
             window.location = $("#txtPreviousPageLocation").val();
-        } else {
+        }
+        else if (bIsFromReport || getLocalStorage("reportActionData").length > 0) {
+            var reportData = $.parseJSON(getLocalStorage("reportActionData"));
+
+            if (reportData["previousPage"].length > 0) {
+                window.location = reportData["previousPage"];
+            } else {
+                window.location = "/utilities/genericreport/genericReportList.html";
+            }
+
+        }
+        else {
             goBackToDashboard();
         }
 

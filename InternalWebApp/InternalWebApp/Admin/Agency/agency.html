@@ -234,7 +234,7 @@
                                     <input value="Update" onclick="updateAgency()" class="default-button" type="button">
                                 </div>
                                 <div style="padding-top: 10px">
-                                    <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button">
+                                    <input value="Back" onclick="determineGoBack();" class="default-button" type="button">
                                 </div>
                             </div>
                         </div>
@@ -275,6 +275,7 @@
     var bIsNew = false;
     var bLinkParentAgency = false;
     var bLinkAgency = false;
+    var bIsFromReport = false;
 
     $(document).ready(function () {
 
@@ -285,6 +286,8 @@
 
         $("#txtAgencyId").val(agencyId);
         bIsNew = agencyId <= 0;
+
+        bIsFromReport = getParameterByName("FromReport") == null ? false : getParameterByName("FromReport");
 
         getMarketList();
 
@@ -868,5 +871,23 @@
 
     function renameParentAgency() {
         bootbox.alert("This functionality&apos;s availability needs to be determined and developed.", function () { });
+    }
+
+    function determineGoBack()
+    {
+        if (bIsFromReport || getLocalStorage("reportActionData").length > 0) {
+
+            var reportData = $.parseJSON(getLocalStorage("reportActionData"));
+
+            if (reportData["previousPage"].length > 0) {
+                window.location = reportData["previousPage"];
+            } else {
+                window.location = "/utilities/genericreport/genericReportList.html";
+            }
+
+
+        } else {
+            goBackToDashboard();
+        }
     }
 </script>

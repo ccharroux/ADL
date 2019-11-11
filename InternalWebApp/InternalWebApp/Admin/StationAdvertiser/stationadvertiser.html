@@ -273,6 +273,7 @@
     var bLinkMarketAdvertiserRevenues = false;
     var bIsNew = false;
     var bIsAdvMatch = false;
+    var bIsFromReport = false;
 
     $(document).ready(function () {
 
@@ -281,7 +282,7 @@
         $("#txtStationAdvertiserId").val(stationAdvertiserId);
 
         bIsAdvMatch = getParameterByName("AdvMatch") == null ? false : getParameterByName("AdvMatch").toLowerCase() == "true";
-
+        bIsFromReport = getParameterByName("FromReport") == null ? false : getParameterByName("FromReport");
         //console.log(bIsAdvMatch);
 
         bIsNew = stationAdvertiserId <= 0;
@@ -879,9 +880,21 @@
 
     function determineGoBack() {
 
-        if (bIsAdvMatch) {
+        if (bIsAdvMatch || getLocalStorage("newAdvertiserMatch").length > 0) {
             window.location = $("#txtPreviousPageLocation").val();
-        } else {
+        }
+        else if (bIsFromReport || getLocalStorage("reportActionData").length > 0)
+        {
+            var reportData = $.parseJSON(getLocalStorage("reportActionData"));
+
+            if (reportData["previousPage"].length > 0) {
+                window.location = reportData["previousPage"];
+            } else {
+                window.location = "/utilities/genericreport/genericReportList.html";
+            }
+
+        }
+        else {
             goBackToDashboard();
         }
         

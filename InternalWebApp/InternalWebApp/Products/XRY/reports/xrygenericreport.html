@@ -156,11 +156,11 @@
                         -->
                         <div class="form-group rptView auditProduct">
                             <label for="ddlProduct" class="dropdown-label rptView auditProduct">Product</label>
-                            <select id="ddlProduct" apiInput="inProductId" class="dropdown-select rptView auditProduct"></select>
+                            <select id="ddlProduct" apiInput="inProductId" onchange="updateDependentLists(this)" class="dropdown-select rptView auditProduct"></select>
                         </div>
                         <div class="form-group rptView auditMarket">
                             <label for="ddlMarket" class="dropdown-label rptView auditMarket">Market</label>
-                            <select id="ddlMarket" apiInput="inMarketId" class="dropdown-select rptView auditMarket"></select>
+                            <select id="ddlMarket" apiInput="inMarketId" onchange="updateDependentLists(this)" class="dropdown-select rptView auditMarket"></select>
                         </div>
                         <div class="form-group rptView auditStation">
                             <label for="ddlStation" class="dropdown-label rptView auditStation">Station</label>
@@ -213,12 +213,12 @@
                         <div class="form-group rptView auditIndustry">
                             <!-- industry -->
                             <label for="ddlIndustry" class="dropdown-label rptView auditIndustry">Industry</label>
-                            <select id="ddlIndustry" apiInput="inIndustryId" class="dropdown-select rptView auditIndustry"></select>
+                            <select id="ddlIndustry" apiInput="inIndustryId" onchange="updateDependentLists(this)"   class="dropdown-select rptView auditIndustry"></select>
                         </div>
                         <div class="form-group rptView auditSubIndustry">
                             <!-- subindustry -->
                             <label for="ddlSubIndustry" class="dropdown-label rptView auditSubIndustry">Sub Industry</label>
-                            <select id="ddlSubIndustry" apiInput="inSubIndustryId" class="dropdown-select rptView auditSubIndustry"></select>
+                            <select id="ddlSubIndustry" apiInput="inSubIndustryId" onchange="updateDependentLists(this)"   class="dropdown-select rptView auditSubIndustry"></select>
                         </div>
                         <div class="form-group rptView auditParentAdvertiser">
                             <!-- parent advertiser using generic search functionality-->
@@ -256,7 +256,7 @@
 
                         <div class="form-group rptView auditOwner">
                             <label for="ddlOwner" class="dropdown-label rptView auditOwner">Owner</label>
-                            <select id="ddlOwner" apiInput="inOwnerId" class="dropdown-select rptView auditOwner"></select>
+                            <select id="ddlOwner" apiInput="inOwnerId" onchange="updateDependentLists(this)" class="dropdown-select rptView auditOwner"></select>
                         </div>
                         <div class="form-group rptView auditAccountType">
                             <label for="ddlAccountType" class="dropdown-label rptView auditAccountType">Account Type</label>
@@ -412,6 +412,7 @@
         setAutoRun(reportFilterArray);
 
     });
+
     function validReportIdCheck(reportId)
     {
         var bReturn = true;
@@ -522,6 +523,7 @@
 
         if (!searchResults)
         {
+            loadReportParameters();
             runReportFromAdvancedSearch();
             return;
         }
@@ -571,13 +573,14 @@
             setLocalStorage("gSearchResults", "");
         }
 
+        loadReportParameters();
         runReportFromAdvancedSearch();
 
     }
 
     function runReportFromAdvancedSearch()
     {
-        setTimeout('getReport(true)', 500);
+        setTimeout('getReport(true)', 1000);
     }
 
     function preSelectItem(whatToCheckFor) {
@@ -1036,6 +1039,8 @@
         }
 
         hideHeader();
+
+        setLocalStorage("gSearchResults", "");
 
         $("#noDataFound").hide();
 
@@ -1532,9 +1537,11 @@
         $("#hid" + control).val("");
     }
 
-    function getSubIndustryList(industryId, subIndustryId) {
+    function getSubIndustryList(industryId, subIndustryId)
+    {
+        //console.log(industryId);
 
-        if (industryId === "-1") {
+        if (industryId == undefined || industryId === "-1") {
             $("#ddlSubIndustry").html('');
             getDefaultSubIndustry();
             return;
@@ -1574,11 +1581,17 @@
 
                     convertToChosenSelect('ddlSubIndustry', gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
-                    if (subIndustryId.length === 0) {
+                   // console.log("subindustry: " + subIndustryId);
+
+                    if ((subIndustryId == undefined) || (subIndustryId != undefined && subIndustryId.length == 0))
+                    {
                         $("#ddlSubIndustry").val(-1);
+                        saveLoadedControlSelection("ddlSubIndustry");
                     } else {
                         $("#ddlSubIndustry").val(subIndustryId);
                     }
+
+                    saveLoadedControlSelection("ddlSubIndustry");
 
                 }
             },
@@ -1589,9 +1602,11 @@
 
     }
 
-    function getOwnerList(marketId) {
+    function getOwnerList(marketId)
+    {
+        console.log("ownerlist market: " + marketId);
 
-        if (marketId == "") {
+        if (marketId == undefined || marketId == "") {
 
             $("#ddlOwner").html('');
             getDefaultOwner();
@@ -1642,4 +1657,190 @@
             }
         });
     }
+
+    function editAdvertiser(advertiserId)
+    {
+        //this functionality to get the params will go into centralized function
+        var reportParams = getReportParameters();
+
+        setLocalStorage("reportActionData", JSON.stringify(reportParams));
+        window.location = "/admin/advertiser/advertiser.html?AdvertiserID=" + advertiserId + "&FromReport=true";
+    }
+
+    function editStationAdvertiser(stationAdvertiserId)
+    {
+        //this functionality to get the params will go into centralized function
+        var reportParams = getReportParameters();
+
+        setLocalStorage("reportActionData", JSON.stringify(reportParams));
+        window.location = "/admin/stationadvertiser/stationadvertiser.html?StationAdvertiserID=" + stationAdvertiserId + "&FromReport=true";
+    }
+
+    function editMediaAdvertiser(mediaAdvertiserId)
+    {
+        //this functionality to get the params will go into centralized function
+        var reportParams = getReportParameters();
+
+        setLocalStorage("reportActionData", JSON.stringify(reportParams));
+        window.location = "/admin/mediaadvertiser/mediaadvertiser.html?MediaAdvertiserID=" + mediaAdvertiserId + "&FromReport=true";
+    }
+
+    function editAgency(agencyId) {
+        //this functionality to get the params will go into centralized function
+        var reportParams = getReportParameters();
+
+        setLocalStorage("reportActionData", JSON.stringify(reportParams));
+        window.location = "/admin/agency/agency.html?AgencyID=" + agencyId + "&FromReport=true";
+    }
+
+    function editStationAgency(stationAgencyId) {
+        //this functionality to get the params will go into centralized function
+        var reportParams = getReportParameters();
+
+        setLocalStorage("reportActionData", JSON.stringify(reportParams));
+        window.location = "/admin/stationagency/stationagency.html?StationAgencyID=" + stationAgencyId + "&FromReport=true";
+    }
+
+    //this function does the basic stuff will need to expand it.
+    function loadReportParameters() {
+
+        if (getLocalStorage("reportActionData").length <= 0)
+        {
+            return;
+        }
+
+        var reportParamData = $.parseJSON(getLocalStorage("reportActionData"));
+
+        var searchResults = {};
+
+        for (var key in reportParamData)
+        {
+            searchResults[key] = reportParamData[key];
+
+            $("#" + key).val(reportParamData[key]);
+            if (key.indexOf("ddl") > -1)
+            {
+                //console.log(key);
+                $("#" + key).change();
+            }
+        }
+
+        setLocalStorage("gSearchResults", JSON.stringify(searchResults));
+
+        setLocalStorage("reportActionData", "");
+    }
+
+    function updateDependentLists(controlThatWasClicked)
+    {
+
+        $.each(reportFilterArray, function (objectName, objectValue) {
+            var bReloadNeeded = false;
+
+            // create array
+            var params = new Array();
+            var thisControl = "";
+
+            if (objectValue.reloadBasedProduct != undefined && objectValue.reloadBasedProduct == true) {
+
+                console.log(objectValue);
+
+                thisControl = "ddlProduct";
+
+                if ($("#" + thisControl).val() != "") {
+                    // add value to array
+                    params.push($("#" + thisControl).val()); // this will be the market value...
+                }
+                else {
+                    params.push(null);
+                }
+
+                if (controlThatWasClicked.id == thisControl) {
+                    bReloadNeeded = true;
+                }
+
+            }
+
+            if (objectValue.reloadBasedMarket != undefined) {
+
+                thisControl = "ddlMarket";
+
+                if ($("#" + thisControl).val() != "") {
+                    // add value to array
+                    params.push($("#" + thisControl).val()); // this will be the market value...
+                }
+                else {
+                    params.push(null);
+                }
+                if (controlThatWasClicked.id == thisControl) {
+                    bReloadNeeded = true;
+                }
+
+            }
+
+            if (objectValue.reloadBasedOwner != undefined) {
+
+                thisControl = "ddlOwner";
+
+                if ($("#" + thisControl).val() != "") {
+                    // add value to array
+                    params.push($("#" + thisControl).val()); // this will be the market value...
+                }
+                else {
+                    params.push(null);
+                }
+
+                if (controlThatWasClicked.id == thisControl) {
+                    bReloadNeeded = true;
+
+                }
+
+            }
+
+            if (objectValue.reloadBasedIndustry != undefined) {
+                thisControl = "ddlIndustry";
+
+                if ($("#" + thisControl).val() != "") {
+                    // add value to array
+                    params.push($("#" + thisControl).val()); // this will be the market value...
+                }
+                else {
+                    params.push(null);
+                }
+
+                if (controlThatWasClicked.id == thisControl) {
+                    bReloadNeeded = true;
+
+                }
+            }
+
+            if (bReloadNeeded == true) {
+                // set object parameters to the array
+                objectValue.jsCallParameters = params;
+                // activate / reload the filter
+                activateFilter(objectValue);
+            }
+            
+        });
+
+    }
+
+    function getReportParameters()
+    {
+        var reportParams = {}
+        $('.form-group:visible').children('input').each(function (i, obj) {
+            if (obj.type != "button") {
+                reportParams[obj.id] = obj.value;
+            }
+
+        });
+
+        $('.form-group:visible').children('select').each(function (i, obj) {
+            reportParams[obj.id] = obj.value;
+        });
+
+        reportParams["previousPage"] = window.location.href;
+
+        return reportParams;
+    }
+
 </script>

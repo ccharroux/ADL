@@ -228,7 +228,7 @@
                                     <input value="Update" onclick="updateAdvertiser()" class="default-button" type="button">
                                 </div>
                                 <div style="padding-top: 10px">
-                                    <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button">
+                                    <input value="Back" onclick="determineGoBack();" class="default-button" type="button">
                                 </div>
                             </div>
                         </div>
@@ -268,12 +268,15 @@
     var bLinkAdvertiser = false;
     var bLinkParentAdvertiser = false;
     var bIsNew = false;
+    var bIsFromReport = false;
 
     $(document).ready(function () {
 
         buildXRYMenu("Utility");
         buildQuickReports(['advertiser']);
         advertiserId = (getParameterByName("AdvertiserID") == null ? 0 : getParameterByName("AdvertiserID"));
+
+        bIsFromReport = getParameterByName("FromReport") == null ? false : getParameterByName("FromReport");
 
         $("#txtAdvertiserId").val(advertiserId);
 
@@ -1043,6 +1046,26 @@
             //show
             $(".link-parent").show();
         }
+    }
+
+    function determineGoBack() {
+
+        if (bIsFromReport || getLocalStorage("reportActionData").length > 0) {
+            
+            var reportData = $.parseJSON(getLocalStorage("reportActionData"));
+
+            if (reportData["previousPage"].length > 0)
+            {
+                window.location = reportData["previousPage"];
+            } else {
+                window.location = "/utilities/genericreport/genericReportList.html";
+            }
+
+            
+        } else {
+            goBackToDashboard();
+        }
+
     }
 
 </script>

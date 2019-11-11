@@ -5926,8 +5926,10 @@ function getReportObject_Advertisers() {
     columnsToDisplay.push({
         "action": "edit",
         "mRender": function (data, type, row) {
-            var action = "/admin/advertiser/advertiser.html?AdvertiserID=";
-            return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.advertiserId + ')\'>Edit</a>';
+            //var action = "/admin/advertiser/advertiser.html?AdvertiserID=";
+            //return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.advertiserId + ')\'>Edit</a>';
+            var action = "editAdvertiser(" + row.advertiserId + ")";
+            return '<a href="#" onclick=\'' + action + '\'>Edit</a>';
         },
         "orderable": false,
         "searchable": false,
@@ -5983,19 +5985,20 @@ function getReportFilterArray_Advertisers() {
         token: "Industry",
         jsCall: "getIndustryList",
         objectName: "ddlIndustry",
-        onchange: function () {
+        //onchange: function () {
 
-            getSubIndustryList($("#ddlIndustry").val(), '');
+        //    getSubIndustryList($("#ddlIndustry").val(), '');
 
-        },
+        //},
         required: false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "SubIndustry",
-        jsCall: "getDefaultSubIndustry",
+        jsCall: "getSubIndustryList",
         objectName: "ddlSubIndustry",
+        reloadBasedIndustry: true,
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -6034,8 +6037,8 @@ function getReportObject_MediaAdvertisers() {
     columnsToDisplay.push({
         "action": "edit",
         "mRender": function (data, type, row) {
-            var action = "/admin/mediaadvertiser/mediaadvertiser.html?MediaAdvertiserID=";
-            return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.mediaAdvertiserId + ')\'>Edit</a>';
+            //var action = "/admin/mediaadvertiser/mediaadvertiser.html?MediaAdvertiserID=";
+            return '<a href="#" onclick=\'editMediaAdvertiser(' + row.mediaAdvertiserId + ')\'>Edit</a>';
         },
         "orderable": false,
         "searchable": false,
@@ -6114,8 +6117,10 @@ function getReportObject_StationAdvertisers() {
     columnsToDisplay.push({
         "action": "edit",
         "mRender": function (data, type, row) {
-            var action = "/admin/stationadvertiser/stationadvertiser.html?StationAdvertiserID=";
-            return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.stationAdvertiserId + ')\'>Edit</a>';
+            //var action = "/admin/stationadvertiser/stationadvertiser.html?StationAdvertiserID=";
+            //return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.stationAdvertiserId + ')\'>Edit</a>';
+            var action = "editStationAdvertiser(" + row.stationAdvertiserId + ")";
+            return '<a href="#" onclick=\'' + action + '\'>Edit</a>';
         },
         "orderable": false,
         "searchable": false,
@@ -6143,19 +6148,20 @@ function getReportFilterArray_StationAdvertisers() {
         token: "Market",
         jsCall: "getXRYMarketList",
         objectName: "ddlMarket",
-        onchange: function () {
+        //onchange: function () {
 
-            getOwnerList($("#ddlMarket").val());
+        //    getOwnerList($("#ddlMarket").val());
 
-        },
+        //},
         required: true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getDefaultOwner",
+        jsCall: "getOwnerList",
         objectName: "ddlOwner",
+        reloadBasedMarket: true,
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -6182,19 +6188,20 @@ function getReportFilterArray_StationAdvertisers() {
         token: "Industry",
         jsCall: "getIndustryList",
         objectName: "ddlIndustry",
-        onchange: function () {
+        //onchange: function () {
 
-            getSubIndustryList($("#ddlIndustry").val(), '');
+        //    getSubIndustryList($("#ddlIndustry").val(), '');
 
-        },
+        //},
         required: false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "SubIndustry",
-        jsCall: "getDefaultSubIndustry",
+        jsCall: "getSubIndustryList",
         objectName: "ddlSubIndustry",
+        reloadBasedIndustry: true,
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -6230,17 +6237,20 @@ function getReportObject_NewAdvertisers() {
                 );
             }
 
-            var action = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/advertiser/advertiser.html?AdvertiserID=",' + row.advertiserId + ')\'>Edit&nbsp;Advertiser</a>';
+            //var action = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/advertiser/advertiser.html?AdvertiserID=",' + row.advertiserId + ')\'>Edit&nbsp;Advertiser</a>';
+            var action = '<a href="#" onclick=\'setUpBackButton();editAdvertiser(' + row.advertiserId + ')\'>Edit&nbsp;Advertiser</a>';
             var action2 = '';
 
             if (row.stationAdvertiserId != null)
             {
-                action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/stationadvertiser/stationadvertiser.html?StationAdvertiserID=",' + row.stationAdvertiserId + ')\'>Edit&nbsp;Station&nbsp;Advertiser</a>';
+                //action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/stationadvertiser/stationadvertiser.html?StationAdvertiserID=",' + row.stationAdvertiserId + ')\'>Edit&nbsp;Station&nbsp;Advertiser</a>';
+                action2 = '<a href="#" onclick=\'setUpBackButton(); editStationAdvertiser(' + row.stationAdvertiserId + ')\'>Edit&nbsp;Station&nbsp;Advertiser</a>';
             }
 
             if (row.mediaAdvertiserId != null)
             {
-                action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/mediaadvertiser/mediaadvertiser.html?MediaAdvertiserID=",' + row.mediaAdvertiserId + ')\'>Edit&nbsp;Media&nbsp;Advertiser</a>';
+                //action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/mediaadvertiser/mediaadvertiser.html?MediaAdvertiserID=",' + row.mediaAdvertiserId + ')\'>Edit&nbsp;Media&nbsp;Advertiser</a>';
+                action2 = '<a href="#" onclick=\'setUpBackButton(); editMediaAdvertiser(' + row.mediaAdvertiserId + ')\'>Edit&nbsp;Media&nbsp;Advertiser</a>';
             }
 
             return action + (action2.length == 0 ? '' :'<br />' + action2);
@@ -6292,8 +6302,8 @@ function getReportObject_Agencies() {
     columnsToDisplay.push({
         "action": "edit",
         "mRender": function (data, type, row) {
-            var action = "/Admin/agency/agency.html?AgencyID=";
-            return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.agencyId + ')\'>Edit</a>';
+            //var action = "/Admin/agency/agency.html?AgencyID=";
+            return '<a href="#" onclick=\'editAgency(' + row.agencyId + ')\'>Edit</a>';
         },
         "orderable": false,
         "searchable": false,
@@ -6368,8 +6378,10 @@ function getReportObject_StationAgencies() {
     columnsToDisplay.push({
         "action": "edit",
         "mRender": function (data, type, row) {
-            var action = "/admin/stationagency/stationagency.html?StationAgencyID=";
-            return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.stationAgencyId + ')\'>Edit</a>';
+            //var action = "/admin/stationagency/stationagency.html?StationAgencyID=";
+            //return '<a href="#" onclick=\'loadActionPage("' + action + '",' + row.stationAgencyId + ')\'>Edit</a>';
+            var action = "editStationAgency(" + row.stationAgencyId + ")";
+            return '<a href="#" onclick=\'' + action + '\'>Edit</a>';
         },
         "orderable": false,
         "searchable": false,
@@ -6397,11 +6409,11 @@ function getReportFilterArray_StationAgencies() {
         token: "Market",
         jsCall: "getXRYMarketList",
         objectName: "ddlMarket",
-        onchange: function () {
+        //onchange: function () {
 
-            getOwnerList($("#ddlMarket").val());
+        //    getOwnerList($("#ddlMarket").val());
 
-        },
+        //},
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -6426,8 +6438,9 @@ function getReportFilterArray_StationAgencies() {
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getDefaultOwner",
+        jsCall: "getOwnerList",
         objectName: "ddlOwner",
+        reloadBasedMarket: true,
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -6467,8 +6480,10 @@ function getReportObject_NewAgencies() {
                 );
             }
 
-            var action = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/Admin/agency/agency.html?AgencyID=",' + row.agencyId + ')\'>Edit&nbsp;Agency</a>';
-            var action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/stationagency/stationagency.html?StationAgencyID=",' + (row.stationAgencyId == null ? '0' : row.stationAgencyId) + ')\'>Edit&nbsp;Station&nbsp;Agency</a>';
+            //var action = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/Admin/agency/agency.html?AgencyID=",' + row.agencyId + ')\'>Edit&nbsp;Agency</a>';
+            var action = '<a href="#" onclick=\'setUpBackButton(); editAgency(' + row.agencyId + ');\'>Edit&nbsp;Agency</a>';
+            //var action2 = '<a href="#" onclick=\'setUpBackButton(); loadActionPage("/admin/stationagency/stationagency.html?StationAgencyID=",' + (row.stationAgencyId == null ? '0' : row.stationAgencyId) + ')\'>Edit&nbsp;Station&nbsp;Agency</a>';
+            var action2 = '<a href="#" onclick=\'setUpBackButton(); editStationAgency(' + row.stationAgencyId + ');\'>Edit&nbsp;Station&nbsp;Agency</a>';
             if (row.stationAgencyId == null)
             {
                 action2 = "";

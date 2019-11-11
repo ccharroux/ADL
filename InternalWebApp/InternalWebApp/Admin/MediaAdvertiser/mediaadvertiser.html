@@ -217,7 +217,7 @@
                                     <input value="Update" onclick="updateMediaAdvertiser()" class="default-button" type="button">
                                 </div>
                                 <div style="padding-top: 10px">
-                                    <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button">
+                                    <input value="Back" onclick="determineGoBack();" class="default-button" type="button">
                                 </div>
                             </div>
                         </div>
@@ -259,6 +259,7 @@
     var mediaAdvertiserId = 0;
     var bLinkMarketAdvertiserRevenues = false;
     var bIsNew = false;
+    var bIsFromReport = false;
 
     $(document).ready(function ()
     {
@@ -277,6 +278,7 @@
         mediaAdvertiserId = (getParameterByName("MediaAdvertiserID") == null ? 0 : getParameterByName("MediaAdvertiserID"));
         $("#txtMediaAdvertiserId").val(mediaAdvertiserId);
         bIsNew = mediaAdvertiserId <= 0;
+        bIsFromReport = getParameterByName("FromReport") == null ? false : getParameterByName("FromReport");
     }
 
     function getMarketList() {
@@ -728,5 +730,22 @@
             }
         });
 
+    }
+
+    function determineGoBack()
+    {
+        if (bIsFromReport || getLocalStorage("reportActionData").length > 0) {
+            var reportData = $.parseJSON(getLocalStorage("reportActionData"));
+
+            if (reportData["previousPage"].length > 0) {
+                window.location = reportData["previousPage"];
+            } else {
+                window.location = "/utilities/genericreport/genericReportList.html";
+            }
+
+        }
+        else {
+            goBackToDashboard();
+        }
     }
 </script>
