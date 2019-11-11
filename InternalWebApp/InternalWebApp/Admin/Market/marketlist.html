@@ -83,14 +83,18 @@
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-10 ">
-                        <label for="ddlMediaType" class="dropdown-label">Media Type</label>
-                        <select id="ddlMediaType" class="dropdown-select"  onchange="getMarketList();"></select>
 
-                        <label for="searchText">Market Name</label>
+                        <label for="ddlMediaType" class="dropdown-label">Media Type</label>
+                        <select id="ddlMediaType" class="search-ddl-select dropdown-select"  onchange="getMarketList();"></select>
+
+                        <label for="ddlMarket" class="dropdown-label">Market</label>
+                        <select id="ddlMarket" class="search-ddl-select dropdown-select" onchange="editMarket(this.value);"></select>
+
+                        <!--<label for="searchText">Market Name</label>
                         <input type="text" id="searchText" />
 
                         <label for="searchTextNumber">Market Number</label>
-                        <input type="text" id="searchTextNumber" value="" />
+                        <input type="text" id="searchTextNumber" value="" />-->
                         <!--<input type="button" class="search-button" style="" value="Search" onclick="getMarketList()" />-->
                     </div>
                     <div class="col-md-2 ">
@@ -169,6 +173,7 @@
     var bSecondaryMarketsOnly = false;
 
     $(document).ready(function () {
+        getMarketListAll();
 
         getComplimentaryMarketSettings();
  
@@ -191,23 +196,31 @@
 
         setTimeout(loadLastSearch, 1000);
 
-        setLocalStorage("search", $("#searchText").val().trim() + '|' + $("#searchTextNumber").val().trim() + '|' + $("#ddlMediaType").val()  );
+        setLocalStorage("search", $("#ddlMediaType").val()  );
         setLocalStorage("searchPage", window.location);
 
     });
 
-    function getComplimentaryMarketSettings() {
-        if (getParameterByName("NonPrimaryOnly") == null) {
+    function getComplimentaryMarketSettings() 
+    {
+    
+        if (getParameterByName("NonPrimaryOnly") == null) 
+        {
             //check local storage
             var secondaryMarketsOnly = getLocalStorage("NonPrimaryOnly");
             //reset local storage
             setLocalStorage("NonPrimaryOnly", '');
-            if (secondaryMarketsOnly.length > 0 && secondaryMarketsOnly === 'true') {
+        
+            if (secondaryMarketsOnly.length > 0 && secondaryMarketsOnly === 'true') 
+            {
                 bSecondaryMarketsOnly = true;
-            } else {
+            } else 
+            {
                 bSecondaryMarketsOnly = false;
             }
-        } else {
+        } 
+        else 
+        {
             bSecondaryMarketsOnly = (getParameterByName("NonPrimaryOnly") == null ? false : (getParameterByName("NonPrimaryOnly").toLowerCase() === 'true'));
         }
     }
@@ -340,27 +353,27 @@
 
     function setEventListeners()
     {
-        var input = document.getElementById("searchTextNumber");
-        input.addEventListener("keyup", function (event) {
-            // Cancel the default action, if needed
-            event.preventDefault();
-            // Number 13 is the "Enter" key on the keyboard
-            if (event.keyCode === 13) {
-                setLocalStorage("search", "");
-                editMarket(document.getElementById("searchTextNumber").value);
-            }
-        });
+        //var input = document.getElementById("searchTextNumber");
+        //input.addEventListener("keyup", function (event) {
+        //    // Cancel the default action, if needed
+        //    event.preventDefault();
+        //    // Number 13 is the "Enter" key on the keyboard
+        //    if (event.keyCode === 13) {
+        //        setLocalStorage("search", "");
+        //        editMarket(document.getElementById("searchTextNumber").value);
+        //    }
+        //});
 
-        var input = document.getElementById("searchText");
-        input.addEventListener("keyup", function (event) {
-            // Cancel the default action, if needed
-            event.preventDefault();
-            // Number 13 is the "Enter" key on the keyboard
-            if (event.keyCode === 13) {
+        //var input = document.getElementById("searchText");
+        //input.addEventListener("keyup", function (event) {
+        //    // Cancel the default action, if needed
+        //    event.preventDefault();
+        //    // Number 13 is the "Enter" key on the keyboard
+        //    if (event.keyCode === 13) {
 
-                getMarketList();
-            }
-        });
+        //        getMarketList();
+        //    }
+        //});
     }
 
     function setTitle()
@@ -427,9 +440,9 @@
                 var sArray = new Array();
                 sArray = search.split("|");
 
-                $("#searchText").val(sArray[0].toString());
-                $("#searchTextNumber").val(sArray[1].toString());
-                $("#ddlMediaType").val(sArray[2].toString());
+                //$("#searchText").val(sArray[0].toString());
+                //$("#searchTextNumber").val(sArray[1].toString());
+                $("#ddlMediaType").val(sArray[0].toString());
 
                 getMarketList();
             }
@@ -446,13 +459,13 @@
             return;
         }
 
-        if ( $("#searchText").val().trim().length > 0 && $("#searchText").val().trim().length < 3)
-        {
-            bootbox.alert('Market Name filter must be 3 characters or more. Filter being ignored.', function () {});
-            $("#searchText").val("");
-        }
+        //if ( $("#searchText").val().trim().length > 0 && $("#searchText").val().trim().length < 3)
+        //{
+        //    bootbox.alert('Market Name filter must be 3 characters or more. Filter being ignored.', function () {});
+        //    $("#searchText").val("");
+        //}
 
-        setLocalStorage("search", $("#searchText").val().trim() + '|' + $("#searchTextNumber").val().trim() + '|' + $("#ddlMediaType").val());
+        setLocalStorage("search", $("#ddlMediaType").val());
         setLocalStorage("searchPage", window.location);
 
         $.ajax({
@@ -463,7 +476,7 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inMediaTypeId": $("#ddlMediaType").val(),
-                "inMarketName" : $("#searchText").val().trim(),
+                //"inMarketName" : $("#searchText").val().trim(),
                 "inActiveOnly": "1",
                 "inPrimaryMarketOnly": "0"
             }),
@@ -516,5 +529,50 @@
 
     }
 
+
+    function getMarketListAll() {
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Market --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        if (
+                            (data.report.rows[index].primaryMarket == true && bSecondaryMarketsOnly == false) ||
+                            (data.report.rows[index].primaryMarket == false && bSecondaryMarketsOnly == true)
+                            )
+                        {
+                            str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
+                        }
+                    });
+
+                    $("#ddlMarket").html(str);
+
+                    convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+ 
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
 </script>
 
