@@ -1398,7 +1398,8 @@ function returnProductListLinks(row) {
 
 
 
-function populateDataTable(tableName, data) {
+function populateDataTable(tableName, data)
+{
     var tableJson;
 
     if (data.response.status.toUpperCase() === "SUCCESS") {
@@ -1409,10 +1410,14 @@ function populateDataTable(tableName, data) {
         MKAErrorMessageRtn(data.response.errorMessage[0]);
         tableJson = data;
     }
-
+ 
     var table = $("#" + tableName).DataTable();
+ 
     table.clear().draw();
+ 
     table.rows.add(tableJson).draw();
+ 
+
 }
 
 //ajax error function
