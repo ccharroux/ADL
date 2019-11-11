@@ -3570,6 +3570,15 @@ function getReportObject_GeneralStationData() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Affiliation");
+    columnsToDisplay.push("Active");
+    columnsToDisplay.push("Product Active Date");
+    columnsToDisplay.push("Product Disable Date");
+    columnsToDisplay.push("Product");
+    columnsToDisplay.push("Media");
 
 
     tempObject =
