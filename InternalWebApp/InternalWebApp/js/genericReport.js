@@ -696,15 +696,15 @@ function getReportObject_TVBUsage() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("ReportDateTime");
-    columnsToDisplay.push("PersonnelId");
-    columnsToDisplay.push("ReportTitle");
-    columnsToDisplay.push("LoginDateTime");
+
+    columnsToDisplay.push("Report Date");
+    columnsToDisplay.push("Report Title");
+    columnsToDisplay.push("Login Date");
     columnsToDisplay.push("Browser");
-    columnsToDisplay.push("MarketNames");
- 
-    columnsToDisplay.push("OwnerNames");
-    columnsToDisplay.push("UserName");
+    columnsToDisplay.push("Market(s)"); 
+    columnsToDisplay.push("Owner(s)");
+    columnsToDisplay.push("Email");
+    columnsToDisplay.push("User");
 
     tempObject =
     {
