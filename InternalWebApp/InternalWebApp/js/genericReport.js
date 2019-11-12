@@ -3951,7 +3951,12 @@ function getReportObject_AgencyRevenueInWrongMarket() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-
+    columnsToDisplay.push("Revenue Detail Market");
+    columnsToDisplay.push("Agency");
+    columnsToDisplay.push("Advertiser Market");
+    columnsToDisplay.push("Revenue Year");
+    columnsToDisplay.push("Revenue Period");
+    columnsToDisplay.push("Revenue Market");
 
     tempObject =
     {
