@@ -1955,3 +1955,22 @@ function buildCustomLink(objectName, data, bSortable, className )
 
     return column;
 }
+
+function getReportParameters()
+{
+    var reportParams = {}
+    $('.form-group:visible').children('input').each(function (i, obj) {
+        if (obj.type != "button") {
+            reportParams[obj.id] = obj.value;
+        }
+
+    });
+
+    $('.form-group:visible').children('select').each(function (i, obj) {
+        reportParams[obj.id] = obj.value;
+    });
+
+    reportParams["previousPage"] = window.location.href;
+
+    return reportParams;
+}
