@@ -3103,6 +3103,13 @@ function getReportObject_XRYMarketRelease() {
 
     var tempObject = new Object();
     var columnsToDisplay = new Array();
+    
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Reminder Sent By");
+    columnsToDisplay.push("Reminder Sent On");
+    columnsToDisplay.push("Stations Pending");
+    columnsToDisplay.push("Contacts Pending");
+    columnsToDisplay.push("On Hold");
 
     tempObject =
     {
@@ -3156,6 +3163,13 @@ function getReportObject_XRYMarketStationRelease() {
 
     var tempObject = new Object();
     var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Contact");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Reminders");
+    columnsToDisplay.push("Input On");
+    columnsToDisplay.push("Reminder Sent On");
 
     tempObject =
     {
