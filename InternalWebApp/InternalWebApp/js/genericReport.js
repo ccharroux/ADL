@@ -6835,12 +6835,12 @@ function getReportObject_AEStatusList() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
-    columnsToDisplay.push("ae");
-    columnsToDisplay.push("owner");
-    columnsToDisplay.push("market");
-    columnsToDisplay.push("active date");
-    columnsToDisplay.push("disable date");
-    columnsToDisplay.push("linked user");
+    columnsToDisplay.push("Account Executive");
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Active Date");
+    columnsToDisplay.push("Disable Date");
+    columnsToDisplay.push("User");
 
     //this column is used to create the edit link
     //for each result row
