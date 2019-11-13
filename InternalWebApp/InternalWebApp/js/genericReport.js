@@ -3917,12 +3917,12 @@ function getReportObject_AdvertiserRevenueInWrongMarket() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("Revenue Detail Market");
+    columnsToDisplay.push("Market");
     columnsToDisplay.push("Advertiser");
     columnsToDisplay.push("Advertiser Market");
-    columnsToDisplay.push("Revenue Year");
+ 
     columnsToDisplay.push("Revenue Period");
-    columnsToDisplay.push("Revenue Market");
+    columnsToDisplay.push("Revenue");
 
     tempObject =
     {
@@ -3930,7 +3930,7 @@ function getReportObject_AdvertiserRevenueInWrongMarket() {
         apiControllerAction: "/api/XRAYReport/GetAdvertiserRevenueInWrongMarketList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry']
+        product: ['xry', 'advertiser']
     }
 
     return tempObject;
@@ -3951,12 +3951,12 @@ function getReportObject_AgencyRevenueInWrongMarket() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-    columnsToDisplay.push("Revenue Detail Market");
+    columnsToDisplay.push("Market");
     columnsToDisplay.push("Agency");
-    columnsToDisplay.push("Advertiser Market");
-    columnsToDisplay.push("Revenue Year");
+    columnsToDisplay.push("Agency Market");
     columnsToDisplay.push("Revenue Period");
-    columnsToDisplay.push("Revenue Market");
+
+    columnsToDisplay.push("Revenue");
 
     tempObject =
     {
@@ -3964,7 +3964,7 @@ function getReportObject_AgencyRevenueInWrongMarket() {
         apiControllerAction: "/api/XRAYReport/GetAgencyRevenueInWrongMarketList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry']
+        product: ['xry', 'agency']
     }
 
     return tempObject;
