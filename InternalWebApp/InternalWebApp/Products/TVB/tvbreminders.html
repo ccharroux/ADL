@@ -221,7 +221,7 @@
 </html>
 <script>
 
-
+    var bulkSendArray = new Array();
     var gotMarkets = false; // unused as of 5-23-2019, but include it for consistency in case that changes later
     var gotYearsPeriods = false;
     var gotContacts = false;
@@ -291,16 +291,46 @@
     {
         var reportTitle = "Reminders List";
         var exportColumns = returnTableColumnsByClass("dtReminders", "exportColumn");
- 
- 
+  
+        bulkSendArray = new Array();
 
         $("#dtReminders").DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
             "columns": [
-                { "data": 'Contact' },
+                {
+                    mRender: function (data, type, row)
+                    {
+                        var newObj = {
+                            "inPersonnelId": row.personnelId,
+                            "inMarketId": row.marketId,
+                            "inStationId": row.stationId
+                        }
+
+                        var index1 = bulkSendArray.findIndex(x => x.inPersonnelId==row.personnelId);
+                        var index2 = bulkSendArray.findIndex(x => x.inMarketId==row.marketId);
+                        var index3 = bulkSendArray.findIndex(x => x.inStationId==row.stationId);
+
+ 
+
+                        if (index1 === -1 || index2 === -1 || index3 === -1)
+                        {
+ 
+                            bulkSendArray.push(newObj);
+                        }
+   
+                        return '<a href="#" onclick="selectContactId(' + row.personnelId + ')">' + row.Contact + '</a>';
+
+                    }
+                },
                 { "data": 'Primary' },
-                { "data": 'Market' },
+                {
+            
+                    mRender: function (data, type, row) {
+                        return '<a href="#" onclick="selectMarketId(' + row.marketId + ')">' + row.Market + '</a>';
+
+                    }
+                },
                 { "data": 'Station' },
                 { "data": 'Reminders' },
                 { "data": 'Period' },
@@ -485,7 +515,7 @@
 
             previousMarketId = $("#ddlMarket").val();
             var str = '';
-            //console.log(JSON.stringify(data));
+
             if (previousMarketId == null) {
                 str = '<option selected value="-1">-- All Markets</option>';
             } else {
@@ -690,6 +720,7 @@
         if ($("#chkOnlyPendingMarkets").prop('checked')) {
             url += '&inOnlyPendingMarkets=true';
         }
+        bulkSendArray = new Array();
 
         $.ajax({
             url: url,
@@ -714,6 +745,8 @@
                 }
                 populateDataTable("dtReminders", data);
                 showHideColumns();
+
+ 
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -744,7 +777,8 @@
         }
     }
 
-    function sendReminderInitiate(marketId, stationId, personnelId) {
+    function sendReminderInitiate(marketId, stationId, personnelId)
+    {
         currentMarketId = marketId;
         currentStationId = stationId;
         currentPersonnelId = personnelId;
@@ -756,7 +790,9 @@
         $("#emailNoteDialog").dialog("close");
     }
 
-    function sendReminder() {
+    function sendReminder()
+    {
+
         closeEmailNoteDialog();
 
         var url = ServicePrefix + '/api/TVB/InsertRemindersIntoQueue';
@@ -795,6 +831,20 @@
 
         getReminders();
     }
-
+    function selectMarketId(inMarketId)
+    {
+        if ($("#ddlMarket").val() == "-1") {
+            $("#ddlMarket").val(inMarketId);
+            getContacts();
+        }
+    }
+    function selectContactId(inPersonnelId)
+    {
+        if ($("#ddlContact").val() == "-1") {
+ 
+            $("#ddlContact").val(inPersonnelId);
+            contactChanged();
+        }
+    }
 </script>
 
