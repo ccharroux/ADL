@@ -2966,19 +2966,12 @@ function getReportObject_MRRMarketRelease() {
 
     var tempObject = new Object();
     var columnsToDisplay = new Array();
-    
-    columnsToDisplay.push("Contact");
-    columnsToDisplay.push("Primary");
+
     columnsToDisplay.push("Market");
-    columnsToDisplay.push("Station");
-    columnsToDisplay.push("Reminders");
-    columnsToDisplay.push("Period");
-    columnsToDisplay.push("Input On");
     columnsToDisplay.push("Reminder Sent By");
     columnsToDisplay.push("Reminder Sent On");
     columnsToDisplay.push("Stations Pending");
     columnsToDisplay.push("Contacts Pending");
-    columnsToDisplay.push("Media Type");
     columnsToDisplay.push("Schedule");
     columnsToDisplay.push("On Hold");
 
@@ -3037,19 +3030,12 @@ function getReportObject_MRRMarketStationRelease() {
     var columnsToDisplay = new Array();
 
     columnsToDisplay.push("Contact");
-    columnsToDisplay.push("Primary");
     columnsToDisplay.push("Market");
     columnsToDisplay.push("Station");
     columnsToDisplay.push("Reminders");
-    columnsToDisplay.push("Period");
     columnsToDisplay.push("Input On");
-    columnsToDisplay.push("Reminder Sent By");
     columnsToDisplay.push("Reminder Sent On");
-    columnsToDisplay.push("Stations Pending");
-    columnsToDisplay.push("Contacts Pending");
-    columnsToDisplay.push("Media Type");
     columnsToDisplay.push("Schedule");
-    columnsToDisplay.push("On Hold");
 
     tempObject =
     {
