@@ -101,18 +101,21 @@
 
  
                 <div class="row search-section" style="padding-top:40px">
-                    <div class="col-md-12 ">
+ 
+                    <div class="col-md-12">
                         <center>
                             <input type="checkbox" id="chkOnlyPendingMarkets" value="" onclick="getReminders();" /><label for="chkOnlyPendingMarkets">&nbsp;Only show pending markets</label>
                             &nbsp;&nbsp;
                             <input type="checkbox" id="chkOnlyMarketsForCurrentContact" value="" onclick="getMarkets();" /><label for="chkOnlyMarketsForCurrentContact">&nbsp;Current contact's markets</label>
                         </center>
                     </div>
+ 
                 </div>
 
                 <div class="row search-section" style="padding-top:20px">
-                    <div class="col-md-12 ">
 
+                    <div class="col-md-3">&nbsp;</div>
+                    <div class="col-md-6">
                         <center>
                             <div class="allMarketsAndContactsTotal" style="text-align:center; border:solid 1px silver; border-radius:15px;background-color:lightblue;width:50%">
                                 <b>Total Stations Pending:</b>
@@ -122,6 +125,9 @@
                             </div>
                         </center>
                     </div>
+                    <div class="col-md-3" style="height:56px; text-align:center">
+                        <input style="margin-top:10px" id="btnSendAll" type="button" value="Send All" onclick="sendRemindersBulkInitiate();" /></div>
+
                 </div>
 
 
@@ -238,6 +244,10 @@
     var currentStationId = null;
     var currentPersonnelId = null;
 
+    const columnTotalStationsPending = 9;
+    const columnTotalContactsPending = 10;
+
+
     $(document).ready(function ()
     {
 
@@ -291,6 +301,8 @@
     {
         var reportTitle = "Reminders List";
         var exportColumns = returnTableColumnsByClass("dtReminders", "exportColumn");
+
+
   
         bulkSendArray = new Array();
 
@@ -311,12 +323,11 @@
                         var index2 = bulkSendArray.findIndex(x => x.inMarketId==row.marketId);
                         var index3 = bulkSendArray.findIndex(x => x.inStationId==row.stationId);
 
- 
-
                         if (index1 === -1 || index2 === -1 || index3 === -1)
                         {
- 
                             bulkSendArray.push(newObj);
+
+           
                         }
    
                         return '<a href="#" style="color:blue" onclick="selectContactId(' + row.personnelId + ')">' + row.Contact + '</a>';
@@ -327,7 +338,7 @@
                 {
             
                     mRender: function (data, type, row) {
-                        return '<a href="#" style="color:blue"  onclick="selectMarketId(' + row.marketId + ')">' + row.Market + '</a>';
+                        return '<a href="#" style="color:blue" onclick="selectMarketId(' + row.marketId + ')">' + row.Market + '</a>';
 
                     }
                 },
@@ -403,9 +414,8 @@
             "fnDrawCallback": function (oSettings) {
                 showHideColumns();
             },
-            "footerCallback": function (row, data, start, end, display) {
-                var columnTotalStationsPending = 9;
-                var columnTotalContactsPending = 10;
+            "footerCallback": function (row, data, start, end, display)
+            {
 
                 var api = this.api();
 
@@ -693,15 +703,13 @@
 
     function getReminders()
     {
-
+        $("#btnSendAll").hide();
         if (!gotContacts || !gotYearsPeriods)
         {
             return;
         }
 
-        //setLocalStorage("search", $("#searchText").val().trim() + '|' + $("#searchTextNumber").val().trim() + '|' + $("#ddlMediaType").val());
-        //setLocalStorage("searchPage", window.location);
-
+ 
         var url = ServicePrefix + '/api/TVBReport/GetMarketRelease'
                 + '?inApiToken=' + getLocalStorage("APIToken")
                 + '&inYear=' + currentYear()
@@ -731,13 +739,10 @@
             success: function (data, textStatus, jQxhr) {
                 if (data.response.status.toUpperCase() === "SUCCESS")
                 {
-                    //if (data.report.rows.length == 1)
-                    //{
-                    //    var id = data.report.rows[0].marketId;
-                    //    setLocalStorage("search", "");
-                    //    editMarket(id);
-                    //    return;
-                    //}
+                    if (data.report.rows.length > 0)
+                    {
+                        $("#btnSendAll").show();
+                    }
                 }
                 if (!initializedReminders) {
                     setDataTable();
@@ -779,6 +784,8 @@
 
     function sendReminderInitiate(marketId, stationId, personnelId)
     {
+        gBulkSubmit = false;
+
         currentMarketId = marketId;
         currentStationId = stationId;
         currentPersonnelId = personnelId;
@@ -792,8 +799,15 @@
 
     function sendReminder()
     {
-
         closeEmailNoteDialog();
+
+        if (gBulkSubmit == true)
+        {
+            sendRemindersBulkAjax();
+            return;
+        }
+
+
 
         var url = ServicePrefix + '/api/TVB/InsertRemindersIntoQueue';
 
@@ -845,6 +859,41 @@
             $("#ddlContact").val(inPersonnelId);
             contactChanged();
         }
+    }
+
+    function sendRemindersBulkInitiate()
+    {
+        gBulkSubmit = true;
+
+        $("#emailNoteDialog").dialog("open");
+    }
+
+    function sendRemindersBulkAjax()
+    {
+        var url = ServicePrefix + '/api/TVB/InsertRemindersIntoQueueBulk';
+ 
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inReminderModel": bulkSendArray,
+                "inYear": currentYear(),
+                "inPeriod": currentPeriod(),
+                "inOnlyPendingMarkets": $("#chkOnlyPendingMarkets").is(':checked'),
+                "inEmailNote": $("#txtEmailNote").val(),
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                sendReminderSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
     }
 </script>
 
