@@ -162,7 +162,7 @@
                             </div>
                         </div>
                     </div>
-                   
+
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="txtActiveDate">Active Date</label>
@@ -198,7 +198,7 @@
                             <input class="field-width-325" type="text" id="txtDisableDate" value="" maxlength="50" placeholder="MM/DD/YYYY" readonly />
                         </div>
                     </div>
-                    
+
                     <!-- Buttons -->
                     <div class="default-button-section">
                         <div class="row input-row">
@@ -218,24 +218,32 @@
                         </div>
                     </div>
                     <!-- End Buttons-->
-                    
+
                 </div>
 
                 <!-- extra fields for matching -->
-                <div class="row advertiser-category input-row" style="display: none;"><hr />
-                    <div class="col-md-3">
-                        <strong><span>Category from Import:&nbsp;</span></strong>
+                <div class="advertiser-category" style="display: none;">
+                    <div class="row input-row" >
+                        <hr />
+                        <div class="col-md-3">
+                            <strong><span>Station Agency:&nbsp;</span></strong>
+                        </div>
+                        <div class="col-md-9">
+                            <span id="txtStationAgency"></span>
+                            <input type="hidden" id="txtPeriod" />
+                            <input type="hidden" id="txtYear" />
+                            <input type="hidden" id="txtPreviousPageLocation" />
+                        </div>
                     </div>
-                    <div class="col-md-9">
-                        <span id="txtAdvertiserCategory"></span>
-                        <input type="hidden" id="txtPeriod" />
-                        <input type="hidden" id="txtYear" />
-                        <input type="hidden" id="txtPreviousPageLocation" />
-                        <!--<input class="field-width-325" type="text" id="txtAdvertiserCategory" value="" maxlength="50" disabled="disabled" />-->
-                        
+                    <div class="row input-row">
+                        <div class="col-md-3">
+                            <strong><span>Category from Import:&nbsp;</span></strong>
+                        </div>
+                        <div class="col-md-9">
+                            <span id="txtAdvertiserCategory"></span>
+                        </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -297,8 +305,7 @@
 
     });
 
-    function setupUI()
-    {
+    function setupUI() {
         $("#chkActive").change(function () {
             if (this.checked) {
                 $(".disable-date").hide();
@@ -446,7 +453,7 @@
 
                         if (obj["dateSetup"] !== null) {
                             var activeDate = new Date(obj["dateSetup"]);
- 
+
                             $("#txtActiveDate").val(addZero(activeDate.getMonth() + 1) + '/' + addZero(activeDate.getDate()) + '/' + activeDate.getFullYear());
                         }
 
@@ -533,7 +540,7 @@
 
     function initializeActiveDate() {
         var activeDate = new Date();
- 
+
         $("#txtActiveDate").val(addZero(activeDate.getMonth() + 1) + '/' + addZero(activeDate.getDate()) + '/' + activeDate.getFullYear());
 
         $("#chkActive").prop('checked', true);
@@ -567,8 +574,9 @@
             "marketAdvertiserName": $("#txtMarketAdvertiser").val(),
             "marketAdvertiserId": $("#txtMarketAdvertiserId").val(),
             "searchPage": window.location,
-            "advertiserCategory":$("#txtAdvertiserCategory").html(),
-            "period":$("#txtPeriod").val(),
+            "advertiserCategory": $("#txtAdvertiserCategory").html(),
+            "stationAgency" : $("#txtStationAgency").html(),
+            "period": $("#txtPeriod").val(),
             "year": $("#txtYear").val(),
             "previousPage": $("#txtPreviousPageLocation").val()
         }
@@ -599,6 +607,7 @@
             $("#txtStationAdvertiser").prop("disabled", true);
             $(".advertiser-category").show();
             $("#txtAdvertiserCategory").html(searchResults["advertiserCategory"]);
+            $("#txtStationAgency").html(searchResults["stationAgency"]);
             $("#txtPeriod").val(searchResults["period"]);
             $("#txtYear").val(searchResults["year"]);
             $("#txtPreviousPageLocation").val(searchResults["previousPage"]);
@@ -845,11 +854,12 @@
 
         $(".advertiser-category").show();
         $("#txtAdvertiserCategory").html(advertiserMatchData["advertiserCategory"]);
+        $("#txtStationAgency").html(advertiserMatchData["stationAgency"]);
         $("#txtPeriod").val(advertiserMatchData["period"]);
         $("#txtYear").val(advertiserMatchData["year"]);
         $("#txtPreviousPageLocation").val(advertiserMatchData["previousPage"]);
 
-        
+
     }
 
     function updateStationAdvertiserMatch() {
@@ -879,7 +889,7 @@
                 else {
 
                     //console.log($("#txtPreviousPageLocation").val());
-                    bootbox.alert("The station advertiser has been matched.", function() {
+                    bootbox.alert("The station advertiser has been matched.", function () {
                         window.location = $("#txtPreviousPageLocation").val();
                     });
                 }
@@ -889,7 +899,7 @@
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
-       
+
     }
 
     function determineGoBack() {
@@ -898,8 +908,7 @@
 
             window.location = $("#txtPreviousPageLocation").val();
         }
-        else if (bIsFromReport || getLocalStorage("reportActionData").length > 0)
-        {
+        else if (bIsFromReport || getLocalStorage("reportActionData").length > 0) {
             var reportData = $.parseJSON(getLocalStorage("reportActionData"));
 
             if (reportData["previousPage"].length > 0) {
@@ -912,6 +921,6 @@
         else {
             goBackToDashboard();
         }
-        
+
     }
 </script>

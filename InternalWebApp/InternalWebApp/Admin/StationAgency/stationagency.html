@@ -41,7 +41,7 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
-    
+
     <!--Chosen Dropdown-->
     <link rel="stylesheet" href="/css/chosen.min.css" />
 
@@ -211,19 +211,27 @@
                 </div>
 
                 <!-- extra fields for matching -->
-                <div class="row agency-category input-row" style="display: none;">
- 
+                <div class="agency-category"  style="display: none;">
+                    <div class="row input-row">
                         <hr />
+                        <div class="col-md-3">
+                            <strong><span>Station Advertiser:&nbsp;</span></strong>
+                        </div>
+                        <div class="col-md-9">
+                            <span id="txtStationAdvertiser"></span>
+                            <input type="hidden" id="txtPeriod" />
+                            <input type="hidden" id="txtYear" />
+                            <input type="hidden" id="txtPreviousPageLocation" />
+                        </div>
+                    </div>
+                    <div class="row input-row">
                         <div class="col-md-3">
                             <strong><span>Category from Import:&nbsp;</span></strong>
                         </div>
                         <div class="col-md-9">
                             <span id="txtAgencyCategory"></span>
-                            <input type="hidden" id="txtPeriod" />
-                            <input type="hidden" id="txtYear" />
-                            <input type="hidden" id="txtPreviousPageLocation" />
-                            <!--<input class="field-width-325" type="text" id="txtAgencyCategory" value="" maxlength="50" disabled="disabled" />-->
                         </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -262,21 +270,19 @@
     var bIsAgyMatch = false;
     var bIsFromReport = false;
 
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
 
         setupUIFields();
         getStationList();
 
         buildXRYMenu("Utility");
         buildQuickReports(['agency']);
- 
+
         setupUI();
 
     });
 
-    function setupUIFields()
-    {
+    function setupUIFields() {
 
         marketId = (getParameterByName("MarketID") == null ? 0 : getParameterByName("MarketID"));
         stationAgencyId = (getParameterByName("StationAgencyID") == null ? 0 : getParameterByName("StationAgencyID"));
@@ -288,8 +294,7 @@
 
     }
 
-    function setupUI()
-    {
+    function setupUI() {
         $("#ddlStations").on('change',
             function () {
                 var marketId = $(this).find(':selected').data('market-id');
@@ -297,8 +302,7 @@
             });
     }
 
-    function getStationList()
-    {
+    function getStationList() {
         var bMarketVersion = false;
 
         var url = '/api/Station/GetStationListByProduct';
@@ -307,14 +311,13 @@
             "inProductId": 'XRY'
         };
 
-        if (marketId > 0 && stationAgencyId == 0)
-        {
+        if (marketId > 0 && stationAgencyId == 0) {
             bMarketVersion = true;
             url = '/api/Station/GetStationListByMarketProduct';
             var inObject = {
                 "inApiToken": getLocalStorage("APIToken"),
                 "inProductId": 'XRY',
-                "inMarketId" : marketId
+                "inMarketId": marketId
             };
         }
 
@@ -332,17 +335,14 @@
                     $stationList.append("<option value='-1' data-market-id='-1'> -- Select a Station</option>");
 
                     $.each(data.report.rows,
-                        function ()
-                        {
-                            if (bMarketVersion == false)
-                            {
+                        function () {
+                            if (bMarketVersion == false) {
                                 var element = $('<option></option>');
                                 element.val(this.reid).html(this.fullName);
                                 element.attr("data-market-id", this.primaryMarketId);
                                 $stationList.append(element);
                             }
-                            else
-                            {
+                            else {
                                 var element = $('<option></option>');
                                 element.val(this["Station Id"]).html(this["Station Name"]);
                                 element.attr("data-market-id", marketId);
@@ -451,7 +451,7 @@
 
                         if (obj["dateSetup"] !== null) {
                             var activeDate = new Date(obj["dateSetup"]);
-        
+
                             $("#txtActiveDate").val(addZero(activeDate.getMonth() + 1) + '/' + addZero(activeDate.getDate()) + '/' + activeDate.getFullYear());
                         }
 
@@ -538,7 +538,7 @@
 
     function initializeActiveDate() {
         var activeDate = new Date();
- 
+
         $("#txtActiveDate").val(addZero(activeDate.getMonth() + 1) + '/' + addZero(activeDate.getDate()) + '/' + activeDate.getFullYear());
 
         $("#chkActive").prop('checked', true);
@@ -553,7 +553,7 @@
 
         var searchResults = $.parseJSON(getLocalStorage("gSearchResults"));
 
- 
+
 
         if (stationAgencyId <= 0) {
             //load everthing but market advertiser and id
@@ -567,6 +567,7 @@
             $("#txtStationAgencyName").prop("disabled", true);
             $(".agency-category").show();
             $("#txtAgencyCategory").html(searchResults["agencyCategory"]);
+            $("#txtStationAdvertiser").html(searchResults["stationAdvertiser"]);
             $("#txtPeriod").val(searchResults["period"]);
             $("#txtYear").val(searchResults["year"]);
             $("#txtPreviousPageLocation").val(searchResults["previousPage"]);
@@ -608,6 +609,7 @@
             "searchAgencyId": $("#txtMarketAgencyId").val(),
             "searchPage": window.location,
             "agencyCategory": $("#txtAgencyCategory").html(),
+            "stationAdvertiser": $("#txtStationAdvertiser").html(),
             "period": $("#txtPeriod").val(),
             "year": $("#txtYear").val(),
             "previousPage": $("#txtPreviousPageLocation").val()
@@ -824,6 +826,7 @@
 
         $(".agency-category").show();
         $("#txtAgencyCategory").html(agencyMatchData["agencyCategory"]);
+        $("#txtStationAdvertiser").html(agencyMatchData["stationAdvertiser"]);
         $("#txtPeriod").val(agencyMatchData["period"]);
         $("#txtYear").val(agencyMatchData["year"]);
         $("#txtPreviousPageLocation").val(agencyMatchData["previousPage"]);
