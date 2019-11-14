@@ -1405,6 +1405,7 @@ function populateDataTable(tableName, data)
     if (data.response.status.toUpperCase() === "SUCCESS") {
         data = JSON.stringify(data.report.rows);
         tableJson = $.parseJSON(data);
+
     } else {
 
         MKAErrorMessageRtn(data.response.errorMessage[0]);

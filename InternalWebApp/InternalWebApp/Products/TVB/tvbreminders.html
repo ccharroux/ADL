@@ -301,35 +301,17 @@
     {
         var reportTitle = "Reminders List";
         var exportColumns = returnTableColumnsByClass("dtReminders", "exportColumn");
-
-
   
-        bulkSendArray = new Array();
-
-        $("#dtReminders").DataTable({
+         $("#dtReminders").DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
             "columns": [
                 {
                     mRender: function (data, type, row)
                     {
-                        var newObj = {
-                            "inPersonnelId": row.personnelId,
-                            "inMarketId": row.marketId,
-                            "inStationId": row.stationId
-                        }
 
-                        var index1 = bulkSendArray.findIndex(x => x.inPersonnelId==row.personnelId);
-                        var index2 = bulkSendArray.findIndex(x => x.inMarketId==row.marketId);
-                        var index3 = bulkSendArray.findIndex(x => x.inStationId==row.stationId);
 
-                        if (index1 === -1 || index2 === -1 || index3 === -1)
-                        {
-                            bulkSendArray.push(newObj);
 
-           
-                        }
-   
                         return '<a href="#" style="color:blue" onclick="selectContactId(' + row.personnelId + ')">' + row.Contact + '</a>';
 
                     }
@@ -704,6 +686,8 @@
     function getReminders()
     {
         $("#btnSendAll").hide();
+        bulkSendArray = new Array();
+
         if (!gotContacts || !gotYearsPeriods)
         {
             return;
@@ -728,7 +712,8 @@
         if ($("#chkOnlyPendingMarkets").prop('checked')) {
             url += '&inOnlyPendingMarkets=true';
         }
-        bulkSendArray = new Array();
+
+
 
         $.ajax({
             url: url,
@@ -748,10 +733,10 @@
                     setDataTable();
                     initializedReminders = true;
                 }
-                populateDataTable("dtReminders", data);
-                showHideColumns();
 
- 
+                populateDataTable("dtReminders", data);
+                buildSendArray(data);
+                showHideColumns();
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -760,7 +745,33 @@
         });
 
     }
+    function buildSendArray(inData)
+    {
+ 
+        var data = inData.report;
 
+        var newObj = new Object();
+
+        for (var i = 0; i < data.rows.length; i++) {
+            newObj = {
+                "inPersonnelId": data.rows[i].personnelId,
+                "inMarketId": data.rows[i].marketId,
+                "inStationId": data.rows[i].stationId
+            }
+
+            var index = bulkSendArray.findIndex(x => x.inPersonnelId == data.rows[i].personnelId &&
+                                                     x.inMarketId == data.rows[i].marketId &&
+                                                     x.inStationId == data.rows[i].stationId);
+
+            if (index === -1) {
+                bulkSendArray.push(newObj);
+
+            }
+
+        }
+
+        //alert(bulkSendArray.length);
+    }
     function showHideColumns() {
         var marketId = $("#ddlMarket").val();
         var contactId = $("#ddlContact").val();
@@ -872,6 +883,7 @@
     {
         var url = ServicePrefix + '/api/TVB/InsertRemindersIntoQueueBulk';
  
+
         var settings = {
             dataType: 'json',
             type: 'post',
