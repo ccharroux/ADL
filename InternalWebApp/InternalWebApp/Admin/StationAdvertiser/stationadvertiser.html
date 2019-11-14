@@ -475,7 +475,12 @@
 
                         //get advertiser based on advertiser that comes back
                         getMarketAdvertiser(obj["advertiserId"]);
+
                     });
+
+                    if (bIsAdvMatch) {
+                        loadMatchData();
+                    }
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -821,21 +826,30 @@
 
         //should possibly disable this since required for match
         $('#ddlStations').prop("disabled", true);
-        $("#ddlStations").val(advertiserMatchData["station"]);
-        $("#ddlMarkets").val(advertiserMatchData["market"]);
-        $("#txtStationAdvertiser").val(advertiserMatchData["advertiser"]);
+
+        if (advertiserMatchData["station"] != undefined)
+            $("#ddlStations").val(advertiserMatchData["station"]);
+
+        if (advertiserMatchData["market"] != undefined)
+            $("#ddlMarkets").val(advertiserMatchData["market"]);
+
+        if (advertiserMatchData["advertiser"] != undefined)
+            $("#txtStationAdvertiser").val(advertiserMatchData["advertiser"]);
+
         //can the user change the name??
         //it is required for the matching process
         $("#txtStationAdvertiser").prop("disabled", true);
-        $("#txtStationAdvertiserCode").val(advertiserMatchData["stationAdvertiserCode"]);
+
+        if (advertiserMatchData["stationAdvertiserCode"] != undefined)
+            $("#txtStationAdvertiserCode").val(advertiserMatchData["stationAdvertiserCode"]);
+
         $(".advertiser-category").show();
         $("#txtAdvertiserCategory").html(advertiserMatchData["advertiserCategory"]);
         $("#txtPeriod").val(advertiserMatchData["period"]);
         $("#txtYear").val(advertiserMatchData["year"]);
         $("#txtPreviousPageLocation").val(advertiserMatchData["previousPage"]);
 
-        //clear local storage
-        //setLocalStorage("newAdvertiserMatch", "");
+        
     }
 
     function updateStationAdvertiserMatch() {
@@ -881,6 +895,7 @@
     function determineGoBack() {
 
         if (bIsAdvMatch || getLocalStorage("newAdvertiserMatch").length > 0) {
+
             window.location = $("#txtPreviousPageLocation").val();
         }
         else if (bIsFromReport || getLocalStorage("reportActionData").length > 0)

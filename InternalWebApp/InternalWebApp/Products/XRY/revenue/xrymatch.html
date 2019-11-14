@@ -378,16 +378,19 @@
             "mRender": function (data, type, row) {
                 var action = "";
 
-                action += "editStationAdvertiser(";
-                action += row["marketId"] + "," + row["ownerId"] + "," + row["stationId"] + ",";
-                action += "'" + row["Station Advertiser"] + "','" + row["Station Category"] + "','" + row["Station Advertiser Code"] + "'";
-                action += "," + row["linkedAdvertiserId"] + ");";
+
                 //pass the advertiser name, station category
-                if (row["linkedAdvertiserId"] > 0)
-                {
-                    return '<a href="#" onclick="' + action + '">Edit</a>';
-                } else
-                {
+                if (row["linkedAdvertiserId"] > 0) {
+                    action = "";
+                    action += "editStationAdvertiser(";
+                    action += "'" + row["Station Category"] + "',"+ row["linkedAdvertiserId"] + ");";
+                    return '<a href="#" onclick="' + action + '">Edit&nbsp;Station&nbsp;Advertiser</a>';
+                } else {
+                    action = "";
+                    action += "createStationAdvertiser(";
+                    action += row["marketId"] + "," + row["ownerId"] + "," + row["stationId"] + ",";
+                    action += "'" + row["Station Advertiser"] + "','" + row["Station Category"] + "','" + row["Station Advertiser Code"] + "'";
+                    action += "," + row["linkedAdvertiserId"] + ");";
                     return '<a href="#" onclick="' + action + '">Match</a>';
                 }
             },
@@ -456,13 +459,19 @@
             "mRender": function (data, type, row) {
                 var action = "";
 
-                action += "editStationAgency(";
-                action += row["marketId"] + "," + row["ownerId"] + "," + row["stationId"] + ",";
-                action += "'" + row["Station Agency"] + "','" + row["Station Category"] + "','" + row["Station Agency Code"] + "'";
-                action += ");";
-                //pass the advertiser name, station category
-                
-                return '<a href="#" onclick="' + action + '">Match</a>';
+                if (row["linkedAgencyId"] > 0)
+                {
+                    action = "";
+                    action += "editStationAgency(";
+                    action += "'" + row["Station Category"] + "'," + row["linkedAgencyId"] + ");";
+                    return '<a href="#" onclick="' + action + '">Edit&nbsp;Station&nbsp;Agency</a>';
+                } else {
+                    action += "createStationAgency(";
+                    action += row["marketId"] + "," + row["ownerId"] + "," + row["stationId"] + ",";
+                    action += "'" + row["Station Agency"] + "','" + row["Station Category"] + "','" + row["Station Agency Code"] + "'";
+                    action += "," + row["linkedAgencyId"] + ");";
+                    return '<a href="#" onclick="' + action + '">Match</a>';
+                }
             },
             "orderable": false,
             "searchable": false,
@@ -472,7 +481,7 @@
         return columnsToDisplay;
     }
 
-    function editStationAdvertiser(marketId, ownerId, stationId, advertiserName, category, stationAdvertiserCode, linkedAdvertiserId) {
+    function createStationAdvertiser(marketId, ownerId, stationId, advertiserName, category, stationAdvertiserCode, linkedAdvertiserId) {
         /*
          * load object
          * save object to local storage
@@ -482,32 +491,51 @@
 
         //use what is passed in for the edit functionality
 
-        var queryString = "";
-        queryString += "?Period=" + $("#ddlPeriod").val();
-        queryString += "&Year=" + $("#ddlYear").val();
-        queryString += "&OwnerID=" + $("#ddlOwner").val();
-        queryString += "&MarketID=" + $("#ddlMarket").val();
-        queryString += "&StationID=" + $("#ddlStation").val();
-        queryString += "&MatchPage=" + matchPageType;
+        var queryString = buildPreviousPageQueryString();
 
         var advertiserMatchData =
-        {
-            period: $("#ddlPeriod").val(),
-            year: $("#ddlYear").val(),
-            station: stationId,
-            advertiser: advertiserName,
-            market: marketId,
-            stationAdvertiserCode: stationAdvertiserCode,
-            advertiserCategory: category,
-            previousPage: "/products/xry/revenue/xrymatch.html" + queryString
-        }
+            {
+                period: $("#ddlPeriod").val(),
+                year: $("#ddlYear").val(),
+                station: stationId,
+                advertiser: advertiserName,
+                market: marketId,
+                stationAdvertiserCode: stationAdvertiserCode,
+                advertiserCategory: category,
+                previousPage: "/products/xry/revenue/xrymatch.html" + queryString
+            }
 
         setLocalStorage("newAdvertiserMatch", JSON.stringify(advertiserMatchData));
         window.location = "/admin/stationadvertiser/stationadvertiser.html?StationAdvertiserID=" + linkedAdvertiserId + "&AdvMatch=true";
 
     }
 
-    function editStationAgency(marketId, ownerId, stationId, agencyName, category, stationAgencyCode) {
+    function editStationAdvertiser(category, linkedAdvertiserId) {
+        /*
+         * load object
+         * save object to local storage
+         * redirect to station advertiser CRUD page
+         * add flag to notate coming from this page
+         */
+
+        //use what is passed in for the edit functionality
+
+        var queryString = buildPreviousPageQueryString();
+
+        var advertiserMatchData =
+            {
+                period: $("#ddlPeriod").val(),
+                year: $("#ddlYear").val(),
+                advertiserCategory: category,
+                previousPage: "/products/xry/revenue/xrymatch.html" + queryString
+            }
+
+        setLocalStorage("newAdvertiserMatch", JSON.stringify(advertiserMatchData));
+        window.location = "/admin/stationadvertiser/stationadvertiser.html?StationAdvertiserID=" + linkedAdvertiserId + "&AdvMatch=true";
+
+    }
+
+    function createStationAgency(marketId, ownerId, stationId, agencyName, category, stationAgencyCode, linkedAgencyId) {
         /*
          * load object
          * save object to local storage
@@ -515,28 +543,58 @@
          * add flag to notate coming from this page
          */
 
+        var queryString = buildPreviousPageQueryString();
+
+        var agencyMatchData =
+            {
+                period: $("#ddlPeriod").val(),
+                year: $("#ddlYear").val(),
+                station: stationId,
+                agency: agencyName,
+                market: marketId,
+                stationAgencyCode: stationAgencyCode,
+                agencyCategory: category,
+                previousPage: "/products/xry/revenue/xrymatch.html" + queryString
+            }
+
+        setLocalStorage("newAgencyMatch", JSON.stringify(agencyMatchData));
+        window.location = "/admin/stationagency/stationagency.html?StationAgencyID=" + linkedAgencyId + "&AgyMatch=true";
+    }
+
+    function editStationAgency(category, linkedAgencyId) {
+        /*
+         * load object
+         * save object to local storage
+         * redirect to station agency CRUD page
+         * add flag to notate coming from this page
+         */
+
+        var queryString = buildPreviousPageQueryString();
+
+        var agencyMatchData =
+            {
+                period: $("#ddlPeriod").val(),
+                year: $("#ddlYear").val(),
+                agencyCategory: category,
+                previousPage: "/products/xry/revenue/xrymatch.html" + queryString
+            }
+
+        setLocalStorage("newAgencyMatch", JSON.stringify(agencyMatchData));
+        window.location = "/admin/stationagency/stationagency.html?StationAgencyID=" + linkedAgencyId + "&AgyMatch=true";
+    }
+
+    function buildPreviousPageQueryString()
+    {
         var queryString = "";
+
         queryString += "?Period=" + $("#ddlPeriod").val();
         queryString += "&Year=" + $("#ddlYear").val();
         queryString += "&OwnerID=" + $("#ddlOwner").val();
         queryString += "&MarketID=" + $("#ddlMarket").val();
         queryString += "&StationID=" + $("#ddlStation").val();
         queryString += "&MatchPage=" + matchPageType;
-
-        var agencyMatchData =
-        {
-            period: $("#ddlPeriod").val(),
-            year: $("#ddlYear").val(),
-            station: stationId,
-            agency: agencyName,
-            market: marketId,
-            stationAgencyCode: stationAgencyCode,
-            agencyCategory: category,
-            previousPage: "/products/xry/revenue/xrymatch.html" + queryString
-        }
-
-        setLocalStorage("newAgencyMatch", JSON.stringify(agencyMatchData));
-        window.location = "/admin/stationagency/stationagency.html?StationAgencyID=0&AgyMatch=true";
+        queryString += "&OptionFlag=" + $("#ddlOptions").val();
+        return queryString;
     }
 
     function getMarketListByProduct(inProduct) {
@@ -726,34 +784,29 @@
         var bIncludeAdvertiserUnmatched = false;
         var bIncludeAgencyUnmatched = false;
 
-        switch (matchPageType.toUpperCase())
-        {
+        switch (matchPageType.toUpperCase()) {
             case "ADV":
-                if ($("#ddlOptions").val().toLowerCase() == "unmatched")
-                {
+                if ($("#ddlOptions").val().toLowerCase() == "unmatched") {
                     bIncludeAdvertiserMatched = false;
                     bIncludeAdvertiserUnmatched = true;
                     bDistinctAdvertisers = true;
                     bIncludeAgencyMatched = true;
                     bIncludeAgencyUnmatched = true;
 
-                } else if ($("#ddlOptions").val().toLowerCase() == "matched")
-                {
+                } else if ($("#ddlOptions").val().toLowerCase() == "matched") {
                     bIncludeAdvertiserMatched = true;
                     bIncludeAdvertiserUnmatched = false;
                     bDistinctAdvertisers = false;
                     bIncludeAgencyMatched = true;
                     bIncludeAgencyUnmatched = true;
 
-                } else if ($("#ddlOptions").val().toLowerCase() == "both")
-                {
+                } else if ($("#ddlOptions").val().toLowerCase() == "both") {
                     bIncludeAdvertiserMatched = true;
                     bIncludeAdvertiserUnmatched = true;
                     bDistinctAdvertisers = false;
                     bIncludeAgencyMatched = true;
                     bIncludeAgencyUnmatched = true;
-                } else
-                {
+                } else {
                     bIncludeAdvertiserMatched = false;
                     bIncludeAdvertiserUnmatched = true;
                     bDistinctAdvertisers = true;
@@ -762,26 +815,23 @@
                 }
                 break;
             case "AGY":
-                if ($("#ddlOptions").val().toLowerCase() == "unmatched")
-                {
+                if ($("#ddlOptions").val().toLowerCase() == "unmatched") {
                     bIncludeAgencyMatched = false;
                     bIncludeAgencyUnmatched = true;
                     bDistinctAgencies = true;
                     bIncludeAdvertiserMatched = true;
                     bIncludeAdvertiserUnmatched = true;
 
-                } else if ($("#ddlOptions").val().toLowerCase() == "matched")
-                {
-                    
+                } else if ($("#ddlOptions").val().toLowerCase() == "matched") {
+
                     bIncludeAgencyMatched = true;
                     bIncludeAgencyUnmatched = false;
                     bDistinctAgencies = false;
                     bIncludeAdvertiserMatched = true;
                     bIncludeAdvertiserUnmatched = true;
 
-                } else if ($("#ddlOptions").val().toLowerCase() == "both")
-                {
-                    
+                } else if ($("#ddlOptions").val().toLowerCase() == "both") {
+
                     bIncludeAgencyMatched = true;
                     bIncludeAgencyUnmatched = true;
                     bDistinctAgencies = false;
