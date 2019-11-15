@@ -3035,7 +3035,6 @@ function getReportObject_MRRMarketStationRelease() {
     columnsToDisplay.push("Reminders");
     columnsToDisplay.push("Input On");
     columnsToDisplay.push("Reminder Sent On");
-    columnsToDisplay.push("Schedule");
 
     tempObject =
     {
