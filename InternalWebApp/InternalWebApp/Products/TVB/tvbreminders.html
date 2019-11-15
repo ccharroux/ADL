@@ -54,6 +54,10 @@
         .dropdown-select {
             max-width: 200px;
         }
+        .checkboxView
+        {
+            padding-right:20px;
+        }
     </style>
 
     <!-- Modernizr JS -->
@@ -104,9 +108,15 @@
  
                     <div class="col-md-12">
                         <center>
-                            <input type="checkbox" id="chkOnlyPendingMarkets" value="" onclick="getReminders();" /><label for="chkOnlyPendingMarkets">&nbsp;Only show pending markets</label>
-                            &nbsp;&nbsp;
-                            <input type="checkbox" id="chkOnlyMarketsForCurrentContact" value="" onclick="getMarkets();" /><label for="chkOnlyMarketsForCurrentContact">&nbsp;Current contact's markets</label>
+                            <label for="chkOnlyPendingMarkets" class="checkboxView">
+                                <input type="checkbox" id="chkOnlyPendingMarkets" value="" onclick="getReminders();" />&nbsp;Only show pending markets
+                            </label>
+                            <label for="chkOnlyMarketsForCurrentContact" class="checkboxView">
+                                <input type="checkbox" id="chkOnlyMarketsForCurrentContact" value="" onclick="getMarkets();" />&nbsp;Current contact's markets
+                            </label>
+                            <label for="chkForceUserView" class="checkboxView forceUserView">
+                                <input type="checkbox" id="chkForceUserView" value="" onclick="getReminders();" checked="checked" />&nbsp;Show Contacts
+                            </label>
                         </center>
                     </div>
  
@@ -486,7 +496,7 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inProductId": "TVB",
                 "inActiveOnly": true,
-                "inPersonnelId": $("#chkOnlyMarketsForCurrentContact").prop('checked') ? $("#ddlContact").val() : -1
+                "inPersonnelId": $("#chkOnlyMarketsForCurrentContact").is(":checked") ? $("#ddlContact").val() : -1
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -511,11 +521,15 @@
             previousMarketId = $("#ddlMarket").val();
             var str = '';
 
-            if (previousMarketId == null) {
+            if (previousMarketId == null)
+            {
                 str = '<option selected value="-1">-- All Markets</option>';
-            } else {
+            }
+            else
+            {
                 str = '<option value="-1">-- All Markets</option>';
             }
+
             $.each(data.report.rows, function (index) {
 
                 if (data.report.rows[index].marketId == previousMarketId) {
@@ -536,7 +550,9 @@
         }
     }
 
-    function getYearsPeriods() {
+    function getYearsPeriods()
+    {
+
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
         var d = new Date();
@@ -568,8 +584,20 @@
         getReminders();
     }
 
-    function getContacts() {
-        if (skipPopulatingContacts) {
+    function getContacts()
+    {
+        if ($("#ddlMarket").val() == "-1") {
+            $("#chkForceUserView").prop('disabled', '');
+        }
+        else {
+ 
+            $("#chkForceUserView").prop('checked', true);
+            $("#chkForceUserView").prop('disabled', true);
+
+        }
+
+        if (skipPopulatingContacts)
+        {
             skipPopulatingContacts = false;
             previousContactId = $("#ddlContact").val();
             postGetContacts(previousContactId);
@@ -634,8 +662,7 @@
     function postGetContacts(previousContactId) {
         if ((previousContactId != null) && (previousContactId != -1) && ($("#ddlContact").val() == -1)) {
             skipPopulatingContacts = true;
-            // leave this checkbox unchanged, it's just a no-op while Contact = All, but if user picks another contact then it will come back into effect
-            // $("#chkOnlyMarketsForCurrentContact").prop('checked', false);
+ 
             getMarkets();
         } else {
             getReminders();
@@ -645,12 +672,9 @@
     function contactChanged()
     {
 
-        if ($("#chkOnlyMarketsForCurrentContact").prop('checked')) {
+        if ($("#chkOnlyMarketsForCurrentContact").is(":checked")) {
             skipPopulatingContacts = true;
-            // see above
-            //if ($("#ddlContact").val() == -1) {
-            //    $("#chkOnlyMarketsForCurrentContact").prop('checked', false);
-            //}
+ 
             getMarkets();
         } else {
             getReminders();
@@ -695,28 +719,30 @@
         {
             return;
         }
-
- 
+         
         var url = ServicePrefix + '/api/TVBReport/GetMarketRelease'
                 + '?inApiToken=' + getLocalStorage("APIToken")
                 + '&inYear=' + currentYear()
                 + '&inPeriod=' + currentPeriod();
+
         var marketId = $("#ddlMarket").val();
-        if (marketId != -1) {
+        if (marketId != -1)
+        {
             url += '&inMarketId=' + marketId;
         }
 
         var contactId = $("#ddlContact").val();
-
-        if (contactId != -1) {
+        if (contactId != -1)
+        {
             url += '&inPersonnelId=' + contactId;
         }
 
-        if ($("#chkOnlyPendingMarkets").prop('checked')) {
+        if ($("#chkOnlyPendingMarkets").is(":checked"))
+        {
             url += '&inOnlyPendingMarkets=true';
         }
 
-
+        url += '&inForceUserView=' + $("#chkForceUserView").is(":checked");
 
         $.ajax({
             url: url,
@@ -779,15 +805,20 @@
 
         //alert(bulkSendArray.length);
     }
-    function showHideColumns() {
+    function showHideColumns()
+    {
+
         var marketId = $("#ddlMarket").val();
         var contactId = $("#ddlContact").val();
 
-        if (marketId == -1 && contactId == -1) {
+        if (marketId == -1 && contactId == -1 && $("#chkForceUserView").is(":checked") == false)
+        {
             $(".allMarketsAndContactsColumn").show();
             $(".singleMarketOrContactColumn").hide();
             $(".allMarketsAndContactsTotal").show();
-        } else {
+        }
+        else
+        {
             $(".allMarketsAndContactsColumn").hide();
             $(".singleMarketOrContactColumn").show();
             $(".allMarketsAndContactsTotal").hide();
@@ -865,10 +896,16 @@
     }
     function selectMarketId(inMarketId)
     {
-        if ($("#ddlMarket").val() == "-1") {
+        if ($("#ddlMarket").val() == "-1")
+        {
+ 
             $("#ddlMarket").val(inMarketId);
             getContacts();
+ 
         }
+ 
+
+
     }
     function selectContactId(inPersonnelId)
     {
