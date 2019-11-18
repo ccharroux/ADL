@@ -104,19 +104,49 @@
             transform: translateY(-50%);*/
             vertical-align: middle;
         }
+        .rowStatus
+        {
+            text-align:center;
+            border-radius:15px;
+            padding:2px 2px 2px 2px;
+            height:71px;
+            width:71px;            
+            vertical-align:middle;
+            display: table-cell;
+        }
+        .rowNotActive{
+            background:black;
+            color:yellow;
+        }
+        .rowUnPosted
+        {
+            background:orange;
+            color:black;
+        }
+        .rowPosted
+        {
+            background:green;
+            color:white;
+        }
+
+        .rowNoData
+        {
+            background:red;
+            color:white;
+        }
     </style>
 
 </head>
 <body>
     <div id="fh5co-page">
         <header id="fh5co-header" role="banner">
-            <div class="container">
+            <div class="container" >
                 <div class="header-inner" id="menu"></div>
             </div>
         </header>
 
         <div id="fh5co-contact-section" class="contact-section">
-            <div class="container">
+            <div class="container" style="margin-top: -35px;">
                 <div id="divQuickReport" style="float:right;padding-right:0px;padding-bottom:10px">
                     <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
                     <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
@@ -127,7 +157,7 @@
                     </div>
                 </div>
 
-                <div class="row search-section">
+                <div class="row search-section" >
                     <div class="col-md-12">
                         <!--
                         radio buttons market, owner
@@ -194,7 +224,12 @@
 
                     </div>
                 </div>
-
+                <center>
+                    <div class="row" style="width:25%; border:solid 1px silver">
+                        <div id="statusOfGrid">
+                        </div>
+                    </div>
+                </center>
                 <!-- datatable -->
                 <div class="dataTable-top-margin">
                     <table id="dtResults" class="stripe"></table>
@@ -240,6 +275,8 @@
 </html>
 <script>
 
+    var rowStatusArrayCtr = new Array();
+    var rowStatusArray = new Array();
     var product = "XRY";
     var workingMarketId = 0;
     var workingStationId = 0;
@@ -248,6 +285,7 @@
     var bRevision = false;
     var bCorrection = false;
     var workingRevisionNumber = 0;
+    var status = "";
 
     $(document).ready(function () {
 
@@ -1399,13 +1437,13 @@
     function getDataColumns() {
         var columnsToDisplay = new Array();
 
-        columnsToDisplay.push({
-            "title": "Market",
-            "visible": true,
-            "mData": "Market",
-            "orderable": true,
-            "searchable": true
-        });
+        //columnsToDisplay.push({
+        //    "title": "Market",
+        //    "visible": true,
+        //    "mData": "Market",
+        //    "orderable": true,
+        //    "searchable": true
+        //});
 
         columnsToDisplay.push({
             "title": "Station",
@@ -1451,7 +1489,7 @@
         });
 
         columnsToDisplay.push({
-            "title": "Rev Rec $",
+            "title": "Revenue",
             "visible": true,
             "mData": "Revenue",
             "mRender": $.fn.dataTable.render.number(',', '.', 0, '$'),
@@ -1461,7 +1499,7 @@
         });
 
         columnsToDisplay.push({
-            "title": "Rev Rec $<br/>Prev Period",
+            "title": "Revenue<br/>Prev Period",
             "visible": true,
             "mData": "Revenue Previous Period",
             "mRender": $.fn.dataTable.render.number(',', '.', 0, '$'),
@@ -1471,7 +1509,7 @@
         });
 
         columnsToDisplay.push({
-            "title": "Rev Rec $<br/>Prev Year",
+            "title": "Revenue<br/>Prev Year",
             "visible": true,
             "mData": "Revenue Previous Year",
             "mRender": $.fn.dataTable.render.number(',', '.', 0, '$'),
@@ -1491,30 +1529,28 @@
         columnsToDisplay.push({
             "title": "Status",
             "mRender": function (data, type, row) {
-                if (row["Posted"].toLowerCase() === "no") {
-                    return "Un-Posted";
-                } else {
-                    return "Posted";
-                }
+                var status = getRowStatus(row);
+                return status;
+
             },
             "visible": true,
             "orderable": true,
             "searchable": true
         });
 
-        columnsToDisplay.push({
-            "title": "Enabled",
-            "mRender": function (data, type, row) {
-                if (row["enabled"] === true) {
-                    return "True";
-                } else {
-                    return "False";
-                }
-            },
-            "visible": true,
-            "orderable": true,
-            "searchable": true
-        });
+        //columnsToDisplay.push({
+        //    "title": "Enabled",
+        //    "mRender": function (data, type, row) {
+        //        if (row["enabled"] === true) {
+        //            return "True";
+        //        } else {
+        //            return "False";
+        //        }
+        //    },
+        //    "visible": true,
+        //    "orderable": true,
+        //    "searchable": true
+        //});
 
         columnsToDisplay.push({
             "title": "Actions",
@@ -1635,6 +1671,9 @@
         //call new api once built
         //load table with results
 
+        rowStatusArray = new Array();
+        rowStatusArrayCtr = new Array();
+
         var queryString = "?";
 
         queryString += "inApiToken=" + getLocalStorage("APIToken");
@@ -1671,7 +1710,8 @@
 
     }
 
-    function loadCollectionStatusData(data) {
+    function loadCollectionStatusData(data)
+    {
         //get columns
         var columns = getDataColumns();
         loadResults(data, columns);
@@ -1732,9 +1772,72 @@
 
         //re-drawing the table with the new data
         searchTable.rows.add(results).draw();
+        buildStatusGrid();
+ 
+
 
     }
 
+    function buildStatusGrid()
+    {
+        var str = '<div class="col-md-8" style="text-align:left;background:silver;color:black;">Status</div>';
+        str = str + '<div class="col-md-4" style="text-align:right;background:silver;color:black;">Counts</div>';
+
+        for (var i=0; i < rowStatusArray.length; i++)
+        {
+            str = str + '<div class="col-md-8 row' + rowStatusArray[i].replace('-', '').replace(' ', '') + '" style="text-align:left;">' + rowStatusArray[i] + '</div>';
+            str = str + '<div class="col-md-4 row' + rowStatusArray[i].replace('-', '').replace(' ', '') + '" style="text-align:right;">' + rowStatusArrayCtr[i] + '</div>';
+        }
+
+        $("#statusOfGrid").html(str);
+    }
     //end datatable functionality
 
+    function getRowStatus(row)
+    {
+
+        status = "";
+        var arrayStatusHTML = "";
+
+        if (row["enabled"] === false)
+        {
+            status = "Not Active";
+            arrayStatusHTML = "<div class='rowStatus rowNotActive'>" + status + "</div>";
+        }
+        else if (row["Number of Records"] == "0")
+        {
+            status = "No Data";
+            arrayStatusHTML = "<div class='rowStatus rowNoData'>" + status + "</div>";
+        }
+        else if (row["Posted"].toLowerCase() === "no")
+        {
+            status = "Un-Posted";
+            arrayStatusHTML = "<div class='rowStatus rowUnPosted'>" + status + "</div>";
+        }
+        else
+        {
+            status = "Posted";
+            arrayStatusHTML = "<div class='rowStatus rowPosted'>" + status + "</div>";
+        }
+ 
+        var index = rowStatusArray.findIndex(getStatus);
+ 
+
+        if (index === -1)
+        {
+            rowStatusArrayCtr.push(1);
+            rowStatusArray.push(status);
+        }
+        else
+        {
+            rowStatusArrayCtr[index] = rowStatusArrayCtr[index] + 1;
+        }
+
+        return arrayStatusHTML;
+    }
+
+    function getStatus(element)
+    {
+        return element == status;
+    }
 </script>
