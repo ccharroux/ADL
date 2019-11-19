@@ -8601,6 +8601,7 @@ function getReportFilterArray_TimeSalesVsRepBilling() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'quarter'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -8665,6 +8666,7 @@ function getReportFilterArray_RepBillingSubmissionStatusList() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'quarter'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -8848,7 +8850,8 @@ function getReportFilterArray_RepBillingCompareList() {
         token: "PriorPeriod",
         objectName: "ddlPriorPeriod",
         jsCall: "getPeriodList",
-        required: true
+        jsCallParameters: ['all', 'quarter'],
+        required: true 
     }
     arrayFilters.push(arrayObject);
 

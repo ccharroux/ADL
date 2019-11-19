@@ -1521,13 +1521,16 @@ function getYearList() {
  
 
 }
-function getPeriodList(inType)
+function getPeriodList(inType, inDefaultSelect)
 {
-
-  
-
+ 
     if (!inType) {
         inType = 'all';
+    }
+
+    if (!inDefaultSelect)
+    {
+        inDefaultSelect = "";
     }
 
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -1553,14 +1556,42 @@ function getPeriodList(inType)
         str = str + '<option value="">-----------</option>';
     }
 
-    if (inType == 'quarters' || inType == 'all') {
-        for (var i = 1; i <= 4; i++) {
+    var thisQuarter = -1;
+    if (inDefaultSelect.toLowerCase() == 'quarter') {
+        if (thisMonth == 0 || thisMonth == 1 || thisMonth == 2) {
+            thisQuarter = 1;
+        }
 
-            str = str + '<option value="Q' + i.toString() + '">Quarter - ' + i.toString() + '</option>';
+        if (thisMonth == 3 || thisMonth == 4 || thisMonth == 5) {
+            thisQuarter = 2;
+        }
+
+        if (thisMonth == 6 || thisMonth == 7 || thisMonth == 8) {
+            thisQuarter = 3;
+        }
+
+        if (thisMonth == 9 || thisMonth == 10 || thisMonth == 11) {
+            thisQuarter = 4;
+        }
+    }
+
+    if (inType == 'quarters' || inType == 'all')
+    {
+        for (var i = 1; i <= 4; i++)
+        {
+            str = str + '<option value="Q' + i.toString();
+
+            if (thisQuarter == i)
+            {
+                str = str + " selected ";
+            }
+
+            str = str + '">Quarter - ' + i.toString() + '</option>';
         }
     }
 
     $("#ddlPeriod").html(str);
+
  
     try {
         convertToChosenSelect("ddlPeriod", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
@@ -1578,6 +1609,7 @@ function getPeriodList(inType)
     if (paramRevenuePeriod.length > 0) {
         $("#ddlPeriod").val(paramRevenuePeriod);
     }
+
 
 }
 

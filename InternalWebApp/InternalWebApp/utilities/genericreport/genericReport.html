@@ -1242,14 +1242,20 @@
             }
         });
     }
-    function getPeriodList(typesToLoad)
+    function getPeriodList(typesToLoad, inDefaultSelect)
     {
+
+        console.log(typesToLoad);
+        console.log(inDefaultSelect);
 
         if (!typesToLoad)
         {
             typesToLoad = "all";
         }
 
+        if (!inDefaultSelect) {
+            inDefaultSelect = "";
+        }
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
         var str = '';
@@ -1262,7 +1268,8 @@
 
             for (var i = 1; i <= 12; i++) {
 
-                str = str + '<option ' + (thisPeriod == i ? "selected" : "") + ' value="' + (i < 10 ? '0' + i.toString() : i.toString()) + '">' + monthNames[i - 1] + '</option>';
+                str = str + '<option ' + (thisPeriod == i && inDefaultSelect != "quarter" ? "selected" : "");
+                str = str + ' value="' + (i < 10 ? '0' + i.toString() : i.toString()) + '">' + monthNames[i - 1] + '</option>';
             }
         }
 
@@ -1270,14 +1277,41 @@
             str = str + '<option value="">-----------</option>';
         }
 
-        if (typesToLoad.toLowerCase() == "all" || typesToLoad.toLowerCase() == "quarters")
-        {
-            for (var i = 1; i <= 4; i++) {
+        var thisQuarter = -1;
+        if (inDefaultSelect.toLowerCase() == 'quarter') {
+            if (thisPeriod == 0 || thisPeriod == 1 || thisPeriod == 2) {
+                thisQuarter = 1;
+            }
 
-                str = str + '<option value="Q' + i.toString() + '">Quarter - ' + i.toString() + '</option>';
+            if (thisPeriod == 3 || thisPeriod == 4 || thisPeriod == 5) {
+                thisQuarter = 2;
+            }
+
+            if (thisPeriod == 6 || thisPeriod == 7 || thisPeriod == 8) {
+                thisQuarter = 3;
+            }
+
+            if (thisPeriod == 9 || thisPeriod == 10 || thisPeriod == 11) {
+                thisQuarter = 4;
             }
         }
+        console.log(thisQuarter);
+        if (typesToLoad.toLowerCase() == "all" || typesToLoad.toLowerCase() == "quarter")
+        {
+            for (var i = 1; i <= 4; i++)
+            {
+                str = str + '<option '; 
+ 
+                if (thisQuarter == i)
+                {
+                    str = str + ' selected ';
+                }
 
+                str = str +  ' value="Q' + i.toString() + '">';
+                str = str + 'Quarter - ' + i.toString() + '</option>';
+            }
+        }
+        console.log(str);
         $("#ddlPeriod").html(str);
 
         convertToChosenSelect("ddlPeriod", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
