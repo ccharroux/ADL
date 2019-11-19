@@ -239,10 +239,13 @@ reportName.push("rptSweeperLogMRRRevenue");
 
 reportName.push("rptRABSummaryByRegion");
 reportName.push("rptRAB");
-reportName.push("rptProductMarketOwnerActivationList")
-reportName.push("rptXRYMarketExclusivitySettings")
+reportName.push("rptProductMarketOwnerActivationList");
+reportName.push("rptXRYMarketExclusivitySettings");
 
-reportName.push("rptAEWebUserMatches")
+reportName.push("rptAEWebUserMatches");
+
+reportName.push("rptRevenueWithDisabledAdvertisersAgencies");
+reportName.push("rptMarketStationSummary");
 
 function buildReportArray()
 {
@@ -9612,6 +9615,131 @@ function getReportObject_AEWebUserMatches() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['xry', 'account executive']
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_RevenueWithDisabledAdvertisersAgencies() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationListByGeneralFilters",
+        objectName: "ddlStation",
+        reloadBasedMarket: true,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_RevenueWithDisabledAdvertisersAgencies() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+
+        reportTitle: "Revenue with Disabled Advertisers and Agencies",
+        apiControllerAction: "/api/XRAYRevenue/GetRevenueWithDisabledAdvertisersAgencies",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry', 'xray monthly']
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_MarketStationSummary() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MarketStationSummary() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    //need to set message with no MRR data an # of stations posted
+    //if ($("#header-summary-section").is(":visible") == false || $("#header-summary").html() == "") {
+    //    $("#header-summary-section").show();
+    //    $("#header-summary").html(
+    //        'Market last released ' + row["Release Date"]
+    //    );
+    //}
+
+    tempObject =
+    {
+
+        reportTitle: "Market Station Summary",
+        apiControllerAction: "/api/XRAYRevenue/GetMarketStationSummary",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry', 'xray monthly']
     }
 
     return tempObject;
