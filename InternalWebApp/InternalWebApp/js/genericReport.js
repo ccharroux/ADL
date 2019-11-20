@@ -3347,7 +3347,8 @@ function getReportFilterArray_TVBMRRCompare() {
     arrayObject = {
         token: "Period",
         objectName: "ddlPeriod",
-        jsCall: "getPeriodListQuarters",
+        jsCall: "getPeriodList",
+        jsCallParameters: ["quarter", "quarter"],
         required: true
     }
     arrayFilters.push(arrayObject);
