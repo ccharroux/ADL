@@ -322,15 +322,24 @@
                         <div class="row input-row">
                             <a id="ancOwnerships"></a>
                             <div class="col-md-6 text-align-left">
-                                <label for="ddlAssignedOwnerships">Current Assigned Ownerships</label>
-                                <select id="ddlAssignedOwnerships" size="7" class="field-width-325"></select>
-                                <input type="button" class="default-button background-red" onclick="removeOwnership();" value="Remove" />
+                                <div  >
+                                    <label for="ddlAssignedOwnerships">Current Assigned Ownerships</label>
+                                </div>
+                                <div>
+                                    <select id="ddlAssignedOwnerships" size="7" class="field-width-325"></select>
+                                    <input type="button" class="default-button background-red" onclick="removeOwnership();" value="Remove" />
+                                </div>
                             </div>
+                            <div class="col-md-6 text-align-left">
+                                <div style="margin-bottom:40px;">
+                                    <div class="col-md-3"><label for="ddlOwnership">Ownerships</label></div>
+                                    <div class="col-md-3"> <select style="margin-left:5px" onchange="getOwnershipList(false);" id="ddlOwnershipProducts"></select> </div>
+                                </div>
 
-                            <div class="col-md-5 text-align-left">
-                                <label for="ddlOwnership">Ownerships</label>
-                                <select id="ddlOwnership" size="7" class="field-width-325"></select>
-                                <input type="button" class="default-button background-green" onclick="addOwnership();" value="Add" />
+                                <div>
+                                    <select id="ddlOwnership" size="7" class="field-width-325"></select>
+                                    <input type="button" class="default-button background-green" onclick="addOwnership();" value="Add" />
+                                </div>
                             </div>
 
                         </div>
@@ -543,6 +552,7 @@
         else {
 
             var str = '';
+            var ddlStr = "<option value=''>-- Select a Product</option>";
 
             $("#productList").html("");
 
@@ -564,7 +574,11 @@
                 str = str + '</div>';
                 str = str + '</div>';
 
+                ddlStr = ddlStr + "<option value='" + productId + "'>" + obj.P_ProductName + "</option>";
+
             });
+
+            $("#ddlOwnershipProducts").html(ddlStr);
 
             $("#productList").append(str);
 
@@ -675,7 +689,7 @@
             $.each(data.report.rows, function (index) {
 
                 var obj = data.report.rows[index];
-                str = str + '<option value="' + obj.ownerId + '">' + obj.ownerName + '</option>';
+                str = str + '<option value="' + obj.ownerId + '">' + obj.ownerName + ' (' + obj.ownerId + ')</option>';
 
             })
 
@@ -686,9 +700,15 @@
 
     }
 
-    function getOwnershipList() {
+    function getOwnershipList(bAlsoLoadPersonnel)
+    {
 
-        var url = ServicePrefix + '/api/Owner/GetOwnerList';
+        if (!bAlsoLoadPersonnel)
+        {
+            bAlsoLoadPersonnel = true;
+        }
+
+        var url = ServicePrefix + '/api/Owner/GetOwnerListByProduct';
 
         var settings = {
             dataType: 'json',
@@ -696,11 +716,12 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inActiveOnly": true
+ 
+                "inProductId": $("#ddlOwnershipProducts").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getOwnershipListSuccess(data, textStatus, jQxhr);
+                getOwnershipListSuccess(data, textStatus, jQxhr, bAlsoLoadPersonnel);
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
@@ -709,7 +730,7 @@
         $.ajax(url, settings);
     }
 
-    function getOwnershipListSuccess(data, textStatus, jQxhr) {
+    function getOwnershipListSuccess(data, textStatus, jQxhr, bAlsoLoadPersonnel) {
 
         if (data.response.status != "SUCCESS") {
             bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
@@ -722,19 +743,31 @@
                 var isAssigned = false;
                 var obj = data.report.rows[index];
 
-                $("#ddlAssignedOwnerships > option").each(function () {
-                    if (this.value == obj.OwnerID) {
+                $("#ddlAssignedOwnerships > option").each(function ()
+                {
+
+                    if (this.value == obj.ownerid)
+                    {
                         isAssigned = true;
                     }
                 })
-                if (isAssigned != true) {
-                    str = str + '<option value="' + obj.OwnerID + '">' + obj.OwnerName + '</option>';
-                } else {
+
+                if (isAssigned != true)
+                {
+                    str = str + '<option value="' + obj.ownerid + '">' + obj.ownername + ' (' + obj.ownerid + ')</option>';
+                }
+                else
+                {
 
                 }
             });
+
             $("#ddlOwnership").html(str);
-            getPersonnel();
+
+            if (bAlsoLoadPersonnel == true) {
+                getPersonnel();
+            }
+
         }
     }
 
@@ -912,7 +945,9 @@
         if (data.response.status != "SUCCESS") {
             bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
         } else {
-            bootbox.alert("Ownership has been added successfully.")
+
+            bootbox.alert("Ownership has been added successfully.");
+
             $('#ddlOwnership > option:selected').each(function () {
                 if ($('#ddlAssignedOwnerships [value="' + $(this).val() + '"]').length == 0) {
                     $('#ddlAssignedOwnerships').html('<option value="' + $(this).val() + '">' + $(this).text() + '</option>' + $('#ddlAssignedOwnerships').html());
