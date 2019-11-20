@@ -11,6 +11,8 @@ const gChosenParams = {
     allowSplitWordSearch: false
 }
 
+ 
+
 const gMonths = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
 ; (function () {
@@ -1976,14 +1978,48 @@ function buildCustomLink(objectName, data, bSortable, className )
 
     }
     else {
- 
+
+            //
         column = {
             "title": objectName,
-            "visible": true,
-            "mData": objectName,
-            "orderable": bSortable,
-            "className": className
+            "visible": true,          
+            "className": className,  
+            "mRender": function (data, type, row) {
+ 
+                var textClassName = "";
+                var ret = "";
+
+                // negative numbers
+                if (isNaN(row[objectName].replace("$", "")) == false)
+                {
+                    if ( row[objectName].indexOf(  "-") > -1)
+                    {
+                        textClassName = "redText";
+                    }
+                }
+                // negative %
+                if (isNaN(row[objectName].replace("%", "")) == false)
+                {
+                    if (row[objectName].indexOf("%") > -1) {
+                        if (row[objectName].indexOf("-") > -1) {
+                            textClassName = "redText";
+                        }
+                    }
+                }
+
+                ret = row[objectName];
+
+                if (textClassName.length > 0)
+                {
+                    ret = '<div class="'+textClassName+'">' + row[objectName] + "</div>";
+                }
+
+                return ret;
+            },
+            "orderable": bSortable 
+  
         };
+ 
     }
 
     return column;
