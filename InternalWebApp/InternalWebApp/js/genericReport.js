@@ -3390,7 +3390,7 @@ function getReportObject_TVBMRRCompare() {
         apiControllerAction: "/api/TVBReport/GetMRRTVBCompare",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb']
+        product: ['tvb', 'tvb review']
     }
 
     return tempObject;
@@ -8643,7 +8643,7 @@ function getReportObject_TimeSalesVsRepBilling() {
         apiControllerAction: "/api/TVBReport/GetTimeSalesVersusRepBilling",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb'],
+        product: ['tvb', 'tvb review'],
         sortable: true
 
     }
@@ -8708,7 +8708,7 @@ function getReportObject_RepBillingSubmissionStatusList() {
         apiControllerAction: "/api/TVBReport/GetRepBillingSubmissionStatus",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb'],
+        product: ['tvb', 'tvb review'],
         sortable: true
 
     }
@@ -8901,7 +8901,7 @@ function getReportObject_RepBillingCompareList() {
         apiControllerAction: "/api/TVBReport/GetRepBillingCompare",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb'],
+        product: ['tvb', 'tvb review'],
         sortable: true
 
     }
@@ -8984,7 +8984,7 @@ function getReportObject_TimeSalesCompareList() {
         apiControllerAction: "/api/TVBReport/GetTimeSalesCompare",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb'],
+        product: ['tvb', 'tvb review'],
         sortable: true
 
     }
