@@ -302,6 +302,8 @@ function getReportObject(inReportId)
 
 function buildQuickReports(rptType, control, container, postfix)
 {
+    var reportNameArray = new Array();
+    var reportNumberArray = new Array();
 
     if (!control)
     {
@@ -318,12 +320,19 @@ function buildQuickReports(rptType, control, container, postfix)
     {
         for (var v = 0; v < reportObjectArray[i].product.length; v++)
         {
-
             for (var z = 0; z < rptType.length; z++)
             {
-                if (reportObjectArray[i].product[v].toLowerCase() == rptType[z].toLowerCase()) {
+                if (reportObjectArray[i].product[v].toLowerCase() == rptType[z].toLowerCase())
+                {
                     rptHit = true;
-                    $("#" + control).append("<option value='" + i + "'>" + reportObjectArray[i].reportTitle + "</option>");
+                    var index = reportNumberArray.findIndex(function (element, index, array) {
+                         return element == i;
+                    });
+
+                    if (index == -1) {
+                        reportNameArray.push(reportObjectArray[i].reportTitle);
+                        reportNumberArray.push(i);
+                    }
                 }
             }
         }
@@ -332,8 +341,15 @@ function buildQuickReports(rptType, control, container, postfix)
 
     if (rptHit == true)
     {
-        $("#" + control).prepend("<option value='-1'>  -- Select a Report --  </option>");
-        $("#" + control).val("-1");
+        var ddlStr = "<option value='-1'>  -- Select a Report --  </option>";
+
+
+        for (var i = 0; i < reportNameArray.length; i++)
+        {
+            ddlStr = ddlStr  +  "<option value='" + reportNumberArray[i] + "'>" + reportNameArray[i] + "</option>";
+        }
+
+        $("#" + control).html(ddlStr);
         $("#" + container).show();
 
         try {
