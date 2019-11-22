@@ -188,13 +188,17 @@
     var submissionId = 0;
     var bReloadPage = false;
     var isNewProduct = 0;
+    var bIsFromReport = false;
 
     $(document).ready(function () {
 
         buildMainMenu("Stations");
+
         stationId = (getParameterByName("StationID") == null ? 0 : getParameterByName("StationID"));
         submissionId = (getParameterByName("SubmissionID") == null ? 0 : getParameterByName("SubmissionID"));
         isNewProduct = (getParameterByName("ProductNew") == null ? 0 : getParameterByName("ProductNew"));
+        bIsFromReport = getParameterByName("FromReport") == null ? false : getParameterByName("FromReport");
+
         checkIfNewProduct();    
         $("#hdnSubmissionId").val(submissionId);
         getInputScriptList();
@@ -434,12 +438,25 @@
 
     function goBackToStationProductXRY() {
 
-        if (isNewProduct == 1) {
+        if (isNewProduct == 1)
+        {
             window.location = "/admin/station/station.html?StationID=" + stationId;
-        } else {
+
+        } else if (bIsFromReport || getLocalStorage("reportActionData").length > 0)
+        {
+            var reportData = $.parseJSON(getLocalStorage("reportActionData"));
+
+            if (reportData["previousPage"].length > 0)
+            {
+                window.location = reportData["previousPage"];
+            } else
+            {
+                window.location = "/utilities/genericreport/genericReportList.html";
+            }
+        } else
+        {
             window.location = "/products/xry/xrystationproduct.html?StationID=" + stationId;
         }
-
     }
 
     function updateXRYSubmission() {
@@ -598,7 +615,8 @@
             MKAErrorMessageRtn(data.response.errorMessage[0]);
         } else {
             bootbox.alert('XRY has been enabled successfully.', function () {
-                window.location = "/products/xry/xrystationproduct.html?StationID=" + stationId;
+                //window.location = "/products/xry/xrystationproduct.html?StationID=" + stationId;
+                goBackToStationProductXRY();
             });
         }
     }

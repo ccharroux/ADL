@@ -2028,8 +2028,21 @@ function buildCustomLink(objectName, data, bSortable, className )
 function getReportParameters()
 {
     var reportParams = {}
-    $('.form-group:visible').children('input').each(function (i, obj) {
-        if (obj.type != "button") {
+    $('.form-group:visible').children('input').each(function (i, obj)
+    {
+        //console.log(obj.type);
+        //if (obj.type != "button") {
+        //    reportParams[obj.id] = obj.value;
+        //}
+
+        if (obj.type == 'radio')
+        {
+            reportParams[obj.id] = obj.checked;
+        } else if (obj.type == 'button')
+        {
+            //do nothing
+        } else
+        {
             reportParams[obj.id] = obj.value;
         }
 

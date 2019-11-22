@@ -193,13 +193,13 @@
                         </div>
 
                         <div class="form-group rptView collection-market vertical-center">
-                            <label for="ddlMarket" class="dropdown-label rptView">Market</label>
-                            <select id="ddlMarket" apiInput="inMarketId" onchange="" class="dropdown-select rptView"></select>
+                            <label for="ddlMarket" class="requiredText dropdown-label rptView"> * Market</label>
+                            <select id="ddlMarket" apiInput="inMarketId" onchange="" class="mkaRequired dropdown-select rptView"></select>
                         </div>
 
                         <div class="form-group rptView collection-owner vertical-center">
-                            <label for="ddlOwner" class="dropdown-label rptView">Owner</label>
-                            <select id="ddlOwner" apiInput="inOwnerId" onchange="" class="dropdown-select rptView"></select>
+                            <label for="ddlOwner" class="requiredText dropdown-label rptView"> * Owner</label>
+                            <select id="ddlOwner" apiInput="inOwnerId" onchange="" class="mkaRequired dropdown-select rptView"></select>
                         </div>
 
                         <div class="form-group rptView collection-station vertical-center">
@@ -208,13 +208,13 @@
                         </div>
 
                         <div class="form-group rptView vertical-center">
-                            <label for="ddlYear" class="dropdown-label rptView">Year</label>
-                            <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView"></select>
+                            <label for="ddlYear" class="requiredText dropdown-label rptView"> * Year</label>
+                            <select id="ddlYear" apiInput="inYear" class="mkaRequired dropdown-select rptView"></select>
                         </div>
 
                         <div class="form-group rptView vertical-center">
-                            <label for="ddlPeriod" class="dropdown-label rptView">Period</label>
-                            <select id="ddlPeriod" apiInput="inPeriod" class="dropdown-select rptView"></select>
+                            <label for="ddlPeriod" class="requiredText dropdown-label rptView"> * Period</label>
+                            <select id="ddlPeriod" apiInput="inPeriod" class="mkaRequired dropdown-select rptView"></select>
                         </div>
 
                         <div class="form-group rptButton vertical-center" style="float:none;text-align:left">
@@ -226,10 +226,16 @@
                 </div>
                 <center>
                     <div class="row" style="width:25%; border:solid 1px silver">
-                        <div id="statusOfGrid">
+                        <div id="statusOfGrid" >
                         </div>
+                        <!--<div id="monthend-buttons" style="">
+                            <input type="button" id="btnReview" class="search-button" value="Review" onclick="" />
+                            <input type="button" id="btnReviewRevenue" class="search-button" value="Review Revenue" onclick="" />
+                            <input type="button" id="btnRank" class="search-button" value="Rank" onclick="" />
+                        </div>-->
                     </div>
                 </center>
+                
                 <!-- datatable -->
                 <div style="width:70%; margin:auto;">
                     <div class="dataTable-top-margin" >
@@ -300,8 +306,65 @@
         loadYears();
         //load markets
         getMarketListByProduct(product);
+        
+        setAutoRun();
 
     });
+
+    function setAutoRun()
+    {
+        setTimeout('loadAdvancedSearch()', 1000);
+    }
+
+    function loadAdvancedSearch()
+    {
+
+        $.blockUI;
+
+        loadReportParameters();
+        runReportFromAdvancedSearch();
+
+    }
+
+    function runReportFromAdvancedSearch() {
+            setTimeout('getDataCollectionList(true)', 1000);
+    }
+
+    function loadReportParameters() {
+
+        if (getLocalStorage("reportActionData").length <= 0) {
+            return;
+        }
+
+        var reportParamData = $.parseJSON(getLocalStorage("reportActionData"));
+
+        var searchResults = {};
+
+        for (var key in reportParamData) {
+            searchResults[key] = reportParamData[key];
+
+            if (key.indexOf("rdo") > -1)
+            {
+                $("#" + key).prop('checked', reportParamData[key]);
+            } else
+            {
+                $("#" + key).val(reportParamData[key]);
+            }
+
+            if (key.indexOf("ddl") > -1) {
+                //console.log(key);
+                $("#" + key).change();
+            }
+
+            if (key.indexOf("rdo") > -1 && reportParamData[key] == true) {
+                $("#" + key).change();
+            }
+        }
+
+        setLocalStorage("gSearchResults", JSON.stringify(searchResults));
+
+        setLocalStorage("reportActionData", "");
+    }
 
     function setupUI() {
 
@@ -1422,15 +1485,20 @@
         );
     }
 
-    function changeAvailability(stationId, marketId, ownerId, stationName, mediaType) {
+    function changeAvailability(stationId, marketId, ownerId, stationName, mediaType, submissionId) {
+    
+        //setLocalStorage("tempStationMarketId", marketId);
+        //setLocalStorage("tempStationOwnerId", ownerId);
+        //setLocalStorage("tempStationName", stationName);
+        //setLocalStorage("tempStationMedia", mediaType);
 
-        setLocalStorage("tempStationMarketId", marketId);
-        setLocalStorage("tempStationOwnerId", ownerId);
-        setLocalStorage("tempStationName", stationName);
-        setLocalStorage("tempStationMedia", mediaType);
+        //window.location = "/products/xry/xrystationproduct.html?StationID=" + stationId;
+        var reportParams = getReportParameters();
 
-        window.location = "/products/xry/xrystationproduct.html?StationID=" + stationId;
+        //console.log(reportParams);
+        setLocalStorage("reportActionData", JSON.stringify(reportParams));
 
+        window.location = "/products/xry/xrystationsubmission.html?StationID=" + stationId + "&SubmissionID=" + submissionId + "&FromReport=true";
     }
 
     //start data table functionality
@@ -1474,13 +1542,25 @@
             "searchable": true
         });
 
-        columnsToDisplay.push({
-            "title": "Owner",
-            "visible": true,
-            "mData": "Owner",
-            "orderable": true,
-            "searchable": true,
-        })
+        if ($("#rdoOwner").is(':checked'))
+        {
+            columnsToDisplay.push({
+                "title": "Market",
+                "visible": true,
+                "mData": "Market",
+                "orderable": true,
+                "searchable": true
+            });
+        } else
+        {
+            columnsToDisplay.push({
+                "title": "Owner",
+                "visible": true,
+                "mData": "Owner",
+                "orderable": true,
+                "searchable": true
+            });
+        }
 
         columnsToDisplay.push({
             "title": "Records",
@@ -1612,13 +1692,15 @@
                     }
                 }
 
-                if (row["enabled"] === false) {
-                    actions += "<a href='#' onclick='enable();'>Enable</a><br/>";
-                }
+                //removing the options for now
+                //based on 11/19/2019 discussion with carl.
+                //if (row["enabled"] === false) {
+                //    actions += "<a href='#' onclick='enable();'>Enable</a><br/>";
+                //}
 
-                if (row["enabled"] === true) {
-                    actions += "<a href='#' onclick='disable();'>Disable</a><br/>";
-                }
+                //if (row["enabled"] === true) {
+                //    actions += "<a href='#' onclick='disable();'>Disable</a><br/>";
+                //}
 
                 //page uses local storage
                 //use onclick and pass variables
@@ -1635,7 +1717,7 @@
                     row["Station"].replace(/[\s]/g, "&nbsp;") +
                     '","' +
                     row["Media Type"] +
-                    '"';
+                    '",' + row["submissionId"] ;
                 actions += '<a href="#" onclick=changeAvailability(' + parameters + ');>Change&nbsp;Availability</a>';
 
                 return actions;
@@ -1648,10 +1730,88 @@
         return columnsToDisplay;
     }
 
-    function getDataCollectionList() {
+    function validateFilters(bSilent)
+    {
+
+
+        var loopBreak = true;
+        var msg = "";
+        //current issue is the chosen being visible
+        //if market ddlmarket needs a value
+        //if owner ddlowner needs a value
+        if ($("#rdoOwner").is(':checked'))
+        {
+            if ($("#ddlOwner").val().trim() == "")
+            {
+                msg = "Please select an owner.";
+                if (bSilent == false)
+                {
+                    bootbox.alert(msg, function() {});
+                }
+                loopBreak = false;
+                return false;
+            }
+        } else if ($("#rdoMarket").is(':checked'))
+        {
+            if ($("#ddlMarket").val().trim() == "")
+            {
+                msg = "Please select a market.";
+                if (bSilent == false)
+                {
+                    bootbox.alert(msg, function() {});
+                }
+                loopBreak = false;
+                return false;
+            }
+        } else
+        {
+            msg = "Third Party functionality will send you to another page. At this time chose one of the other options to get the data.";
+            if (bSilent == false)
+            {
+                bootbox.alert(msg, function () { });
+            }
+            return false;
+        }
+
+        //year and period regardless
+        if ($("#ddlYear").val().trim() == "")
+        {
+            msg = "Please select a year.";
+            if (bSilent == false)
+            {
+                bootbox.alert(msg, function () { });
+            }
+            loopBreak = false;
+            return false;
+        }
+
+        if ($("#ddlPeriod").val().trim() == "") {
+            msg = "Please select a period.";
+            if (bSilent == false)
+            {
+                bootbox.alert(msg, function () { });
+            }
+            loopBreak = false;
+            return false;
+        }
+
+        return loopBreak;
+    }
+
+    function getDataCollectionList(bSilent) {
         //determine the validation
         //call new api once built
         //load table with results
+
+        if (!bSilent) {
+            bSilent = false;
+        }
+
+        if (validateFilters(bSilent) == false)
+        {
+            return;
+        }
+
 
         rowStatusArray = new Array();
         rowStatusArrayCtr = new Array();
