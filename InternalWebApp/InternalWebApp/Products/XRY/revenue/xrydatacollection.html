@@ -225,14 +225,16 @@
                     </div>
                 </div>
                 <center>
-                    <div class="row" style="width:25%; border:solid 1px silver">
-                        <div id="statusOfGrid" >
+                    <div class="row" >
+                        <div id="statusOfGrid" style="width:25%; border:solid 1px silver">
                         </div>
-                        <!--<div id="monthend-buttons" style="">
+                        <div id="monthend-buttons" style="display: none;">
                             <input type="button" id="btnReview" class="search-button" value="Review" onclick="" />
                             <input type="button" id="btnReviewRevenue" class="search-button" value="Review Revenue" onclick="" />
+                            <input type="button" id="btnApprove" class="search-button" value="Approve" onclick="" />
+                            <input type="button" id="btnApproveRevenue" class="search-button" value="Approve Revenue" onclick="" />
                             <input type="button" id="btnRank" class="search-button" value="Rank" onclick="" />
-                        </div>-->
+                        </div>
                     </div>
                 </center>
                 
@@ -309,6 +311,7 @@
         
         setAutoRun();
 
+        
     });
 
     function setAutoRun()
@@ -366,6 +369,32 @@
         setLocalStorage("reportActionData", "");
     }
 
+    function checkMarketStatus()
+    {
+        //eventually this will call an api to check the market status
+        //that will turn on/off the buttons
+        if ($("#rdoMarket").is(':checked'))
+        {
+            //console.log($("#ddlMarket").val());
+            if ($("#ddlMarket").val() != "")
+            {
+                //determine button logic
+                //this will be based on the status
+                //this is temporary to set the buttons
+                $("#btnApprove").hide();
+                $("#btnApproveRevenue").hide();
+                $("#btnRank").hide();
+                $("#monthend-buttons").show();
+            } else
+            {
+                $("#monthend-buttons").hide();
+            }
+        } else
+        {
+            $("#monthend-buttons").hide();
+        }
+    }
+
     function setupUI() {
 
         $("#rdoMarket").prop("checked", true);
@@ -399,6 +428,9 @@
                 );
             }
 
+            checkMarketStatus();
+            //clear the table??
+            //clear status section??
         });
 
         $("#ddlMarket").change(function () {
@@ -1841,7 +1873,7 @@
                 else {
 
                     loadCollectionStatusData(data);
-
+                    checkMarketStatus();
                 }
 
             },
