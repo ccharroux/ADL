@@ -1988,9 +1988,10 @@ function buildCustomLink(objectName, data, bSortable, className )
  
                 var textClassName = "";
                 var ret = "";
-
+                //console.log(objectName);
+                //console.log(row[objectName])
                 // negative numbers
-                if (row[objectName]!= null && isNaN(row[objectName].replace("$", "")) == false)
+                if (row[objectName]!= null && row[objectName]!="" && isNaN(row[objectName].replace("$", "")) == false)
                 {
                     if ( row[objectName].indexOf(  "-") > -1)
                     {
@@ -1998,7 +1999,7 @@ function buildCustomLink(objectName, data, bSortable, className )
                     }
                 }
                 // negative %
-                if (row[objectName] != null && isNaN(row[objectName].replace("%", "")) == false)
+                if (row[objectName] != null && row[objectName] != "" && isNaN(row[objectName].replace("%", "")) == false)
                 {
                     if (row[objectName].indexOf("%") > -1) {
                         if (row[objectName].indexOf("-") > -1) {

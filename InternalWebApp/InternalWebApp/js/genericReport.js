@@ -9740,14 +9740,21 @@ function getReportObject_MarketStationSummary() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-
-    //need to set message with no MRR data an # of stations posted
-    //if ($("#header-summary-section").is(":visible") == false || $("#header-summary").html() == "") {
-    //    $("#header-summary-section").show();
-    //    $("#header-summary").html(
-    //        'Market last released ' + row["Release Date"]
-    //    );
-    //}
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Client Number");
+    columnsToDisplay.push("Revenue");
+    columnsToDisplay.push("MRR Total Spot + Paid + Digital");
+    columnsToDisplay.push("Diff XRay / MRR");
+    columnsToDisplay.push("XRay/MRR %");
+    columnsToDisplay.push("This Year Last Period %");
+    columnsToDisplay.push("Last Year This Period %");
+    columnsToDisplay.push("Revenue This Year - Last Period");
+    columnsToDisplay.push("Revenue Last Year - This Period");	
+    columnsToDisplay.push("MRR/XRY Combo Station");	
+    columnsToDisplay.push("MRR Total Spot + Paid");	
+    columnsToDisplay.push("MRR Total Digital");	
+    columnsToDisplay.push("Script");	
+    columnsToDisplay.push("Owner");
 
     tempObject =
     {
@@ -9756,7 +9763,8 @@ function getReportObject_MarketStationSummary() {
         apiControllerAction: "/api/XRAYRevenue/GetMarketStationSummary",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry', 'xray monthly']
+        product: ['xry', 'xray monthly'],
+        sortable: false
     }
 
     return tempObject;
