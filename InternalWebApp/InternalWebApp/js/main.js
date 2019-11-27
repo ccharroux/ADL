@@ -1991,12 +1991,13 @@ function buildCustomLink(objectName, data, bSortable, className )
                 //console.log(objectName);
                 //console.log(row[objectName])
                 // negative numbers
+
                 if (row[objectName] != null &&
                     row[objectName] != "" &&
-                    isNaN(row[objectName].replace("$", "").replace(new RegExp('\,'), '')
+                    isNaN(row[objectName].toString().replace("$", "").replace(new RegExp('\,'), '')
                     ) == false)
                 {
-                    if ( row[objectName].indexOf(  "-") > -1)
+                    if (row[objectName].toString().indexOf("-") > -1)
                     {
                         textClassName = "redText";
                     }
@@ -2004,10 +2005,10 @@ function buildCustomLink(objectName, data, bSortable, className )
                 // negative %
                 if (row[objectName] != null &&
                     row[objectName] != "" &&
-                    isNaN(row[objectName].replace("%", "").replace(new RegExp('\,'), '')) == false)
+                    isNaN(row[objectName].toString().replace("%", "").replace(new RegExp('\,'), '')) == false)
                 {
-                    if (row[objectName].indexOf("%") > -1) {
-                        if (row[objectName].indexOf("-") > -1) {
+                    if (row[objectName].toString().indexOf("%") > -1) {
+                        if (row[objectName].toString().indexOf("-") > -1) {
                             textClassName = "redText";
                         }
                     }

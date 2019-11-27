@@ -9686,6 +9686,17 @@ function getReportObject_RevenueWithDisabledAdvertisersAgencies() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Station Advertiser");
+    columnsToDisplay.push("Advertiser");
+    columnsToDisplay.push("Advertiser Disable Date");
+    columnsToDisplay.push("Media Type");
+    columnsToDisplay.push("Station Agency");
+    columnsToDisplay.push("Agency");
+    columnsToDisplay.push("Agency Disable Date");
+    columnsToDisplay.push("Revenue");
+    columnsToDisplay.push("Date Posted");
 
 
     tempObject =
