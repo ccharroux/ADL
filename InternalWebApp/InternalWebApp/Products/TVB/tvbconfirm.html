@@ -86,8 +86,8 @@
                                 <select id="ddlYearPeriod" onchange="getOwners();"></select><br />
                             </div>
                             <div class="col-md-3 form-group rptView rptOwner">
-                                <label for="ddlOwner" class="dropdown-label rptView rptOwner">Owner</label>
-                                <select id="ddlOwner" apiInput="inOwnerId" class="dropdown-select rptView rptOwner" onchange="getData(); getDeclinedData();"></select>
+                                <label for="ddlOwner" class="dropdown-label rptView rptOwner">Owner</label><br />
+                                <select id="ddlOwner" apiInput="inOwnerId" class="dropdown-select rptView rptOwner" onchange="getData();"></select>
                             </div>
                             <div class="col-md-5">
                                 <span style="margin-top:5px;margin-bottom:5px">
@@ -345,7 +345,6 @@
             gotOwners = true;
 
             getData();
-            getDeclinedData();
 
             // convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
@@ -547,13 +546,26 @@
     function currentPeriod() {
         return $("#ddlYearPeriod").val().substr(4, 2);
     }
-    
+
+    function currentOwnerId() {
+        return $("#ddlOwner").val();
+    }
+
+    function currentOwnerName() {
+        return $("#ddlOwner option:selected").text();
+    }
+
     function getData() {
+        getPendingData();
+        getDeclinedData();
+    }
+    
+    function getPendingData() {
         if (gotYearsPeriods == false || gotOwners == false) {
             return;
         }
 
-        var ownerId = $("#ddlOwner").val();
+        var ownerId = currentOwnerId();
         if (ownerId == '') {
             return;
         }
@@ -594,7 +606,7 @@
             return;
         }
 
-        var ownerId = $("#ddlOwner").val();
+        var ownerId = currentOwnerId();
         if (ownerId == '') {
             return;
         }
@@ -628,6 +640,162 @@
         //ajax call
         $.ajax(url, settings);
 
+    }
+
+    function divideRevenueBy1000() {
+        var ownerId = currentOwnerId();
+        if (ownerId == '') {
+            bootbox.alert("Must select an owner first");
+            return;
+        }
+
+        bootbox.confirm(
+            "Divide all pending revenue figures for " + currentPeriod() + "/" + currentYear() + " and " + currentOwnerName() + " by 1000?",
+            function (confirmed) {
+                if (confirmed) {
+                    divideRevenueBy1000Confirmed();
+                }
+            }
+        );
+    }
+
+    function divideRevenueBy1000Confirmed() {
+
+        var url = ServicePrefix + '/api/TVB/UpdateTimeSalesRevenueToConfirmByOwnerDivideBy1000';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inYear": currentYear(),
+                "inPeriod": currentPeriod(),
+                "inOwnerId": currentOwnerId()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                divideRevenueBy1000Success(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function divideRevenueBy1000Success(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+            getData();
+        }
+    }
+
+    function confirmRevenue() {
+        var ownerId = currentOwnerId();
+        if (ownerId == '') {
+            bootbox.alert("Must select an owner first");
+            return;
+        }
+
+        bootbox.confirm(
+            "Confirm all pending revenue figures for " + currentPeriod() + "/" + currentYear() + " and " + currentOwnerName() + "?",
+            function (confirmed) {
+                if (confirmed) {
+                    confirmRevenueConfirmed();
+                }
+            }
+        );
+    }
+
+    function confirmRevenueConfirmed() {
+
+        var url = ServicePrefix + '/api/TVB/InsertTimeSalesConfirmedRevenueByOwner';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inYear": currentYear(),
+                "inPeriod": currentPeriod(),
+                "inOwnerId": currentOwnerId()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                confirmRevenueSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function confirmRevenueSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+            getData();
+        }
+    }
+
+    function deleteRevenue() {
+        var ownerId = currentOwnerId();
+        if (ownerId == '') {
+            bootbox.alert("Must select an owner first");
+            return;
+        }
+
+        bootbox.confirm(
+            "Delete all confirmed and pending revenue figures for " + currentPeriod() + "/" + currentYear() + " and " + currentOwnerName() + "?",
+            function (confirmed) {
+                if (confirmed) {
+                    deleteRevenueConfirmed();
+                }
+            }
+        );
+    }
+
+    function deleteRevenueConfirmed() {
+
+        var url = ServicePrefix + '/api/TVB/DeleteTimeSalesRevenue';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inYear": currentYear(),
+                "inPeriod": currentPeriod(),
+                "inOwnerId": currentOwnerId()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deleteRevenueSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function deleteRevenueSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+            getData();
+        }
     }
 
     function genericAjaxError(jqXhr, textStatus, errorThrown) {
