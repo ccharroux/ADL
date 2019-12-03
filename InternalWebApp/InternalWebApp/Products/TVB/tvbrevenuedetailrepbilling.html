@@ -191,7 +191,7 @@
                                 <label for="ddlStation">Station</label>
                                 <select id="ddlStation" onchange="getRevenueDetail();"></select>
                                 <div class="stationNavigation" style="display:none">
-                                    <a href="#" onclick="moveToPreviousStation();">Previous Station</a> | <a href="#" onclick="moveToNextStation();">Next Station</a>
+                                    <a class="stationNavPrev" href="#" onclick="moveToPreviousStation();">Previous Station</a> <span class="stationNavSeparator">|</span> <a class="stationNavNext" href="#" onclick="moveToNextStation();">Next Station</a>
                                 </div>
                             </div>
                             <div class="col-md-6" style="padding-top: 20px;height: 62px;vertical-align: middle;">
@@ -229,7 +229,7 @@
                                     <label for="ddlStationBottom">Station</label>
                                     <span id="ddlStationBottom"></span>
                                     <div class="stationNavigation" style="display:none">
-                                        <a href="#" onclick="moveToPreviousStation();">Previous Station</a> | <a href="#" onclick="moveToNextStation();">Next Station</a>
+                                        <a class="stationNavPrev"  href="#" onclick="moveToPreviousStation();">Previous Station</a> <span class="stationNavSeparator">|</span> <a class="stationNavNext"  href="#" onclick="moveToNextStation();">Next Station</a>
                                     </div>
                                 </div>
                                 <div class="col-md-6" style="padding-top: 20px;height: 62px;vertical-align: middle;">
@@ -1045,7 +1045,41 @@
 
         $("#StationEntered").text(stationText);
 
+        setStationNavigation();
+    }
 
+    function setStationNavigation()
+    {
+        console.log('in');
+        console.log($("#ddlStation option:selected").index());
+        console.log($("#ddlStation option").length - 1);
+
+        $(".stationNavPrev").show();
+        $(".stationNavSeparator").show();
+        $(".stationNavNext").show();
+
+        var bHideSeparator = false;
+
+        if ($("#ddlStation option:selected").index() == 1)
+        {
+            // hide previous
+            bHideSeparator = true;
+            $(".stationNavPrev").hide();
+            console.log('hide prev');
+        }
+
+        if ($("#ddlStation option:selected").index() == $("#ddlStation option").length - 1) {
+            // hide next
+            bHideSeparator = true;
+            $(".stationNavNext").hide();
+            console.log('hide next');
+        }
+
+        if (bHideSeparator == true)
+        {
+            console.log('hide sep');
+            $(".stationNavSeparator").hide();
+        }
     }
 
     function showStationContactInfo() {
@@ -1718,6 +1752,7 @@
     function moveToNextStation()
     {
         scrollToAnchor("topOfStations");
+
         if ($("#ddlStation option:selected").index() == $("#ddlStation option").length - 1) {
             bootbox.alert("Already on last station");
             return;
