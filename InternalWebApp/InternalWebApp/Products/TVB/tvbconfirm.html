@@ -91,6 +91,10 @@
                             </div>
                             <div class="col-md-5">
                                 <span style="margin-top:5px;margin-bottom:5px">
+                                    <input type="button" id="btnSelectAll" value="Select All" onclick="selectAllStations();" />
+                                    &nbsp; &nbsp;
+                                    <input type="button" id="btnClearAll" value="Clear All" onclick="clearAllStations();" />
+                                    &nbsp; &nbsp;
                                     <input type="button" id="btnDivideBy1000" value="Divide by 1000" onclick="divideRevenueBy1000();" />
                                     &nbsp; &nbsp;
                                     <input type="button" id="btnConfirm" value="Confirm" onclick="confirmRevenue();" />
@@ -114,6 +118,7 @@
                     <table id="dt" class="dataTable-border dataTable-headers dataTable-cell-border">
                         <thead>
                             <tr>
+                                <th class="exportColumn">Selected</th>
                                 <th class="exportColumn">Status</th>
                                 <th class="exportColumn">Station</th>
                                 <th class="exportColumn">Affiliation</th>
@@ -135,6 +140,7 @@
                         </thead>
                         <!--<tfoot>
                             <tr>
+                                <th>Selected</th>
                                 <th>Status</th>
                                 <th>Station</th>
                                 <th>Affiliation</th>
@@ -361,6 +367,13 @@
             "pageLength": gDataTableDefaultRows,
             "data": [],
             "columns": [
+                {
+                    mRender: function (data, type, row) {
+                        return '<input type="checkbox" class="chkStation" value="' + row['StationID'] + '" checked="checked">';
+                    },
+                    "orderable": false,
+                    "searchable": false
+                },
                 { "data": 'Status' },
                 { "data": 'Station' },
                 { "data": 'ReportedAffiliation' },
@@ -555,6 +568,20 @@
         return $("#ddlOwner option:selected").text();
     }
 
+    function getStationArray() {
+        var stationArray = new Array();
+
+        $(".chkStation:checked").each(function () {
+            var stationObject = {
+                "stationId": $(this).val(),
+                "selected": true
+            }
+            stationArray.push(stationObject);
+        });
+
+        return stationArray;
+    }
+
     function getData() {
         getPendingData();
         getDeclinedData();
@@ -642,6 +669,14 @@
 
     }
 
+    function selectAllStations() {
+        $(".chkStation").prop("checked", true);
+    }
+
+    function clearAllStations() {
+        $(".chkStation").prop("checked", false);
+    }
+
     function divideRevenueBy1000() {
         var ownerId = currentOwnerId();
         if (ownerId == '') {
@@ -649,8 +684,13 @@
             return;
         }
 
+        if ($(".chkStation:checked").length == 0) {
+            bootbox.alert("Must select one or more stations first");
+            return;
+        }
+
         bootbox.confirm(
-            "Divide all pending revenue figures for " + currentPeriod() + "/" + currentYear() + " and " + currentOwnerName() + " by 1000?",
+            "Divide all pending revenue figures for " + currentPeriod() + "/" + currentYear() + " and selected stations for " + currentOwnerName() + " by 1000?",
             function (confirmed) {
                 if (confirmed) {
                     divideRevenueBy1000Confirmed();
@@ -661,7 +701,7 @@
 
     function divideRevenueBy1000Confirmed() {
 
-        var url = ServicePrefix + '/api/TVB/UpdateTimeSalesRevenueToConfirmByOwnerDivideBy1000';
+        var url = ServicePrefix + '/api/TVB/UpdateTimeSalesRevenueToConfirmByStationsDivideBy1000';
 
         var settings = {
             dataType: 'json',
@@ -671,7 +711,7 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inYear": currentYear(),
                 "inPeriod": currentPeriod(),
-                "inOwnerId": currentOwnerId()
+                "inStationList": getStationArray()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -701,8 +741,13 @@
             return;
         }
 
+        if ($(".chkStation:checked").length == 0) {
+            bootbox.alert("Must select one or more stations first");
+            return;
+        }
+
         bootbox.confirm(
-            "Confirm all pending revenue figures for " + currentPeriod() + "/" + currentYear() + " and " + currentOwnerName() + "?",
+            "Confirm all pending revenue figures for " + currentPeriod() + "/" + currentYear() + " and selected stations for " + currentOwnerName() + "?",
             function (confirmed) {
                 if (confirmed) {
                     confirmRevenueConfirmed();
@@ -713,7 +758,7 @@
 
     function confirmRevenueConfirmed() {
 
-        var url = ServicePrefix + '/api/TVB/InsertTimeSalesConfirmedRevenueByOwner';
+        var url = ServicePrefix + '/api/TVB/InsertTimeSalesConfirmedRevenueByStations';
 
         var settings = {
             dataType: 'json',
@@ -723,7 +768,7 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inYear": currentYear(),
                 "inPeriod": currentPeriod(),
-                "inOwnerId": currentOwnerId()
+                "inStationList": getStationArray()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -753,8 +798,13 @@
             return;
         }
 
+        if ($(".chkStation:checked").length == 0) {
+            bootbox.alert("Must select one or more stations first");
+            return;
+        }
+
         bootbox.confirm(
-            "Delete all confirmed and pending revenue figures for " + currentPeriod() + "/" + currentYear() + " and " + currentOwnerName() + "?",
+            "Delete all confirmed and pending revenue figures for " + currentPeriod() + "/" + currentYear() + " and selected stations for " + currentOwnerName() + "?",
             function (confirmed) {
                 if (confirmed) {
                     deleteRevenueConfirmed();
@@ -775,7 +825,7 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inYear": currentYear(),
                 "inPeriod": currentPeriod(),
-                "inOwnerId": currentOwnerId()
+                "inStationList": getStationArray()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
