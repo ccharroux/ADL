@@ -295,12 +295,15 @@
     var bCorrection = false;
     var workingRevisionNumber = 0;
     var status = "";
+    //var bMenuItem = false;
 
     $(document).ready(function () {
 
         buildXRYMenu("Revenue");
         buildQuickReports(['xry']);
         setupUI();
+
+        //bMenuItem = getParameterByName("MenuItem") == null ? false : getParameterByName("MenuItem");
 
         //load periods
         loadPeriods();
@@ -335,11 +338,15 @@
 
     function loadReportParameters() {
 
-        if (getLocalStorage("reportActionData").length <= 0) {
+        //change this to be the back button functionality
+
+        if (hasBackButtonData() == false) {
             return;
         }
 
-        var reportParamData = $.parseJSON(getLocalStorage("reportActionData"));
+        //var reportParamData = $.parseJSON(getLocalStorage("reportActionData"));
+        //var reportParamData = getBackButtonLastItem();
+        var reportParamData = getBackButtonDataByPage(window.location.pathname);
 
         var searchResults = {};
 
@@ -366,7 +373,15 @@
 
         setLocalStorage("gSearchResults", JSON.stringify(searchResults));
 
-        setLocalStorage("reportActionData", "");
+        //setLocalStorage("reportActionData", "");
+        //removeCurrentPageItem(window.location.pathname);
+        //if (bMenuItem)
+        //{
+        //    initializeBackButton();
+        //}
+        cleanupBackButton(window.location.pathname);
+        //determine whether to clear back button data
+        //destroyBackButton();
     }
 
     function checkMarketStatus()
@@ -1290,12 +1305,11 @@
                         //need to determine what the message and content should be
                         strMessage = "There are owner revenue types that require mapping.";
 
-                        bootbox.alert({
-                            message: strMessage,
+                        bootbox.alert(strMessage,
                             function() {
                                 return;
                             }
-                        });
+                        );
 
                     } else {
                         //unpost revenue by station year and period
@@ -1414,12 +1428,11 @@
                         //do i need to let them know??
                         strMessage = "The station has been posted. However, there are un-posted submissions for the market.";
 
-                        bootbox.alert({
-                            message: strMessage,
+                        bootbox.alert(strMessage,
                             function() {
                                 //reloading the datatable
                             }
-                        });
+                        );
 
                         getDataCollectionList();
 
@@ -1475,12 +1488,12 @@
                         //do i even need to let them know??
                         strMessage = "The station has been posted. However, there are un-posted media types for the market.";
 
-                        bootbox.alert({
-                            message: strMessage,
+                        bootbox.alert(
+                            strMessage,
                             function() {
                                 //reloading the datatable
                             }
-                        });
+                        );
 
                         getDataCollectionList();
 
@@ -1521,16 +1534,10 @@
 
     function changeAvailability(stationId, marketId, ownerId, stationName, mediaType, submissionId) {
     
-        //setLocalStorage("tempStationMarketId", marketId);
-        //setLocalStorage("tempStationOwnerId", ownerId);
-        //setLocalStorage("tempStationName", stationName);
-        //setLocalStorage("tempStationMedia", mediaType);
+        //var reportParams = getReportParameters();
+        //setLocalStorage("reportActionData", JSON.stringify(reportParams));
 
-        //window.location = "/products/xry/xrystationproduct.html?StationID=" + stationId;
-        var reportParams = getReportParameters();
-
-        //console.log(reportParams);
-        setLocalStorage("reportActionData", JSON.stringify(reportParams));
+        //buildBackButton();
 
         window.location = "/products/xry/xrystationsubmission.html?StationID=" + stationId + "&SubmissionID=" + submissionId + "&FromReport=true";
     }
@@ -1687,42 +1694,44 @@
                 if (row["Number of Records"] > 0)
                 {
                     link = "";
-                    link = '/products/xry/revenue/xrymatch.html?MatchPage=adv';
-                    link += '&OwnerID=' + row["ownerId"];
-                    link += '&MarketID=' + row["marketId"];
-                    link += '&StationID=' + row["stationId"];
-                    link += '&Period=' + $("#ddlPeriod").val();
-                    link += '&Year=' + $("#ddlYear").val();
+                    //link = '/products/xry/revenue/xrymatch.html?MatchPage=adv';
+                    //link += '&OwnerID=' + row["ownerId"];
+                    //link += '&MarketID=' + row["marketId"];
+                    //link += '&StationID=' + row["stationId"];
+                    //link += '&Period=' + $("#ddlPeriod").val();
+                    //link += '&Year=' + $("#ddlYear").val();
 
-                    if (row["Number of Records"] !== row["Advertisers Matched"])
+                    link += row["ownerId"] + ',' + row["marketId"] + ',';
+                    link += row["stationId"] + ',"' + $("#ddlPeriod").val() + '","';
+                    link += $("#ddlYear").val() + '"';
+
+                    if (row["Number of Records"] != row["Advertisers Matched"])
                     {
-                        link += '&OptionFlag=unmatched';
-                        actions += "<a href='" + link + "'>Match&nbsp;Advertisers</a><br/>";
+                        link += ',"unmatched"';
+                        actions += "<a href='#' onclick=matchStationAdvertisers(" + link + ")>Match&nbsp;Advertisers</a><br/>";
                     } else
                     {
-                        link += '&OptionFlag=matched';
-                        actions += "<a href='" + link + "'>View&nbsp;Advertisers</a><br/>";
+                        //link += '&OptionFlag=matched';
+                        link += ',"matched"';
+                        actions += "<a href='#' onclick=matchStationAdvertisers(" + link + ")>View&nbsp;Advertisers</a><br/>";
                     }
                 }
 
                 if (row["Number of Records"] > 0)
                 {
                     link = "";
-                    link = '/products/xry/revenue/xrymatch.html?MatchPage=agy';
-                    link += '&OwnerID=' + row["ownerId"];
-                    link += '&MarketID=' + row["marketId"];
-                    link += '&StationID=' + row["stationId"];
-                    link += '&Period=' + $("#ddlPeriod").val();
-                    link += '&Year=' + $("#ddlYear").val();
+                    link += row["ownerId"] + ',' + row["marketId"] + ',';
+                    link += row["stationId"] + ',"' + $("#ddlPeriod").val() + '","';
+                    link += $("#ddlYear").val() + '"';
 
                     if (row["Number of Records"] !== row["Agencies Matched"])
                     {
-                        link += '&OptionFlag=unmatched';
-                        actions += "<a href='" + link + "'>Match&nbsp;Agencies</a><br/>";
+                        link += ',"unmatched"';
+                        actions += "<a href='#' onclick=matchStationAgencies(" + link + ")>Match&nbsp;Agencies</a><br/>";
                     } else
                     {
-                        link += '&OptionFlag=matched';
-                        actions += "<a href='" + link + "'>View&nbsp;Agencies</a><br/>";
+                        link += ',"matched"';
+                        actions += "<a href='#' onclick=matchStationAgencies(" + link + ")>View&nbsp;Agencies</a><br/>";
                     }
                 }
 
@@ -1950,8 +1959,6 @@
         searchTable.rows.add(results).draw();
         buildStatusGrid();
  
-
-
     }
 
     function buildStatusGrid()
@@ -2015,5 +2022,41 @@
     function getStatus(element)
     {
         return element == status;
+    }
+
+    function matchStationAdvertisers(ownerId, marketId, stationId, period, year, option)
+    {
+        //alert("match advertisers");
+
+        //need to send it to this point
+
+        //buildBackButton();
+
+        var loc = "";
+        loc = '/products/xry/revenue/xrymatch.html?MatchPage=adv';
+        loc += '&OwnerID=' + ownerId;
+        loc += '&MarketID=' + marketId;
+        loc += '&StationID=' + stationId;
+        loc += '&Period=' + period;
+        loc += '&Year=' + year;
+        loc += '&OptionFlag=' + option;
+
+        window.location = loc;
+    }
+
+    function matchStationAgencies(ownerId, marketId, stationId, period, year, option)
+    {
+        //buildBackButton();
+
+        var loc = "";
+        loc = '/products/xry/revenue/xrymatch.html?MatchPage=agy';
+        loc += '&OwnerID=' + ownerId;
+        loc += '&MarketID=' + marketId;
+        loc += '&StationID=' + stationId;
+        loc += '&Period=' + period;
+        loc += '&Year=' + year;
+        loc += '&OptionFlag=' + option;
+
+        window.location = loc;
     }
 </script>
