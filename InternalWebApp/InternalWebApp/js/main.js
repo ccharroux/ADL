@@ -1139,13 +1139,13 @@ function buildXRYMenu(selectedItem) {
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="/admin/advertiser/advertiserlist.html" role="button" aria-expanded="false">Market Advertiser</a></li>'; 
-    menuItems += '                  <li style="display:block;"><a href="/admin/stationadvertiser/stationadvertiserlist.html">Station Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/stationadvertiser/stationadvertiserlist.html?MenuItem=true">Station Advertiser</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/mediaadvertiser/mediaadvertiserlist.html">Media Advertiser</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html">Parent Advertiser</a></li>';
 
     menuItems += '                  <li style="display:block;"><a href="/admin/agency/agencylist.html" role="button" aria-expanded="false">Market Agency</a></li>';
  
-    menuItems += '                  <li style="display:block;"><a href="/admin/stationagency/stationagencylist.html">Station Agency</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/stationagency/stationagencylist.html?MenuItem=true">Station Agency</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/parentagency/parentagencylist.html">Parent Agency</a></li>';
  
     
@@ -2049,28 +2049,51 @@ function getReportParameters()
 {
     //need to modify this to work with all pages including reports and lists
     var reportParams = {}
-    $('.form-group:visible').children('input').each(function (i, obj)
+    //$('.form-group:visible').children('input').each(function (i, obj)
+    //{
+    //    //console.log(obj.type);
+    //    //if (obj.type != "button") {
+    //    //    reportParams[obj.id] = obj.value;
+    //    //}
+
+    //    if (obj.type == 'radio')
+    //    {
+    //        reportParams[obj.id] = obj.checked;
+    //    } else if (obj.type == 'button')
+    //    {
+    //        //do nothing
+    //    } else
+    //    {
+    //        reportParams[obj.id] = obj.value;
+    //    }
+
+    //});
+
+    //$('.form-group:visible').children('select').each(function (i, obj) {
+    //    reportParams[obj.id] = obj.value;
+    //});
+
+    $(".report-filter").each(function(index, value)
     {
-        //console.log(obj.type);
-        //if (obj.type != "button") {
-        //    reportParams[obj.id] = obj.value;
-        //}
 
-        if (obj.type == 'radio')
+        if (this.tagName.toLowerCase() == "select")
         {
-            reportParams[obj.id] = obj.checked;
-        } else if (obj.type == 'button')
+            reportParams[this.id] = this.value;
+        }else if (this.tagName.toLowerCase() == "input")
         {
-            //do nothing
-        } else
-        {
-            reportParams[obj.id] = obj.value;
+            switch(this.type.toLowerCase())
+            {
+                case "radio":
+                    reportParams[this.id] = this.checked;
+                    break;
+                case "button":
+                    break;
+                default:
+                    reportParams[this.id] = this.value;
+                    break;
+            }
+
         }
-
-    });
-
-    $('.form-group:visible').children('select').each(function (i, obj) {
-        reportParams[obj.id] = obj.value;
     });
 
     reportParams["previousPage"] = window.location.href;
