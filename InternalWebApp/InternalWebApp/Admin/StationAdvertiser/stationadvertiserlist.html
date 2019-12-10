@@ -83,10 +83,10 @@
                 <div class="row search-section">
                     <div class="col-md-10 ">
                         <label for="ddlStation" class="search-ddl-label">Station</label>
-                        <select id="ddlStation" class="search-ddl-select" onchange="getNewStationAdvertiserList()" style=""></select>
+                        <select id="ddlStation" class="search-ddl-select report-filter" onchange="getNewStationAdvertiserList()" style=""></select>
 
                         <label for="searchText">Advertiser Name</label>
-                        <input type="text" id="searchText" />
+                        <input type="text" id="searchText" class="report-filter" />
 
                         <input type="button" class="search-button" style="" value="Search" onclick="getStationAdvertiserList()" />
                     </div>
@@ -171,7 +171,7 @@
 
 
 
-        setLocalStorage("search","");
+        setLocalStorage("search", "");
         setLocalStorage("searchPage", window.location);
 
         buildXRYMenu("Utility");
@@ -199,8 +199,7 @@
         setLocalStorage("newAdvertiserMatch", "");
     }
 
-    function loadScreen()
-    {
+    function loadScreen() {
         var reportTitle = 'Station Advertiser List';
         var exportColumns = returnTableColumnsByClass("dtStationAdvertiserList", "exportColumn");
 
@@ -295,8 +294,7 @@
             }
         });
     }
-    function setupUI()
-    {
+    function setupUI() {
         $("body").on("click",
             "#clear_search_button",
             function () {
@@ -352,23 +350,47 @@
     }
 
     function loadLastSearch() {
-        var search = getParameterByName("search");
+        //var search = getParameterByName("search");
 
-        if (!search == false) {
-            if (search.length > 0) {
-                var sArray = new Array();
-                sArray = search.split("|");
+        //if (!search == false) {
+        //    if (search.length > 0) {
+        //        var sArray = new Array();
+        //        sArray = search.split("|");
 
-                $("#searchText").val(sArray[0]);
-                $("#ddlStation").val(sArray[1].toString());
+        //        $("#searchText").val(sArray[0]);
+        //        $("#ddlStation").val(sArray[1].toString());
 
-                getStationAdvertiserList();
-            }
+        //        getStationAdvertiserList();
+        //    }
+        //}
+
+        if (hasBackButtonData() == false) {
+            return;
         }
+
+        var reportParamData = getBackButtonDataByPage(window.location.pathname);
+
+        //console.log(jQuery.isEmptyObject(reportParamData));
+
+        if (jQuery.isEmptyObject(reportParamData) == false) {
+
+            for (var key in reportParamData) {
+
+                if (key.indexOf("rdo") > -1) {
+                    $("#" + key).prop('checked', reportParamData[key]);
+                } else {
+                    $("#" + key).val(reportParamData[key]);
+                }
+
+            }
+
+            getStationAdvertiserList();
+        }
+
+        cleanupBackButton(window.location.pathname);
     }
 
-    function getNewStationAdvertiserList()
-    {
+    function getNewStationAdvertiserList() {
         $("#searchText").val("");
         getStationAdvertiserList();
     }
@@ -437,4 +459,3 @@
     }
 
 </script>
-

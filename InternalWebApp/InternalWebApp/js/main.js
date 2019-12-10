@@ -15,6 +15,11 @@ const gChosenParams = {
 
 const gMonths = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
+//back button functionality
+const gDefaultBackPage = "/admin/login/dashboard.html";
+var gExcludeFromBackButton = false;
+const gBackButtonArrayLimit = 5;
+
 ; (function () {
 	
 	'use strict';
@@ -391,7 +396,15 @@ $( document ).ready(function()
 
 	setTimeout(getLastPage, delayForLastPage);
 
+    $(window).on("beforeunload", function (e)
+    {
+        if (gExcludeFromBackButton == false)
+        {
+            buildBackButton();
+        }
 
+        gExcludeFromBackButton = false;
+    });
 
 });
 
@@ -1108,9 +1121,9 @@ function buildXRYMenu(selectedItem) {
     menuItems += '        <li style="display:block"><a href="/products/xry/xryrelease.html">Release</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/xry/xryreminders.html">Reminders</a></li>';
     menuItems += '        <li style="display:block;"><a href="/products/xry/xryownershipmappinglist.html">Ownership Mapping</a></li>';
-    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrydatacollection.html">Data Collection</a></li>';
-    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=adv">Advertiser Matching</a></li>';
-    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=agy">Agency Matching</a></li>';
+    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrydatacollection.html?MenuItem=true">Data Collection</a></li>';
+    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=adv&MenuItem=true">Advertiser Matching</a></li>';
+    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=agy&MenuItem=true">Agency Matching</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
 
@@ -1126,13 +1139,13 @@ function buildXRYMenu(selectedItem) {
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="/admin/advertiser/advertiserlist.html" role="button" aria-expanded="false">Market Advertiser</a></li>'; 
-    menuItems += '                  <li style="display:block;"><a href="/admin/stationadvertiser/stationadvertiserlist.html">Station Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/stationadvertiser/stationadvertiserlist.html?MenuItem=true">Station Advertiser</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/mediaadvertiser/mediaadvertiserlist.html">Media Advertiser</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html">Parent Advertiser</a></li>';
 
     menuItems += '                  <li style="display:block;"><a href="/admin/agency/agencylist.html" role="button" aria-expanded="false">Market Agency</a></li>';
  
-    menuItems += '                  <li style="display:block;"><a href="/admin/stationagency/stationagencylist.html">Station Agency</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/stationagency/stationagencylist.html?MenuItem=true">Station Agency</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/parentagency/parentagencylist.html">Parent Agency</a></li>';
  
     
@@ -2034,32 +2047,236 @@ function buildCustomLink(objectName, data, bSortable, className )
 
 function getReportParameters()
 {
+    //need to modify this to work with all pages including reports and lists
     var reportParams = {}
-    $('.form-group:visible').children('input').each(function (i, obj)
+    //$('.form-group:visible').children('input').each(function (i, obj)
+    //{
+    //    //console.log(obj.type);
+    //    //if (obj.type != "button") {
+    //    //    reportParams[obj.id] = obj.value;
+    //    //}
+
+    //    if (obj.type == 'radio')
+    //    {
+    //        reportParams[obj.id] = obj.checked;
+    //    } else if (obj.type == 'button')
+    //    {
+    //        //do nothing
+    //    } else
+    //    {
+    //        reportParams[obj.id] = obj.value;
+    //    }
+
+    //});
+
+    //$('.form-group:visible').children('select').each(function (i, obj) {
+    //    reportParams[obj.id] = obj.value;
+    //});
+
+    $(".report-filter").each(function(index, value)
     {
-        //console.log(obj.type);
-        //if (obj.type != "button") {
-        //    reportParams[obj.id] = obj.value;
-        //}
 
-        if (obj.type == 'radio')
+        if (this.tagName.toLowerCase() == "select")
         {
-            reportParams[obj.id] = obj.checked;
-        } else if (obj.type == 'button')
+            reportParams[this.id] = this.value;
+        }else if (this.tagName.toLowerCase() == "input")
         {
-            //do nothing
-        } else
-        {
-            reportParams[obj.id] = obj.value;
+            switch(this.type.toLowerCase())
+            {
+                case "radio":
+                    reportParams[this.id] = this.checked;
+                    break;
+                case "button":
+                    break;
+                default:
+                    reportParams[this.id] = this.value;
+                    break;
+            }
+
         }
-
-    });
-
-    $('.form-group:visible').children('select').each(function (i, obj) {
-        reportParams[obj.id] = obj.value;
     });
 
     reportParams["previousPage"] = window.location.href;
 
     return reportParams;
 }
+
+function hasBackButtonData()
+{
+
+    if (getLocalStorage("backButtonData").length > 0)
+    {
+        return true;
+    } else
+    {
+        return false;
+    }
+
+}
+
+function buildBackButton()
+{
+    
+    var backButtonData = {};
+    var currentPageData = getReportParameters();
+
+    if (getLocalStorage("backButtonData").length > 0) {
+
+        backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
+        backButtonData["drilldown"].push(currentPageData);
+
+        if (backButtonData["drilldown"].length > gBackButtonArrayLimit)
+        {
+            backButtonData["drilldown"].splice(0,1);
+        }
+
+        setLocalStorage("backButtonData", JSON.stringify(backButtonData));
+
+    } else {
+
+        backButtonData["startingPage"] = window.location.href;
+        backButtonData["drilldown"] = new Array();
+        backButtonData["drilldown"].push(currentPageData);
+        setLocalStorage("backButtonData", JSON.stringify(backButtonData));
+
+    }
+
+}
+
+function initializeBackButton()
+{
+    setLocalStorage("backButtonData", "");
+}
+
+function removeBackButtonLastItem()
+{
+    var backButtonData = {};
+    if (getLocalStorage("backButtonData").length > 0)
+    {
+        backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
+
+
+        backButtonData["drilldown"].pop();
+
+        if (backButtonData["drilldown"].length > 0)
+        {
+            setLocalStorage("backButtonData", JSON.stringify(backButtonData));
+        } else
+        {
+            initializeBackButton();
+        }
+    }
+}
+
+function removeCurrentPageItem(pageName)
+{
+    var backButtonData = {};
+    if (getLocalStorage("backButtonData").length > 0) {
+        backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
+
+
+        for (var i = 0; i < backButtonData["drilldown"].length; i++)
+        {
+            var index = backButtonData["drilldown"][i].previousPage.indexOf(pageName);
+            if (index > -1)
+            {
+                backButtonData["drilldown"].splice(i, 1);
+                break;
+            }
+        }
+
+
+        if (backButtonData["drilldown"].length > 0)
+        {
+            setLocalStorage("backButtonData", JSON.stringify(backButtonData));
+        } else
+        {
+            initializeBackButton();
+        }
+
+    }
+}
+
+function getBackButtonDataByPage(pageName)
+{
+
+    var backButtonData = {};
+    if (getLocalStorage("backButtonData").length > 0)
+    {
+        backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
+
+
+        for (var i = 0; i < backButtonData["drilldown"].length; i++)
+        {
+            var index = backButtonData["drilldown"][i].previousPage.indexOf(pageName);
+            if (index > -1)
+            {
+                return backButtonData["drilldown"][i];
+            }
+        }
+
+        return {};
+    } else
+    {
+        return backButtonData;
+    }
+}
+
+function getBackButtonLastItem()
+{
+    var backButtonData = {};
+    if (getLocalStorage("backButtonData").length > 0)
+    {
+        backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
+
+        return backButtonData["drilldown"][backButtonData["drilldown"].length - 1];
+
+    } else
+    {
+        return backButtonData;
+    }
+}
+
+function getBackButtonPage()
+{
+    var backButtonData = {};
+    var backButtonLink = "";
+
+    if (getLocalStorage("backButtonData").length > 0) {
+        backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
+
+        backButtonLink = backButtonData["drilldown"][backButtonData["drilldown"].length - 1].previousPage;
+
+    }
+
+    if (backButtonLink != null && backButtonLink.length > 0)
+    {
+        return backButtonLink;
+    } else
+    {
+        return gDefaultBackPage;
+    }
+}
+
+function updatedGoBack()
+{
+    excludeFromBackButton();
+    window.location = getBackButtonPage();
+}
+
+function excludeFromBackButton()
+{
+    gExcludeFromBackButton = true;
+}
+
+function cleanupBackButton(pageName)
+{
+    var bMenuItem = getParameterByName("MenuItem") == null ? false : getParameterByName("MenuItem");
+
+    removeCurrentPageItem(pageName);
+
+    if (bMenuItem)
+    {
+        initializeBackButton();
+    }
+} 

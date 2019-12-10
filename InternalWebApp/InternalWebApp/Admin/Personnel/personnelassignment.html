@@ -963,14 +963,54 @@
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
         } else {
-            var obj = data.report.rows[0];
-            bootbox.alert("Corporate Assignment completed. " + obj["_updateStatus"] + " records have updated.");
-            loadPersonnelAssignmentList("dtPersonnelAssignmentList");
+            bootbox.alert("MRR Corporate Assignment completed successfully.");
         }
+            loadPersonnelAssignmentList("dtPersonnelAssignmentList");
     }
 
     function assignXRYCorporate() {
-        corporateDialogErrorMessage("This functionality is currently in development.");
+
+        var marketArray = new Array();
+
+        if ($("#chkSelectedMarketsCorpAssign").is(':checked') == false) {
+            $("#ddlMarketCorpAssign option:selected").each(function () {
+                marketArray.push($(this).val());
+            });
+        }
+
+        var url = ServicePrefix + '/api/XRAY/InsertXRYCorporateAssignment';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelId,
+                "inOwnerId": $("#ddlOwnerCorpAssign").val(),
+                "inAccessLevelId": $("#ddlAccessXRYCorpAssign").val(),
+                "inMarketList": marketArray
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                assignXRYCorporateSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                closeCorporateDialog();
+                MKAErrorMessageRtn(errorThrown);
+            }
+        }
+        $.ajax(url, settings);
+    }
+
+    function assignXRYCorporateSuccess(data, textStatus, jQxhr) {
+        closeCorporateDialog();
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            bootbox.alert("Corporate Assignment completed successfully.");
+        }
+            loadPersonnelAssignmentList("dtPersonnelAssignmentList");
     }
 
     function isCorporateAssignmentValid() {
@@ -988,12 +1028,13 @@
         }
 
         if ($("#ddlProduct").val().toUpperCase() == "XRY") {
-            if ($("#ddlAccessXRYCorpAssign").val() == "") {
-                corporateDialogErrorMessage("You must select an Access level to perform the assignment operation.");
+            var accessCount = $("#ddlAccessXRYCorpAssign :selected").length;
+
+            if (accessCount <= 0) {
+                corporateDialogErrorMessage("You must select an Access Level to perform the assignment operation.");
                 return false;
             }
         }
-
     }
 
     function corporateDialogErrorMessage(errorMessage) {
@@ -2467,6 +2508,7 @@
 
         loadOwnerList("ddlOwnerCorpAssign");
         $("#ddlMarketCorpAssign").html("");
+        $("#chkSelectedMarketsCorpAssign").prop("checked", false);
 
         if ($("#ddlProduct").val().toUpperCase() == "MRR") {
             $("#corpAssignAccessXRY").hide();
@@ -2487,7 +2529,7 @@
             return;
         }
 
-        var url = ServicePrefix + '/api/Owner/GetMarketListByOwner';
+        var url = ServicePrefix + '/api/Market/GetMarketListByOwnerProduct';
 
         var settings = {
             dataType: 'json',
@@ -2495,7 +2537,8 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inOwnerId": $("#ddlOwnerCorpAssign").val()
+                "inOwnerId": $("#ddlOwnerCorpAssign").val(),
+                "inProductId": $("#ddlProduct").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -2517,7 +2560,7 @@
             var str = '';
 
             $.each(data.report.rows, function (index) {
-                str = str + '<option value="' + data.report.rows[index].M_MarketID + '">' + data.report.rows[index].M_MarketName + '</option>';
+                str = str + '<option value="' + data.report.rows[index].MarketId + '">' + data.report.rows[index].Market + '</option>';
             });
 
             $("#ddlMarketCorpAssign").html(str);

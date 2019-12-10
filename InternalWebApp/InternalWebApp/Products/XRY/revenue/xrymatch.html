@@ -118,31 +118,33 @@
                         -->
                         <div class="form-group rptView">
                             <label for="ddlPeriod" class="dropdown-label rptView">Period</label>
-                            <select id="ddlPeriod" apiInput="inPeriod" class="mkaRequired dropdown-select rptView " errorMessage="Select a period."></select>
+                            <select id="ddlPeriod" apiInput="inPeriod" class="mkaRequired dropdown-select rptView report-filter" errorMessage="Select a period."></select>
                         </div>
                         <div class="form-group rptView">
                             <label for="ddlYear" class="dropdown-label rptView">Year</label>
-                            <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView mkaRequired" errorMessage="Select a year."></select>
+                            <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView mkaRequired report-filter" errorMessage="Select a year."></select>
                         </div>
                         <div class="form-group rptView">
                             <label for="ddlMarket" class="dropdown-label rptView">Market</label>
-                            <select id="ddlMarket" apiInput="inMarketId" onchange="" class="dropdown-select rptView"></select>
+                            <select id="ddlMarket" apiInput="inMarketId" onchange="" class="dropdown-select rptView report-filter"></select>
                         </div>
                         <div class="form-group rptView">
                             <label for="ddlOwner" class="dropdown-label rptView">Owner</label>
-                            <select id="ddlOwner" apiInput="inOwnerId" onchange="" class="dropdown-select rptView"></select>
+                            <select id="ddlOwner" apiInput="inOwnerId" onchange="" class="dropdown-select rptView report-filter"></select>
                         </div>
                         <div class="form-group rptView">
                             <label for="ddlStation" class="dropdown-label rptView">Station</label>
-                            <select id="ddlStation" apiInput="inStationId" onchange="" class="dropdown-select rptView"></select>
+                            <select id="ddlStation" apiInput="inStationId" onchange="" class="dropdown-select rptView report-filter"></select>
                         </div>
                         <div class="form-group rptView">
                             <label for="ddlOptions" class="dropdown-label rptView">Options</label>
-                            <select id="ddlOptions" apiInput="inOptionId" onchange="" class="dropdown-select rptView"></select>
+                            <select id="ddlOptions" apiInput="inOptionId" onchange="" class="dropdown-select rptView report-filter"></select>
                         </div><!-- adding comments here-->
-                        <div class="form-group col-md-3 rptButton" style="text-align:right">
+                        <div class="form-group col-md-3 rptButton" style="text-align: right">
+                            <label for="btnBack" class="dropdown-label">&nbsp;</label>
+                            <input type="button" id="btnBack" class="search-button" value="Back" onclick="updatedGoBack()" />
                             <label for="btnReport" class="dropdown-label">&nbsp;</label>
-                            <input type="button" id="btnReport" class="search-button" value="Show" onclick="getMatchingReport()" />
+                            <input type="button" id="btnReport" class="search-button" value="Show" onclick="getMatchingReport()"/>
                         </div>
                     </div>
                 </div>
@@ -205,6 +207,7 @@
     var year = "";
     var product = "XRY";
     var matchOptions = "";
+    //var bMenuItem = false;
 
     $(document).ready(function () {
 
@@ -234,8 +237,7 @@
         //if has data coming over, load page.
         //if direct, just load dropdowns
 
-
-
+        determineToShowBackButton();
     });
 
     function clearLocalStorage() {
@@ -262,6 +264,44 @@
         year = (getParameterByName("Year") == null ? "" : getParameterByName("Year"));
         matchPageType = (getParameterByName("MatchPage") == null ? "ADV" : getParameterByName("MatchPage"));
         matchOptions = (getParameterByName("OptionFlag") == null ? "unmatched" : getParameterByName("OptionFlag"));
+        //bMenuItem = getParameterByName("MenuItem") == null ? false : getParameterByName("MenuItem");
+
+        //do i add the functionality to get previous page info here??
+        if (getLocalStorage("backButtonData").length > 0)
+        {
+            //var paramData = getBackButtonLastItem();
+            var paramData = getBackButtonDataByPage(window.location.pathname);
+
+            //load parameters
+            if (paramData["ddlOwner"] != undefined && paramData["ddlOwner"].length > 0) {
+                ownerId = paramData["ddlOwner"];
+            }
+
+            if (paramData["ddlMarket"] != undefined && paramData["ddlMarket"].length > 0) {
+                marketId = paramData["ddlMarket"];
+            }
+
+            if (paramData["ddlStation"] != undefined && paramData["ddlStation"].length > 0) {
+                stationId = paramData["ddlStation"];
+            }
+
+            if (paramData["ddlYear"] != undefined && paramData["ddlYear"].length > 0) {
+                year = paramData["ddlYear"];
+            }
+
+            if (paramData["ddlPeriod"] != undefined && paramData["ddlPeriod"].length > 0)
+            {
+                period = paramData["ddlPeriod"];
+            }
+
+            if (paramData["ddlOptions"] != undefined && paramData["ddlOptions"].length > 0) {
+                matchOptions = paramData["ddlOptions"];
+            }
+
+        }
+
+        cleanupBackButton(window.location.pathname);
+
     }
 
     function assignPageTitle() {
@@ -507,6 +547,11 @@
             }
 
         setLocalStorage("newAdvertiserMatch", JSON.stringify(advertiserMatchData));
+
+        //setup back button functionality
+        //buildBackButton();
+
+
         window.location = "/admin/stationadvertiser/stationadvertiser.html?StationAdvertiserID=" + linkedAdvertiserId + "&AdvMatch=true";
 
     }
@@ -533,6 +578,9 @@
             }
 
         setLocalStorage("newAdvertiserMatch", JSON.stringify(advertiserMatchData));
+
+        //buildBackButton();
+
         window.location = "/admin/stationadvertiser/stationadvertiser.html?StationAdvertiserID=" + linkedAdvertiserId + "&AdvMatch=true";
 
     }
@@ -544,6 +592,7 @@
          * redirect to station agency CRUD page
          * add flag to notate coming from this page
          */
+
 
         var queryString = buildPreviousPageQueryString();
 
@@ -560,7 +609,11 @@
                 previousPage: "/products/xry/revenue/xrymatch.html" + queryString
             }
 
+
         setLocalStorage("newAgencyMatch", JSON.stringify(agencyMatchData));
+
+        //buildBackButton();
+
         window.location = "/admin/stationagency/stationagency.html?StationAgencyID=" + linkedAgencyId + "&AgyMatch=true";
     }
 
@@ -584,6 +637,9 @@
             }
 
         setLocalStorage("newAgencyMatch", JSON.stringify(agencyMatchData));
+
+        //buildBackButton();
+
         window.location = "/admin/stationagency/stationagency.html?StationAgencyID=" + linkedAgencyId + "&AgyMatch=true";
     }
 
@@ -1008,4 +1064,26 @@
         return loopBreak;
     }
 
+    function determineToShowBackButton() {
+        //alert("figure out to show back button.");
+        if (getLocalStorage("backButtonData").length <= 0) {
+            $("#btnBack").hide();
+        } else {
+            $("#btnBack").show();
+        }
+    }
+
+
+    //function determineGoBack()
+    //{
+    //    gExcludeFromBackButton = true;
+
+    //    if (hasBackButtonData()) {
+    //        //var backButtonData = getBackButtonLastItem();
+
+    //        //window.location = backButtonData.previousPage;
+    //        window.location = getBackButtonPage();
+    //    }
+
+    //}
 </script>
