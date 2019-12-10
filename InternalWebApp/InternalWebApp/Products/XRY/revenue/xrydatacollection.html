@@ -113,7 +113,9 @@
             width:71px;            
             vertical-align:middle;
             display: table-cell;
+            font-size: 12px;
         }
+
         .rowNotActive{
             background:black;
             color:yellow;
@@ -128,10 +130,18 @@
             background:green;
             color:white;
         }
-
+        .rowDisabledRev
+        {
+            background:blue;
+            color:white;
+        }
         .rowNoData
         {
             background:red;
+            color:white;
+        }
+        .rowUnMatched{
+            background:purple;
             color:white;
         }
     </style>
@@ -1655,76 +1665,83 @@
                 var actions = "";
                 var parameters = "";
 
-                if (row["enabled"] === true &&
-                    row["Number of Records"] > 0 &&
-                    row["Advertisers Matched"] === row["Number of Records"] &&
-                    row["Agencies Matched"] === row["Number of Records"] &&
-                    row["Posted"].toLowerCase() === "no") {
-
-                    parameters = "";
-                    parameters += row["stationId"] + "," + row["marketId"];
-                    parameters += ",\"" + $("#ddlPeriod").val() + "\"";
-                    parameters += ",\"" + $("#ddlYear").val() + "\"";
-                    parameters += ",\"" + row["Station"] + "\"";
-
-                    actions += "<a href='#' onclick='postRevenueProcess(" + parameters + ");'>Post</a><br/>";
-
-                }
-
-                if (row["enabled"] === true && row["Posted"].toLowerCase() === "yes") {
-
-                    parameters = "";
-                    parameters += row["stationId"] + "," + row["marketId"];
-                    parameters += ",\"" + $("#ddlPeriod").val() + "\"";
-                    parameters += ",\"" + $("#ddlYear").val() + "\"";
-                    parameters += ",\"" + row["Station"] + "\"";
-
-                    actions += "<a href='#' onclick='unpostRevenueProcess(" + parameters + ");'>Un-Post</a><br/>";
-                }
-
-                var link = "";
-
-                if (row["Number of Records"] > 0)
+                if (type === 'display')
                 {
-                    link = "";
-                    link = '/products/xry/revenue/xrymatch.html?MatchPage=adv';
-                    link += '&OwnerID=' + row["ownerId"];
-                    link += '&MarketID=' + row["marketId"];
-                    link += '&StationID=' + row["stationId"];
-                    link += '&Period=' + $("#ddlPeriod").val();
-                    link += '&Year=' + $("#ddlYear").val();
+                    var status = getRowStatus(row, "statusOnly");
 
-                    if (row["Number of Records"] !== row["Advertisers Matched"])
-                    {
-                        link += '&OptionFlag=unmatched';
-                        actions += "<a href='" + link + "'>Match&nbsp;Advertisers</a><br/>";
-                    } else
-                    {
-                        link += '&OptionFlag=matched';
-                        actions += "<a href='" + link + "'>View&nbsp;Advertisers</a><br/>";
+                    if (status == "Disabled Rev") {
+                        actions += "Disabled Rpt<br>";
                     }
-                }
 
-                if (row["Number of Records"] > 0)
-                {
-                    link = "";
-                    link = '/products/xry/revenue/xrymatch.html?MatchPage=agy';
-                    link += '&OwnerID=' + row["ownerId"];
-                    link += '&MarketID=' + row["marketId"];
-                    link += '&StationID=' + row["stationId"];
-                    link += '&Period=' + $("#ddlPeriod").val();
-                    link += '&Year=' + $("#ddlYear").val();
+                    // post
+                    if (row["enabled"] === true &&
+                        row["Number of Records"] > 0 &&
+                        row["Advertisers Matched"] === row["Number of Records"] &&
+                        row["Agencies Matched"] === row["Number of Records"] &&
+                        row["Posted"].toLowerCase() === "no") {
 
-                    if (row["Number of Records"] !== row["Agencies Matched"])
-                    {
-                        link += '&OptionFlag=unmatched';
-                        actions += "<a href='" + link + "'>Match&nbsp;Agencies</a><br/>";
-                    } else
-                    {
-                        link += '&OptionFlag=matched';
-                        actions += "<a href='" + link + "'>View&nbsp;Agencies</a><br/>";
+                        parameters = "";
+                        parameters += row["stationId"] + "," + row["marketId"];
+                        parameters += ",\"" + $("#ddlPeriod").val() + "\"";
+                        parameters += ",\"" + $("#ddlYear").val() + "\"";
+                        parameters += ",\"" + row["Station"] + "\"";
+
+                        actions += "<a href='#' onclick='postRevenueProcess(" + parameters + ");'>Post</a><br/>";
+
                     }
-                }
+
+                    // unpost
+                    if (row["enabled"] === true && row["Posted"].toLowerCase() === "yes") {
+
+                        parameters = "";
+                        parameters += row["stationId"] + "," + row["marketId"];
+                        parameters += ",\"" + $("#ddlPeriod").val() + "\"";
+                        parameters += ",\"" + $("#ddlYear").val() + "\"";
+                        parameters += ",\"" + row["Station"] + "\"";
+
+                        actions += "<a href='#' onclick='unpostRevenueProcess(" + parameters + ");'>Un-Post</a><br/>";
+                    }
+
+                    var link = "";
+
+                    // match report view adv
+                    if (row["Number of Records"] > 0) {
+                        link = "";
+                        link = '/products/xry/revenue/xrymatch.html?MatchPage=adv';
+                        link += '&OwnerID=' + row["ownerId"];
+                        link += '&MarketID=' + row["marketId"];
+                        link += '&StationID=' + row["stationId"];
+                        link += '&Period=' + $("#ddlPeriod").val();
+                        link += '&Year=' + $("#ddlYear").val();
+
+                        if (row["Number of Records"] !== row["Advertisers Matched"]) {
+                            link += '&OptionFlag=unmatched';
+                            actions += "<a href='" + link + "'>Match&nbsp;Advertisers</a><br/>";
+                        } else {
+                            link += '&OptionFlag=matched';
+                            actions += "<a href='" + link + "'>View&nbsp;Advertisers</a><br/>";
+                        }
+                    }
+
+                    // match report view agency
+                    if (row["Number of Records"] > 0) {
+                        link = "";
+                        link = '/products/xry/revenue/xrymatch.html?MatchPage=agy';
+                        link += '&OwnerID=' + row["ownerId"];
+                        link += '&MarketID=' + row["marketId"];
+                        link += '&StationID=' + row["stationId"];
+                        link += '&Period=' + $("#ddlPeriod").val();
+                        link += '&Year=' + $("#ddlYear").val();
+
+                        if (row["Number of Records"] !== row["Agencies Matched"]) {
+                            link += '&OptionFlag=unmatched';
+                            actions += "<a href='" + link + "'>Match&nbsp;Agencies</a><br/>";
+                        } else {
+                            link += '&OptionFlag=matched';
+                            actions += "<a href='" + link + "'>View&nbsp;Agencies</a><br/>";
+                        }
+                    }
+            
 
                 //removing the options for now
                 //based on 11/19/2019 discussion with carl.
@@ -1739,20 +1756,23 @@
                 //page uses local storage
                 //use onclick and pass variables
                 //set local storage as part of the function
-                parameters = "";
-                parameters = row["stationId"] +
-                    ',' +
-                    row["marketId"] +
-                    ',' +
-                    row["ownerId"] +
-                    ',"' +
-                    //converted to whitespace to a non-breaking space
-                    //the white space was causing an unseen "
-                    row["Station"].replace(/[\s]/g, "&nbsp;") +
-                    '","' +
-                    row["Media Type"] +
-                    '",' + row["submissionId"] ;
-                actions += '<a href="#" onclick=changeAvailability(' + parameters + ');>Change&nbsp;Availability</a>';
+
+                // this is the change availability
+                    parameters = "";
+                    parameters = row["stationId"] +
+                        ',' +
+                        row["marketId"] +
+                        ',' +
+                        row["ownerId"] +
+                        ',"' +
+                        //converted to whitespace to a non-breaking space
+                        //the white space was causing an unseen "
+                        row["Station"].replace(/[\s]/g, "&nbsp;") +
+                        '","' +
+                        row["Media Type"] +
+                        '",' + row["submissionId"] ;
+                    actions += '<a href="#" onclick=changeAvailability(' + parameters + ');>Change&nbsp;Availability</a>';
+                }
 
                 return actions;
             },
@@ -1971,7 +1991,7 @@
 
     function getRowStatus(row, type)
     {
-
+ 
         status = "";
         var arrayStatusHTML = "";
 
@@ -1980,10 +2000,22 @@
             status = "Not Active";
             arrayStatusHTML = "<div class='rowStatus rowNotActive'>" + status + "</div>";
         }
+        else if (row["AdvertiserDisabled"] ==  true  ||
+                 row["AgencyDisabled"] ==  true )
+        {
+            status = "Disabled Rev";
+            arrayStatusHTML = "<div class='rowStatus rowDisabledRev'>" + status + "</div>";
+        }
         else if (row["Number of Records"] == "0")
         {
             status = "No Data";
             arrayStatusHTML = "<div class='rowStatus rowNoData'>" + status + "</div>";
+        }
+        else if ((row["Number of Records"] !== row["Advertisers Matched"])  || 
+                 (row["Number of Records"] !== row["Agencies Matched"]))
+        {
+            status = "Un-Matched";
+            arrayStatusHTML = "<div class='rowStatus rowUnMatched'>" + status + "</div>";
         }
         else if (row["Posted"].toLowerCase() === "no")
         {
@@ -2009,7 +2041,12 @@
             }
         }
 
-        return arrayStatusHTML;
+        if (type === 'statusOnly') {
+            return status;
+        }
+        else {
+            return arrayStatusHTML;
+        }
     }
 
     function getStatus(element)
