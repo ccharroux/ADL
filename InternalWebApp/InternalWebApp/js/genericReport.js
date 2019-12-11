@@ -4981,7 +4981,19 @@ function getReportObject_MRRUploadTemplateByOwnerWithRevenue() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-
+    columnsToDisplay.push("Period");
+    columnsToDisplay.push("Station Id");	
+    columnsToDisplay.push("Station");	
+    columnsToDisplay.push("Category");	
+    columnsToDisplay.push("Category Description");	
+    columnsToDisplay.push("Market Id");
+    columnsToDisplay.push("Market");	
+    columnsToDisplay.push("Prior Year");	
+    columnsToDisplay.push("Revenue");
+    columnsToDisplay.push("Prior Year Revenue");
+    columnsToDisplay.push("Prior Period");
+    columnsToDisplay.push("Prior Period Revenue");
+ 
     bLongQuery = true;
 
     tempObject =
