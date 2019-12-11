@@ -99,8 +99,9 @@
                         <div class="text-align-center">
                             <div class="col-md-4">
                                 <label>View</label><br />
-                                <input type="radio" name="view" onclick="swapView();" checked="checked" />&nbsp;Confirm Data&nbsp;
-                                <input type="radio" name="view" onclick="swapView();" />&nbsp;Declined Data
+                                <input type="radio" name="view" onclick="swapView(this.value);" value="confirmableData" checked="checked" />&nbsp;Confirm Data&nbsp;
+                                <input type="radio" name="view" onclick="swapView(this.value);" value="declinedData" />&nbsp;Declined Data&nbsp;
+                                <input type="radio" name="view" onclick="showAll();" />&nbsp;Both
                             </div>
                             <div class="col-md-4">
                                 <label for="ddlYearPeriod">Year-Period</label><br />
@@ -110,10 +111,7 @@
                                 <label for="ddlOwner" class="dropdown-label rptView rptOwner">Owner</label><br />
                                 <select id="ddlOwner" apiInput="inOwnerId" class="dropdown-select rptView rptOwner" onchange="getData();"></select>
                             </div>
-                            <div class="col-md-4 form-group rptView rptOwner declinedData" style="display:none">
-                                <label>Owners</label><br />
-                                <span>All</span>
-                            </div>
+ 
 
                             
                         </div>
@@ -194,7 +192,7 @@
                     </div>
                 </div>
                 <div class="declinedData" style="display:none;margin-top:50px">
-                    <h3 style="margin-bottom:-50px">Declined Entries</h3 >
+                    <h3 style="margin-bottom:-50px">Declined Entries <span style="font-size:medium">(all owners)</span></h3 >
                     <div class="dataTable-top-margin">
                         <table id="dtDeclined" class="dataTable-border dataTable-headers dataTable-cell-border">
                             <thead>
@@ -293,7 +291,7 @@
         loadData();
         loadDeclinedData();
 
-        buildTVBMenu("Revenue");
+        buildTVBMenu("Confirm");
         getYearsPeriods();
         getOwners();
 
@@ -737,7 +735,7 @@
 
         var ownerId = currentOwnerId();
         if (ownerId == '') {
-            return;
+            ownerId = "1";
         }
 
         //filling out url for ajax
@@ -954,9 +952,17 @@
         MKAErrorMessageRtn(errorThrown);
     }
 
-    function swapView()
+    function showAll() {
+ 
+        $(".declinedData").show();
+ 
+        $(".confirmableData").show();
+ 
+    }
+    function swapView(classToShow)
     {
-        if ($(".confirmableData").is(":visible"))
+ 
+        if (classToShow == "declinedData")
         {
             $(".confirmableData").hide();
             $(".declinedData").show();

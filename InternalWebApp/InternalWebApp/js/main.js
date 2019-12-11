@@ -1238,6 +1238,11 @@ function buildTVBMenu(selectedItem) {
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbestimates.html">Estimates</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
+    menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Confirm") + ' href="" role="button" aria-expanded="false">Confirm <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '<ul class="dropdown-menu" role="menu">';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirm.html">Time Sales</a></li>';
+    menuItems += '</ul>';
+    menuItems += '</li>';
     menuItems += productDashboard('');
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
     menuItems += '    </ul>';
