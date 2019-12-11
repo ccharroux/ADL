@@ -267,16 +267,33 @@
 
         buildMainMenu("Personnel");
         personnelId = (getParameterByName("PersonnelId") == null ? 0 : getParameterByName("PersonnelId"));
-        nameOfSelectedUser = getParameterByName("PersonnelName");
-
-        $("#txtPersonnelName").val(nameOfSelectedUser.toUpperCase() + " (" + personnelId + ")");
-        $("#spnCurrentAssignments").text(nameOfSelectedUser.toUpperCase() + " (" + personnelId + ")" + " Assignments");
+        getPageParameters();
 
         //load personnel product list
         getPersonnelProductList();
 
 
     });
+
+    function getPageParameters() {
+
+        //these are values past in local storage
+        var name = '';
+        if (getLocalStorage("gPageParameters").length > 0) {
+            var pageParameters = $.parseJSON(getLocalStorage("gPageParameters"));
+            name = pageParameters["personnelName"];
+        }
+
+        setUserName(name)
+    }
+
+    function setUserName(name) {
+
+        $("#txtPersonnelName").val(name.toUpperCase());
+        $("#spnCurrentAssignments").text(name.toUpperCase() + " Assignments");
+        nameOfSelectedUser = name.toUpperCase();
+
+    }
 
     function getPersonnelProductList() {
 
