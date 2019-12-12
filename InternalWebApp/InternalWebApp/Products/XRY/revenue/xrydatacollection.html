@@ -262,7 +262,7 @@
                     <div class="row">
                         <div class="col-md-3">&nbsp;</div>
                         <div id="statusOfGrid" class="col-md-3"></div>
-                        <div id="monthend-buttons" class="col-md-3">
+                        <div id="monthend-buttons" class="col-md-3" style="display:none">
                             <div class="monthEndButtonDiv">
                                 <input type="button" class="search-button monthEndButton" value="Assign to Operator" onclick="" />
                             </div>
@@ -332,6 +332,8 @@
 </body>
 </html>
 <script>
+
+    var arrayAcceptableStationStatus = ['posted', 'not active'];
 
     var rowStatusArrayCtr = new Array();
     var rowStatusArray = new Array();
@@ -447,33 +449,7 @@
 
     }
 
-    function checkMarketStatus()
-    {
-        //removing for now to hide the buttons
-        //will add functionality back in when api, etc. is built.
-        //eventually this will call an api to check the market status
-        //that will turn on/off the buttons
-        //if ($("#rdoMarket").is(':checked'))
-        //{
-        //    //console.log($("#ddlMarket").val());
-        //    if ($("#ddlMarket").val() != "")
-        //    {
-        //        //determine button logic
-        //        //this will be based on the status
-        //        //this is temporary to set the buttons
-        //        $("#btnApprove").hide();
-        //        $("#btnApproveRevenue").hide();
-        //        $("#btnRank").hide();
-        //        $("#monthend-buttons").show();
-        //    } else
-        //    {
-        //        $("#monthend-buttons").hide();
-        //    }
-        //} else
-        //{
-        //    $("#monthend-buttons").hide();
-        //}
-    }
+ 
 
     function setupUI() {
 
@@ -1978,8 +1954,7 @@
                 else {
 
                     loadCollectionStatusData(data);
-                    checkMarketStatus();
-                }
+                 }
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -2067,6 +2042,7 @@
         }
 
         $("#statusOfGrid").html(str);
+        canWeShowMonthEndButtons();
     }
     //end datatable functionality
 
@@ -2155,8 +2131,52 @@
         return element == status;
     }
 
+    function canWeShowMonthEndButtons()
+    {
+        if (areStationsReady() == true)
+        {
+            $("#monthend-buttons").show();
+            whatMonthEndButtonsCanWeShow();
+        }
+        else
+        {
+            $("#monthend-buttons").hide();
+        }
+    }
+    function whatMonthEndButtonsCanWeShow()
+    {
+
+    }
     function areStationsReady()
     {
+        // only acceptable status are in
+        // arrayAcceptableStationStatus
+ 
+        if (rowStatusArrayCtr.length < 1 ||
+            rowStatusArrayCtr.length > arrayAcceptableStationStatus.length)
+        {
+ 
+            return false;
+        }
+
+        for (var i = 0; i < rowStatusArrayCtr.length; i++)
+        {
+            var bMissed = true;
+            for (var x= 0; x < arrayAcceptableStationStatus.length; x++)
+            {
+                // this means one of our status is outside of the acceptable
+                if (rowStatusArray[i].toLowerCase() == arrayAcceptableStationStatus[x].toLowerCase())
+                {
+                    bMissed = false;
+                }
+            }
+
+            if (bMissed == true)
+            {
+                return false;
+            }
+        }
+
         return true;
     }
 
