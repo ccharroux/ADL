@@ -1037,8 +1037,8 @@ function buildMainMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
-    menuItems += '<nav role="navigation" style="margin-top:20px">'
+    menuItems += '<h1><a href="/admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
+    menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
     menuItems += buildGenericReportsLink(selectedItem);
@@ -1054,38 +1054,38 @@ function buildMainMenu(selectedItem) {
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Personnel") + '">Personnel <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block"><a href="/admin/personnel/personnellist.html">Personnel</a></li>';
-    menuItems += '                  <li style="display:block"><a href="/admin/webnotification/webnotification.html">Web Notifications</a></li>';
+    menuItems += '                  <li style="display:block"><a href="/admin/personnel/personnellist.html?MenuItem=true">Personnel</a></li>';
+    menuItems += '                  <li style="display:block"><a href="/admin/webnotification/webnotification.html?MenuItem=true">Web Notifications</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Stations") + ' role="button" aria-expended="false">Stations<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block"><a href="/admin/station/stationlist.html">Stations</a></li>';
+    menuItems += '                  <li style="display:block"><a href="/admin/station/stationlist.html?MenuItem=true">Stations</a></li>';
     menuItems += '                  <li style="display:block"><a href="">MRR/X-Ray Link</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Markets") + '">Markets<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block"><a href="/admin/market/marketlist.html" role="button" aria-expanded="false">Markets </a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/market/marketlist.html?NonPrimaryOnly=true">Complimentary</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/parentmarket/parentmarketlist.html">Parent</a></li>';
+    menuItems += '                  <li style="display:block"><a href="/admin/market/marketlist.html?MenuItem=true" role="button" aria-expanded="false">Markets </a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/market/marketlist.html?NonPrimaryOnly=true&MenuItem=true">Complimentary</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/parentmarket/parentmarketlist.html?MenuItem=true">Parent</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Ownerships") + '">Ownerships<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/admin/ownership/ownershiplist.html" role="button" aria-expanded="false">Ownerships </a>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/ownershipgroup/ownershipgrouplist.html">Groups</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/parentownership/parentownershiplist.html">Parents</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/ownership/ownershiplist.html?MenuItem=true" role="button" aria-expanded="false">Ownerships </a>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/ownershipgroup/ownershipgrouplist.html?MenuItem=true">Groups</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/parentownership/parentownershiplist.html?MenuItem=true">Parents</a></li>';
     menuItems += '              </ul>';  
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="/admin/login/dashboard.html">Virtual Groups</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="/admin/login/dashboard.html?MenuItem=true">Virtual Groups</a></li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Settings") + ' role="button" aria-expanded="false">Settings <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/admin/format/formatlist.html">Formats</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/marketsize/marketsizelist.html">Market Sizes</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/position/positionlist.html">Positions</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/region/regionlist.html">Regions</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/revenuecategory/revenuecategorylist.html">Revenue Categories</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html">Tech Tools</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/format/formatlist.html?MenuItem=true">Formats</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/marketsize/marketsizelist.html?MenuItem=true">Market Sizes</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/position/positionlist.html?MenuItem=true">Positions</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/region/regionlist.html?MenuItem=true">Regions</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/revenuecategory/revenuecategorylist.html?MenuItem=true">Revenue Categories</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html?MenuItem=true">Tech Tools</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
@@ -1099,7 +1099,7 @@ function buildXRYMenu(selectedItem) {
     
     var menuItems = '';
 
-    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
@@ -1118,9 +1118,9 @@ function buildXRYMenu(selectedItem) {
 
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
-    menuItems += '        <li style="display:block"><a href="/products/xry/xryrelease.html">Release</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/xry/xryreminders.html">Reminders</a></li>';
-    menuItems += '        <li style="display:block;"><a href="/products/xry/xryownershipmappinglist.html">Ownership Mapping</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/xry/xryrelease.html?MenuItem=true">Release</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/xry/xryreminders.html?MenuItem=true">Reminders</a></li>';
+    menuItems += '        <li style="display:block;"><a href="/products/xry/xryownershipmappinglist.html?MenuItem=true">Ownership Mapping</a></li>';
     menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrydatacollection.html?MenuItem=true">Data Collection</a></li>';
     menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=adv&MenuItem=true">Advertiser Matching</a></li>';
     menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=agy&MenuItem=true">Agency Matching</a></li>';
@@ -1129,32 +1129,30 @@ function buildXRYMenu(selectedItem) {
 
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "XRay Reports") + ' href="" role="button" aria-expanded="false"> XRay Reports <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=xray monthly" role="button" aria-expanded="false">XRay Monthly Reports </a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=xray monthly&MenuItem=true" role="button" aria-expanded="false">XRay Monthly Reports </a></li>';
 
-    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=xry" role="button" aria-expanded="false">XRay Reports </a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=corporate" role="button" aria-expanded="false">Corporate Reports </a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=xry&MenuItem=true" role="button" aria-expanded="false">XRay Reports </a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=corporate&MenuItem=true" role="button" aria-expanded="false">Corporate Reports </a></li>';
     menuItems += '              </ul>';
     menuItems += '       </li>';
 
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/admin/advertiser/advertiserlist.html" role="button" aria-expanded="false">Market Advertiser</a></li>'; 
+    menuItems += '                  <li style="display:block;"><a href="/admin/advertiser/advertiserlist.html?MenuItem=true" role="button" aria-expanded="false">Market Advertiser</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/stationadvertiser/stationadvertiserlist.html?MenuItem=true">Station Advertiser</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/mediaadvertiser/mediaadvertiserlist.html">Media Advertiser</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html">Parent Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/mediaadvertiser/mediaadvertiserlist.html?MenuItem=true">Media Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html?MenuItem=true">Parent Advertiser</a></li>';
 
-    menuItems += '                  <li style="display:block;"><a href="/admin/agency/agencylist.html" role="button" aria-expanded="false">Market Agency</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/agency/agencylist.html?MenuItem=true" role="button" aria-expanded="false">Market Agency</a></li>';
  
     menuItems += '                  <li style="display:block;"><a href="/admin/stationagency/stationagencylist.html?MenuItem=true">Station Agency</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/parentagency/parentagencylist.html">Parent Agency</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/parentagency/parentagencylist.html?MenuItem=true">Parent Agency</a></li>';
  
     
 
-    menuItems += '                  <li style="display:block;"><a href="/admin/industry/industrylist.html">Industry</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/subindustry/subindustrylist.html">Sub Industry</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/nielsenmarketname/nielsenmarketnamelist.html">Nielson Market</a></li>';
-    //menuItems += '                  <li style="display:block;"><a href="/products/xry/xrydisablednotlinked.html?DisablePage=adv">Disabled Advertisers</a></li>';
-    //menuItems += '                  <li style="display:block;"><a href="/products/xry/xrydisablednotlinked.html?DisablePage=agy">Disabled Agencies</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/industry/industrylist.html?MenuItem=true">Industry</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/subindustry/subindustrylist.html?MenuItem=true">Sub Industry</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/nielsenmarketname/nielsenmarketnamelist.html?MenuItem=true">Nielson Market</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += productDashboard('');
@@ -1170,8 +1168,8 @@ function buildMRRMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
-    menuItems += '<nav role="navigation" style="margin-top:20px">'
+    menuItems += '<h1><a href="/admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
+    menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
     menuItems += buildGenericReportsLink(selectedItem);
@@ -1187,16 +1185,16 @@ function buildMRRMenu(selectedItem) {
     menuItems += '</li>';
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
-    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrrelease.html">Release</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrreminders.html">Reminders</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrrevenuedetail.html">Revenue Detail</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrmarketdelivery.html">Report Delivery</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrsnapshot.html">Snapshot</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrrelease.html?MenuItem=true">Release</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrreminders.html?MenuItem=true">Reminders</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrrevenuedetail.html?MenuItem=true">Revenue Detail</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrmarketdelivery.html?MenuItem=true">Report Delivery</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrsnapshot.html?MenuItem=true">Snapshot</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrmarketcategorydefinitionlist.html" role="button" aria-expanded="false">Market Categories</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrmarketcategorydefinitionlist.html?MenuItem=true" role="button" aria-expanded="false">Market Categories</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += productDashboard('');
@@ -1213,8 +1211,8 @@ function buildTVBMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
-    menuItems += '<nav role="navigation" style="margin-top:20px">'
+    menuItems += '<h1><a href="/admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
+    menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
     menuItems += buildGenericReportsLink(selectedItem);
@@ -1230,17 +1228,17 @@ function buildTVBMenu(selectedItem) {
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
 
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbreminders.html">Reminders</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbdashboard.html">Report Status</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbmarketdelivery.html">Report Delivery</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetailrepbilling.html">Edit Rep Billing</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetail.html">Edit Time Sales</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbestimates.html">Estimates</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbreminders.html?MenuItem=true">Reminders</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbdashboard.html?MenuItem=true">Report Status</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbmarketdelivery.html?MenuItem=true">Report Delivery</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetailrepbilling.html?MenuItem=true">Edit Rep Billing</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetail.html?MenuItem=true">Edit Time Sales</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbestimates.html?MenuItem=true">Estimates</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Confirm") + ' href="" role="button" aria-expanded="false">Confirm <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirm.html">Time Sales</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirm.html?MenuItem=true">Time Sales</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += productDashboard('');
@@ -1255,7 +1253,7 @@ function buildTVBMenu(selectedItem) {
 function buildMSSMenu(selectedItem) {
     var menuItems = '';
 
-    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
@@ -1282,7 +1280,7 @@ function buildDMAMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
@@ -1303,10 +1301,10 @@ function buildDMAMenu(selectedItem) {
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
 
-    menuItems += '        <li style="display:block"><a href="/Products/DMA/dmarelease.html">Release</a></li>';
+    menuItems += '        <li style="display:block"><a href="/Products/DMA/dmarelease.html?MenuItem=true">Release</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "DMA Reports") + ' href="/utilities/genericreport/genericreportlist.html?tag=dma" role="button" aria-expanded="false">DMA Reports </span></a>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "DMA Reports") + ' href="/utilities/genericreport/genericreportlist.html?tag=dma&MenuItem=true" role="button" aria-expanded="false">DMA Reports </span></a>';
     menuItems += '       </li>';
 
     menuItems += productDashboard('');
@@ -1327,27 +1325,27 @@ function productDashboard(productId)
     switch(productId.toLowerCase()) 
     {
         case '':
-            strOut = '<a href="/admin/login/dashboard.html">Dashboard</a>';
+            strOut = '<a href="/admin/login/dashboard.html?MenuItem=true">Dashboard</a>';
             break;
         case 'mrr':
             style = 'display:block;';
-            strOut = '<a href="/products/mrr/mrrdashboard.html">MRR</a>';
+            strOut = '<a href="/products/mrr/mrrdashboard.html?MenuItem=true">MRR</a>';
             break;
         case 'xry':
             style = 'display:block;';
-            strOut = '<a href="/products/xry/xrydashboard.html">XRY</a>';
+            strOut = '<a href="/products/xry/xrydashboard.html?MenuItem=true">XRY</a>';
             break;
         case 'tvb':
             style = 'display:block;';
-            strOut = '<a href="/products/tvb/tvbdashboard.html">TVB</a>';
+            strOut = '<a href="/products/tvb/tvbdashboard.html?MenuItem=true">TVB</a>';
             break;
         case 'mss':
             style = 'display:block;';
-            strOut = '<a href="/products/mss/mssdashboard.html">MSS</a>';
+            strOut = '<a href="/products/mss/mssdashboard.html?MenuItem=true">MSS</a>';
             break;
         case 'dma':
             style = 'display:block;';
-            strOut = '<a href="/Products/DMA/dmadashboard.html">DMA</a>';
+            strOut = '<a href="/Products/DMA/dmadashboard.html?MenuItem=true">DMA</a>';
             break;
     }
 
@@ -1358,7 +1356,7 @@ function buildGenericReportsLink(selectedItem)
     var strOut = '';
     var style = '';
 
-    strOut = '<a ' + getSelectedItemClass(selectedItem, "Reports") +' href="/utilities/genericreport/genericReportList.html">Reports</a>';
+    strOut = '<a ' + getSelectedItemClass(selectedItem, "Reports") + ' href="/utilities/genericreport/genericReportList.html?MenuItem=true">Reports</a>';
 
     return '<li style="' + style + '">' + strOut + '</li>';
 }
@@ -1366,7 +1364,7 @@ function buildGenericReportsLink2(selectedItem) {
     var strOut = '';
     var style = '';
 
-    strOut = '<a ' + getSelectedItemClass(selectedItem, "Reports") + ' href="/utilities/genericreport/genericReportList.html">All Reports</a>';
+    strOut = '<a ' + getSelectedItemClass(selectedItem, "Reports") + ' href="/utilities/genericreport/genericReportList.html?MenuItem=true">All Reports</a>';
 
     return '<li style="' + style + '">' + strOut + '</li>';
 }
@@ -1456,7 +1454,7 @@ function buildTechMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
@@ -1472,14 +1470,14 @@ function buildTechMenu(selectedItem) {
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "TechTools") + ' role="button" aria-expanded="false">Tools <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html">Tech Tools</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/encryptdecrypt.html">Encryption/Decryption Tool</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrarchiverollover.html">MRR Rollover</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrmarkethistorydatamatrix.html">MRR Market History Maintenance</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrstationownerchanged.html">MRR Station Ownership Change</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/xry/xrymarkethistorydatamatrix.html">XRY Market History Maintenance</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/xry/xrystationownerchanged.html">XRY Station Ownership Change</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/tvb/tvbMarketHistoryDataMatrix.html">TVB Market History Maintenance</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html?MenuItem=true">Tech Tools</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/encryptdecrypt.html?MenuItem=true">Encryption/Decryption Tool</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrarchiverollover.html?MenuItem=true">MRR Rollover</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrmarkethistorydatamatrix.html?MenuItem=true">MRR Market History Maintenance</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrstationownerchanged.html?MenuItem=true">MRR Station Ownership Change</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/xry/xrymarkethistorydatamatrix.html?MenuItem=true">XRY Market History Maintenance</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/xry/xrystationownerchanged.html?MenuItem=true">XRY Station Ownership Change</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/tvb/tvbMarketHistoryDataMatrix.html?MenuItem=true">TVB Market History Maintenance</a></li>';
 
     menuItems += '              </ul>';
     menuItems += '        </li>';
