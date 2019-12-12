@@ -332,9 +332,16 @@ $( document ).ready(function()
         $("#fh5co-header").prepend("<div class='container' style='color:white; background:red; padding-top: 3px; font-weight:600;border-radius:15px; text-align: center;'>" + environment + "</div>");
     }
 
+    $(document).ajaxStop(function () {
+        buildBackButtonGeneric();
+    });
+ 
+
+    // build a generic back button...
+
     var nonLoggedInPages = new Array();
     nonLoggedInPages.push('/admin/login/login.html');
-     nonLoggedInPages.push('index.html');
+    nonLoggedInPages.push('index.html');
 
 
     // Block UI Stuff
@@ -386,8 +393,6 @@ $( document ).ready(function()
 		
 	}
 
-
-
 	if (bDoLoginCheck == true)
 	{
 	    // add favorites
@@ -408,6 +413,21 @@ $( document ).ready(function()
 
 });
 
+function buildBackButtonGeneric()
+{
+
+    // cleanup can go here...
+    cleanupBackButton();
+
+    if (getLocalStorage("backButtonData").length > 0) {
+ 
+        var backButton = '<input type="button" id="btnBack" class="search-button" value="Back" onclick="updatedGoBack()">';
+        $("#fh5co-contact-section").prepend("<div style='padding-right: 35px;float:right; margin-top:-35px'>" + backButton + "</div>");
+
+    }
+
+
+}
 function showHeader()
 {
     var hideHeader = getParameterByName("hideHeader");
@@ -1881,7 +1901,70 @@ function buildOwnerWrapper(inData) {
 
     return ret;
 }
+function buildAgencyWrapper(inData) {
 
+    var ret = inData;
+
+    // find parens
+    var bIDIncluded = false;
+
+    if ((inData.lastIndexOf("(") > -1) &&
+        (inData.lastIndexOf(")") > -1)) {
+        bIDIncluded = true;
+    }
+
+    if (bIDIncluded == true) {
+        var ID = '';
+
+        var init = inData.lastIndexOf('(');
+        var fin = inData.lastIndexOf(')');
+
+        ID = inData.substr(init + 1, fin - init - 1);
+
+        if (ID.length > 0) {
+            if (isNaN(ID) == false) {
+                ret = "<a href='#' onclick='window.location=\"/Admin/agency/agency.html?AgencyID=" + ID + "\"'>";
+                ret = ret + inData
+                ret = ret + "</a>";
+            }
+        }
+
+    }
+
+    return ret;
+}
+function buildAdvertiserWrapper(inData) {
+
+    var ret = inData;
+
+    // find parens
+    var bIDIncluded = false;
+
+    if ((inData.lastIndexOf("(") > -1) &&
+        (inData.lastIndexOf(")") > -1)) {
+        bIDIncluded = true;
+    }
+
+    if (bIDIncluded == true) {
+        var ID = '';
+
+        var init = inData.lastIndexOf('(');
+        var fin = inData.lastIndexOf(')');
+
+        ID = inData.substr(init + 1, fin - init - 1);
+
+        if (ID.length > 0) {
+            if (isNaN(ID) == false) {
+                ret = "<a href='#' onclick='window.location=\"/Admin/advertiser/advertiser.html?AdvertiserID=" + ID + "\"'>";
+                ret = ret + inData
+                ret = ret + "</a>";
+            }
+        }
+
+    }
+
+    return ret;
+}
 function buildCustomLink(objectName, data, bSortable, className )
 {
     var column = new Object();
@@ -1900,10 +1983,8 @@ function buildCustomLink(objectName, data, bSortable, className )
         return column;
     }
 
-
- 
-
-    if (objectName == "User") {
+    if (objectName == "User")
+    {
         column = {
             "title": objectName,
             "visible": true,
@@ -1919,9 +2000,10 @@ function buildCustomLink(objectName, data, bSortable, className )
             "orderable": bSortable,
             "className": className
         };
-
+        return column;
     }
-    else if (objectName == "Contact") {
+
+    if (objectName == "Contact") {
         column = {
             "title": objectName,
             "visible": true,
@@ -1936,9 +2018,10 @@ function buildCustomLink(objectName, data, bSortable, className )
             "orderable": bSortable,
             "className": className
         };
-
+        return column;
     }
-    else if (objectName == "Market") {
+
+    if (objectName == "Market") {
         column = {
             "title": objectName,
             "visible": true,
@@ -1955,9 +2038,10 @@ function buildCustomLink(objectName, data, bSortable, className )
             "orderable": bSortable,
             "className": className
         };
-
+        return column;
     }
-    else if (objectName == "Owner") {
+
+    if (objectName == "Owner") {
         column = {
             "title": objectName,
             "visible": true,
@@ -1973,9 +2057,10 @@ function buildCustomLink(objectName, data, bSortable, className )
             "orderable": bSortable,
             "className": className
         };
-
+        return column;
     }
-    else if (objectName == "Station") {
+    
+    if (objectName == "Station") {
         column = {
             "title": objectName,
             "visible": true,
@@ -1991,59 +2076,91 @@ function buildCustomLink(objectName, data, bSortable, className )
             "orderable": bSortable,
             "className": className
         };
-
+        return column;
     }
-    else {
 
-            //
+    if (objectName == "Advertiser") {
         column = {
             "title": objectName,
-            "visible": true,          
-            "className": className,  
+            "visible": true,
             "mRender": function (data, type, row) {
- 
-                var textClassName = "";
-                var ret = "";
-                //console.log(objectName);
-                //console.log(row[objectName])
-                // negative numbers
+                if (row.Advertiser != null) {
+                    return buildAdvertiserWrapper(row.Advertiser);
+                } else {
+                    return '';
+                }
+            },
+            "orderable": bSortable,
+            "className": className
+        };
+        return column;
+    }
 
-                if (row[objectName] != null &&
-                    row[objectName] != "" &&
-                    isNaN(row[objectName].toString().replace("$", "").replace(new RegExp('\,'), '')
-                    ) == false)
+    if (objectName == "Agency") {
+        column = {
+            "title": objectName,
+            "visible": true,
+            "mRender": function (data, type, row) {
+                if (row.Agency != null) {
+                    return buildAgencyWrapper(row.Agency);
+                } else {
+                    return '';
+                }
+            },
+            "orderable": bSortable,
+            "className": className
+        };
+        return column;
+    }
+
+    // standard column build
+    column = {
+        "title": objectName,
+        "visible": true,          
+        "className": className,  
+        "mRender": function (data, type, row) {
+ 
+            var textClassName = "";
+            var ret = "";
+
+            // negative numbers
+
+            if (row[objectName] != null &&
+                row[objectName] != "" &&
+                isNaN(row[objectName].toString().replace("$", "").replace(new RegExp('\,'), '')
+                ) == false)
+            {
+                if (row[objectName].toString().indexOf("-") > -1)
                 {
-                    if (row[objectName].toString().indexOf("-") > -1)
-                    {
+                    textClassName = "redText";
+                }
+            }
+            // negative %
+            if (row[objectName] != null &&
+                row[objectName] != "" &&
+                isNaN(row[objectName].toString().replace("%", "").replace(new RegExp('\,'), '')) == false)
+            {
+                if (row[objectName].toString().indexOf("%") > -1) {
+                    if (row[objectName].toString().indexOf("-") > -1) {
                         textClassName = "redText";
                     }
                 }
-                // negative %
-                if (row[objectName] != null &&
-                    row[objectName] != "" &&
-                    isNaN(row[objectName].toString().replace("%", "").replace(new RegExp('\,'), '')) == false)
-                {
-                    if (row[objectName].toString().indexOf("%") > -1) {
-                        if (row[objectName].toString().indexOf("-") > -1) {
-                            textClassName = "redText";
-                        }
-                    }
-                }
+            }
 
-                ret = row[objectName];
+            ret = row[objectName];
 
-                if (textClassName.length > 0)
-                {
-                    ret = '<div class="'+textClassName+'">' + row[objectName] + "</div>";
-                }
+            if (textClassName.length > 0)
+            {
+                ret = '<div class="'+textClassName+'">' + row[objectName] + "</div>";
+            }
 
-                return ret;
-            },
-            "orderable": bSortable 
+            return ret;
+        },
+        "orderable": bSortable 
   
-        };
+    };
  
-    }
+ 
 
     return column;
 }
@@ -2174,9 +2291,9 @@ function removeBackButtonLastItem()
 function removeCurrentPageItem(pageName)
 {
     var backButtonData = {};
-    if (getLocalStorage("backButtonData").length > 0) {
+    if (getLocalStorage("backButtonData").length > 0)
+    {
         backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
-
 
         for (var i = 0; i < backButtonData["drilldown"].length; i++)
         {
@@ -2188,11 +2305,11 @@ function removeCurrentPageItem(pageName)
             }
         }
 
-
         if (backButtonData["drilldown"].length > 0)
         {
             setLocalStorage("backButtonData", JSON.stringify(backButtonData));
-        } else
+        }
+        else
         {
             initializeBackButton();
         }
@@ -2263,6 +2380,9 @@ function getBackButtonPage()
 
 function updatedGoBack()
 {
+    console.log('----------------');
+    console.log($.parseJSON(getLocalStorage("backButtonData")));
+
     excludeFromBackButton();
     window.location = getBackButtonPage();
 }
@@ -2274,6 +2394,12 @@ function excludeFromBackButton()
 
 function cleanupBackButton(pageName)
 {
+
+    if (!pageName)
+    {
+        pageName = window.location.pathname;
+    }
+
     var bMenuItem = getParameterByName("MenuItem") == null ? false : getParameterByName("MenuItem");
 
     removeCurrentPageItem(pageName);
