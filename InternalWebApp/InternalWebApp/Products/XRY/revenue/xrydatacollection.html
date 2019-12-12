@@ -264,13 +264,13 @@
                         <div id="statusOfGrid" class="col-md-3"></div>
                         <div id="monthend-buttons" class="col-md-3" style="display:none">
                             <div class="monthEndButtonDiv assignToOperatorButton">
-                                <input type="button" class="search-button monthEndButton" value="Assign to Operator" onclick="" />
+                                <input type="button" class="search-button monthEndButton" value="Assign to Operator" onclick="updateStatus('AssignMarketToOperator')" />
                             </div>
                             <div class="monthEndButtonDiv operatorReviewCompleteButton">
-                                <input type="button" class="search-button monthEndButton" value="Operator Review Complete" onclick="" />
+                                <input type="button" class="search-button monthEndButton" value="Operator Review Complete" onclick="updateStatus('OperatorReviewComplete')" />
                             </div>
                             <div class="monthEndButtonDiv revenueReviewCompleteButton">
-                                <input type="button" class="search-button monthEndButton" value="Revenue Review Complete" onclick="" />
+                                <input type="button" class="search-button monthEndButton" value="Revenue Review Complete" onclick="updateStatus('RevenueReviewComplete')" />
                             </div>
                             <div class="monthEndButtonDiv approveRevenueButton">
                                 <input type="button" class="search-button monthEndButton" value="Approve Revenue" onclick="" />
@@ -2145,10 +2145,76 @@
     }
     function whatMonthEndButtonsCanWeShow()
     {
+        
+        var parms = "?inApiToken=" + getLocalStorage("APIToken");
+        parms = parms + "&inYear=" + $("#ddlYear").val();
+        parms = parms + "&inPeriod=" + $("#ddlPeriod").val();
+        parms = parms + "&inMarketId=" + $("#ddlMarket").val();
+        
+        $.ajax({
+            url: ServicePrefix + '/api/XRayRevenue/GetMarketApprovalLog' + parms,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
 
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    whatMonthEndButtonsCanWeShowResults(data)
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
     }
-    function whatMonthEndButtonsCanWeShowResults()
+    function whatMonthEndButtonsCanWeShowResults(data)
     {
+        $(".monthEndButtonDiv").hide();
+
+        // starting state...
+
+        $(".assignToOperatorButton").show();
+        $(".revenueReviewCompleteButton").show();
+ 
+        var RankBtnCount = 0;
+
+        $.each(data.report.rows, function (index) {
+
+            if (data.report.rows[index].Token.toLowerCase() == ('AssignMarketToOperator').toLowerCase()) {
+                RankBtnCount = RankBtnCount + 1;
+                $(".assignToOperatorButton").hide();
+                $(".operatorReviewCompleteButton").show();
+            }
+            if (data.report.rows[index].Token.toLowerCase() == ('OperatorReviewComplete').toLowerCase()) {
+                RankBtnCount = RankBtnCount + 1;
+            }
+            if (data.report.rows[index].Token.toLowerCase() == ('RevenueReviewComplete').toLowerCase()) {
+                RankBtnCount = RankBtnCount + 1;
+            }
+            //str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + ' (' + data.report.rows[index].marketId + ')' + '</option>';
+
+        });
+
+        if (RankBtnCount == 3)
+        {
+            $(".rankButton").show();
+        }
+        else
+        {
+            $(".rankButton").hide();
+        }
+      
+
+        // this means we can show
+        // operatorReviewCompleteButton
+
         //<div class="monthEndButtonDiv assignToOperatorButton">
          //<div class="monthEndButtonDiv operatorReviewCompleteButton">
          //<div class="monthEndButtonDiv revenueReviewCompleteButton">
@@ -2189,6 +2255,9 @@
 
         return true;
     }
-
+    function updateStatus(token)
+    {
+        console.log(token);
+    }
 
 </script>
