@@ -144,6 +144,22 @@
             background:purple;
             color:white;
         }
+        .rowImported
+        {
+            background: pink;
+            color: black;
+        }
+        .rowRevAcctIssue
+        {
+            background-color: green;
+            color: yellow;
+        }
+        .rowRevMissing
+        {
+            background-color:brown;
+            color: yellow;
+        }
+
     </style>
 
 </head>
@@ -1702,6 +1718,14 @@
                         actions += "Disabled Rpt<br>";
                     }
 
+                    if (status.toLowerCase() == "rev-acct issue")
+                    {
+                        var url = '/products/xry/xryownershipmappinglist.html?BuildBackButton=true';
+                        url = url + "&OwnerId=" + row["ownerId"];
+                        url = url + "&MarketId=" + row["marketId"];
+                        actions += "<a href='" + url + "'>Map Types</a><br/>";
+                    }
+
                     // post
                     if (row["enabled"] === true &&
                         row["Number of Records"] > 0 &&
@@ -2031,6 +2055,26 @@
         {
             status = "Disabled Rev";
             arrayStatusHTML = "<div class='rowStatus rowDisabledRev'>" + status + "</div>";
+        }
+        else if (row["StatusToken"].length > 0)
+        {
+            switch(row["StatusToken"].toLowerCase())
+            {
+                case "imported":
+                    status = "Imported";
+                    arrayStatusHTML = "<div class='rowStatus rowImported'>" + status + "</div>";
+                    break;
+                case "revaccttypeissue":
+                    status = "Rev-Acct Issue";
+                    arrayStatusHTML = "<div class='rowStatus rowRevAcctIssue'>" + status + "</div>";
+                    break;
+                default:
+                    status = row["StatusToken"].toLowerCase();
+                    arrayStatusHTML = "<div class='rowStatus rowRevMissing'>" + row["StatusToken"].toLowerCase() + "</div>";
+                    break;
+            }
+
+
         }
         else if (row["Number of Records"] == "0")
         {
