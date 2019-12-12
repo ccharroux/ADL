@@ -9714,7 +9714,7 @@ function getReportObject_RevenueWithDisabledAdvertisersAgencies() {
     tempObject =
     {
 
-        reportTitle: "Revenue with Disabled Advertisers and Agencies",
+        reportTitle: "Revenue with Disabled Advertisers/Agencies",
         apiControllerAction: "/api/XRAYRevenue/GetRevenueWithDisabledAdvertisersAgencies",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,

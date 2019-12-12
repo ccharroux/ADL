@@ -1617,7 +1617,7 @@ function getPeriodList(inType, inDefaultSelect)
     catch (err) {
         console.log("This page is not converted to use Chosen selects yet.");
     }
-
+ 
 
     if (typeof paramRevenuePeriod == "undefined" || paramRevenuePeriod == null)
     {
@@ -2282,4 +2282,21 @@ function cleanupBackButton(pageName)
     {
         initializeBackButton();
     }
-} 
+}
+
+function getReportIdByToken(inValue)
+{
+    //get the item by the key with a value
+
+    for (var i = 0; i < reportObjectArray.length; i++) 
+    {
+
+        if (reportObjectArray[i]['reportTitle'].toLowerCase() === inValue.toLowerCase()) 
+        {
+             return i;
+        }
+    }
+
+    return null;
+
+}
