@@ -24,11 +24,6 @@ const gBackButtonArrayLimit = 5;
 	
 	'use strict';
 
-
-
-	
-	
-
 	var isMobile = {
 		Android: function() {
 			return navigator.userAgent.match(/Android/i);
@@ -212,45 +207,7 @@ const gBackButtonArrayLimit = 5;
 }());
 var unblockHandle;
 
-
-//function processSuccessResult(data, successMessage)
-//{
-//    if (data.response.status != "SUCCESS") 
-//    {
-//        bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () 
-//        {
-//            return false;
-//            //window.location = "preprocess.html";
-//        });
-//    }
-//    else 
-//    {
-//        if (data.report.rows[0].Status == -1)
-//        {
-//            bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () 
-//            {
-//                return false;
-//                //window.location = "preprocess.html";
-//            });
-//        }
-//        else
-//        {
-//            if (successMessage != null && successMessage.length > 0)
-//            {
-//                bootbox.alert(successMessage, function () 
-//                {
  
-//                    return true;
-//                });
-//            }
-//            else
-//            {
-//                return true;
-//            }
-                    	
-//        }
-//    }
-//}
 var delayForLastPage = 1 * 1000;
 var maxHoldEntries = 10;
 var bLongQuery = false;
@@ -410,24 +367,10 @@ $( document ).ready(function()
 
         gExcludeFromBackButton = false;
     });
-
+     
 });
 
-function buildBackButtonGeneric()
-{
 
-    // cleanup can go here...
-    cleanupBackButton();
-
-    if (getLocalStorage("backButtonData").length > 0) {
- 
-        var backButton = '<input type="button" id="btnBack" class="search-button" value="Back" onclick="updatedGoBack()">';
-        $("#fh5co-contact-section").prepend("<div style='padding-right: 35px;float:right; margin-top:-35px'>" + backButton + "</div>");
-
-    }
-
-
-}
 function showHeader()
 {
     var hideHeader = getParameterByName("hideHeader");
@@ -2169,29 +2112,6 @@ function getReportParameters()
 {
     //need to modify this to work with all pages including reports and lists
     var reportParams = {}
-    //$('.form-group:visible').children('input').each(function (i, obj)
-    //{
-    //    //console.log(obj.type);
-    //    //if (obj.type != "button") {
-    //    //    reportParams[obj.id] = obj.value;
-    //    //}
-
-    //    if (obj.type == 'radio')
-    //    {
-    //        reportParams[obj.id] = obj.checked;
-    //    } else if (obj.type == 'button')
-    //    {
-    //        //do nothing
-    //    } else
-    //    {
-    //        reportParams[obj.id] = obj.value;
-    //    }
-
-    //});
-
-    //$('.form-group:visible').children('select').each(function (i, obj) {
-    //    reportParams[obj.id] = obj.value;
-    //});
 
     $(".report-filter").each(function(index, value)
     {
@@ -2220,6 +2140,8 @@ function getReportParameters()
 
     return reportParams;
 }
+
+// Back Button Stuff START
 
 function hasBackButtonData()
 {
@@ -2265,7 +2187,7 @@ function buildBackButton()
 
 function initializeBackButton()
 {
-    setLocalStorage("backButtonData", "");
+     setLocalStorage("backButtonData", "");
 }
 
 function removeBackButtonLastItem()
@@ -2409,6 +2331,54 @@ function cleanupBackButton(pageName)
         initializeBackButton();
     }
 }
+function loadReportParameters() {
+
+    if (hasBackButtonData() == false)
+    {
+        return;
+    }
+
+    var reportParamData = getBackButtonDataByPage(window.location.pathname);
+
+    for (var key in reportParamData) {
+
+        if (key.indexOf("rdo") > -1) {
+            $("#" + key).prop('checked', reportParamData[key]);
+        } else {
+            $("#" + key).val(reportParamData[key]);
+        }
+
+        if (key.indexOf("ddl") > -1) {
+            $("#" + key).change();
+        }
+
+        if (key.indexOf("rdo") > -1 && reportParamData[key] == true) {
+            $("#" + key).change();
+        }
+    }
+
+    cleanupBackButton(window.location.pathname);
+
+}
+
+function buildBackButtonGeneric() {
+
+    // cleanup can go here...
+    //cleanupBackButton();
+    var menuItem = getParameterByName("MenuItem");
+
+    if (getLocalStorage("backButtonData").length > 0 && (!menuItem ||menuItem.length == 0))
+    {
+        var backButton = '<input type="button" id="btnBack" class="search-button" value="Back" onclick="updatedGoBack()">';
+        $("#fh5co-contact-section").prepend("<div style='padding-right: 35px;float:right; margin-top:-35px'>" + backButton + "</div>");
+    }
+    else
+    {
+        $("#btnBack").hide();
+    }
+
+}
+// Back Button Stuff END
 
 function getReportIdByToken(inValue)
 {
@@ -2426,3 +2396,4 @@ function getReportIdByToken(inValue)
     return null;
 
 }
+
