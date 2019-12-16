@@ -55,6 +55,11 @@
     <![endif]-->
 
     <style type="text/css">
+        .heading
+        {
+            background-color: #566573;
+            color: white;
+        }
         h3 
         { 
             text-align: center; 
@@ -72,6 +77,18 @@
         .rightJ
         {
             text-align:right;
+        }
+        .leftJ {
+            text-align:left;
+        }
+        .borderRight
+        {
+            border-bottom:silver 1px solid;
+            border-right: silver 1px solid;
+        }
+        .borderBottom
+        {
+            border-bottom:silver 1px solid;
         }
     </style>
 
@@ -111,9 +128,7 @@
                                 <label for="ddlOwner" class="dropdown-label rptView rptOwner">Owner</label><br />
                                 <select id="ddlOwner" apiInput="inOwnerId" class="dropdown-select rptView rptOwner" onchange="getData();"></select>
                             </div>
- 
-
-                            
+                           
                         </div>
                     </div>
                     <div class="col-md-12 confirmableData"  style="text-align:center">
@@ -138,7 +153,18 @@
             <div class="container-wide">
 
                 <!-- start datatable coding-->
-
+                <div>
+                    <center>
+                        <div class="row" style="width:70%;
+                                border-top:solid 1px silver; 
+                                border-left:solid 1px silver; 
+                                border-right:solid 1px silver; 
+                                border-top-right-radius: 15px;
+                                border-top-left-radius: 15px; 
+                                margin: 30px 10px 10px 10px;" id="summaryData">
+                        </div>
+                    </center>
+                </div>
                 <!--<h3>Available to confirm (Submitted) or already confirmed (Processed)</h3>-->
                 <div class="confirmableData"  style="margin-top:50px">
                     <h3 style="margin-bottom:-50px">Confirmable Entries</h3>
@@ -332,6 +358,84 @@
         getOwners();
     }
 
+    function getSummaryData() {
+
+        if ($("#ddlOwner").val() == "")
+        {
+            $("#summaryData").append("");
+            return;
+        }
+
+        var str = "<h3 style='margin: 0;background:#1c84c6; color:white; padding: 10px 0px 10px 0px; border-top-left-radius: 15px; border-top-right-Radius: 15px;'>Summary Data</h3>";
+        str = str + "<div class='row' style='margin-left: 0px;margin-right: 0px;'>";
+
+        str = str + "<div class='col-md-4 heading leftJ borderRight'>&nbsp;</div>";
+
+        str = str + "<div class='col-md-3 heading rightJ borderRight'>Current</div>";
+
+        str = str + "<div class='col-md-3 heading rightJ borderRight'>Prior</div>";
+
+        str = str + "<div class='col-md-2 heading rightJ borderBottom'>Growth</div>";
+
+        str = str + "</div>";
+
+        var url = ServicePrefix + '/api/TVBReport/GetTimeSalesSummaryRevenueToConfirm';
+        url = url + "?inApiToken=" + getLocalStorage("APIToken");
+        url = url + "&inYear=" + currentYear();
+        url = url + "&inPeriod=" + currentPeriod();
+        url = url + "&inOwnerId=" + $("#ddlOwner").val();
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+
+                        str = str + "<div class='row' style='margin-left: 0px;margin-right: 0px;'>";
+
+                        str = str + "<div class='col-md-4 leftJ borderRight'>";
+                        str = str + obj['Row Title'];
+                        str = str + "</div>";
+
+                        str = str + "<div class='col-md-3 rightJ borderRight'>";
+                        str = str + obj['Current Amount'];
+                        str = str + "</div>";
+
+                        str = str + "<div class='col-md-3 rightJ borderRight'>";
+                        str = str + obj['Prior Amount'];
+                        str = str + "</div>";
+
+                        str = str + "<div class='col-md-2 rightJ borderBottom'>";
+                        str = str + obj['Growth Percent'];
+                        str = str + "</div>";
+
+                        str = str + "</div>";
+                    });
+                    console.log(str);
+                    $("#summaryData").html(str);
+
+ 
+
+                }
+
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
     function getOwners() {
 
         var url = ServicePrefix + '/api/TVB/GetTimeSalesOwnersToConfirm';
@@ -685,9 +789,11 @@
     function getData() {
         getPendingData();
         getDeclinedData();
+        getSummaryData();
     }
     
-    function getPendingData() {
+    function getPendingData()
+    {
         if (gotYearsPeriods == false || gotOwners == false) {
             return;
         }
