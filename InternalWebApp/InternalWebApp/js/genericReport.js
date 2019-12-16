@@ -3760,6 +3760,8 @@ function getReportObject_CorporateGroupUserList() {
     columnsToDisplay.push("Owner");
     columnsToDisplay.push("Email");
     columnsToDisplay.push("User");
+    columnsToDisplay.push("Position");
+
     columnsToDisplay.push("MRR");
     columnsToDisplay.push("XRAY");
  
