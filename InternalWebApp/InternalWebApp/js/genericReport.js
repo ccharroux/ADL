@@ -247,6 +247,9 @@ reportName.push("rptAEWebUserMatches");
 reportName.push("rptRevenueWithDisabledAdvertisersAgencies");
 reportName.push("rptMarketStationSummary");
 
+reportName.push("rptXRYImportTypeIssueList");
+
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -9792,4 +9795,67 @@ function getReportObject_MarketStationSummary() {
 
     return tempObject;
 
+}
+
+ 
+function getReportFilterArray_XRYImportTypeIssueList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+ 
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        jsCallParameters: ['months'],
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationListByGeneralFilters",
+        objectName: "ddlStation",
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
+        reloadBasedProduct: true,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_XRYImportTypeIssueList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+ 
+    tempObject =
+    {
+        // id: rptXRAYUsage,
+        reportTitle: "XRay Import Issue Type List",
+        apiControllerAction: "/api/XRAYReport/GetImportIssueTypeList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry', 'xray monthly']
+    }
+
+    return tempObject;
 }
