@@ -1720,9 +1720,11 @@ function buildMarketWrapper(inData) {
     // find parens
     var bIDIncluded = false;
 
-    if ((inData.lastIndexOf("(") > -1) &&
-        (inData.lastIndexOf(")") > -1)) {
-        bIDIncluded = true;
+    if (!inData == false) {
+        if ((inData.lastIndexOf("(") > -1) &&
+            (inData.lastIndexOf(")") > -1)) {
+            bIDIncluded = true;
+        }
     }
 
     if (bIDIncluded == true) {

@@ -7847,6 +7847,15 @@ function getReportFilterArray_MRRModeUsageSummary() {
     }
     arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['MRR'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
     return arrayFilters;
 }
 
@@ -7855,6 +7864,9 @@ function getReportObject_MRRModeUsageSummary()
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
+
+
+    columnsToDisplay.push("Market");
 
     columnsToDisplay.push("Effective Report Title");
     columnsToDisplay.push("Report Type");
