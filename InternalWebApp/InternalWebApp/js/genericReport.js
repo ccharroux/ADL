@@ -7766,7 +7766,7 @@ function getReportObject_UsersNotSetupInSystem()
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['personnel'],
-        sortable : false
+        sortable : true
 
     }
 
