@@ -487,7 +487,7 @@ function addDialogComponents()
 
     d = d + '<div class="favoriteButtonClass" style="position:absolute;top:5px; right:10px;z-index:1000">';
     d = d + '<div class="dropdown inline-block linkdropdown">';
-    d = d + '           <a class="favoritesButtonFromLink" role="button" aria=expanded="false">&nbsp;&nbsp;&nbsp;Favorites&nbsp;&nbsp;</span></a>';
+    d = d + '           &nbsp;&nbsp;&nbsp;<a style="padding-left:10px!important;padding-right:10px!important" class="favoritesButtonFromLink" role="button" aria=expanded="false">Favorites</a>&nbsp;&nbsp;</a>';
     d = d + '          <ul id="favoritesQuickList" class="dropdown-menu linkdropdown-menu" role="menu">';
 
 
@@ -527,7 +527,7 @@ function getFavoritesForQuickList()
                 {
                     var title = data.report.rows[index].Title;
                     var url = data.report.rows[index].URL;
-
+                    console.log(url);
                     $("#favoritesQuickList").append('<li class="display-block"><a href="' + url + '">' + title + '</a></li>');
                 });
 
