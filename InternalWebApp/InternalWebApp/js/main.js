@@ -2392,7 +2392,7 @@ function buildBackButtonGeneric() {
     if (getLocalStorage("backButtonData").length > 0 && (!menuItem ||menuItem.length == 0))
     {
         var backButton = '<input type="button" id="btnBack" class="search-button" value="Back" onclick="updatedGoBack()">';
-        $("#fh5co-contact-section").prepend("<div style='padding-right: 35px;float:right; margin-top:-35px'>" + backButton + "</div>");
+        $("#fh5co-contact-section").prepend("<div style='padding-right: 35px;float:right; margin-top:0px'>" + backButton + "</div>");
     }
     else
     {
