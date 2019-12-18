@@ -1518,6 +1518,17 @@ function getReportFilterArray_StationChangeHistory() {
     }
     arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationListByGeneralFilters",
+        objectName: "ddlStation",
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
+        reloadBasedProduct: false,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
     return arrayFilters;
 }
 function getReportObject_StationChangeHistory() {
