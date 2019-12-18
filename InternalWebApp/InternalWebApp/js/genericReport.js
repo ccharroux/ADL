@@ -341,7 +341,7 @@ function buildQuickReports(rptType, control, container, postfix)
         }
   
     }
-
+ 
     if (rptHit == true)
     {
         var ddlStr = "<option value='-1'>  -- Select a Report --  </option>";

@@ -10,6 +10,7 @@ const gChosenParams = {
     allowSearchContains: true, 
     allowSplitWordSearch: false
 }
+var gShowHeader = true;
 
 var release =
 {
@@ -298,7 +299,10 @@ $( document ).ready(function()
     }
 
     $(document).ajaxStop(function () {
+        gShowHeader = showHeader();
         buildBackButtonGeneric();
+
+
     });
  
 
@@ -382,6 +386,7 @@ $( document ).ready(function()
 function showHeader()
 {
     var hideHeader = getParameterByName("hideHeader");
+    var returnVal = false;
 
     if (!hideHeader == false && hideHeader.toLowerCase() == "true")
     {
@@ -390,12 +395,16 @@ function showHeader()
         $(".favoriteButtonClass").hide();
         $("#reportTitleRow").hide();
         gDataTableDefaultRows = 10;
+        returnVal = false;
     }
     else {
         $("#fh5co-header").show();
+        returnVal = true;
     }
 
     $("body").show();
+
+    return returnVal;
 }
 function showComponentDialog(url, title)
 {
@@ -535,8 +544,7 @@ function getFavoritesForQuickList()
                 {
                     var title = data.report.rows[index].Title;
                     var url = data.report.rows[index].URL;
-                    console.log(url);
-                    $("#favoritesQuickList").append('<li class="display-block"><a href="' + url + '">' + title + '</a></li>');
+                     $("#favoritesQuickList").append('<li class="display-block"><a href="' + url + '">' + title + '</a></li>');
                 });
 
 
@@ -2169,7 +2177,6 @@ function hasBackButtonData()
 
 function buildBackButton()
 {
-    
     var backButtonData = {};
     var currentPageData = getReportParameters();
 
@@ -2373,7 +2380,11 @@ function loadReportParameters() {
 }
 
 function buildBackButtonGeneric() {
-
+    if (gShowHeader == false)
+    {
+        $("#btnBack").hide();
+        return;
+    }
     // cleanup can go here...
     //cleanupBackButton();
     var menuItem = getParameterByName("MenuItem");
