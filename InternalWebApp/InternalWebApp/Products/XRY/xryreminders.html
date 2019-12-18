@@ -89,7 +89,7 @@
                         <h2 id="pageTitle">Reminders - X-Ray</h2>
                     </div>
                 </div>
-                <div id="divQuickReport" style="float:right;padding-right:25px;padding-bottom:10px;margin-top: -100px;">
+                <div id="divQuickReport" >
                     <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
                     <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
                 </div>
@@ -140,7 +140,7 @@
                         <center>
                             <div class="allMarketsAndContactsTotal" style="text-align:center; border:solid 1px silver; border-radius:15px;background-color:lightblue;width:50%">
                                 <b>Total Stations Pending:</b>
-                                <span id="spanTotalStationsPending"></span><br />
+                                <span id="spanTotalStationsPending"></span>&nbsp;&nbsp;/&nbsp;&nbsp;
                                 <b>Total Contacts Pending:</b>
                                 <span id="spanTotalContactsPending"></span>
                             </div>
@@ -359,9 +359,19 @@
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
             "columns": [
-                { "data": 'Contact' },
+                {
+                    mRender: function (data, type, row) {
+                        return '<a href="#" style="color:blue" onclick="selectContactId(' + row.personnelId + ')">' + row.Contact + '</a>';
+                    }
+                },
                 { "data": 'Primary' },
-                { "data": 'Market' },
+                {
+
+                    mRender: function (data, type, row) {
+                        return '<a href="#" style="color:blue" onclick="selectMarketId(' + row.marketId + ')">' + row.Market + '</a>';
+
+                    }
+                },
                 { "data": 'Station' },
                 { "data": 'Reminders' },
                 { "data": 'Period' },
@@ -734,7 +744,7 @@
                 } else {
                     str = str + '<option';
                 }
-                str = str + ' value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
+                str = str + ' value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + ' (' + data.report.rows[index].marketId + ')' + '</option>';
 
             });
 
@@ -999,10 +1009,13 @@
 
     function sendReminders() {
         closeEmailNoteDialog();
-        getOutstandingSubmissionsWithoutContacts();
+
+        insertRemindersIntoQueue();
+        //getOutstandingSubmissionsWithoutContacts();
     }
 
-    function getOutstandingSubmissionsWithoutContacts() {
+    function getOutstandingSubmissionsWithoutContacts()
+    {
         var url = ServicePrefix + '/api/XRAY/GetOutstandingSubmissionsWithoutContacts';
 
         var settings = {
@@ -1037,8 +1050,6 @@
 
         if (data.report.rows.length > 0) {
             populateDataTable("dtOutstandingSubmissionsWithoutContacts", data);
-
-
             $("#outstandingSubmissionsWithoutContactsDialog").dialog("open");
             return;
         }
@@ -1087,5 +1098,22 @@
 
         getReminders();
     }
+    function selectContactId(inPersonnelId) {
+        if ($("#ddlContact").val() == "-1") {
 
+            $("#ddlContact").val(inPersonnelId);
+            contactChanged();
+        }
+    }
+    function selectMarketId(inMarketId) {
+        if ($("#ddlMarket").val() == "-1") {
+
+            $("#ddlMarket").val(inMarketId);
+            getContacts();
+
+        }
+
+
+
+    }
 </script>

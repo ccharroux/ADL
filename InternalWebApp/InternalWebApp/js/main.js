@@ -295,7 +295,7 @@ $( document ).ready(function()
     environment = getEnvironment();
 
     if (environment.length > 0) {
-        $("#fh5co-header").prepend("<div class='container' style='color:white; background:red; padding-top: 3px; font-weight:600;border-radius:15px; text-align: center;'>" + environment + "</div>");
+        $("#fh5co-header").prepend("<div class='container environment'>" + environment + "</div>");
     }
 
     $(document).ajaxStop(function () {
