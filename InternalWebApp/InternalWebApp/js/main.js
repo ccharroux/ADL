@@ -11,7 +11,15 @@ const gChosenParams = {
     allowSplitWordSearch: false
 }
 
- 
+var release =
+{
+    "DEV": "N/A",
+    "STAGING": "12/17/2019",
+    "PRODUCTION": "12/17/2019",
+    "DEMO": "12/17/2019"
+}
+var dateOfCode = new Date();
+release["DEV"] = (dateOfCode.getMonth() + 1) + '-' + dateOfCode.getDate() + '-' + dateOfCode.getFullYear();
 
 const gMonths = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
@@ -715,24 +723,25 @@ function buildFavoritesDialog()
 
 function getEnvironment()
 {
-    var environment = "";
+    var environment = "&nbsp;PRODUCTION as of " + release['PRODUCTION'];
 
     var loc = window.location.toString().toLocaleLowerCase();
 
 
     if (loc.indexOf("devmediainternal.millerkaplan.com") > -1) {
-        environment = "&nbsp;DEV";
+        environment = "&nbsp;DEV as of " + release["DEV"];;
     }
 
     if (loc.indexOf("localhost") > -1) {
-        environment = "&nbsp;LOCAL";
+        environment = "&nbsp;LOCAL as of " + release["DEV"];
     }
 
     if (loc.indexOf("stagingmediainternal.millerkaplan.com") > -1) {
-        environment = "&nbsp;STAGING";
+        environment = "&nbsp;STAGING as of " + release["STAGING"];
     }
+
     if (loc.indexOf("demomediainternal.millerkaplan.com") > -1) {
-        environment = "&nbsp;DEMO";
+        environment = "&nbsp;DEMO as of " + release["DEMO"];
     }
 
     return environment;
