@@ -4180,7 +4180,7 @@ function getReportObject_MultipleOwnersPerUser() {
 
     tempObject =
     {
-        reportTitle: "Multiple Owners Per User List",
+        reportTitle: "Multiple Parent Owners Per User List",
         apiControllerAction: "/api/PersonnelReport/GetMultipleOwnersPerUserList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
