@@ -60,7 +60,10 @@
         #ddlMediaType_chosen {
             margin-right: 0px;
         }
-
+        .ui-dialog-titlebar-close
+        {
+            display: none;
+        }
     </style>
 
     <!-- Modernizr JS -->
@@ -133,15 +136,24 @@
                 <div class="row search-section" style="padding-top:40px">
                     <div class="col-md-12 ">
                         <center>
-                            <input type="checkbox" id="chkOnlyPendingMarkets" value="" onclick="getReminders();" /><label for="chkOnlyPendingMarkets">&nbsp;Only show pending markets</label>
-                            &nbsp;&nbsp;
-                            <input type="checkbox" id="chkOnlyMarketsForCurrentContact" value="" onclick="getMarkets();" /><label for="chkOnlyMarketsForCurrentContact">&nbsp;Current contact's markets</label>
+                            <label for="chkOnlyPendingMarkets" class="checkboxView">
+                                <input type="checkbox" id="chkOnlyPendingMarkets" value="" onclick="getReminders();" />&nbsp;Only pending markets
+                            </label>
+ 
+                            <label for="chkOnlyMarketsForCurrentContact" class="checkboxView">
+                                <input type="checkbox" id="chkOnlyMarketsForCurrentContact" value="" onclick="getMarkets();" />&nbsp;Current contact's markets
+                            </label>
+ 
+                            <label for="chkForceUserView" class="checkboxView forceUserView">
+                                <input type="checkbox" id="chkForceUserView" value="" onclick="getReminders();" checked="checked" />&nbsp;Show Contacts
+                            </label>
                         </center>
                     </div>
                 </div>
                 <div class="row search-section" style="padding-top:20px">
-                    <div class="col-md-12 ">
 
+                    <div class="col-md-2">&nbsp;</div>
+                    <div class="col-md-8">
                         <center>
                             <div class="allMarketsAndContactsTotal" style="text-align:center; border:solid 1px silver; border-radius:15px;background-color:lightblue;width:50%">
                                 <b>Total Stations Pending:</b>
@@ -150,6 +162,9 @@
                                 <span id="spanTotalContactsPending"></span>
                             </div>
                         </center>
+                    </div>
+                    <div class="col-md-2" style="height:56px; text-align:center">
+                        <input style="margin-top:10px" id="btnSendAll" type="button" value="Send All" onclick="sendRemindersBulkInitiate();" />
                     </div>
                 </div>
 
@@ -253,7 +268,7 @@
 </html>
 <script>
 
-
+    var bulkSendArray = new Array();
     var gotMediaTypes = false;
     var gotSchedules = false;
     var gotMarkets = false; // unused as of 5-23-2019, but include it for consistency in case that changes later
@@ -332,9 +347,17 @@
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
             "columns": [
-                { "data": 'Contact' },
+                {
+                    mRender: function (data, type, row) {
+                        return '<a href="#" style="color:blue" onclick="selectContactId(' + row.personnelId + ')">' + row.Contact + '</a>';
+                    }
+                },
                 { "data": 'Primary' },
-                { "data": 'Market' },
+                {
+                    mRender: function (data, type, row) {
+                        return '<a href="#" style="color:blue" onclick="selectMarketId(' + row.marketId + ')">' + row.Market + '</a>';
+                    }
+                },
                 { "data": 'Station' },
                 { "data": 'Reminders' },
  
@@ -348,14 +371,29 @@
                 { "data": 'On Hold' },
                 {
                     mRender: function (data, type, row) {
+                        //// single-market-or-contact doesn't show these, but does provide them for the purpose of this decision
+                        //if (row["stations pending"] == 0) {
+                        //    return "Nothing pending";
+                        //}
+                        //if (row["on hold"] == "Yes") {
+                        //    return "Market on hold";
+                        //}
+                        //return '<a href="#" onclick="sendReminderInitiate(' + row.marketId + ',' + row.stationId + ',' + row.personnelId + ')">Send</a>';
+
                         // single-market-or-contact doesn't show these, but does provide them for the purpose of this decision
-                        if (row["stations pending"] == 0) {
+                        if (row["Input On"] != null) {
+                            return "Already Submitted";
+                        }
+
+                        if (row["Stations Pending"] == 0) {
                             return "Nothing pending";
                         }
-                        if (row["on hold"] == "Yes") {
+
+                        if (row["On Hold"] == "Yes") {
                             return "Market on hold";
                         }
                         return '<a href="#" onclick="sendReminderInitiate(' + row.marketId + ',' + row.stationId + ',' + row.personnelId + ')">Send</a>';
+
 
                     },
                     "orderable": false,
@@ -735,8 +773,19 @@
         getReminders();
     }
 
-    function getContacts() {
-        if (skipPopulatingContacts) {
+    function getContacts()
+    {
+        if ($("#ddlMarket").val() == "-1") {
+            $("#chkForceUserView").prop('disabled', '');
+        }
+        else {
+
+            $("#chkForceUserView").prop('checked', true);
+            $("#chkForceUserView").prop('disabled', true);
+        }
+
+        if (skipPopulatingContacts)
+        {
             skipPopulatingContacts = false;
             previousContactId = $("#ddlContact").val();
             postGetContacts(previousContactId);
@@ -854,6 +903,10 @@
     }
 
     function getReminders() {
+
+        $("#btnSendAll").hide();
+        bulkSendArray = new Array();
+
         if (!gotContacts || !gotYearsPeriods) {
             return;
         }
@@ -865,7 +918,9 @@
                 + '?inApiToken=' + getLocalStorage("APIToken")
                 + '&inYear=' + currentYear()
                 + '&inPeriod=' + currentPeriod();
+
         var marketId = $("#ddlMarket").val();
+
         if (marketId != -1) {
             url += '&inMarketId=' + marketId;
         } else {
@@ -874,6 +929,7 @@
                 url += '&inMediaTypeId=' + mediaTypeId;
             }
         }
+
         var contactId = $("#ddlContact").val();
         if (contactId != -1) {
             url += '&inPersonnelId=' + contactId;
@@ -882,10 +938,13 @@
         if ($("#chkOnlyPendingMarkets").prop('checked')) {
             url += '&inOnlyPendingMarkets=true';
         }
+
         var scheduleId = $("#ddlSchedule").val();
         if (scheduleId != "") {
             url += '&inScheduleId=' + scheduleId;
         }
+
+        url += '&inForceUserView=' + $("#chkForceUserView").is(":checked");
 
         $.ajax({
             url: url,
@@ -896,19 +955,31 @@
             success: function (data, textStatus, jQxhr) {
                 if (data.response.status.toUpperCase() === "SUCCESS")
                 {
-                    //if (data.report.rows.length == 1)
-                    //{
-                    //    var id = data.report.rows[0].marketId;
-                    //    setLocalStorage("search", "");
-                    //    editMarket(id);
-                    //    return;
-                    //}
+                    if (data.report.rows.length > 0)  
+                    {
+                        var bShow = false;
+
+                        if ($("#ddlMarket").val() == "-1" && 
+                            $("#chkForceUserView").is(":checked") == true)
+                        {
+                            bShow = true;
+                        }
+                        else if ($("#ddlMarket").val() != "-1")
+                        {
+                            bShow = true;
+                        }
+
+                        if (bShow) {
+                            $("#btnSendAll").show();
+                        }
+                    }
                 }
                 if (!initializedReminders) {
                     setDataTable();
                     initializedReminders = true;
                 }
                 populateDataTable("dtReminders", data);
+                buildSendArray(data);
                 showHideColumns();
 
             },
@@ -919,32 +990,41 @@
 
     }
 
-    function showHideColumns() {
+    function showHideColumns()
+    {
         var marketId = $("#ddlMarket").val();
         var contactId = $("#ddlContact").val();
 
-        if (marketId == -1 && contactId == -1) {
+        if (marketId == -1 && contactId == -1 && $("#chkForceUserView").is(":checked") == false)
+        {
             $(".allMarketsAndContactsColumn").show();
             $(".singleMarketOrContactColumn").hide();
             $(".allMarketsAndContactsTotal").show();
-        } else {
+        }
+        else
+        {
             $(".allMarketsAndContactsColumn").hide();
             $(".singleMarketOrContactColumn").show();
             $(".allMarketsAndContactsTotal").hide();
         }
 
-        if (marketId == -1) {
+        if (marketId == -1)
+        {
             $(".allMarketsColumn").show();
-        } else {
+        }
+        else
+        {
             $(".allMarketsColumn").hide();
         }
     }
 
-    function sendReminderInitiate(marketId, stationId, personnelId) {
+    function sendReminderInitiate(marketId, stationId, personnelId)
+    {
         currentMarketId = marketId;
         currentStationId = stationId;
         currentPersonnelId = personnelId;
-
+        gBulkSubmit = false;
+        $("#txtEmailNote").val("");
         $("#emailNoteDialog").dialog("open");
     }
 
@@ -952,8 +1032,15 @@
         $("#emailNoteDialog").dialog("close");
     }
 
-    function sendReminder() {
+    function sendReminder()
+    {
+
         closeEmailNoteDialog();
+
+        if (gBulkSubmit == true) {
+            sendRemindersBulkAjax();
+            return;
+        }
 
         var url = ServicePrefix + '/api/MRR/InsertRemindersIntoQueue';
 
@@ -992,5 +1079,98 @@
         getReminders();
     }
 
+    function selectMarketId(inMarketId) {
+        if ($("#ddlMarket").val() == "-1") {
+
+            $("#ddlMarket").val(inMarketId);
+            getContacts();
+
+        }
+
+
+
+    }
+    function selectContactId(inPersonnelId) {
+        if ($("#ddlContact").val() == "-1") {
+
+            $("#ddlContact").val(inPersonnelId);
+            contactChanged();
+        }
+    }
+    function buildSendArray(inData) {
+
+        var data = inData.report;
+
+        var newObj = new Object();
+
+        for (var i = 0; i < data.rows.length; i++) {
+            newObj = {
+                "inPersonnelId": data.rows[i].personnelId,
+                "inMarketId": data.rows[i].marketId,
+                "inStationId": data.rows[i].stationId
+            }
+
+            var index = bulkSendArray.findIndex(x => x.inPersonnelId == data.rows[i].personnelId
+                                                    /* &&
+                                                     x.inMarketId == data.rows[i].marketId &&
+                                                     x.inStationId == data.rows[i].stationId*/
+                                                     );
+
+            if (index === -1 &&
+                data.rows[i]["Input On"] == null &&
+                data.rows[i]["Stations Pending"] != 0 &&
+                data.rows[i]["On Hold"] != "Yes"
+            ) {
+                bulkSendArray.push(newObj);
+            }
+
+        }
+
+        //alert(bulkSendArray.length);
+    }
+
+    function sendRemindersBulkInitiate() {
+        gBulkSubmit = true;
+        $("#txtEmailNote").val("");
+        $("#emailNoteDialog").dialog("open");
+    }
+
+    function sendRemindersBulkAjax() {
+
+        var url = ServicePrefix + '/api/MRR/InsertRemindersIntoQueueBulk';
+
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inReminderModel": bulkSendArray,
+                "inYear": currentYear(),
+                "inPeriod": currentPeriod(),
+                "inOnlyPendingMarkets": $("#chkOnlyPendingMarkets").is(':checked'),
+                "inEmailNote": $("#txtEmailNote").val(),
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                sendReminderSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        var message = "This will send " + bulkSendArray.length + " emails. This is the number of distinct contacts that have been selected. Do you wish to continue?";
+
+        bootbox.confirm(message, function (result) {
+            if (result) {
+                $.ajax(url, settings);
+            }
+            else {
+                return;
+            }
+        });
+    }
 </script>
 

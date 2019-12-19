@@ -54,9 +54,10 @@
         .dropdown-select {
             max-width: 200px;
         }
-        .checkboxView
+
+        .ui-dialog-titlebar-close
         {
-            padding-right:20px;
+            display: none;
         }
     </style>
 
@@ -109,7 +110,7 @@
                     <div class="col-md-12">
                         <center>
                             <label for="chkOnlyPendingMarkets" class="checkboxView">
-                                <input type="checkbox" id="chkOnlyPendingMarkets" value="" onclick="getReminders();" />&nbsp;Only show pending markets
+                                <input type="checkbox" id="chkOnlyPendingMarkets" value="" onclick="getReminders();" />&nbsp;Only pending markets
                             </label>
                             <label for="chkOnlyMarketsForCurrentContact" class="checkboxView">
                                 <input type="checkbox" id="chkOnlyMarketsForCurrentContact" value="" onclick="getMarkets();" />&nbsp;Current contact's markets
@@ -124,8 +125,8 @@
 
                 <div class="row search-section" style="padding-top:20px">
 
-                    <div class="col-md-3">&nbsp;</div>
-                    <div class="col-md-6">
+                    <div class="col-md-2">&nbsp;</div>
+                    <div class="col-md-8">
                         <center>
                             <div class="allMarketsAndContactsTotal" style="text-align:center; border:solid 1px silver; border-radius:15px;background-color:lightblue;width:75%">
                                 <b>Total Stations Pending:</b>
@@ -135,8 +136,9 @@
                             </div>
                         </center>
                     </div>
-                    <div class="col-md-3" style="height:56px; text-align:center">
-                        <input style="margin-top:10px" id="btnSendAll" type="button" value="Send All" onclick="sendRemindersBulkInitiate();" /></div>
+                    <div class="col-md-2" style="height:56px; text-align:center">
+                        <input style="margin-top:10px" id="btnSendAll" type="button" value="Send All" onclick="sendRemindersBulkInitiate();" />
+                    </div>
 
                 </div>
 
@@ -601,7 +603,6 @@
  
             $("#chkForceUserView").prop('checked', true);
             $("#chkForceUserView").prop('disabled', true);
-
         }
 
         if (skipPopulatingContacts)
@@ -761,11 +762,27 @@
             success: function (data, textStatus, jQxhr) {
                 if (data.response.status.toUpperCase() === "SUCCESS")
                 {
+                    
                     if (data.report.rows.length > 0)
                     {
-                        $("#btnSendAll").show();
+                        var bShow = false;
+
+                        if ($("#ddlMarket").val() == "-1" && 
+                            $("#chkForceUserView").is(":checked") == true)
+                        {
+                            bShow = true;
+                        }
+                        else if ($("#ddlMarket").val() != "-1")
+                        {
+                            bShow = true;
+                        }
+
+                        if (bShow) {
+                            $("#btnSendAll").show();
+                        }
                     }
                 }
+
                 if (!initializedReminders) {
                     setDataTable();
                     initializedReminders = true;
@@ -796,9 +813,11 @@
                 "inStationId": data.rows[i].stationId
             }
 
-            var index = bulkSendArray.findIndex(x => x.inPersonnelId == data.rows[i].personnelId &&
-                                                     x.inMarketId == data.rows[i].marketId &&
-                                                     x.inStationId == data.rows[i].stationId);
+            var index = bulkSendArray.findIndex(x => x.inPersonnelId == data.rows[i].personnelId
+                                                     //   &&
+                                                     //x.inMarketId == data.rows[i].marketId &&
+                                                     //x.inStationId == data.rows[i].stationId
+                                                     );
 
             if (index === -1 &&
                 data.rows[i]["Input On"] == null &&
@@ -846,7 +865,7 @@
         currentMarketId = marketId;
         currentStationId = stationId;
         currentPersonnelId = personnelId;
-
+        $("#txtEmailNote").val("");
         $("#emailNoteDialog").dialog("open");
     }
 
@@ -922,19 +941,22 @@
             $("#ddlContact").val(inPersonnelId);
             contactChanged();
         }
-    }
+    } 
 
     function sendRemindersBulkInitiate()
     {
         gBulkSubmit = true;
-
+        $("#txtEmailNote").val("");
         $("#emailNoteDialog").dialog("open");
     }
 
     function sendRemindersBulkAjax()
     {
-        var url = ServicePrefix + '/api/TVB/InsertRemindersIntoQueueBulk';
+
+
  
+
+        var url = ServicePrefix + '/api/TVB/InsertRemindersIntoQueueBulk';
 
         var settings = {
             dataType: 'json',
@@ -957,7 +979,19 @@
             }
         };
 
-        $.ajax(url, settings);
+        var message = "This will send " + bulkSendArray.length + " emails. This is the number of distinct contacts that have been selected. Do you wish to continue?";
+
+
+        bootbox.confirm(message, function (result) {
+            if (result)
+            {
+                $.ajax(url, settings);
+            }
+            else {
+                    return;
+                }
+        });
+
     }
 </script>
 
