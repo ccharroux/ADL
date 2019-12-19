@@ -250,6 +250,7 @@ reportName.push("rptMarketStationSummary");
 reportName.push("rptXRYImportTypeIssueList");
 
 reportName.push("rptXRYContactListByMarketOwner");
+reportName.push("rptXRYAdvertiserExclusivitySpecs");
 
 function buildReportArray()
 {
@@ -9935,6 +9936,41 @@ function getReportObject_XRYContactListByMarketOwner() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['xry', 'xray monthly']
+    }
+
+    return tempObject;
+}
+
+ 
+function getReportFilterArray_XRYAdvertiserExclusivitySpecs() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "MarketAdvertiser",
+        objectName: "txtMarketAdvertiser",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+ 
+    return arrayFilters;
+}
+function getReportObject_XRYAdvertiserExclusivitySpecs() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "XRay Advertiser Exclusivity List",
+        apiControllerAction: "/api/XRAYReport/GetAdvertiserExclusivitySpecs",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry', 'qa']
     }
 
     return tempObject;
