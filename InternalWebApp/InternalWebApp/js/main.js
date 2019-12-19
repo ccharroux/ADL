@@ -294,15 +294,31 @@ $( document ).ready(function()
 
     environment = getEnvironment();
 
-    if (environment.length > 0) {
-        $("#fh5co-header").prepend("<div class='container environment'>" + environment + "</div>");
+    var environmentClass = "environment";
+
+    if (environment.length > 0)
+    {
+
+        if ((environment.indexOf("DEV") > -1) || (environment.indexOf("LOCAL") > -1))
+        {        
+            environmentClass = environmentClass + "DEV";
+        }
+        if  (environment.indexOf("STAGING") > -1)   {
+            environmentClass = environmentClass + "STAGING";
+        }
+        if  (environment.indexOf("DEMO") > -1)   {
+            environmentClass = environmentClass + "DEMO";
+        }
+        if (environment.indexOf("PRODUCTION") > -1) {
+            environmentClass = environmentClass + "PRODUCTION";
+        }
+
+        $("#fh5co-header").prepend("<div class='environment " + environmentClass + "'>" + environment + "</div>");
     }
 
     $(document).ajaxStop(function () {
         gShowHeader = showHeader();
         buildBackButtonGeneric();
-
-
     });
  
 
