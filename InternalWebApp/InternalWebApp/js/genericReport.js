@@ -7000,7 +7000,7 @@ function getReportFilterArray_AdvertisersAgenciesList() {
         token: "Market",
         jsCall: "getXRYMarketList",
         objectName: "ddlMarket",
-        required: false
+        required: true
     }
     arrayFilters.push(arrayObject);
 
