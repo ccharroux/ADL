@@ -249,6 +249,7 @@ reportName.push("rptMarketStationSummary");
 
 reportName.push("rptXRYImportTypeIssueList");
 
+reportName.push("rptXRYContactListByMarketOwner");
 
 function buildReportArray()
 {
@@ -9877,6 +9878,60 @@ function getReportObject_XRYImportTypeIssueList() {
         // id: rptXRAYUsage,
         reportTitle: "XRay Import Issue Type List",
         apiControllerAction: "/api/XRAYReport/GetImportIssueTypeList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry', 'xray monthly']
+    }
+
+    return tempObject;
+}
+ 
+function getReportFilterArray_XRYContactListByMarketOwner() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationListByGeneralFilters",
+        objectName: "ddlStation",
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
+        reloadBasedProduct: true,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_XRYContactListByMarketOwner() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    tempObject =
+    {
+ 
+        reportTitle: "XRay Contact List",
+        apiControllerAction: "/api/XRAYReport/GetContactListByMarketOwner",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['xry', 'xray monthly']

@@ -158,15 +158,15 @@
                                 <th class="exportColumn allMarketsColumn">Market</th>
                                 <th class="exportColumn singleMarketOrContactColumn">Station</th>
                                 <th class="exportColumn singleMarketOrContactColumn text-align-right">#</th>
-                                <th class="exportColumn">Period</th>
+ 
                                 <th class="exportColumn singleMarketOrContactColumn">Input On</th>
                                 <th class="exportColumn">Sent By</th>
                                 <th class="exportColumn">Sent On</th>
                                 <th class="exportColumn allMarketsAndContactsColumn text-align-right">Stations Pending</th>
                                 <th class="exportColumn allMarketsAndContactsColumn text-align-right">Contacts Pending</th>
-                                <th class="exportColumn allMarketsAndContactsColumn">Media</th>
-                                <th class="exportColumn allMarketsAndContactsColumn">On Hold</th>
-                                <th class="exportColumn">Send</th>
+                                <th class="exportColumn allMarketsAndContactsColumn text-align-center">Media</th>
+                                <th class="exportColumn allMarketsAndContactsColumn text-align-center">On Hold</th>
+                                <th class="text-align-center">Send</th>
                             </tr>
                         </thead>
                         <tfoot>
@@ -176,15 +176,15 @@
                                 <th class="allMarketsColumn">Market</th>
                                 <th class="singleMarketOrContactColumn">Station</th>
                                 <th class="singleMarketOrContactColumn text-align-right">#</th>
-                                <th>Period</th>
+ 
                                 <th class="singleMarketOrContactColumn">Input On</th>
                                 <th>Sent By</th>
                                 <th>Sent On</th>
                                 <th class="allMarketsAndContactsColumn text-align-right">Stations Pending</th>
                                 <th class="allMarketsAndContactsColumn text-align-right" >Contacts Pending</th>
-                                <th class="allMarketsAndContactsColumn">Media</th>
-                                <th class="allMarketsAndContactsColumn">On Hold</th>
-                                <th>Send</th>
+                                <th class="allMarketsAndContactsColumn text-align-center">Media</th>
+                                <th class="allMarketsAndContactsColumn text-align-center">On Hold</th>
+                                <th class="text-align-center">Send</th>
                             </tr>
                         </tfoot>
                     </table>
@@ -295,6 +295,9 @@
     var currentStationId = null;
     var currentPersonnelId = null;
 
+    var removePeriodColumn = 1;
+
+
     $(document).ready(function () {
 
         buildXRYMenu("Revenue");
@@ -374,7 +377,7 @@
                 },
                 { "data": 'Station' },
                 { "data": 'Reminders' },
-                { "data": 'Period' },
+ 
                 { "data": 'Input On' },
                 { "data": 'Reminder Sent By' },
                 { "data": 'Reminder Sent On' },
@@ -415,14 +418,14 @@
                 },
                 {
                     "targets": [
-                        6 // Input On
+                        6 - removePeriodColumn // Input On
                     ],
                     "className": "singleMarketOrContactColumn"
                 },
                 {
                     "targets": [
-                        9, // Stations Pending
-                        10, // Contacts Pending
+                        9 - removePeriodColumn, // Stations Pending
+                        10 - removePeriodColumn, // Contacts Pending
 
                     ],
                     "className": "allMarketsAndContactsColumn text-align-right"
@@ -430,10 +433,18 @@
                 {
                     "targets": [
 
-                        11, // Media Type
-                        12, // On Hold
+                        11 - removePeriodColumn, // Media Type
+                        12 - removePeriodColumn, // On Hold
                     ],
-                    "className": "allMarketsAndContactsColumn"
+                    "className": "allMarketsAndContactsColumn text-align-center"
+                },
+                {
+                    "targets": [
+
+                        13 - removePeriodColumn  // send
+ 
+                    ],
+                    "className": "text-align-center"
                 },
 
             ],
@@ -441,8 +452,8 @@
                 showHideColumns();
             },
             "footerCallback": function (row, data, start, end, display) {
-                var columnTotalStationsPending = 9;
-                var columnTotalContactsPending = 10;
+                var columnTotalStationsPending = 9 - removePeriodColumn;
+                var columnTotalContactsPending = 10 - removePeriodColumn;
 
                 var api = this.api();
 
@@ -493,21 +504,8 @@
                        }
                    }
                },
-               {
-                   extend: 'pdf',
-                   title: reportTitle,
-                   exportOptions: {
-                       columns: exportColumns,
-                       format: {
-                           header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtReminders", data, columnIdx);
-                           }
-                       }
-                   }
-               }
-               //,
                //{
-               //    extend: 'print',
+               //    extend: 'pdf',
                //    title: reportTitle,
                //    exportOptions: {
                //        columns: exportColumns,
@@ -518,6 +516,19 @@
                //        }
                //    }
                //}
+               //,
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtReminders", data, columnIdx);
+                           }
+                       }
+                   }
+               }
                //,
                //this button is supposed to handle column visibility
                //however it isn't working on our site
@@ -575,19 +586,6 @@
                        }
                    }
                },
-               {
-                   extend: 'pdf',
-                   title: reportTitle,
-                   exportOptions: {
-                       columns: exportColumns,
-                       format: {
-                           header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtOutstandingSubmissionsWithoutContacts", data, columnIdx);
-                           }
-                       }
-                   }
-               }
-               //,
                //{
                //    extend: 'print',
                //    title: reportTitle,
@@ -600,6 +598,19 @@
                //        }
                //    }
                //}
+               ////,
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtOutstandingSubmissionsWithoutContacts", data, columnIdx);
+                           }
+                       }
+                   }
+               }
                //,
                //this button is supposed to handle column visibility
                //however it isn't working on our site
@@ -1094,6 +1105,13 @@
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
+        }
+        else
+        {
+            if (data.report.rows[0]["_updateStatus"] == "-99")
+            {
+                bootbox.alert("Reminders sent succusfully, but some stations do not have contacts set up and they were not sent reminders. You may want to review this market for missing contacts.");
+            }
         }
 
         getReminders();

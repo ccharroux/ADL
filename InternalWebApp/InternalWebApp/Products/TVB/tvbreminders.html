@@ -127,9 +127,9 @@
                     <div class="col-md-3">&nbsp;</div>
                     <div class="col-md-6">
                         <center>
-                            <div class="allMarketsAndContactsTotal" style="text-align:center; border:solid 1px silver; border-radius:15px;background-color:lightblue;width:50%">
+                            <div class="allMarketsAndContactsTotal" style="text-align:center; border:solid 1px silver; border-radius:15px;background-color:lightblue;width:75%">
                                 <b>Total Stations Pending:</b>
-                                <span id="spanTotalStationsPending"></span><br />
+                                <span id="spanTotalStationsPending"></span>&nbsp;&nbsp;/&nbsp;&nbsp;
                                 <b>Total Contacts Pending:</b>
                                 <span id="spanTotalContactsPending"></span>
                             </div>
@@ -152,14 +152,14 @@
                                 <th class="exportColumn allMarketsColumn">Market</th>
                                 <th class="exportColumn singleMarketOrContactColumn">Station</th>
                                 <th class="exportColumn singleMarketOrContactColumn text-align-right"># Reminders</th>
-                                <th class="exportColumn">Period</th>
+                                <!--<th class="exportColumn">Period</th>-->
                                 <th class="exportColumn singleMarketOrContactColumn">Input On</th>
                                 <th class="exportColumn">Sent By</th>
                                 <th class="exportColumn">Sent On</th>
                                 <th class="exportColumn allMarketsAndContactsColumn text-align-right">Stations Pending</th>
                                 <th class="exportColumn allMarketsAndContactsColumn text-align-right">Contacts Pending</th>
-                                <th class="exportColumn allMarketsAndContactsColumn">On Hold</th>
-                                <th class="exportColumn">Send</th>
+                                <th class="exportColumn allMarketsAndContactsColumn text-align-center">On Hold</th>
+                                <th class="exportColumn text-align-center">Send</th>
                             </tr>
                         </thead>
                         <!--<tfoot>
@@ -254,8 +254,9 @@
     var currentStationId = null;
     var currentPersonnelId = null;
 
-    const columnTotalStationsPending = 9;
-    const columnTotalContactsPending = 10;
+    const removePeriodColumn = 1;
+    const columnTotalStationsPending = 9 - removePeriodColumn;
+    const columnTotalContactsPending = 10 - removePeriodColumn;
 
 
     $(document).ready(function ()
@@ -332,7 +333,7 @@
                 },
                 { "data": 'Station' },
                 { "data": 'Reminders' },
-                { "data": 'Period' },
+                //{ "data": 'Period' },
                 { "data": 'Input On' },
                 { "data": 'Reminder Sent By' },
                 { "data": 'Reminder Sent On' },
@@ -342,13 +343,18 @@
                 {
                     mRender: function (data, type, row) {
                         // single-market-or-contact doesn't show these, but does provide them for the purpose of this decision
-                        if (row["Input On"] != null) {
+                        if (row["Input On"] != null)
+                        {
                             return "Already Submitted";
                         }
-                        if (row["Stations Pending"] == 0) {
+
+                        if (row["Stations Pending"] == 0)
+                        {
                             return "Nothing pending";
                         }
-                        if (row["On Hold"] == "Yes") {
+
+                        if (row["On Hold"] == "Yes")
+                        {
                             return "Market on hold";
                         }
                         return '<a href="#" onclick="sendReminderInitiate(' + row.marketId + ',' + row.stationId + ',' + row.personnelId + ')">Send</a>';
@@ -381,14 +387,14 @@
                 },
                 {
                     "targets": [
-                        6 // Input On
+                        6 - removePeriodColumn // Input On
                     ],
                     "className": "singleMarketOrContactColumn"
                 },
                 {
                     "targets": [
-                        9, // Stations Pending
-                        10, // Contacts Pending
+                        9 - removePeriodColumn, // Stations Pending
+                        10 - removePeriodColumn, // Contacts Pending
                          
                     ],
                     "className": "allMarketsAndContactsColumn text-align-right"
@@ -396,11 +402,17 @@
                 {
                     "targets": [
  
-                        11, // On Hold
+                        11 - removePeriodColumn, // On Hold
                     ],
-                    "className": "allMarketsAndContactsColumn"
+                    "className": "allMarketsAndContactsColumn text-align-center"
                 },
+                {
+                    "targets": [
 
+                        12 - removePeriodColumn, // On Hold
+                    ],
+                    "className": "text-align-center"
+                },
             ],
             "fnDrawCallback": function (oSettings) {
                 showHideColumns();
