@@ -252,6 +252,9 @@ reportName.push("rptXRYImportTypeIssueList");
 reportName.push("rptXRYContactListByMarketOwner");
 reportName.push("rptXRYAdvertiserExclusivitySpecs");
 
+reportName.push("rptDemoMarketList");
+reportName.push("rptDemoStationList");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -9971,6 +9974,58 @@ function getReportObject_XRYAdvertiserExclusivitySpecs() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['xry', 'qa']
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_DemoMarketList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    return arrayFilters;
+}
+function getReportObject_DemoMarketList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Demo Market List",
+        apiControllerAction: "/api/Demo/GetDemoMarketList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tech']
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_DemoStationList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    return arrayFilters;
+}
+function getReportObject_DemoStationList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Demo Station List",
+        apiControllerAction: "/api/Demo/GetDemoStationList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tech']
     }
 
     return tempObject;
