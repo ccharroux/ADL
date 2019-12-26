@@ -84,11 +84,6 @@
         }
         .contact-section {
             padding-bottom: 2em!important;
-            width:90%!important;
-            margin: 0 auto;
-        }
-        .container{
-            width:90%!important;
         }
     </style>
 
@@ -106,7 +101,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>TVB Revenue Input Status</h2>
+                        <h2>TVB Report Status</h2>
                     </div>
                 </div>
                 <div id="divQuickReport" >
@@ -117,15 +112,6 @@
                 <div class="row search-section">
                     <div class="col-md-12">
                         <center>
-                            <div class="form-group rptView rptDataSource">
-                                <label for="ddlDataSource" class="dropdown-label rptView rptDataSource">Data Source</label>
-                                <select id="ddlDataSource" onchange="reloadOwnersAndDates()" apiInput="inDataSource" class="dropdown-select rptView rptDataSource">
-                                    <option value="">--Select a Data Source</option>
-                                    <option value="timesales" selected>Time Sales</option>
-                                    <option value="repfirm">Rep Firm</option>
-                                    <option value="estimated">Estimated</option>
-                                </select>
-                            </div>
                             <div class="form-group rptView rptYear">
                                 <label for="ddlYear" onchange="getReport();" class="dropdown-label rptView rptYear">Year</label>
                                 <select id="ddlYear" onchange="getReport();" apiInput="inYear" class="dropdown-select rptView rptYear"></select>
@@ -134,12 +120,7 @@
                                 <label for="ddlPeriod" class="dropdown-label rptView rptPeriod">Period</label>
                                 <select id="ddlPeriod" apiInput="inPeriod" class="dropdown-select rptView rptPeriod"></select>
                             </div>
-                            <div class="form-group rptView rptOwner">
-                                <label for="ddlOwner" class="dropdown-label rptView rptOwner">Owner</label>
-                                <select style="width:300px" id="ddlOwner" apiInput="inOwnerId" class="dropdown-select rptView rptOwner"></select>
-                            </div>
-
-                            <div class="form-group rptButton" style="float:none;text-align:left">
+                            <div class="form-group col-md-3 rptButton" style="float:none;text-align:left">
                                 <label for="btnReport" class="dropdown-label">&nbsp;</label>
                                 <input type="button" id="btnReport" class="search-button" value="Show" onclick="getReport()" />
                             </div>
@@ -147,7 +128,21 @@
                     </div>
                 </div>
                 <!-- data table html -->
-                <div class="dataTable-top-margin" id="dtResultsWrapper">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <center>
+                            <span>
+                                <input type="button" id="btnApprove" onclick="approveAllMarkets(true);" value='Approve' />
+                            </span>
+                            <span>
+                                <input type="button" id="btnUnapprove" onclick="approveAllMarkets(false);" value="Unapprove" />
+                            </span>
+                        </center>
+                    </div>
+                
+                </div>
+
+                <div class="dataTable-top-margin">
                     <table id="dtResults" class="dataTable-border dataTable-headers dataTable-cell-border" ></table>
                     <div id="noDataFound" style="display:none; color: red">No data found</div>
                 </div>
@@ -194,7 +189,6 @@
 </html>
 <script>
 
-    var gotOwners = false;
     var reportObject = new Object();
     var reportFilterArray = new Object();
 
@@ -269,7 +263,6 @@
         //    to be pre built for the user
         getYearList();
         getPeriodList();
-        getTVBOwners();
 
         setTimeout(getReport, 500);
 
@@ -283,14 +276,27 @@
         var tempObject = new Object();
 
         columnsToDisplay = new Array();
+        columnsToDisplay.push("Market");
+        columnsToDisplay.push("Revision");
+        columnsToDisplay.push("Total Stations");
+        columnsToDisplay.push("Total Outstanding");
+        columnsToDisplay.push("Completed");
+        columnsToDisplay.push("Ranked On");
+        columnsToDisplay.push("Approved");
+        columnsToDisplay.push("Delivered On");
+        columnsToDisplay.push("On Hold");
+        columnsToDisplay.push("Revised On");
+//        columnsToDisplay.push("Market ID");
+//        columnsToDisplay.push("Can Approve");
+//        columnsToDisplay.push("CAn Unapprove");
 
         tempObject =
         {
-            reportTitle: "TVB Revenue Input Counts",
-            apiControllerAction: "/api/TVBReport/GetTVBRevenueInputCounts",
+            reportTitle: "TVB Market Release Status",
+            apiControllerAction: "/api/TVB/GetMarketApprovalList",
             apiType: "get",
             columnsToDisplay: columnsToDisplay,
-            product: 'tvb'
+            product: 'misc'
         }
 
         return tempObject;
@@ -318,21 +324,6 @@
         }
         arrayFilters.push(arrayObject);
 
-        arrayObject = new Object();
-        arrayObject = {
-            token: "DataSource",
-            objectName: "ddlDataSource",
-            required: true
-        }
-        arrayFilters.push(arrayObject);
-
-        arrayObject = new Object();
-        arrayObject = {
-            token: "Owner",
-            objectName: "ddlOwner",
-            required: false
-        }
-        arrayFilters.push(arrayObject);
         return arrayFilters;
     }
  
@@ -427,7 +418,6 @@
     }
     function getTheReportAJAX()
     {
-       // ServicePrefix='http://localhost:54064/';
         
         $.ajax({
             url: ServicePrefix + api,
@@ -455,17 +445,17 @@
     function buildColumnsArray(dataObj)
     {
         columnsToExport = new Array();
-        destroyDataTable();
 
         if (!dataObj["report"]["rows"])
         {
-
+            destroyDataTable();
             $("#noDataFound").show();
             return;
         }
 
         if (dataObj["report"]["rows"].length == 0)
         {
+            destroyDataTable();
             $("#noDataFound").show();
             return;
         }
@@ -555,6 +545,24 @@
             });
         });
 
+        $("#btnApprove").hide();
+        $("#btnUnapprove").hide();
+
+        // show this button
+        if (canApproveCtr == marketArray.length && marketArray.length > 0)
+        {
+            $("#btnApprove").show();
+            $("#btnUnapprove").hide();
+        }
+
+        // show this button
+        if (canUnapproveCtr == marketArray.length && marketArray.length > 0)
+        {
+            $("#btnApprove").hide();
+            $("#btnUnapprove").show();
+        }
+ 
+
         loadResults(dataObj, columns);
     }
 
@@ -634,60 +642,43 @@
 
     }
     function destroyDataTable() {
-
         if ($.fn.DataTable.isDataTable('#dtResults')) {
             var searchTable = $('#dtResults').DataTable();
             searchTable.destroy();
             $('#dtResults').hide();
         }
 
-
-        resetDataTableDOM("dtResults", "dtResultsWrapper", "dataTable-border dataTable-headers dataTable-cell-border");
-        $("#dtResultsWrapper").append('<div id="noDataFound" style="display:none; color: red">No data found</div>');
     }
 
-    function reloadOwnersAndDates()
+    function approveAllMarkets(bApproveFlag)
     {
-        var periodSource = "";
+        var processVerb = (bApproveFlag == true ? "APPROVE" : "UNAPPROVE");
+        approveErrorCtr = 0;
+        approveErrorMessage = "";
 
-        if ($("#ddlDataSource").val() == "timesales") {
-            periodSource = "months";
-        }
-
-        if ($("#ddlDataSource").val() == "estimated") {
-            periodSource = "all";
-        }
-
-        if ($("#ddlDataSource").val() == "repfirm") {
-            periodSource = "months";
-        }
-
-        getPeriodList(periodSource);
-        getYearList();
-
-        getTVBOwners();
-
-        destroyDataTable();
-
-    }
-    function getTVBOwners() {
-
-        var dataSource = "";
-
-        if ($("#ddlDataSource").val() == "timesales")
+        bootbox.confirm("Are you sure you want to " + processVerb + " ALL Markets? ", function (result)
         {
-            dataSource = "TimeSales";
-        }
+            if (result)
+            {
+                // loop
+                for (var i=0; i < marketArray.length; i++)
+                {
+                    approveMarket(marketArray[i], bApproveFlag);
+                }
 
-        if ($("#ddlDataSource").val() == "estimated") {
-            dataSource = "Estimated";
-        }
 
-        if ($("#ddlDataSource").val() == "repfirm") {
-            dataSource = "RepFirm";
-        }
+                getReport();
+            }
+            else {
+                return;
+            }
 
-        var url = ServicePrefix + '/api/TVB/Get' + dataSource +'OwnersToConfirm';
+        });
+    }
+    function approveMarket(marketId, bApproveFlag)
+    {
+
+        var url = ServicePrefix + '/api/TVB/UpdateMarketApproval';
 
         var settings = {
             dataType: 'json',
@@ -695,46 +686,35 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId,
+                "inPeriod": $("#ddlPeriod").val(),
                 "inYear": $("#ddlYear").val(),
-                "inPeriod": $("#ddlPeriod").val()
+                "inApproved": bApproveFlag
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getTVBOwnersSuccess(data, textStatus, jQxhr);
+
+                if (data.response.status != "SUCCESS")
+                {
+                    approveErrorCtr++;
+                    approveErrorMessage = data.response.errorMessage[0];
+                    if (approveErrorCtr == 1) {
+                        bootbox.alert("Process failed due to - " + approveErrorMessage + ". Issue must be resolved and rerun");
+                    }
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
+                return false;
             }
         };
 
         $.ajax(url, settings);
-    }
-
-    function getTVBOwnersSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-
-        }
-        else {
-
-            var str = '';
-
-            $("#ddlOwner").html("<option value=''>-- Select an Owner </option>");
-
-            $.each(data.report.rows, function (index) {
-                var obj = data.report.rows[index];
-                str = str + "<option value='" + obj['Owner ID'] + "'>" + obj['Owner'] + "</option>";
-            });
-
-            $("#ddlOwner").append(str);
-
-
-            convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-
-        }
 
     }
-
 </script>

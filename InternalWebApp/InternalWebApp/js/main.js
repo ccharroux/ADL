@@ -1225,7 +1225,7 @@ function buildTVBMenu(selectedItem) {
     menuItems += '<ul class="dropdown-menu" role="menu">';
 
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbreminders.html?MenuItem=true">Reminders</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbdashboard.html?MenuItem=true">Report Status</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbreportstatus.html?MenuItem=true">Report Status</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbmarketdelivery.html?MenuItem=true">Report Delivery</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetailrepbilling.html?MenuItem=true">Edit Rep Billing</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetail.html?MenuItem=true">Edit Time Sales</a></li>';
