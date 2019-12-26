@@ -622,12 +622,14 @@
         convertToChosenSelect("ddlRepFirm", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
         var previousRepFirmIdStillInList = false;
+
         $("#ddlRepFirm option").each(function () {
             if (this.value == previousRepFirmId) {
                 previousRepFirmIdStillInList = true;
                 return false;
             }
         });
+
         $("#ddlRepFirm").val(previousRepFirmIdStillInList ? previousRepFirmId : "-1");
 
         gotRepFirms = true;
@@ -636,21 +638,29 @@
     }
 
     function getMarkets() {
+
+
         var source = currentSource();
         var url = ServicePrefix + '/api/TVB/GetRepBillingMarketList' + source;
+
         var data = {
             "inApiToken": getLocalStorage("APIToken"),
             "inActiveOnly": true
         };
-        if (source == "RepFirm") {
+
+        if (source == "RepFirm")
+        {
             var repFirmId = currentRepFirmId();
-            if (repFirmId == -1) {
+
+            if (repFirmId == -1 || repFirmId == null) {
                 var str = '<option value="-1">-- Rep firm not yet selected</option>';
                 $("#ddlMarket").html(str);
                 convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
                 getStations(); // hide relevant elements
                 return;
-            } else {
+            }
+            else
+            {
                 data["inRepFirmId"] = repFirmId;
             }
         }
@@ -984,6 +994,8 @@
             $(".revenue-detail").prop("disabled", false);
         }
 
+ 
+
         showStationEnteredStatus();
         showStationContactInfo();
         showStationComment();
@@ -1050,9 +1062,6 @@
 
     function setStationNavigation()
     {
-        console.log('in');
-        console.log($("#ddlStation option:selected").index());
-        console.log($("#ddlStation option").length - 1);
 
         $(".stationNavPrev").show();
         $(".stationNavSeparator").show();
@@ -1065,19 +1074,16 @@
             // hide previous
             bHideSeparator = true;
             $(".stationNavPrev").hide();
-            console.log('hide prev');
         }
 
         if ($("#ddlStation option:selected").index() == $("#ddlStation option").length - 1) {
             // hide next
             bHideSeparator = true;
             $(".stationNavNext").hide();
-            console.log('hide next');
         }
 
         if (bHideSeparator == true)
         {
-            console.log('hide sep');
             $(".stationNavSeparator").hide();
         }
     }
@@ -1193,10 +1199,11 @@
     {
         $(".saveChanges").hide();
         $(".revenue-detail").prop("disabled", true);
+
         $(".divInternalComment").hide();
         $(".divExternalComment").hide();
 
-        var url = ServicePrefix + '/api/TVB/GetYearPeriodRanked';
+        var url = ServicePrefix + '/api/TVB/GetYearPeriodReleasedOrRanked';
 
         var settings = {
             dataType: 'json',
@@ -1269,6 +1276,7 @@
 
         $("#MarketRanked").html( "<div>" +message+ "</div>");
 
+ 
         if (data.report.rows[0].isReleased == false && data.report.rows[0].rankingInProgress == false) {
             $(".saveChanges").show();
             $(".revenue-detail").prop("disabled", false);
@@ -1277,6 +1285,9 @@
     }
 
     function showRepBillingStationsSubmitted() {
+
+ 
+
         var source = currentSource();
         var url = ServicePrefix + '/api/TVB/GetRepBillingStationsSubmitted' + source;
         var data = {
@@ -1284,6 +1295,7 @@
             "inYear": currentRevenueYear(),
             "inPeriod": currentRevenuePeriod()
         };
+
         if (source == "RepFirm") {
             data["inRepFirmId"] = currentRepFirmId();
         }
