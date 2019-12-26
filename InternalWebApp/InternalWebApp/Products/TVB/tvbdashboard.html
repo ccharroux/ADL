@@ -127,12 +127,12 @@
                                 </select>
                             </div>
                             <div class="form-group rptView rptYear">
-                                <label for="ddlYear" onchange="getReport();" class="dropdown-label rptView rptYear">Year</label>
-                                <select id="ddlYear" onchange="getReport();" apiInput="inYear" class="dropdown-select rptView rptYear"></select>
+                                <label for="ddlYear" class="dropdown-label rptView rptYear">Year</label>
+                                <select id="ddlYear" onchange="getTVBOwners();" apiInput="inYear" class="dropdown-select rptView rptYear"></select>
                             </div>
                             <div class="form-group rptView rptPeriod">
                                 <label for="ddlPeriod" class="dropdown-label rptView rptPeriod">Period</label>
-                                <select id="ddlPeriod" apiInput="inPeriod" class="dropdown-select rptView rptPeriod"></select>
+                                <select id="ddlPeriod"  onchange="getTVBOwners();" apiInput="inPeriod" class="dropdown-select rptView rptPeriod"></select>
                             </div>
                             <div class="form-group rptView rptOwner">
                                 <label for="ddlOwner" class="dropdown-label rptView rptOwner">Owner</label>
@@ -212,11 +212,6 @@
     //------------------------
     // approval vars
     //------------------------
-    var marketArray = new Array();
-    var canApproveCtr = 0;
-    var canUnapproveCtr = 0;
-    var approveErrorCtr = 0;
-    var approveErrorMessage = 0;
 
     $(document).ready(function () {
 
@@ -474,9 +469,7 @@
 
 
         // reset this array
-        marketArray = new Array();
-        canUnapproveCtr = 0;
-        canApproveCtr = 0;
+        
         var rowCtr = 0;
 
         // just the header...
@@ -489,27 +482,6 @@
             $.each(data, function (objectName, objectValue)
             {
 
-
-
-                if (objectName.toLowerCase() == 'market id') {
-                    marketArray.push(objectValue);
-                }
-
-                if (objectName.toLowerCase() == 'can approve')
-                {
-                    if (objectValue == "1") {
-                        canApproveCtr++;
-                    }
-                }
-
-                if (objectName.toLowerCase() == 'can unapprove')
-                {
-                    if (objectValue == "1")
-                    {
-                        canUnapproveCtr++;
-                    }
-                }
-
                 if (rowCtr == 1)
                 {
                     if (reportObject.columnsToDisplay.length == 0 || IsInArray(reportObject.columnsToDisplay, objectName) == true) {
@@ -521,7 +493,7 @@
                         else {
                             if ((isNaN(objectValue) == false)) {
                                 if (objectValue.toString().length > 0) {
-                                    className = "text-align-right";
+                                    className = "text-align-center";
                                 }
                             }
                             else {
@@ -542,14 +514,26 @@
                             bSortable = reportObject.sortable;
                         }
 
-                        columns.push({
-                            "title": objectName,
-                            "visible": true,
-                            "mData": objectName,
-                            "orderable": bSortable,
-                            "className": className
-                        });
+                        if (objectName.toLowerCase().indexOf("missing") > -1) {
+                            columns.push({
+                                "title": objectName,
+                                "visible": true,
+                                "mData": objectName,
+                                "orderable": bSortable,
+                                "className": 'text-align-center'
+                            });
 
+                        }
+
+                        else {
+                            columns.push({
+                                "title": objectName,
+                                "visible": true,
+                                "mData": objectName,
+                                "orderable": bSortable,
+                                "className": className
+                            });
+                        }
                     }
                 }
             });
@@ -734,6 +718,19 @@
 
 
         }
+
+    }
+    function selectOwnerId(inOwnerId)
+    {
+
+        if ($("#ddlOwner").val() == "-1") {
+
+            $("#ddlOwner").val(inOwnerId);
+            getReport();
+
+        }
+
+
 
     }
 
