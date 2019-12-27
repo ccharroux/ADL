@@ -231,7 +231,7 @@ reportName.push("rptPostedData");
 reportName.push("rptActiveMarketLog");
 reportName.push("rptActiveMarketLogSummary");
 
-reportName.push("rptMRRStationSubmissionStatus");
+reportName.push("rptMRRStationSubmissionStatusByMarket");
 
 reportName.push("rptExclusiveAdvertiserChanges");
 reportName.push("rptMRRMarketTotalsForNAB");
@@ -256,6 +256,8 @@ reportName.push("rptDemoMarketList");
 reportName.push("rptDemoStationList");
 
 reportName.push("rptInactiveStationAssignmentList");
+reportName.push("rptMRRStationSubmissionStatus");
+
 
 function buildReportArray()
 {
@@ -9363,9 +9365,71 @@ function getReportObject_MarketStationProductCountList() {
 
     return tempObject;
 }
-
- 
 function getReportFilterArray_MRRStationSubmissionStatus() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['MRR'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "StationStatus",
+        jsCall: "getStationStatus",
+        objectName: "ddlStationStatus",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MRRStationSubmissionStatus() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "MRR Station Submission Status",
+        apiControllerAction: "/api/MRRReport/GetMRRStationSubmissionStatus",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['market', 'station', 'mrr'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+ 
+function getReportFilterArray_MRRStationSubmissionStatusByMarket() {
 
     var arrayFilters = new Array();
     var arrayObject = new Object();
@@ -9382,7 +9446,7 @@ function getReportFilterArray_MRRStationSubmissionStatus() {
 
     return arrayFilters;
 }
-function getReportObject_MRRStationSubmissionStatus() {
+function getReportObject_MRRStationSubmissionStatusByMarket() {
 
     var tempObject = new Object();
 
@@ -9390,7 +9454,7 @@ function getReportObject_MRRStationSubmissionStatus() {
 
     tempObject =
     {
-        reportTitle: "MRR Station Submission Status",
+        reportTitle: "MRR UI Station Submission Status",
         apiControllerAction: "/api/MRRReport/GetMRRStationSubmissionStatusByMarket",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
