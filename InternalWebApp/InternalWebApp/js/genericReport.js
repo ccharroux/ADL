@@ -255,6 +255,8 @@ reportName.push("rptXRYAdvertiserExclusivitySpecs");
 reportName.push("rptDemoMarketList");
 reportName.push("rptDemoStationList");
 
+reportName.push("rptInactiveStationAssignmentList");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -10026,6 +10028,32 @@ function getReportObject_DemoStationList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tech']
+    }
+
+    return tempObject;
+}
+ 
+function getReportFilterArray_InactiveStationAssignmentList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    return arrayFilters;
+}
+function getReportObject_InactiveStationAssignmentList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Inactive Station Assignment List",
+        apiControllerAction: "/api/PersonnelReport/GetInactiveStationAssignmentList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['personnel']
     }
 
     return tempObject;
