@@ -185,6 +185,19 @@
                     <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
                     <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
                 </div>
+                <div class="row search-section">
+                    <div class="col-md-12">
+                        <!-- fix spacing on the radio buttons instead of spaces -->
+                        <div class="form-group rptView vertical-center">
+                            <input type="radio" name="collectionType" id="rdoMarket" value="market" class="report-filter" checked="checked"><label class="rdo-label rtpViewRight" for="rdoMarket">Market</label>
+                            &nbsp;&nbsp;
+                            <input type="radio" name="collectionType" id="rdoOwner" value="owner" class="report-filter"><label class="rdo-label rtpViewRight" for="rdoOwner">Owner</label>
+                            &nbsp;&nbsp;
+                            <input type="radio" name="collectionType" id="rdoThirdParty" value="thirdParty" class="report-filter"><label class="rdo-label rtpViewRight" for="rdoThirdParty">Third Party</label>
+                        </div>
+                    </div>
+
+                </div>
                 <div class="row search-section" >
                     <div class="col-md-12">
                         <!--
@@ -211,14 +224,7 @@
 
 
                         -->
-                        <!-- fix spacing on the radio buttons instead of spaces -->
-                        <div class="form-group rptView vertical-center">
-                            <input type="radio" name="collectionType" id="rdoMarket" value="market" class="report-filter" checked="checked"><label class="rdo-label rtpViewRight" for="rdoMarket">Market</label>
-                            <br />
-                            <input type="radio" name="collectionType" id="rdoOwner" value="owner" class="report-filter"><label class="rdo-label rtpViewRight" for="rdoOwner">Owner</label>
-                            <br />
-                            <input type="radio" name="collectionType" id="rdoThirdParty" value="thirdParty" class="report-filter"><label class="rdo-label rtpViewRight" for="rdoThirdParty">Third Party</label>
-                        </div>
+
 
                         <div class="form-group rptView collection-market vertical-center">
                             <label for="ddlMarket" class="requiredText dropdown-label rptView"> * Market</label>
@@ -1638,7 +1644,9 @@
                 {
                     var status = getRowStatus(row, "statusOnly");
 
-                    if (status == "Disabled Rev") {
+                    //if (status == "Disabled Rev")
+                    if (row['linkDisabledRpt'] == true)
+                    {
  
                         var url = '/utilities/genericreport/genericreport.html?BuildBackButton=true';
                         url = url + "&reportTitle=" + "Revenue with Disabled Advertisers/Agencies";
@@ -1650,7 +1658,8 @@
                         actions += "<a href='" + url + "'>Disabled Report</a><br/>";
                     }
 
-                    if (status.toLowerCase() == "rev type issue")
+                    //if (status.toLowerCase() == "rev type issue")
+                    if (row['linkRevTypeIssueRpt'] == true)
                     {
                         var url = '/products/xry/xryownershipmappinglist.html?BuildBackButton=true';
                         url = url + "&OwnerId=" + row["ownerId"];
@@ -1659,11 +1668,13 @@
                     }
 
                     // post
-                    if (row["enabled"] === true &&
-                        row["Number of Records"] > 0 &&
-                        row["Advertisers Matched"] === row["Number of Records"] &&
-                        row["Agencies Matched"] === row["Number of Records"] &&
-                        row["Posted"].toLowerCase() === "no") {
+                    //if (row["enabled"] === true &&
+                    //    row["Number of Records"] > 0 &&
+                    //    row["Advertisers Matched"] === row["Number of Records"] &&
+                    //    row["Agencies Matched"] === row["Number of Records"] &&
+                    //    row["Posted"].toLowerCase() === "no")
+                    if (row['linkPost'] == true)
+                    {
 
                         parameters = "";
                         parameters += row["stationId"] + "," + row["marketId"];
@@ -1676,7 +1687,9 @@
                     }
 
                     // unpost
-                    if (row["enabled"] === true && row["Posted"].toLowerCase() === "yes") {
+                    //if (row["enabled"] === true && row["Posted"].toLowerCase() === "yes")
+                    if (row['linkUnpost'] == true)
+                    {
 
                         parameters = "";
                         parameters += row["stationId"] + "," + row["marketId"];
@@ -1690,7 +1703,9 @@
                     var link = "";
 
                     // match report view adv
-                    if (row["Number of Records"] > 0) {
+                    //if (row["Number of Records"] > 0)
+                    if (row['linkMatchAdvertiser'] == true)
+                    {
                         link = "";
                         link = '/products/xry/revenue/xrymatch.html?MatchPage=adv';
                         link += '&OwnerID=' + row["ownerId"];
@@ -1699,17 +1714,37 @@
                         link += '&Period=' + $("#ddlPeriod").val();
                         link += '&Year=' + $("#ddlYear").val();
 
-                        if (row["Number of Records"] !== row["Advertisers Matched"]) {
+                        //if (row["Number of Records"] !== row["Advertisers Matched"]) {
                             link += '&OptionFlag=unmatched';
                             actions += "<a href='" + link + "'>Match&nbsp;Advertisers</a><br/>";
-                        } else {
+                        //} else {
+                        //    link += '&OptionFlag=matched';
+                        //    actions += "<a href='" + link + "'>View&nbsp;Advertisers</a><br/>";
+                        //}
+                    }
+
+                    if (row['linkViewAdvertiser'] == true) {
+                        link = "";
+                        link = '/products/xry/revenue/xrymatch.html?MatchPage=adv';
+                        link += '&OwnerID=' + row["ownerId"];
+                        link += '&MarketID=' + row["marketId"];
+                        link += '&StationID=' + row["stationId"];
+                        link += '&Period=' + $("#ddlPeriod").val();
+                        link += '&Year=' + $("#ddlYear").val();
+
+                        //if (row["Number of Records"] !== row["Advertisers Matched"]) {
+                        //    link += '&OptionFlag=unmatched';
+                        //    actions += "<a href='" + link + "'>Match&nbsp;Advertisers</a><br/>";
+                        //} else {
                             link += '&OptionFlag=matched';
                             actions += "<a href='" + link + "'>View&nbsp;Advertisers</a><br/>";
-                        }
+                        //}
                     }
 
                     // match report view agency
-                    if (row["Number of Records"] > 0) {
+                    //if (row["Number of Records"] > 0)
+                    if (row['linkMatchAdvertiser'] == true)
+                    {
                         link = "";
                         link = '/products/xry/revenue/xrymatch.html?MatchPage=agy';
                         link += '&OwnerID=' + row["ownerId"];
@@ -1718,15 +1753,32 @@
                         link += '&Period=' + $("#ddlPeriod").val();
                         link += '&Year=' + $("#ddlYear").val();
 
-                        if (row["Number of Records"] !== row["Agencies Matched"]) {
+                        //if (row["Number of Records"] !== row["Agencies Matched"]) {
                             link += '&OptionFlag=unmatched';
                             actions += "<a href='" + link + "'>Match&nbsp;Agencies</a><br/>";
-                        } else {
+                        //} else {
+                        //    link += '&OptionFlag=matched';
+                        //    actions += "<a href='" + link + "'>View&nbsp;Agencies</a><br/>";
+                        //}
+                    }
+                    if (row['linkViewAdvertiser'] == true)
+                    {
+                        link = "";
+                        link = '/products/xry/revenue/xrymatch.html?MatchPage=agy';
+                        link += '&OwnerID=' + row["ownerId"];
+                        link += '&MarketID=' + row["marketId"];
+                        link += '&StationID=' + row["stationId"];
+                        link += '&Period=' + $("#ddlPeriod").val();
+                        link += '&Year=' + $("#ddlYear").val();
+
+                        //if (row["Number of Records"] !== row["Agencies Matched"]) {
+                        //    link += '&OptionFlag=unmatched';
+                        //    actions += "<a href='" + link + "'>Match&nbsp;Agencies</a><br/>";
+                        //} else {
                             link += '&OptionFlag=matched';
                             actions += "<a href='" + link + "'>View&nbsp;Agencies</a><br/>";
-                        }
+                        //}
                     }
-            
 
                 //removing the options for now
                 //based on 11/19/2019 discussion with carl.
@@ -1742,21 +1794,24 @@
                 //use onclick and pass variables
                 //set local storage as part of the function
 
-                // this is the change availability
-                    parameters = "";
-                    parameters = row["stationId"] +
-                        ',' +
-                        row["marketId"] +
-                        ',' +
-                        row["ownerId"] +
-                        ',"' +
-                        //converted to whitespace to a non-breaking space
-                        //the white space was causing an unseen "
-                        row["Station"].replace(/[\s]/g, "&nbsp;") +
-                        '","' +
-                        row["Media Type"] +
-                        '",' + row["submissionId"] ;
-                    actions += '<a href="#" onclick=changeAvailability(' + parameters + ');>Change&nbsp;Availability</a>';
+                    // this is the change availability
+                    if (row['linkChangeAvailability'] == true)
+                    {
+                        parameters = "";
+                        parameters = row["stationId"] +
+                            ',' +
+                            row["marketId"] +
+                            ',' +
+                            row["ownerId"] +
+                            ',"' +
+                            //converted to whitespace to a non-breaking space
+                            //the white space was causing an unseen "
+                            row["Station"].replace(/[\s]/g, "&nbsp;") +
+                            '","' +
+                            row["Media Type"] +
+                            '",' + row["submissionId"];
+                        actions += '<a href="#" onclick=changeAvailability(' + parameters + ');>Change&nbsp;Availability</a>';
+                    }
                 }
 
                 return actions;
