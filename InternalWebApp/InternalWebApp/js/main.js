@@ -1120,6 +1120,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrydatacollection.html?MenuItem=true">Data Collection</a></li>';
     menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=adv&MenuItem=true">Advertiser Matching</a></li>';
     menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=agy&MenuItem=true">Agency Matching</a></li>';
+    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=media&MenuItem=true">Media Matching</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
 
