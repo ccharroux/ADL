@@ -406,6 +406,7 @@ function showHeader()
 
     if (!hideHeader == false && hideHeader.toLowerCase() == "true")
     {
+        $("#fh5co-page").css("marginTop", "20px");
         $("#fh5co-header").hide();
         $("#divQuickReport").hide();
         $(".favoriteButtonClass").hide();
@@ -454,12 +455,16 @@ function instantiatePopupComponent()
     
     var wWidth = $(window).width();
     var dWidth = wWidth * 0.95;
+    var wHeight = $(window).height();
+    var dHeight = (wHeight * 0.5) + 50;
+    var dTop = $(window).height() - dHeight;
  
     $("#componentDialog").dialog({
         autoOpen: false,
         resizable: false,
         width: dWidth,
         height: 600,
+        top: dHeight,
         modal: false,
         dialogClass: 'componentDialogClass'
     });
