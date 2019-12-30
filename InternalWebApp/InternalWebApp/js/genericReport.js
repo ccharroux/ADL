@@ -257,7 +257,7 @@ reportName.push("rptDemoStationList");
 
 reportName.push("rptInactiveStationAssignmentList");
 reportName.push("rptMRRStationSubmissionStatus");
-
+reportName.push("rptMediaRevenueWithDisabledAdvertisers");
 
 function buildReportArray()
 {
@@ -9748,7 +9748,69 @@ function getReportObject_AEWebUserMatches() {
     return tempObject;
 
 }
+function getReportFilterArray_MediaRevenueWithDisabledAdvertisers() {
 
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_MediaRevenueWithDisabledAdvertisers() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Station Advertiser");
+    columnsToDisplay.push("Advertiser");
+    columnsToDisplay.push("Advertiser Disable Date");
+    columnsToDisplay.push("Media Type");
+ 
+    columnsToDisplay.push("Revenue");
+    columnsToDisplay.push("Date Posted");
+
+
+    tempObject =
+    {
+
+        reportTitle: "Media Revenue with Disabled Advertisers",
+        apiControllerAction: "/api/XRAYRevenue/GetMediaRevenueWithDisabledAdvertisers",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry', 'xray monthly']
+    }
+
+    return tempObject;
+
+}
 function getReportFilterArray_RevenueWithDisabledAdvertisersAgencies() {
 
     var arrayFilters = new Array();
