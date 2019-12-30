@@ -359,8 +359,6 @@
 
         var reportParamData = getBackButtonDataByPage(window.location.pathname);
 
-        console.log(jQuery.isEmptyObject(reportParamData));
-
         if (jQuery.isEmptyObject(reportParamData) == false) {
 
             for (var key in reportParamData) {
@@ -373,7 +371,7 @@
 
             }
 
-            getStationAgencyList();
+            getStationAgencyList(true);
         }
 
         cleanupBackButton(window.location.pathname);
@@ -385,10 +383,19 @@
         getStationAgencyList();
     }
 
-    function getStationAgencyList() {
+    function getStationAgencyList(bSilent) {
 
-        if ($("#ddlStation").val() === "") {
-            bootbox.alert("Please choose a station for the Agency Search", function () { });
+        if (!bSilent)
+        {
+            bSilent = false;
+        }
+
+        if ($("#ddlStation").val() === "")
+        {
+            if (bSilent == false)
+            {
+                bootbox.alert("Please choose a station for the Agency Search", function() {});
+            }
             return;
         }
 
@@ -398,8 +405,6 @@
         //}
    
         var searchCriteria = $("#searchText").val().trim() + "|" + $("#ddlStation").val().trim();
-
-
 
         setLocalStorage("search", searchCriteria);
         setLocalStorage("searchPage", window.location);

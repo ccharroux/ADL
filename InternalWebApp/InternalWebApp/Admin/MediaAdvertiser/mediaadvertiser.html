@@ -153,7 +153,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <div>
-                                <input value="Search Market Advertiser" onclick="searchMarketAdvertiser();" class="default-button" type="button">
+                                <input value="Search Market Advertiser" onclick="excludeFromBackButton(); searchMarketAdvertiser();" class="default-button" type="button">
                             </div>
                         </div>
                     </div>
@@ -166,7 +166,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <div>
-                                <input value="Link Market Advertiser" onclick="linkMarketAdvertiserQuestion();" class="default-button" type="button">
+                                <input value="Link Market Advertiser" onclick="excludeFromBackButton(); linkMarketAdvertiserQuestion();" class="default-button" type="button">
                             </div>
                         </div>
                     </div>
@@ -215,17 +215,34 @@
                             </div>
                             <div class="col-md-9">
                                 <div>
-                                    <input value="Update" onclick="updateMediaAdvertiser()" class="default-button" type="button">
+                                    <input value="Update" onclick="excludeFromBackButton(); updateMediaAdvertiser();" class="default-button" type="button">
                                 </div>
-                                <div style="padding-top: 10px">
+                                <!--<div style="padding-top: 10px">
                                     <input value="Back" onclick="determineGoBack();" class="default-button" type="button">
-                                </div>
+                                </div>-->
                             </div>
                         </div>
                     </div>
                     <!-- End Buttons-->
 
                 </div>
+                
+                <!-- extra fields for matching -->
+                <div class="advertiser-category" style="display: none;">
+                    <div class="row input-row">
+                        <hr />
+                        <div class="col-md-3">
+                            <strong><span>Category from Import:&nbsp;</span></strong>
+                        </div>
+                        <div class="col-md-9">
+                            <input type="hidden" id="txtPeriod"/>
+                            <input type="hidden" id="txtYear"/>
+                            <input type="hidden" id="txtPreviousPageLocation"/>
+                            <span id="txtAdvertiserCategory"></span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -261,6 +278,7 @@
     var bLinkMarketAdvertiserRevenues = false;
     var bIsNew = false;
     var bIsFromReport = false;
+    var bIsAdvMatch = false;
 
     $(document).ready(function ()
     {
@@ -280,6 +298,8 @@
         $("#txtMediaAdvertiserId").val(mediaAdvertiserId);
         bIsNew = mediaAdvertiserId <= 0;
         bIsFromReport = getParameterByName("FromReport") == null ? false : getParameterByName("FromReport");
+
+        bIsAdvMatch = getParameterByName("AdvMatch") == null ? false : getParameterByName("AdvMatch").toLowerCase() == "true";
     }
 
     function getMarketList() {
@@ -380,7 +400,6 @@
 
         var searchCriteriaObj = {
             "searchToken": "MEDIAMARKET",
-            //"stationID": $("#ddlStations").val(),
             "marketID": $("#ddlMarkets").val(),
             "mediaType":$("#ddlMediaType").val(),
             "advertiserName": $("#txtMediaAdvertiser").val(),
@@ -388,13 +407,14 @@
             "searchHeading": "Market Advertiser Search",
             "marketAdvertiserName": $("#txtMarketAdvertiser").val(),
             "marketAdvertiserId": $("#txtMarketAdvertiserId").val(),
-            "searchPage": window.location
+            "searchPage": window.location,
+            "advertiserCategory": $("#txtAdvertiserCategory").html(),
+            "period": $("#txtPeriod").val(),
+            "year": $("#txtYear").val()
         }
 
         setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
-        //console.log(getLocalStorage("gSearchCriteria"));
-
-        //alert('doing search stuff');
+       
         window.location = "/utilities/search.html";
     }
 
@@ -406,8 +426,6 @@
 
         var searchResults = $.parseJSON(getLocalStorage("gSearchResults"));
 
-        //console.log(searchResults);
-
         if (mediaAdvertiserId <= 0) {
             //load everthing but market advertiser and id
             $('#ddlMarkets').val(searchResults["marketID"]);
@@ -416,6 +434,9 @@
             $('#txtMediaAdvertiserCode').val(searchResults["advertiserCode"]);
         }
 
+        $("#txtAdvertiserCategory").html(searchResults["advertiserCategory"]);
+        $("#txtPeriod").val(searchResults["period"]);
+        $("#txtYear").val(searchResults["year"]);
 
         $("#txtMarketAdvertiser").val(searchResults["marketAdvertiserName"]);
 
@@ -428,8 +449,15 @@
         turnOnLinkMarketAdvertiser();
     }
 
-    function getMediaAdvertiser() {
-        if (mediaAdvertiserId <= 0) {
+    function getMediaAdvertiser()
+    {
+        if (mediaAdvertiserId <= 0)
+        {
+
+            if (bIsAdvMatch) {
+                loadMatchData();
+            }
+
             loadMarketAdvertiserSearchResults();
             initializeActiveDate();
             return;
@@ -458,14 +486,10 @@
 
                         var obj = data.report.rows[index];
 
-                        //console.log(obj);
-
-                        $('#ddlMarkets').val(obj["marketId"]);
+                        $('#ddlMarkets').prop('disabled', true).val(obj["marketId"]);
                         $('#ddlMediaType').prop('disabled', true).val(obj["mediaType"]);
                         $('#txtMediaAdvertiser').val(obj["mediaAdvertiserName"]);
                         $('#txtMediaAdvertiserCode').val(obj["mediaAdvertiserCode"]);
-
-
 
                         if (obj["dateSetup"] !== null) {
                             var activeDate = new Date(obj["dateSetup"]);
@@ -500,6 +524,10 @@
                         //get advertiser based on advertiser that comes back
                         getMarketAdvertiser(obj["xrayAdvertiserId"]);
                     });
+
+                    if (bIsAdvMatch) {
+                        loadMatchData();
+                    }
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -552,6 +580,46 @@
         $("#txtActiveDate").val(addZero(activeDate.getMonth() + 1) + '/' + addZero(activeDate.getDate()) + '/' + activeDate.getFullYear());
 
         $("#chkActive").prop('checked', true);
+    }
+
+    function loadMatchData()
+    {
+        if (getLocalStorage("newMediaMatch").length <= 0) {
+            return;
+        }
+
+        var mediaMatchData = $.parseJSON(getLocalStorage("newMediaMatch"));
+
+        //should possibly disable this since required for match
+        $('#ddlMarkets').prop("disabled", true);
+        if (mediaMatchData["market"] != undefined)
+        {
+            $("#ddlMarkets").val(mediaMatchData["market"]);
+        }
+
+        $('#ddlMediaType').prop("disabled", true);
+        if (mediaMatchData["mediaType"] != undefined)
+        {
+            $("#ddlMediaType").val(mediaMatchData["mediaType"]);
+        }
+
+        if (mediaMatchData["mediaAdvertiser"] != undefined)
+        {
+            $("#txtMediaAdvertiser").val(mediaMatchData["mediaAdvertiser"]);
+        }
+        ////can the user change the name??
+        ////it is required for the matching process
+        $("#txtMediaAdvertiser").prop("disabled", true);
+
+        if (mediaMatchData["mediaAdvertiserCode"] != undefined)
+        {
+            $("#txtMediaAdvertiserCode").val(mediaMatchData["mediaAdvertiserCode"]);
+        }
+
+        $(".advertiser-category").show();
+        $("#txtAdvertiserCategory").html(mediaMatchData["advertiserCategory"]);
+        $("#txtPeriod").val(mediaMatchData["period"]);
+        $("#txtYear").val(mediaMatchData["year"]);
     }
 
     function validationPassed() {
@@ -615,6 +683,16 @@
                     //if new load new station advertiserid
                     if (bIsNew) {
                         $("#txtMediaAdvertiserId").val(obj["_updateStatus"]);
+                    }
+
+                    if (bIsAdvMatch || bIsAdvMatch == "true") {
+                        //call function to update the match
+                        //how to handle when done in case the user wants to do more updates
+                        //disable update button
+                        //or just send them back to the unmatched list
+                        updateMediaAdvertiserMatch();
+                        //add processing window
+                        return;
                     }
 
                     if (bLinkMarketAdvertiserRevenues) {
@@ -731,6 +809,46 @@
             }
         });
 
+    }
+
+    function updateMediaAdvertiserMatch()
+    {
+        //call xrayrevenue/UpdateMatchMediaAdvertiser
+        $.ajax({
+            url: ServicePrefix + '/api/XRAYRevenue/UpdateMatchMediaAdvertiser',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inYear": $("#txtYear").val(),
+                "inPeriod": $("#txtPeriod").val(),
+                "inMarketId": $("#ddlMarkets").val(),
+                "inMediaTypeId": $("#ddlMediaType").val(),
+                "inMediaAdvertiserName": $("#txtMediaAdvertiser").val(),
+                "inMarketAdvertiserId": $("#txtMarketAdvertiserId").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    //console.log($("#txtPreviousPageLocation").val());
+                    bootbox.alert("The media advertiser has been matched.", function () {
+                        //window.location = $("#txtPreviousPageLocation").val();
+                        //window.location = getBackButtonPage();
+                        updatedGoBack();
+                    });
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
     }
 
     function determineGoBack()
