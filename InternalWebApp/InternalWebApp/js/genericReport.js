@@ -9788,8 +9788,10 @@ function getReportObject_MediaRevenueWithDisabledAdvertisers() {
 
     columnsToDisplay = new Array();
     columnsToDisplay.push("Market");
-    columnsToDisplay.push("Station");
-    columnsToDisplay.push("Station Advertiser");
+    //columnsToDisplay.push("Station");
+    //columnsToDisplay.push("Station Advertiser");
+    columnsToDisplay.push("Media Advertiser");
+    columnsToDisplay.push("Media Period");
     columnsToDisplay.push("Advertiser");
     columnsToDisplay.push("Advertiser Disable Date");
     columnsToDisplay.push("Media Type");
