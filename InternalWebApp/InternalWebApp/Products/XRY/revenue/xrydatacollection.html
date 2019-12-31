@@ -333,7 +333,8 @@
 </html>
 <script>
 
-    var arrayAcceptableStationStatus = ['posted', 'not active'];
+    var gMediaStatusCount = 0;
+    //var arrayAcceptableStationStatus = ['posted', 'not active'];
 
     var rowStatusArrayCtr = new Array();
     var rowStatusArray = new Array();
@@ -2173,8 +2174,7 @@
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
                 else {
-
-                    whatMonthEndButtonsCanWeShowResults(data)
+                    whatMonthEndButtonsCanWeShowResults(data);
                 }
 
 
@@ -2235,35 +2235,78 @@
     }
     function areStationsReady()
     {
-        // only acceptable status are in
-        // arrayAcceptableStationStatus
- 
-        if (rowStatusArrayCtr.length < 1 ||
-            rowStatusArrayCtr.length > arrayAcceptableStationStatus.length)
-        {
- 
-            return false;
-        }
+        var parms = "?inApiToken=" + getLocalStorage("APIToken");
+        parms = parms + "&inYear=" + $("#ddlYear").val();
+        parms = parms + "&inPeriod=" + $("#ddlPeriod").val();
+        parms = parms + "&inMarketId=" + $("#ddlMarket").val();
 
-        for (var i = 0; i < rowStatusArrayCtr.length; i++)
-        {
-            var bMissed = true;
-            for (var x= 0; x < arrayAcceptableStationStatus.length; x++)
-            {
-                // this means one of our status is outside of the acceptable
-                if (rowStatusArray[i].toLowerCase() == arrayAcceptableStationStatus[x].toLowerCase())
-                {
-                    bMissed = false;
+        $.ajax({
+            url: ServicePrefix + '/api/XRayRevenue/GetReformatListMarketOverallStatus' + parms,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                    return false;
                 }
-            }
+                else {
+                    var bReturn = false;
 
-            if (bMissed == true)
-            {
+                    $.each(data.report.rows, function (index) {
+
+                        gMediaStatusCount = data.report.rows[index]['Media Status Count'];
+
+                        if (data.report.rows[index]['Standard Status Count'] == data.report.rows[index]['Standard Status Complete Count'] &&
+                            data.report.rows[index]['Media Status Count'] == data.report.rows[index]['Media Status Complete Count'] && 
+                            data.report.rows[index]['Standard Status Count'] > 0 && 
+                            data.report.rows[index]['Media Status Count'] > 0)
+                        {
+                            bReturn = true;
+                        }
+
+                    });
+                    return bReturn;
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
                 return false;
             }
-        }
+        });
+        //////// only acceptable status are in
+        //////// arrayAcceptableStationStatus
+ 
+        //////if (rowStatusArrayCtr.length < 1 ||
+        //////    rowStatusArrayCtr.length > arrayAcceptableStationStatus.length)
+        //////{
+ 
+        //////    return false;
+        //////}
 
-        return true;
+        //////for (var i = 0; i < rowStatusArrayCtr.length; i++)
+        //////{
+        //////    var bMissed = true;
+        //////    for (var x= 0; x < arrayAcceptableStationStatus.length; x++)
+        //////    {
+        //////        // this means one of our status is outside of the acceptable
+        //////        if (rowStatusArray[i].toLowerCase() == arrayAcceptableStationStatus[x].toLowerCase())
+        //////        {
+        //////            bMissed = false;
+        //////        }
+        //////    }
+
+        //////    if (bMissed == true)
+        //////    {
+        //////        return false;
+        //////    }
+        //////}
+
+        //////return true;
     }
     function updateStatus(token)
     {
