@@ -75,7 +75,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2 id="pageTitle">Market Delivery - TVB</h2>
+                        <h2 id="pageTitle">Delivery - TVB</h2>
                     </div>
                 </div>
                 <div id="divQuickReport" style="float:right;padding-right:25px;padding-bottom:10px;margin-top: -100px">
@@ -98,17 +98,12 @@
                             <div>
                                 <div class="col-md-6">
                                     <label for="ddlYearPeriod">Year-Period</label><br />
-                                    <select id="ddlYearPeriod" onchange="getMarketDeliveryList();"></select><br />
+                                    <select id="ddlYearPeriod" onchange="getDeliveryList();"></select><br />
                                     <a href="#" onclick="moveToPreviousPeriod();">Previous Period</a> | <a href="#" onclick="moveToNextPeriod();">Next Period</a>
                                 </div>
-                                <!-- possible future addition -->
-                                <!--<div class="col-md-3">
-                                    <label for="ddlSchedule">Schedule</label><br />
-                                    <select id="ddlSchedule" onchange="getMarketDeliveryList();"></select>
-                                </div>-->
                                 <div class="col-md-6">
                                     <label for="chkShowDelivered">Show Delivered</label><br />
-                                    <input id="chkShowDelivered" type="checkbox" onchange="getMarketDeliveryList();" />
+                                    <input id="chkShowDelivered" type="checkbox" onchange="getDeliveryList();" />
                                 </div>
                             </div>
                         </center>
@@ -120,10 +115,10 @@
                 <div class="dataTable-top-margin">
 
                     <div class="col-md-12">
-                        <table id="dtMarketDeliveryList" class="dataTable-border dataTable-headers dataTable-cell-border">
+                        <table id="dtDeliveryList" class="dataTable-border dataTable-headers dataTable-cell-border">
                             <thead>
                                 <tr>
-                                    <th class="exportColumn">Market</th>
+                                    <th class="exportColumn">Report</th>
                                     <th class="exportColumn">Ranked On</th>
                                     <th class="exportColumn">Approved On</th>
                                     <th class="exportColumn">Delivered On</th>
@@ -135,7 +130,7 @@
                             </thead>
                             <tfoot>
                                 <tr>
-                                    <th class="exportColumn">Market</th>
+                                    <th class="exportColumn">Report</th>
                                     <th class="exportColumn">Ranked On</th>
                                     <th class="exportColumn">Approved On</th>
                                     <th class="exportColumn">Delivered On</th>
@@ -161,10 +156,10 @@
                     <div class="dataTable-top-margin">
 
                         <div class="col-md-12">
-                            <table id="dtMarketDeliveryListPartnerReview" class="dataTable-border dataTable-headers dataTable-cell-border">
+                            <table id="dtDeliveryListPartnerReview" class="dataTable-border dataTable-headers dataTable-cell-border">
                                 <thead>
                                     <tr>
-                                        <th class="exportColumn">Market</th>
+                                        <th class="exportColumn">Report</th>
                                         <th class="exportColumn">Ranked On</th>
                                         <th class="exportColumn">Approved On</th>
                                         <th class="exportColumn">Delivered On</th>
@@ -176,7 +171,7 @@
                                 </thead>
                                 <tfoot>
                                     <tr>
-                                        <th class="exportColumn">Market</th>
+                                        <th class="exportColumn">Report</th>
                                         <th class="exportColumn">Ranked On</th>
                                         <th class="exportColumn">Approved On</th>
                                         <th class="exportColumn">Delivered On</th>
@@ -248,14 +243,11 @@
 <script>
 
 
-    // possible future addition
-    //var gotSchedules = false;
     var gotYearsPeriods = false;
     var initializedDataTable = false;
     var initializedDataTablePartnerReview = false;
-    var currentMarketId = null;
+    var currentReport = null;
     var currentRevision = null;
-    var currentMarketName = null;
     var currentEmailRecipients = false;
 
     $(document).ready(function () {
@@ -264,8 +256,6 @@
         buildTVBMenu('Revenue');
         buildUIDialogs();
 
-        // possible future addition
-        //getSchedules();
         getYearsPeriods();
 
         //setEventListeners();
@@ -307,19 +297,19 @@
 
     }
 
-    function dtMarketDeliveryListId(partnerReview)
+    function dtDeliveryListId(partnerReview)
     {
-        return partnerReview ? "dtMarketDeliveryListPartnerReview" : "dtMarketDeliveryList";
+        return partnerReview ? "dtDeliveryListPartnerReview" : "dtDeliveryList";
     }
 
     function setUpDataTable(partnerReview) {
-        var dtMarketDeliveryList = dtMarketDeliveryListId(partnerReview);
+        var dtDeliveryList = dtDeliveryListId(partnerReview);
 
-        $("#" + dtMarketDeliveryList).DataTable({
+        $("#" + dtDeliveryList).DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
             "columns": [
-                { "data": 'Market' },
+                { "data": 'Report' },
                 { "data": 'Ranked On' },
                 { "data": 'Approved On' },
                 { "data": 'Delivered On' },
@@ -332,9 +322,9 @@
                         if (row["Delivered On"] != null) {
                             return '<a href="#" onclick="prepToSendEmailToRecipients()">Re-deliver</a>';
                         }
-                        var text = '<a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', true)">Release</a>';
+                        var text = '<a href="#" onclick="releaseReport(' + row["Report"] + ',' + row["Revision"] + '\', true)">Release</a>';
                         if (row["Revision"] > 0) {
-                            text += ' | <a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', false)">Release without email</a>';
+                            text += ' | <a href="#" onclick="releaseReport(' + row["Report"] + ',' + row["Revision"] + '\', false)">Release without email</a>';
                         }
                         return text;
                     },
@@ -440,28 +430,28 @@
         $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
     }
 
-    function getMarketDeliveryList()
+    function getDeliveryList()
     {
-        getMarketDeliveryList_PerGrid(false);
-        getMarketDeliveryList_PerGrid(true);
+        getDeliveryList_PerGrid(false);
+        getDeliveryList_PerGrid(true);
     }
 
-    function getMarketDeliveryList_PerGrid(partnerReview)
+    function getDeliveryList_PerGrid(partnerReview)
     {
         // possible future addition
         if ((gotYearsPeriods == false)) {
             return;
         }
 
-        var reportTitle = "Market Delivery List";
-        var exportColumns = returnTableColumnsByClass("dtMarketDeliveryList", "exportColumn");
+        var reportTitle = "Delivery List";
+        var exportColumns = returnTableColumnsByClass("dtDeliveryList", "exportColumn");
 
         if ((initializedDataTable == false) || (initializedDataTablePartnerReview == false)) {
             setUpDataTable(partnerReview);
         }
 
 
-        var url = ServicePrefix + '/api/TVB/GetMarketDeliveryList';
+        var url = ServicePrefix + '/api/TVB/GetDeliveryList';
 
         $.ajax({
             url: url,
@@ -477,7 +467,7 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getMarketDeliveryListSuccess(data, textStatus, jQxhr, partnerReview);
+                getDeliveryListSuccess(data, textStatus, jQxhr, partnerReview);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -486,15 +476,15 @@
 
     }
 
-    function getMarketDeliveryListSuccess(data, textStatus, jQxhr, partnerReview) {
+    function getDeliveryListSuccess(data, textStatus, jQxhr, partnerReview) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
-        var dtMarketDeliveryList = dtMarketDeliveryListId(partnerReview);
-        populateDataTable(dtMarketDeliveryList, data);
+        var dtDeliveryList = dtDeliveryListId(partnerReview);
+        populateDataTable(dtDeliveryList, data);
 
         if (partnerReview) {
             if (data.report.rows.length == 0) {
@@ -535,53 +525,6 @@
     // Filters
     //--------------
 
-    // possible future addition
-    //function getSchedules() {
-    //    var url = ServicePrefix + '/api/ReportingPeriod/GetScheduleList';
-
-    //    var settings = {
-    //        dataType: 'json',
-    //        type: 'post',
-    //        contentType: 'application/json',
-    //        data: JSON.stringify({
-    //            "inApiToken": getLocalStorage("APIToken")
-    //        }),
-    //        processData: false,
-    //        success: function (data, textStatus, jQxhr) {
-    //            getSchedulesSuccess(data, textStatus, jQxhr);
-    //        },
-    //        error: function (jqXhr, textStatus, errorThrown) {
-    //            genericAjaxError(jqXhr, textStatus, errorThrown);
-    //        }
-    //    };
-
-    //    $.ajax(url, settings);
-
-    //}
-
-    //function getSchedulesSuccess(data, textStatus, jQxhr) {
-
-    //    if (data.response.status != "SUCCESS") {
-    //        MKAErrorMessageRtn(data.response.errorMessage[0]);
-    //        return;
-    //    }
-
-    //    var str = '';
-
-    //    str = '<option selected value="">-- All Schedules</option>';
-    //    $.each(data.report.rows, function (index) {
-
-    //        str = str + '<option value="' + data.report.rows[index]["Schedule ID"] + '">' + data.report.rows[index]["Schedule Description"] + '</option>';
-
-    //    });
-
-    //    $("#ddlSchedule").html(str);
-
-    //    gotSchedules = true;
-    //    getMarketDeliveryList();
-
-    //}
-
     function getYearsPeriods() {
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -611,7 +554,7 @@
         convertToChosenSelect("ddlYearPeriod", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
         gotYearsPeriods = true;
-        getMarketDeliveryList();
+        getDeliveryList();
 
     }
 
@@ -689,17 +632,17 @@
         $("#ddlYearPeriod").trigger("change");
     }
 
-    function releaseMarket(marketId, revision, marketName, emailRecipients) {
-        currentMarketId = marketId;
+    function releaseReport(report, revision, emailRecipients) {
+        // report = "1 - Time Sales" or "2 - Rep Billing" for sorting
+        currentReport = report.split(" - ")[1];
         currentRevision = revision;
-        currentMarketName = marketName;
         currentEmailRecipients = emailRecipients;
 
         bootbox.confirm({
-            message: "Release " + currentMarketName + " for " + currentYearPeriodText() + (currentEmailRecipients ? " and email recipients" : "") + "?",
+            message: "Release " + currentReport + " for " + currentYearPeriodText() + (currentEmailRecipients ? " and email recipients" : "") + "?",
             callback: function (confirmed) {
                 if (confirmed) {
-                    releaseMarketConfirm();
+                    releaseReportConfirm();
                 } else {
                     clearCurrentSettings();
                 }
@@ -707,8 +650,8 @@
         });
     }
 
-    function releaseMarketConfirm() {
-        var url = ServicePrefix + '/api/TVB/UpdateMarketYearPeriodRelease';
+    function releaseReportConfirm() {
+        var url = ServicePrefix + '/api/TVB/UpdateYearPeriodRelease';
 
         var settings = {
             dataType: 'json',
@@ -716,14 +659,14 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inMarketId": currentMarketId,
+                // "inReport": currentReport, // need to enable this once system supports separate release of Time Sales / Rep Billing
                 "inYear": currentRevenueYear(),
                 "inPeriod": currentRevenuePeriod(),
                 "inRevision": currentRevision
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                releaseMarketSuccess(data, textStatus, jQxhr);
+                releaseReportSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -733,7 +676,7 @@
         $.ajax(url, settings);
     }
 
-    function releaseMarketSuccess(data, textStatus, jQxhr) {
+    function releaseReportSuccess(data, textStatus, jQxhr) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
@@ -741,7 +684,7 @@
         }
 
         bootbox.alert(
-            currentMarketName + " is released for " + currentYearPeriodText(),
+            currentReport + " is released for " + currentYearPeriodText(),
             function () {
                 if (currentEmailRecipients) {
                     prepToSendEmailToRecipients();
@@ -765,7 +708,6 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inMarketId": currentMarketId,
                 "inYear": currentRevenueYear(),
                 "inPeriod": currentRevenuePeriod()
             }),
@@ -818,7 +760,6 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inMarketId": currentMarketId,
                 "inYear": currentRevenueYear(),
                 "inPeriod": currentRevenuePeriod(),
                 "inClientRevisionMessage": $("#clientComment").val()
@@ -931,13 +872,12 @@
         insertRevenueStatusAllStations();
         clearCurrentSettings();
         $("#externalComments").val("");
-        getMarketDeliveryList();
+        getDeliveryList();
     }
 
     function clearCurrentSettings() {
-        currentMarketId = null;
+        currentReport = null;
         currentRevision = null;
-        currentMarketName = null;
         currentEmailRecipients = null;
     }
 
