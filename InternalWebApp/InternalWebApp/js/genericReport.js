@@ -9114,7 +9114,7 @@ function getReportObject_TimeSalesCompleteRevenueList() {
         apiControllerAction: "/api/TVBReport/GetTimeSalesCompleteRevenue",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb'],
+        product: ['tvb', 'tvb review'],
         sortable: true
 
     }
