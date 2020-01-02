@@ -1481,6 +1481,7 @@ function buildTechMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/products/xry/xrymarkethistorydatamatrix.html?MenuItem=true">XRY Market History Maintenance</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/products/xry/xrystationownerchanged.html?MenuItem=true">XRY Station Ownership Change</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/products/tvb/tvbMarketHistoryDataMatrix.html?MenuItem=true">TVB Market History Maintenance</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/Admin/TechTools/passedQAList.html?MenuItem=true">Passed QA List</a></li>';
 
     menuItems += '              </ul>';
     menuItems += '        </li>';
