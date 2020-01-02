@@ -68,10 +68,6 @@
             text-align: center;
         }
 
-        .container {
-            width: 100% !important;
-        }
-
         .requiredText {
             color: red !important;
         }
@@ -85,10 +81,26 @@
         select {
             max-width: 200px;
         }
+
+        .vertical-center {
+            /*margin: 0;
+            position: absolute;
+            top: 50%;
+            -ms-transform: translateY(-50%);
+            transform: translateY(-50%);*/
+            vertical-align: middle;
+        }
+
+        .rtpViewRight {
+            margin-right: 5px;
+            vertical-align: top;
+            display: inline-block;
+        }
+
+        .rdo-label {
+            padding-left: 5px;
+        }
     </style>
-
-
-
 </head>
 <body>
     <div id="fh5co-page">
@@ -109,38 +121,44 @@
                 <div class="row search-section">
                     <div class="col-md-12 ">
                         <!-- filters -->
-                        <!--
-                        period
-                        year
-                        market
-                        owner
-                        stations
-                        -->
-                        <div class="form-group rptView">
+                        <div class="form-group rptView vertical-center">
+                            <input type="radio" name="matchType" id="rdoAdvertiser" value="advertiser" class="report-filter" checked="checked"><label class="rdo-label rtpViewRight" for="rdoAdvertiser">Advertiser</label>
+                            <br />
+                            <input type="radio" name="matchType" id="rdoAgency" value="agency" class="report-filter"><label class="rdo-label rtpViewRight" for="rdoAgency">Agency</label>
+                            <br />
+                            <input type="radio" name="matchType" id="rdoMedia" value="media" class="report-filter"><label class="rdo-label rtpViewRight" for="rdoMedia">Media</label>
+                        </div>
+                        <div class="form-group rptView vertical-center match-station match-media">
                             <label for="ddlPeriod" class="dropdown-label rptView">Period</label>
-                            <select id="ddlPeriod" apiInput="inPeriod" class="mkaRequired dropdown-select rptView " errorMessage="Select a period."></select>
+                            <select id="ddlPeriod" apiInput="inPeriod" class="mkaRequired dropdown-select rptView report-filter" errorMessage="Select a period."></select>
                         </div>
-                        <div class="form-group rptView">
+                        <div class="form-group rptView vertical-center match-station match-media">
                             <label for="ddlYear" class="dropdown-label rptView">Year</label>
-                            <select id="ddlYear" apiInput="inYear" class="dropdown-select rptView mkaRequired" errorMessage="Select a year."></select>
+                            <select id="ddlYear" apiInput="inYear" class="mkaRequired dropdown-select rptView report-filter" errorMessage="Select a year."></select>
                         </div>
-                        <div class="form-group rptView">
+                        <div class="form-group rptView vertical-center match-station match-media">
                             <label for="ddlMarket" class="dropdown-label rptView">Market</label>
-                            <select id="ddlMarket" apiInput="inMarketId" onchange="" class="dropdown-select rptView"></select>
+                            <select id="ddlMarket" apiInput="inMarketId" onchange="" class="dropdown-select rptView report-filter"></select>
                         </div>
-                        <div class="form-group rptView">
+                        <div class="form-group rptView vertical-center match-station">
                             <label for="ddlOwner" class="dropdown-label rptView">Owner</label>
-                            <select id="ddlOwner" apiInput="inOwnerId" onchange="" class="dropdown-select rptView"></select>
+                            <select id="ddlOwner" apiInput="inOwnerId" onchange="" class="dropdown-select rptView report-filter"></select>
                         </div>
-                        <div class="form-group rptView">
+                        <div class="form-group rptView vertical-center match-station">
                             <label for="ddlStation" class="dropdown-label rptView">Station</label>
-                            <select id="ddlStation" apiInput="inStationId" onchange="" class="dropdown-select rptView"></select>
+                            <select id="ddlStation" apiInput="inStationId" onchange="" class="dropdown-select rptView report-filter"></select>
                         </div>
-                        <div class="form-group rptView">
+                        <div class="form-group rptView vertical-center match-media">
+                            <label for="ddlMediaType" class="dropdown-label rptView">Media Type</label>
+                            <select id="ddlMediaType" apiInput="inMediaTypeId" onchange="" class="dropdown-select rptView report-filter"></select>
+                        </div>
+                        <div class="form-group rptView vertical-center match-station match-media">
                             <label for="ddlOptions" class="dropdown-label rptView">Options</label>
-                            <select id="ddlOptions" apiInput="inOptionId" onchange="" class="dropdown-select rptView"></select>
+                            <select id="ddlOptions" apiInput="inOptionId" onchange="" class="dropdown-select rptView report-filter"></select>
                         </div><!-- adding comments here-->
-                        <div class="form-group col-md-3 rptButton" style="text-align:right">
+                        <div class="form-group col-md-3 rptButton" style="text-align: right">
+                            <label for="btnBack" class="dropdown-label">&nbsp;</label>
+                            <input type="button" id="btnBack" class="search-button" value="Back" onclick="updatedGoBack()" />
                             <label for="btnReport" class="dropdown-label">&nbsp;</label>
                             <input type="button" id="btnReport" class="search-button" value="Show" onclick="getMatchingReport()" />
                         </div>
@@ -149,7 +167,9 @@
 
                 <!-- datatable -->
                 <div class="dataTable-top-margin">
-                    <table id="dtResults" class="cell-border dataTable-border dataTable-headers dataTable-cell-border"></table>
+                    <div id="dtResultsHolder">
+                        <table id="dtResults" class="cell-border dataTable-border dataTable-headers dataTable-cell-border"></table>
+                    </div>
                     <div id="noDataFound" style="display:none; color: red">No data found</div>
                 </div>
 
@@ -205,6 +225,7 @@
     var year = "";
     var product = "XRY";
     var matchOptions = "";
+    var mediaType = "";
 
     $(document).ready(function () {
 
@@ -217,30 +238,24 @@
 
         setupUI();
 
-        //load periods
         loadPeriods();
-        //load years
         loadYears();
-
         loadReportOptions();
+
+        getMediaAdvertiserMediaTypeList();
 
         //load markets
         getMarketListByProduct(product);
-        //load owners
-        //getOwnerListByProduct(product);
-        //load stations (will figure out the order for these loads)
-        //do i just get by product??
-        //getStations();
-        //if has data coming over, load page.
-        //if direct, just load dropdowns
 
-
+ 
+        determineToShowBackButton();
 
     });
 
     function clearLocalStorage() {
         setLocalStorage("newAdvertiserMatch", "");
         setLocalStorage("newAgencyMatch", "");
+        setLocalStorage("newMediaMatch", "");
     }
 
     function getParameters() {
@@ -257,29 +272,130 @@
         ownerId = (getParameterByName("OwnerID") == null ? "" : getParameterByName("OwnerID"));
         marketId = (getParameterByName("MarketID") == null ? "" : getParameterByName("MarketID"));
         stationId = (getParameterByName("StationID") == null ? "" : getParameterByName("StationID"));
-        //not sure for the default value using empty for now
         period = (getParameterByName("Period") == null ? "" : getParameterByName("Period"));
         year = (getParameterByName("Year") == null ? "" : getParameterByName("Year"));
         matchPageType = (getParameterByName("MatchPage") == null ? "ADV" : getParameterByName("MatchPage"));
         matchOptions = (getParameterByName("OptionFlag") == null ? "unmatched" : getParameterByName("OptionFlag"));
+        mediaType = (getParameterByName("MediaType") == null ? "" : getParameterByName("MediaType"));
+
+        //set radio buttons based on matchpage value
+        switch (matchPageType.toLowerCase()) {
+            case 'adv':
+                $("#rdoAdvertiser").prop('checked', true);
+                $("#rdoAdvertiser").click();
+                break;
+            case 'agy':
+                $("#rdoAgency").prop('checked', true);
+                $("#rdoAgency").click();
+                break;
+            case 'media':
+                $("#rdoMedia").prop('checked', true);
+                $("#rdoMedia").click();
+                break;
+            default:
+                $("#rdoAdvertiser").prop('checked', true);
+                $("#rdoAdvertiser").click();
+                break;
+        }
+
+        
+        //do i add the functionality to get previous page info here??
+        //if (hasBackButtonData()) {
+        //    //var paramData = getBackButtonLastItem();
+        //    var paramData = getBackButtonDataByPage(window.location.pathname);
+
+        //    //load parameters
+        //    if (paramData["ddlOwner"] != undefined && paramData["ddlOwner"].length > 0) {
+        //        ownerId = paramData["ddlOwner"];
+        //    }
+
+        //    if (paramData["ddlMarket"] != undefined && paramData["ddlMarket"].length > 0) {
+        //        marketId = paramData["ddlMarket"];
+        //    }
+
+        //    if (paramData["ddlStation"] != undefined && paramData["ddlStation"].length > 0) {
+        //        stationId = paramData["ddlStation"];
+        //    }
+
+        //    if (paramData["ddlYear"] != undefined && paramData["ddlYear"].length > 0) {
+        //        year = paramData["ddlYear"];
+        //    }
+
+        //    if (paramData["ddlPeriod"] != undefined && paramData["ddlPeriod"].length > 0) {
+        //        period = paramData["ddlPeriod"];
+        //    }
+
+        //    if (paramData["ddlOptions"] != undefined && paramData["ddlOptions"].length > 0) {
+        //        matchOptions = paramData["ddlOptions"];
+        //    }
+
+        //    if (paramData["ddlMediaType"] != undefined && paramData["ddlMediaType"].length > 0) {
+        //        mediaType = paramData["ddlMediaType"];
+        //    }
+
+        //    //DEAL WITH THE RADIO BUTTONS
+        //    //need to add the change call
+        //    //if (paramData["rdoAdvertiser"] != undefined && paramData["rdoAdvertiser"].length > 0)
+        //    //{
+        //    //    $("#rdoAdvertiser").prop('checked', paramData["rdoAdvertiser"]);
+        //    //    if($("#rdoAdvertiser").is(':checked'))
+        //    //    {
+        //    //        $("#rdoAdvertiser").change();
+        //    //    }
+                
+        //    //}
+
+        //    //if (paramData["rdoAgency"] != undefined && paramData["rdoAgency"].length > 0) {
+        //    //    $("#rdoAgency").prop('checked', paramData["rdoAgency"]);
+        //    //    if ($("#rdoAgency").is(':checked'))
+        //    //    {
+        //    //        $("#rdoAgency").change();
+        //    //    }
+                
+        //    //}
+
+        //    //if (paramData["rdoMedia"] != undefined && paramData["rdoMedia"].length > 0) {
+        //    //    $("#rdoMedia").prop('checked', paramData["rdoMedia"]);
+        //    //    if ($("#rdoMedia").is(':checked'))
+        //    //    {
+        //    //        $("#rdoMedia").change();
+        //    //    }
+                
+        //    //}
+        //}
+
+        //cleanupBackButton(window.location.pathname);
+
     }
 
     function assignPageTitle() {
-        switch (matchPageType.toUpperCase()) {
-            case "ADV":
-                $("#pageTitle").html("Station Advertiser Match Page");
-                break;
-            case "AGY":
-                $("#pageTitle").html("Station Agency Match Page");
-                break;
-            default:
-                $("#pageTitle").html("Station Advertiser Match Page");
-                break;
+        //switch (matchPageType.toUpperCase()) {
+        //    case "ADV":
+        //        $("#pageTitle").html("Station Advertiser Match Page");
+        //        break;
+        //    case "AGY":
+        //        $("#pageTitle").html("Station Agency Match Page");
+        //        break;
+        //    default:
+        //        $("#pageTitle").html("Station Advertiser Match Page");
+        //        break;
+        //}
+
+        if ($('#rdoAgency').is(':checked')) {
+            $("#pageTitle").html("Station Agency Match Page");
+
+        } else if ($('#rdoMedia').is(':checked')) {
+            $("#pageTitle").html("Media Advertiser Match Page");
+
+        } else {
+            $("#pageTitle").html("Station Advertiser Match Page");
         }
     }
 
     function setupUI() {
         assignPageTitle();
+
+        setupInitialFilters();
 
         //market change get stations
         $("#ddlMarket").change(function () {
@@ -290,6 +406,39 @@
         $("#ddlOwner").change(function () {
             getStations();
         });
+
+        $('input[type=radio][name=matchType]').change(function () {
+
+            setupFilters(this.value);
+            assignPageTitle();
+        });
+    }
+
+    function setupInitialFilters() {
+        var radioValue = $("input[name='matchType']:checked").val();
+
+        setupFilters(radioValue);
+    }
+
+    function setupFilters(radioValue) {
+        switch (radioValue.toLowerCase()) {
+            case 'advertiser':
+                $(".match-media").hide();
+                $(".match-station").show();
+                break;
+            case 'agency':
+                $(".match-media").hide();
+                $(".match-station").show();
+                break;
+            case 'media':
+                $(".match-station").hide();
+                $(".match-media").show();
+                break;
+            default:
+                $(".match-media").hide();
+                $(".match-station").show();
+                break;
+        }
     }
 
     function loadPeriods() {
@@ -308,10 +457,22 @@
         }
     }
 
-    function loadReportOptions() {
-        $('#ddlOptions').append($('<option>').val("unmatched").text("Only Unmatched"));
-        $('#ddlOptions').append($('<option>').val("matched").text("Only Matched"));
-        $('#ddlOptions').append($('<option>').val("both").text("Both Matched and Unmatched"));
+    function loadReportOptions()
+    {
+
+        var str = '';
+        str =  '<option value="">-- Select a Media Type --</option>';
+        str += '<option value="unmatched" selected="selected">Only Unmatched</option>';
+        str += '<option value="matched">Only Matched</option>';
+        str += '<option value="both">Both Matched and Unmatched</option>';
+
+        $("#ddlOptions").html(str);
+
+        //$('#ddlOptions').append($('<option>').val("unmatched").text("Only Unmatched").prop("selected", true));
+        //$('#ddlOptions').append($('<option>').val("matched").text("Only Matched"));
+        //$('#ddlOptions').append($('<option>').val("both").text("Both Matched and Unmatched"));
+
+        //$("#ddlOptions").val("unmatched");
 
         //$("#" + control).html(str);
         convertToChosenSelect("ddlOptions", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
@@ -383,7 +544,7 @@
                 if (row["linkedAdvertiserId"] > 0) {
                     action = "";
                     action += "editStationAdvertiser(";
-                    action += "'" + row["Station Category"] + "','" + row["Station Agency"] + "',"+ row["linkedAdvertiserId"] + ");";
+                    action += "'" + row["Station Category"] + "','" + row["Station Agency"] + "'," + row["linkedAdvertiserId"] + ");";
                     return '<a href="#" onclick="' + action + '">Edit&nbsp;Station&nbsp;Advertiser</a>';
                 } else {
                     action = "";
@@ -391,7 +552,7 @@
                     action += row["marketId"] + "," + row["ownerId"] + "," + row["stationId"] + ",";
                     action += "'" + row["Station Advertiser"] + "','" + row["Station Category"] + "','" + row["Station Advertiser Code"] + "'";
                     action += ",'" + row["Station Agency"] + "'," + row["linkedAdvertiserId"] + ");";
-                    return '<a href="#" onclick="' + action + '">Match</a>';
+                    return '<a href="#" onclick="' + action + '">Match&nbsp;Station&nbsp;Advertiser</a>';
                 }
             },
             "orderable": false,
@@ -459,8 +620,7 @@
             "mRender": function (data, type, row) {
                 var action = "";
 
-                if (row["linkedAgencyId"] > 0)
-                {
+                if (row["linkedAgencyId"] > 0) {
                     action = "";
                     action += "editStationAgency(";
                     action += "'" + row["Station Category"] + "','" + row["Station Advertiser"] + "'," + row["linkedAgencyId"] + ");";
@@ -470,7 +630,77 @@
                     action += row["marketId"] + "," + row["ownerId"] + "," + row["stationId"] + ",";
                     action += "'" + row["Station Agency"] + "','" + row["Station Category"] + "','" + row["Station Agency Code"] + "'";
                     action += ",'" + row["Station Advertiser"] + "'," + row["linkedAgencyId"] + ");";
-                    return '<a href="#" onclick="' + action + '">Match</a>';
+                    return '<a href="#" onclick="' + action + '">Match&nbsp;Station&nbsp;Agency</a>';
+                }
+            },
+            "orderable": false,
+            "searchable": false,
+            "className": "text-align-right"
+        });
+
+        return columnsToDisplay;
+    }
+
+    function getMediaAdvertiserColumns() {
+        var columnsToDisplay = new Array();
+
+        columnsToDisplay.push({
+            "title": "Market",
+            "visible": true,
+            "mData": "Market",
+            "orderable": true,
+            "searchable": true
+        });
+
+        columnsToDisplay.push({
+            "title": "Media Advertiser",
+            "visible": true,
+            "mData": "Media Advertiser",
+            "orderable": true,
+            "searchable": true
+        });
+
+        columnsToDisplay.push({
+            "title": "Media Type",
+            "visible": true,
+            "mData": "Media Type",
+            "orderable": true,
+            "searchable": true
+        });
+
+        columnsToDisplay.push({
+            "title": "Media Period",
+            "visible": true,
+            "mData": "Media Period",
+            "orderable": true,
+            "searchable": true
+        });
+
+
+        columnsToDisplay.push({
+            "title": "Market Advertiser",
+            "visible": true,
+            "mData": "Market Advertiser",
+            "orderable": true,
+            "searchable": true
+        });
+
+        columnsToDisplay.push({
+            "mRender": function (data, type, row) {
+                var action = "";
+                //pass the advertiser name, station category
+                if (row["linkedAdvertiserId"] > 0) {
+                    action = "";
+                    action += "editMediaAdvertiser(";
+                    action += "'" + row["Media Category"] + "'," + row["linkedAdvertiserId"] + ");";
+                    return '<a href="#" onclick="' + action + '">Edit&nbsp;Media&nbsp;Advertiser</a>';
+                } else {
+                    action = "";
+                    action += "createMediaAdvertiser(";
+                    action += row["marketId"] + ",'" + row["mediaTypeId"] + "','" + row["Media Advertiser"] + "'";
+                    action += ",'" + row["Media Category"] + "','" + row["Media Advertiser Code"] + "'";
+                    action += "," + row["linkedAdvertiserId"] + ");";
+                    return '<a href="#" onclick="' + action + '">Match&nbsp;Media&nbsp;Advertiser</a>';
                 }
             },
             "orderable": false,
@@ -507,6 +737,11 @@
             }
 
         setLocalStorage("newAdvertiserMatch", JSON.stringify(advertiserMatchData));
+
+        //setup back button functionality
+        //buildBackButton();
+
+
         window.location = "/admin/stationadvertiser/stationadvertiser.html?StationAdvertiserID=" + linkedAdvertiserId + "&AdvMatch=true";
 
     }
@@ -533,6 +768,9 @@
             }
 
         setLocalStorage("newAdvertiserMatch", JSON.stringify(advertiserMatchData));
+
+        //buildBackButton();
+
         window.location = "/admin/stationadvertiser/stationadvertiser.html?StationAdvertiserID=" + linkedAdvertiserId + "&AdvMatch=true";
 
     }
@@ -544,6 +782,7 @@
          * redirect to station agency CRUD page
          * add flag to notate coming from this page
          */
+
 
         var queryString = buildPreviousPageQueryString();
 
@@ -560,7 +799,11 @@
                 previousPage: "/products/xry/revenue/xrymatch.html" + queryString
             }
 
+
         setLocalStorage("newAgencyMatch", JSON.stringify(agencyMatchData));
+
+        //buildBackButton();
+
         window.location = "/admin/stationagency/stationagency.html?StationAgencyID=" + linkedAgencyId + "&AgyMatch=true";
     }
 
@@ -584,11 +827,53 @@
             }
 
         setLocalStorage("newAgencyMatch", JSON.stringify(agencyMatchData));
+
+        //buildBackButton();
+
         window.location = "/admin/stationagency/stationagency.html?StationAgencyID=" + linkedAgencyId + "&AgyMatch=true";
     }
 
-    function buildPreviousPageQueryString()
+    function createMediaAdvertiser(marketId, mediaTypeId, mediaAdvertiser, category, mediaAdvertiserCode, linkedAdvertiserId)
     {
+        var advertiserMatchData =
+        {
+            period: $("#ddlPeriod").val(),
+            year: $("#ddlYear").val(),
+            market: marketId,
+            mediaType: mediaTypeId,
+            mediaAdvertiser: mediaAdvertiser,
+            mediaAdvertiserCode: mediaAdvertiserCode,
+            advertiserCategory: category
+            //previousPage: "/products/xry/revenue/xrymatch.html" + queryString
+        }
+
+        setLocalStorage("newMediaMatch", JSON.stringify(advertiserMatchData));
+
+        window.location = "/admin/mediaadvertiser/mediaadvertiser.html?MediaAdvertiserID=" + linkedAdvertiserId + "&AdvMatch=true";
+    }
+
+    function editMediaAdvertiser(category, linkedAdvertiserId)
+    {
+
+        //var queryString = buildPreviousPageQueryString();
+
+        var advertiserMatchData =
+        {
+            period: $("#ddlPeriod").val(),
+            year: $("#ddlYear").val(),
+            advertiserCategory: category
+            //previousPage: "/products/xry/revenue/xrymatch.html" + queryString
+        }
+
+        setLocalStorage("newMediaMatch", JSON.stringify(advertiserMatchData));
+
+        //buildBackButton();
+
+        window.location = "/admin/mediaadvertiser/mediaadvertiser.html?MediaAdvertiserID=" + linkedAdvertiserId + "&AdvMatch=true";
+
+    }
+
+    function buildPreviousPageQueryString() {
         var queryString = "";
 
         queryString += "?Period=" + $("#ddlPeriod").val();
@@ -600,6 +885,8 @@
         queryString += "&OptionFlag=" + $("#ddlOptions").val();
         return queryString;
     }
+
+    
 
     function getMarketListByProduct(inProduct) {
         var control = "ddlMarket";
@@ -774,12 +1061,149 @@
         });
     }
 
+    function getMediaAdvertiserMediaTypeList() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/MediaAdvertiser/GetMediaAdvertiserMediaTypeList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Media Type --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].mediaTypeId + '">' + data.report.rows[index].mediaType + '</option>';
+
+                    });
+
+                    $("#ddlMediaType").html(str);
+
+                    convertToChosenSelect('ddlMediaType', gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    console.log(mediaType);
+                    if (mediaType.length > 0) {
+                        $("#ddlMediaType").val(mediaType.toUpperCase());
+                    } else {
+                        $("#ddlMediaType").val("");
+                    }
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
     function getMatchingReport() {
 
+        //fix validation right now only will look at year and period
         if (validationPassed() === false) {
             return;
         }
 
+        loadReportParameters();
+
+
+        //this now needs to be based on radio button selection
+        if ($('#rdoMedia').is(':checked')) {
+            //go do the media items
+            getMediaAdvertiserData();
+        } else {
+            //go do the station/agency items
+            getStationAgencyData();
+        }
+
+    }
+
+    function getMediaAdvertiserData() {
+        //GetMediaAccountListForMatching
+
+        //should only continue
+        //has market, media type, period and year
+        if ($("#ddlMarket").val() == "" ||
+            $("#ddlMediaType").val() == "" ||
+            $("#ddlYear").val() == "" ||
+            $("#ddlPeriod").val() == "")
+        {
+            return;
+        }
+
+        var bIncludeMatched = false;
+        var bIncludeUnMatched = false;
+
+        switch ($("#ddlOptions").val().toLowerCase()) {
+            case 'unmatched':
+                bIncludeMatched = false;
+                bIncludeUnMatched = true;
+                break;
+            case 'matched':
+                bIncludeMatched = true;
+                bIncludeUnMatched = false;
+                break;
+            case 'both':
+                bIncludeMatched = true;
+                bIncludeUnMatched = true;
+                break;
+            default:
+                bIncludeMatched = false;
+                bIncludeUnMatched = true;
+                break;
+        }
+
+        $.ajax({
+            url: ServicePrefix + "/api/XRAYRevenue/GetMediaAccountListForMatching",
+            dataType: 'json',
+            type: 'post',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPeriod": $("#ddlPeriod").val(),
+                "inYear": $("#ddlYear").val(),
+                "inMarketId": $("#ddlMarket").val(),
+                "inMediaTypeId": $("#ddlMediaType").val(),
+                "inIncludeUnmatched": bIncludeUnMatched,
+                "inIncludeMatched": bIncludeMatched
+            }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    loadMediaAdvertiserData(data);
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function loadMediaAdvertiserData(data) {
+        var columns = getMediaAdvertiserColumns();
+        var title = "Unmatched Media Advertisers";
+        loadResults(data, columns, title);
+    }
+
+    function getStationAgencyData() {
         var bIncludeAdvertiserMatched = false;
         var bIncludeAgencyMatched = false;
         var bIncludeBothMatched = true;
@@ -788,78 +1212,139 @@
         var bIncludeAdvertiserUnmatched = false;
         var bIncludeAgencyUnmatched = false;
 
-        switch (matchPageType.toUpperCase()) {
-            case "ADV":
-                if ($("#ddlOptions").val().toLowerCase() == "unmatched") {
-                    bIncludeAdvertiserMatched = false;
-                    bIncludeAdvertiserUnmatched = true;
-                    bDistinctAdvertisers = false;
-                    bIncludeAgencyMatched = true;
-                    bIncludeAgencyUnmatched = true;
+        ////switch (matchPageType.toUpperCase()) {
+        ////    case "ADV":
+        ////        if ($("#ddlOptions").val().toLowerCase() == "unmatched") {
+        ////            bIncludeAdvertiserMatched = false;
+        ////            bIncludeAdvertiserUnmatched = true;
+        ////            bDistinctAdvertisers = false;
+        ////            bIncludeAgencyMatched = true;
+        ////            bIncludeAgencyUnmatched = true;
 
-                } else if ($("#ddlOptions").val().toLowerCase() == "matched") {
-                    bIncludeAdvertiserMatched = true;
-                    bIncludeAdvertiserUnmatched = false;
-                    bDistinctAdvertisers = false;
-                    bIncludeAgencyMatched = true;
-                    bIncludeAgencyUnmatched = true;
+        ////        } else if ($("#ddlOptions").val().toLowerCase() == "matched") {
+        ////            bIncludeAdvertiserMatched = true;
+        ////            bIncludeAdvertiserUnmatched = false;
+        ////            bDistinctAdvertisers = false;
+        ////            bIncludeAgencyMatched = true;
+        ////            bIncludeAgencyUnmatched = true;
 
-                } else if ($("#ddlOptions").val().toLowerCase() == "both") {
-                    bIncludeAdvertiserMatched = true;
-                    bIncludeAdvertiserUnmatched = true;
-                    bDistinctAdvertisers = false;
-                    bIncludeAgencyMatched = true;
-                    bIncludeAgencyUnmatched = true;
-                } else {
-                    bIncludeAdvertiserMatched = false;
-                    bIncludeAdvertiserUnmatched = true;
-                    bDistinctAdvertisers = false;
-                    bIncludeAgencyMatched = true;
-                    bIncludeAgencyUnmatched = true;
-                }
-                break;
-            case "AGY":
-                if ($("#ddlOptions").val().toLowerCase() == "unmatched") {
-                    bIncludeAgencyMatched = false;
-                    bIncludeAgencyUnmatched = true;
-                    bDistinctAgencies = false;
-                    bIncludeAdvertiserMatched = true;
-                    bIncludeAdvertiserUnmatched = true;
+        ////        } else if ($("#ddlOptions").val().toLowerCase() == "both") {
+        ////            bIncludeAdvertiserMatched = true;
+        ////            bIncludeAdvertiserUnmatched = true;
+        ////            bDistinctAdvertisers = false;
+        ////            bIncludeAgencyMatched = true;
+        ////            bIncludeAgencyUnmatched = true;
+        ////        } else {
+        ////            bIncludeAdvertiserMatched = false;
+        ////            bIncludeAdvertiserUnmatched = true;
+        ////            bDistinctAdvertisers = false;
+        ////            bIncludeAgencyMatched = true;
+        ////            bIncludeAgencyUnmatched = true;
+        ////        }
+        ////        break;
+        ////    case "AGY":
+        ////        if ($("#ddlOptions").val().toLowerCase() == "unmatched") {
+        ////            bIncludeAgencyMatched = false;
+        ////            bIncludeAgencyUnmatched = true;
+        ////            bDistinctAgencies = false;
+        ////            bIncludeAdvertiserMatched = true;
+        ////            bIncludeAdvertiserUnmatched = true;
 
-                } else if ($("#ddlOptions").val().toLowerCase() == "matched") {
+        ////        } else if ($("#ddlOptions").val().toLowerCase() == "matched") {
 
-                    bIncludeAgencyMatched = true;
-                    bIncludeAgencyUnmatched = false;
-                    bDistinctAgencies = false;
-                    bIncludeAdvertiserMatched = true;
-                    bIncludeAdvertiserUnmatched = true;
+        ////            bIncludeAgencyMatched = true;
+        ////            bIncludeAgencyUnmatched = false;
+        ////            bDistinctAgencies = false;
+        ////            bIncludeAdvertiserMatched = true;
+        ////            bIncludeAdvertiserUnmatched = true;
 
-                } else if ($("#ddlOptions").val().toLowerCase() == "both") {
+        ////        } else if ($("#ddlOptions").val().toLowerCase() == "both") {
 
-                    bIncludeAgencyMatched = true;
-                    bIncludeAgencyUnmatched = true;
-                    bDistinctAgencies = false;
-                    bIncludeAdvertiserMatched = true;
-                    bIncludeAdvertiserUnmatched = true;
+        ////            bIncludeAgencyMatched = true;
+        ////            bIncludeAgencyUnmatched = true;
+        ////            bDistinctAgencies = false;
+        ////            bIncludeAdvertiserMatched = true;
+        ////            bIncludeAdvertiserUnmatched = true;
 
-                } else {
+        ////        } else {
 
-                    bIncludeAgencyMatched = false;
-                    bIncludeAgencyUnmatched = true;
-                    bDistinctAgencies = false;
-                    bIncludeAdvertiserMatched = true;
-                    bIncludeAdvertiserUnmatched = true;
+        ////            bIncludeAgencyMatched = false;
+        ////            bIncludeAgencyUnmatched = true;
+        ////            bDistinctAgencies = false;
+        ////            bIncludeAdvertiserMatched = true;
+        ////            bIncludeAdvertiserUnmatched = true;
 
-                }
-                break;
-            default:
-                bIncludeAdvertiserMatched = false;
-                bIncludeAgencyMatched = true;
-                bDistinctAdvertisers = false;
-                bIncludeAdvertiserUnmatched = true;
+        ////        }
+        ////        break;
+        ////    default:
+        ////        bIncludeAdvertiserMatched = false;
+        ////        bIncludeAgencyMatched = true;
+        ////        bDistinctAdvertisers = false;
+        ////        bIncludeAdvertiserUnmatched = true;
+        ////        bIncludeAgencyUnmatched = true;
+        ////        break;
+        ////}
+
+        //keep getting error that options is null
+        //not sure what is causing the issue
+        if ($('#rdoAgency').is(':checked')) {
+            if ($("#ddlOptions").val().toLowerCase() == "unmatched") {
+                bIncludeAgencyMatched = false;
                 bIncludeAgencyUnmatched = true;
-                break;
+                bDistinctAgencies = false;
+                bIncludeAdvertiserMatched = true;
+                bIncludeAdvertiserUnmatched = true;
+            } else if ($("#ddlOptions").val().toLowerCase() == "matched") {
+                bIncludeAgencyMatched = true;
+                bIncludeAgencyUnmatched = false;
+                bDistinctAgencies = false;
+                bIncludeAdvertiserMatched = true;
+                bIncludeAdvertiserUnmatched = true;
+            } else if ($("#ddlOptions").val().toLowerCase() == "both") {
+                bIncludeAgencyMatched = true;
+                bIncludeAgencyUnmatched = true;
+                bDistinctAgencies = false;
+                bIncludeAdvertiserMatched = true;
+                bIncludeAdvertiserUnmatched = true;
+            } else {
+                bIncludeAgencyMatched = false;
+                bIncludeAgencyUnmatched = true;
+                bDistinctAgencies = false;
+                bIncludeAdvertiserMatched = true;
+                bIncludeAdvertiserUnmatched = true;
+            }
+        } else //should be advertisers at this point
+        {
+           
+            if ($("#ddlOptions").val().toLowerCase() == "unmatched") {
+                bIncludeAdvertiserMatched = false;
+                bIncludeAdvertiserUnmatched = true;
+                bDistinctAdvertisers = false;
+                bIncludeAgencyMatched = true;
+                bIncludeAgencyUnmatched = true;
+
+            } else if ($("#ddlOptions").val().toLowerCase() == "matched") {
+                bIncludeAdvertiserMatched = true;
+                bIncludeAdvertiserUnmatched = false;
+                bDistinctAdvertisers = false;
+                bIncludeAgencyMatched = true;
+                bIncludeAgencyUnmatched = true;
+
+            } else if ($("#ddlOptions").val().toLowerCase() == "both") {
+                bIncludeAdvertiserMatched = true;
+                bIncludeAdvertiserUnmatched = true;
+                bDistinctAdvertisers = false;
+                bIncludeAgencyMatched = true;
+                bIncludeAgencyUnmatched = true;
+            } else {
+                bIncludeAdvertiserMatched = false;
+                bIncludeAdvertiserUnmatched = true;
+                bDistinctAdvertisers = false;
+                bIncludeAgencyMatched = true;
+                bIncludeAgencyUnmatched = true;
+            }
         }
+
 
         $.ajax({
             url: ServicePrefix + "/api/XRAYRevenue/GetStationAccountListForMatching",
@@ -889,7 +1374,8 @@
                 }
                 else {
 
-                    if (matchPageType.toUpperCase() == "AGY") {
+                    //if (matchPageType.toUpperCase() == "AGY") {
+                    if ($('#rdoAgency').is(':checked')) {
                         //populate datatable with agency stuff
                         loadAgencyData(data);
                     }
@@ -905,7 +1391,6 @@
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
-
     }
 
     function loadAdvertiserData(data) {
@@ -941,6 +1426,8 @@
             searchTable = $('#dtResults').DataTable();
             searchTable.destroy();
         }
+
+        resetDataTableDOM("dtResults", "dtResultsHolder", "cell-border dataTable-border dataTable-headers dataTable-cell-border");
 
         //this code rebuilds the datatable with the updated data from the search
         //or initial load.
@@ -1008,4 +1495,26 @@
         return loopBreak;
     }
 
+    function determineToShowBackButton() {
+        //alert("figure out to show back button.");
+        if (getLocalStorage("backButtonData").length <= 0) {
+            $("#btnBack").hide();
+        } else {
+            $("#btnBack").show();
+        }
+    }
+
+
+    //function determineGoBack()
+    //{
+    //    gExcludeFromBackButton = true;
+
+    //    if (hasBackButtonData()) {
+    //        //var backButtonData = getBackButtonLastItem();
+
+    //        //window.location = backButtonData.previousPage;
+    //        window.location = getBackButtonPage();
+    //    }
+
+    //}
 </script>

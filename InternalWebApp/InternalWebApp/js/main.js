@@ -10,19 +10,28 @@ const gChosenParams = {
     allowSearchContains: true, 
     allowSplitWordSearch: false
 }
+var gShowHeader = true;
 
- 
+var release =
+{
+    "DEV": "N/A",
+    "STAGING": "12/17/2019",
+    "PRODUCTION": "12/17/2019",
+    "DEMO": "12/17/2019"
+}
+var dateOfCode = new Date();
+release["DEV"] = (dateOfCode.getMonth() + 1) + '-' + dateOfCode.getDate() + '-' + dateOfCode.getFullYear();
 
 const gMonths = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
+//back button functionality
+const gDefaultBackPage = "/admin/login/dashboard.html";
+var gExcludeFromBackButton = false;
+const gBackButtonArrayLimit = 5;
 
 ; (function () {
 	
 	'use strict';
-
-
-
-	
-	
 
 	var isMobile = {
 		Android: function() {
@@ -207,45 +216,7 @@ const gMonths = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", 
 }());
 var unblockHandle;
 
-
-//function processSuccessResult(data, successMessage)
-//{
-//    if (data.response.status != "SUCCESS") 
-//    {
-//        bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () 
-//        {
-//            return false;
-//            //window.location = "preprocess.html";
-//        });
-//    }
-//    else 
-//    {
-//        if (data.report.rows[0].Status == -1)
-//        {
-//            bootbox.alert('Process Failed.\n\r\n\r' + data.report.rows[0].ErrorNumber + " - " + data.report.rows[0].ErrorMessage + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () 
-//            {
-//                return false;
-//                //window.location = "preprocess.html";
-//            });
-//        }
-//        else
-//        {
-//            if (successMessage != null && successMessage.length > 0)
-//            {
-//                bootbox.alert(successMessage, function () 
-//                {
  
-//                    return true;
-//                });
-//            }
-//            else
-//            {
-//                return true;
-//            }
-                    	
-//        }
-//    }
-//}
 var delayForLastPage = 1 * 1000;
 var maxHoldEntries = 10;
 var bLongQuery = false;
@@ -323,13 +294,39 @@ $( document ).ready(function()
 
     environment = getEnvironment();
 
-    if (environment.length > 0) {
-        $("#fh5co-header").prepend("<div class='container' style='color:white; background:red; padding-top: 3px; font-weight:600;border-radius:15px; text-align: center;'>" + environment + "</div>");
+    var environmentClass = "environment";
+
+    if (environment.length > 0)
+    {
+
+        if ((environment.indexOf("DEV") > -1) || (environment.indexOf("LOCAL") > -1))
+        {        
+            environmentClass = environmentClass + "DEV";
+        }
+        if  (environment.indexOf("STAGING") > -1)   {
+            environmentClass = environmentClass + "STAGING";
+        }
+        if  (environment.indexOf("DEMO") > -1)   {
+            environmentClass = environmentClass + "DEMO";
+        }
+        if (environment.indexOf("PRODUCTION") > -1) {
+            environmentClass = environmentClass + "PRODUCTION";
+        }
+
+        $("#fh5co-header").prepend("<div class='environment " + environmentClass + "'>" + environment + "</div>");
     }
+
+    $(document).ajaxStop(function () {
+        gShowHeader = showHeader();
+        buildBackButtonGeneric();
+    });
+ 
+
+    // build a generic back button...
 
     var nonLoggedInPages = new Array();
     nonLoggedInPages.push('/admin/login/login.html');
-     nonLoggedInPages.push('index.html');
+    nonLoggedInPages.push('index.html');
 
 
     // Block UI Stuff
@@ -381,8 +378,6 @@ $( document ).ready(function()
 		
 	}
 
-
-
 	if (bDoLoginCheck == true)
 	{
 	    // add favorites
@@ -391,27 +386,42 @@ $( document ).ready(function()
 
 	setTimeout(getLastPage, delayForLastPage);
 
+    $(window).on("beforeunload", function (e)
+    {
+        if (gExcludeFromBackButton == false)
+        {
+            buildBackButton();
+        }
 
-
+        gExcludeFromBackButton = false;
+    });
+     
 });
+
 
 function showHeader()
 {
     var hideHeader = getParameterByName("hideHeader");
+    var returnVal = false;
 
     if (!hideHeader == false && hideHeader.toLowerCase() == "true")
     {
+        $("#fh5co-page").css("marginTop", "20px");
         $("#fh5co-header").hide();
         $("#divQuickReport").hide();
         $(".favoriteButtonClass").hide();
         $("#reportTitleRow").hide();
         gDataTableDefaultRows = 10;
+        returnVal = false;
     }
     else {
         $("#fh5co-header").show();
+        returnVal = true;
     }
 
     $("body").show();
+
+    return returnVal;
 }
 function showComponentDialog(url, title)
 {
@@ -445,12 +455,16 @@ function instantiatePopupComponent()
     
     var wWidth = $(window).width();
     var dWidth = wWidth * 0.95;
+    var wHeight = $(window).height();
+    var dHeight = (wHeight * 0.5) + 50;
+    var dTop = $(window).height() - dHeight;
  
     $("#componentDialog").dialog({
         autoOpen: false,
         resizable: false,
         width: dWidth,
         height: 600,
+        top: dHeight,
         modal: false,
         dialogClass: 'componentDialogClass'
     });
@@ -511,7 +525,7 @@ function addDialogComponents()
 
     d = d + '<div class="favoriteButtonClass" style="position:absolute;top:5px; right:10px;z-index:1000">';
     d = d + '<div class="dropdown inline-block linkdropdown">';
-    d = d + '           <a class="favoritesButtonFromLink" role="button" aria=expanded="false">&nbsp;&nbsp;&nbsp;Favorites&nbsp;&nbsp;</span></a>';
+    d = d + '           &nbsp;&nbsp;&nbsp;<a style="padding-left:10px!important;padding-right:10px!important" class="favoritesButtonFromLink" role="button" aria=expanded="false">Favorites</a>&nbsp;&nbsp;</a>';
     d = d + '          <ul id="favoritesQuickList" class="dropdown-menu linkdropdown-menu" role="menu">';
 
 
@@ -551,8 +565,7 @@ function getFavoritesForQuickList()
                 {
                     var title = data.report.rows[index].Title;
                     var url = data.report.rows[index].URL;
-
-                    $("#favoritesQuickList").append('<li class="display-block"><a href="' + url + '">' + title + '</a></li>');
+                     $("#favoritesQuickList").append('<li class="display-block"><a href="' + url + '">' + title + '</a></li>');
                 });
 
 
@@ -739,24 +752,25 @@ function buildFavoritesDialog()
 
 function getEnvironment()
 {
-    var environment = "";
+    var environment = "&nbsp;PRODUCTION as of " + release['PRODUCTION'];
 
     var loc = window.location.toString().toLocaleLowerCase();
 
 
     if (loc.indexOf("devmediainternal.millerkaplan.com") > -1) {
-        environment = "&nbsp;DEV";
+        environment = "&nbsp;DEV as of " + release["DEV"];;
     }
 
     if (loc.indexOf("localhost") > -1) {
-        environment = "&nbsp;LOCAL";
+        environment = "&nbsp;LOCAL as of " + release["DEV"];
     }
 
     if (loc.indexOf("stagingmediainternal.millerkaplan.com") > -1) {
-        environment = "&nbsp;STAGING";
+        environment = "&nbsp;STAGING as of " + release["STAGING"];
     }
+
     if (loc.indexOf("demomediainternal.millerkaplan.com") > -1) {
-        environment = "&nbsp;DEMO";
+        environment = "&nbsp;DEMO as of " + release["DEMO"];
     }
 
     return environment;
@@ -1024,8 +1038,8 @@ function buildMainMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
-    menuItems += '<nav role="navigation" style="margin-top:20px">'
+    menuItems += '<h1><a href="/admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
+    menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
     menuItems += buildGenericReportsLink(selectedItem);
@@ -1041,38 +1055,38 @@ function buildMainMenu(selectedItem) {
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Personnel") + '">Personnel <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block"><a href="/admin/personnel/personnellist.html">Personnel</a></li>';
-    menuItems += '                  <li style="display:block"><a href="/admin/webnotification/webnotification.html">Web Notifications</a></li>';
+    menuItems += '                  <li style="display:block"><a href="/admin/personnel/personnellist.html?MenuItem=true">Personnel</a></li>';
+    menuItems += '                  <li style="display:block"><a href="/admin/webnotification/webnotification.html?MenuItem=true">Web Notifications</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Stations") + ' role="button" aria-expended="false">Stations<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block"><a href="/admin/station/stationlist.html">Stations</a></li>';
+    menuItems += '                  <li style="display:block"><a href="/admin/station/stationlist.html?MenuItem=true">Stations</a></li>';
     menuItems += '                  <li style="display:block"><a href="">MRR/X-Ray Link</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Markets") + '">Markets<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block"><a href="/admin/market/marketlist.html" role="button" aria-expanded="false">Markets </a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/market/marketlist.html?NonPrimaryOnly=true">Complimentary</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/parentmarket/parentmarketlist.html">Parent</a></li>';
+    menuItems += '                  <li style="display:block"><a href="/admin/market/marketlist.html?MenuItem=true" role="button" aria-expanded="false">Markets </a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/market/marketlist.html?NonPrimaryOnly=true&MenuItem=true">Complimentary</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/parentmarket/parentmarketlist.html?MenuItem=true">Parent</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Ownerships") + '">Ownerships<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/admin/ownership/ownershiplist.html" role="button" aria-expanded="false">Ownerships </a>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/ownershipgroup/ownershipgrouplist.html">Groups</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/parentownership/parentownershiplist.html">Parents</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/ownership/ownershiplist.html?MenuItem=true" role="button" aria-expanded="false">Ownerships </a>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/ownershipgroup/ownershipgrouplist.html?MenuItem=true">Groups</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/parentownership/parentownershiplist.html?MenuItem=true">Parents</a></li>';
     menuItems += '              </ul>';  
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="/admin/login/dashboard.html">Virtual Groups</a></li>';
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="/admin/login/dashboard.html?MenuItem=true">Virtual Groups</a></li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Settings") + ' role="button" aria-expanded="false">Settings <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/admin/format/formatlist.html">Formats</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/marketsize/marketsizelist.html">Market Sizes</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/position/positionlist.html">Positions</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/region/regionlist.html">Regions</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/revenuecategory/revenuecategorylist.html">Revenue Categories</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html">Tech Tools</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/format/formatlist.html?MenuItem=true">Formats</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/marketsize/marketsizelist.html?MenuItem=true">Market Sizes</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/position/positionlist.html?MenuItem=true">Positions</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/region/regionlist.html?MenuItem=true">Regions</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/revenuecategory/revenuecategorylist.html?MenuItem=true">Revenue Categories</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html?MenuItem=true">Tech Tools</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
@@ -1086,7 +1100,7 @@ function buildXRYMenu(selectedItem) {
     
     var menuItems = '';
 
-    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
@@ -1105,43 +1119,42 @@ function buildXRYMenu(selectedItem) {
 
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
-    menuItems += '        <li style="display:block"><a href="/products/xry/xryrelease.html">Release</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/xry/xryreminders.html">Reminders</a></li>';
-    menuItems += '        <li style="display:block;"><a href="/products/xry/xryownershipmappinglist.html">Ownership Mapping</a></li>';
-    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrydatacollection.html">Data Collection</a></li>';
-    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=adv">Advertiser Matching</a></li>';
-    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=agy">Agency Matching</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/xry/xryrelease.html?MenuItem=true">Release</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/xry/xryreminders.html?MenuItem=true">Reminders</a></li>';
+    menuItems += '        <li style="display:block;"><a href="/products/xry/xryownershipmappinglist.html?MenuItem=true">Ownership Mapping</a></li>';
+    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrydatacollection.html?MenuItem=true">Data Collection</a></li>';
+    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=adv&MenuItem=true">Advertiser Matching</a></li>';
+    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=agy&MenuItem=true">Agency Matching</a></li>';
+    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=media&MenuItem=true">Media Matching</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
 
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "XRay Reports") + ' href="" role="button" aria-expanded="false"> XRay Reports <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=xray monthly" role="button" aria-expanded="false">XRay Monthly Reports </a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=xray monthly&MenuItem=true" role="button" aria-expanded="false">XRay Monthly Reports </a></li>';
 
-    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=xry" role="button" aria-expanded="false">XRay Reports </a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=corporate" role="button" aria-expanded="false">Corporate Reports </a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=xry&MenuItem=true" role="button" aria-expanded="false">XRay Reports </a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=corporate&MenuItem=true" role="button" aria-expanded="false">Corporate Reports </a></li>';
     menuItems += '              </ul>';
     menuItems += '       </li>';
 
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/admin/advertiser/advertiserlist.html" role="button" aria-expanded="false">Market Advertiser</a></li>'; 
-    menuItems += '                  <li style="display:block;"><a href="/admin/stationadvertiser/stationadvertiserlist.html">Station Advertiser</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/mediaadvertiser/mediaadvertiserlist.html">Media Advertiser</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html">Parent Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/advertiser/advertiserlist.html?MenuItem=true" role="button" aria-expanded="false">Market Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/stationadvertiser/stationadvertiserlist.html?MenuItem=true">Station Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/mediaadvertiser/mediaadvertiserlist.html?MenuItem=true">Media Advertiser</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html?MenuItem=true">Parent Advertiser</a></li>';
 
-    menuItems += '                  <li style="display:block;"><a href="/admin/agency/agencylist.html" role="button" aria-expanded="false">Market Agency</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/agency/agencylist.html?MenuItem=true" role="button" aria-expanded="false">Market Agency</a></li>';
  
-    menuItems += '                  <li style="display:block;"><a href="/admin/stationagency/stationagencylist.html">Station Agency</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/parentagency/parentagencylist.html">Parent Agency</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/stationagency/stationagencylist.html?MenuItem=true">Station Agency</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/parentagency/parentagencylist.html?MenuItem=true">Parent Agency</a></li>';
  
     
 
-    menuItems += '                  <li style="display:block;"><a href="/admin/industry/industrylist.html">Industry</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/subindustry/subindustrylist.html">Sub Industry</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/nielsenmarketname/nielsenmarketnamelist.html">Nielson Market</a></li>';
-    //menuItems += '                  <li style="display:block;"><a href="/products/xry/xrydisablednotlinked.html?DisablePage=adv">Disabled Advertisers</a></li>';
-    //menuItems += '                  <li style="display:block;"><a href="/products/xry/xrydisablednotlinked.html?DisablePage=agy">Disabled Agencies</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/industry/industrylist.html?MenuItem=true">Industry</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/subindustry/subindustrylist.html?MenuItem=true">Sub Industry</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/nielsenmarketname/nielsenmarketnamelist.html?MenuItem=true">Nielson Market</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += productDashboard('');
@@ -1157,8 +1170,8 @@ function buildMRRMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
-    menuItems += '<nav role="navigation" style="margin-top:20px">'
+    menuItems += '<h1><a href="/admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
+    menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
     menuItems += buildGenericReportsLink(selectedItem);
@@ -1174,16 +1187,16 @@ function buildMRRMenu(selectedItem) {
     menuItems += '</li>';
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
-    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrrelease.html">Release</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrreminders.html">Reminders</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrrevenuedetail.html">Revenue Detail</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrmarketdelivery.html">Report Delivery</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrsnapshot.html">Snapshot</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrrelease.html?MenuItem=true">Release</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrreminders.html?MenuItem=true">Reminders</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrrevenuedetail.html?MenuItem=true">Revenue Detail</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrmarketdelivery.html?MenuItem=true">Report Delivery</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/mrr/mrrsnapshot.html?MenuItem=true">Snapshot</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrmarketcategorydefinitionlist.html" role="button" aria-expanded="false">Market Categories</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrmarketcategorydefinitionlist.html?MenuItem=true" role="button" aria-expanded="false">Market Categories</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += productDashboard('');
@@ -1200,8 +1213,8 @@ function buildTVBMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
-    menuItems += '<nav role="navigation" style="margin-top:20px">'
+    menuItems += '<h1><a href="/admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
+    menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
     menuItems += buildGenericReportsLink(selectedItem);
@@ -1217,12 +1230,17 @@ function buildTVBMenu(selectedItem) {
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
 
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbreminders.html">Reminders</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbdashboard.html">Report Status</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbmarketdelivery.html">Report Delivery</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetailrepbilling.html">Edit Rep Billing</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetail.html">Edit Time Sales</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbestimates.html">Estimates</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbreminders.html?MenuItem=true">Reminders</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbreportstatus.html?MenuItem=true">Report Status</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbmarketdelivery.html?MenuItem=true">Report Delivery</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetailrepbilling.html?MenuItem=true">Edit Rep Billing</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetail.html?MenuItem=true">Edit Time Sales</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbestimates.html?MenuItem=true">Estimates</a></li>';
+    menuItems += '</ul>';
+    menuItems += '</li>';
+    menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Confirm") + ' href="" role="button" aria-expanded="false">Confirm <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '<ul class="dropdown-menu" role="menu">';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirm.html?MenuItem=true">Time Sales</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += productDashboard('');
@@ -1237,7 +1255,7 @@ function buildTVBMenu(selectedItem) {
 function buildMSSMenu(selectedItem) {
     var menuItems = '';
 
-    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
@@ -1264,7 +1282,7 @@ function buildDMAMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
@@ -1285,10 +1303,10 @@ function buildDMAMenu(selectedItem) {
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
 
-    menuItems += '        <li style="display:block"><a href="/Products/DMA/dmarelease.html">Release</a></li>';
+    menuItems += '        <li style="display:block"><a href="/Products/DMA/dmarelease.html?MenuItem=true">Release</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "DMA Reports") + ' href="/utilities/genericreport/genericreportlist.html?tag=dma" role="button" aria-expanded="false">DMA Reports </span></a>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "DMA Reports") + ' href="/utilities/genericreport/genericreportlist.html?tag=dma&MenuItem=true" role="button" aria-expanded="false">DMA Reports </span></a>';
     menuItems += '       </li>';
 
     menuItems += productDashboard('');
@@ -1309,27 +1327,27 @@ function productDashboard(productId)
     switch(productId.toLowerCase()) 
     {
         case '':
-            strOut = '<a href="/admin/login/dashboard.html">Dashboard</a>';
+            strOut = '<a href="/admin/login/dashboard.html?MenuItem=true">Dashboard</a>';
             break;
         case 'mrr':
             style = 'display:block;';
-            strOut = '<a href="/products/mrr/mrrdashboard.html">MRR</a>';
+            strOut = '<a href="/products/mrr/mrrdashboard.html?MenuItem=true">MRR</a>';
             break;
         case 'xry':
             style = 'display:block;';
-            strOut = '<a href="/products/xry/xrydashboard.html">XRY</a>';
+            strOut = '<a href="/products/xry/xrydashboard.html?MenuItem=true">XRY</a>';
             break;
         case 'tvb':
             style = 'display:block;';
-            strOut = '<a href="/products/tvb/tvbdashboard.html">TVB</a>';
+            strOut = '<a href="/products/tvb/tvbdashboard.html?MenuItem=true">TVB</a>';
             break;
         case 'mss':
             style = 'display:block;';
-            strOut = '<a href="/products/mss/mssdashboard.html">MSS</a>';
+            strOut = '<a href="/products/mss/mssdashboard.html?MenuItem=true">MSS</a>';
             break;
         case 'dma':
             style = 'display:block;';
-            strOut = '<a href="/Products/DMA/dmadashboard.html">DMA</a>';
+            strOut = '<a href="/Products/DMA/dmadashboard.html?MenuItem=true">DMA</a>';
             break;
     }
 
@@ -1340,7 +1358,7 @@ function buildGenericReportsLink(selectedItem)
     var strOut = '';
     var style = '';
 
-    strOut = '<a ' + getSelectedItemClass(selectedItem, "Reports") +' href="/utilities/genericreport/genericReportList.html">Reports</a>';
+    strOut = '<a ' + getSelectedItemClass(selectedItem, "Reports") + ' href="/utilities/genericreport/genericReportList.html?MenuItem=true">Reports</a>';
 
     return '<li style="' + style + '">' + strOut + '</li>';
 }
@@ -1348,7 +1366,7 @@ function buildGenericReportsLink2(selectedItem) {
     var strOut = '';
     var style = '';
 
-    strOut = '<a ' + getSelectedItemClass(selectedItem, "Reports") + ' href="/utilities/genericreport/genericReportList.html">All Reports</a>';
+    strOut = '<a ' + getSelectedItemClass(selectedItem, "Reports") + ' href="/utilities/genericreport/genericReportList.html?MenuItem=true">All Reports</a>';
 
     return '<li style="' + style + '">' + strOut + '</li>';
 }
@@ -1406,6 +1424,7 @@ function populateDataTable(tableName, data)
 
     if (data.response.status.toUpperCase() === "SUCCESS") {
         data = JSON.stringify(data.report.rows);
+
         tableJson = $.parseJSON(data);
 
     } else {
@@ -1438,7 +1457,7 @@ function buildTechMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="/admin/login/dashboard.html">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="/admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
@@ -1454,14 +1473,14 @@ function buildTechMenu(selectedItem) {
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "TechTools") + ' role="button" aria-expanded="false">Tools <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html">Tech Tools</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/encryptdecrypt.html">Encryption/Decryption Tool</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrarchiverollover.html">MRR Rollover</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrmarkethistorydatamatrix.html">MRR Market History Maintenance</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrstationownerchanged.html">MRR Station Ownership Change</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/xry/xrymarkethistorydatamatrix.html">XRY Market History Maintenance</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/xry/xrystationownerchanged.html">XRY Station Ownership Change</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/tvb/tvbMarketHistoryDataMatrix.html">TVB Market History Maintenance</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html?MenuItem=true">Tech Tools</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/encryptdecrypt.html?MenuItem=true">Encryption/Decryption Tool</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrarchiverollover.html?MenuItem=true">MRR Rollover</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrmarkethistorydatamatrix.html?MenuItem=true">MRR Market History Maintenance</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrstationownerchanged.html?MenuItem=true">MRR Station Ownership Change</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/xry/xrymarkethistorydatamatrix.html?MenuItem=true">XRY Market History Maintenance</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/xry/xrystationownerchanged.html?MenuItem=true">XRY Station Ownership Change</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/tvb/tvbMarketHistoryDataMatrix.html?MenuItem=true">TVB Market History Maintenance</a></li>';
 
     menuItems += '              </ul>';
     menuItems += '        </li>';
@@ -1601,7 +1620,7 @@ function getPeriodList(inType, inDefaultSelect)
     catch (err) {
         console.log("This page is not converted to use Chosen selects yet.");
     }
-
+ 
 
     if (typeof paramRevenuePeriod == "undefined" || paramRevenuePeriod == null)
     {
@@ -1741,9 +1760,11 @@ function buildMarketWrapper(inData) {
     // find parens
     var bIDIncluded = false;
 
-    if ((inData.lastIndexOf("(") > -1) &&
-        (inData.lastIndexOf(")") > -1)) {
-        bIDIncluded = true;
+    if (!inData == false) {
+        if ((inData.lastIndexOf("(") > -1) &&
+            (inData.lastIndexOf(")") > -1)) {
+            bIDIncluded = true;
+        }
     }
 
     if (bIDIncluded == true) {
@@ -1865,7 +1886,70 @@ function buildOwnerWrapper(inData) {
 
     return ret;
 }
+function buildAgencyWrapper(inData) {
 
+    var ret = inData;
+
+    // find parens
+    var bIDIncluded = false;
+
+    if ((inData.lastIndexOf("(") > -1) &&
+        (inData.lastIndexOf(")") > -1)) {
+        bIDIncluded = true;
+    }
+
+    if (bIDIncluded == true) {
+        var ID = '';
+
+        var init = inData.lastIndexOf('(');
+        var fin = inData.lastIndexOf(')');
+
+        ID = inData.substr(init + 1, fin - init - 1);
+
+        if (ID.length > 0) {
+            if (isNaN(ID) == false) {
+                ret = "<a href='#' onclick='window.location=\"/Admin/agency/agency.html?AgencyID=" + ID + "\"'>";
+                ret = ret + inData
+                ret = ret + "</a>";
+            }
+        }
+
+    }
+
+    return ret;
+}
+function buildAdvertiserWrapper(inData) {
+
+    var ret = inData;
+
+    // find parens
+    var bIDIncluded = false;
+
+    if ((inData.lastIndexOf("(") > -1) &&
+        (inData.lastIndexOf(")") > -1)) {
+        bIDIncluded = true;
+    }
+
+    if (bIDIncluded == true) {
+        var ID = '';
+
+        var init = inData.lastIndexOf('(');
+        var fin = inData.lastIndexOf(')');
+
+        ID = inData.substr(init + 1, fin - init - 1);
+
+        if (ID.length > 0) {
+            if (isNaN(ID) == false) {
+                ret = "<a href='#' onclick='window.location=\"/Admin/advertiser/advertiser.html?AdvertiserID=" + ID + "\"'>";
+                ret = ret + inData
+                ret = ret + "</a>";
+            }
+        }
+
+    }
+
+    return ret;
+}
 function buildCustomLink(objectName, data, bSortable, className )
 {
     var column = new Object();
@@ -1884,10 +1968,8 @@ function buildCustomLink(objectName, data, bSortable, className )
         return column;
     }
 
-
- 
-
-    if (objectName == "User") {
+    if (objectName == "User")
+    {
         column = {
             "title": objectName,
             "visible": true,
@@ -1903,9 +1985,10 @@ function buildCustomLink(objectName, data, bSortable, className )
             "orderable": bSortable,
             "className": className
         };
-
+        return column;
     }
-    else if (objectName == "Contact") {
+
+    if (objectName == "Contact") {
         column = {
             "title": objectName,
             "visible": true,
@@ -1920,9 +2003,10 @@ function buildCustomLink(objectName, data, bSortable, className )
             "orderable": bSortable,
             "className": className
         };
-
+        return column;
     }
-    else if (objectName == "Market") {
+
+    if (objectName == "Market") {
         column = {
             "title": objectName,
             "visible": true,
@@ -1939,9 +2023,10 @@ function buildCustomLink(objectName, data, bSortable, className )
             "orderable": bSortable,
             "className": className
         };
-
+        return column;
     }
-    else if (objectName == "Owner") {
+
+    if (objectName == "Owner") {
         column = {
             "title": objectName,
             "visible": true,
@@ -1957,9 +2042,10 @@ function buildCustomLink(objectName, data, bSortable, className )
             "orderable": bSortable,
             "className": className
         };
-
+        return column;
     }
-    else if (objectName == "Station") {
+    
+    if (objectName == "Station") {
         column = {
             "title": objectName,
             "visible": true,
@@ -1975,91 +2061,386 @@ function buildCustomLink(objectName, data, bSortable, className )
             "orderable": bSortable,
             "className": className
         };
-
+        return column;
     }
-    else {
 
-            //
+    if (objectName == "Advertiser") {
         column = {
             "title": objectName,
-            "visible": true,          
-            "className": className,  
+            "visible": true,
             "mRender": function (data, type, row) {
- 
-                var textClassName = "";
-                var ret = "";
-                //console.log(objectName);
-                //console.log(row[objectName])
-                // negative numbers
+                if (row.Advertiser != null) {
+                    return buildAdvertiserWrapper(row.Advertiser);
+                } else {
+                    return '';
+                }
+            },
+            "orderable": bSortable,
+            "className": className
+        };
+        return column;
+    }
 
-                if (row[objectName] != null &&
-                    row[objectName] != "" &&
-                    isNaN(row[objectName].toString().replace("$", "").replace(new RegExp('\,'), '')
-                    ) == false)
+    if (objectName == "Agency") {
+        column = {
+            "title": objectName,
+            "visible": true,
+            "mRender": function (data, type, row) {
+                if (row.Agency != null) {
+                    return buildAgencyWrapper(row.Agency);
+                } else {
+                    return '';
+                }
+            },
+            "orderable": bSortable,
+            "className": className
+        };
+        return column;
+    }
+
+    // standard column build
+    column = {
+        "title": objectName,
+        "visible": true,          
+        "className": className,  
+        "mRender": function (data, type, row) {
+ 
+            var textClassName = "";
+            var ret = "";
+
+            // negative numbers
+
+            if (row[objectName] != null &&
+                row[objectName] != "" &&
+                isNaN(row[objectName].toString().replace("$", "").replace(new RegExp('\,'), '')
+                ) == false)
+            {
+                if (row[objectName].toString().indexOf("-") > -1)
                 {
-                    if (row[objectName].toString().indexOf("-") > -1)
-                    {
+                    textClassName = "redText";
+                }
+            }
+            // negative %
+            if (row[objectName] != null &&
+                row[objectName] != "" &&
+                isNaN(row[objectName].toString().replace("%", "").replace(new RegExp('\,'), '')) == false)
+            {
+                if (row[objectName].toString().indexOf("%") > -1) {
+                    if (row[objectName].toString().indexOf("-") > -1) {
                         textClassName = "redText";
                     }
                 }
-                // negative %
-                if (row[objectName] != null &&
-                    row[objectName] != "" &&
-                    isNaN(row[objectName].toString().replace("%", "").replace(new RegExp('\,'), '')) == false)
-                {
-                    if (row[objectName].toString().indexOf("%") > -1) {
-                        if (row[objectName].toString().indexOf("-") > -1) {
-                            textClassName = "redText";
-                        }
-                    }
-                }
+            }
 
-                ret = row[objectName];
+            ret = row[objectName];
 
-                if (textClassName.length > 0)
-                {
-                    ret = '<div class="'+textClassName+'">' + row[objectName] + "</div>";
-                }
+            if (textClassName.length > 0)
+            {
+                ret = '<div class="'+textClassName+'">' + row[objectName] + "</div>";
+            }
 
-                return ret;
-            },
-            "orderable": bSortable 
+            return ret;
+        },
+        "orderable": bSortable 
   
-        };
+    };
  
-    }
+ 
 
     return column;
 }
 
 function getReportParameters()
 {
+    //need to modify this to work with all pages including reports and lists
     var reportParams = {}
-    $('.form-group:visible').children('input').each(function (i, obj)
+
+    $(".report-filter").each(function(index, value)
     {
-        //console.log(obj.type);
-        //if (obj.type != "button") {
-        //    reportParams[obj.id] = obj.value;
-        //}
 
-        if (obj.type == 'radio')
+        if (this.tagName.toLowerCase() == "select")
         {
-            reportParams[obj.id] = obj.checked;
-        } else if (obj.type == 'button')
+            reportParams[this.id] = this.value;
+        }else if (this.tagName.toLowerCase() == "input")
         {
-            //do nothing
-        } else
-        {
-            reportParams[obj.id] = obj.value;
+            switch(this.type.toLowerCase())
+            {
+                case "radio":
+                    reportParams[this.id] = this.checked;
+                    break;
+                case "button":
+                    break;
+                default:
+                    reportParams[this.id] = this.value;
+                    break;
+            }
+
         }
-
-    });
-
-    $('.form-group:visible').children('select').each(function (i, obj) {
-        reportParams[obj.id] = obj.value;
     });
 
     reportParams["previousPage"] = window.location.href;
 
     return reportParams;
 }
+
+// Back Button Stuff START
+
+function hasBackButtonData()
+{
+
+    if (getLocalStorage("backButtonData").length > 0)
+    {
+        return true;
+    } else
+    {
+        return false;
+    }
+
+}
+
+function buildBackButton()
+{
+    var backButtonData = {};
+    var currentPageData = getReportParameters();
+
+    if (getLocalStorage("backButtonData").length > 0) {
+
+        backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
+        backButtonData["drilldown"].push(currentPageData);
+
+        if (backButtonData["drilldown"].length > gBackButtonArrayLimit)
+        {
+            backButtonData["drilldown"].splice(0,1);
+        }
+
+        setLocalStorage("backButtonData", JSON.stringify(backButtonData));
+
+    } else {
+
+        backButtonData["startingPage"] = window.location.href;
+        backButtonData["drilldown"] = new Array();
+        backButtonData["drilldown"].push(currentPageData);
+        setLocalStorage("backButtonData", JSON.stringify(backButtonData));
+
+    }
+
+}
+
+function initializeBackButton()
+{
+     setLocalStorage("backButtonData", "");
+}
+
+function removeBackButtonLastItem()
+{
+    var backButtonData = {};
+    if (getLocalStorage("backButtonData").length > 0)
+    {
+        backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
+
+
+        backButtonData["drilldown"].pop();
+
+        if (backButtonData["drilldown"].length > 0)
+        {
+            setLocalStorage("backButtonData", JSON.stringify(backButtonData));
+        } else
+        {
+            initializeBackButton();
+        }
+    }
+}
+
+function removeCurrentPageItem(pageName)
+{
+    var backButtonData = {};
+    if (getLocalStorage("backButtonData").length > 0)
+    {
+        backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
+
+        for (var i = 0; i < backButtonData["drilldown"].length; i++)
+        {
+            var index = backButtonData["drilldown"][i].previousPage.indexOf(pageName);
+            if (index > -1)
+            {
+                backButtonData["drilldown"].splice(i, 1);
+                break;
+            }
+        }
+
+        if (backButtonData["drilldown"].length > 0)
+        {
+            setLocalStorage("backButtonData", JSON.stringify(backButtonData));
+        }
+        else
+        {
+            initializeBackButton();
+        }
+
+    }
+}
+
+function getBackButtonDataByPage(pageName)
+{
+
+    var backButtonData = {};
+    if (getLocalStorage("backButtonData").length > 0)
+    {
+        backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
+
+
+        for (var i = 0; i < backButtonData["drilldown"].length; i++)
+        {
+            var index = backButtonData["drilldown"][i].previousPage.indexOf(pageName);
+            if (index > -1)
+            {
+                return backButtonData["drilldown"][i];
+            }
+        }
+
+        return {};
+    } else
+    {
+        return backButtonData;
+    }
+}
+
+function getBackButtonLastItem()
+{
+    var backButtonData = {};
+    if (getLocalStorage("backButtonData").length > 0)
+    {
+        backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
+
+        return backButtonData["drilldown"][backButtonData["drilldown"].length - 1];
+
+    } else
+    {
+        return backButtonData;
+    }
+}
+
+function getBackButtonPage()
+{
+    var backButtonData = {};
+    var backButtonLink = "";
+
+    if (getLocalStorage("backButtonData").length > 0) {
+        backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
+
+        backButtonLink = backButtonData["drilldown"][backButtonData["drilldown"].length - 1].previousPage;
+
+    }
+
+    if (backButtonLink != null && backButtonLink.length > 0)
+    {
+        return backButtonLink;
+    } else
+    {
+        return gDefaultBackPage;
+    }
+}
+
+function updatedGoBack()
+{
+    console.log('----------------');
+    console.log($.parseJSON(getLocalStorage("backButtonData")));
+
+    excludeFromBackButton();
+    window.location = getBackButtonPage();
+}
+
+function excludeFromBackButton()
+{
+    gExcludeFromBackButton = true;
+}
+
+function cleanupBackButton(pageName)
+{
+
+    if (!pageName)
+    {
+        pageName = window.location.pathname;
+    }
+
+    var bMenuItem = getParameterByName("MenuItem") == null ? false : getParameterByName("MenuItem");
+
+    removeCurrentPageItem(pageName);
+
+    if (bMenuItem)
+    {
+        initializeBackButton();
+    }
+}
+function loadReportParameters() {
+
+    if (hasBackButtonData() == false)
+    {
+        return;
+    }
+
+    var reportParamData = getBackButtonDataByPage(window.location.pathname);
+
+    for (var key in reportParamData) {
+
+        if (key.indexOf("rdo") > -1) {
+            $("#" + key).prop('checked', reportParamData[key]);
+        } else {
+            $("#" + key).val(reportParamData[key]);
+        }
+
+        if (key.indexOf("ddl") > -1) {
+            $("#" + key).change();
+        }
+
+        if (key.indexOf("rdo") > -1 && reportParamData[key] == true) {
+            $("#" + key).change();
+        }
+    }
+
+    cleanupBackButton(window.location.pathname);
+
+}
+
+function buildBackButtonGeneric() {
+    if (gShowHeader == false)
+    {
+        $("#btnBack").hide();
+        return;
+    }
+    // cleanup can go here...
+    //cleanupBackButton();
+    var menuItem = getParameterByName("MenuItem");
+
+    if (getLocalStorage("backButtonData").length > 0 && (!menuItem ||menuItem.length == 0))
+    {
+        if ($("#btnBack").length == 0) {
+            var backButton = '<input type="button" id="btnBack" class="search-button" value="Back" onclick="updatedGoBack()">';
+            $("#fh5co-contact-section").prepend("<div style='padding-right: 35px;float:right; margin-top:10px'>" + backButton + "</div>");
+        }
+    }
+    else
+    {
+        $("#btnBack").hide();
+    }
+
+}
+// Back Button Stuff END
+
+function getReportIdByToken(inValue)
+{
+    //get the item by the key with a value
+
+    for (var i = 0; i < reportObjectArray.length; i++) 
+    {
+
+        if (reportObjectArray[i]['reportTitle'].toLowerCase() === inValue.toLowerCase()) 
+        {
+             return i;
+        }
+    }
+
+    return null;
+
+}
+

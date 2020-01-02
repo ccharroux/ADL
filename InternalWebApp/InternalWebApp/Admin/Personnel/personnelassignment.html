@@ -42,6 +42,7 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
@@ -57,32 +58,35 @@
     <script src="js/respond.min.js"></script>
     <![endif]-->
     <style type="text/css">
-        .assignmentBoxes
-        {
-            border:silver solid 1px; 
-            border-radius:15px; 
-            padding:5px 5px 5px 5px;
-            height:287px;
+        .assignmentBoxes {
+            border: silver solid 1px;
+            border-radius: 15px;
+            padding: 5px 5px 5px 5px;
+            height: 287px;
         }
-        .fh5co-heading
-        {
-            margin-bottom:unset;
+
+        .fh5co-heading {
+            margin-bottom: unset;
         }
-        hr
-        {
-            margin-top:5px;
-            margin-bottom:5px;
+
+        hr {
+            margin-top: 5px;
+            margin-bottom: 5px;
         }
-        .assignmentBoxHeader
-        {
+
+        .assignmentBoxHeader {
             padding-bottom: 3px;
             border-top-left-radius: 15px;
             border-top-right-radius: 15px;
-            text-align:center;
-            margin-bottom:5px;
-            margin-top:0px;
-            background-color:#34587a;
-            color:white;
+            text-align: center;
+            margin-bottom: 5px;
+            margin-top: 0px;
+            background-color: #34587a;
+            color: white;
+        }
+
+        .ui-dialog-titlebar-close{
+            display:none !important;
         }
     </style>
 
@@ -98,29 +102,31 @@
         </header>
         <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
-                <div id="divQuickReport" style="float:right;padding-right:0px;padding-bottom:10px">
-                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
-                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
-                </div>  
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <a name="workArea"></a> 
+                        <a name="workArea"></a>
                         <h2>Personnel Assignment</h2>
                         <h3 id="nameOfPersonnel"></h3>
                     </div>
                 </div>
+                <div id="divQuickReport"  >
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>
+
 
                 <!-- search / filter area -->
                 <div class="row">
                     <div class="col-md-12">
                         <label for="ddlProduct" class="search-ddl-label">Product</label>
                         <select id="ddlProduct" class="search-ddl-select" style="" onchange="loadScreenForProductChange()"></select>
+                        <input value="Corporate Assignment" onclick="corporateAssignInitiate();" style="display:none;" id="btnCorporateAssignInitiate" class="default-button" type="button">
                     </div>
                 </div>
                 <div class="col-md-12" id="marketChoice" style="display:none">
                     <hr />
                     <div class="row" style="padding-bottom:10px">
-                        <div >
+                        <div>
                             <label for="ddlMarketAssign" class="search-ddl-label">Market</label>
                             <select id="ddlMarketAssign" class="search-ddl-select" style="" onchange="loadStationList()"></select>
                         </div>
@@ -160,7 +166,7 @@
                                     &nbsp;&nbsp;
                                     <input type="radio" name="radContactXRY" id="radXRYSecondaryContact" style="margin-right:5px" value="secondary" /><label for="radXRYSecondaryContact">Secondary Contact</label>
                                     <hr />
-                                    <input type="checkbox" id="chkXRYRecipient"  onclick="resetRelatedControl(this, 'ddlAccessXRY');"   style="margin-right:5px" /><label for="chkXRYRecipient">Recipient</label> <br />
+                                    <input type="checkbox" id="chkXRYRecipient" onclick="resetRelatedControl(this, 'ddlAccessXRY');" style="margin-right:5px" /><label for="chkXRYRecipient">Recipient</label> <br />
                                     <label for="ddlAccessXRY" class="search-ddl-label" style="vertical-align: top; margin-left:10px">Access Levels</label>
                                     <select id="ddlAccessXRY" class="search-ddl-select" style="height: 170px;width: 340px;" size="10"></select>
                                 </div>
@@ -176,13 +182,13 @@
                                 <br />
                                 <input type="radio" name="radContactTVB" id="radTVBSecondaryContact" style="margin-right:5px" value="secondary" /><label for="radTVBSecondaryContact">Secondary Contact</label>
                                 <div><b>NOTE:&nbsp;</b>Requires Market / Station selection.</div>
- 
+
                             </div>
                         </div>
                     </div>
                     <div class="row" style="margin-top:10px;">
-                        <div class="col-md-12 ProductChoices MRRChoices"  >
-                                                           
+                        <div class="col-md-12 ProductChoices MRRChoices">
+
                             <div class="assignmentBoxes" style="padding-top:0px;padding-left:0px;padding-right:0px;height:auto">
                                 <h4 class="assignmentBoxHeader">Assignment Actions</h4>
                                 <div style="padding-left:20px; padding-right:20px">
@@ -202,24 +208,24 @@
                             <div class="assignmentBoxes">
 
                                 <input type="checkbox" id="chkTVBRecipient" onclick="resetRelatedControl(this, 'ddlAccessTVB');" style="margin-right:5px" /><label for="chkTVBRecipient">Recipient</label>
-                                
+
                                 <hr />
 
                                 <label for="ddlAccessTVB" class="search-ddl-label" style="vertical-align: top; margin-left:10px">Access</label>
-                                <select id="ddlAccessTVB" class="search-ddl-select"  style="margin-top:10px" size="9"></select>
+                                <select id="ddlAccessTVB" class="search-ddl-select" style="margin-top:10px" size="9"></select>
                                 <div><b>NOTE:&nbsp;</b>Requires Market / Station selection.</div>
                             </div>
                         </div>
                         <div class="col-md-6 ProductChoices TVBChoices" style="display:none">
                             <div class="assignmentBoxes">
-                                <input type="checkbox" id="chkTVBRepDataContact"  onclick="resetRelatedControl(this, 'ddlRepFirms', 'chkSelectedRepFirms');"  style="margin-right:5px" /><label for="chkTVBRepDataContact">Rep Data Contact</label>
+                                <input type="checkbox" id="chkTVBRepDataContact" onclick="resetRelatedControl(this, 'ddlRepFirms', 'chkSelectedRepFirms');" style="margin-right:5px" /><label for="chkTVBRepDataContact">Rep Data Contact</label>
 
                                 <hr />
 
                                 <div style="margin-left:10px;vertical-align: top; margin-left:20px"><input type="checkbox" id="chkSelectedRepFirms" onclick="selectItems('chkSelectedRepFirms', 'ddlRepFirms')" /><span>&nbsp;Select All</span></div>
                                 <label for="ddlRepFirms" class="search-ddl-label" style="vertical-align: top; margin-left:10px">Rep Firms</label>
-                                <select id="ddlRepFirms" style="margin-top:10px" class="search-ddl-select"   multiple size="8"></select>
- 
+                                <select id="ddlRepFirms" style="margin-top:10px" class="search-ddl-select" multiple size="8"></select>
+
                             </div>
                         </div>
                     </div>
@@ -227,7 +233,7 @@
                         <div class="col-md-6 ProductChoices TVBChoices">
 
                             <div class="assignmentBoxes" style="padding-top:0px;padding-left:0px;padding-right:0px;height:80px">
- 
+
                                 <div style="padding-left:20px; padding-right:20px;padding-top:15px">
                                     <input type="checkbox" id="chkTVBEstimatedContact" style="margin-right:5px" /><label for="chkTVBEstimatedContact">Estimated Contact</label>
                                 </div>
@@ -240,7 +246,7 @@
                                 <div style="padding-left:20px; padding-right:20px;padding-top:15px">
                                     <input type="checkbox" id="chkTVBAdministrator" style="margin-right:5px" /><label for="chkTVBAdministrator">Administrator</label>
                                 </div>
-                                <div style="padding-left:20px;" ><b>NOTE:&nbsp;</b>Requires Market / Station selection.</div>
+                                <div style="padding-left:20px;"><b>NOTE:&nbsp;</b>Requires Market / Station selection.</div>
                             </div>
                         </div>
                     </div>
@@ -275,11 +281,11 @@
                         <hr />
                         <strong>Data Level View:</strong> &nbsp;&nbsp;
 
-                        <input type="radio" name="dataView"  value="role" onclick="loadPersonnelAssignmentList('dtPersonnelAssignmentList');" />&nbsp;Role&nbsp;&nbsp;
+                        <input type="radio" name="dataView" value="role" onclick="loadPersonnelAssignmentList('dtPersonnelAssignmentList');" />&nbsp;Role&nbsp;&nbsp;
                         <input type="radio" name="dataView" value="market" onclick="loadPersonnelAssignmentList('dtPersonnelAssignmentList');" />&nbsp;Market&nbsp;&nbsp;
                         <input type="radio" name="dataView" value="owner" onclick="loadPersonnelAssignmentList('dtPersonnelAssignmentList');" />&nbsp;Owner&nbsp;&nbsp;
                         <input type="radio" name="dataView" checked="checked" value="station" onclick="loadPersonnelAssignmentList('dtPersonnelAssignmentList');" />&nbsp;Station
-                        <div style="display:inline-block" class="MRRChoices ProductChoices"><input type="radio" name="dataView" value="report" onclick="loadPersonnelAssignmentList('dtPersonnelAssignmentList');" />&nbsp;Report</div>
+                        <div style="display:inline-block" class="MRRChoices ProductChoices">&nbsp;&nbsp;<input type="radio" name="dataView" value="report" onclick="loadPersonnelAssignmentList('dtPersonnelAssignmentList');">&nbsp;Report</div>
                     </div>
                 </div>
                 <!-- start datatable-->
@@ -292,13 +298,38 @@
                 <!-- end datatable -->
 
             </div>
-            </div>
-            <!--<div id="map" data-animate-effect="fadeIn"></div>-->
         </div>
- 
+        <!--<div id="map" data-animate-effect="fadeIn"></div>-->
+    </div>
+
+    <div id="corporateAssignDialog" title="" style="display:none; width: 100%;">
+        <div id="corpAssignOwnerMarket" style="width:55%; display:inline-block; vertical-align:top;">
+            <label for="ddlOwnerCorpAssign">Owner</label><br />
+            <select id="ddlOwnerCorpAssign" class="search-ddl-select" style="" onchange="loadMarketListByOwner();"></select>
+            <br />
+            <label for="ddlMarketCorpAssign">Market</label><br />
+            <div><input type="checkbox" id="chkSelectedMarketsCorpAssign" onclick="selectItems('chkSelectedMarketsCorpAssign', 'ddlMarketCorpAssign')" /><span>&nbsp;Select All</span></div>
+            <select id="ddlMarketCorpAssign" class="search-ddl-select" style="height:170px;width:340px;" multiple size="8"></select>
+        </div>
+        <div id="corpAssignAccess" style="width:40%;display:inline-block; vertical-align:top;">
+            <div id="corpAssignAccessXRY" style="display:none;">
+                <label for="ddlAccessXRYCorpAssign" class="" style="">Access Levels</label>
+                <select id="ddlAccessXRYCorpAssign" class="search-ddl-select" style="height:170px;width:340px;" size="10"></select>
+            </div>
+        </div>
+        <div style="margin-top:20px; text-align:center;">
+            <input type="button" id="btnCorporateAssign" value="Assign" class="default-button" onclick="doCorporateAssignment();" />
+        </div>
+        <div style="margin-top:4px; text-align:center">
+            <input type="button" id="btnCorporateAssignCancel" value="Cancel" class="default-button" onclick="closeCorporateDialog()" />
+        </div>
+    </div>
+
+
 
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <!-- jQuery Easing -->
     <script src="/js/jquery.easing.1.3.js"></script>
     <!-- Bootstrap -->
@@ -348,14 +379,31 @@
 
         buildMainMenu("Personnel");
         buildQuickReports(['personnel', 'owner', 'market', 'station']);
+        buildUIDialogs();
 
         loadProductList();
- 
+
         gDataTableDefaultRows = 10;
     });
 
-    function getPageParameters()
-    {
+    function buildUIDialogs() {
+        $(function () {
+            $("#corporateAssignDialog").dialog({
+                autoOpen: false,
+                resizable: false,
+                width: 850,
+                height: 460,
+                modal: true,
+                title: 'Corporate Assignment',
+                create: function (event, ui) {
+                    $(event.target).parent().css('position', 'fixed');                   
+                }
+            });
+        });
+
+    }
+
+    function getPageParameters() {
 
         //these are values past in local storage
         if (getLocalStorage("gPageParameters").length > 0) {
@@ -376,27 +424,22 @@
     //--------------------------------//
     // Assignment start
     //--------------------------------//
-    function doAssignment()
-    {
+    function doAssignment() {
 
         // validation
-        if (areAssignmentsValid()==false)
-        {
+        if (areAssignmentsValid() == false) {
             return;
         }
-        else
-        {
+        else {
             beginAssignmentProcess();
         }
 
 
     }
 
-    function beginAssignmentProcess()
-    {
+    function beginAssignmentProcess() {
 
-        switch ($("#ddlProduct").val().toString().toLowerCase())
-        {
+        switch ($("#ddlProduct").val().toString().toLowerCase()) {
 
             case "dma":
                 return assignDMA();
@@ -416,8 +459,7 @@
         }
 
     }
-    function assignDMA()
-    {
+    function assignDMA() {
         var stationArray = new Array();
         var reportArray = new Array();
 
@@ -444,14 +486,13 @@
             "inPersonnelId": personnelId,
             "inMarketStationList": stationArray,
             "inReportList": reportArray,
-            "inIsRecipient": 'true' 
+            "inIsRecipient": 'true'
         });
 
         assignAJAX(inputObject, $("#ddlProduct").val(), $("#ddlProduct").val() + " Assignments Complete");
 
     }
-    function assignTVB()
-    {
+    function assignTVB() {
         var stationArray = new Array();
         var repFirmArray = new Array();
 
@@ -477,7 +518,7 @@
         // default settings - not a contact
         var isContact = false;
         var isPrimaryContact = false;
- 
+
 
 
         if (radioValue.toLowerCase() == "primary") {
@@ -492,26 +533,23 @@
         var inputObject = JSON.stringify({
             "inApiToken": getLocalStorage("APIToken"),
             "inPersonnelId": personnelId,
-            "inMarketId" : $("#ddlMarketAssign").val(),
+            "inMarketId": $("#ddlMarketAssign").val(),
             "inStationList": stationArray,
             "inRepFirmList": repFirmArray,
             "inAccessLevelId": $("#ddlAccessTVB").val(),
-            "inIsTimeSalesContact" : isContact,
-            "inIsPrimaryTimeSalesContact" :  isPrimaryContact,
+            "inIsTimeSalesContact": isContact,
+            "inIsPrimaryTimeSalesContact": isPrimaryContact,
             "inIsRepFirmContact": $("#chkTVBRepDataContact").is(':checked').toString(),
             "inIsEstimateContact": $("#chkTVBEstimatedContact").is(':checked').toString(),
             "inIsAdministrator": $("#chkTVBAdministrator").is(':checked').toString(),
             "inIsRecipient": $("#chkTVBRecipient").is(':checked').toString()
- 
+
         });
 
- 
- 
         assignAJAX(inputObject, $("#ddlProduct").val(), $("#ddlProduct").val() + " Assignments Complete");
 
     }
-    function assignXRY()
-    {
+    function assignXRY() {
         var stationArray = new Array();
         var stationSubmissionArray = new Array();
 
@@ -530,11 +568,9 @@
             isPrimaryContact = false;
         }
 
-        $("#ddlStation option:selected").each(function ()
-        {
+        $("#ddlStation option:selected").each(function () {
             // recipient only array
-            if ($("#chkXRYRecipient").is(':checked') == true)
-            {
+            if ($("#chkXRYRecipient").is(':checked') == true) {
                 var stationObject = {
                     "stationId": $(this).val(),
                     "selected": true
@@ -543,8 +579,7 @@
             }
 
             // contacts only array
-            if (isContact == true)
-            {
+            if (isContact == true) {
                 var stationObject = {
                     "stationId": $(this).val(),
                     "submissionId": '1',
@@ -570,13 +605,11 @@
         assignAJAX(inputObject, $("#ddlProduct").val(), $("#ddlProduct").val() + " Assignments Complete");
 
     }
-    function assignMRR()
-    {
+    function assignMRR() {
         var stationArray = new Array();
         var reportArray = new Array();
 
-        $("#ddlStation option:selected").each(function ()
-        {
+        $("#ddlStation option:selected").each(function () {
             var stationObject = {
                 "stationId": $(this).val(),
                 "selected": true
@@ -585,48 +618,45 @@
         });
 
 
-        $("#ddlReport option:selected").each(function ()
-        {
-            var reportObject = {"reportId":$(this).val(),
+        $("#ddlReport option:selected").each(function () {
+            var reportObject = {
+                "reportId": $(this).val(),
                 "selected": true
             }
             reportArray.push(reportObject);
         });
 
         var radioValue = $("input[name='radContactMRR']:checked").val();
-        
+
         // default settings - not a contact
         var isContact = false;
         var isPrimaryContact = false;
 
-        if (radioValue.toLowerCase() == "primary")
-        {
+        if (radioValue.toLowerCase() == "primary") {
             isContact = true;
             isPrimaryContact = true;
         }
-        if (radioValue.toLowerCase() == "secondary")
-        {
+        if (radioValue.toLowerCase() == "secondary") {
             isContact = true;
             isPrimaryContact = false;
         }
 
         var inputObject = JSON.stringify({
             "inApiToken": getLocalStorage("APIToken"),
-            "inPersonnelId": personnelId,        
-            "inMarketId" : $("#ddlMarketAssign").val(),
-            "inStationList" : stationArray,
-            "inReportList" : reportArray,
+            "inPersonnelId": personnelId,
+            "inMarketId": $("#ddlMarketAssign").val(),
+            "inStationList": stationArray,
+            "inReportList": reportArray,
             "inIsContact": isContact.toString(),
-            "inIsPrimaryContact" : isPrimaryContact.toString(),
+            "inIsPrimaryContact": isPrimaryContact.toString(),
             "inIsRecipient": $("#chkMRRRecipient").is(':checked').toString(),
-            "inIsAdministrator" : $("#chkMRRAdministrator").is(':checked').toString()
+            "inIsAdministrator": $("#chkMRRAdministrator").is(':checked').toString()
         });
- 
+
         assignAJAX(inputObject, $("#ddlProduct").val(), $("#ddlProduct").val() + " Assignments Complete");
 
     }
-    function assignAJAX(inputObject, product, successMessage)
-    {
+    function assignAJAX(inputObject, product, successMessage) {
         // reset product for XRAY.. use XRAY instead of XRAY
         product = (product.toLowerCase() == 'xry' ? 'XRAY' : product.toUpperCase());
 
@@ -638,16 +668,14 @@
         //-------------------
 
         var actionAlter = "";
- 
-        if (product.toUpperCase() == "MRR" || product.toUpperCase() == "XRAY")
-        {
+
+        if (product.toUpperCase() == "MRR" || product.toUpperCase() == "XRAY") {
             actionAlter = "MarketStation";
         }
- 
- 
 
-        var url = ServicePrefix + '/api/' + product + '/UpdatePersonnel' + actionAlter+'Assignments';
-        
+
+        var url = ServicePrefix + '/api/' + product + '/UpdatePersonnel' + actionAlter + 'Assignments';
+
         $.ajax({
             url: url,
             dataType: 'json',
@@ -671,15 +699,13 @@
 
             }
         });
- 
+
     }
 
-    function areAssignmentsValid()
-    {
+    function areAssignmentsValid() {
 
 
-        switch ($("#ddlProduct").val().toString().toLowerCase())
-        {
+        switch ($("#ddlProduct").val().toString().toLowerCase()) {
 
             case "dma":
                 return areDMAAssignmentsValid();
@@ -698,22 +724,19 @@
 
         }
     }
-    function marketSelectionValid()
-    {
+    function marketSelectionValid() {
         // a market must be selected
         if ($("#ddlMarketAssign").val() == "") {
             bootbox.alert("You must select a market to perform the assignment operation.");
             return false;
         }
-        else
-        {
+        else {
             return true;
         }
 
     }
 
-    function stationSelectionValid()
-    {
+    function stationSelectionValid() {
 
         // at least 1 station
         var count = $("#ddlStation :selected").length;
@@ -724,24 +747,21 @@
         }
     }
 
-    function areTVBAssignmentsValid()
-    {
+    function areTVBAssignmentsValid() {
 
         // at least 1 action
         if ($("#chkTVBRepDataContact").is(':checked') == false &&
             $("#chkTVBRecipient").is(':checked') == false &&
             $("#chkTVBEstimatedContact").is(':checked') == false &&
             $("#chkTVBAdministrator").is(':checked') == false &&
-            $('input[name=radContactTVB]:checked').val() == "")
-        {
+            $('input[name=radContactTVB]:checked').val() == "") {
             bootbox.alert("You must select at least 1 assignment action to perform the assignment operation.");
             return false;
         }
 
         // Time Sales Contact
-        if ($('input[name=radContactTVB]:checked').val() != "")
-        {
- 
+        if ($('input[name=radContactTVB]:checked').val() != "") {
+
             if (marketSelectionValid() == false) {
                 return false;
             }
@@ -754,8 +774,7 @@
         }
 
         // Recipients
-        if ($("#chkTVBRecipient").is(':checked'))
-        {
+        if ($("#chkTVBRecipient").is(':checked')) {
 
             if (marketSelectionValid() == false) {
                 return false;
@@ -770,7 +789,7 @@
                 bootbox.alert("You must select at least 1 Access Level to perform the assignment operation.");
                 return false;
             }
- 
+
         }
 
         // Administrator
@@ -783,14 +802,13 @@
             if (stationSelectionValid() == false) {
                 return false;
             }
- 
+
 
         }
 
 
         // Rep Firm Contact
-        if ($("#chkTVBRepDataContact").is(':checked'))
-        {
+        if ($("#chkTVBRepDataContact").is(':checked')) {
             var count = $("#ddlRepFirms :selected").length;
 
             if (count <= 0) {
@@ -802,33 +820,28 @@
         return true;
 
     }
-    function areMRRAssignmentsValid()
-    {
+    function areMRRAssignmentsValid() {
 
 
 
         // at least 1 action
         if ($("#chkMRRAdministrator").is(':checked') == false &&
             $("#chkMRRRecipient").is(':checked') == false &&
-            $('input[name=radContactMRR]:checked').val() == "")
-        {
+            $('input[name=radContactMRR]:checked').val() == "") {
             bootbox.alert("You must select at least 1 assignment action to perform the assignment operation.");
             return false;
         }
 
-        if (marketSelectionValid() == false)
-        {
+        if (marketSelectionValid() == false) {
             return false;
         }
 
-        if (stationSelectionValid() == false)
-        {
+        if (stationSelectionValid() == false) {
             return false;
         }
 
         // Recipients
-        if ($("#chkMRRRecipient").is(':checked'))
-        {
+        if ($("#chkMRRRecipient").is(':checked')) {
             var count = $("#ddlReport :selected").length;
 
             if (count <= 0) {
@@ -840,11 +853,10 @@
         return true;
 
     }
-    function areDMAAssignmentsValid()
-    {
+    function areDMAAssignmentsValid() {
 
         // Recipients
- 
+
         var count = $("#ddlReportDMA :selected").length;
 
         if (count <= 0) {
@@ -862,34 +874,28 @@
 
         return true;
     }
-    function areXRYAssignmentsValid()
-    {
+    function areXRYAssignmentsValid() {
 
         // at least 1 action
         if ($("#chkXRYRecipient").is(':checked') == false &&
-            $('input[name=radContactXRY]:checked').val() == "")
-        {
+            $('input[name=radContactXRY]:checked').val() == "") {
             bootbox.alert("You must select at least 1 assignment action to perform the assignment operation.");
             return false;
         }
 
-        if (marketSelectionValid() == false)
-        {
+        if (marketSelectionValid() == false) {
             return false;
         }
 
-        if (stationSelectionValid() == false)
-        {
+        if (stationSelectionValid() == false) {
             return false;
         }
 
         // Recipients
-        if ($("#chkXRYRecipient").is(':checked'))
-        {
+        if ($("#chkXRYRecipient").is(':checked')) {
             var count = $("#ddlAccessXRY :selected").length;
 
-            if (count <= 0)
-            {
+            if (count <= 0) {
                 bootbox.alert("You must select an Access Level to perform the assignment operation.");
                 return false;
             }
@@ -898,47 +904,190 @@
         return true;
 
     }
+
+    function doCorporateAssignment() {
+
+        if (isCorporateAssignmentValid() == false) {
+            return false;
+        } else {
+            beginCorporateAssignment();
+        }
+
+    }
+
+    function beginCorporateAssignment() {
+
+        switch ($("#ddlProduct").val().toString().toUpperCase()) {
+            case "MRR":
+                return assignMRRCorporate();
+            case "XRY":
+                return assignXRYCorporate();
+            default:
+                return false;
+        }
+
+    }
+
+    function assignMRRCorporate() {
+
+        var marketArray = new Array();
+
+        if ($("#chkSelectedMarketsCorpAssign").is(':checked') == false) {
+            $("#ddlMarketCorpAssign option:selected").each(function () {
+                marketArray.push($(this).val());
+            });
+        }
+
+        var url = ServicePrefix + '/api/MRR/InsertMRRCorporateAssignment';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelId,
+                "inOwnerId": $("#ddlOwnerCorpAssign").val(),
+                "inMarketList": marketArray
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                assignMRRCorporateSuccess(data, textStatus, jQxhr);
+
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                closeCorporateDialog();
+                MKAErrorMessageRtn(errorThrown);
+            }
+
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function assignMRRCorporateSuccess(data, textStatus, jQxhr) {
+        closeCorporateDialog();
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            bootbox.alert("MRR Corporate Assignment completed successfully.");
+        }
+        loadPersonnelAssignmentList("dtPersonnelAssignmentList");
+    }
+
+    function assignXRYCorporate() {
+
+        var marketArray = new Array();
+
+        if ($("#chkSelectedMarketsCorpAssign").is(':checked') == false) {
+            $("#ddlMarketCorpAssign option:selected").each(function () {
+                marketArray.push($(this).val());
+            });
+        }
+
+        var url = ServicePrefix + '/api/XRAY/InsertXRYCorporateAssignment';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelId,
+                "inOwnerId": $("#ddlOwnerCorpAssign").val(),
+                "inAccessLevelId": $("#ddlAccessXRYCorpAssign").val(),
+                "inMarketList": marketArray
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                assignXRYCorporateSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                closeCorporateDialog();
+                MKAErrorMessageRtn(errorThrown);
+            }
+        }
+        $.ajax(url, settings);
+    }
+
+    function assignXRYCorporateSuccess(data, textStatus, jQxhr) {
+        closeCorporateDialog();
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            bootbox.alert("Corporate Assignment completed successfully.");
+        }
+        loadPersonnelAssignmentList("dtPersonnelAssignmentList");
+    }
+
+    function isCorporateAssignmentValid() {
+
+        if ($("#ddlOwnerCorpAssign").val() == "") {
+            corporateDialogErrorMessage("You must select an Owner to perform the assignment operation.");
+            return false;
+        }
+
+        var marketCount = $("#ddlMarketCorpAssign :selected").length;
+
+        if (marketCount <= 0) {
+            corporateDialogErrorMessage("You must select at least 1 market to perform the assignment operation.");
+            return false;
+        }
+
+        if ($("#ddlProduct").val().toUpperCase() == "XRY") {
+            var accessCount = $("#ddlAccessXRYCorpAssign :selected").length;
+
+            if (accessCount <= 0) {
+                corporateDialogErrorMessage("You must select an Access Level to perform the assignment operation.");
+                return false;
+            }
+        }
+    }
+
+    function corporateDialogErrorMessage(errorMessage) {
+        closeCorporateDialog();
+        bootbox.alert(errorMessage, function () {
+            setTimeout("openCorporateDialog()", 1);
+        });
+    }
+
+
     //--------------------------------//
     // Assignment end
     //--------------------------------//
 
-    function resetFiltersAndRefreshGrid(filter)
-    {
-        if (filter.toLowerCase() == "station")
-        {
+    function resetFiltersAndRefreshGrid(filter) {
+        if (filter.toLowerCase() == "station") {
             $("#ddlMarket").val("");
             $("#ddlOwner").val("");
         }
 
-        if (filter.toLowerCase() == "market")
-        {
+        if (filter.toLowerCase() == "market") {
             $("#ddlStationProduct").val("");
             $("#ddlOwner").val("");
         }
 
-        if (filter.toLowerCase() == "owner")
-        {
+        if (filter.toLowerCase() == "owner") {
             $("#ddlMarket").val("");
             $("#ddlStationProduct").val("");
         }
 
         loadPersonnelAssignmentList('dtPersonnelAssignmentList');
     }
-    function pullQSData()
-    {
+    function pullQSData() {
         personnelId = getParameterByName("PersonnelId");
         if (personnelId == null) {
             window.location = "/admin/login/dashboard.html";
         }
-        
+
         //gets nameOfUser param from /admin/personnel/personnellist.html page
         getPageParameters();
 
         $("#nameOfPersonnel").html(nameOfUser.toUpperCase());
     }
 
-    function setUI()
-    {
+    function setUI() {
         $("body").on("click", "#clear_search_button",
                      function () {
                          var table = $("#dtPersonnelList").DataTable();
@@ -946,38 +1095,32 @@
                      });
     }
 
-    function selectItems(controlchecked, control)
-    {
+    function selectItems(controlchecked, control) {
 
-        if ($("#" + controlchecked).is(':checked') == false)
-        {
+        if ($("#" + controlchecked).is(':checked') == false) {
             $("#" + control + " option:selected").each(function () {
- 
+
                 $(this).prop("selected", false);
             });
         }
-        else
-        {
+        else {
             $("#" + control + " option").each(function () {
                 $(this).prop("selected", true);
             });
         }
     }
-    function uncheckACheckbox(controlToUncheck)
-    {
+    function uncheckACheckbox(controlToUncheck) {
         $("#" + controlToUncheck).prop("checked", false);
     }
 
-    function uncheckAllCheckboxes()
-    { 
+    function uncheckAllCheckboxes() {
         $("#chkSelectedStations").prop("checked", false);
         $("#chkSelectedReportsDMA").prop("checked", false);
         $("#chkSelectedReports").prop("checked", false);
         $("#chkSelectedRepFirms").prop("checked", false);
     }
 
-    function loadScreenForProductChange()
-    {
+    function loadScreenForProductChange() {
         // Hide all choices
         $(".ProductChoices").hide();
 
@@ -989,10 +1132,8 @@
         uncheckAllCheckboxes();
 
         // special scenario for MRR
-        if ($("#ddlProduct").val().toString().toLowerCase() != 'mrr')
-        {
-            if ($("input[name='dataView']:checked").val().toLowerCase() == "report")
-            {
+        if ($("#ddlProduct").val().toString().toLowerCase() != 'mrr') {
+            if ($("input[name='dataView']:checked").val().toLowerCase() == "report") {
                 $('input:radio[name="dataView"]').filter('[value="station"]').attr('checked', true);
             }
         }
@@ -1002,15 +1143,16 @@
             $("#btnAssign").hide();
             $("#marketChoice").hide();
         }
-        else
-        {
+        else {
             $("#btnAssign").show();
             $("#marketChoice").show();
         }
 
+        hideShowCorporateAssign();
+
         scrollToAnchor('workArea');
         loadMarketList();
-        loadOwnerList();
+        loadOwnerList('ddlOwner');
         loadStationListByProduct();
         loadPersonnelAssignmentList("dtPersonnelAssignmentList");
 
@@ -1018,47 +1160,51 @@
 
     }
 
-    function loadPersonnelAssignmentList(dataTable)
-    {
-        if ($("#ddlProduct").val() == "MSS")
-        {
+    function hideShowCorporateAssign() {
+
+        if ($("#ddlProduct").val().toUpperCase() == "MRR" || $("#ddlProduct").val().toUpperCase() == "XRY") {
+            $("#btnCorporateAssignInitiate").show();
+        } else {
+            $("#btnCorporateAssignInitiate").hide();
+        }
+
+    }
+
+    function loadPersonnelAssignmentList(dataTable) {
+        if ($("#ddlProduct").val() == "MSS") {
             destroyDataTable('dtPersonnelAssignmentList');
             $("#NotFunctional").show();
             return;
         }
-        else
-        {
+        else {
             $("#NotFunctional").hide();
         }
 
-        if (!$("input[name='dataView']:checked").val())
-        {
+        if (!$("input[name='dataView']:checked").val()) {
             //bootbox.alert("A view must be selected");
             return;
         }
-        if ($("#ddlProduct").val() == "")
-        {
+        if ($("#ddlProduct").val() == "") {
             return;
         }
 
         var apiParameters = new Object();
         var columns = [];
         var apiToken = getLocalStorage("APIToken");
- 
+
         // need to branch here by product...
         var api = '/api/' + getProductController($("#ddlProduct").val()) + '/Get' + $("#ddlProduct").val() + 'PersonnelAssignmentsBy';
         api = api + $("input[name='dataView']:checked").val();
         api = api + "?inApiToken=" + apiToken;
         api = api + "&inPersonnelId=" + personnelId;
 
-        if ($("#ddlStationProduct").val() != "")
-        {
+        if ($("#ddlStationProduct").val() != "") {
             api = api + "&inStationId=" + $("#ddlStationProduct").val();
         }
         if ($("#ddlOwner").val() != "") {
             api = api + "&inOwnerId=" + $("#ddlOwner").val();
         }
- 
+
         if ($("#ddlMarket").val() != "") {
             api = api + "&inMarketId=" + $("#ddlMarket").val();
         }
@@ -1093,61 +1239,54 @@
         });
     }
 
-    function destroyDataTable(tableToDestroy)
-    {
-        if ($.fn.DataTable.isDataTable('#' + tableToDestroy))
-        {
-                var searchTable = $('#' + tableToDestroy).DataTable();
-                searchTable.destroy();
-                $('#' + tableToDestroy).hide();
+    function destroyDataTable(tableToDestroy) {
+        if ($.fn.DataTable.isDataTable('#' + tableToDestroy)) {
+            var searchTable = $('#' + tableToDestroy).DataTable();
+            searchTable.destroy();
+            $('#' + tableToDestroy).hide();
         }
 
         resetDataTableDOM(tableToDestroy, tableToDestroy + "Holder");
     }
 
-    function buildColumnsArray(dataObj, dataTable)
-    {
+    function buildColumnsArray(dataObj, dataTable) {
 
         columnsToDisplay = new Array();
 
-        if ($("input[name='dataView']:checked").val() == "market")
-        {
+        if ($("input[name='dataView']:checked").val() == "market") {
             columnsToDisplay.push("Market");
- 
+
             columnsToDisplay.push("Role");
             columnsToDisplay.push("Station Count");
- 
+
         }
 
-        if ($("input[name='dataView']:checked").val() == "owner")
-        {
- 
+        if ($("input[name='dataView']:checked").val() == "owner") {
+
             columnsToDisplay.push("Owner");
- 
+
             columnsToDisplay.push("Role");
             columnsToDisplay.push("Station Count");
- 
+
         }
 
 
-        if ($("input[name='dataView']:checked").val() == "role")
-        {
- 
+        if ($("input[name='dataView']:checked").val() == "role") {
+
             columnsToDisplay.push("Role");
             columnsToDisplay.push("Station Count");
- 
+
         }
 
-        if ($("input[name='dataView']:checked").val() == "station")
-        {
+        if ($("input[name='dataView']:checked").val() == "station") {
             columnsToDisplay.push("Market");
             columnsToDisplay.push("Owner");
             columnsToDisplay.push("Station");
             columnsToDisplay.push("Role");
- 
+
             columnsToDisplay.push("Report Count");
         }
- 
+
         if ($("input[name='dataView']:checked").val() == "report") {
             columnsToDisplay.push("Market");
             columnsToDisplay.push("Owner");
@@ -1174,19 +1313,15 @@
         columns = new Array();
         var bCreateSpecialExportCol = false;
 
-        $.each(data, function (objectName, objectValue)
-        {
+        $.each(data, function (objectName, objectValue) {
 
-            if (columnsToDisplay.includes(objectName))
-            {
+            if (columnsToDisplay.includes(objectName)) {
                 var className = "";
 
-                if (isNaN(objectValue) == false)
-                {
+                if (isNaN(objectValue) == false) {
                     className = "text-align-right";
                 }
-                switch (objectName)
-                {
+                switch (objectName) {
                     case "Market":
                         {
                             // This is the exportable column
@@ -1220,12 +1355,10 @@
                                         (bTVBRecip == true) ||
                                         ($("#ddlProduct").val().toString().toLowerCase() == 'tvb' && row["Role"].toString().toLowerCase() == "rep firm contact") ||
                                         ($("#ddlProduct").val().toString().toLowerCase() == 'mrr' && row["Role"].toString().toLowerCase() == "recipient") ||
-                                        ($("#ddlProduct").val().toString().toLowerCase() == 'xry'  && row["Role"].toString().toLowerCase().indexOf('contact') == -1 ))
-                                    {
+                                        ($("#ddlProduct").val().toString().toLowerCase() == 'xry' && row["Role"].toString().toLowerCase().indexOf('contact') == -1)) {
                                         return row["Market"] + '&nbsp;<a href="#" onclick="buildMarketLevelRemove(\'' + row.MarketId + '\', ' + '\'' + row.Market + '\', ' + '\'' + row.Role + '\'' + ');"><img src="/images/red-x.png" width="20" height="20" title="remove market assignment" alt="remove market assignment"></a>';
                                     }
-                                    else
-                                    {
+                                    else {
                                         return row["Market"];
                                     }
 
@@ -1255,13 +1388,11 @@
                                 "title": objectName,
                                 "visible": true,
                                 "mRender": function (data, type, row) {
-                                    if (    $("#ddlProduct").val().toString().toLowerCase() == 'mrr' && 
-                                            row["Role"].toString().toLowerCase() == "recipient")
-                                    {
+                                    if ($("#ddlProduct").val().toString().toLowerCase() == 'mrr' &&
+                                            row["Role"].toString().toLowerCase() == "recipient") {
                                         return row["Report"] + '&nbsp;<a href="#" onclick="buildReportLevelRemove(\'' + row.StationId + '\', ' + '\'' + row.Station + ':&nbsp;' + row.Report + '\', ' + '\'' + row.MarketId + '\', ' + '\'' + row.Role + '\',' + '\'' + row.ReportId + '\' ' + ');"><img src="/images/red-x.png" width="20" height="20" title="remove report assignment" alt="remove report assignment"></a>';
                                     }
-                                    else
-                                    {
+                                    else {
                                         return row["Report"]
                                     }
                                 },
@@ -1291,12 +1422,10 @@
                                 "visible": true,
                                 "mRender": function (data, type, row) {
 
-                                    if (row["Station"] == "N/A")
-                                    {
+                                    if (row["Station"] == "N/A") {
                                         return row["Station"];
                                     }
-                                    else
-                                    {
+                                    else {
                                         return row["Station"] + '&nbsp;<a href="#" onclick="buildStationLevelRemove(\'' + row.StationId + '\', ' + '\'' + row.Station + '\', ' + '\'' + row.MarketId + '\', ' + '\'' + row.Role + '\'' + ');"><img src="/images/red-x.png" width="20" height="20" title="remove station assignment" alt="remove station assignment"></a>';
                                     }
                                 },
@@ -1315,8 +1444,7 @@
                             "visible": true,
                             "mRender": function (data, type, row) {
 
-                                if ($("#ddlProduct").val().toString().toLowerCase() == 'tvb' && row["Role"].toString().toLowerCase() == "estimated contact")
-                                {
+                                if ($("#ddlProduct").val().toString().toLowerCase() == 'tvb' && row["Role"].toString().toLowerCase() == "estimated contact") {
                                     bCreateSpecialExportCol = true;
                                     return row["Role"] + '&nbsp;<a href="#" onclick="buildMarketLevelRemove(\'' + row.MarketId + '\', ' + '\'' + row.Role + '\', ' + '\'' + row.Role + '\'' + ');"><img src="/images/red-x.png" width="20" height="20" title="remove role assignment" alt="remove role assignment"></a>';
                                 }
@@ -1376,16 +1504,13 @@
         loadResults(dataObj, columns, dataTable);
     }
 
-    function IsThisATVBRecipient(label)
-    {
+    function IsThisATVBRecipient(label) {
         var bReturn = false;
 
-        $("#ddlAccessTVB option").each(function ()
-        {
- 
-            if ($(this).text().toString().toLowerCase() == label.toLowerCase())
-            {
- 
+        $("#ddlAccessTVB option").each(function () {
+
+            if ($(this).text().toString().toLowerCase() == label.toLowerCase()) {
+
                 bReturn = true;
             }
         });
@@ -1393,14 +1518,11 @@
         return bReturn;
 
     }
-    function getProductController(product)
-    {
-        if (product.toLowerCase() == 'xry')
-        {
+    function getProductController(product) {
+        if (product.toLowerCase() == 'xry') {
             return 'xray';
         }
-        else
-        {
+        else {
             return product;
         }
     }
@@ -1428,11 +1550,11 @@
 
         destroyDataTable(dataTable);
 
-        //this code rebuilds the datatable with the updated data from the search 
+        //this code rebuilds the datatable with the updated data from the search
         //or initial load.
-       
+
         //////If you want to repopulate the datatable with new columns and data,
-        //////you need to remove the datatable from the DOM. 
+        //////you need to remove the datatable from the DOM.
         //////The .remove function will remove it.
         ////$("#" + dataTable).remove();
 
@@ -1488,23 +1610,20 @@
         });
 
     }
-    function resetRelatedControl(masterControl, controlToChange, relatedCheckbox)
-    {
- 
-        $('#' + controlToChange + ' option').each(function(){
- 
-             this .selected = false;
+    function resetRelatedControl(masterControl, controlToChange, relatedCheckbox) {
+
+        $('#' + controlToChange + ' option').each(function () {
+
+            this.selected = false;
 
         });
- 
-        if (!relatedCheckbox == false)
-        {
+
+        if (!relatedCheckbox == false) {
             uncheckACheckbox(relatedCheckbox);
         }
- 
+
     }
-    function loadStationList()
-    {
+    function loadStationList() {
         var str = '';
         var controlToLoad = "#ddlStation";
 
@@ -1512,8 +1631,7 @@
         uncheckAllCheckboxes();
 
         // no market select
-        if ($("#ddlMarketAssign").val() == "")
-       {
+        if ($("#ddlMarketAssign").val() == "") {
             $("#ddlReport").html("");
             $("#ddlReportDMA").html("");
             $("#ddlStation").html("");
@@ -1576,16 +1694,13 @@
 
     }
 
-    function loadProductSpecificAssignmentLists()
-    {
-        if ($("#ddlProduct").val().toString().toLowerCase() == 'mrr')
-        {
+    function loadProductSpecificAssignmentLists() {
+        if ($("#ddlProduct").val().toString().toLowerCase() == 'mrr') {
             loadReportList();
         }
 
-        if ($("#ddlProduct").val().toString().toLowerCase() == 'xry')
-        {
-            loadXrayAccessLevelList();
+        if ($("#ddlProduct").val().toString().toLowerCase() == 'xry') {
+            loadXrayAccessLevelList("ddlAccessXRY");
         }
 
         if ($("#ddlProduct").val().toString().toLowerCase() == 'dma') {
@@ -1593,17 +1708,15 @@
 
         }
 
-        if ($("#ddlProduct").val().toString().toLowerCase() == 'tvb')
-        {
+        if ($("#ddlProduct").val().toString().toLowerCase() == 'tvb') {
             loadRepFirmList();
             loadTVBAccessLevelList();
         }
     }
 
-    function loadXrayAccessLevelList()
-    {
+    function loadXrayAccessLevelList(control) {
         var str = '';
-        var controlToLoad = "#ddlAccessXRY";
+        var controlToLoad = "#" + control;
 
         $(controlToLoad).html("");
         //str = str + '<option value="">';
@@ -1618,7 +1731,7 @@
         apiParameters["inMarketId"] = $("#ddlMarket").val();
 
 
-        var api = 
+        var api =
 
         $.ajax({
             url: ServicePrefix + '/api/XRAY/GetXRYAccessLevelList?inApiToken=' + apiToken,
@@ -1661,8 +1774,7 @@
 
     }
 
-    function loadReportListDMA()
-    {
+    function loadReportListDMA() {
         var str = '';
         var controlToLoad = "#ddlReportDMA";
 
@@ -1718,8 +1830,7 @@
 
 
     }
-    function loadReportList()
-    {
+    function loadReportList() {
         var str = '';
         var controlToLoad = "#ddlReport";
 
@@ -1729,8 +1840,7 @@
         //str = str + '</option>';
         //$(controlToLoad).append(str);
 
-        if ($("#ddlMarketAssign").val() == "")
-        {
+        if ($("#ddlMarketAssign").val() == "") {
             return;
         }
 
@@ -1739,8 +1849,8 @@
 
         apiParameters["inApiToken"] = apiToken;
         apiParameters["inMarketId"] = $("#ddlMarketAssign").val();
- 
- 
+
+
 
 
         $.ajax({
@@ -1798,7 +1908,7 @@
 
 
         $.ajax({
-            url: ServicePrefix + '/api/TVB/GetAccessLevelList?inAPIToken='+getLocalStorage("APIToken"),
+            url: ServicePrefix + '/api/TVB/GetAccessLevelList?inAPIToken=' + getLocalStorage("APIToken"),
             dataType: 'json',
             type: 'get',
             contentType: 'application/json',
@@ -1848,7 +1958,7 @@
         //str = str + '</option>';
 
         $(controlToLoad).append(str);
- 
+
 
         $.ajax({
             url: ServicePrefix + '/api/RepFirm/GetRepFirmList',
@@ -1856,7 +1966,7 @@
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken") 
+                "inApiToken": getLocalStorage("APIToken")
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -1880,7 +1990,7 @@
 
                     });
 
- 
+
 
                 }
 
@@ -1917,7 +2027,7 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inPersonnelId": personnelId,
                 "inProductId": $("#ddlProduct").val(),
-                "inActiveOnly" : true
+                "inActiveOnly": true
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -2011,22 +2121,21 @@
 
 
     }
-    function loadOwnerList() {
+    function loadOwnerList(control) {
 
         var str = '';
 
-        if ($("#ddlProduct").val()=="")
-        {
+        if ($("#ddlProduct").val() == "") {
             return;
         }
 
 
-        $("#ddlOwner").html("");
+        $("#" + control).html("");
         str = str + '<option value="">';
         str = str + '-- Select an Owner';
         str = str + '</option>';
 
-        $("#ddlOwner").append(str);
+        $("#" + control).append(str);
 
         $.ajax({
             url: ServicePrefix + '/api/Personnel/GetPersonnelAssignedOwnershipList',
@@ -2056,11 +2165,11 @@
                         str = str + obj.ownerName;
                         str = str + '</option>';
 
-                        $("#ddlOwner").append(str);
+                        $("#" + control).append(str);
 
                     });
 
-                    convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+                    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
                 }
 
@@ -2077,8 +2186,7 @@
 
         var str = '';
 
-        if ($("#ddlProduct").val() == "")
-        {
+        if ($("#ddlProduct").val() == "") {
             return;
         }
 
@@ -2120,7 +2228,7 @@
                         $("#ddlStationProduct").append(str);
 
                     });
-                    
+
                     convertToChosenSelect("ddlStationProduct", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
                 }
@@ -2155,22 +2263,24 @@
         }
 
     }
-    function buildMarketLevelRemove(marketId, descriptor, role, reportId)
-    {
-        buildStationLevelRemove(-1, descriptor, marketId, role, -1);
+    function buildMarketLevelRemove(marketId, descriptor, role, reportId) {
+        buildStationLevelRemove(null, descriptor, marketId, role, -1);
     }
-    function buildReportLevelRemove(stationId, descriptor, marketId, role, reportId)
-    {
+    function buildReportLevelRemove(stationId, descriptor, marketId, role, reportId) {
         buildStationLevelRemove(stationId, descriptor, marketId, role, reportId);
     }
 
-    function buildStationLevelRemove(stationId, descriptor, marketId, role, reportId)
-    {
+    function buildStationLevelRemove(stationId, descriptor, marketId, role, reportId) {
+
         if (!reportId) {
             reportId = -1;
         }
 
-        if (!stationId) {
+        //if (!stationId) {
+        //    stationId = -1;
+        //}
+
+        if (stationId == 'CLUSTER') {
             stationId = -1;
         }
 
@@ -2199,22 +2309,19 @@
 
         var msg = "Are you sure you want to remove " + role + " assignments for " + descriptor;
 
-        bootbox.confirm(msg + "?", function (result)
-        {
-            if (result == false)
-            {
+        bootbox.confirm(msg + "?", function (result) {
+            if (result == false) {
                 return;
-            }  
-            else
-            {
+            }
+            else {
                 assignAJAX(inputObject, $("#ddlProduct").val(), $("#ddlProduct").val() + " Assignments Removed");
             }
 
 
         });
     }
-    function buildMRRRemoveObject(stationId, marketId, role, reportId)
-    {
+    function buildMRRRemoveObject(stationId, marketId, role, reportId) {
+
         var stationArray = new Array();
         var reportArray = new Array();
 
@@ -2240,16 +2347,13 @@
         var isRecipient = false;
 
 
-        if (role.toLowerCase().toString().indexOf("contact") > -1)
-        {
+        if (role.toLowerCase().toString().indexOf("contact") > -1) {
             isContact = true;
         }
-        if (role.toLowerCase() == "recipient")
-        {
+        if (role.toLowerCase() == "recipient") {
             isRecipient = true;
         }
-        if (role.toLowerCase() == "manager" || role.toLowerCase() == "administrator")
-        {
+        if (role.toLowerCase() == "manager" || role.toLowerCase() == "administrator") {
             isAdministrator = true;
         }
 
@@ -2268,8 +2372,7 @@
 
         return inputObject;
     }
-    function buildDMARemoveObject(stationId, marketId, role, reportId)
-    {
+    function buildDMARemoveObject(stationId, marketId, role, reportId) {
         var stationArray = new Array();
         var reportArray = new Array();
 
@@ -2297,8 +2400,7 @@
 
         return inputObject;
     }
-    function buildXRYRemoveObject(stationId, marketId, role, accessId)
-    {
+    function buildXRYRemoveObject(stationId, marketId, role, accessId) {
         var isContact = false;
         var isPrimaryContact = false;
         var isRecipient = false;
@@ -2307,8 +2409,7 @@
         if (role.toLowerCase().toString().indexOf("contact") > -1) {
             isContact = true;
         }
-        else
-        {
+        else {
             isRecipient = true;
         }
 
@@ -2346,8 +2447,7 @@
 
     }
 
-    function buildTVBRemoveObject(stationId, marketId, role, accessId)
-    {
+    function buildTVBRemoveObject(stationId, marketId, role, accessId) {
         var repFirmArray = new Array();
         var stationArray = new Array();
 
@@ -2357,27 +2457,23 @@
         var isEstimatedContact = false;
         var isRepFirmContact = false;
 
-        if (role.toString().toLowerCase() == "secondary contact" || role.toString().toLowerCase() == "primary contact")
-        {
+        if (role.toString().toLowerCase() == "secondary contact" || role.toString().toLowerCase() == "primary contact") {
             isContact = true;
         }
 
         isRecipient = IsThisATVBRecipient(role.toString().toLowerCase());
-        
-        if (role.toString().toLowerCase() == 'manager')
-        {
+
+        if (role.toString().toLowerCase() == 'manager') {
             isAdministrator = true;
         }
 
-        if (role.toString().toLowerCase() == 'estimated contact')
-        {
+        if (role.toString().toLowerCase() == 'estimated contact') {
             isEstimatedContact = true;
         }
-        
-        if (role.toString().toLowerCase() == "rep firm contact")
-        {
+
+        if (role.toString().toLowerCase() == "rep firm contact") {
             isRepFirmContact = true;
- 
+
         }
 
         var stationArray = new Array();
@@ -2410,10 +2506,86 @@
             "inIsRecipient": isRecipient.toString(),
             "inDeleteOperation": true
         });
- 
+
 
         return inputObject;
 
     }
-</script>
 
+    function corporateAssignInitiate() {
+
+        loadOwnerList("ddlOwnerCorpAssign");
+        $("#ddlMarketCorpAssign").html("");
+        $("#chkSelectedMarketsCorpAssign").prop("checked", false);
+
+        if ($("#ddlProduct").val().toUpperCase() == "MRR") {
+            $("#corpAssignAccessXRY").hide();
+        }
+
+        if ($("#ddlProduct").val().toUpperCase() == "XRY") {
+            $("#corpAssignAccessXRY").show();
+            loadXrayAccessLevelList("ddlAccessXRYCorpAssign");
+        }
+
+        $("#corporateAssignDialog").dialog("open");
+
+    }
+
+    function loadMarketListByOwner() {
+
+        if ($("#ddlOwnerCorpAssign").val() == "") {
+            return;
+        }
+
+        var url = ServicePrefix + '/api/Market/GetMarketListByOwnerProduct';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerId": $("#ddlOwnerCorpAssign").val(),
+                "inProductId": $("#ddlProduct").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                loadMarketListByOwnerSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function loadMarketListByOwnerSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage);
+        } else {
+            var str = '';
+
+            $.each(data.report.rows, function (index) {
+                str = str + '<option value="' + data.report.rows[index].MarketId + '">' + data.report.rows[index].Market + '</option>';
+            });
+
+            $("#ddlMarketCorpAssign").html(str);
+
+        }
+    }
+
+    function closeCorporateDialog() {
+        $("#corporateAssignDialog").dialog("close");
+    }
+
+    function openCorporateDialog() {
+        $("#corporateAssignDialog").dialog("open");
+    }
+
+    function userExitedDialog() {
+        console.log("user has exited dialog.");
+    }
+
+</script>

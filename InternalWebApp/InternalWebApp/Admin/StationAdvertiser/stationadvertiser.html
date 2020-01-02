@@ -65,15 +65,16 @@
 
         <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
-                <div id="divQuickReport" style="float:right;padding-right:0px;padding-bottom:10px">
-                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
-                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
-                </div>
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
                         <h2>Station Advertiser</h2>
                     </div>
                 </div>
+                <div id="divQuickReport"  >
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>
+
                 <div class="text-center" style="margin-top: 0">
                     <!--
                     station,
@@ -145,7 +146,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <div>
-                                <input value="Search Market Advertiser" onclick="searchMarketAdvertiser();" class="default-button" type="button">
+                                <input value="Search Market Advertiser" onclick="excludeFromBackButton(); searchMarketAdvertiser();" class="default-button" type="button">
                             </div>
                         </div>
                     </div>
@@ -158,7 +159,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <div>
-                                <input value="Link Market Advertiser" onclick="linkMarketAdvertiserQuestion();" class="default-button" type="button">
+                                <input value="Link Market Advertiser" onclick="excludeFromBackButton(); linkMarketAdvertiserQuestion();" class="default-button" type="button">
                             </div>
                         </div>
                     </div>
@@ -209,11 +210,11 @@
                             </div>
                             <div class="col-md-9 text-align-left">
                                 <div>
-                                    <input value="Update" onclick="updateStationAdvertiser()" class="default-button" type="button">
+                                    <input value="Update" onclick="excludeFromBackButton(); updateStationAdvertiser();" class="default-button" type="button">
                                 </div>
-                                <div style="padding-top: 10px">
-                                    <input value="Back" onclick="determineGoBack();" class="default-button" type="button">
-                                </div>
+                                <!--<div style="padding-top: 10px">
+                                    <input value="Back" onclick="updatedGoBack();" class="default-button" type="button">
+                                </div>-->
                             </div>
                         </div>
                     </div>
@@ -890,7 +891,9 @@
 
                     //console.log($("#txtPreviousPageLocation").val());
                     bootbox.alert("The station advertiser has been matched.", function () {
-                        window.location = $("#txtPreviousPageLocation").val();
+                        //window.location = $("#txtPreviousPageLocation").val();
+                        //window.location = getBackButtonPage();
+                        updatedGoBack();
                     });
                 }
 
@@ -904,9 +907,19 @@
 
     function determineGoBack() {
 
-        if (bIsAdvMatch || getLocalStorage("newAdvertiserMatch").length > 0) {
+        //if (bIsAdvMatch || getLocalStorage("newAdvertiserMatch").length > 0) {
 
-            window.location = $("#txtPreviousPageLocation").val();
+        //    window.location = $("#txtPreviousPageLocation").val();
+        //}
+
+        gExcludeFromBackButton = true;
+
+        if (hasBackButtonData())
+        {
+            //var backButtonData = getBackButtonLastItem();
+            
+            //window.location = backButtonData.previousPage;
+            window.location = getBackButtonPage();
         }
         else if (bIsFromReport || getLocalStorage("reportActionData").length > 0) {
             var reportData = $.parseJSON(getLocalStorage("reportActionData"));

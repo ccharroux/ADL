@@ -55,8 +55,52 @@
     <![endif]-->
 
     <style type="text/css">
-        h3 { text-align: center; }
-        .container-wide { width: 90%; margin-left: 25px; margin-right: 25px; }
+        .heading
+        {
+            background-color: #566573;
+            color: white;
+        }
+        h3 
+        { 
+            text-align: center; 
+        }
+        .container-wide 
+        { 
+            width: 95%; 
+            margin-left:5px; 
+            margin-right: 5px; 
+
+        }
+        td, th{
+            font-size:11px;
+        }
+        .rightJ
+        {
+            text-align:right;
+        }
+        .leftJ {
+            text-align:left;
+        }
+        .centerJ {
+            text-align:center;
+        }
+        .borderRight
+        {
+            border-bottom:silver 1px solid;
+            border-right: silver 1px solid;
+        }
+        .borderBottom
+        {
+            border-bottom:silver 1px solid;
+        }
+        #dtDeclined
+        {
+            width: 100%!important;
+        }  
+        #dt
+        {
+            width: 100%!important;
+        }
     </style>
 
 </head>
@@ -81,137 +125,124 @@
                 <div class="row search-section">
                     <div class="col-md-12">
                         <div class="text-align-center">
-                            <div class="col-md-3">
+                            <div class="col-md-4">
+                                <label>View</label><br />
+                                <input type="radio" name="view" onclick="swapView(this.value);" value="confirmableData" checked="checked" />&nbsp;Confirm Data&nbsp;
+                                <input type="radio" name="view" onclick="swapView(this.value);" value="declinedData" />&nbsp;Declined Data&nbsp;
+                                <input type="radio" name="view" onclick="showAll();" />&nbsp;Both
+                            </div>
+                            <div class="col-md-4">
                                 <label for="ddlYearPeriod">Year-Period</label><br />
                                 <select id="ddlYearPeriod" onchange="getOwners();"></select><br />
                             </div>
-                            <div class="col-md-3 form-group rptView rptOwner">
+                            <div class="col-md-4 form-group rptView rptOwner confirmableData">
                                 <label for="ddlOwner" class="dropdown-label rptView rptOwner">Owner</label><br />
                                 <select id="ddlOwner" apiInput="inOwnerId" class="dropdown-select rptView rptOwner" onchange="getData();"></select>
                             </div>
-                            <div class="col-md-5">
-                                <span style="margin-top:5px;margin-bottom:5px">
-                                    <input type="button" id="btnSelectAll" value="Select All" onclick="selectAllStations();" />
-                                    &nbsp; &nbsp;
-                                    <input type="button" id="btnClearAll" value="Clear All" onclick="clearAllStations();" />
-                                    &nbsp; &nbsp;
-                                    <input type="button" id="btnDivideBy1000" value="Divide by 1000" onclick="divideRevenueBy1000();" />
-                                    &nbsp; &nbsp;
-                                    <input type="button" id="btnConfirm" value="Confirm" onclick="confirmRevenue();" />
-                                    &nbsp; &nbsp;
-                                    <input type="button" id="btnDelete" value="Delete" onclick="deleteRevenue();" />
-                                </span>
-                            </div>
+                           
                         </div>
+                    </div>
+                    <div class="col-md-12 confirmableData noDataShown"  style="text-align:center">
+                        <hr />
+                        <span style="margin-top:5px;margin-bottom:5px">
+                            <input type="button" id="btnDivideBy1000" value="Divide by 1000" onclick="divideRevenueBy1000();" />
+                            &nbsp; &nbsp;
+                            <input type="button" id="btnConfirm" value="Confirm" onclick="confirmRevenue();" />
+                            &nbsp; &nbsp;
+                            <input type="button" id="btnDelete" value="Delete" onclick="deleteRevenue();" />
+                        </span>
                     </div>
                 </div>
 
             </div>
+            <center>
+                <div class="container-wide">
+                    <!-- start datatable coding-->
+                    <div class="noDataShown confirmableData">
+                        <center>
+                            <div class="row" style="width:70%;
+                                border-top:solid 1px silver;
+                                border-left:solid 1px silver;
+                                border-right:solid 1px silver;
+                                border-top-right-radius: 15px;
+                                border-top-left-radius: 15px;
+                                margin: 30px 10px 10px 10px;" id="summaryData">
+                            </div>
+                        </center>
+                    </div>
 
-            <div class="container-wide">
+                    <!--<h3>Available to confirm (Submitted) or already confirmed (Processed)</h3>-->
+                    <div class="confirmableData" id="confirmableDataTable" style="margin-top:10px">
+                        <div style="margin-bottom:-25px">
+                            <h3 style="margin-bottom:0px">Revenue Entries</h3>
+                            <div style="float:left; margin-bottom:10px; margin-top:-30px">
+                                <span style="margin-top:5px;margin-bottom:5px">
+                                    <input type="button" id="btnSelectAll" value="Select All" onclick="selectAllStations();" />
+                                    &nbsp; &nbsp;
+                                    <input type="button" id="btnClearAll" value="Clear All" onclick="clearAllStations();" />
+                                </span>
+                            </div>
+                        </div>
+ 
+                        <div class="dataTable-top-margin">
+                            <table id="dt" class="dataTable-border dataTable-headers dataTable-cell-border">
+                                <thead>
+                                    <tr>
+                                        <th>&nbsp;</th>
+                                        <th class="exportColumn centerJ">Status</th>
+                                        <th class="exportColumn">Station</th>
+                                        <th class="exportColumn">Affiliation</th>
+                                        <th class="exportColumn">Market</th>
+                                        <th class="exportColumn rightJ">Local Non-Political</th>
+                                        <th class="exportColumn rightJ">National Non-Political</th>
+                                        <th class="exportColumn rightJ">Total <br />Non-Political</th>
+                                        <th class="exportColumn rightJ">Local Political</th>
+                                        <th class="exportColumn rightJ">National Political</th>
+                                        <th class="exportColumn rightJ">Total Political</th>
+                                        <th class="exportColumn rightJ">Total <br />Time Sales</th>
+                                        <th class="exportColumn rightJ">Local Digital</th>
+                                        <th class="exportColumn rightJ">National Digital</th>
+                                        <th class="exportColumn rightJ">Total <br />Digital</th>
+                                        <th class="exportColumn rightJ">Mobile</th>
+                                        <th class="exportColumn rightJ">Total <br />Revenue</th>
+                                        <th class="exportColumn">Email</th>
+                                    </tr>
+                                </thead>
 
-                <!-- start datatable coding-->
+                            </table>
+                        </div>
+                    </div>
+                    <div class="declinedData"  id="declinedDataTable"  style="display:none;margin-top:50px">
+                        <h3 style="margin-bottom:-50px">Declined Entries <span style="font-size:medium">(all owners)</span></h3>
+                        <div class="dataTable-top-margin">
+                            <table id="dtDeclined" class="dataTable-border dataTable-headers dataTable-cell-border">
+                                <thead>
+                                    <tr>
+                                        <th class="exportColumn">Station</th>
+                                        <th class="exportColumn">Affiliation</th>
+                                        <th class="exportColumn">Market</th>
+                                        <th class="exportColumn rightJ">Local Non-Political</th>
+                                        <th class="exportColumn rightJ">National Non-Political</th>
+                                        <th class="exportColumn rightJ">Total <br />Non-Political</th>
+                                        <th class="exportColumn rightJ">Local Political</th>
+                                        <th class="exportColumn rightJ">National Political</th>
+                                        <th class="exportColumn rightJ">Total <br />Political</th>
+                                        <th class="exportColumn rightJ">Total <br />Time Sales</th>
+                                        <th class="exportColumn rightJ">Local Digital</th>
+                                        <th class="exportColumn rightJ">National Digital</th>
+                                        <th class="exportColumn rightJ">Total <br />Digital</th>
+                                        <th class="exportColumn rightJ">Mobile</th>
+                                        <th class="exportColumn rightJ">Total <br />Revenue</th>
+                                        <th class="exportColumn">Email</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- end datatable coding-->
+                    </div>
 
-                <h3>Available to confirm (Submitted) or already confirmed (Processed)</h3>
-
-                <div class="dataTable-top-margin">
-                    <table id="dt" class="dataTable-border dataTable-headers dataTable-cell-border">
-                        <thead>
-                            <tr>
-                                <th class="exportColumn">Selected</th>
-                                <th class="exportColumn">Status</th>
-                                <th class="exportColumn">Station</th>
-                                <th class="exportColumn">Affiliation</th>
-                                <th class="exportColumn">Market</th>
-                                <th class="exportColumn">Local Non-Political</th>
-                                <th class="exportColumn">National Non-Political</th>
-                                <th class="exportColumn">Total Non-Political</th>
-                                <th class="exportColumn">Local Political</th>
-                                <th class="exportColumn">National Political</th>
-                                <th class="exportColumn">Total Political</th>
-                                <th class="exportColumn">Total Time Sales</th>
-                                <th class="exportColumn">Local Digital</th>
-                                <th class="exportColumn">National Digital</th>
-                                <th class="exportColumn">Total Digital</th>
-                                <th class="exportColumn">Mobile</th>
-                                <th class="exportColumn">Total Revenues</th>
-                                <th class="exportColumn">Email</th>
-                            </tr>
-                        </thead>
-                        <!--<tfoot>
-                            <tr>
-                                <th>Selected</th>
-                                <th>Status</th>
-                                <th>Station</th>
-                                <th>Affiliation</th>
-                                <th>Market</th>
-                                <th>Local Non-Political</th>
-                                <th>National Non-Political</th>
-                                <th>Total Non-Political</th>
-                                <th>Local Political</th>
-                                <th>National Political</th>
-                                <th>Total Political</th>
-                                <th>Total Time Sales</th>
-                                <th>Local Digital</th>
-                                <th>National Digital</th>
-                                <th>Total Digital</th>
-                                <th>Mobile</th>
-                                <th>Total Revenues</th>
-                                <th>Email</th>
-                            </tr>
-                        </tfoot>-->
-                    </table>
                 </div>
-
-                <h3>Declined (non-owner-specific)</h3>
-
-                <div class="dataTable-top-margin">
-                    <table id="dtDeclined" class="dataTable-border dataTable-headers dataTable-cell-border">
-                        <thead>
-                            <tr>
-                                <th class="exportColumn">Station</th>
-                                <th class="exportColumn">Affiliation</th>
-                                <th class="exportColumn">Market</th>
-                                <th class="exportColumn">Local Non-Political</th>
-                                <th class="exportColumn">National Non-Political</th>
-                                <th class="exportColumn">Total Non-Political</th>
-                                <th class="exportColumn">Local Political</th>
-                                <th class="exportColumn">National Political</th>
-                                <th class="exportColumn">Total Political</th>
-                                <th class="exportColumn">Total Time Sales</th>
-                                <th class="exportColumn">Local Digital</th>
-                                <th class="exportColumn">National Digital</th>
-                                <th class="exportColumn">Total Digital</th>
-                                <th class="exportColumn">Mobile</th>
-                                <th class="exportColumn">Total Revenues</th>
-                                <th class="exportColumn">Email</th>
-                            </tr>
-                        </thead>
-                        <!--<tfoot>
-                            <tr>
-                                <th>Station</th>
-                                <th>Affiliation</th>
-                                <th>Market</th>
-                                <th>Local Non-Political</th>
-                                <th>National Non-Political</th>
-                                <th>Total Non-Political</th>
-                                <th>Local Political</th>
-                                <th>National Political</th>
-                                <th>Total Political</th>
-                                <th>Total Time Sales</th>
-                                <th>Local Digital</th>
-                                <th>National Digital</th>
-                                <th>Total Digital</th>
-                                <th>Mobile</th>
-                                <th>Total Revenues</th>
-                                <th>Email</th>
-                            </tr>
-                        </tfoot>-->
-                    </table>
-                </div>
-                <!-- end datatable coding-->
-
-            </div>
+            </center>
         </div>
     </div>
 
@@ -263,7 +294,7 @@
         loadData();
         loadDeclinedData();
 
-        buildTVBMenu("Revenue");
+        buildTVBMenu("Confirm");
         getYearsPeriods();
         getOwners();
 
@@ -304,7 +335,94 @@
         getOwners();
     }
 
+    function getSummaryData() {
+
+        if ($("#ddlOwner").val() == "")
+        {
+            $("#summaryData").append("");
+            return;
+        }
+
+        var str = "<h3 style='margin: 0;background:#1c84c6; color:white; padding: 10px 0px 10px 0px; border-top-left-radius: 15px; border-top-right-Radius: 15px;'>Summary Data</h3>";
+        str = str + "<div class='row' style='margin-left: 0px;margin-right: 0px;'>";
+
+        str = str + "<div class='col-md-4 heading leftJ borderRight'>&nbsp;</div>";
+
+        str = str + "<div class='col-md-3 heading rightJ borderRight'>Current</div>";
+
+        str = str + "<div class='col-md-3 heading rightJ borderRight'>Prior</div>";
+
+        str = str + "<div class='col-md-2 heading rightJ borderBottom'>Growth</div>";
+
+        str = str + "</div>";
+
+        var url = ServicePrefix + '/api/TVBReport/GetTimeSalesSummaryRevenueToConfirm';
+        url = url + "?inApiToken=" + getLocalStorage("APIToken");
+        url = url + "&inYear=" + currentYear();
+        url = url + "&inPeriod=" + currentPeriod();
+        url = url + "&inOwnerId=" + $("#ddlOwner").val();
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+
+                        str = str + "<div class='row' style='margin-left: 0px;margin-right: 0px;'>";
+
+                        str = str + "<div class='col-md-4 leftJ borderRight'>";
+                        str = str + obj['Row Title'];
+                        str = str + "</div>";
+
+                        str = str + "<div class='col-md-3 rightJ borderRight'>";
+                        str = str + obj['Current Amount'];
+                        str = str + "</div>";
+
+                        str = str + "<div class='col-md-3 rightJ borderRight'>";
+                        str = str + obj['Prior Amount'];
+                        str = str + "</div>";
+
+                        str = str + "<div class='col-md-2 rightJ borderBottom'>";
+                        str = str + obj['Growth Percent'];
+                        str = str + "</div>";
+
+                        str = str + "</div>";
+                    });
+
+                    $("#summaryData").html(str);
+                }
+
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function resetPage()
+    {
+        $("input[name='view'][value='confirmableData']").trigger("click");;
+    }
+
     function getOwners() {
+
+        resetPage();
+        swapView("confirmableData");
+
+        $("#declineableDataTable").hide();
+        $("#confirmableDataTable").hide();
 
         var url = ServicePrefix + '/api/TVB/GetTimeSalesOwnersToConfirm';
 
@@ -348,13 +466,12 @@
 
             $("#ddlOwner").append(str);
 
+            convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
             gotOwners = true;
 
             getData();
 
-            // convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-            // saveLoadedControlSelection("ddlOwner");
 
         }
 
@@ -369,27 +486,76 @@
             "columns": [
                 {
                     mRender: function (data, type, row) {
-                        return '<input type="checkbox" class="chkStation" value="' + row['StationID'] + '" checked="checked">';
+
+                        if (row['Status'].toLowerCase() == "processed" ||
+                            row['Status'].toLowerCase() == "submitted"
+                            ) {
+                            return '<input type="checkbox" status="' + row["Status"] + '" class="chkStation" value="' + row['StationID'] + '" checked="checked">';
+                            
+                        }
+                        else {
+                            return "";
+                        }
                     },
                     "orderable": false,
-                    "searchable": false
+                    "searchable": false,
+                    "className": "centerJ"
                 },
-                { "data": 'Status' },
+                {
+                    "data": 'Status',
+                    "className": "centerJ"
+                },
                 { "data": 'Station' },
                 { "data": 'ReportedAffiliation' },
                 { "data": 'Market' },
-                { "data": 'LocalNonPolitical' },
-                { "data": 'NationalNonPolitical' },
-                { "data": 'TotalNonPolitical' },
-                { "data": 'LocalPolitical' },
-                { "data": 'NationalPolitical' },
-                { "data": 'TotalPolitical' },
-                { "data": 'TotalTimeSales' },
-                { "data": 'LocalDigital' },
-                { "data": 'NationalDigital' },
-                { "data": 'TotalDigital' },
-                { "data": 'Mobile' },
-                { "data": 'TotalRevenues' },
+                {
+                    "data": 'LocalNonPolitical',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'NationalNonPolitical',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'TotalNonPolitical',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'LocalPolitical',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'NationalPolitical',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'TotalPolitical',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'TotalTimeSales',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'LocalDigital',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'NationalDigital',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'TotalDigital',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'Mobile',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'TotalRevenues',
+                    "className": "rightJ"
+                },
                 { "data": 'Email' },
             ],
             "pagingType": "full_numbers",
@@ -469,18 +635,54 @@
                 { "data": 'Station' },
                 { "data": 'ReportedAffiliation' },
                 { "data": 'Market' },
-                { "data": 'LocalNonPolitical' },
-                { "data": 'NationalNonPolitical' },
-                { "data": 'TotalNonPolitical' },
-                { "data": 'LocalPolitical' },
-                { "data": 'NationalPolitical' },
-                { "data": 'TotalPolitical' },
-                { "data": 'TotalTimeSales' },
-                { "data": 'LocalDigital' },
-                { "data": 'NationalDigital' },
-                { "data": 'TotalDigital' },
-                { "data": 'Mobile' },
-                { "data": 'TotalRevenues' },
+                {
+                    "data": 'LocalNonPolitical',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'NationalNonPolitical',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'TotalNonPolitical',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'LocalPolitical',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'NationalPolitical',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'TotalPolitical',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'TotalTimeSales',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'LocalDigital',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'NationalDigital',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'TotalDigital',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'Mobile',
+                    "className": "rightJ"
+                },
+                {
+                    "data": 'TotalRevenues',
+                    "className": "rightJ"
+                },
                 { "data": 'Email' },
             ],
             "pagingType": "full_numbers",
@@ -568,34 +770,73 @@
         return $("#ddlOwner option:selected").text();
     }
 
-    function getStationArray() {
+    function getStationArray(typeOfAction)
+    {
+
+        if (!typeOfAction == true)
+        {
+            typeOfAction = "";
+        }
+
         var stationArray = new Array();
 
         $(".chkStation:checked").each(function () {
+
+            console.log($(this));
             var stationObject = {
                 "stationId": $(this).val(),
                 "selected": true
             }
-            stationArray.push(stationObject);
+
+            if (typeOfAction.toString().toLowerCase() == "divide") {
+                var status = $(this).attr("status");
+                if (status.toLowerCase() != "processed" &&
+                    status.toLowerCase() != "estimated") {
+                    stationArray.push(stationObject);
+                }
+            }
+            else if (typeOfAction.toString().toLowerCase() == "confirm")
+            {
+                var status = $(this).attr("status");
+                if (status.toLowerCase() == "submitted")
+                {
+                    stationArray.push(stationObject);
+                }
+            }
+            else
+            {
+                stationArray.push(stationObject);
+            }
         });
 
         return stationArray;
     }
 
     function getData() {
+
+        $("#declinedDataTable").hide();
+        $("#confirmableDataTable").hide();
+        swapView("confirmableData");
+
         getPendingData();
         getDeclinedData();
+        getSummaryData();
     }
     
-    function getPendingData() {
+    function getPendingData()
+    {
+ 
         if (gotYearsPeriods == false || gotOwners == false) {
             return;
         }
-
+        
         var ownerId = currentOwnerId();
+
         if (ownerId == '') {
             return;
         }
+
+        showHideTables();
 
         //filling out url for ajax
         var url = ServicePrefix + '/api/TVB/GetTimeSalesRevenueToConfirm';
@@ -629,14 +870,19 @@
     }
 
     function getDeclinedData() {
-        if (gotYearsPeriods == false || gotOwners == false) {
+
+        if (gotYearsPeriods == false || gotOwners == false)
+        {
             return;
         }
 
         var ownerId = currentOwnerId();
-        if (ownerId == '') {
-            return;
+
+        if (ownerId == '')
+        {
+            ownerId = "1";
         }
+        showHideTables();
 
         //filling out url for ajax
         var url = ServicePrefix + '/api/TVB/GetTimeSalesRevenueToConfirm';
@@ -677,7 +923,8 @@
         $(".chkStation").prop("checked", false);
     }
 
-    function divideRevenueBy1000() {
+    function divideRevenueBy1000()
+    {
         var ownerId = currentOwnerId();
         if (ownerId == '') {
             bootbox.alert("Must select an owner first");
@@ -689,8 +936,16 @@
             return;
         }
 
+        var tempArray = getStationArray("divide");
+
+        if (tempArray.length == 0) {
+            bootbox.alert("No selected stations are eligible to be divided by 1000 - status not Processed");
+            return;
+        }
+        var message = "Divide selected stations (" + getStationArray("divide").length + ") pending revenue figures for " + currentPeriod() + "/" + currentYear() + ", owner: " + currentOwnerName() + "?";
+
         bootbox.confirm(
-            "Divide all pending revenue figures for " + currentPeriod() + "/" + currentYear() + " and selected stations for " + currentOwnerName() + " by 1000?",
+            message,
             function (confirmed) {
                 if (confirmed) {
                     divideRevenueBy1000Confirmed();
@@ -711,7 +966,7 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inYear": currentYear(),
                 "inPeriod": currentPeriod(),
-                "inStationList": getStationArray()
+                "inStationList": getStationArray("divide")
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -727,27 +982,43 @@
 
     function divideRevenueBy1000Success(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
+
             MKAErrorMessageRtn(data.response.errorMessage[0]);
         }
         else {
+            bootbox.alert(getStationArray("divide").length + " rows of data divided by 1000!");
             getData();
         }
     }
 
-    function confirmRevenue() {
+    function confirmRevenue()
+    {
+
         var ownerId = currentOwnerId();
+
         if (ownerId == '') {
             bootbox.alert("Must select an owner first");
             return;
         }
 
-        if ($(".chkStation:checked").length == 0) {
+        if ($(".chkStation:checked").length == 0)
+        {
             bootbox.alert("Must select one or more stations first");
             return;
         }
 
+        var tempArray = getStationArray("confirm");
+
+        if (tempArray.length == 0)
+        {
+            bootbox.alert("No selected stations are eligible to be confirmed - status of Submitted");
+            return;
+        }
+
+        var message = "Confirm selected stations (" + getStationArray("confirm").length + ") pending revenue figures for " + currentPeriod() + "/" + currentYear() + ", owner: " + currentOwnerName() + "?";
+
         bootbox.confirm(
-            "Confirm all pending revenue figures for " + currentPeriod() + "/" + currentYear() + " and selected stations for " + currentOwnerName() + "?",
+            message,
             function (confirmed) {
                 if (confirmed) {
                     confirmRevenueConfirmed();
@@ -768,7 +1039,7 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inYear": currentYear(),
                 "inPeriod": currentPeriod(),
-                "inStationList": getStationArray()
+                "inStationList": getStationArray("confirm")
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -787,11 +1058,38 @@
             MKAErrorMessageRtn(data.response.errorMessage[0]);
         }
         else {
+            bootbox.alert(getStationArray("confirm").length + " rows of data confirmed!");
             getData();
         }
     }
+    function showHideTables()
+    {
+        if (currentOwnerId() == "")
+        {
+            $("#confirmableDataTable").hide();
+            $("#declineableDataTable").hide();
+            $(".noDataShown").hide();
+        }
+        else if ($("input[name='view']").val() == "confirmableData")
+        {
+            $("#confirmableDataTable").show();
+            $("#declineableDataTable").hide();
+        }
+        else if ($("input[name='view']").val() == "declineableData") {
+            $("#declineableDataTable").show();
+            $("#confirmableDataTable").hide();
+        }
+        else
+        {
+            $("#confirmableDataTable").show();
+            $("#declineableDataTable").show();
+ 
+        }
+    }
 
-    function deleteRevenue() {
+    function deleteRevenue()
+    {
+
         var ownerId = currentOwnerId();
         if (ownerId == '') {
             bootbox.alert("Must select an owner first");
@@ -802,9 +1100,10 @@
             bootbox.alert("Must select one or more stations first");
             return;
         }
+        var message = "Delete selected stations (" + getStationArray("delete").length + ") pending revenue figures for " + currentPeriod() + "/" + currentYear() + ", owner: " + currentOwnerName() + "?";
 
         bootbox.confirm(
-            "Delete all confirmed and pending revenue figures for " + currentPeriod() + "/" + currentYear() + " and selected stations for " + currentOwnerName() + "?",
+            message,
             function (confirmed) {
                 if (confirmed) {
                     deleteRevenueConfirmed();
@@ -825,7 +1124,7 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inYear": currentYear(),
                 "inPeriod": currentPeriod(),
-                "inStationList": getStationArray()
+                "inStationList": getStationArray("delete")
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -844,12 +1143,41 @@
             MKAErrorMessageRtn(data.response.errorMessage[0]);
         }
         else {
+            bootbox.alert(getStationArray("delete").length + ' rows of data deleted');
             getData();
         }
     }
 
     function genericAjaxError(jqXhr, textStatus, errorThrown) {
         MKAErrorMessageRtn(errorThrown);
+    }
+
+    function showAll() {
+ 
+        $("#declinedDataTable").show();
+ 
+        $("#confirmableDataTable").show();
+ 
+    }
+    function swapView(classToShow)
+    {
+
+        if (classToShow == "declinedData")
+        {
+            $(".confirmableData").hide();
+            $(".declinedData").show();
+        }
+        else
+        {
+            $(".confirmableData").show();
+            $(".declinedData").hide();
+        }
+
+        if (currentOwnerId() == "") {
+            $("#confirmableDataTable").hide();
+            $("#declineableDataTable").hide();
+            $(".noDataShown").hide();
+        }
     }
 
 </script>

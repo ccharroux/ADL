@@ -69,7 +69,10 @@
                         <h2>Ownership Mapping</h2>
                     </div>
                 </div>
-
+                <div id="divQuickReport" >
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>
                 <!--Hidden Values-->
                 <input type="hidden" id="hdnMarketId" value="" />
 
@@ -102,16 +105,7 @@
                                 <th></th>
                             </tr>
                         </thead>
-                        <tfoot>
-                            <tr>
-                                <th>Owner Type</th>
-                                <th>Market</th>
-                                <th>Account Type</th>
-                                <th>Revenue Type</th>
-                                <th>Include</th>
-                                <th></th>
-                            </tr>
-                        </tfoot>
+ 
                     </table>
                 </div>
 
@@ -140,6 +134,8 @@
     <script src="/js/config.js"></script>
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
+    <!-- genericReport JS -->
+    <script src="/js/genericReport.js"></script>
 
     <!--Data Tables-->
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
@@ -162,12 +158,18 @@
     var columns = [];
     var columnsToDisplay = new Array();
     var columnsToExport = new Array();
+    var param_ownerId = "";
+    var param_marketId = "";
 
     $(document).ready(function () {
+
+        param_ownerId = getParameterByName("OwnerId");
+        param_marketId = getParameterByName("MarketId");
 
         setDataTable();
 
         buildXRYMenu("Revenue");
+        buildQuickReports(['XRAY MONTHLY']);
         getOwnerListByProduct();
 
         setLocalStorage("search", "");
@@ -220,6 +222,13 @@
             $("#ddlOwner").html(str);
             convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
+ 
+            if (!param_ownerId == false && param_ownerId.length > 0)
+            {
+                $("#ddlOwner").val(param_ownerId);
+                getMarketListByOwner();
+            }
+
         }
 
     }
@@ -265,17 +274,23 @@
             str = '<option value="-1">-- Select a Market </option>';
 
             $.each(data.report.rows, function (index) {
-                str = str + '<option value="' + data.report.rows[index].M_MarketID + '">' + data.report.rows[index].M_MarketName + '</option>';
+                str = str + '<option value="' + data.report.rows[index].M_MarketID + '">' + data.report.rows[index].M_MarketName + ' (' + data.report.rows[index].M_MarketID + ')' + '</option>';
             });
 
             $("#ddlMarket").html(str);
             convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
-            //last saved search
-            if ($("#hdnMarketId").val() != "") {
-                $("#ddlMarket").val($("#hdnMarketId").val());
+            ////last saved search
+            //if ($("#hdnMarketId").val() != "") {
+            //    $("#ddlMarket").val($("#hdnMarketId").val());
+            //    getOwnerMappingList();
+            //    $("#hdnMarketId").val("");
+            //}
+
+            if (!param_marketId == false && param_marketId.length > 0)
+            {
+                $("#ddlMarket").val(param_marketId);
                 getOwnerMappingList();
-                $("#hdnMarketId").val("");
             }
 
         }

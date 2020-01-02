@@ -57,6 +57,14 @@
     <![endif]-->
 
     <style>
+        .monthEndButton
+        {
+            width: 220px;
+        }
+        .monthEndButtonDiv
+        {
+            padding-top:5px;
+        }
         .rptView {
             margin-left: 5px;
             vertical-align: top;
@@ -77,10 +85,7 @@
             /*max-width:100px;*/
             text-align: center;
         }
-
-        .container {
-            width: 100% !important;
-        }
+ 
 
         .requiredText {
             color: red !important;
@@ -109,11 +114,10 @@
             text-align:center;
             border-radius:15px;
             padding:2px 2px 2px 2px;
-            height:71px;
-            width:71px;            
-            vertical-align:middle;
-            display: table-cell;
+            display: block;
+            font-size: 12px;
         }
+
         .rowNotActive{
             background:black;
             color:yellow;
@@ -128,12 +132,36 @@
             background:green;
             color:white;
         }
-
+        .rowDisabledRev
+        {
+            background:blue;
+            color:white;
+        }
         .rowNoData
         {
             background:red;
             color:white;
         }
+        .rowUnMatched{
+            background:purple;
+            color:white;
+        }
+        .rowImported
+        {
+            background: pink;
+            color: black;
+        }
+        .rowRevTypeIssue
+        {
+            background-color: green;
+            color: yellow;
+        }
+        .rowRevMissing
+        {
+            background-color:brown;
+            color: yellow;
+        }
+
     </style>
 
 </head>
@@ -146,17 +174,30 @@
         </header>
 
         <div id="fh5co-contact-section" class="contact-section">
-            <div class="container" style="margin-top: -35px;">
-                <div id="divQuickReport" style="float:right;padding-right:0px;padding-bottom:10px">
-                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
-                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
-                </div>
+            <div class="container" v>
+
                 <div class="row" id="reportTitleRow">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
                         <h2 id="pageTitle">X-Ray Data Collection</h2>
                     </div>
                 </div>
+                <div id="divQuickReport">
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>
+                <div class="row search-section">
+                    <div class="col-md-12">
+                        <!-- fix spacing on the radio buttons instead of spaces -->
+                        <div class="form-group rptView vertical-center">
+                            <input type="radio" name="collectionType" id="rdoMarket" value="market" class="report-filter" checked="checked"><label class="rdo-label rtpViewRight" for="rdoMarket">Market</label>
+                            &nbsp;&nbsp;
+                            <input type="radio" name="collectionType" id="rdoOwner" value="owner" class="report-filter"><label class="rdo-label rtpViewRight" for="rdoOwner">Owner</label>
+                            &nbsp;&nbsp;
+                            <input type="radio" name="collectionType" id="rdoThirdParty" value="thirdParty" class="report-filter"><label class="rdo-label rtpViewRight" for="rdoThirdParty">Third Party</label>
+                        </div>
+                    </div>
 
+                </div>
                 <div class="row search-section" >
                     <div class="col-md-12">
                         <!--
@@ -183,38 +224,31 @@
 
 
                         -->
-                        <!-- fix spacing on the radio buttons instead of spaces -->
-                        <div class="form-group rptView vertical-center">
-                            <input type="radio" name="collectionType" id="rdoMarket" value="market"><label class="rdo-label rtpViewRight" for="rdoMarket">Market</label>
-                            <br />
-                            <input type="radio" name="collectionType" id="rdoOwner" value="owner"><label class="rdo-label rtpViewRight" for="rdoOwner">Owner</label>
-                            <br />
-                            <input type="radio" name="collectionType" id="rdoThirdParty" value="thirdParty"><label class="rdo-label rtpViewRight" for="rdoThirdParty">Third Party</label>
-                        </div>
+
 
                         <div class="form-group rptView collection-market vertical-center">
                             <label for="ddlMarket" class="requiredText dropdown-label rptView"> * Market</label>
-                            <select id="ddlMarket" apiInput="inMarketId" onchange="" class="mkaRequired dropdown-select rptView"></select>
+                            <select id="ddlMarket" apiInput="inMarketId" onchange="" class="mkaRequired dropdown-select rptView report-filter"></select>
                         </div>
 
                         <div class="form-group rptView collection-owner vertical-center">
                             <label for="ddlOwner" class="requiredText dropdown-label rptView"> * Owner</label>
-                            <select id="ddlOwner" apiInput="inOwnerId" onchange="" class="mkaRequired dropdown-select rptView"></select>
+                            <select id="ddlOwner" apiInput="inOwnerId" onchange="" class="mkaRequired dropdown-select rptView report-filter"></select>
                         </div>
 
                         <div class="form-group rptView collection-station vertical-center">
                             <label for="ddlStation" class="dropdown-label rptView">Station</label>
-                            <select id="ddlStation" apiInput="inStationId" onchange="" class="dropdown-select rptView"></select>
+                            <select id="ddlStation" apiInput="inStationId" onchange="" class="dropdown-select rptView report-filter"></select>
                         </div>
 
                         <div class="form-group rptView vertical-center">
                             <label for="ddlYear" class="requiredText dropdown-label rptView"> * Year</label>
-                            <select id="ddlYear" apiInput="inYear" class="mkaRequired dropdown-select rptView"></select>
+                            <select id="ddlYear" apiInput="inYear" class="mkaRequired dropdown-select rptView report-filter"></select>
                         </div>
 
                         <div class="form-group rptView vertical-center">
                             <label for="ddlPeriod" class="requiredText dropdown-label rptView"> * Period</label>
-                            <select id="ddlPeriod" apiInput="inPeriod" class="mkaRequired dropdown-select rptView"></select>
+                            <select id="ddlPeriod" apiInput="inPeriod" class="mkaRequired dropdown-select rptView report-filter"></select>
                         </div>
 
                         <div class="form-group rptButton vertical-center" style="float:none;text-align:left">
@@ -225,21 +259,36 @@
                     </div>
                 </div>
                 <center>
-                    <div class="row" >
-                        <div id="statusOfGrid" style="width:25%; border:solid 1px silver">
+                    <div class="row">
+                        <div class="col-md-3">&nbsp;</div>
+                        <div id="statusOfGrid" class="col-md-3"></div>
+                        <div id="monthend-buttons" class="col-md-3" style="display:none">
+                            <div class="monthEndButtonDiv assignToOperatorButton">
+                                <input type="button" class="search-button monthEndButton" value="Assign to Operator" onclick="updateStatus('AssignMarketToOperator')" />
+                            </div>
+                            <div class="monthEndButtonDiv operatorReviewCompleteButton">
+                                <input type="button" class="search-button monthEndButton" value="Operator Review Complete" onclick="updateStatus('OperatorReviewComplete')" />
+                            </div>
+                            <div class="monthEndButtonDiv revenueReviewCompleteButton">
+                                <input type="button" class="search-button monthEndButton" value="Revenue Review Complete" onclick="updateStatus('RevenueReviewComplete')" />
+                            </div>
+                            <div class="monthEndButtonDiv approveRevenueButton">
+                                <input type="button" class="search-button monthEndButton" value="Approve Revenue" onclick="" />
+                            </div>
+                            <div class="monthEndButtonDiv rankButton">
+                                <input type="button" class="search-button monthEndButton" value="Rank" onclick="" />
+                            </div>
+                            <div class="monthEndButtonDiv releaseButton">
+                                <input type="button" class="search-button monthEndButton" value="Release" onclick="" />
+                            </div>
                         </div>
-                        <div id="monthend-buttons" style="display: none;">
-                            <input type="button" id="btnReview" class="search-button" value="Review" onclick="" />
-                            <input type="button" id="btnReviewRevenue" class="search-button" value="Review Revenue" onclick="" />
-                            <input type="button" id="btnApprove" class="search-button" value="Approve" onclick="" />
-                            <input type="button" id="btnApproveRevenue" class="search-button" value="Approve Revenue" onclick="" />
-                            <input type="button" id="btnRank" class="search-button" value="Rank" onclick="" />
-                        </div>
+
+                        <div class="col-md-3">&nbsp;</div>
                     </div>
                 </center>
                 
                 <!-- datatable -->
-                <div style="width:70%; margin:auto;">
+                <div style="width:100%; margin:auto;">
                     <div class="dataTable-top-margin" >
                         <table id="dtResults" class="cell-border dataTable-border dataTable-headers dataTable-cell-border"></table>
                         <div id="noDataFound" style="display: none; color: red">No data found</div>
@@ -284,6 +333,9 @@
 </html>
 <script>
 
+    var gMediaStatusCount = 0;
+    //var arrayAcceptableStationStatus = ['posted', 'not active'];
+
     var rowStatusArrayCtr = new Array();
     var rowStatusArray = new Array();
     var product = "XRY";
@@ -311,7 +363,6 @@
         
         setAutoRun();
 
-        
     });
 
     function setAutoRun()
@@ -321,81 +372,15 @@
 
     function loadAdvancedSearch()
     {
-
-        $.blockUI;
-
+        //$.blockUI;
         loadReportParameters();
         runReportFromAdvancedSearch();
-
     }
 
     function runReportFromAdvancedSearch() {
-            setTimeout('getDataCollectionList(true)', 1000);
+        setTimeout('getDataCollectionList(true)', 1000);
     }
-
-    function loadReportParameters() {
-
-        if (getLocalStorage("reportActionData").length <= 0) {
-            return;
-        }
-
-        var reportParamData = $.parseJSON(getLocalStorage("reportActionData"));
-
-        var searchResults = {};
-
-        for (var key in reportParamData) {
-            searchResults[key] = reportParamData[key];
-
-            if (key.indexOf("rdo") > -1)
-            {
-                $("#" + key).prop('checked', reportParamData[key]);
-            } else
-            {
-                $("#" + key).val(reportParamData[key]);
-            }
-
-            if (key.indexOf("ddl") > -1) {
-                //console.log(key);
-                $("#" + key).change();
-            }
-
-            if (key.indexOf("rdo") > -1 && reportParamData[key] == true) {
-                $("#" + key).change();
-            }
-        }
-
-        setLocalStorage("gSearchResults", JSON.stringify(searchResults));
-
-        setLocalStorage("reportActionData", "");
-    }
-
-    function checkMarketStatus()
-    {
-        //removing for now to hide the buttons
-        //will add functionality back in when api, etc. is built.
-        //eventually this will call an api to check the market status
-        //that will turn on/off the buttons
-        //if ($("#rdoMarket").is(':checked'))
-        //{
-        //    //console.log($("#ddlMarket").val());
-        //    if ($("#ddlMarket").val() != "")
-        //    {
-        //        //determine button logic
-        //        //this will be based on the status
-        //        //this is temporary to set the buttons
-        //        $("#btnApprove").hide();
-        //        $("#btnApproveRevenue").hide();
-        //        $("#btnRank").hide();
-        //        $("#monthend-buttons").show();
-        //    } else
-        //    {
-        //        $("#monthend-buttons").hide();
-        //    }
-        //} else
-        //{
-        //    $("#monthend-buttons").hide();
-        //}
-    }
+ 
 
     function setupUI() {
 
@@ -430,7 +415,7 @@
                 );
             }
 
-            checkMarketStatus();
+ 
             //clear the table??
             //clear status section??
         });
@@ -1557,7 +1542,8 @@
             },
             "visible": true,
             "orderable": true,
-            "searchable": true
+            "searchable": true,
+            "className": "text-align-center"
         });
 
         columnsToDisplay.push({
@@ -1606,7 +1592,7 @@
         });
 
         columnsToDisplay.push({
-            "title": "Advertisers / Agencies <br/>Matched",
+            "title": "Advertisers /<br>Agencies <br/>Matched",
             "visible": true,
             "mData": "Advertisers / Agencies Matched",
             "orderable": true,
@@ -1625,7 +1611,7 @@
         });
 
         columnsToDisplay.push({
-            "title": "Revenue<br/> Prev Period / Prev Year",
+            "title": "Revenue<br/> Prev Period /<br> Year",
             "visible": true,
             "mData": "Revenue Previous Period / Year",
             "orderable": true,
@@ -1655,76 +1641,145 @@
                 var actions = "";
                 var parameters = "";
 
-                if (row["enabled"] === true &&
-                    row["Number of Records"] > 0 &&
-                    row["Advertisers Matched"] === row["Number of Records"] &&
-                    row["Agencies Matched"] === row["Number of Records"] &&
-                    row["Posted"].toLowerCase() === "no") {
-
-                    parameters = "";
-                    parameters += row["stationId"] + "," + row["marketId"];
-                    parameters += ",\"" + $("#ddlPeriod").val() + "\"";
-                    parameters += ",\"" + $("#ddlYear").val() + "\"";
-                    parameters += ",\"" + row["Station"] + "\"";
-
-                    actions += "<a href='#' onclick='postRevenueProcess(" + parameters + ");'>Post</a><br/>";
-
-                }
-
-                if (row["enabled"] === true && row["Posted"].toLowerCase() === "yes") {
-
-                    parameters = "";
-                    parameters += row["stationId"] + "," + row["marketId"];
-                    parameters += ",\"" + $("#ddlPeriod").val() + "\"";
-                    parameters += ",\"" + $("#ddlYear").val() + "\"";
-                    parameters += ",\"" + row["Station"] + "\"";
-
-                    actions += "<a href='#' onclick='unpostRevenueProcess(" + parameters + ");'>Un-Post</a><br/>";
-                }
-
-                var link = "";
-
-                if (row["Number of Records"] > 0)
+                if (type === 'display')
                 {
-                    link = "";
-                    link = '/products/xry/revenue/xrymatch.html?MatchPage=adv';
-                    link += '&OwnerID=' + row["ownerId"];
-                    link += '&MarketID=' + row["marketId"];
-                    link += '&StationID=' + row["stationId"];
-                    link += '&Period=' + $("#ddlPeriod").val();
-                    link += '&Year=' + $("#ddlYear").val();
+                    var status = getRowStatus(row, "statusOnly");
 
-                    if (row["Number of Records"] !== row["Advertisers Matched"])
+                    //if (status == "Disabled Rev")
+                    if (row['linkDisabledRpt'] == true)
                     {
-                        link += '&OptionFlag=unmatched';
-                        actions += "<a href='" + link + "'>Match&nbsp;Advertisers</a><br/>";
-                    } else
-                    {
-                        link += '&OptionFlag=matched';
-                        actions += "<a href='" + link + "'>View&nbsp;Advertisers</a><br/>";
+ 
+                        var url = '/utilities/genericreport/genericreport.html?BuildBackButton=true';
+                        url = url + "&reportTitle=" + "Revenue with Disabled Advertisers/Agencies";
+                        url = url + "&marketId=" + row["marketId"];
+                        url = url + "&year=" + $("#ddlYear").val();
+                        url = url + "&period=" + $("#ddlPeriod").val();
+                        url = url + "&stationId=" + row["stationId"];
+
+                        actions += "<a href='" + url + "'>Disabled Report</a><br/>";
                     }
-                }
 
-                if (row["Number of Records"] > 0)
-                {
-                    link = "";
-                    link = '/products/xry/revenue/xrymatch.html?MatchPage=agy';
-                    link += '&OwnerID=' + row["ownerId"];
-                    link += '&MarketID=' + row["marketId"];
-                    link += '&StationID=' + row["stationId"];
-                    link += '&Period=' + $("#ddlPeriod").val();
-                    link += '&Year=' + $("#ddlYear").val();
-
-                    if (row["Number of Records"] !== row["Agencies Matched"])
+                    //if (status.toLowerCase() == "rev type issue")
+                    if (row['linkRevTypeIssueRpt'] == true)
                     {
-                        link += '&OptionFlag=unmatched';
-                        actions += "<a href='" + link + "'>Match&nbsp;Agencies</a><br/>";
-                    } else
-                    {
-                        link += '&OptionFlag=matched';
-                        actions += "<a href='" + link + "'>View&nbsp;Agencies</a><br/>";
+                        var url = '/products/xry/xryownershipmappinglist.html?BuildBackButton=true';
+                        url = url + "&OwnerId=" + row["ownerId"];
+                        url = url + "&MarketId=" + row["marketId"];
+                        actions += "<a href='" + url + "'>Map Rev Types</a><br/>";
                     }
-                }
+
+                    // post
+                    //if (row["enabled"] === true &&
+                    //    row["Number of Records"] > 0 &&
+                    //    row["Advertisers Matched"] === row["Number of Records"] &&
+                    //    row["Agencies Matched"] === row["Number of Records"] &&
+                    //    row["Posted"].toLowerCase() === "no")
+                    if (row['linkPost'] == true)
+                    {
+
+                        parameters = "";
+                        parameters += row["stationId"] + "," + row["marketId"];
+                        parameters += ",\"" + $("#ddlPeriod").val() + "\"";
+                        parameters += ",\"" + $("#ddlYear").val() + "\"";
+                        parameters += ",\"" + row["Station"] + "\"";
+
+                        actions += "<a href='#' onclick='postRevenueProcess(" + parameters + ");'>Post</a><br/>";
+
+                    }
+
+                    // unpost
+                    //if (row["enabled"] === true && row["Posted"].toLowerCase() === "yes")
+                    if (row['linkUnpost'] == true)
+                    {
+
+                        parameters = "";
+                        parameters += row["stationId"] + "," + row["marketId"];
+                        parameters += ",\"" + $("#ddlPeriod").val() + "\"";
+                        parameters += ",\"" + $("#ddlYear").val() + "\"";
+                        parameters += ",\"" + row["Station"] + "\"";
+
+                        actions += "<a href='#' onclick='unpostRevenueProcess(" + parameters + ");'>Un-Post</a><br/>";
+                    }
+
+                    var link = "";
+
+                    // match report view adv
+                    //if (row["Number of Records"] > 0)
+                    if (row['linkMatchAdvertiser'] == true)
+                    {
+                        link = "";
+                        link = '/products/xry/revenue/xrymatch.html?MatchPage=adv';
+                        link += '&OwnerID=' + row["ownerId"];
+                        link += '&MarketID=' + row["marketId"];
+                        link += '&StationID=' + row["stationId"];
+                        link += '&Period=' + $("#ddlPeriod").val();
+                        link += '&Year=' + $("#ddlYear").val();
+
+                        //if (row["Number of Records"] !== row["Advertisers Matched"]) {
+                            link += '&OptionFlag=unmatched';
+                            actions += "<a href='" + link + "'>Match&nbsp;Advertisers</a><br/>";
+                        //} else {
+                        //    link += '&OptionFlag=matched';
+                        //    actions += "<a href='" + link + "'>View&nbsp;Advertisers</a><br/>";
+                        //}
+                    }
+
+                    if (row['linkViewAdvertiser'] == true) {
+                        link = "";
+                        link = '/products/xry/revenue/xrymatch.html?MatchPage=adv';
+                        link += '&OwnerID=' + row["ownerId"];
+                        link += '&MarketID=' + row["marketId"];
+                        link += '&StationID=' + row["stationId"];
+                        link += '&Period=' + $("#ddlPeriod").val();
+                        link += '&Year=' + $("#ddlYear").val();
+
+                        //if (row["Number of Records"] !== row["Advertisers Matched"]) {
+                        //    link += '&OptionFlag=unmatched';
+                        //    actions += "<a href='" + link + "'>Match&nbsp;Advertisers</a><br/>";
+                        //} else {
+                            link += '&OptionFlag=matched';
+                            actions += "<a href='" + link + "'>View&nbsp;Advertisers</a><br/>";
+                        //}
+                    }
+
+                    // match report view agency
+                    //if (row["Number of Records"] > 0)
+                    if (row['linkMatchAdvertiser'] == true)
+                    {
+                        link = "";
+                        link = '/products/xry/revenue/xrymatch.html?MatchPage=agy';
+                        link += '&OwnerID=' + row["ownerId"];
+                        link += '&MarketID=' + row["marketId"];
+                        link += '&StationID=' + row["stationId"];
+                        link += '&Period=' + $("#ddlPeriod").val();
+                        link += '&Year=' + $("#ddlYear").val();
+
+                        //if (row["Number of Records"] !== row["Agencies Matched"]) {
+                            link += '&OptionFlag=unmatched';
+                            actions += "<a href='" + link + "'>Match&nbsp;Agencies</a><br/>";
+                        //} else {
+                        //    link += '&OptionFlag=matched';
+                        //    actions += "<a href='" + link + "'>View&nbsp;Agencies</a><br/>";
+                        //}
+                    }
+                    if (row['linkViewAdvertiser'] == true)
+                    {
+                        link = "";
+                        link = '/products/xry/revenue/xrymatch.html?MatchPage=agy';
+                        link += '&OwnerID=' + row["ownerId"];
+                        link += '&MarketID=' + row["marketId"];
+                        link += '&StationID=' + row["stationId"];
+                        link += '&Period=' + $("#ddlPeriod").val();
+                        link += '&Year=' + $("#ddlYear").val();
+
+                        //if (row["Number of Records"] !== row["Agencies Matched"]) {
+                        //    link += '&OptionFlag=unmatched';
+                        //    actions += "<a href='" + link + "'>Match&nbsp;Agencies</a><br/>";
+                        //} else {
+                            link += '&OptionFlag=matched';
+                            actions += "<a href='" + link + "'>View&nbsp;Agencies</a><br/>";
+                        //}
+                    }
 
                 //removing the options for now
                 //based on 11/19/2019 discussion with carl.
@@ -1739,26 +1794,33 @@
                 //page uses local storage
                 //use onclick and pass variables
                 //set local storage as part of the function
-                parameters = "";
-                parameters = row["stationId"] +
-                    ',' +
-                    row["marketId"] +
-                    ',' +
-                    row["ownerId"] +
-                    ',"' +
-                    //converted to whitespace to a non-breaking space
-                    //the white space was causing an unseen "
-                    row["Station"].replace(/[\s]/g, "&nbsp;") +
-                    '","' +
-                    row["Media Type"] +
-                    '",' + row["submissionId"] ;
-                actions += '<a href="#" onclick=changeAvailability(' + parameters + ');>Change&nbsp;Availability</a>';
+
+                    // this is the change availability
+                    if (row['linkChangeAvailability'] == true)
+                    {
+                        parameters = "";
+                        parameters = row["stationId"] +
+                            ',' +
+                            row["marketId"] +
+                            ',' +
+                            row["ownerId"] +
+                            ',"' +
+                            //converted to whitespace to a non-breaking space
+                            //the white space was causing an unseen "
+                            row["Station"].replace(/[\s]/g, "&nbsp;") +
+                            '","' +
+                            row["Media Type"] +
+                            '",' + row["submissionId"];
+                        actions += '<a href="#" onclick=changeAvailability(' + parameters + ');>Change&nbsp;Availability</a>';
+                    }
+                }
 
                 return actions;
             },
             "orderable": false,
             "searchable": false,
-            "visible": true
+            "visible": true,
+            "className": "text-align-center"
         });
 
         return columnsToDisplay;
@@ -1766,7 +1828,6 @@
 
     function validateFilters(bSilent)
     {
-
 
         var loopBreak = true;
         var msg = "";
@@ -1875,8 +1936,7 @@
                 else {
 
                     loadCollectionStatusData(data);
-                    checkMarketStatus();
-                }
+                 }
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -1950,8 +2010,6 @@
         searchTable.rows.add(results).draw();
         buildStatusGrid();
  
-
-
     }
 
     function buildStatusGrid()
@@ -1961,41 +2019,103 @@
 
         for (var i=0; i < rowStatusArray.length; i++)
         {
-            str = str + '<div class="col-md-8 row' + rowStatusArray[i].replace('-', '').replace(' ', '') + '" style="text-align:left;">' + rowStatusArray[i] + '</div>';
-            str = str + '<div class="col-md-4 row' + rowStatusArray[i].replace('-', '').replace(' ', '') + '" style="text-align:right;">' + rowStatusArrayCtr[i] + '</div>';
+            str = str + '<div class="col-md-8 row' + rowStatusArray[i].replace(/-/g, '').replace(/ /g, '') + '" style="text-align:left;">' + rowStatusArray[i] + '</div>';
+            str = str + '<div class="col-md-4 row' + rowStatusArray[i].replace(/-/g, '').replace(/ /g, '') + '" style="text-align:right;">' + rowStatusArrayCtr[i] + '</div>';
         }
 
         $("#statusOfGrid").html(str);
+        canWeShowMonthEndButtons();
     }
     //end datatable functionality
 
     function getRowStatus(row, type)
     {
-
+ 
         status = "";
         var arrayStatusHTML = "";
 
+        /*
         if (row["enabled"] === false)
         {
             status = "Not Active";
             arrayStatusHTML = "<div class='rowStatus rowNotActive'>" + status + "</div>";
         }
-        else if (row["Number of Records"] == "0")
+        else if (row["AdvertiserDisabled"] ==  true  ||
+                 row["AgencyDisabled"] ==  true )
         {
-            status = "No Data";
-            arrayStatusHTML = "<div class='rowStatus rowNoData'>" + status + "</div>";
-        }
-        else if (row["Posted"].toLowerCase() === "no")
-        {
-            status = "Un-Posted";
-            arrayStatusHTML = "<div class='rowStatus rowUnPosted'>" + status + "</div>";
+            status = "Disabled Rev";
+            arrayStatusHTML = "<div class='rowStatus rowDisabledRev'>" + status + "</div>";
         }
         else
+            */
+        if (row["StatusToken"].length > 0)
         {
-            status = "Posted";
-            arrayStatusHTML = "<div class='rowStatus rowPosted'>" + status + "</div>";
+            switch(row["StatusToken"].toLowerCase())
+            {
+
+                case "nodata":
+                    status = "No Data";
+                    arrayStatusHTML = "<div class='rowStatus rowNoData'>" + status + "</div>";
+                    break;
+                case "unmatched":
+                    status = "Un-Matched";
+                    arrayStatusHTML = "<div class='rowStatus rowUnMatched'>" + status + "</div>";
+                    break;
+                case "notactive":
+                    status = "Not Active";
+                    arrayStatusHTML = "<div class='rowStatus rowNotActive'>" + status + "</div>";
+                    break;
+                case "disabledrev":
+                    status = "Disabled Rev";
+                    arrayStatusHTML = "<div class='rowStatus rowDisabledRev'>" + status + "</div>";
+                    break;
+                case "imported":
+                    status = "Imported";
+                    arrayStatusHTML = "<div class='rowStatus rowImported'>" + status + "</div>";
+                    break;
+                case "revtypeissue":
+                    status = "Rev Type Issue";
+                    arrayStatusHTML = "<div class='rowStatus rowRevTypeIssue'>" + status + "</div>";
+                    break;
+                case "posted":
+                    status = "Posted";
+                    arrayStatusHTML = "<div class='rowStatus rowPosted'>" + status + "</div>";
+                    break;
+                case "unposted":
+                    status = "Un-Posted";
+                    arrayStatusHTML = "<div class='rowStatus rowUnPosted'>" + status + "</div>";
+                    break;
+                default:
+                    status = row["StatusToken"].toLowerCase();
+                    arrayStatusHTML = "<div class='rowStatus rowRevMissing'>" + row["StatusToken"].toLowerCase() + "</div>";
+                    break;
+            }
+
+
         }
+        //else if (row["Number of Records"] == "0")
+        //{
+        //    status = "No Data";
+        //    arrayStatusHTML = "<div class='rowStatus rowNoData'>" + status + "</div>";
+        //}
+        //else if ((row["Number of Records"] !== row["Advertisers Matched"])  || 
+        //         (row["Number of Records"] !== row["Agencies Matched"]))
+        //{
+        //    status = "Un-Matched";
+        //    arrayStatusHTML = "<div class='rowStatus rowUnMatched'>" + status + "</div>";
+        //}
+        //else if (row["Posted"].toLowerCase() === "no")
+        //{
+        //    status = "Un-Posted";
+        //    arrayStatusHTML = "<div class='rowStatus rowUnPosted'>" + status + "</div>";
+        //}
+        //else
+        //{
+        //    status = "Posted";
+        //    arrayStatusHTML = "<div class='rowStatus rowPosted'>" + status + "</div>";
+        //}
  
+
         if (type === 'display')
         {
             var index = rowStatusArray.findIndex(getStatus);
@@ -2009,11 +2129,188 @@
             }
         }
 
-        return arrayStatusHTML;
+        if (type === 'statusOnly') {
+            return status;
+        }
+        else {
+            return arrayStatusHTML;
+        }
     }
 
     function getStatus(element)
     {
         return element == status;
     }
+
+    function canWeShowMonthEndButtons()
+    {
+        if (areStationsReady() == true)
+        {
+            $("#monthend-buttons").show();
+            whatMonthEndButtonsCanWeShow();
+        }
+        else
+        {
+            $("#monthend-buttons").hide();
+        }
+    }
+    function whatMonthEndButtonsCanWeShow()
+    {
+        
+        var parms = "?inApiToken=" + getLocalStorage("APIToken");
+        parms = parms + "&inYear=" + $("#ddlYear").val();
+        parms = parms + "&inPeriod=" + $("#ddlPeriod").val();
+        parms = parms + "&inMarketId=" + $("#ddlMarket").val();
+        
+        $.ajax({
+            url: ServicePrefix + '/api/XRayRevenue/GetMarketApprovalLog' + parms,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    whatMonthEndButtonsCanWeShowResults(data);
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+    function whatMonthEndButtonsCanWeShowResults(data)
+    {
+        $(".monthEndButtonDiv").hide();
+
+        // starting state...
+
+        $(".assignToOperatorButton").show();
+        $(".revenueReviewCompleteButton").show();
+ 
+        var RankBtnCount = 0;
+
+        $.each(data.report.rows, function (index) {
+
+            if (data.report.rows[index].Token.toLowerCase() == ('AssignMarketToOperator').toLowerCase()) {
+                RankBtnCount = RankBtnCount + 1;
+                $(".assignToOperatorButton").hide();
+                $(".operatorReviewCompleteButton").show();
+            }
+            if (data.report.rows[index].Token.toLowerCase() == ('OperatorReviewComplete').toLowerCase()) {
+                RankBtnCount = RankBtnCount + 1;
+            }
+            if (data.report.rows[index].Token.toLowerCase() == ('RevenueReviewComplete').toLowerCase()) {
+                RankBtnCount = RankBtnCount + 1;
+            }
+            //str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + ' (' + data.report.rows[index].marketId + ')' + '</option>';
+
+        });
+
+        if (RankBtnCount == 3)
+        {
+            $(".rankButton").show();
+        }
+        else
+        {
+            $(".rankButton").hide();
+        }
+      
+
+        // this means we can show
+        // operatorReviewCompleteButton
+
+        //<div class="monthEndButtonDiv assignToOperatorButton">
+         //<div class="monthEndButtonDiv operatorReviewCompleteButton">
+         //<div class="monthEndButtonDiv revenueReviewCompleteButton">
+         //<div class="monthEndButtonDiv approveRevenueButton">
+         //<div class="monthEndButtonDiv rankButton">
+         //<div class="monthEndButtonDiv releaseButton">
+ 
+    }
+    function areStationsReady()
+    {
+        var parms = "?inApiToken=" + getLocalStorage("APIToken");
+        parms = parms + "&inYear=" + $("#ddlYear").val();
+        parms = parms + "&inPeriod=" + $("#ddlPeriod").val();
+        parms = parms + "&inMarketId=" + $("#ddlMarket").val();
+
+        $.ajax({
+            url: ServicePrefix + '/api/XRayRevenue/GetReformatListMarketOverallStatus' + parms,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                    return false;
+                }
+                else {
+                    var bReturn = false;
+
+                    $.each(data.report.rows, function (index) {
+
+                        gMediaStatusCount = data.report.rows[index]['Media Status Count'];
+
+                        if (data.report.rows[index]['Standard Status Count'] == data.report.rows[index]['Standard Status Complete Count'] &&
+                            data.report.rows[index]['Media Status Count'] == data.report.rows[index]['Media Status Complete Count'] && 
+                            data.report.rows[index]['Standard Status Count'] > 0 && 
+                            data.report.rows[index]['Media Status Count'] > 0)
+                        {
+                            bReturn = true;
+                        }
+
+                    });
+                    return bReturn;
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+                return false;
+            }
+        });
+        //////// only acceptable status are in
+        //////// arrayAcceptableStationStatus
+ 
+        //////if (rowStatusArrayCtr.length < 1 ||
+        //////    rowStatusArrayCtr.length > arrayAcceptableStationStatus.length)
+        //////{
+ 
+        //////    return false;
+        //////}
+
+        //////for (var i = 0; i < rowStatusArrayCtr.length; i++)
+        //////{
+        //////    var bMissed = true;
+        //////    for (var x= 0; x < arrayAcceptableStationStatus.length; x++)
+        //////    {
+        //////        // this means one of our status is outside of the acceptable
+        //////        if (rowStatusArray[i].toLowerCase() == arrayAcceptableStationStatus[x].toLowerCase())
+        //////        {
+        //////            bMissed = false;
+        //////        }
+        //////    }
+
+        //////    if (bMissed == true)
+        //////    {
+        //////        return false;
+        //////    }
+        //////}
+
+        //////return true;
+    }
+    function updateStatus(token)
+    {
+        console.log(token);
+    }
+
 </script>
