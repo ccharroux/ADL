@@ -259,7 +259,9 @@ reportName.push("rptInactiveStationAssignmentList");
 reportName.push("rptMRRStationSubmissionStatus");
 
 reportName.push("rptMediaRevenueWithDisabledAdvertisers");
+
 reportName.push("rptComplementaryMarketStationGapAnalysis");
+reportName.push("rptUnreleasedMarketIssueList");
 
 function buildReportArray()
 {
@@ -10188,7 +10190,6 @@ function getReportObject_InactiveStationAssignmentList() {
 
     return tempObject;
 }
-//rptComplementaryMarketStationGapAnalysis
 function getReportFilterArray_ComplementaryMarketStationGapAnalysis() {
 
     var arrayFilters = new Array();
@@ -10215,6 +10216,33 @@ function getReportObject_ComplementaryMarketStationGapAnalysis() {
 
         reportTitle: "Complementary Market Station Gap Analysis",
         apiControllerAction: "/api/MarketReport/GetComplementaryMarketStationGapAnalysis",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['market']
+    }
+
+    return tempObject;
+}
+ 
+function getReportFilterArray_UnreleasedMarketIssueList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+ 
+
+    return arrayFilters;
+}
+function getReportObject_UnreleasedMarketIssueList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Unreleased Market Issue List",
+        apiControllerAction: "/api/MarketReport/GetUnreleasedMarketIssueList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['market']
