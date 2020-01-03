@@ -2169,6 +2169,48 @@
         });
 
     }
+    function getComplementaryMarketList() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetComplementaryMarketList?inApiToken=' + getLocalStorage("APIToken"),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    var str = '';
+
+                    $("#ddlMarket").html("<option value=''> -- Select an Market --</option>");
+
+
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = str + "<option value='" + obj['MarketId'] + "'>" + obj.Market + "</option>";
+
+                    });
+
+                    $("#ddlMarket").append(str);
+
+                    convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    saveLoadedControlSelection("ddlMarket");
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
     function getAsyncJobStatusList() {
 
         $.ajax({

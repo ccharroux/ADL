@@ -257,7 +257,9 @@ reportName.push("rptDemoStationList");
 
 reportName.push("rptInactiveStationAssignmentList");
 reportName.push("rptMRRStationSubmissionStatus");
+
 reportName.push("rptMediaRevenueWithDisabledAdvertisers");
+reportName.push("rptComplementaryMarketStationGapAnalysis");
 
 function buildReportArray()
 {
@@ -10182,6 +10184,40 @@ function getReportObject_InactiveStationAssignmentList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['personnel']
+    }
+
+    return tempObject;
+}
+//rptComplementaryMarketStationGapAnalysis
+function getReportFilterArray_ComplementaryMarketStationGapAnalysis() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getComplementaryMarketList",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_ComplementaryMarketStationGapAnalysis() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Complementary Market Station Gap Analysis",
+        apiControllerAction: "/api/MarketReport/GetComplementaryMarketStationGapAnalysis",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['market']
     }
 
     return tempObject;
