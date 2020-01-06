@@ -263,6 +263,11 @@ reportName.push("rptMediaRevenueWithDisabledAdvertisers");
 reportName.push("rptComplementaryMarketStationGapAnalysis");
 reportName.push("rptUnreleasedMarketIssueList");
 
+reportName.push("rptTVBReviewUserListing");
+reportName.push("rptUsersByProduct");
+reportName.push("rptOutstandingStations");
+reportName.push("rptListErrors");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -3570,7 +3575,7 @@ function getReportObject_TVBTimeSalesStationList() {
         apiControllerAction: "/api/TVBReport/GetTVBTimeSalesStationList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb']
+        product: ['tvb', 'old admin']
     }
 
     return tempObject;
@@ -8712,7 +8717,7 @@ function getReportObject_TimeSalesVsRepBilling() {
         apiControllerAction: "/api/TVBReport/GetTimeSalesVersusRepBilling",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb', 'tvb review'],
+        product: ['tvb', 'tvb review', 'old admin'],
         sortable: true
 
     }
@@ -8777,7 +8782,7 @@ function getReportObject_RepBillingSubmissionStatusList() {
         apiControllerAction: "/api/TVBReport/GetRepBillingSubmissionStatus",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb', 'tvb review'],
+        product: ['tvb', 'tvb review', 'old admin'],
         sortable: true
 
     }
@@ -8970,7 +8975,7 @@ function getReportObject_RepBillingCompareList() {
         apiControllerAction: "/api/TVBReport/GetRepBillingCompare",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb', 'tvb review'],
+        product: ['tvb', 'tvb review', 'old admin'],
         sortable: true
 
     }
@@ -9053,7 +9058,7 @@ function getReportObject_TimeSalesCompareList() {
         apiControllerAction: "/api/TVBReport/GetTimeSalesCompare",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb', 'tvb review'],
+        product: ['tvb', 'tvb review', 'old admin'],
         sortable: true
 
     }
@@ -9118,7 +9123,7 @@ function getReportObject_TimeSalesCompleteRevenueList() {
         apiControllerAction: "/api/TVBReport/GetTimeSalesCompleteRevenue",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb', 'tvb review'],
+        product: ['tvb', 'tvb review', 'old admin'],
         sortable: true
 
     }
@@ -10246,6 +10251,111 @@ function getReportObject_UnreleasedMarketIssueList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['market']
+    }
+
+    return tempObject;
+}
+ 
+function getReportFilterArray_TVBReviewUserListing() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+    return arrayFilters;
+}
+function getReportObject_TVBReviewUserListing() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "TVB Review User Listing",
+        apiControllerAction: "none",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb', 'tvb review', 'old admin']
+    }
+
+    return tempObject;
+}
+function getReportFilterArray_UsersByProduct() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+    return arrayFilters;
+}
+function getReportObject_UsersByProduct() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Users by Product",
+        apiControllerAction: "none",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['users', 'old admin']
+    }
+
+    return tempObject;
+}
+function getReportFilterArray_OutstandingStations() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+    return arrayFilters;
+}
+function getReportObject_OutstandingStations() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Outstanding Stations",
+        apiControllerAction: "none",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['station', 'old admin']
+    }
+
+    return tempObject;
+}
+function getReportFilterArray_ListErrors() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+    return arrayFilters;
+}
+function getReportObject_ListErrors() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "Web Error Report",
+        apiControllerAction: "none",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tech', 'old admin']
     }
 
     return tempObject;

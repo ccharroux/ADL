@@ -51,13 +51,38 @@
     <script src="js/respond.min.js"></script>
     <![endif]-->
     <style>
+ 
+        .exclusion-name{
+            width: 100%!important;
+        }
+        #dtExclusionList td
+        {   background: #e1dddc;
+            vertical-align:top;
+            padding: 10px 10px 10px 10px!important;
+        }
+        textarea
+        {
+            width: 100%;
+            background: white;
+            font-size:14px!important;
+        }
         .mrr-name {
             width: 150px;
             min-width: 150px;
+            vertical-align: top;
+
         }
         .mrr-definition {
             width: 700px;
             min-width: 700px;
+            height: auto!important;
+        }
+        .mrr-definition p {
+ 
+            font-size:14px!important;
+        }
+        p{
+            margin-bottom:10px!important;
         }
     </style>
 </head>
@@ -105,7 +130,7 @@
                                 <tr>
                                     <th class="exportColumn">Category Name</th>
                                     <th class="exportColumn">Definition</th>
-                                    <th></th>
+                                    <th style="text-align:center"></th>
                                 </tr>
                             </thead>
                             <!--<tfoot>
@@ -127,8 +152,8 @@
 
                     <div class="text-center">
                         <h3>Market Exclusion Definitions</h3>
-                        <p>"Instructions and definitions for revenue categories not displayed in the market"</p>
-                        <p><input type="button" value="Update" onclick="updateExclusions();" /></p>
+                        <div>Note: Instructions and definitions for revenue categories not displayed in the market</div>
+                        <div><input type="button" value="Update" onclick="updateExclusions();" /></div>
                     </div>
 
                     <!-- start datatable-->
@@ -371,7 +396,7 @@
                     // "data": 'Definition',
                     "className": "mrr-definition",
                     "mRender": function (data, type, row) {
-                        return row["Definition"].replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                        return row["Definition"];//.replace(/</g, "&lt;").replace(/>/g, "&gt;");
                     }
                 },
                 {
@@ -384,7 +409,7 @@
                     },
                     "orderable": false,
                     "searchable": false,
-                    "className": "text-align-right"
+                    "className": "text-align-center"
                 }
             ],
             "bSort": false,
@@ -545,7 +570,7 @@
                         return '<textarea class="exclusion-definition"'
                             + ' id="exclusion-definition-' + row['Exclusion ID'] + '"'
                             + ' data-exclusion-id="' + row['Exclusion ID'] + '"'
-                            + ' maxlength="2000" rows="10" cols="80" style="height: auto;"'
+                            + ' maxlength="2000" rows="3" cols="200" style="height: auto;"'
                             + '>' + data + '</textarea>';
                     }
                 }
@@ -729,37 +754,56 @@
     }
 
     function updateExclusions() {
-        var exclusionDefinition = '<p style="font-style: italic; font-weight: bold; color: navy">Instructions and definitions for revenue categories not displayed in the market:</p><ul>';
 
-        var okayToUpdate = true;
+        var exclusionDefinition = '<div style="font-style: italic; font-weight: bold; color: navy">Instructions and definitions for revenue categories not displayed in the market:</div><ul>';
+
+        var okayToUpdate;
         var exclusionItems = new Array();
-        $(".exclusion-name").each(function (index, value) {
+        var ctr = 0;
+
+        $(".exclusion-name").each(function (index, value)
+        {
+
             var currentExclusionId = $(this).attr("data-exclusion-id");
             var currentExclusionName = $(this).val().trim();
             var currentExclusionDefinition = $("#exclusion-definition-" + currentExclusionId).val().trim();
-            if (currentExclusionName != "" && currentExclusionDefinition != "") {
+
+            if (currentExclusionName != "" && currentExclusionDefinition != "")
+            {
+                okayToUpdate = true;
                 exclusionItems[currentExclusionId] = "<li><strong>" + currentExclusionName + ":</strong> " + currentExclusionDefinition + "</li>";
                 return true; // continue to next iteration of .each() loop
             }
-            if (currentExclusionName != "") {
+            else if (currentExclusionName != "")
+            {
                 bootbox.alert("Cannot save a name without a description");
                 okayToUpdate = false;
                 return false; // break out of .each() loop
             }
-            if (currentExclusionDefinition != "") {
+            else if (currentExclusionDefinition != "")
+            {
                 bootbox.alert("Cannot save a description without a name");
                 okayToUpdate = false;
                 return false;
             }
+ 
         });
-        if (!okayToUpdate) {
+
+ 
+        if (!okayToUpdate)
+        {
+            bootbox.alert("Nothing to Update");
             return;
         }
-        for (var exclusionItemIndex = 1; exclusionItemIndex < exclusionItems.length; ++exclusionItemIndex) {
-            if (exclusionItems[exclusionItemIndex] != null) {
+
+        for (var exclusionItemIndex = 1; exclusionItemIndex < exclusionItems.length; ++exclusionItemIndex)
+        {
+            if (exclusionItems[exclusionItemIndex] != null)
+            {
                 exclusionDefinition += exclusionItems[exclusionItemIndex];
             }
         }
+
         exclusionDefinition += "</ul>";
 
         //filling out url for ajax call
@@ -788,7 +832,8 @@
         $.ajax(url, settings);
     }
 
-    function updateExclusionsSuccess(data, textStatus, jQxhr) {
+    function updateExclusionsSuccess(data, textStatus, jQxhr)
+    {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
         }
