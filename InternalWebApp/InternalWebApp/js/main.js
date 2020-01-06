@@ -1025,7 +1025,7 @@ function MKAErrorMessageRtn(message, url)
     else if (message.toLowerCase().indexOf('authentication failed') > -1)
     {
         newMessage = "Authentication Failed";
-  
+        $("#password").val('');
         bootbox.alert(newMessage, function () {});
     }
     else
