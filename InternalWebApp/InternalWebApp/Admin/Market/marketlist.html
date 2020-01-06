@@ -89,6 +89,8 @@
 
                         <label for="ddlMarket" class="dropdown-label">Market</label>
                         <select id="ddlMarket" class="search-ddl-select dropdown-select" onchange="editMarket(this.value);"></select>
+                        <label for="ddlOwner" class="dropdown-label">Owner</label>
+                        <select id="ddlOwner" class="search-ddl-select dropdown-select" onchange="getMarketList();"></select>
 
                         <!--<label for="searchText">Market Name</label>
                         <input type="text" id="searchText" />
@@ -174,6 +176,7 @@
 
     $(document).ready(function () {
         getMarketListAll();
+        getOwnerListAll();
 
         getComplimentaryMarketSettings();
  
@@ -477,6 +480,7 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inMediaTypeId": $("#ddlMediaType").val(),
                 //"inMarketName" : $("#searchText").val().trim(),
+                "inOwnerId": $("#ddlOwner").val(),
                 "inActiveOnly": "1",
                 "inPrimaryMarketOnly": "0"
             }),
@@ -529,7 +533,46 @@
 
     }
 
+    function getOwnerListAll() {
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
 
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select an Owner --</option>';
+                    $.each(data.report.rows, function (index) {
+
+ 
+                        str = str + '<option value="' + data.report.rows[index].OwnerID + '">' + data.report.rows[index].OwnerName + ' (' + data.report.rows[index].OwnerID + ')' + '</option>';
+ 
+                    });
+
+                    $("#ddlOwner").html(str);
+
+                    convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
     function getMarketListAll() {
         $.ajax({
             url: ServicePrefix + '/api/Market/GetMarketList',
