@@ -1067,7 +1067,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Markets") + '">Markets<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block"><a href="/admin/market/marketlist.html?MenuItem=true" role="button" aria-expanded="false">Markets </a></li>';
+    menuItems += '                  <li style="display:block"><a href="/admin/market/marketlist.html?MenuItem=true" role="button" aria-expanded="false">Primary</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/market/marketlist.html?NonPrimaryOnly=true&MenuItem=true">Complimentary</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/parentmarket/parentmarketlist.html?MenuItem=true">Parent</a></li>';
     menuItems += '              </ul>';
