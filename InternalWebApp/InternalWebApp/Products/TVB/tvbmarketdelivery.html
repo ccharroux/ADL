@@ -121,7 +121,7 @@
                                     <th class="exportColumn">Report</th>
                                     <th class="exportColumn">Ranked On</th>
                                     <th class="exportColumn">Approved On</th>
-                                    <th class="exportColumn">Delivered On</th>
+                                    <th class="exportColumn">Released On</th>
                                     <th class="exportColumn text-align-right">Revision</th>
                                     <th class="exportColumn">Client Comment</th>
 
@@ -133,7 +133,7 @@
                                     <th class="exportColumn">Report</th>
                                     <th class="exportColumn">Ranked On</th>
                                     <th class="exportColumn">Approved On</th>
-                                    <th class="exportColumn">Delivered On</th>
+                                    <th class="exportColumn">Released On</th>
                                     <th class="exportColumn text-align-right">Revision</th>
                                     <th class="exportColumn">Client Comment</th>
 
@@ -162,7 +162,7 @@
                                         <th class="exportColumn">Report</th>
                                         <th class="exportColumn">Ranked On</th>
                                         <th class="exportColumn">Approved On</th>
-                                        <th class="exportColumn">Delivered On</th>
+                                        <th class="exportColumn">Released On</th>
                                         <th class="exportColumn text-align-right">Revision</th>
                                         <th class="exportColumn">Client Comment</th>
 
@@ -174,7 +174,7 @@
                                         <th class="exportColumn">Report</th>
                                         <th class="exportColumn">Ranked On</th>
                                         <th class="exportColumn">Approved On</th>
-                                        <th class="exportColumn">Delivered On</th>
+                                        <th class="exportColumn">Released On</th>
                                         <th class="exportColumn text-align-right">Revision</th>
                                         <th class="exportColumn">Client Comment</th>
 
@@ -312,19 +312,19 @@
                 { "data": 'Report' },
                 { "data": 'Ranked On' },
                 { "data": 'Approved On' },
-                { "data": 'Delivered On' },
+                { "data": 'Released On' },
                 { "data": 'Revision' },
                 { "data": 'Client Comment' },
                 {
                     mRender: partnerReview ? function (data, type, row) {
                         return '';
                     } : function (data, type, row) {
-                        if (row["Delivered On"] != null) {
+                        if (row["Released On"] != null) {
                             return '<a href="#" onclick="prepToSendEmailToRecipients()">Re-deliver</a>';
                         }
-                        var text = '<a href="#" onclick="releaseReport(' + row["Report"] + ',' + row["Revision"] + '\', true)">Release</a>';
+                        var text = '<a href="#" onclick="releaseReport(\'' + row["Report"] + '\',\'' + row["Revision"] + '\', true)">Release</a>';
                         if (row["Revision"] > 0) {
-                            text += ' | <a href="#" onclick="releaseReport(' + row["Report"] + ',' + row["Revision"] + '\', false)">Release without email</a>';
+                            text += ' | <a href="#" onclick="releaseReport(\'' + row["Report"] + '\',\'' + row["Revision"] + '\', false)">Release without email</a>';
                         }
                         return text;
                     },
@@ -686,6 +686,47 @@
         bootbox.alert(
             currentReport + " is released for " + currentYearPeriodText(),
             function () {
+                insertRevenueStatusAllStations();
+            }
+        );
+    }
+
+    function insertRevenueStatusAllStations() {
+        var url = ServicePrefix + '/api/TVB/InsertRevenueStatusAllStations';
+
+        var data = {
+            "inApiToken": getLocalStorage("APIToken"),
+            "inYear": nextRevenueYear(),
+            "inPeriod": nextRevenuePeriod()
+        };
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                insertRevenueStatusAllStationsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function insertRevenueStatusAllStationsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert(
+            "Stations are ready for next submission cycle",
+            function () {
                 if (currentEmailRecipients) {
                     prepToSendEmailToRecipients();
                 } else {
@@ -696,10 +737,12 @@
     }
 
     function prepToSendEmailToRecipients() {
+        alert('Debug 1');
         getClientComment();
     }
 
     function getClientComment() {
+        alert('Debug 2');
         var url = ServicePrefix + '/api/TVB/GetYearPeriodClientRevisionMessage';
 
         var settings = {
@@ -724,6 +767,7 @@
     }
 
     function getClientCommentSuccess(data, textStatus, jQxhr) {
+        alert('Debug 3');
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
@@ -733,6 +777,7 @@
         $("#clientComment").val(data.report.rows[0]["clientRevisionMessage"]);
 
         $("#clientCommentDialog").dialog("open");
+        alert('Debug 4');
     }
 
     function clientCommentCancel() {
@@ -827,49 +872,7 @@
         );
     }
 
-    function insertRevenueStatusAllStations() {
-        var url = ServicePrefix + '/api/TVB/InsertRevenueStatusAllStations';
-
-        var data = {
-            "inApiToken": getLocalStorage("APIToken"),
-            "inYear": nextRevenueYear(),
-            "inPeriod": nextRevenuePeriod()
-        };
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                insertRevenueStatusAllStationsSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
-    }
-
-    function insertRevenueStatusAllStationsSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        bootbox.alert(
-            "Stations are ready for next submission cycle",
-            function () {
-                postSendEmailToRecipients();
-            }
-        );
-    }
-
     function postSendEmailToRecipients() {
-        insertRevenueStatusAllStations();
         clearCurrentSettings();
         $("#clientComment").val("");
         getDeliveryList();
