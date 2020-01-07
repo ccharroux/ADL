@@ -10303,7 +10303,7 @@ function getReportObject_UsersByProduct() {
         apiControllerAction: "none",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['users', 'old admin']
+        product: ['personnel', 'old admin']
     }
 
     return tempObject;
