@@ -348,6 +348,7 @@
     var workingRevisionNumber = 0;
     var status = "";
     var workingMediaType = "";
+    var workingMarketName = "";
 
     $(document).ready(function () {
 
@@ -622,7 +623,7 @@
         getMarketPeriodYearLatestRevisionForUnposting(workingMarketId, workingPeriod, workingYear, stationName);
     }
 
-    function getMarketPeriodYearLatestRevisionForUnposting(marketId, period, year, stationName) {
+    function getMarketPeriodYearLatestRevisionForUnposting(marketId, period, year, stationName, marketName, mediaTypeName) {
 
         var queryString = "";
 
@@ -651,8 +652,15 @@
                     if (results.length > 0 && results[0]["Release Date"] !== null) {
 
                         var strMessage = "";
-                        strMessage +=
-                            "The market has already been released and " + stationName + " cannot be re-posted.";
+
+                        if ($("#rdoThirdParty").is(':checked'))
+                        {
+                            strMessage += "The market - " + marketName + " has already been released and " + mediaTypeName + " cannot be re-posted.";
+                        } else
+                        {
+                            strMessage +=
+                                "The market has already been released and " + stationName + " cannot be re-posted.";
+                        }
 
                         bootbox.alert(strMessage,
                             function () {
@@ -665,11 +673,18 @@
 
                         //display dialog to reformat
                         var strMessage = "";
-                        strMessage += "Do you want to un-post this station - " + stationName + "?";
+
+                        if ($("#rdoThirdParty").is(':checked'))
+                        {
+                            strMessage += "Do you want to un-post media type - " + mediaTypeName + " for this market - " + marketName + "?";
+                        } else
+                        {
+                            strMessage += "Do you want to un-post this station - " + stationName + "?";
+                        }
 
                         bootbox.dialog({
                             message: strMessage,
-                            title: "Un-post Station",
+                            title: "Un-post",
                             buttons:
                             {
                                 btnRevision: {
@@ -730,8 +745,15 @@
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
                 else {
-                    //un-post station
-                    updateStationYearPeriodPostedStatusForUnposting();
+                    if ($("#rdoThirdParty").is(':checked'))
+                    {
+                        //create function to go down the media path of unposting
+                        updateMediaYearPeriodPostedStatusForUnposting();
+                    } else
+                    {
+                        //un-post station
+                        updateStationYearPeriodPostedStatusForUnposting();
+                    }
                 }
 
             },
@@ -1804,10 +1826,10 @@
                     if (row['linkUnpost'] != undefined && row['linkUnpost'] == true) {
                         if ($("#rdoThirdParty").is(':checked')) {
                             parameters = "";
-                            parameters += row["stationId"] + "," + row["marketId"];
+                            parameters += row["marketId"] + ",\"" + row["Market"] + "\"";
                             parameters += ",\"" + $("#ddlPeriod").val() + "\"";
                             parameters += ",\"" + $("#ddlYear").val() + "\"";
-                            parameters += ",\"" + row["Station"] + "\"";
+                            parameters += ",\"" + row["Media Type"] + "\"";
 
                             actions += "<a href='#' onclick='unpostMediaRevenueProcess(" + parameters + ");'>Un-Post</a><br/>";
                         } else {
@@ -2685,13 +2707,116 @@
         });
     }
 
-    function unpostMediaRevenueProcess() {
-        bootbox.alert(
-            "Functionality under development.",
-            function () {
+    function unpostMediaRevenueProcess(marketId, market, period, year, mediaType) {
+        
+        workingMarketId = marketId;
+        workingMediaType = mediaType;
+        workingPeriod = period;
+        workingYear = year;
+        workingMarketName = market;
 
-            }
-        );
+        var tmpMediaTypeName = mediaType.toUpperCase() == 'T' ? "Television" : "Newspaper";
+
+        getMarketPeriodYearLatestRevisionForUnposting(workingMarketId, workingPeriod, workingYear,
+            workingStationId, workingMarketName, tmpMediaTypeName);
+
+        //updateMarketYearPeriodPostedStatusForUnposting
+        //updateMediaYearPeriodPostedStatusForUnposting
+        //unpostRevenueByMediaYearPeriodForUnposting
     }
 
+    function updateMediaYearPeriodPostedStatusForUnposting()
+    {
+
+        // /api/XRAYRevenue/UpdatePostedStatusByMediaYearPeriod
+        //posted flag will be false
+
+        $.ajax({
+            url: ServicePrefix + "/api/XRAYRevenue/UpdatePostedStatusByMediaYearPeriod",
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": workingMarketId,
+                "inMediaTypeId": workingMediaType,
+                "inPeriod": workingPeriod,
+                "inYear": workingYear,
+                "inPosted": false
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else
+                {
+                    unpostRevenueByMediaYearPeriodForUnposting();
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+        //will call unpostRevenueByMediaYearPeriodForUnposting
+        
+    }
+
+    function unpostRevenueByMediaYearPeriodForUnposting()
+    {
+        //display message of being unposted
+        //reload data grid
+
+        $.ajax({
+            url: ServicePrefix + "/api/XRAYRevenue/UnpostRevenueByMediaYearPeriod",
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": workingMarketId,
+                "inMediaTypeId": workingMediaType,
+                "inPeriod": workingPeriod,
+                "inYear": workingYear
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else
+                {
+                    var tmpMediaTypeName = workingMediaType.toUpperCase() == 'T' ? "Television" : "Newspaper";
+                    var strMessage = "";
+                    strMessage = "The market - " +
+                        workingMarketName +
+                        " and media type - " +
+                        tmpMediaTypeName +
+                        " for period/Year - " +
+                        workingPeriod +
+                        "/" +
+                        workingYear +
+                        " has been unposted.";
+
+                    bootbox.alert(
+                        strMessage,
+                        function () {
+
+                        }
+                    );
+
+                    //reload the page.
+                    getDataCollectionList();
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
 </script>
