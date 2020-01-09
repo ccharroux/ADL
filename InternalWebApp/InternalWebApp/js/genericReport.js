@@ -538,11 +538,11 @@ function getReportObject_MRRMarketSummary()
     tempObject =
     {
         // id: rptMRRMarketSummary,
-        reportTitle:  "Market Summary",
+        reportTitle:  "MRR Market Summary",
         apiControllerAction:  "/api/MRRReport/GetMarketSummary",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product: ['mrr']
+        product: ['mrr', 'MRR Data Review']
     }
 
     return tempObject;
@@ -1696,7 +1696,7 @@ function getReportObject_MarketRevenueXRay() {
         apiControllerAction:  "/api/Report/GetMarketRevenueRevenueXRay",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product: ['mrr','xry', 'xray monthly']
+        product: ['mrr', 'xry', 'XRY Data Review', 'MRR Data Review']
     }
 
     return tempObject;
@@ -1975,7 +1975,7 @@ function getReportObject_MRREstimatedStationList() {
         apiControllerAction: "/api/MRRReport/GetMRREstimatedStationList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr']
+        product: ['mrr', 'MRR Data Review']
     }
 
     return tempObject;
@@ -2328,7 +2328,7 @@ function getReportObject_MarketSetupMarket() {
         apiControllerAction: "/api/MarketReport/GetMarketSetupMarket",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'mrr setup info'],
         sortable: true
     }
 
@@ -2366,7 +2366,7 @@ function getReportObject_MarketSetupMarketMRRCategories() {
         apiControllerAction: "/api/MarketReport/GetMarketSetupMarketMRRCategories",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'mrr setup info'],
         sortable: true
     }
 
@@ -2402,7 +2402,7 @@ function getReportObject_MarketSetupMarketMRRReports() {
         apiControllerAction: "/api/MarketReport/GetMarketSetupMarketMRRReports",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'mrr setup info'],
         sortable: true
     }
 
@@ -2438,7 +2438,7 @@ function getReportObject_MarketSetupMarketOwnerGroups() {
         apiControllerAction: "/api/MarketReport/GetMarketSetupMarketOwnerGroups",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'mrr setup info'],
         sortable: true
     }
 
@@ -2474,7 +2474,7 @@ function getReportObject_MarketSetupMarketProducts() {
         apiControllerAction: "/api/MarketReport/GetMarketSetupMarketProducts",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'mrr setup info'],
         sortable: true
     }
 
@@ -2510,7 +2510,7 @@ function getReportObject_MarketSetupMarketStations() {
         apiControllerAction: "/api/MarketReport/GetMarketSetupMarketStations",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'mrr setup info'],
         sortable: true
     }
 
@@ -2546,7 +2546,7 @@ function getReportObject_MarketSetupMarketUsers() {
         apiControllerAction: "/api/MarketReport/GetMarketSetupMarketUsers",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'mrr setup info'],
         sortable: true
     }
 
@@ -2582,7 +2582,7 @@ function getReportObject_MarketSetupMarketVirtualGroups() {
         apiControllerAction: "/api/MarketReport/GetMarketSetupMarketVirtualGroups",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'mrr setup info'],
         sortable: true
     }
 
@@ -2911,7 +2911,7 @@ function getReportObject_MRRNoPrimaryContactList() {
         apiControllerAction: "/api/MRRReport/GetNoPrimaryContactList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Data Review'],
         sortable: true
     }
 
@@ -2972,7 +2972,7 @@ function getReportObject_MarketReleaseList() {
         apiControllerAction: "/api/MarketReport/GetMarketReleaseList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Data Review'],
         sortable: true
     }
 
@@ -3034,7 +3034,7 @@ function getReportObject_MRRMarketRelease() {
         apiControllerAction: "/api/MRRReport/GetMarketRelease",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Data Review'],
         sortable: true
     }
 
@@ -3094,7 +3094,7 @@ function getReportObject_MRRMarketStationRelease() {
         apiControllerAction: "/api/MRRReport/GetMarketRelease",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Data Review'],
         sortable: true
     }
 
@@ -3438,7 +3438,7 @@ function getReportObject_TVBMRRCompare() {
         apiControllerAction: "/api/TVBReport/GetMRRTVBCompare",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb', 'tvb review']
+        product: ['tvb', 'TVB Data Review']
     }
 
     return tempObject;
@@ -4118,7 +4118,7 @@ function getReportObject_MRRWithoutManager() {
         apiControllerAction: "/api/MRRReport/GetMRRWithoutManagerList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr']
+        product: ['mrr', 'MRR Security and Analysis']
     }
 
     return tempObject;
@@ -4146,7 +4146,7 @@ function getReportObject_MRRUserMissing() {
         apiControllerAction: "/api/MRRReport/GetMRRUserMissingReportList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr']
+        product: ['mrr', 'MRR Security and Analysis']
     }
 
     return tempObject;
@@ -4617,7 +4617,7 @@ function getReportObject_MRRRevenueWithoutSubmitterList() {
         apiControllerAction: "/api/MRRReport/GetMRRRevenueWithoutSubmitterList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Security and Analysis'],
         autoUpdate: false
     }
 
@@ -4662,7 +4662,7 @@ function getReportObject_MRRRevenueOutOfBalanceList() {
         apiControllerAction: "/api/MRRReport/GetMRRRevenueOutOfBalanceList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Security and Analysis'],
         autoUpdate: false
     }
 
@@ -4707,7 +4707,7 @@ function getReportObject_MRRRevenueEntryMissingList() {
         apiControllerAction: "/api/MRRReport/GetMRRRevenueEntryMissingList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Data Review'],
         autoUpdate: false
     }
 
@@ -4968,7 +4968,7 @@ function getReportObject_MRRUploadTemplateByOwner() {
         apiControllerAction: "/api/MRRReport/GetMRRUploadTemplateByOwner",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Data Review'],
         autoUpdate: false
     }
 
@@ -5036,7 +5036,7 @@ function getReportObject_MRRUploadTemplateByOwnerWithRevenue() {
         apiControllerAction: "/api/MRRReport/GetMRRUploadTemplateByOwnerWithRevenue",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Data Review'],
         autoUpdate: false
     }
 
@@ -5090,7 +5090,7 @@ function getReportObject_MRRMarketRevisionHistory() {
         apiControllerAction: "/api/MRRReport/GetMarketRevisionHistoryReport",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Data Review'],
         autoUpdate: false
     }
 
@@ -5162,7 +5162,7 @@ function getReportObject_MRRNationwideTVByAffiliation() {
         apiControllerAction: "/api/MRRReport/GetNationwideRevenueByAffiliationReport",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Setup Info'],
         autoUpdate: false,
         sortable: false
     }
@@ -5235,7 +5235,7 @@ function getReportObject_MRRNationwideTVByRegion() {
         apiControllerAction: "/api/MRRReport/GetNationwideRevenueByRegionReport",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Setup Info'],
         autoUpdate: false,
         sortable: false
     }
@@ -5307,7 +5307,7 @@ function getReportObject_MRRNationwideTVBySize() {
         apiControllerAction: "/api/MRRReport/GetNationwideRevenueBySizeReport",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Setup Info'],
         autoUpdate: false,
         sortable: false
     }
@@ -5380,7 +5380,7 @@ function getReportObject_MRRNationwideRadioByFormat() {
         apiControllerAction: "/api/MRRReport/GetNationwideRevenueByFormatReport",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Setup Info'],
         autoUpdate: false,
         sortable: false
     }
@@ -5453,7 +5453,7 @@ function getReportObject_MRRNationwideRadioByRegion() {
         apiControllerAction: "/api/MRRReport/GetNationwideRevenueByRegionReport",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Setup Info'],
         autoUpdate: false,
         sortable: false
     }
@@ -5525,7 +5525,7 @@ function getReportObject_MRRNationwideRadioBySize() {
         apiControllerAction: "/api/MRRReport/GetNationwideRevenueBySizeReport",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Setup Info'],
         autoUpdate: false,
         sortable: false
     }
@@ -5644,7 +5644,7 @@ function getReportObject_MRRMissingManagerSuggestedList() {
         apiControllerAction: "/api/MRRReport/GetMRRMissingManagerSuggestedList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Security and Analysis'],
         autoUpdate: false
     }
 
@@ -6341,7 +6341,7 @@ function getReportObject_NewAdvertisers() {
         apiControllerAction: "/api/AdvertiserAudit/GetNewAdvertiserAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry', 'advertiser', 'xray monthly'],
+        product: ['xry', 'advertiser', 'XRY Data Review'],
         reportPath: "/Products/XRY/reports/xrygenericreport.html"
     }
 
@@ -6576,7 +6576,7 @@ function getReportObject_NewAgencies() {
         apiControllerAction: "/api/AgencyAudit/GetNewAgencyAuditList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry', 'agency', 'xray monthly'],
+        product: ['xry', 'agency', 'XRY Data Review'],
         reportPath: "/Products/XRY/reports/xrygenericreport.html"
     }
 
@@ -7849,7 +7849,7 @@ function getReportObject_MRRComplimentaryMarketRevenueEntry()
         apiControllerAction: "/api/MRRReport/GetComplimentaryMarketRevenueEntryList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Setup Info'],
         sortable: true
 
     }
@@ -7977,7 +7977,7 @@ function getReportObject_MRROutstandingStationList() {
         apiControllerAction: "/api/MRRReport/GetOutstandingStations",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr'],
+        product: ['mrr', 'MRR Data Review'],
         sortable: true
 
     }
@@ -8717,7 +8717,7 @@ function getReportObject_TimeSalesVsRepBilling() {
         apiControllerAction: "/api/TVBReport/GetTimeSalesVersusRepBilling",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb', 'tvb review', 'old admin'],
+        product: ['tvb', 'TVB Data Review', 'old admin'],
         sortable: true
 
     }
@@ -8782,7 +8782,7 @@ function getReportObject_RepBillingSubmissionStatusList() {
         apiControllerAction: "/api/TVBReport/GetRepBillingSubmissionStatus",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb', 'tvb review', 'old admin'],
+        product: ['tvb', 'TVB Data Review', 'old admin'],
         sortable: true
 
     }
@@ -8975,7 +8975,7 @@ function getReportObject_RepBillingCompareList() {
         apiControllerAction: "/api/TVBReport/GetRepBillingCompare",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb', 'tvb review', 'old admin'],
+        product: ['tvb', 'TVB Data Review', 'old admin'],
         sortable: true
 
     }
@@ -9058,7 +9058,7 @@ function getReportObject_TimeSalesCompareList() {
         apiControllerAction: "/api/TVBReport/GetTimeSalesCompare",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb', 'tvb review', 'old admin'],
+        product: ['tvb', 'TVB Data Review', 'old admin'],
         sortable: true
 
     }
@@ -9123,7 +9123,7 @@ function getReportObject_TimeSalesCompleteRevenueList() {
         apiControllerAction: "/api/TVBReport/GetTimeSalesCompleteRevenue",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb', 'tvb review', 'old admin'],
+        product: ['tvb', 'TVB Data Review', 'old admin'],
         sortable: true
 
     }
@@ -9430,7 +9430,7 @@ function getReportObject_MRRStationSubmissionStatus() {
         apiControllerAction: "/api/MRRReport/GetMRRStationSubmissionStatus",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['market', 'station', 'mrr'],
+        product: ['market', 'station', 'mrr', 'MRR Data Review'],
         sortable: true
 
     }
@@ -9606,7 +9606,7 @@ function getReportObject_SweeperLogMRRRevenue() {
         apiControllerAction: "/api/MRRReport/GetSweeperLogMRRRevenue",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tech', 'mrr'],
+        product: ['tech', 'mrr', 'MRR Security and Analysis'],
         autoUpdate: false
     }
 
@@ -9816,7 +9816,7 @@ function getReportObject_MediaRevenueWithDisabledAdvertisers() {
         apiControllerAction: "/api/XRAYRevenue/GetMediaRevenueWithDisabledAdvertisers",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry', 'xray monthly']
+        product: ['xry', 'XRY Data Review']
     }
 
     return tempObject;
@@ -9890,7 +9890,7 @@ function getReportObject_RevenueWithDisabledAdvertisersAgencies() {
         apiControllerAction: "/api/XRAYRevenue/GetRevenueWithDisabledAdvertisersAgencies",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry', 'xray monthly']
+        product: ['xry', 'XRY Data Review']
     }
 
     return tempObject;
@@ -9958,7 +9958,7 @@ function getReportObject_MarketStationSummary() {
         apiControllerAction: "/api/XRAYRevenue/GetMarketStationSummary",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry', 'xray monthly'],
+        product: ['xry', 'XRY Data Review'],
         sortable: false
     }
 
@@ -10023,7 +10023,7 @@ function getReportObject_XRYImportTypeIssueList() {
         apiControllerAction: "/api/XRAYReport/GetImportIssueTypeList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry', 'xray monthly']
+        product: ['xry', 'XRY Data Review']
     }
 
     return tempObject;
@@ -10077,7 +10077,7 @@ function getReportObject_XRYContactListByMarketOwner() {
         apiControllerAction: "/api/XRAYReport/GetContactListByMarketOwner",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry', 'xray monthly']
+        product: ['xry', 'XRY Data Review']
     }
 
     return tempObject;
@@ -10273,11 +10273,11 @@ function getReportObject_TVBReviewUserListing() {
     tempObject =
     {
 
-        reportTitle: "TVB Review User Listing",
+        reportTitle: "TVB Data Review User Listing",
         apiControllerAction: "none",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb', 'tvb review', 'old admin']
+        product: ['tvb', 'TVB Data Review', 'old admin']
     }
 
     return tempObject;

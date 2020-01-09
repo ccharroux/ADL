@@ -1131,7 +1131,7 @@ function buildXRYMenu(selectedItem) {
 
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "XRay Reports") + ' href="" role="button" aria-expanded="false"> XRay Reports <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=xray monthly&MenuItem=true" role="button" aria-expanded="false">XRay Monthly Reports </a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=XRY Data Review&MenuItem=true" role="button" aria-expanded="false">XRY Data Review Reports </a></li>';
 
     menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=xry&MenuItem=true" role="button" aria-expanded="false">XRay Reports </a></li>';
     menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=corporate&MenuItem=true" role="button" aria-expanded="false">Corporate Reports </a></li>';
@@ -1185,6 +1185,14 @@ function buildMRRMenu(selectedItem) {
     menuItems += productDashboard('dma');
     menuItems += '</ul>';
     menuItems += '</li>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "MRR Reports") + ' href="" role="button" aria-expanded="false">MRR Reports <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=MRR Data Review&MenuItem=true" role="button" aria-expanded="false">MRR Data Review</a></li>';
+
+    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=MRR Security and Analysis&MenuItem=true" role="button" aria-expanded="false">MRR Security and Analysis</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=MRR Setup Info&MenuItem=true" role="button" aria-expanded="false">MRR Setup Info</a></li>';
+    menuItems += '              </ul>';
+    menuItems += '       </li>';
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
     menuItems += '        <li style="display:block"><a href="/products/mrr/mrrrelease.html?MenuItem=true">Release</a></li>';
