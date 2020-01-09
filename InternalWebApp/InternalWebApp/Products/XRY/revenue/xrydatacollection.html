@@ -339,16 +339,19 @@
     var rowStatusArrayCtr = new Array();
     var rowStatusArray = new Array();
     var product = "XRY";
+
     var workingMarketId = 0;
     var workingStationId = 0;
     var workingPeriod = "";
     var workingYear = "";
-    var bRevision = false;
-    var bCorrection = false;
     var workingRevisionNumber = 0;
-    var status = "";
     var workingMediaType = "";
     var workingMarketName = "";
+    var workingMediaTypeFullName = "";
+
+    var bRevision = false;
+    var bCorrection = false;
+    var status = "";
 
     $(document).ready(function () {
 
@@ -605,12 +608,13 @@
     }
 
     //unpost revenue process
-    function unpostRevenueProcess(stationId, marketId, period, year, stationName) {
+    function unpostRevenueProcess(stationId, marketId, period, year, stationName, marketName) {
 
         workingStationId = stationId;
         workingMarketId = marketId;
         workingPeriod = period;
         workingYear = year;
+        workingMarketName = marketName;
 
         //getMarketPeriodYearLatestRevision
         //may need to create a new version for unposting
@@ -659,7 +663,7 @@
                         } else
                         {
                             strMessage +=
-                                "The market has already been released and " + stationName + " cannot be re-posted.";
+                                "The market - " + workingMarketName + " has already been released and " + stationName + " cannot be re-posted.";
                         }
 
                         bootbox.alert(strMessage,
@@ -676,7 +680,7 @@
 
                         if ($("#rdoThirdParty").is(':checked'))
                         {
-                            strMessage += "Do you want to un-post media type - " + mediaTypeName + " for this market - " + marketName + "?";
+                            strMessage += "Do you want to un-post media type - " + mediaTypeName + " for this market - " + workingMarketName + "?";
                         } else
                         {
                             strMessage += "Do you want to un-post this station - " + stationName + "?";
@@ -846,7 +850,7 @@
     //end unpost revenue process
 
     //start post revenue functionality
-    function postRevenueProcess(stationId, marketId, period, year, stationName) {
+    function postRevenueProcess(stationId, marketId, period, year, stationName, marketName) {
 
         //The overall flow of how the posting process works
         //see if the market is already released for that period - getMarketPeriodYearLatestRevision
@@ -869,6 +873,7 @@
         workingMarketId = marketId;
         workingPeriod = period;
         workingYear = year;
+        workingMarketName = marketName;
 
         var strMessage = "";
         strMessage += "Would you like to post the revenue for the station - " + stationName + "?";
@@ -936,7 +941,7 @@
 
                         if ($("#rdoThirdParty").is(':checked'))
                         {
-                            strMessage += "Revision will be created for selected Delivered Market. Confirm Revision?";
+                            strMessage += "Revision will be created for selected Market - " + workingMarketName + ". Confirm Revision?";
                             bootbox.dialog({
                                 message: strMessage,
                                 title: "Initiate Revision",
@@ -961,7 +966,7 @@
                         } else
                         {
                             strMessage +=
-                                "The market has already been released. <br/> Is this a revision and want to notify recipients when re-release?";
+                                "The market - " + workingMarketName + " has already been released. <br/> Is this a revision and want to notify recipients when re-release?";
                             strMessage += "<br/>Or is this a correction and should not notify recipients?";
 
 
@@ -1461,15 +1466,13 @@
                         if ($("#rdoThirdParty").is(':checked'))
                         {
                             strMessage =
-                                "This media type has been posted. However, there are un-posted submissions for the market.";
+                                "The media type - " + workingMediaTypeFullName + " for market - " + workingMarketName + " has been posted. However, there are un-posted submissions for the market.";
                         } else
                         {
                             //need to determine what the message and content should be
                             //do i need to let them know??
-                            strMessage = "The station has been posted. However, there are un-posted submissions for the market.";
+                            strMessage = "The station has been posted. However, there are un-posted submissions for the market - " + workingMarketName + ".";
                         }
-
-                        
 
                         bootbox.alert({
                             message: strMessage,
@@ -1531,7 +1534,7 @@
                         if ($("#rdoThirdParty").is(':checked'))
                         {
                             strMessage =
-                                "The media type has been posted. However, there are still un-posted media types for the market.";
+                                "The media type - " + workingMediaTypeFullName + " has been posted for market - " + workingMarketName + ". However, there are still un-posted media types for the market.";
                         } else
                         {
                             //need to determine what the message and content should be
@@ -1815,7 +1818,7 @@
                             parameters += row["stationId"] + "," + row["marketId"];
                             parameters += ",\"" + $("#ddlPeriod").val() + "\"";
                             parameters += ",\"" + $("#ddlYear").val() + "\"";
-                            parameters += ",\"" + row["Station"] + "\"";
+                            parameters += ",\"" + row["Station"] + "\",\"" + row["Market"] + "\"";
 
                             actions += "<a href='#' onclick='postRevenueProcess(" + parameters + ");'>Post</a><br/>";
                         }
@@ -1837,7 +1840,7 @@
                             parameters += row["stationId"] + "," + row["marketId"];
                             parameters += ",\"" + $("#ddlPeriod").val() + "\"";
                             parameters += ",\"" + $("#ddlYear").val() + "\"";
-                            parameters += ",\"" + row["Station"] + "\"";
+                            parameters += ",\"" + row["Station"] + "\",\"" + row["Market"] + "\"";
 
                             actions += "<a href='#' onclick='unpostRevenueProcess(" +
                                 parameters +
@@ -2112,12 +2115,9 @@
         //call new api once built
         //load table with results
 
-
-
         if (validateFilters(bSilent) == false) {
             return;
         }
-
 
         rowStatusArray = new Array();
         rowStatusArrayCtr = new Array();
@@ -2521,18 +2521,12 @@
         workingMediaType = mediaType;
         workingPeriod = period;
         workingYear = year;
-
-        ////ask question if they want to post the media stuff market/media type
-        var mediaTypeName = "";
-        if (mediaType.toUpperCase() == "T") {
-            mediaTypeName = "Television";
-        } else {
-            mediaTypeName = "Newspaper";
-        }
+        workingMarketName = marketName;
+        workingMediaTypeFullName = mediaType.toUpperCase() == "T" ? "Television" : "Newspaper";
 
         var strMessage = "";
         strMessage += "Would you like to post the media revenue for the market - " + marketName +
-            " for media type - " + mediaTypeName + "?";
+            " for media type - " + workingMediaTypeFullName + "?";
 
         bootbox.dialog({
             message: strMessage,
@@ -2714,11 +2708,10 @@
         workingPeriod = period;
         workingYear = year;
         workingMarketName = market;
-
-        var tmpMediaTypeName = mediaType.toUpperCase() == 'T' ? "Television" : "Newspaper";
+        workingMediaTypeFullName = mediaType.toUpperCase() == 'T' ? "Television" : "Newspaper";
 
         getMarketPeriodYearLatestRevisionForUnposting(workingMarketId, workingPeriod, workingYear,
-            workingStationId, workingMarketName, tmpMediaTypeName);
+            workingStationId, workingMarketName, workingMediaTypeFullName);
 
         //updateMarketYearPeriodPostedStatusForUnposting
         //updateMediaYearPeriodPostedStatusForUnposting
@@ -2790,12 +2783,11 @@
                 }
                 else
                 {
-                    var tmpMediaTypeName = workingMediaType.toUpperCase() == 'T' ? "Television" : "Newspaper";
                     var strMessage = "";
                     strMessage = "The market - " +
                         workingMarketName +
                         " and media type - " +
-                        tmpMediaTypeName +
+                        workingMediaTypeFullName +
                         " for period/Year - " +
                         workingPeriod +
                         "/" +
