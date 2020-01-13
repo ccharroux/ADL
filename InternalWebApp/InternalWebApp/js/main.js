@@ -2453,3 +2453,136 @@ function getReportIdByToken(inValue)
 
 }
 
+function getFeatureButtons(featureToken, featureValue)
+{
+    //loop through results to build the buttons
+    //active will be remove
+    //  will pass featureid and value
+    //non-active will be add
+    //  will pass featureid, conditionid, value
+
+    $.ajax({
+        url: ServicePrefix + '/api/Feature/GetFeatureListByTokenValue',
+        dataType: 'json',
+        type: 'post',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inFeatureToken": featureToken,
+            "inFeatureValue": featureValue
+        }),
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+
+            if (data.response.status != "SUCCESS") {
+                MKAErrorMessageRtn(data.response.errorMessage[0]);
+            }
+            else {
+
+                var str = '';
+               
+                $.each(data.report.rows, function (index) {
+                    var obj = data.report.rows[index];
+
+                    var parameters = "";
+                    var btnValue = "";
+
+                    if (obj.Active == true || obj.Active == 1)
+                    {
+                        ////make delete button
+                        btnValue = "Remove " + obj.Description;
+                        parameters = "";
+                        parameters += "'" + featureToken + "'," + obj.FeatureId + ",'" + featureValue + "'";
+
+                        str += '<' + 'input type="button" class="default-button" style="margin-bottom:5px;" value="' + btnValue + '" onclick="deleteFeatureAssignment(' + parameters + ')"/><br/>';
+
+                    } else
+                    {
+                        ////make add button
+                        btnValue = "Add " + obj.Description;
+
+                        parameters = "";
+                        parameters += "'" + featureToken + "'," + obj.FeatureId + "," + obj.ConditionId + ",'" + featureValue + "'";
+
+                        str += '<' + 'input type="button" class="default-button" style="margin-bottom:5px;" value="' + btnValue + '" onclick="addFeatureAssignment(' + parameters + ')"/><br/>';
+                    }
+
+                });
+
+
+                $("#featureButtons").html(str);
+               
+            }
+
+
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    });
+
+}
+
+function addFeatureAssignment(featureToken, featureId, conditionId, value)
+{
+    
+    $.ajax({
+        url: ServicePrefix + '/api/Feature/AddFeatureByFeatureConditionValue',
+        dataType: 'json',
+        type: 'post',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inFeatureId": featureId,
+            "inConditionId": conditionId,
+            "inFeatureValue": value
+        }),
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+
+            if (data.response.status != "SUCCESS") {
+                MKAErrorMessageRtn(data.response.errorMessage[0]);
+            }
+            else {
+                getFeatureButtons(featureToken, value);
+            }
+
+
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    });
+}
+
+function deleteFeatureAssignment(featureToken, featureId, value)
+{
+  
+    $.ajax({
+        url: ServicePrefix + '/api/Feature/DeleteFeatureByFeatureValue',
+        dataType: 'json',
+        type: 'post',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inFeatureId": featureId,
+            "inFeatureValue": value
+        }),
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+
+            if (data.response.status != "SUCCESS") {
+                MKAErrorMessageRtn(data.response.errorMessage[0]);
+            }
+            else
+            {
+                getFeatureButtons(featureToken, value);
+            }
+
+
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    });
+}
