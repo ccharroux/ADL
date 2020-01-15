@@ -281,7 +281,7 @@
                             <input type="text" id="txtEmailAddress" maxlength="50" class="mkaRequired field-width-325" errorMessage="You must enter an Email Address" />
                         </div>
                         <div id="divResetPassword" class="col-md-4 text-align-center hidden">
-                            <input onclick="resetPassword();" value="Reset Password" class="default-button" type="button" />
+                            <input onclick="excludeFromBackButton(); resetPassword();" value="Reset Password" class="default-button" type="button" />
                         </div>
                     </div>
 
@@ -310,11 +310,11 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div>
-                                    <input value="Update" onclick="updatePersonnel();" class="default-button" type="button" />
+                                    <input value="Update" onclick="excludeFromBackButton(); updatePersonnel();" class="default-button" type="button" />
                                 </div>
-                                <div class="back-button-div">
+                                <!--<div class="back-button-div">
                                     <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button" />
-                                </div>
+                                </div>-->
                             </div>
                         </div>
                     </div>
@@ -376,7 +376,7 @@
                         <hr />
 
                         <!--Buttons-->
-                        <div class="default-button-section">
+                        <!--<div class="default-button-section">
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="back-button-div">
@@ -384,7 +384,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div>-->
 
                     </div>
 
@@ -575,8 +575,8 @@
                 str = str + '<div id="date' + productId + '" />';
                 str = str + '</div>';
                 str = str + '<div id="productButtons' + productId + '" class="col-md-6" style="text-align:left;">';
-                str = str + '<input type="button" id="productAdd' + productId + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="enableProduct(' + '\'' + productId + '\')" Value="Enable" />';
-                str = str + '<input type="button" id="productDisable' + productId + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="disableProduct(' + '\'' + productId + '\')" Value="Disable" />';
+                str = str + '<input type="button" id="productAdd' + productId + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="excludeFromBackButton(); enableProduct(' + '\'' + productId + '\');" Value="Enable" />';
+                str = str + '<input type="button" id="productDisable' + productId + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="excludeFromBackButton(); disableProduct(' + '\'' + productId + '\');" Value="Disable" />';
                 str = str + '</div>';
                 str = str + '</div>';
 
@@ -749,14 +749,13 @@
                 var isAssigned = false;
                 var obj = data.report.rows[index];
 
-                $("#ddlAssignedOwnerships > option").each(function ()
+                $("#ddlAssignedOwnerships > option").each(function()
                 {
-
                     if (this.value == obj.ownerid)
                     {
                         isAssigned = true;
                     }
-                })
+                });
 
                 if (isAssigned != true)
                 {
@@ -780,6 +779,7 @@
     function getPersonnel() {
 
         if (personnelID <= 0) {
+            cleanupBackButton(window.location.pathname);
             return;
         }
 
@@ -812,43 +812,50 @@
             bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
             });
-        } else {
-            $.each(data.report.rows, function (index) {
-                var obj = data.report.rows[index];
+        } else
+        {
+            $.each(data.report.rows,
+                function(index)
+                {
+                    var obj = data.report.rows[index];
 
-                $("#txtFirstName").val(obj["firstName"]);
-                $("#txtLastName").val(obj["lastName"]);
-                $("#txtMiddleInitial").val(obj["middleInitial"]);
-                $("#txtSalutation").val(obj["salutation"]);
-                $("#txtSuffix").val(obj["suffix"]);
-                $("#txtTitle").val(obj["title"]);
-                $("#ddlPosition").val(obj["positionCode"]);
-                $("#txtAddress1").val(obj["address1"]);
-                $("#txtAddress2").val(obj["address2"]);
-                $("#txtAddress3").val(obj["address3"]);
-                $("#txtCity").val(obj["city"]);
-                if (obj["stateAbbreviation"] == null) {
-                    $("#ddlState").val(-1);
-                } else {
-                    $("#ddlState").val(obj["stateAbbreviation"]);
-                }
-                $("#txtZipCode").val(obj["zipCode"]);
-                $("#txtZip4").val(obj["zip4"]);
-                $("#txtPhoneAreaCode").val(obj["areaCode"]);
-                $("#txtPhoneNumber").val(obj["phone"]);
-                $("#txtPhoneNumberExt").val(obj["extension"]);
-                $("#txtMobileAreaCode").val(obj["mobileAreaCode"]);
-                $("#txtMobileNumber").val(obj["mobilePhone"]);
-                $("#txtFaxAreaCode").val(obj["faxAreaCode"]);
-                $("#txtFaxNumber").val(obj["faxPhone"]);
-                $("#txtEmailAddress").val(obj["email"]);
-                $("#txtAltEmailAddress").val(obj["altEmail"]);
-                $("#txtComment").val(obj["comment"]);
+                    $("#txtFirstName").val(obj["firstName"]);
+                    $("#txtLastName").val(obj["lastName"]);
+                    $("#txtMiddleInitial").val(obj["middleInitial"]);
+                    $("#txtSalutation").val(obj["salutation"]);
+                    $("#txtSuffix").val(obj["suffix"]);
+                    $("#txtTitle").val(obj["title"]);
+                    $("#ddlPosition").val(obj["positionCode"]);
+                    $("#txtAddress1").val(obj["address1"]);
+                    $("#txtAddress2").val(obj["address2"]);
+                    $("#txtAddress3").val(obj["address3"]);
+                    $("#txtCity").val(obj["city"]);
+                    if (obj["stateAbbreviation"] == null)
+                    {
+                        $("#ddlState").val(-1);
+                    } else
+                    {
+                        $("#ddlState").val(obj["stateAbbreviation"]);
+                    }
+                    $("#txtZipCode").val(obj["zipCode"]);
+                    $("#txtZip4").val(obj["zip4"]);
+                    $("#txtPhoneAreaCode").val(obj["areaCode"]);
+                    $("#txtPhoneNumber").val(obj["phone"]);
+                    $("#txtPhoneNumberExt").val(obj["extension"]);
+                    $("#txtMobileAreaCode").val(obj["mobileAreaCode"]);
+                    $("#txtMobileNumber").val(obj["mobilePhone"]);
+                    $("#txtFaxAreaCode").val(obj["faxAreaCode"]);
+                    $("#txtFaxNumber").val(obj["faxPhone"]);
+                    $("#txtEmailAddress").val(obj["email"]);
+                    $("#txtAltEmailAddress").val(obj["altEmail"]);
+                    $("#txtComment").val(obj["comment"]);
 
-                personnelName = obj["lastName"] + ', ' + obj["firstName"] + ' (' + personnelID + ')';
+                    personnelName = obj["lastName"] + ', ' + obj["firstName"] + ' (' + personnelID + ')';
 
-                getPersonnelWebSetup();
-            })
+                    getPersonnelWebSetup();
+
+                    cleanupBackButton(window.location.pathname);
+                });
         }
 
     }
@@ -956,12 +963,19 @@
 
             bootbox.alert("Ownership has been added successfully.");
 
-            $('#ddlOwnership > option:selected').each(function () {
-                if ($('#ddlAssignedOwnerships [value="' + $(this).val() + '"]').length == 0) {
-                    $('#ddlAssignedOwnerships').html('<option value="' + $(this).val() + '">' + $(this).text() + '</option>' + $('#ddlAssignedOwnerships').html());
+            $('#ddlOwnership > option:selected').each(function()
+            {
+                if ($('#ddlAssignedOwnerships [value="' + $(this).val() + '"]').length == 0)
+                {
+                    $('#ddlAssignedOwnerships').html('<option value="' +
+                        $(this).val() +
+                        '">' +
+                        $(this).text() +
+                        '</option>' +
+                        $('#ddlAssignedOwnerships').html());
                     $(this).remove();
                 }
-            })
+            });
         }
     }
 
@@ -1011,8 +1025,9 @@
 
                 if (obj['_updateStatus'] == -1) {
                     bootbox.alert("Ownership has been removed but ContactId: " + personnelID + " has active/submitted surveys and hence can not be deleted from ContactMSS table. In order to delete this contact, first delete all survey assignments.");
-                } else {
-                    bootbox.alert("Ownership has been removed successfully.")
+                } else
+                {
+                    bootbox.alert("Ownership has been removed successfully.");
                 }
             });
         }
