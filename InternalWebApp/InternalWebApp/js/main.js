@@ -2381,6 +2381,7 @@ function cleanupBackButton(pageName)
         initializeBackButton();
     }
 }
+
 function loadReportParameters() {
 
     if (hasBackButtonData() == false)
