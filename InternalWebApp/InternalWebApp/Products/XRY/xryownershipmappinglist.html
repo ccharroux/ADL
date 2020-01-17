@@ -80,10 +80,10 @@
                 <div class="row">
                     <div class="col-md-10">
                         <label for="ddlOwner" class="search-ddl-label">Owner</label>
-                        <select id="ddlOwner" class="search-ddl-select mkaRequired" errorMessage="You must select an Owner." onchange="getMarketListByOwner()"></select>
+                        <select id="ddlOwner" class="search-ddl-select mkaRequired report-filter" errorMessage="You must select an Owner." onchange="getMarketListByOwner()"></select>
 
                         <label for="ddlMarket" class="search-ddl-label">Market</label>
-                        <select id="ddlMarket" class="search-ddl-select mkaRequired" errorMessage="You must select a Market."></select>
+                        <select id="ddlMarket" class="search-ddl-select mkaRequired report-filter" errorMessage="You must select a Market."></select>
 
                         <input type="button" class="search-button" style="" value="Search" onclick="getOwnerMappingList()" />
                     </div>
@@ -268,7 +268,9 @@
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
         }
-        else {
+        else
+        {
+            
             var str = '';
 
             str = '<option value="-1">-- Select a Market </option>';
@@ -281,17 +283,20 @@
             convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
             ////last saved search
-            //if ($("#hdnMarketId").val() != "") {
-            //    $("#ddlMarket").val($("#hdnMarketId").val());
+            //console.log($("#hdnMarketId").val());
+            if ($("#hdnMarketId").val() != "") {
+                $("#ddlMarket").val($("#hdnMarketId").val());
+                getOwnerMappingList();
+                $("#hdnMarketId").val("");
+            }
+
+            //if (!param_marketId == false && param_marketId.length > 0)
+            //{
+            //    $("#ddlMarket").val(param_marketId);
             //    getOwnerMappingList();
-            //    $("#hdnMarketId").val("");
             //}
 
-            if (!param_marketId == false && param_marketId.length > 0)
-            {
-                $("#ddlMarket").val(param_marketId);
-                getOwnerMappingList();
-            }
+
 
         }
     }
@@ -485,18 +490,42 @@
     }
 
     function loadLastSearch() {
-        var search = getParameterByName("search");
+        //var search = getParameterByName("search");
 
-        if (!search == false) {
-            if (search.length > 0) {
-                var sArray = new Array();
-                sArray = search.split("|");
+        //if (!search == false) {
+        //    if (search.length > 0) {
+        //        var sArray = new Array();
+        //        sArray = search.split("|");
 
-                $("#ddlOwner").val(sArray[0]).trigger("change");
-                $("#hdnMarketId").val(sArray[1]);
+        //        $("#ddlOwner").val(sArray[0]).trigger("change");
+        //        $("#hdnMarketId").val(sArray[1]);
+        //    }
+        //}
+
+        if (hasBackButtonData() == false) {
+            return;
+        }
+
+        var reportParamData = getBackButtonDataByPage(window.location.pathname);
+
+        for (var key in reportParamData) {
+
+            if (key.indexOf("rdo") > -1) {
+                $("#" + key).prop('checked', reportParamData[key]);
+            } else {
+                $("#" + key).val(reportParamData[key]);
+                if (key == "ddlMarket")
+                {
+                    $("#hdnMarketId").val(reportParamData[key]);
+                }
+            }
+
+            if (key.indexOf("ddlOwner") > -1) {
+                $("#" + key).change();
             }
         }
 
+        cleanupBackButton(window.location.pathname);
     }
 
     function editOwnerMapping(ownerTypeId, ownerId, marketId) {
