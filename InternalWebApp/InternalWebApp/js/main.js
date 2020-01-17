@@ -534,7 +534,7 @@ function addDialogComponents()
     d = d + '&nbsp;<span><input id="btnAddAsFavorite" type="button"  value="Add as Favorite" onclick="showFavoriteDialog();"/></span>';
     d = d + '</div>';
     //d = d + '&nbsp;<input class="favoriteButtonClass" type="button" value="My Favorites" onclick="window.location=\'/admin/login/dashboard.html\'"/>';
-    $("body").append(d)
+    $("body").append(d);
     getFavoritesForQuickList();
     setTimeout(buildFavoritesDialog, 250);
 
