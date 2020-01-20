@@ -268,6 +268,8 @@ reportName.push("rptUsersByProduct");
 reportName.push("rptOutstandingStations");
 reportName.push("rptListErrors");
 
+reportName.push("rptXRYOwnersWithoutRecipients")
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -10356,6 +10358,33 @@ function getReportObject_ListErrors() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tech', 'old admin']
+    }
+
+    return tempObject;
+}
+ 
+function getReportFilterArray_XRYOwnersWithoutRecipients() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+    return arrayFilters;
+}
+function getReportObject_XRYOwnersWithoutRecipients() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "XRay Owners without Recipients",
+        apiControllerAction: "/api/XRAYReport/GetOwnersWithoutRecipients",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry' ]
     }
 
     return tempObject;
