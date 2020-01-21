@@ -73,16 +73,6 @@
                     <!--Hidden Input-->
                     <input type="hidden" id="hdnMarketId" value="" />
 
-                    <!--Owner Type-->
-                    <div class="row input-row">
-                        <div class="col-md-3 text-align-left">
-                            <label for="txtOwnerType">Owner Type</label>
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <input type="text" id="txtOwnerType" class="mkaRequired field-width-325" errorMessage="You must enter an Owner Type." />
-                        </div>
-                    </div>
-
                     <!--Owner-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
@@ -94,13 +84,23 @@
                         </div>
                     </div>
 
+                    <!--Revenue Code-->
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtRevenueCode">Revenue Code</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" id="txtRevenueCode" class="mkaRequired field-width-325" errorMessage="You must enter an Revenue Code." />
+                        </div>
+                    </div>
+
                     <!--All Markets-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="chkAllMarkets">All Markets</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="checkbox" checked onchange="hideShowMarketDropdown()" id="chkAllMarkets" />
+                            <input type="checkbox" disabled checked onchange="hideShowMarketDropdown()" id="chkAllMarkets" />
                         </div>
                     </div>
 
@@ -118,7 +118,7 @@
                     <!--Account Type-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="ddlAccountType">Our Account Type</label>
+                            <label for="ddlAccountType">MKA Account Type</label>
                         </div>
                         <div class="col-md-9 text-align-left">
                             <select id="ddlAccountType" class="mkaRequired field-width-325" errorMessage="You must select an Account Type"></select>
@@ -128,7 +128,7 @@
                     <!--Revenue Type-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="ddlRevenueType">Our Revenue Type</label>
+                            <label for="ddlRevenueType">MKA Revenue Type</label>
                         </div>
                         <div class="col-md-9 text-align-left">
                             <select id="ddlRevenueType" class="mkaRequired field-width-325" errorMessage="You must select a Revenue Type"></select>
@@ -138,10 +138,11 @@
                     <!--Include-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="chkInclude">Include</label>
+                            <label for="chkInclude">Include Revenue</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="checkbox" id="chkInclude" />
+                            <input type="checkbox" id="chkInclude" /><br />
+                            <span>Note: By checking this, revenue for this Revenue Code will be included in reporting, if not, revenue will be ignored.</span>
                         </div>
                     </div>
 
@@ -163,11 +164,11 @@
                             </div>
                             <div class="col-md-9 text-align-left">
                                 <div>
-                                    <input value="Update" onclick="updateOwnerMapping()" class="default-button" type="button" />
+                                    <input value="Update" onclick="excludeFromBackButton(); updateOwnerMapping();" class="default-button" type="button" />
                                 </div>
-                                <div class="back-button-div">
+                                <!--<div class="back-button-div">
                                     <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button" />
-                                </div>
+                                </div>-->
                             </div>
                         </div>
                     </div>
@@ -213,7 +214,7 @@
         marketId = (getParameterByName("marketId") == null ? 0 : getParameterByName("marketId"));
 
         buildXRYMenu("Revenue");
-        buildQuickReports(['XRAY MONTHLY']);
+        buildQuickReports(['XRY Data Review']);
  
         getAccountTypeList();
 
@@ -296,7 +297,7 @@
         } else {
             var str = '';
 
-            str = '<option value="-1">-- Select a Revenue Type</option>';
+            str = '<option value="-1">-- Select a Revenue Type</option>'; 
             str = str + '<option value="0">n/a</option>';
 
             $.each(data.report.rows, function (index) {
@@ -397,7 +398,7 @@
             $.each(data.report.rows, function (index) {
                 var obj = data.report.rows[index];
 
-                $("#txtOwnerType").val(obj["revenueDefScript"]);
+                $("#txtRevenueCode").val(obj["revenueDefScript"]);
                 $("#ddlOwner").val(obj["ownerId"]);
                 $("#ddlAccountType").val(obj["accountTypeId"]);
                 $("#ddlRevenueType").val(obj["revenueTypeId"]);
@@ -412,7 +413,7 @@
 
                 }
 
-                $("#txtOwnerType").prop("readOnly", "readOnly");
+                $("#txtRevenueCode").prop("readOnly", "readOnly");
                 $("#chkAllMarkets").prop("disabled", true);
             });
 
@@ -492,7 +493,7 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inOwnerId": $("#ddlOwner").val(),
                 "inMarketId": ($("#chkAllMarkets").prop("checked") == true ? -1 : $("#ddlMarket").val()),
-                "inOwnerType": $("#txtOwnerType").val().trim(),
+                "inOwnerType": $("#txtRevenueCode").val().trim(),
                 "inAccountTypeId": $("#ddlAccountType").val(),
                 "inRevenueTypeId": $("#ddlRevenueType").val(),
                 "inInclude": ($("#chkInclude").prop("checked") == true ? 'Yes' : 'No'),
@@ -518,7 +519,7 @@
         } else {
 
             bootbox.alert("Update successful.", function () {
-                $("#txtOwnerType").prop("readOnly", "readOnly");
+                $("#txtRevenueCode").prop("readOnly", "readOnly");
                 $("#ddlOwner").prop("disabled", true).trigger("chosen:updated");
                 $("#ddlMarket").prop("disabled", true).trigger("chosen:updated");
             });

@@ -15,9 +15,9 @@ var gShowHeader = true;
 var release =
 {
     "DEV": "N/A",
-    "STAGING": "12/17/2019",
-    "PRODUCTION": "12/17/2019",
-    "DEMO": "12/17/2019"
+    "STAGING": "1/9/2020",
+    "PRODUCTION": "1/9/2020",
+    "DEMO": "1/9/2020"
 }
 var dateOfCode = new Date();
 release["DEV"] = (dateOfCode.getMonth() + 1) + '-' + dateOfCode.getDate() + '-' + dateOfCode.getFullYear();
@@ -534,7 +534,7 @@ function addDialogComponents()
     d = d + '&nbsp;<span><input id="btnAddAsFavorite" type="button"  value="Add as Favorite" onclick="showFavoriteDialog();"/></span>';
     d = d + '</div>';
     //d = d + '&nbsp;<input class="favoriteButtonClass" type="button" value="My Favorites" onclick="window.location=\'/admin/login/dashboard.html\'"/>';
-    $("body").append(d)
+    $("body").append(d);
     getFavoritesForQuickList();
     setTimeout(buildFavoritesDialog, 250);
 
@@ -1131,7 +1131,7 @@ function buildXRYMenu(selectedItem) {
 
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "XRay Reports") + ' href="" role="button" aria-expanded="false"> XRay Reports <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=xray monthly&MenuItem=true" role="button" aria-expanded="false">XRay Monthly Reports </a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=XRY Data Review&MenuItem=true" role="button" aria-expanded="false">XRY Data Review Reports </a></li>';
 
     menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=xry&MenuItem=true" role="button" aria-expanded="false">XRay Reports </a></li>';
     menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=corporate&MenuItem=true" role="button" aria-expanded="false">Corporate Reports </a></li>';
@@ -1185,6 +1185,14 @@ function buildMRRMenu(selectedItem) {
     menuItems += productDashboard('dma');
     menuItems += '</ul>';
     menuItems += '</li>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "MRR Reports") + ' href="" role="button" aria-expanded="false">MRR Reports <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=MRR Data Review&MenuItem=true" role="button" aria-expanded="false">MRR Data Review</a></li>';
+
+    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=MRR Security and Analysis&MenuItem=true" role="button" aria-expanded="false">MRR Security and Analysis</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/utilities/genericreport/genericreportlist.html?tag=MRR Setup Info&MenuItem=true" role="button" aria-expanded="false">MRR Setup Info</a></li>';
+    menuItems += '              </ul>';
+    menuItems += '       </li>';
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
     menuItems += '        <li style="display:block"><a href="/products/mrr/mrrrelease.html?MenuItem=true">Release</a></li>';
@@ -2373,6 +2381,7 @@ function cleanupBackButton(pageName)
         initializeBackButton();
     }
 }
+
 function loadReportParameters() {
 
     if (hasBackButtonData() == false)
@@ -2445,3 +2454,136 @@ function getReportIdByToken(inValue)
 
 }
 
+function getFeatureButtons(featureToken, featureValue)
+{
+    //loop through results to build the buttons
+    //active will be remove
+    //  will pass featureid and value
+    //non-active will be add
+    //  will pass featureid, conditionid, value
+
+    $.ajax({
+        url: ServicePrefix + '/api/Feature/GetFeatureListByTokenValue',
+        dataType: 'json',
+        type: 'post',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inFeatureToken": featureToken,
+            "inFeatureValue": featureValue
+        }),
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+
+            if (data.response.status != "SUCCESS") {
+                MKAErrorMessageRtn(data.response.errorMessage[0]);
+            }
+            else {
+
+                var str = '';
+               
+                $.each(data.report.rows, function (index) {
+                    var obj = data.report.rows[index];
+
+                    var parameters = "";
+                    var btnValue = "";
+
+                    if (obj.Active == true || obj.Active == 1)
+                    {
+                        ////make delete button
+                        btnValue = "Remove " + obj.Description;
+                        parameters = "";
+                        parameters += "'" + featureToken + "'," + obj.FeatureId + ",'" + featureValue + "'";
+
+                        str += '<' + 'input type="button" class="default-button" style="margin-bottom:5px;" value="' + btnValue + '" onclick="deleteFeatureAssignment(' + parameters + ')"/><br/>';
+
+                    } else
+                    {
+                        ////make add button
+                        btnValue = "Add " + obj.Description;
+
+                        parameters = "";
+                        parameters += "'" + featureToken + "'," + obj.FeatureId + "," + obj.ConditionId + ",'" + featureValue + "'";
+
+                        str += '<' + 'input type="button" class="default-button" style="margin-bottom:5px;" value="' + btnValue + '" onclick="addFeatureAssignment(' + parameters + ')"/><br/>';
+                    }
+
+                });
+
+
+                $("#featureButtons").html(str);
+               
+            }
+
+
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    });
+
+}
+
+function addFeatureAssignment(featureToken, featureId, conditionId, value)
+{
+    
+    $.ajax({
+        url: ServicePrefix + '/api/Feature/AddFeatureByFeatureConditionValue',
+        dataType: 'json',
+        type: 'post',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inFeatureId": featureId,
+            "inConditionId": conditionId,
+            "inFeatureValue": value
+        }),
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+
+            if (data.response.status != "SUCCESS") {
+                MKAErrorMessageRtn(data.response.errorMessage[0]);
+            }
+            else {
+                getFeatureButtons(featureToken, value);
+            }
+
+
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    });
+}
+
+function deleteFeatureAssignment(featureToken, featureId, value)
+{
+  
+    $.ajax({
+        url: ServicePrefix + '/api/Feature/DeleteFeatureByFeatureValue',
+        dataType: 'json',
+        type: 'post',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inFeatureId": featureId,
+            "inFeatureValue": value
+        }),
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+
+            if (data.response.status != "SUCCESS") {
+                MKAErrorMessageRtn(data.response.errorMessage[0]);
+            }
+            else
+            {
+                getFeatureButtons(featureToken, value);
+            }
+
+
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    });
+}

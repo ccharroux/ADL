@@ -309,7 +309,7 @@
                             <label for="chkRetainHistory">Retain History</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="checkbox" onchange="updateStationHistoryAllProducts()" id="chkRetainHistory" />
+                            <input type="checkbox" onchange="excludeFromBackButton(); updateStationHistoryAllProducts();" id="chkRetainHistory" />
                         </div>
                     </div>
                     <!--Buttons-->
@@ -320,11 +320,11 @@
                             </div>
                             <div class="col-md-9 text-align-left">
                                 <div>
-                                    <input value="Update" onclick="updateStation();" class="default-button" type="button" />
+                                    <input value="Update" onclick="excludeFromBackButton(); updateStation();" class="default-button" type="button" />
                                 </div>
-                                <div class="back-button-div">
+                                <!--<div class="back-button-div">
                                     <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button" />
-                                </div>
+                                </div>-->
                             </div>
                         </div>
                     </div>
@@ -355,11 +355,6 @@
                         </div>
                     </div>
                     <hr />
-
-
-
-
-
                 </div>
             </div>
         </div>
@@ -411,7 +406,7 @@
         removeLocalStorage("tempStationMarketId");
         removeLocalStorage("tempProductNew");
 
-        checkForInsertOrUpdate()
+        checkForInsertOrUpdate();
         getMediaTypeList();
 
 
@@ -657,7 +652,9 @@
 
     function getStation() {
 
-        if (stationId <= 0) {
+        if (stationId <= 0)
+        {
+            cleanupBackButton(window.location.pathname);
             return;
         }
         //getting station first before load of other dropdown lists because those dropdown list values depend on the mediaTypeId returned from getStation
@@ -751,6 +748,8 @@
         var mediaType = $("#ddlMediaType").val();
         getMarketList(mediaType);
         getProductList();
+
+        cleanupBackButton(window.location.pathname);
 
     }
 
@@ -1398,12 +1397,15 @@
                 window.location = '/products/tvb/tvbstationproduct.html?StationID=' + stationId + '&ProductNew=' + isProductEnable;
                 break;
             case 'mss':
+                excludeFromBackButton();
                 enableDisableProductForStation(1, "MSS");
                 break;
             case 'dma':
+                excludeFromBackButton();
                 enableDisableProductForStation(1, "DMA");
                 break;
             default:
+                excludeFromBackButton();
                 window.location = '/admin/station/station.html?StationID=' + stationId;
                 break;
         }

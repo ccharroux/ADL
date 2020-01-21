@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
@@ -45,8 +46,10 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
+
     <!--Chosen Dropdown-->
     <link rel="stylesheet" href="/css/chosen.min.css" />
+
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
 
@@ -67,54 +70,50 @@
         </header>
         <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
+
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Parent Agencies</h2>
+                        <h2 id="pageTitle"></h2>
                     </div>
                 </div>
-                <div id="divQuickReport" >
-                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
-                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
-                </div>
-
+ 
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-10 ">
-                        <label for="searchText">Parent Agency Name</label>
-                        <input type="text" id="searchText" class="report-filter"/>
-                        <!--<label for="ddlMediaType" style="padding-left:10px">Media Type</label>
-                        <select id="ddlMediaType">
-                        </select>-->
-                        <input type="button" class="search-button" value="Search" onclick="getParentAgencyList()" />
+
+                        <label for="ddlDaysBack" class="dropdown-label">Sent Days Back</label>
+                        <select id="ddlDaysBack" class="search-ddl-select dropdown-select"  onchange="getMatchedNotificationList();"></select>
+
+
                     </div>
                     <div class="col-md-2 ">
-                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editParentAgency(0)" />
+                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editMatchedNotification(0)" />
                     </div>
                 </div>
 
-                <!-- start datatable coding-->
 
+                <!-- start datatable-->
                 <div class="dataTable-top-margin">
-                    <table id="dtParentAgencyList" class="dataTable-border dataTable-headers dataTable-cell-border">
+                    <table id="dtMatchedNotification" class="dataTable-border dataTable-headers dataTable-cell-border">
                         <thead>
                             <tr>
-                                <th class="exportColumn">Parent Agency Name</th>
-                                <th></th>
+                                <th class="exportColumn">Subject</th>
+                                <th class="exportColumn">Send Date</th>
+                                <th class="exportColumn">Author</th>
+                                <th class="exportColumn">Date Created</th>
+                                <th class="exportColumn">Approvals</th>
+                                <th class="exportColumn">Assignments</th>
+                               <th></th>
                             </tr>
                         </thead>
-                        <tfoot>
-                            <tr>
-                                <th>Parent Agency Name</th>
-                                <th></th>
-                            </tr>
-                        </tfoot>
+ 
                     </table>
                 </div>
-
-                <!-- end datatable coding-->
-
+                <!-- end datatable -->
             </div>
         </div>
+        <!--<div id="map" data-animate-effect="fadeIn"></div>-->
+
     </div>
 
 
@@ -153,47 +152,95 @@
 </html>
 <script>
 
+
+    var bSecondaryMarketsOnly = false;
+
     $(document).ready(function () {
 
+        getDaysBackList();
+ 
+        setTitle();
 
-        loadScreen();
-        setupUI();
+        setEventListeners();
+
+        setDataTable();
+
+        buildMainMenu("tech");
+
+ 
+
+        getMatchedNotificationList();
+
+     });
+
+    function getDaysBackList() {
 
 
-        buildXRYMenu("Utility");
-        buildQuickReports(['agency']);
+        var str = '';
 
-        loadLastSearch();
+        $("#ddlDaysBack").html("");
 
-        setLocalStorage("search", "");
-        setLocalStorage("searchPage", window.location);
-    });
+        str = str + "<option value='-1' >One Day</option>";
+        str = str + "<option value='-7'>One Week</option>";
+        str = str + "<option value='-30' selected>One Month</option>";
+        str = str + "<option value='-60'>Two Months</option>";
+        str = str + "<option value='-90'>Three Months</option>";
+        str = str + "<option value='-90'>Three Months</option>";
+        str = str + "<option value='-180'>Six Months</option>";
+        str = str + "<option value='-365'>1 Year </option>";
+ 
+        $("#ddlDaysBack").append(str);
 
-    function setupUI()
-    {
-        $("body").on("click",
-            "#clear_search_button",
-            function () {
-                var table = $("#dtParentAgencyList").DataTable();
-                table.search('').draw();
-            });
+        convertToChosenSelect("ddlDaysBack", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+ 
+
+
     }
-    function loadScreen()
-    {
-        var reportTitle = "Parent Agency List";
-        var exportColumns = returnTableColumnsByClass("dtParentAgencyList", "exportColumn");
 
-        $("#dtParentAgencyList").DataTable({
+ 
+    function setDataTable()
+    {
+        var reportTitle = "Matched Notification List";
+        var exportColumns = returnTableColumnsByClass("dtMatchedNotification", "exportColumn");
+
+
+        $("#dtMatchedNotification").DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
             "data": [],
             "columns": [
+                { "data": 'Subject' },
+                { "data": 'Send Date' },
+                { "data": 'Author' },
+                { "data": 'Date Created' },
+
                 {
-                    "data": 'parentAgencyName'
+                    "data": 'Approvals',
+                    "className" : "text-align-center"
+                },
+                {
+                    "data": 'Assignments',
+                    "className": "text-align-center"
                 },
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="#" onclick="editParentAgency(' + row.parentAgencyId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteParentAgency(' + row.parentAgencyId + ')">Delete</a>';
+                        var str = '<a href="#" onclick="viewMatchedNotification(' + row['Matched Notification Id'] + ')">View</a>';
+
+                        if (row['Approvals'] == 0) {
+                            str = str + '&nbsp;<a href="#" onclick="editMatchedNotification(' + row['Matched Notification Id'] + ')">Edit</a>'
+                               + '&nbsp;<a href="#" onclick="deleteMatchedNotification(' + row['Matched Notification Id'] + ')">Delete</a>';
+                        }
+
+                        if (row['Approvals'] == 0 && row['Assignments'] != 0)
+                        {
+                            str = '<a href="#" onclick="approveMatchedNotification(' + row['Matched Notification Id'] + ')">Approve</a>&nbsp;' + str;
+                        }
+
+                        if (row['Assignments'] == 0 && row['Approvals'] == 0) {
+                            str = '<a href="#" onclick="assignMatchedNotification(' + row['Matched Notification Id'] + ')">Assign</a>&nbsp;' + str;
+                        }
+
+                        return str;
                     },
                     "orderable": false,
                     "searchable": false,
@@ -208,7 +255,7 @@
                //        columns: exportColumns,
                //        format: {
                //            header: function (data, columnIdx) {
-               //                return returnExportColumnHeadingTitle("dtParentAgencyList", data, columnIdx);
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
                //            }
                //        }
                //    }
@@ -220,7 +267,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtParentAgencyList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
                            }
                        }
                    }
@@ -232,7 +279,7 @@
                //        columns: exportColumns,
                //        format: {
                //            header: function (data, columnIdx) {
-               //                return returnExportColumnHeadingTitle("dtParentAgencyList", data, columnIdx);
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
                //            }
                //        }
                //    }
@@ -244,7 +291,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtParentAgencyList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
                            }
                        }
                    }
@@ -260,85 +307,97 @@
             createdRow: function (row, data, index) {
                 //this adds the class to every row
                 $(row).addClass('single-line-height');
+
+
             },
             language: {
                 //this changes search box label from Search: to Filter Results:
                 search: "Filter Results:"
             }
         });
+
     }
 
-    function getParentAgencyList(bSilent) {
+    function setEventListeners()
+    {
+        //var input = document.getElementById("searchTextNumber");
+        //input.addEventListener("keyup", function (event) {
+        //    // Cancel the default action, if needed
+        //    event.preventDefault();
+        //    // Number 13 is the "Enter" key on the keyboard
+        //    if (event.keyCode === 13) {
+        //        setLocalStorage("search", "");
+        //        editMarket(document.getElementById("searchTextNumber").value);
+        //    }
+        //});
 
-        if (!bSilent) {
-            bSilent = false;
-        }
+        //var input = document.getElementById("searchText");
+        //input.addEventListener("keyup", function (event) {
+        //    // Cancel the default action, if needed
+        //    event.preventDefault();
+        //    // Number 13 is the "Enter" key on the keyboard
+        //    if (event.keyCode === 13) {
 
-        if ($("#searchText").val().trim() == 0) {
-            if (bSilent == false)
-            {
-                bootbox.alert("Please enter text to search for Parent Agencies(s)",
-                    function()
-                    {
-                    });
-            }
-            return;
-        }
+        //        getMarketList();
+        //    }
+        //});
+    }
 
-        setLocalStorage("search", $("#searchText").val().trim());
-        setLocalStorage("searchPage", window.location);
+    function setTitle()
+    {
+ 
+        $("#pageTitle").text("Matched Notification List");
+ 
+    }
+ 
+    function editMatchedNotification(matchedNotificationId) {
 
-        //filling out url for ajax
-        var url = ServicePrefix + '/api/ParentAgency/GetParentAgencyList';
+ 
+        window.location = "/admin/techtools/matchednotification/matchednotification.html?matchednotificationId=" + matchedNotificationId;
 
-        //filling out settings for ajax call
-        var settings = {
+    }
+
+    function deleteMatchedNotification(matchedNotificationId) {
+
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+
+    }
+    function assignMatchedNotification(matchedNotificationId)
+    {
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+    }
+    function approveMatchedNotification(matchedNotificationId) {
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+    }
+    function viewMatchedNotification(matchedNotificationId) {
+        bootbox.alert('This functionality is still under development.', function () {
+        });
+    }
+    function getMatchedNotificationList() {
+
+        var url = "?inApiToken=" +  getLocalStorage("APIToken");
+        url = url + "&inDaysBack=" + $("#ddlDaysBack").val();
+
+        $.ajax({
+            url: ServicePrefix + '/api/MatchedNotification/GetMatchedNotificationList' + url,
             dataType: 'json',
-            type: 'post',
+            type: 'get',
             contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inParentAgencyName": $("#searchText").val().trim(),
-                "inShowDisabled": false
-            }),
+           
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                //populateTable(data);
-                populateDataTable("dtParentAgencyList", data);
+ 
+                 populateDataTable("dtMatchedNotification", data);
+
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
-        }
-
-        //ajax call
-        $.ajax(url, settings);
-
-    }
-
-    function loadLastSearch() {
-        //var search = getParameterByName("search");
-
-        //if (!search == false) {
-        //    if (search.length > 0) {
-        //        $("#searchText").val(search);
-        //        getParentAgencyList();
-        //    }
-        //}
-
-        loadReportParameters();
-        getParentAgencyList(true);
-
-    }
-
-    function editParentAgency(parentAgencyId) {
-        //ParentAgencyID
-        window.location = "/admin/parentagency/parentagency.html?ParentAgencyID=" + parentAgencyId;
-    }
-
-    function deleteParentAgency(parentAgencyId) {
-        bootbox.alert('This functionality is still under development.', function () {
         });
-    }
 
+    }
 </script>
+
