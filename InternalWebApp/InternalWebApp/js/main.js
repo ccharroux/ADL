@@ -1482,6 +1482,7 @@ function buildTechMenu(selectedItem) {
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "TechTools") + ' role="button" aria-expanded="false">Tools <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html?MenuItem=true">Tech Tools</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/matchednotification/matchednotificationlist.html?MenuItem=true">Matched Notification Tool</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/techtools/encryptdecrypt.html?MenuItem=true">Encryption/Decryption Tool</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrarchiverollover.html?MenuItem=true">MRR Rollover</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrmarkethistorydatamatrix.html?MenuItem=true">MRR Market History Maintenance</a></li>';
@@ -2495,7 +2496,7 @@ function getFeatureButtons(featureToken, featureValue)
                         parameters = "";
                         parameters += "'" + featureToken + "'," + obj.FeatureId + ",'" + featureValue + "'";
 
-                        str += '<' + 'input type="button" class="default-button" style="margin-bottom:5px;" value="' + btnValue + '" onclick="deleteFeatureAssignment(' + parameters + ')"/><br/>';
+                        str += '<' + 'input type="button" class="default-button" style="background-color:red;margin-bottom:5px;" value="' + btnValue + '" onclick="deleteFeatureAssignment(' + parameters + ')"/><br/>';
 
                     } else
                     {
@@ -2505,7 +2506,7 @@ function getFeatureButtons(featureToken, featureValue)
                         parameters = "";
                         parameters += "'" + featureToken + "'," + obj.FeatureId + "," + obj.ConditionId + ",'" + featureValue + "'";
 
-                        str += '<' + 'input type="button" class="default-button" style="margin-bottom:5px;" value="' + btnValue + '" onclick="addFeatureAssignment(' + parameters + ')"/><br/>';
+                        str += '<' + 'input type="button" class="default-button" style="background-color:green;margin-bottom:5px;" value="' + btnValue + '" onclick="addFeatureAssignment(' + parameters + ')"/><br/>';
                     }
 
                 });

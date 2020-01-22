@@ -36,6 +36,12 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
+
+
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <!--Chosen Dropdown-->
     <link rel="stylesheet" href="/css/chosen.min.css" />
@@ -88,7 +94,7 @@
                             <label for="txtSubject">Subject</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" maxlength="100" id="txtSubject" class="mkaRequired" errorMessage="You must enter a Subject." value=""/>
+                            <input type="text" maxlength="100" id="txtSubject" class="mkaRequired mkaEditable" errorMessage="You must enter a Subject." value=""/>
                         </div>
  
                     </div>
@@ -99,7 +105,7 @@
                             <label for="txtMessage">Message</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <textarea cols="20" rows="50" style="height:400px" class="mkaRequired" id="txtMessage" errorMessage="You must enter a Message."></textarea>
+                            <textarea cols="20" rows="50" style="height:200px; width:600px" class="mkaRequired  mkaEditable" id="txtMessage" errorMessage="You must enter a Message."></textarea>
                         </div>
                     </div>
 
@@ -109,7 +115,7 @@
                             <label for="txtLink">Link</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text"  maxlength="300" id="txtLink" value="" />
+                            <input type="text"  maxlength="300" id="txtLink" class="mkaEditable" value="" />
                         </div>
                     </div>
 
@@ -119,7 +125,7 @@
                             <label for="txtSendDate">Send Date</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="txtSendDate" value=""    />
+                            <input type="text" id="txtSendDate" value="" class="mkaEditable"   />
                         </div>
                     </div>
                     <!-- Author -->
@@ -148,7 +154,7 @@
                             </div>
                             <div class="col-md-9 text-align-left">
                                 <div>
-                                    <input value="Update" onclick="updateMatchedNotification()" class="default-button" type="button">
+                                    <input id="btnUpdate" value="Update" onclick="updateMatchedNotification()" class="default-button" type="button">
                                 </div>
                                 <div class="back-button-div">
                                     <input value="Back" onclick="goBackToList();" class="default-button" type="button">
@@ -157,7 +163,32 @@
                         </div>
                     </div>
 
+                    <!-- Assignments -->
+                    <!-- start datatable-->
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-12" style="text-align:center">
+                            <h3>Assignments</h3>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12" style="text-align:right">
+                            <input id="btnRemoveAllAssignments" type="button" value="Remove All Assignments" onclick="removeAllAssignedPersonnelNotification()" />
+                        </div>
+                    </div>
+                    <div class="dataTable-top-margin">
+                        <table id="dtMatchedNotificationPersonnel" class="dataTable-border dataTable-headers dataTable-cell-border">
+                            <thead>
+                                <tr>
+                                    <th class="exportColumn">User</th>
+                                    <th class="exportColumn">Position</th>
+                                    <th class="exportColumn">&nbsp;</th>
+                                </tr>
+                            </thead>
 
+                        </table>
+                    </div>
+                    <!-- end datatable -->
                 </div>
 
             </div>
@@ -184,6 +215,15 @@
     <!-- genericReport JS -->
     <script src="/js/genericReport.js"></script>
 
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
     <!--Chosen Dropdown-->
@@ -199,24 +239,131 @@
     $(document).ready(function ()
     {
 
-        buildMainMenu("Tech");
+        buildTechMenu("TechTools");
         matchedNotificationId = (getParameterByName("MatchedNotificationId") == null ? 0 : getParameterByName("MatchedNotificationId"));
         setupDatePicker();
-
+        setDataTable();
         if (matchedNotificationId != 0)
         {
             getMatchedNotification(matchedNotificationId);
+
+
         }
+
+
 
     });
 
+    function setDataTable()
+    {
+
+        var reportTitle = "Matched Notification Assignment List";
+        var exportColumns = returnTableColumnsByClass("dtMatchedNotificationPersonnel", "exportColumn");
+
+        $("#dtMatchedNotificationPersonnel").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                {
+                    "data": 'User',
+                    "className": "text-align-left"
+                },
+                {
+                    "data": 'Position',
+                    "className": "text-align-left"
+                },
+ 
+                {
+                    mRender: function (data, type, row) {
+                        var str = '<a href="#" onclick="removeAssignedPersonnelNotification(' + matchedNotificationId + ', ' + row['PersonnelId'] + ')">Remove</a>';
+                        if ($("#btnUpdate").is(":visible") == false) {
+                            str = '';
+                        }
+                        return str;
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": "text-align-right"
+                }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               {
+                   extend: 'excel',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+                           }
+                       }
+                   }
+               }
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            initComplete: function () {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+
+
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+
+    }
     function setupDatePicker() {
         // setup date picker 
         $(function () {
             $("#txtSendDate").datepicker();
  
         });
-
+ 
     }
     function getMatchedNotification(matchedNotificationId) {
 
@@ -232,6 +379,7 @@
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 getMatchedNotificationSuccess(data, textStatus, jQxhr);
+                getMatchedNotificationAssignments(matchedNotificationId);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -263,6 +411,16 @@
                 newDate = new Date(data.report.rows[index]['Create Date'].replace("T", ' '));
                 $("#txtCreateDate").val(newDate.getMonth() + 1 + '/' + newDate.getDate() + '/' + newDate.getFullYear());
 
+                if (data.report.rows[index].Admin == false)
+                {
+                    MakePageReadOnly(true);
+                }
+                else
+                {
+                    MakePageReadOnly(false);
+
+                }
+
             });
 
  
@@ -272,7 +430,78 @@
  
 
     }
+    function MakePageReadOnly(bReadOnly)
+    {
+        if (bReadOnly)
+        {
+            $("#btnUpdate").hide();
+            $(".mkaEditable").prop("readonly", "readonly");
+            $(".mkaEditable").prop("disabled", "disabled");
 
+         }
+        else
+        {
+            $("#btnUpdate").show();
+
+        }
+
+    }
+    function deleteMatchedNotificationAssignments(personnelId, bDeleteAll)
+    {
+
+        var url = ServicePrefix + "/api/MatchedNotification/"; 
+        var ajaxObject = new Object;
+
+        if (bDeleteAll == true) {
+            url = url + "DeleteMatchedNotificationAllPersonnel";
+
+            ajaxObject = JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMatchedNotificationId": matchedNotificationId
+            });
+        }
+        else
+        {
+            url = url + "DeleteMatchedNotificationSinglePersonnel";
+            ajaxObject = JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMatchedNotificationId": matchedNotificationId,
+                "inPersonnelId": personnelId
+            });
+        }
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: ajaxObject,
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deleteMatchedNotificationAssignmentsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function deleteMatchedNotificationAssignmentsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+
+            bootbox.alert('Matched Notfication Assignment(s) deleted.',
+                function () {
+                    window.location = "/admin/techtools/matchednotification/matchednotification.html?matchednotificationid=" + matchedNotificationId;
+                });
+
+        }
+    }
 
     function updateMatchedNotification( )
     {
@@ -323,7 +552,38 @@
         }
     }
 
+    function getMatchedNotificationAssignments(id) {
+
+        var url = "?inApiToken=" + getLocalStorage("APIToken");
+        url = url + "&inMatchedNotificationId=" + id;
+
+        $("#btnRemoveAllAssignments").hide();
+
+        $.ajax({
+            url: ServicePrefix + '/api/MatchedNotification/GetMatchedNotificationPersonnelAssignmentList' + url,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.report.rows.length > 0) {
+                    if ($("#btnUpdate").is(":visible"))
+                    {
+                        $("#btnRemoveAllAssignments").show();
+                    }
+                }
+                populateDataTable("dtMatchedNotificationPersonnel", data);
  
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
 
     function validationPassed() {
 
@@ -355,7 +615,25 @@
 
         return loopBreak;
     }
+    function removeAllAssignedPersonnelNotification() {
+        
+        bootbox.confirm("Are you sure you want to remove this assignment from this Notification?", function (result) {
 
+            if (result == true) {
+                deleteMatchedNotificationAssignments(-1, true);
+            }
+        });
+    }
+    function removeAssignedPersonnelNotification(matchedNotificationId, personnelId)
+    {
+
+        bootbox.confirm("Are you sure you want to remove ALL assignments from this Notification?", function (result) {
+
+            if (result == true) {
+                deleteMatchedNotificationAssignments(personnelId, false);
+            }
+        });
+    }
     function goBackToList()
     {
         window.location = '/admin/techtools/matchednotification/matchednotificationlist.html';
