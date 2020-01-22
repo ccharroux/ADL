@@ -132,10 +132,11 @@
                 <div id="divQuickReport" >
                     <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
                     <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
-                </div>
+                 </div>
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-12 ">
+
                         <div class="form-group rptView rptTVBOutstandingStationMode">
                             <label for="ddlTVBOutstandingStationMode" class="dropdown-label rptView rptTVBOutstandingStationMode">Mode</label>
                             <select id="ddlTVBOutstandingStationMode" apiInput="inMode" class="dropdown-select rptView rptTVBOutstandingStationMode report-filter"></select>
@@ -317,7 +318,8 @@
                         </div>
                         <div class="form-group rptButton" style="text-align:right">
                             <label for="btnReport" class="dropdown-label">&nbsp;</label>
-                            <input type="button" id="btnReport" class="search-button" value="Show" onclick="getReport()" />
+                            <input type="button" id="btnReport" class="search-button" value="Show" onclick="getReport()" /><br />
+                            <input id="btnReportData" style="display:none" type="button" value="Notification Data" onclick="getMatchedNotification()" />
                         </div>
 
                     </div>
@@ -339,7 +341,15 @@
             </div>
         </div>
     </div>
+    <div id="notificationDialog" title="Select a Notification">
+        <!--<div style="margin-top:5px;margin-bottom:5px" id="areYouSure">Are you sure you want to...</div>-->
+        <center>
+            <div id="notificationList" style="overflow-y:auto;overflow-x:hidden">
 
+            </div>
+ 
+        </center>
+    </div>
 
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
@@ -405,7 +415,7 @@
 
 
  
-
+        instantiateNotificationComponent();
         LoadDefaultDates();
 
         // get input parameters
@@ -415,6 +425,10 @@
         paramRevenuePeriod = getParameterByName("period");
         param_stationId = getParameterByName("stationId");
         param_marketAdvertiserId = getParameterByName("MarketAdvertiserId");
+
+
+        removeLocalStorage("notificationData");
+        $("#btnReportData").hide();
 
         if (!param_marketAdvertiserId == false)
         {
@@ -2211,6 +2225,7 @@
         });
 
     }
+
     function getAsyncJobStatusList() {
 
         $.ajax({
@@ -2596,7 +2611,8 @@
     }
     function getTheReportAJAX()
     {
- 
+        $("#btnReportData").hide();
+        removeLocalStorage("notificationData");
         $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
         $("#btnReport").removeClass("flash-button");
 
@@ -2612,7 +2628,7 @@
                 if (data.response.status.toUpperCase() === "SUCCESS") {
 
                     buildColumnsArray(data);
-
+                    getReportDataForNotification(true);
                 }
                 else
                 {
@@ -2980,8 +2996,6 @@
                     bootbox.alert("User sucessfully linked!", function () { getReport(); });
                    
                 }
-
-
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -2989,4 +3003,203 @@
         });
 
     }
+
+    function instantiateNotificationComponent() {
+
+        var wWidth = $(window).width();
+        var dWidth = wWidth * 0.5;
+        var wHeight = $(window).height();
+        var dHeight = (wHeight * 0.5) + 50;
+        var dTop = $(window).height() - dHeight;
+
+        $("#notificationDialog").dialog({
+            autoOpen: false,
+            resizable: false,
+            width: dWidth,
+            height: 600,
+            top: dHeight,
+            modal: false,
+            dialogClass: 'componentDialogClass'
+        });
+
+    }
+    function showNotificationDialog( ) {
+
+        $("#notificationDialog").dialog("close");
+        $("#notificationDialog").dialog("open");
+
+    }
+
+    function getMatchedNotification() {
+ 
+        getNotificationList();
+
+        getReportDataForNotification(false);
+        showNotificationDialog();
+ 
+    }
+    function getNotificationList()
+    {
+        var url = "?inApiToken=" + getLocalStorage("APIToken");
+        url = url + "&inDaysBack=-30";
+
+        $.ajax({
+            url: ServicePrefix + '/api/MatchedNotification/GetMatchedNotificationList' + url,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                buildNotificationList(data);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+    function buildNotificationList(data)
+    {
+        str = "";
+ 
+        $.each(data.report.rows, function (index) {
+            str = str + '<div class="row" style="height: 35px;">';
+
+            str = str + '<div class="col-md-9 text-align-left">' + data.report.rows[index]["Subject"] + '</div>';
+            str = str + '<div class="col-md-3 text-align-center"><input type="button" value="Assign To" onclick="assignToNotification(' + data.report.rows[index]["Matched Notification Id"] + ')"; /></div>';
+            str = str + '</div>'
+
+        });
+
+        $("#notificationList").html(str);
+
+    }
+    function cleanEmail(inEmail)
+    {
+        if (inEmail.indexOf('<') > -1)
+        {
+            var cleaned = inEmail.split('>');
+ 
+            if (cleaned.length > 1) {
+                cleaned = cleaned[1].split('<');
+                if (cleaned.length > 0) {
+                    return cleaned[0];
+                }
+            }
+
+        }
+        else
+        {
+            return inEmail;
+        }
+        // all else fails...
+        return inEmail;
+    }
+    function getReportDataForNotification(displayOnly)
+    {
+
+        var emailAddressArray = new Array();
+
+        if ($("#dtResults").is(':visible') == false) {
+            return;
+        }
+
+        $.blockUI();
+
+        var table = document.getElementById("dtResults");
+
+        var rows = null;
+
+        if (displayOnly == true) {
+            var data = $("#dtResults").DataTable().rows({ filter: 'applied' }).data();
+            rows = data[0];
+            if (rows.Email) {
+          //      console.log(rows.Email);
+                emailAddressArray.push(cleanEmail(rows.Email));
+            }
+            if (rows['Email Address']) {
+                emailAddressArray.push(cleanEmail(rows['Email Address']));
+            //    console.log(rows['Email Address']);
+            }
+        }
+        else
+        {
+            rows = $("#dtResults").DataTable().rows({ filter: 'applied' }).data();
+            rows.each(function (value, index) {
+                if (value.Email) {
+                   // console.log(value.Email);
+                    emailAddressArray.push(cleanEmail(value.Email));
+                }
+                if (value['Email Address']) {
+                    emailAddressArray.push(cleanEmail(value['Email Address']));
+                  //  console.log(value['Email Address']);
+                }
+
+                //if (displayOnly == true)
+                //{
+
+                //    isThereNotificationData(emailAddressArray);
+                //    return false;
+                //}
+            });
+
+        }
+        $.unblockUI();
+
+        isThereNotificationData(emailAddressArray);
+
+    }
+
+    function assignToNotification(id)
+    {
+        $("#notificationDialog").dialog("close");
+        var emailList =  getLocalStorage("notificationData");
+        //alert(emailList);
+
+        var emailListObject = JSON.parse(emailList);
+
+ 
+
+ 
+        $.ajax({
+            url: ServicePrefix + '/api/MatchedNotification/InsertPersonnelIntoMatchedNotification',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMatchedNotificationId": id,
+                "inEmailList": emailListObject
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    bootbox.alert("Users sucessfully added to Notification!", function () { getReport(); });
+                    window.location = '/admin/techtools/matchednotification/matchednotification.html?MatchedNotificationId=' + id + '&access=assign';
+
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function isThereNotificationData(emailAddressArray)
+    {
+        if (emailAddressArray.length > 0) {
+            $("#btnReportData").show();
+            setLocalStorage("notificationData", JSON.stringify(emailAddressArray));
+        }
+        else {
+            removeLocalStorage("notificationData");
+            $("#btnReportData").hide();
+        }
+    }
+
 </script>

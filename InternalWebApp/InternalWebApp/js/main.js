@@ -1482,6 +1482,7 @@ function buildTechMenu(selectedItem) {
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "TechTools") + ' role="button" aria-expanded="false">Tools <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html?MenuItem=true">Tech Tools</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/matchednotification/matchednotificationlist.html?MenuItem=true">Matched Notification Tool</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/techtools/encryptdecrypt.html?MenuItem=true">Encryption/Decryption Tool</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrarchiverollover.html?MenuItem=true">MRR Rollover</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrmarkethistorydatamatrix.html?MenuItem=true">MRR Market History Maintenance</a></li>';
