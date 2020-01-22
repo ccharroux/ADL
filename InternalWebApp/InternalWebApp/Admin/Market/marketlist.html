@@ -85,12 +85,12 @@
                     <div class="col-md-10 ">
 
                         <label for="ddlMediaType" class="dropdown-label">Media Type</label>
-                        <select id="ddlMediaType" class="search-ddl-select dropdown-select"  onchange="getMarketList();"></select>
+                        <select id="ddlMediaType" class="search-ddl-select dropdown-select report-filter"  onchange="getMarketList();"></select>
 
                         <label for="ddlMarket" class="dropdown-label">Market</label>
-                        <select id="ddlMarket" class="search-ddl-select dropdown-select" onchange="editMarket(this.value);"></select>
+                        <select id="ddlMarket" class="search-ddl-select dropdown-select report-filter" onchange="editMarket(this.value);"></select>
                         <label for="ddlOwner" class="dropdown-label">Owner</label>
-                        <select id="ddlOwner" class="search-ddl-select dropdown-select" onchange="getMarketList();"></select>
+                        <select id="ddlOwner" class="search-ddl-select dropdown-select report-filter" onchange="getMarketList();"></select>
 
                         <!--<label for="searchText">Market Name</label>
                         <input type="text" id="searchText" />
@@ -436,27 +436,55 @@
     }
     function loadLastSearch() {
 
-        var search = getParameterByName("search");
+        //var search = getParameterByName("search");
 
-        if (!search == false) {
-            if (search.length > 0) {
-                var sArray = new Array();
-                sArray = search.split("|");
+        //if (!search == false) {
+        //    if (search.length > 0) {
+        //        var sArray = new Array();
+        //        sArray = search.split("|");
 
-                //$("#searchText").val(sArray[0].toString());
-                //$("#searchTextNumber").val(sArray[1].toString());
-                $("#ddlMediaType").val(sArray[0].toString());
+        //        //$("#searchText").val(sArray[0].toString());
+        //        //$("#searchTextNumber").val(sArray[1].toString());
+        //        $("#ddlMediaType").val(sArray[0].toString());
 
-                getMarketList();
-            }
-        }
+        //        getMarketList();
+        //    }
+        //}
+
+        //if (hasBackButtonData() == false) {
+        //    return;
+        //}
+
+        //var reportParamData = getBackButtonDataByPage(window.location.pathname);
+
+        //for (var key in reportParamData) {
+
+        //    if (key.indexOf("rdo") > -1) {
+        //        $("#" + key).prop('checked', reportParamData[key]);
+        //    } else {
+        //        $("#" + key).val(reportParamData[key]);
+        //    }
+
+        //    if (key.indexOf("ddlMediaType") > -1 || key.indexOf("ddlOwner") > -1) {
+        //        $("#" + key).change();
+        //    }
+        //}
+
+        //cleanupBackButton(window.location.pathname);
+
+        loadReportParameters();
+        //getMarketList();
+        setTimeout(getMarketList, 500);
 
     }
 
     function getMarketList() {
 
-        if ($("#ddlMediaType").val().length == 0)
+        //if ($("#ddlMediaType").val().length == 0)
+        //console.log($("#ddlMediaType").val());
+        if ($("#ddlMediaType").val() == -1)
         {
+            //console.log("in media type if");
             var table = $("#dtMarketList").DataTable();
             table.clear().draw();
             return;
@@ -514,6 +542,11 @@
     }
 
     function editMarket(marketId) {
+
+        if (marketId.length == 0)
+        {
+            return;
+        }
 
         window.location = "/admin/market/market.html?marketId=" + marketId + "&NonPrimaryOnly=" + bSecondaryMarketsOnly;
 
