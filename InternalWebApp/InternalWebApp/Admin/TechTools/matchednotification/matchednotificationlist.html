@@ -224,19 +224,38 @@
                     mRender: function (data, type, row) {
                         var str = ''; //<a href="#" onclick="viewMatchedNotification(' + row['Matched Notification Id'] + ')">View</a>';
 
-                        if (row['Admin'] == false) {
+                        if (row['Admin'] == false || 
+                            (row['Admin'] == true && row['Ready For Approval'] == true)
+                            ) {
                             str = str + '&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="editMatchedNotification(' + row['Matched Notification Id'] + ')">View</a>'
                         }
-                        else {
-                            if (row['Approvals'] == 0) {
+
+                        if (row['Admin'] == true)
+                        {
+                            if (row['Approvals'] == 0 && 
+                                row['Ready For Approval'] == false) 
+                            {
                                 str = str + '&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="editMatchedNotification(' + row['Matched Notification Id'] + ')">Edit / Assign</a>'
+                                   + '&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="setForApprovalMatchedNotification(' + row['Matched Notification Id'] + ', true)">Ready for Approval</a>' 
                                    + '&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="deleteMatchedNotification(' + row['Matched Notification Id'] + ')">Delete</a>';
                             }
+                        }
 
-                            if (row['Approvals'] == 0 && row['Assignments'] != 0) {
+                        //if (row)
+                        //    if (row['Approvals'] == 0 &&
+                        //        row['Ready For Approval'] == false) {
+                        //        str = str + '&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="editMatchedNotification(' + row['Matched Notification Id'] + ')">Edit / Assign</a>'
+                        //           + '&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="deleteMatchedNotification(' + row['Matched Notification Id'] + ')">Delete</a>';
+                        //    }
+
+
+                        if (row['Can Approve'] == true &&
+                            row['Ready For Approval'] == true &&
+                            row['Approvals'] == 0 &&
+                            row['Assignments'] != 0) {
                                 str = '<a href="#" onclick="approveMatchedNotification(' + row['Matched Notification Id'] + ')">Approve</a>' + str;
                             }
-                        }
+                        //}
                         return str;
                     },
                     "orderable": false,
@@ -395,6 +414,57 @@
             }
         });
 
+    }
+
+    function setForApprovalMatchedNotification(matchedNotificationId, bApprovalFlag)
+    {
+
+        var url = ServicePrefix + "/api/MatchedNotification/";
+        var ajaxObject = new Object;
+ 
+        url = url + "UpdateMatchedNotificationReadyForApproval";
+
+        ajaxObject = JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inMatchedNotificationId": matchedNotificationId,
+            "inReadyForApproval": bApprovalFlag
+        });
+ 
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: ajaxObject,
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                setForApprovalMatchedNotificationSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        bootbox.confirm("Are you sure you want to set this Notification to " + (bApprovalFlag==true ? "Ready For Approval" : "Not Ready For Approval" ) + "?", function (result) {
+
+            if (result == true) {
+        $.ajax(url, settings);
+    }
+        });
+    }
+    function setForApprovalMatchedNotificationSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+
+            bootbox.alert('Matched Notfication Ready for Approval Updated.',
+                function () {
+                    window.location = "/admin/techtools/matchednotification/matchednotificationlist.html";
+                });
+
+        }
     }
 </script>
 
