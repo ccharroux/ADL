@@ -92,14 +92,16 @@
                         </select>
                         <label for="chkIncludeInternal">Include internal trainees</label>
                         <input type="checkbox" id="chkIncludeInternal" />
+                        <label for="ddlRole">Role</label>
+                        <select id="ddlRole" class="search-ddl-select dropdown-select"></select>
+                        <label for="ddlPosition">Position</label>
+                        <select multiple="multiple" id="ddlPosition" class="search-ddl-select dropdown-select"></select>
                         <input type="button" value="Show" onclick="getTrainingList();" />
                         <!--
                             Filters to add:
                             ddlType needs to be added to API
-                            Drop-down list: trainee personnel (maybe filter by partial name first)
-                            Drop-down list: trainer personnel (would need to add a parameter to get_Training)
-                            Drop-down list: role (MRR contact, MRR recipient, MRR manager, all XRY access levels other than "No access")
-                            Drop-down list: position, plus check box "include additional positions" which displays a list of all positions with check boxes (and a "Clear all" button)
+                            Drop-down list: trainee personnel (maybe filter by partial name first, can't just use TrainingIndividual.TraineePersonnelID because it also picks up any cluster training where they have an active role)
+                            Drop-down list: trainer personnel (get_ExistingTrainers, needs API, get_Training needs parameter)
                         -->
                         <!--<label for="searchText">Market Name</label>
                         <input type="text" id="searchText" />
@@ -195,6 +197,8 @@
         getMediaTypes();
         getTopicList();
         getMethodList();
+        getRoleList();
+        getPositionList();
 
         setEventListeners();
 
@@ -453,6 +457,12 @@
         setLocalStorage("searchPage", window.location);
 
         var trainingType = $("#ddlType").val();
+        var userRole = $("#ddlRole").val();
+
+        var delimiter = '~';
+        var positionList = '';
+        $("#ddlPosition").val().forEach(position => positionList += delimiter + position);
+        positionList = positionList.substr(delimiter.length);
 
         $.ajax({
             url: ServicePrefix + '/api/Training/GetTraining',
@@ -470,7 +480,12 @@
                 "inTrainingMethodId": $("#ddlMethod").val(),
                 "inOnlyIndividual": (trainingType == "Individual"),
                 "inOnlyCluster": (trainingType == "Cluster"),
-                "inIncludeInternal": $("#chkIncludeInternal").prop('checked')
+                "inIncludeInternal": $("#chkIncludeInternal").prop('checked'),
+                "inOnlyMRRContacts": (userRole == "MRRContact"),
+                "inOnlyMRRRecipients": (userRole == "MRRRecipient"),
+                "inOnlyMRRManagers": (userRole == "MRRManager"),
+                "inXRYAccessLevelId": (userRole.substr(0, 3) == "XRY" ? userRole.substr(3) : null),
+                "inPositionCodeList": positionList
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -660,6 +675,82 @@
                     $("#ddlMethod").html(str);
 
                     convertToChosenSelect("ddlMethod", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+    function getRoleList() {
+        $.ajax({
+            url: ServicePrefix + '/api/XRAY/GetXRYAccessLevelList?inApiToken=' + getLocalStorage("APIToken"),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Role --</option>';
+                    str = str + '<option value="MRRContact">MRR: Contact</option>';
+                    str = str + '<option value="MRRRecipient">MRR: Recipient</option>';
+                    str = str + '<option value="MRRManager">MRR: Manager</option>';
+                    $.each(data.report.rows, function (index) {
+                        if (data.report.rows[index]["Access Description"] != "No Access") {
+                            str = str + '<option value="XRY' + data.report.rows[index].AccessLevelId + '">XRY: ' + data.report.rows[index]["Access Description"] + '</option>';
+                        }
+                    });
+
+                    $("#ddlRole").html(str);
+
+                    convertToChosenSelect("ddlRole", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+    function getPositionList() {
+        $.ajax({
+            url: ServicePrefix + '/api/Position/GetPositionList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select one or more positions --</option>';
+                    $.each(data.report.rows, function (index) {
+                        str = str + '<option value="' + data.report.rows[index]["Position Code"] + '">' + data.report.rows[index]["Position Title"] + '</option>';
+                    });
+
+                    $("#ddlPosition").html(str);
+
+                    convertToChosenSelect("ddlPosition", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
 
                 }
