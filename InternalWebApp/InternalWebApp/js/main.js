@@ -2495,7 +2495,7 @@ function getFeatureButtons(featureToken, featureValue)
                         parameters = "";
                         parameters += "'" + featureToken + "'," + obj.FeatureId + ",'" + featureValue + "'";
 
-                        str += '<' + 'input type="button" class="default-button" style="margin-bottom:5px;" value="' + btnValue + '" onclick="deleteFeatureAssignment(' + parameters + ')"/><br/>';
+                        str += '<' + 'input type="button" class="default-button" style="background-color:red;margin-bottom:5px;" value="' + btnValue + '" onclick="deleteFeatureAssignment(' + parameters + ')"/><br/>';
 
                     } else
                     {
@@ -2505,7 +2505,7 @@ function getFeatureButtons(featureToken, featureValue)
                         parameters = "";
                         parameters += "'" + featureToken + "'," + obj.FeatureId + "," + obj.ConditionId + ",'" + featureValue + "'";
 
-                        str += '<' + 'input type="button" class="default-button" style="margin-bottom:5px;" value="' + btnValue + '" onclick="addFeatureAssignment(' + parameters + ')"/><br/>';
+                        str += '<' + 'input type="button" class="default-button" style="background-color:green;margin-bottom:5px;" value="' + btnValue + '" onclick="addFeatureAssignment(' + parameters + ')"/><br/>';
                     }
 
                 });

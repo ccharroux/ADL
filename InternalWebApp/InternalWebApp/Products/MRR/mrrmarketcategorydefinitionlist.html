@@ -107,11 +107,11 @@
                     </div>
                     <div class="col-md-3">
                         <label for="ddlMediaType">Media Type</label><br />
-                        <select id="ddlMediaType" onchange="getMarkets();"></select>
+                        <select id="ddlMediaType" class="report-filter" onchange="getMarkets();"></select>
                     </div>
                     <div class="col-md-3">
                         <label for="ddlMarket">Market</label><br />
-                        <select id="ddlMarket" style="width:220px" onchange="recordCurrentMarket(); getCategories(); getExclusions();"></select>
+                        <select id="ddlMarket" class="report-filter" style="width:220px" onchange="recordCurrentMarket(); getCategories(); getExclusions();"></select>
                     </div>
                     <div class="col-md-3">
                         &nbsp;
@@ -222,6 +222,8 @@
     var setUpExclusions = false;
     var gotCategories = false;
     var gotExclusions = false;
+    var previousMarketId = -1;
+
 
     $(document).ready(function () {
 
@@ -235,7 +237,7 @@
         //        table.search('').draw();
         //    });
 
-        buildMainMenu("Settings");
+        buildMRRMenu("Utility");
         //loadLastSearch();
 
         //setLocalStorage("search", $("#searchText").val().trim());
@@ -243,6 +245,7 @@
 
         getMediaTypes();
 
+        setTimeout(loadLastSearch, 1000);
     });
 
     function adjustDataTableLayouts() {
@@ -254,14 +257,39 @@
     }
 
     function loadLastSearch() {
-        var search = getParameterByName("search");
+        //var search = getParameterByName("search");
 
-        if (!search == false) {
-            if (search.length > 0) {
-                $("#searchText").val(search);
-                getCategoryList();
+        //if (!search == false) {
+        //    if (search.length > 0) {
+        //        $("#searchText").val(search);
+        //        getCategoryList();
+        //    }
+        //}
+
+        if (hasBackButtonData() == false) {
+            return;
+        }
+
+        var reportParamData = getBackButtonDataByPage(window.location.pathname);
+
+        for (var key in reportParamData) {
+
+            if (key.indexOf("rdo") > -1) {
+                $("#" + key).prop('checked', reportParamData[key]);
+            } else {
+                $("#" + key).val(reportParamData[key]);
+            }
+
+            if (key.indexOf("ddlMediaType") > -1) {
+                $("#" + key).change();
+            }
+
+            if (key.indexOf("ddlMarket") > -1) {
+                previousMarketId = reportParamData[key];
             }
         }
+
+        cleanupBackButton(window.location.pathname);
     }
 
     function getMediaTypes() {
@@ -343,14 +371,14 @@
             return;
         }
 
-        var previousMarketId = -1;
-        if (gotMarkets) {
-            previousMarketId = $("#ddlMarket").val();
-        } else {
-            if (getParameterByName("search") != null) {
-                previousMarketId = getParameterByName("search");
-            }
-        }
+        //var previousMarketId = -1;
+        //if (gotMarkets) {
+        //    previousMarketId = $("#ddlMarket").val();
+        //} else {
+        //    if (getParameterByName("search") != null) {
+        //        previousMarketId = getParameterByName("search");
+        //    }
+        //}
         var str = '';
 
         str = '<option value="-1">-- Select a Market</option>';
@@ -373,7 +401,7 @@
         $("#ddlMarket").val(previousMarketIdStillInList ? previousMarketId : -1);
 
         gotMarkets = true;
-        recordCurrentMarket();
+        //recordCurrentMarket();
         getCategories();
         getExclusions();
 
