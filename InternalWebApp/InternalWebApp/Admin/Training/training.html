@@ -1,0 +1,739 @@
+﻿
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>MKA Internal Media Site</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Facebook and Twitter integration -->
+    <meta property="og:title" content="" />
+    <meta property="og:image" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:site_name" content="" />
+    <meta property="og:description" content="" />
+    <meta name="twitter:title" content="" />
+    <meta name="twitter:image" content="" />
+    <meta name="twitter:url" content="" />
+    <meta name="twitter:card" content="" />
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="/css/animate.css">
+    <!-- Icomoon Icon Fonts-->
+    <link rel="stylesheet" href="/css/icomoon.css">
+    <!-- Simple Line Icons -->
+    <link rel="stylesheet" href="/css/simple-line-icons.css">
+    <!-- Bootstrap  -->
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <!-- Theme style  -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!--Chosen Dropdown-->
+    <link rel="stylesheet" href="/css/chosen.min.css" />
+    <!-- Timepicker -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/timepicker@1.13.0/jquery.timepicker.min.css" />
+    <!-- Modernizr JS -->
+    <script src="/js/modernizr-2.6.2.min.js"></script>
+    <!-- FOR IE9 below -->
+    <!--[if lt IE 9]>
+    <script src="js/respond.min.js"></script>
+    <![endif]-->
+    <style>
+        .trainingDateTime {
+            width: 125px !important;
+        }
+        .unspecified {
+            background-color: lightgray;
+            color: lightgray;
+        }
+        select, .chosen-container {
+            width: 300px !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="fh5co-page">
+        <header id="fh5co-header" role="banner">
+            <div class="container">
+                <div class="header-inner" id="menu"></div>
+            </div>
+        </header>
+        <div id="fh5co-contact-section" class="contact-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
+                        <h2><span id="spanTitle"></span></h2>
+                    </div>
+                </div>
+                <div id="divQuickReport">
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>
+                <div id="featureButtons"></div>
+                <div class="text-center margin-top-0">
+                    <!-- Training Type -->
+                    <div id="divTrainingType" class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="ddlTrainingType">Training Type</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <select id="ddlTrainingType" class="mkaRequired" onchange="gotTrainingType();" errorMessage="You must select a training type.">
+                                <option value="">(select a training type)</option>
+                                <option value="Individual">Individual</option>
+                                <option value="Cluster">Cluster</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Training Date -->
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="dtTrainingDate">Training Date</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" id="dtTrainingDate" class="trainingDateTime" />
+                        </div>
+                    </div>
+
+                    <!-- Training Time -->
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="tmTrainingTime">Training Time</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input type="text" id="tmTrainingTime" class="trainingDateTime" />
+                            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                            <input type="checkbox" id="chkTrainingTimeUnspecified" onclick="adjustTrainingTimeDisplay();" /> &nbsp; Unspecified
+                        </div>
+                    </div>
+
+                    <!-- fixed-height container for individual vs cluster elements, prevent elements below them from shifting position -->
+                    <div style="height: 125px">
+
+                        <!-- (cluster) Media Type -->
+                        <div class="row input-row divClusterTraining">
+                            <div class="col-md-3 text-align-left">
+                                <label for="ddlMediaType">Media Type</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <select id="ddlMediaType" class="clusterTraining" onclick="mediaTypeChanged();"></select>
+                            </div>
+                        </div>
+
+                        <!-- (cluster) Market -->
+                        <div class="row input-row divClusterTraining">
+                            <div class="col-md-3 text-align-left">
+                                <label for="ddlMarket">Market</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <select id="ddlMarket" class="clusterTraining" errorMessage="You must select a market."></select>
+                            </div>
+                        </div>
+
+                        <!-- (cluster) Owner -->
+                        <div class="row input-row divClusterTraining">
+                            <div class="col-md-3 text-align-left">
+                                <label for="ddlOwner">Owner</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <select id="ddlOwner" class="clusterTraining" errorMessage="You must select an owner."></select>
+                            </div>
+                        </div>
+
+                        <!-- (individual) Trainee -->
+                        <div class="row input-row divIndividualTraining">
+                            <div class="col-md-3 text-align-left">
+                                <label for="ddlTrainee">Trainee</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <!-- TODO how best to filter? -->
+                                <select id="ddlTrainee" class="individualTraining" errorMessage="You must select a trainee."></select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="ddlTrainer">Trainer</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <select id="ddlTrainer" class="mkaRequired" errorMessage="You must select a trainer."></select>
+                        </div>
+                    </div>
+
+                    <!-- Topic -->
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="ddlTopic">Topic</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <select id="ddlTopic" class="mkaRequired" errorMessage="You must select a topic."></select>
+                        </div>
+                    </div>
+
+                    <!-- Method -->
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="ddlMethod">Method</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <select id="ddlMethod" class="mkaRequired" errorMessage="You must select a method."></select>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtNotes">Notes</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <textarea id="txtNotes"></textarea>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <!-- Buttons -->
+                    <div class="default-button-section">
+                        <div class="row input-row">
+                            <div class="col-md-3">
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <div>
+                                    <input value="Update" onclick="excludeFromBackButton(); updateTrainingDetail();" class="default-button" type="button">
+                                </div>
+                                <!--<div class="back-button-div">
+                                    <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button">
+                                </div>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+    <!-- jQuery Easing -->
+    <script src="/js/jquery.easing.1.3.js"></script>
+    <!-- Bootstrap -->
+    <script src="/js/bootstrap.min.js"></script>
+    <!-- Bootbox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+    <!-- Waypoints -->
+    <script src="/js/jquery.waypoints.min.js"></script>
+    <!-- BlockUI JS -->
+    <script src="/js/blockUI.js"></script>
+    <!-- Config JS -->
+    <script src="/js/config.js"></script>
+    <!-- MAIN JS -->
+    <script src="/js/main.js"></script>
+    <!-- genericReport JS -->
+    <script src="/js/genericReport.js"></script>
+    <!-- jQuery UI -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!--Chosen Dropdown-->
+    <script src="/js/chosen.jquery.min.js"></script>
+    <!-- Timepicker -->
+    <script src="https://cdn.jsdelivr.net/npm/timepicker@1.13.0/jquery.timepicker.min.js"></script>
+</body>
+</html>
+<script>
+
+    var isCluster;
+    var trainingId;
+
+    var gotMarkets = false;
+    var gotOwners = false;
+    var gotTrainees = false;
+    var gotTrainers = false;
+    var gotTopics = false;
+    var gotMethods = false;
+
+    $(document).ready(function ()
+    {
+
+        buildMainMenu("Training");
+
+        isCluster = stringToBoolean(getParameterByName("isCluster"));
+        trainingId = getParameterByName("trainingId");
+
+        // local storage for quick reports
+        //if (marketId > 0)
+        //{
+            //setLocalStorage("quickReportQS", "ddlMarket|" + marketId);
+        //}
+        //else
+        //{
+        //    window.location = '/admin/market/marketlist.html';
+        //}
+
+        buildQuickReports(['training']);
+
+        checkForInsertOrUpdate();
+        getTrainingDate();
+        getTrainingTime();
+        getMediaTypes(); // success -> get markets and owners
+        getTrainees();
+        getTrainers();
+        getTopics();
+        getMethods();
+
+        loadFeatureButtons();
+
+    });
+
+    function stringToBoolean(val) {
+        if (val == "true") {
+            return true;
+        }
+        if (val == "false") {
+            return false;
+        }
+        return val;
+    }
+
+    function getTrainingType() {
+        return isCluster ? "Cluster" : "Individual";
+    }
+
+    function checkForInsertOrUpdate() {
+        if (isCluster == null) {
+            // insert
+            $("#spanTitle").text("Add Training");
+        } else {
+            // update
+            $("#spanTitle").text("Edit Training");
+            $("#ddlTrainingType").val(getTrainingType());
+            $("#divTrainingType").hide();
+        }
+        // delay gotTrainingType() until after getMarkets() and getOwners() done, otherwise they end up with wrong widths
+    }
+
+    function getTrainingDate() {
+        var d = new Date();
+        var currentMonth = d.getMonth() + 1;
+        var currentDay = d.getDate(); // getDay() = day of week
+        var currentYear = d.getFullYear();
+
+        $("#dtTrainingDate").val(currentMonth + "/" + currentDay + "/" + currentYear);
+        $("#dtTrainingDate").datepicker();
+    }
+
+    function getTrainingTime() {
+        var d = new Date();
+        var currentHour = d.getHours();
+        var currentMinute = d.getMinutes();
+        $("#tmTrainingTime").val(currentHour + ':' + (currentMinute < 10 ? '0' : '') + currentMinute); // timepicker() translates this to something sensible
+        adjustTrainingTimeFormat();
+    }
+
+    function adjustTrainingTimeFormat() {
+        // https://github.com/jonthornton/jquery-timepicker#timepicker-plugin-for-jquery
+        $("#tmTrainingTime").timepicker({
+            "minTime": "7:00am",
+            "maxTime": "7:00pm",
+            "timeFormat": "g:i a", // https://www.php.net/manual/en/function.date.php
+            "listWidth": 1 // match width of input control
+        });
+    }
+
+    function adjustTrainingTimeDisplay() {
+        if ($("#chkTrainingTimeUnspecified").prop("checked")) {
+            $("#tmTrainingTime").prop("disabled", true);
+            $("#tmTrainingTime").addClass("unspecified");
+        } else {
+            $("#tmTrainingTime").prop("disabled", false);
+            $("#tmTrainingTime").removeClass("unspecified");
+        }
+    }
+
+    function getMediaTypes() {
+        var url = ServicePrefix + '/api/MediaType/GetMediaTypeList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMediaTypesSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getMediaTypesSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+
+            var str = '';
+            str = '<option value="-1">-- Select a Media Type</option>';
+            $.each(data.report.rows, function (index) {
+
+                str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+
+            });
+
+            $("#ddlMediaType").html(str);
+
+            convertToChosenSelect("ddlMediaType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+            mediaTypeChanged();
+
+        }
+
+    }
+
+    function mediaTypeChanged() {
+        getMarkets();
+        getOwners();
+    }
+
+    function getMarkets() {
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMediaTypeId": $("#ddlMediaType").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    var currentMarketId = $("#ddlMarket").val();
+                    if (currentMarketId == 0) { // workaround because database still contains MarketID 0
+                        currentMarketId = -1;
+                    }
+                    var str = '';
+                    str = '<option value="">-- Select a Market --</option>';
+                    $.each(data.report.rows, function (index) {
+                        str = str + '<option value="' + data.report.rows[index].marketId + '"' + (data.report.rows[index].marketId == currentMarketId ? ' selected' : '') + '>' + data.report.rows[index].marketName + '</option>'; // marketName also includes ID
+                    });
+
+                    $("#ddlMarket").html(str);
+
+                    convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    gotMarkets = true;
+                    gotTrainingType();
+                    getTrainingDetail();
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getOwners() {
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMediaTypeId": $("#ddlMediaType").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    var currentOwnerId = $("#ddlOwner").val();
+                    var str = '';
+                    str = '<option value="">-- Select an Owner --</option>';
+                    $.each(data.report.rows, function (index) {
+
+
+                        str = str + '<option value="' + data.report.rows[index].OwnerID + '"' + (data.report.rows[index].OwnerID == currentOwnerId ? ' selected' : '') + '>' + data.report.rows[index].OwnerName + ' (' + data.report.rows[index].OwnerID + ')' + '</option>'; // OwnerName does not include ID
+
+                    });
+
+                    $("#ddlOwner").html(str);
+
+                    convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    gotOwners = true;
+                    gotTrainingType();
+                    getTrainingDetail();
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function gotTrainingType() {
+        // delay until after getMarkets() and getOwners() done, otherwise they end up with wrong widths
+        if (gotMarkets == false || gotOwners == false) {
+            return;
+        }
+
+        $(".divIndividualTraining").hide();
+        $(".individualTraining").removeClass("mkaRequired");
+        $(".divClusterTraining").hide();
+        $(".clusterTraining").removeClass("mkaRequired");
+
+        switch ($("#ddlTrainingType").val()) {
+            case "Individual":
+                $(".divIndividualTraining").show();
+                $(".individualTraining").addClass("mkaRequired");
+                break;
+            case "Cluster":
+                $(".divClusterTraining").show();
+                $(".clusterTraining").addClass("mkaRequired");
+                break;
+        }
+    }
+
+    function getTrainees() {
+        // TODO
+        gotTrainees = true;
+        getTrainingDetail();
+    }
+
+    function getTrainers() {
+        // TODO
+        gotTrainers = true;
+        getTrainingDetail();
+    }
+
+    function getTopics() {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/GetTrainingTopics',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Topic --</option>';
+                    $.each(data.report.rows, function (index) {
+                        str = str + '<option value="' + data.report.rows[index].trainingTopicId + '">' + data.report.rows[index].trainingTopicDescription + '</option>';
+                    });
+
+                    $("#ddlTopic").html(str);
+
+                    convertToChosenSelect("ddlTopic", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    gotTopics = true;
+                    getTrainingDetail();
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getMethods() {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/GetTrainingMethods',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Method --</option>';
+                    $.each(data.report.rows, function (index) {
+                        str = str + '<option value="' + data.report.rows[index].trainingMethodId + '">' + data.report.rows[index].trainingMethodDescription + '</option>';
+                    });
+
+                    $("#ddlMethod").html(str);
+
+                    convertToChosenSelect("ddlMethod", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    gotMethods = true;
+                    getTrainingDetail();
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getTrainingDetail() {
+        // new entry
+        if (trainingId == null) {
+            return;
+        }
+
+        // each get-X calls this function on success, but only proceed once all of them have succeeded
+        if (
+               gotMarkets == false
+            || gotOwners == false
+            || gotTrainees == false
+            || gotTrainers == false
+            || gotTopics == false
+            || gotMethods == false
+        ) {
+            return;
+        }
+
+        var trainingType = getTrainingType();
+        var params;
+        if (isCluster) {
+            params = JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inTrainingClusterId": trainingId
+            });
+        } else {
+            params = JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inTrainingIndividualId": trainingId
+            });
+        }
+        $.ajax({
+            url: ServicePrefix + '/api/Training/GetTraining' + trainingType + 'Detail',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: params,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    $("#dtTrainingDate").val(data.report.rows[0]["Training Date"]);
+
+                    $("#tmTrainingTime").val(data.report.rows[0]["Training Time"]);
+                    if ($("#tmTrainingTime").val() == "") {
+                        $("#chkTrainingTimeUnspecified").prop("checked", true);
+                        adjustTrainingTimeDisplay();
+                    } else {
+                        adjustTrainingTimeFormat();
+                    }
+
+                    if (isCluster) {
+                        $("#ddlMarket").val(data.report.rows[0]["Market ID"]);
+                        $("#ddlOwner").val(data.report.rows[0]["Owner ID"]);
+                    } else {
+                        $("#ddlTrainee").val(data.report.rows[0]["Trainee Personnel ID"]);
+                    }
+
+                    $("#ddlTrainer").val(data.report.rows[0]["Trainer Personnel ID"]);
+                    $("#ddlTopic").val(data.report.rows[0]["Training Topic ID"]);
+                    $("#ddlMethod").val(data.report.rows[0]["Training Method ID"]);
+                    $("#txtNotes").val(data.report.rows[0]["Notes"]);
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function updateTrainingDetail() {
+        if (validationPassed() == false) {
+            return;
+        }
+
+        // TODO
+    }
+
+    function validationPassed() {
+
+        var loopBreak = true;
+        $(".mkaRequired").each(function (index, el) {
+
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+
+            }
+
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == "-1") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+        });
+
+        return loopBreak;
+    }
+
+    function loadFeatureButtons()
+    {
+        //if (marketId > 0) {
+        //    getFeatureButtons("MarketId", marketId);
+        //}
+    }
+
+    function genericAjaxError(jQxhr, textStatus, errorThrown) {
+        MKAErrorMessageRtn(errorThrown);
+    }
+</script>

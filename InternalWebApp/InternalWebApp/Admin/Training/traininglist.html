@@ -58,7 +58,7 @@
             width: 100px;
         }
         .filterControlLeft {
-            width: 250px;
+            width: 225px;
         }
         .filterControlRight {
             width: 350px;
@@ -80,7 +80,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2 id="pageTitle">Training</h2>
+                        <h2 id="pageTitle">Training Calendar</h2>
                     </div>
                 </div>
                 <div id="divQuickReport">
@@ -91,14 +91,13 @@
                 <div class="row search-section">
                     <div class="col-md-3">
                         <label for="dtStartDate" class="filterLabel">Start Date</label>
-                        <input type="text" id="dtStartDate" class="filterControlDate">
+                        <input type="text" id="dtStartDate" class="filterControlDate" />
                         <br />
                         <label for="dtEndDate" class="filterLabel">End Date</label>
-                        <input type="text" id="dtEndDate" class="filterControlDate">
+                        <input type="text" id="dtEndDate" class="filterControlDate" />
                         <br />
                         <label for="ddlType" class="filterLabel">Type</label>
-                        <select id="ddlType" class="filterControlLeft"> <!-- need to adjust API to pass this to SP -->
-                            <option value="">(not yet added to API)</option>
+                        <select id="ddlType" class="filterControlLeft">
                             <option value="Both">Individual and cluster</option>
                             <option value="Individual">Individual only</option>
                             <option value="Cluster">Cluster only</option>
@@ -228,9 +227,9 @@
         $("#dtStartDate").datepicker();
         $("#dtEndDate").datepicker();
 
-        getMediaTypes();
         getTopicList();
         getMethodList();
+        getMediaTypes(); // success -> get markets and owners
         getRoleList();
         getPositionList();
 
@@ -265,16 +264,332 @@
 
     }
 
-    function clearSearchButtonSetup()
-    {
-        $("body").on("click", "#clear_search_button", function () {
-                                                        var table = $("#dtTrainingList").DataTable();
-                                                        table.search('').draw();
-            });
+    function getTopicList() {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/GetTrainingTopics',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Topic --</option>';
+                    $.each(data.report.rows, function (index) {
+                        str = str + '<option value="' + data.report.rows[index].trainingTopicId + '">' + data.report.rows[index].trainingTopicDescription + '</option>';
+                    });
+
+                    $("#ddlTopic").html(str);
+
+                    convertToChosenSelect("ddlTopic", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getMethodList() {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/GetTrainingMethods',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Method --</option>';
+                    $.each(data.report.rows, function (index) {
+                        str = str + '<option value="' + data.report.rows[index].trainingMethodId + '">' + data.report.rows[index].trainingMethodDescription + '</option>';
+                    });
+
+                    $("#ddlMethod").html(str);
+
+                    convertToChosenSelect("ddlMethod", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getMediaTypes() {
+        var url = ServicePrefix + '/api/MediaType/GetMediaTypeList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMediaTypesSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
 
     }
-    function setDataTable()
-    {
+
+    function getMediaTypesSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+
+            var str = '';
+            //console.log(JSON.stringify(data));
+            str = '<option value="">-- Select a Media Type</option>';
+            $.each(data.report.rows, function (index) {
+
+                str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+
+            });
+
+            $("#ddlMediaType").html(str);
+
+            convertToChosenSelect("ddlMediaType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+            gotMediaTypes = true;
+
+            mediaTypeChanged();
+
+        }
+    }
+
+    function mediaTypeChanged() {
+        getMarketList();
+        getOwnerList();
+    }
+
+    function getMarketList() {
+        if (gotMediaTypes == false) {
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMediaTypeId": $("#ddlMediaType").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    var currentMarketId = $("#ddlMarket").val();
+                    if (currentMarketId == 0) { // workaround because database still contains MarketID 0
+                        currentMarketId = -1;
+                    }
+                    var str = '';
+                    str = '<option value="">-- Select a Market --</option>';
+                    $.each(data.report.rows, function (index) {
+                        str = str + '<option value="' + data.report.rows[index].marketId + '"' + (data.report.rows[index].marketId == currentMarketId ? ' selected' : '') + '>' + data.report.rows[index].marketName + '</option>'; // marketName also includes ID
+                    });
+
+                    $("#ddlMarket").html(str);
+
+                    convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getOwnerList() {
+        if (gotMediaTypes == false) {
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMediaTypeId": $("#ddlMediaType").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    var currentOwnerId = $("#ddlOwner").val();
+                    var str = '';
+                    str = '<option value="">-- Select an Owner --</option>';
+                    $.each(data.report.rows, function (index) {
+
+
+                        str = str + '<option value="' + data.report.rows[index].OwnerID + '"' + (data.report.rows[index].OwnerID == currentOwnerId ? ' selected' : '') + '>' + data.report.rows[index].OwnerName + ' (' + data.report.rows[index].OwnerID + ')' + '</option>'; // OwnerName does not include ID
+
+                    });
+
+                    $("#ddlOwner").html(str);
+
+                    convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getRoleList() {
+        $.ajax({
+            url: ServicePrefix + '/api/XRAY/GetXRYAccessLevelList?inApiToken=' + getLocalStorage("APIToken"),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Role --</option>';
+                    str = str + '<option value="MRRContact">MRR: Contact</option>';
+                    str = str + '<option value="MRRRecipient">MRR: Recipient</option>';
+                    str = str + '<option value="MRRManager">MRR: Manager</option>';
+                    $.each(data.report.rows, function (index) {
+                        if (data.report.rows[index]["Access Description"] != "No Access") {
+                            str = str + '<option value="XRY' + data.report.rows[index].AccessLevelId + '">XRY: ' + data.report.rows[index]["Access Description"] + '</option>';
+                        }
+                    });
+
+                    $("#ddlRole").html(str);
+
+                    convertToChosenSelect("ddlRole", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getPositionList() {
+        $.ajax({
+            url: ServicePrefix + '/api/Position/GetPositionList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select one or more positions --</option>';
+                    $.each(data.report.rows, function (index) {
+                        str = str + '<option value="' + data.report.rows[index]["Position Code"] + '">' + data.report.rows[index]["Position Title"] + '</option>';
+                    });
+
+                    $("#ddlPosition").html(str);
+
+                    convertToChosenSelect("ddlPosition", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function setEventListeners() {
+        //var input = document.getElementById("searchTextNumber");
+        //input.addEventListener("keyup", function (event) {
+        //    // Cancel the default action, if needed
+        //    event.preventDefault();
+        //    // Number 13 is the "Enter" key on the keyboard
+        //    if (event.keyCode === 13) {
+        //        setLocalStorage("search", "");
+        //        editMarket(document.getElementById("searchTextNumber").value);
+        //    }
+        //});
+
+        //var input = document.getElementById("searchText");
+        //input.addEventListener("keyup", function (event) {
+        //    // Cancel the default action, if needed
+        //    event.preventDefault();
+        //    // Number 13 is the "Enter" key on the keyboard
+        //    if (event.keyCode === 13) {
+
+        //        getMarketList();
+        //    }
+        //});
+    }
+
+    function setDataTable() {
         var reportTitle = "Markets List";
         var exportColumns = returnTableColumnsByClass("dtTrainingList", "exportColumn");
 
@@ -375,84 +690,14 @@
 
     }
 
-    function setEventListeners()
-    {
-        //var input = document.getElementById("searchTextNumber");
-        //input.addEventListener("keyup", function (event) {
-        //    // Cancel the default action, if needed
-        //    event.preventDefault();
-        //    // Number 13 is the "Enter" key on the keyboard
-        //    if (event.keyCode === 13) {
-        //        setLocalStorage("search", "");
-        //        editMarket(document.getElementById("searchTextNumber").value);
-        //    }
-        //});
-
-        //var input = document.getElementById("searchText");
-        //input.addEventListener("keyup", function (event) {
-        //    // Cancel the default action, if needed
-        //    event.preventDefault();
-        //    // Number 13 is the "Enter" key on the keyboard
-        //    if (event.keyCode === 13) {
-
-        //        getMarketList();
-        //    }
-        //});
-    }
-
-    function getMediaTypes() {
-        var url = ServicePrefix + '/api/MediaType/GetMediaTypeList';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getMediaTypesSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
+    function clearSearchButtonSetup() {
+        $("body").on("click", "#clear_search_button", function () {
+            var table = $("#dtTrainingList").DataTable();
+            table.search('').draw();
+        });
 
     }
 
-    function getMediaTypesSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-        }
-        else {
-
-            var str = '';
-            //console.log(JSON.stringify(data));
-            str = '<option value="">-- Select a Media Type</option>';
-            $.each(data.report.rows, function (index) {
-
-                str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
-
-            });
-
-            $("#ddlMediaType").html(str);
-
-            convertToChosenSelect("ddlMediaType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-            gotMediaTypes = true;
-
-            mediaTypeChanged();
-
-        }
-    }
-    function mediaTypeChanged() {
-        getMarketList();
-        getOwnerList();
-    }
     function loadLastSearch() {
 
         var search = getParameterByName("search");
@@ -471,6 +716,7 @@
         }
 
     }
+
 
     function getTrainingList() {
 
@@ -525,8 +771,7 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                if (data.response.status.toUpperCase() === "SUCCESS")
-                {
+                if (data.response.status.toUpperCase() === "SUCCESS") {
                     populateDataTable("dtTrainingList", data);
                 }
 
@@ -539,262 +784,40 @@
     }
 
     function addTraining() {
-        bootbox.alert('This functionality is still under development.');
-        // window.location = "/admin/market/market.html?marketId=" + marketId + "&NonPrimaryOnly=" + bSecondaryMarketsOnly;
-
+        window.location = "/admin/training/training.html";
     }
 
     function editTraining(isCluster, trainingId) {
-
-        bootbox.alert('This functionality is still under development.', function () {
-        });
-
+        window.location = "/admin/training/training.html?isCluster=" + isCluster + " &trainingId=" + trainingId;
     }
 
     function deleteTraining(isCluster, trainingId) {
-
-        bootbox.alert('This functionality is still under development.', function () {
-        });
-
-    }
-
-    function getOwnerList() {
-        if (gotMediaTypes == false) {
-            return;
-        }
-
-        $.ajax({
-            url: ServicePrefix + '/api/Owner/GetOwnerList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inMediaTypeId": $("#ddlMediaType").val()
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    var currentOwnerId = $("#ddlOwner").val();
-                    var str = '';
-                    str = '<option value="">-- Select an Owner --</option>';
-                    $.each(data.report.rows, function (index) {
-
-
-                        str = str + '<option value="' + data.report.rows[index].OwnerID + '"' + (data.report.rows[index].OwnerID == currentOwnerId ? ' selected' : '') + '>' + data.report.rows[index].OwnerName + ' (' + data.report.rows[index].OwnerID + ')' + '</option>'; // OwnerName does not include ID
-
-                    });
-
-                    $("#ddlOwner").html(str);
-
-                    convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-
-                }
-
-
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
-    function getMarketList() {
-        if (gotMediaTypes == false) {
-            return;
-        }
-
-        $.ajax({
-            url: ServicePrefix + '/api/Market/GetMarketList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inMediaTypeId": $("#ddlMediaType").val()
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    var currentMarketId = $("#ddlMarket").val();
-                    if (currentMarketId == 0) { // workaround because database still contains MarketID 0
-                        currentMarketId = -1;
-                    }
-                    var str = '';
-                    str = '<option value="">-- Select a Market --</option>';
-                    $.each(data.report.rows, function (index) {
-                        str = str + '<option value="' + data.report.rows[index].marketId + '"' + (data.report.rows[index].marketId == currentMarketId ? ' selected' : '') + '>' + data.report.rows[index].marketName + '</option>'; // marketName also includes ID
-                    });
-
-                    $("#ddlMarket").html(str);
-
-                    convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-
-                }
-
-
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
-    function getTopicList() {
-        $.ajax({
-            url: ServicePrefix + '/api/Training/GetTrainingTopics',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-
-                    var str = '';
-                    str = '<option value="">-- Select a Topic --</option>';
-                    $.each(data.report.rows, function (index) {
-                        str = str + '<option value="' + data.report.rows[index].trainingTopicId + '">' + data.report.rows[index].trainingTopicDescription + '</option>';
-                    });
-
-                    $("#ddlTopic").html(str);
-
-                    convertToChosenSelect("ddlTopic", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-
-                }
-
-
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
-    function getMethodList() {
-        $.ajax({
-            url: ServicePrefix + '/api/Training/GetTrainingMethods',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-
-                    var str = '';
-                    str = '<option value="">-- Select a Method --</option>';
-                    $.each(data.report.rows, function (index) {
-                        str = str + '<option value="' + data.report.rows[index].trainingMethodId + '">' + data.report.rows[index].trainingMethodDescription + '</option>';
-                    });
-
-                    $("#ddlMethod").html(str);
-
-                    convertToChosenSelect("ddlMethod", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-
-                }
-
-
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
-    function getRoleList() {
-        $.ajax({
-            url: ServicePrefix + '/api/XRAY/GetXRYAccessLevelList?inApiToken=' + getLocalStorage("APIToken"),
-            dataType: 'json',
-            type: 'get',
-            contentType: 'application/json',
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-
-                    var str = '';
-                    str = '<option value="">-- Select a Role --</option>';
-                    str = str + '<option value="MRRContact">MRR: Contact</option>';
-                    str = str + '<option value="MRRRecipient">MRR: Recipient</option>';
-                    str = str + '<option value="MRRManager">MRR: Manager</option>';
-                    $.each(data.report.rows, function (index) {
-                        if (data.report.rows[index]["Access Description"] != "No Access") {
-                            str = str + '<option value="XRY' + data.report.rows[index].AccessLevelId + '">XRY: ' + data.report.rows[index]["Access Description"] + '</option>';
+        bootbox.confirm('Delete this training entry?', function (result) {
+            if (result) {
+                var trainingType = isCluster ? 'Cluster' : 'Individual';
+                var trainingParam = "inTraining" + trainingType + "Id";
+                $.ajax({
+                    url: ServicePrefix + '/api/Training/Delete' + trainingType + 'Training',
+                    dataType: 'json',
+                    type: 'post',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        "inApiToken": getLocalStorage("APIToken"),
+                        trainingParam: trainingId
+                    }),
+                    processData: false,
+                    success: function (data, textStatus, jQxhr) {
+                        if (data.response.status != "SUCCESS") {
+                            MKAErrorMessageRtn(data.response.errorMessage[0]);
                         }
-                    });
-
-                    $("#ddlRole").html(str);
-
-                    convertToChosenSelect("ddlRole", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-
-                }
-
-
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
-    function getPositionList() {
-        $.ajax({
-            url: ServicePrefix + '/api/Position/GetPositionList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-
-                    var str = '';
-                    str = '<option value="">-- Select one or more positions --</option>';
-                    $.each(data.report.rows, function (index) {
-                        str = str + '<option value="' + data.report.rows[index]["Position Code"] + '">' + data.report.rows[index]["Position Title"] + '</option>';
-                    });
-
-                    $("#ddlPosition").html(str);
-
-                    convertToChosenSelect("ddlPosition", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-
-                }
-
-
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
+                        else {
+                            getTrainingList();
+                        }
+                    },
+                    error: function (jqXhr, textStatus, errorThrown) {
+                        genericAjaxError(jqXhr, textStatus, errorThrown);
+                    }
+                });
             }
         });
     }
