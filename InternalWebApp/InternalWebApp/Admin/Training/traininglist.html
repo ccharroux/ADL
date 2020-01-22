@@ -132,9 +132,7 @@
                         </select> <!-- maybe filter by partial name first, can't just use TrainingIndividual.TraineePersonnelID because it also picks up any cluster training where they have an active role -->
                         <br />
                         <label for="ddlTrainer" class="filterLabel">Trainer</label>
-                        <select id="ddlTrainer" class="filterControlRight">
-                            <option value="">(not yet implemented)</option>
-                        </select> <!-- get_ExistingTrainers, needs API, get_Training needs parameter -->
+                        <select id="ddlTrainer" class="filterControlRight"></select>
                         <br />
                         <label for="chkIncludeInternal" class="filterLabelWide">Include internal trainees</label>
                         <input type="checkbox" id="chkIncludeInternal" class="filterControlNarrow" />
@@ -232,6 +230,7 @@
         getMediaTypes(); // success -> get markets and owners
         getRoleList();
         getPositionList();
+        getTrainerList();
 
         setEventListeners();
 
@@ -565,6 +564,44 @@
         });
     }
 
+    function getTrainerList() {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/GetExistingTrainers',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a trainer --</option>';
+                    $.each(data.report.rows, function (index) {
+                        str = str + '<option value="' + data.report.rows[index]["trainerPersonnelId"] + '">' + data.report.rows[index]["trainer"] + '</option>';
+                    });
+
+                    $("#ddlTrainer").html(str);
+
+                    convertToChosenSelect("ddlTrainer", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
     function setEventListeners() {
         //var input = document.getElementById("searchTextNumber");
         //input.addEventListener("keyup", function (event) {
@@ -767,7 +804,8 @@
                 "inOnlyMRRRecipients": (userRole == "MRRRecipient"),
                 "inOnlyMRRManagers": (userRole == "MRRManager"),
                 "inXRYAccessLevelId": (userRole.substr(0, 3) == "XRY" ? userRole.substr(3) : null),
-                "inPositionCodeList": positionList
+                "inPositionCodeList": positionList,
+                "inTrainerPersonnelId": $("#ddlTrainer").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
