@@ -78,27 +78,13 @@
                 </div>
                 <div id="featureButtons"></div>
                 <div class="text-center margin-top-0">
-                    <!-- Training Type -->
-                    <div id="divTrainingType" class="row input-row">
-                        <div class="col-md-3 text-align-left">
-                            <label for="ddlTrainingType">Training Type</label>
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <select id="ddlTrainingType" class="mkaRequired" onchange="gotTrainingType();" errorMessage="You must select a training type.">
-                                <option value="">(select a training type)</option>
-                                <option value="Individual">Individual</option>
-                                <option value="Cluster">Cluster</option>
-                            </select>
-                        </div>
-                    </div>
-
                     <!-- Training Date -->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="dtTrainingDate">Training Date</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="dtTrainingDate" class="trainingDateTime" />
+                            <input type="text" id="dtTrainingDate" class="trainingDateTime mkaRequired" />
                         </div>
                     </div>
 
@@ -114,50 +100,61 @@
                         </div>
                     </div>
 
-                    <!-- fixed-height container for individual vs cluster elements, prevent elements below them from shifting position -->
-                    <div style="height: 125px">
-
-                        <!-- (cluster) Media Type -->
-                        <div class="row input-row divClusterTraining">
-                            <div class="col-md-3 text-align-left">
-                                <label for="ddlMediaType">Media Type</label>
-                            </div>
-                            <div class="col-md-9 text-align-left">
-                                <select id="ddlMediaType" class="clusterTraining" onclick="mediaTypeChanged();"></select>
-                            </div>
+                    <!-- Media Type -->
+                    <div class="row input-row"> <!-- for individual training, used to filter trainee list -->
+                        <div class="col-md-3 text-align-left">
+                            <label for="ddlMediaType">Media Type</label>
                         </div>
-
-                        <!-- (cluster) Market -->
-                        <div class="row input-row divClusterTraining">
-                            <div class="col-md-3 text-align-left">
-                                <label for="ddlMarket">Market</label>
-                            </div>
-                            <div class="col-md-9 text-align-left">
-                                <select id="ddlMarket" class="clusterTraining" errorMessage="You must select a market."></select>
-                            </div>
+                        <div class="col-md-9 text-align-left">
+                            <select id="ddlMediaType" onchange="mediaTypeChanged();"></select>
                         </div>
+                    </div>
 
-                        <!-- (cluster) Owner -->
-                        <div class="row input-row divClusterTraining">
-                            <div class="col-md-3 text-align-left">
-                                <label for="ddlOwner">Owner</label>
-                            </div>
-                            <div class="col-md-9 text-align-left">
-                                <select id="ddlOwner" class="clusterTraining" errorMessage="You must select an owner."></select>
-                            </div>
+                    <!-- Owner -->
+                    <div class="row input-row"> <!-- for individual training, used to filter trainee list; listed first because filtering by market is slower (especially when not also filtering by owner) -->
+                        <div class="col-md-3 text-align-left">
+                            <label for="ddlOwner">Owner</label>
                         </div>
-
-                        <!-- (individual) Trainee -->
-                        <div class="row input-row divIndividualTraining">
-                            <div class="col-md-3 text-align-left">
-                                <label for="ddlTrainee">Trainee</label>
-                            </div>
-                            <div class="col-md-9 text-align-left">
-                                <!-- TODO how best to filter? -->
-                                <select id="ddlTrainee" class="individualTraining" errorMessage="You must select a trainee."></select>
-                            </div>
+                        <div class="col-md-9 text-align-left">
+                            <select id="ddlOwner" class="mkaRequiredForClusterTraining" errorMessage="You must select an owner." onchange="getTrainees();"></select>
                         </div>
+                    </div>
 
+                    <!-- Market -->
+                    <div class="row input-row"> <!-- for individual training, used to filter trainee list -->
+                        <div class="col-md-3 text-align-left">
+                            <label for="ddlMarket">Market</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <select id="ddlMarket" class="mkaRequiredForClusterTraining" errorMessage="You must select a market." onchange="getTrainees();"></select>
+                        </div>
+                    </div>
+
+                    <!-- Training Type -->
+                    <div id="divTrainingType" class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="ddlTrainingType">Training Type</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <select id="ddlTrainingType" class="mkaRequired" onchange="gotTrainingType();" errorMessage="You must select a training type.">
+                                <option value="">(select a training type)</option>
+                                <option value="Individual">Individual</option>
+                                <option value="Cluster">Cluster</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Trainee -->
+                    <div class="row input-row individualTrainingRow">
+                        <div class="col-md-3 text-align-left">
+                            <label for="ddlTrainee"><span id="spanTrainee"></span></label>
+                        </div>
+                        <div class="col-md-9 text-align-left individualTraining">
+                            <select id="ddlTrainee" class="mkaRequiredForIndividualTraining" errorMessage="You must select a trainee."></select>
+                            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                            <input type="checkbox" id="chkIncludeInternal" onchange="getTrainees();" />
+                            &nbsp; Include internal users
+                        </div>
                     </div>
 
                     <div class="row input-row">
@@ -195,7 +192,7 @@
                             <label for="txtNotes">Notes</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <textarea id="txtNotes"></textarea>
+                            <textarea id="txtNotes" style="width: 900px"></textarea>
                         </div>
                     </div>
 
@@ -257,6 +254,7 @@
     var gotTrainers = false;
     var gotTopics = false;
     var gotMethods = false;
+    var needToUpdateTraineesWhenVisible = false;
 
     $(document).ready(function ()
     {
@@ -281,8 +279,7 @@
         checkForInsertOrUpdate();
         getTrainingDate();
         getTrainingTime();
-        getMediaTypes(); // success -> get markets and owners
-        getTrainees();
+        getMediaTypes(); // success -> get markets and owners, then trainees
         getTrainers();
         getTopics();
         getMethods();
@@ -315,7 +312,7 @@
             $("#ddlTrainingType").val(getTrainingType());
             $("#divTrainingType").hide();
         }
-        // delay gotTrainingType() until after getMarkets() and getOwners() done, otherwise they end up with wrong widths
+        gotTrainingType();
     }
 
     function getTrainingDate() {
@@ -417,7 +414,8 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inMediaTypeId": $("#ddlMediaType").val()
+                "inMediaTypeId": $("#ddlMediaType").val(),
+                "inActiveOnly": true
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -441,7 +439,7 @@
                     convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
                     gotMarkets = true;
-                    gotTrainingType();
+                    getTrainees();
                     getTrainingDetail();
 
                 }
@@ -462,7 +460,8 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inMediaTypeId": $("#ddlMediaType").val()
+                "inMediaTypeId": $("#ddlMediaType").val(),
+                "inActiveOnly": true
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -486,7 +485,7 @@
                     convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
                     gotOwners = true;
-                    gotTrainingType();
+                    getTrainees();
                     getTrainingDetail();
 
                 }
@@ -500,30 +499,98 @@
     }
 
     function gotTrainingType() {
-        // delay until after getMarkets() and getOwners() done, otherwise they end up with wrong widths
-        if (gotMarkets == false || gotOwners == false) {
-            return;
+        if (trainingId != null) {
+            if (isCluster) {
+                $(".individualTrainingRow").hide();
+            } else {
+                $(".clusterTrainingRow").hide();
+            }
         }
 
-        $(".divIndividualTraining").hide();
-        $(".individualTraining").removeClass("mkaRequired");
-        $(".divClusterTraining").hide();
-        $(".clusterTraining").removeClass("mkaRequired");
+        $(".individualTraining").hide();
+        $(".mkaRequiredForIndividualTraining").removeClass("mkaRequired");
+        $(".clusterTraining").hide();
+        $(".mkaRequiredForClusterTraining").removeClass("mkaRequired");
 
         switch ($("#ddlTrainingType").val()) {
             case "Individual":
-                $(".divIndividualTraining").show();
-                $(".individualTraining").addClass("mkaRequired");
+                if (needToUpdateTraineesWhenVisible) {
+                    needToUpdateTraineesWhenVisible = false;
+                    getTrainees();
+                }
+                $(".individualTraining").show();
+                $(".mkaRequiredForIndividualTraining").addClass("mkaRequired");
+                $("#spanTrainee").text("Trainee");
                 break;
             case "Cluster":
-                $(".divClusterTraining").show();
-                $(".clusterTraining").addClass("mkaRequired");
+                $(".clusterTraining").show();
+                $(".mkaRequiredForClusterTraining").addClass("mkaRequired");
+                $("#spanTrainee").html("&nbsp;"); // keep row height same to minimize shifting of other controls
                 break;
         }
     }
 
     function getTrainees() {
-        // TODO
+        if (isCluster) { // editing cluster training, so skip ahead to post-success logic
+            postGetTrainees();
+            return;
+        }
+
+        if ($("#ddlTrainingType").val() != "Individual") { // trainee list not currently visible, set a flag that it needs to be updated if/when it becomes visible
+            needToUpdateTraineesWhenVisible = true;
+            return;
+        }
+
+        if (gotMarkets == false || gotOwners == false) {
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Personnel/GetPersonnelListByMarketOwner',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": $("#ddlMarket").val(),
+                "inOwnerId": $("#ddlOwner").val(),
+                "inOmitInternal": ($("#chkIncludeInternal").prop("checked") == false)
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    var currentTraineeId = $("#ddlTrainee").val();
+                    var str = '';
+                    if (data.report.rows.length == 0 && $("#ddlOwner").val() == "" && $("#ddlMarket").val() == "" && trainingId == null) {
+                        str = '<option value="">-- First select Market and/or Owner --</option>';
+                    } else {
+                        str = '<option value="">-- Select a Trainee --</option>';
+                        $.each(data.report.rows, function (index) {
+                            str = str + '<option value="' + data.report.rows[index].personnelId + '"' + (data.report.rows[index].personnelId == currentTraineeId ? ' selected' : '') + '>' + data.report.rows[index].name + '</option>'; // name includes ID
+                        });
+                    }
+
+                    $("#ddlTrainee").html(str);
+
+                    convertToChosenSelect("ddlTrainee", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    postGetTrainees();
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function postGetTrainees() {
         gotTrainees = true;
         getTrainingDetail();
     }
@@ -543,7 +610,6 @@
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
                 else {
-                    var currentOwnerId = $("#ddlOwner").val();
                     var str = '';
                     str = '<option value="">-- Select a Trainer --</option>';
                     $.each(data.report.rows, function (index) {
@@ -704,13 +770,28 @@
                     }
 
                     if (isCluster) {
-                        $("#ddlMarket").val(data.report.rows[0]["Market ID"]);
-                        $("#ddlOwner").val(data.report.rows[0]["Owner ID"]);
+                        setOwnerFromDetail(
+                            data.report.rows[0]["Owner ID"],
+                            data.report.rows[0]["Owner"]
+                        );
+                        setMarketFromDetail(
+                            data.report.rows[0]["Market ID"],
+                            data.report.rows[0]["Market"]
+                        );
+                        setMediaTypeFromOwner();
                     } else {
-                        $("#ddlTrainee").val(data.report.rows[0]["Trainee Personnel ID"]);
+                        setTraineeFromDetail(
+                            data.report.rows[0]["Trainee Personnel ID"],
+                            data.report.rows[0]["Trainee"]
+                        );
+                        setOwnerFromTrainee();
                     }
 
-                    $("#ddlTrainer").val(data.report.rows[0]["Trainer Personnel ID"]);
+                    setTrainerFromDetail(
+                        data.report.rows[0]["Trainer Personnel ID"],
+                        data.report.rows[0]["Trainer"]
+                    );
+
                     $("#ddlTopic").val(data.report.rows[0]["Training Topic ID"]);
                     $("#ddlMethod").val(data.report.rows[0]["Training Method ID"]);
                     $("#txtNotes").val(data.report.rows[0]["Notes"]);
@@ -724,12 +805,123 @@
         });
     }
 
+    function setOwnerFromDetail(ownerId, ownerName) {
+        $("#ddlOwner").val(ownerId);
+        if ($("#ddlOwner").val() == ownerId) {
+            return;
+        }
+
+        var str = $("#ddlOwner").html();
+        str = str + '<option value="' + ownerId + '">*INACTIVE* ' + ownerName + '</option>'; // name includes ID
+        $("#ddlOwner").html(str);
+        $("#ddlOwner").val(ownerId);
+    }
+
+    function setMarketFromDetail(marketId, marketName) {
+        $("#ddlMarket").val(marketId);
+        if ($("#ddlMarket").val() == marketId) {
+            return;
+        }
+
+        var str = $("#ddlMarket").html();
+        str = str + '<option value="' + marketId + '">*INACTIVE* ' + marketName + '</option>'; // name includes ID
+        $("#ddlMarket").html(str);
+        $("#ddlMarket").val(marketId);
+    }
+
+    function setTraineeFromDetail(traineePersonnelId, traineeName) {
+        $("#ddlTrainee").val(traineePersonnelId);
+        if ($("#ddlTrainee").val() == traineePersonnelId) {
+            return;
+        }
+
+        var str = $("#ddlTrainee").html();
+        str = str + '<option value="' + traineePersonnelId + '">*INACTIVE* ' + traineeName + '</option>'; // name includes email
+        $("#ddlTrainee").html(str);
+        $("#ddlTrainee").val(traineePersonnelId);
+    }
+
+    function setTrainerFromDetail(trainerPersonnelId, trainerName) {
+        $("#ddlTrainer").val(trainerPersonnelId);
+        if ($("#ddlTrainer").val() == trainerPersonnelId) {
+            return;
+        }
+
+        var str = $("#ddlTrainer").html();
+        str = str + '<option value="' + trainerPersonnelId + '">*INACTIVE* ' + trainerName + '</option>'; // name includes ID
+        $("#ddlTrainer").html(str);
+        $("#ddlTrainer").val(trainerPersonnelId);
+    }
+
+    function setOwnerFromTrainee() {
+        $.ajax({
+            url: ServicePrefix + '/api/Personnel/GetPersonnelAssignedOwnershipList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": $("#ddlTrainee").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    var minimumOwnerId = 32768; // OwnerID is smallint which tops out at 32767
+                    var currentOwnerId;
+                    $.each(data.report.rows, function (index) {
+                        currentOwnerId = data.report.rows[index].ownerId;
+                        if (minimumOwnerId > currentOwnerId) {
+                            minimumOwnerId = currentOwnerId;
+                        }
+                    });
+                    if (minimumOwnerId < 32768) {
+                        $("#ddlOwner").val(minimumOwnerId);
+                        setMediaTypeFromOwner();
+                    }
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function setMediaTypeFromOwner() {
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwner',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerId": $("#ddlOwner").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    $("#ddlMediaType").val(data.report.rows[0]["Media Type ID"]);
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
     function updateTrainingDetail() {
         if (validationPassed() == false) {
             return;
         }
 
-        // TODO
+        bootbox.alert('Not yet implemented');
     }
 
     function validationPassed() {
