@@ -2632,7 +2632,7 @@
                 if (data.response.status.toUpperCase() === "SUCCESS") {
 
                     buildColumnsArray(data);
-                    getReportDataForNotification(true);
+                    setTimeout('getReportDataForNotification(true)', 500);
                 }
                 else
                 {
@@ -3067,13 +3067,26 @@
         str = "";
  
         $.each(data.report.rows, function (index) {
+
+            if (data.report.rows[index]["Approvals"] == '0' && 
+                data.report.rows[index]["Ready For Approval"] == false && 
+                data.report.rows[index]["Admin"] == true ) {
+                str = str + '<div class="row" style="height: 35px;">';
+
+                str = str + '<div class="col-md-9 text-align-left">' + data.report.rows[index]["Subject"] + '</div>';
+                str = str + '<div class="col-md-3 text-align-center"><input type="button" value="Assign To" onclick="assignToNotification(' + data.report.rows[index]["Matched Notification Id"] + ')"; /></div>';
+                str = str + '</div>'
+            }
+        });
+
+        if (str.length == 0)
+        {
             str = str + '<div class="row" style="height: 35px;">';
 
-            str = str + '<div class="col-md-9 text-align-left">' + data.report.rows[index]["Subject"] + '</div>';
-            str = str + '<div class="col-md-3 text-align-center"><input type="button" value="Assign To" onclick="assignToNotification(' + data.report.rows[index]["Matched Notification Id"] + ')"; /></div>';
+            str = str + '<div class="col-md-12 text-align-left">You do not have any Matched Notifications eligible to add assignments to. <br><br> Go to Settings >> Tech Tools >> Matched Notification Tool to create a new one.</div>';
+ 
             str = str + '</div>'
-
-        });
+        }
 
         $("#notificationList").html(str);
 
@@ -3105,7 +3118,7 @@
         var emailAddressArray = new Array();
 
         if ($("#dtResults").is(':visible') == false) {
-            return;
+             return;
         }
 
         $.blockUI();
@@ -3117,13 +3130,18 @@
         if (displayOnly == true) {
             var data = $("#dtResults").DataTable().rows({ filter: 'applied' }).data();
             rows = data[0];
+ 
             if (rows.Email) {
-          //      console.log(rows.Email);
+ 
                 emailAddressArray.push(cleanEmail(rows.Email));
+            }
+            if (rows.EMail) {
+ 
+                emailAddressArray.push(cleanEmail(rows.EMail));
             }
             if (rows['Email Address']) {
                 emailAddressArray.push(cleanEmail(rows['Email Address']));
-            //    console.log(rows['Email Address']);
+ 
             }
         }
         else
@@ -3131,12 +3149,16 @@
             rows = $("#dtResults").DataTable().rows({ filter: 'applied' }).data();
             rows.each(function (value, index) {
                 if (value.Email) {
-                   // console.log(value.Email);
+ 
                     emailAddressArray.push(cleanEmail(value.Email));
+                }
+                if (value.EMail) {
+ 
+                    emailAddressArray.push(cleanEmail(value.EMail));
                 }
                 if (value['Email Address']) {
                     emailAddressArray.push(cleanEmail(value['Email Address']));
-                  //  console.log(value['Email Address']);
+ 
                 }
 
                 //if (displayOnly == true)

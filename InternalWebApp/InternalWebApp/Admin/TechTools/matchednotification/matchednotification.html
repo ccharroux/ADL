@@ -156,9 +156,15 @@
                                 <div>
                                     <input id="btnUpdate" value="Update" onclick="updateMatchedNotification()" class="default-button" type="button">
                                 </div>
-                                <div class="back-button-div">
-                                    <input value="Back" onclick="goBackToList();" class="default-button" type="button">
+                                <div id="divApprovals" style="display:none">
+                                    <input value="Approve" onclick="setMatchedNotificationToApproved();" class="default-button" type="button"> 
+                                    <input value="Reject" onclick="setMatchedNotificationToNotReadyForApproval();" class="default-button" type="button">
+                                    <hr />
                                 </div>
+                                <!--<div class="back-button-div">
+                                    <input value="Back" onclick="goBackToList();" class="default-button" type="button">
+                                </div>-->
+                             
                             </div>
                         </div>
                     </div>
@@ -171,8 +177,12 @@
                             <h3>Assignments</h3>
                         </div>
                     </div>
+
                     <div class="row">
-                        <div class="col-md-12" style="text-align:right">
+                        <div class="col-md-6" style="text-align:left">
+                            To assign additional recipients to this Matched Notification, <a href="/utilities/genericreport/genericReportList.html">Click here</a> or go to any report that has an email address listed and click Notification Data button.
+                        </div>
+                        <div class="col-md-6" style="text-align:right">
                             <input id="btnRemoveAllAssignments" type="button" value="Remove All Assignments" onclick="removeAllAssignedPersonnelNotification()" />
                         </div>
                     </div>
@@ -411,7 +421,19 @@
                 newDate = new Date(data.report.rows[index]['Create Date'].replace("T", ' '));
                 $("#txtCreateDate").val(newDate.getMonth() + 1 + '/' + newDate.getDate() + '/' + newDate.getFullYear());
 
-                if (data.report.rows[index].Admin == false ||
+                if ((data.report.rows[index]['Ready For Approval'] == true) && 
+                    (data.report.rows[index]['Can Approve'] == true))
+                {
+                    $("#divApprovals").show();
+                }
+                if (data.report.rows[index]['Delete Date'] == null)
+                {
+                    $("#divApprovals").hide();
+                }
+
+                if (
+                    data.report.rows[index]['Delete Date'] != null ||
+                    data.report.rows[index].Admin == false ||
                     data.report.rows[index]['Ready For Approval'] == true)
                 {
                     MakePageReadOnly(true);
@@ -419,7 +441,6 @@
                 else
                 {
                     MakePageReadOnly(false);
-
                 }
 
             });
@@ -639,5 +660,114 @@
     {
         window.location = '/admin/techtools/matchednotification/matchednotificationlist.html';
     }
+
+    function setMatchedNotificationToNotReadyForApproval()
+    {
+
+        bootbox.confirm("Are you sure you want to reject this Notification?", function (result) {
+
+            if (result == true) {
+                setForApprovalMatchedNotification(matchedNotificationId, false);
+            }
+        });
+    }
+    function setForApprovalMatchedNotification(matchedNotificationId, bApprovalFlag) {
+
+        var url = ServicePrefix + "/api/MatchedNotification/";
+        var ajaxObject = new Object;
+
+        url = url + "UpdateMatchedNotificationReadyForApproval";
+
+        ajaxObject = JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inMatchedNotificationId": matchedNotificationId,
+            "inReadyForApproval": bApprovalFlag
+        });
+
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: ajaxObject,
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                setForApprovalMatchedNotificationSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+         $.ajax(url, settings);
+
+    }
+    function setForApprovalMatchedNotificationSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+
+            bootbox.alert('Matched Notfication Rejected.',
+                function () {
+                    window.location = "/admin/techtools/matchednotification/matchednotificationlist.html";
+                });
+
+        }
+    }
  
+    function setMatchedNotificationToApproved()
+    {
+        bootbox.confirm("Are you sure you want to approve this Notification?", function (result) {
+
+            if (result == true) {
+                setToApprovedMatchedNotification(matchedNotificationId);
+            }
+        });
+    }
+    function setToApprovedMatchedNotification(matchedNotificationId) {
+
+        var url = ServicePrefix + "/api/MatchedNotification/";
+        var ajaxObject = new Object;
+
+        url = url + "UpdateMatchedNotificationToApproved";
+
+        ajaxObject = JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inMatchedNotificationId": matchedNotificationId 
+        });
+
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: ajaxObject,
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                setToApprovedMatchedNotificationSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+    function setToApprovedMatchedNotificationSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+
+            bootbox.alert('Matched Notfication Approved.',
+                function () {
+                    window.location = "/admin/techtools/matchednotification/matchednotificationlist.html";
+                });
+
+        }
+    }
 </script>
