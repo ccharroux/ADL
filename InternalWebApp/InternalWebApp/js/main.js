@@ -2420,7 +2420,6 @@ function buildBackButtonGeneric() {
         return;
     }
     // cleanup can go here...
-    //cleanupBackButton();
     var menuItem = getParameterByName("MenuItem");
 
     if (getLocalStorage("backButtonData").length > 0 && (!menuItem ||menuItem.length == 0))
