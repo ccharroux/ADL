@@ -255,6 +255,7 @@
     var gotTopics = false;
     var gotMethods = false;
     var needToUpdateTraineesWhenVisible = false;
+    var gotTrainingDetail = false;
 
     $(document).ready(function ()
     {
@@ -298,7 +299,7 @@
         return val;
     }
 
-    function getTrainingType() {
+    function getEditTrainingType() {
         return isCluster ? "Cluster" : "Individual";
     }
 
@@ -309,7 +310,7 @@
         } else {
             // update
             $("#spanTitle").text("Edit Training");
-            $("#ddlTrainingType").val(getTrainingType());
+            $("#ddlTrainingType").val(getEditTrainingType());
             $("#divTrainingType").hide();
         }
         gotTrainingType();
@@ -734,7 +735,12 @@
             return;
         }
 
-        var trainingType = getTrainingType();
+        // already got detail (avoid infinite loop due to indirect effects)
+        if (gotTrainingDetail) {
+            return;
+        }
+
+        var trainingType = getEditTrainingType();
         var params;
         if (isCluster) {
             params = JSON.stringify({
@@ -759,6 +765,8 @@
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
                 else {
+                    gotTrainingDetail = true;
+
                     $("#dtTrainingDate").val(data.report.rows[0]["Training Date"]);
 
                     $("#tmTrainingTime").val(data.report.rows[0]["Training Time"]);
@@ -881,6 +889,7 @@
                     if (minimumOwnerId < 32768) {
                         $("#ddlOwner").val(minimumOwnerId);
                         setMediaTypeFromOwner();
+                        getTrainees();
                     }
                 }
             },
@@ -916,12 +925,12 @@
         });
     }
 
-    function updateTrainingDetail() {
-        if (validationPassed() == false) {
-            return;
+    function getTrainingDateTime() {
+        var str = $("#dtTrainingDate").val();
+        if ($("#chkTrainingTimeUnspecified").prop("checked") == false) {
+            str += " " + $("#tmTrainingTime").val();
         }
-
-        bootbox.alert('Not yet implemented');
+        return str;
     }
 
     function validationPassed() {
@@ -952,6 +961,159 @@
         });
 
         return loopBreak;
+    }
+
+    function updateTrainingDetail() {
+        if (validationPassed() == false) {
+            return;
+        }
+
+        switch ($("#ddlTrainingType").val()) {
+            case "Individual":
+                if (trainingId == null) {
+                    insertIndividualTraining();
+                } else {
+                    updateIndividualTraining();
+                }
+                break;
+            case "Cluster":
+                if (trainingId == null) {
+                    insertClusterTraining();
+                } else {
+                    updateClusterTraining();
+                }
+                break;
+            default:
+                bootbox.alert("Must select training type first");
+        }
+    }
+
+    function insertIndividualTraining() {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/InsertIndividualTraining',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inTrainingTopicId": $("#ddlTopic").val(),
+                "inTrainingMethodId": $("#ddlMethod").val(),
+                "inTrainingDate": getTrainingDateTime(),
+                "inPersonnelId": $("#ddlTrainee").val(),
+                "inInternalPersonnelId": $("#ddlTrainer").val(),
+                "inNotes": $("#txtNotes").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    bootbox.alert("Insert Individual Training successful - need to implement return to list and show relevant month with no other filters");
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function updateIndividualTraining() {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/UpdateIndividualTraining',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inTrainingIndividualId": trainingId,
+                "inTrainingTopicId": $("#ddlTopic").val(),
+                "inTrainingMethodId": $("#ddlMethod").val(),
+                "inTrainingDate": getTrainingDateTime(),
+                "inPersonnelId": $("#ddlTrainee").val(),
+                "inInternalPersonnelId": $("#ddlTrainer").val(),
+                "inNotes": $("#txtNotes").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    bootbox.alert("Update Individual Training successful - need to implement return to list and show same filters as before");
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function insertClusterTraining() {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/InsertClusterTraining',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": $("#ddlMarket").val(),
+                "inOwnerId": $("#ddlOwner").val(),
+                "inTrainingTopicId": $("#ddlTopic").val(),
+                "inTrainingMethodId": $("#ddlMethod").val(),
+                "inTrainingDate": getTrainingDateTime(),
+                "inInternalPersonnelId": $("#ddlTrainer").val(),
+                "inNotes": $("#txtNotes").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    bootbox.alert("Insert Cluster Training successful - need to implement return to list and show relevant month with no other filters");
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function updateClusterTraining() {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/UpdateClusterTraining',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inTrainingClusterId": trainingId,
+                "inMarketId": $("#ddlMarket").val(),
+                "inOwnerId": $("#ddlOwner").val(),
+                "inTrainingTopicId": $("#ddlTopic").val(),
+                "inTrainingMethodId": $("#ddlMethod").val(),
+                "inTrainingDate": getTrainingDateTime(),
+                "inInternalPersonnelId": $("#ddlTrainer").val(),
+                "inNotes": $("#txtNotes").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    bootbox.alert("Update Cluster Training successful - need to implement return to list and show same filters as before");
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
     }
 
     function loadFeatureButtons()

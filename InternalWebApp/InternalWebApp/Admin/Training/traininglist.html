@@ -882,23 +882,33 @@
     }
 
     function editTraining(isCluster, trainingId) {
-        window.location = "/admin/training/training.html?isCluster=" + isCluster + " &trainingId=" + trainingId;
+        window.location = "/admin/training/training.html?isCluster=" + isCluster + "&trainingId=" + trainingId;
     }
 
     function deleteTraining(isCluster, trainingId) {
         bootbox.confirm('Delete this training entry?', function (result) {
             if (result) {
-                var trainingType = isCluster ? 'Cluster' : 'Individual';
-                var trainingParam = "inTraining" + trainingType + "Id";
+                var url;
+                var params;
+                if (isCluster) {
+                    url = ServicePrefix + '/api/Training/DeleteClusterTraining';
+                    params = JSON.stringify({
+                        "inApiToken": getLocalStorage("APIToken"),
+                        "inTrainingClusterId": trainingId
+                    });
+                } else {
+                    url = ServicePrefix + '/api/Training/DeleteIndividualTraining';
+                    params = JSON.stringify({
+                        "inApiToken": getLocalStorage("APIToken"),
+                        "inTrainingIndividualId": trainingId
+                    });
+                }
                 $.ajax({
-                    url: ServicePrefix + '/api/Training/Delete' + trainingType + 'Training',
+                    url: url,
                     dataType: 'json',
                     type: 'post',
                     contentType: 'application/json',
-                    data: JSON.stringify({
-                        "inApiToken": getLocalStorage("APIToken"),
-                        trainingParam: trainingId
-                    }),
+                    data: params,
                     processData: false,
                     success: function (data, textStatus, jQxhr) {
                         if (data.response.status != "SUCCESS") {
