@@ -10365,7 +10365,21 @@ function getReportFilterArray_ListErrors() {
 
     var arrayFilters = new Array();
     var arrayObject = new Object();
+    arrayObject = {
+        token: "ErrorDates",
+        jsCall: "getErrorDates",
+        objectName: "ddlErrorDates",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "ErrorIPAddress",
+        jsCall: null,
+        objectName: "ddlErrorIPAddress",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
 
     return arrayFilters;
 }
@@ -10379,8 +10393,8 @@ function getReportObject_ListErrors() {
     {
 
         reportTitle: "Web Error Report",
-        apiControllerAction: "none",
-        apiType: "get",
+        apiControllerAction: "/api/Error/GetErrorList",
+        apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: ['tech', 'old admin']
     }
