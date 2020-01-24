@@ -265,7 +265,7 @@ reportName.push("rptUnreleasedMarketIssueList");
 
 reportName.push("rptTVBReviewUserListing");
 reportName.push("rptUsersByProduct");
-reportName.push("rptOutstandingStations");
+//reportName.push("rptOutstandingStations");
 reportName.push("rptListErrors");
 
 reportName.push("rptXRYOwnersWithoutRecipients")
@@ -10305,7 +10305,13 @@ function getReportFilterArray_UsersByProduct() {
 
     var arrayFilters = new Array();
     var arrayObject = new Object();
-
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
 
     return arrayFilters;
 }
@@ -10319,8 +10325,8 @@ function getReportObject_UsersByProduct() {
     {
 
         reportTitle: "Users by Product",
-        apiControllerAction: "none",
-        apiType: "get",
+        apiControllerAction: "/api/Report/GetAllUsersStationProduct",
+        apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: ['personnel', 'old admin']
     }
@@ -10328,32 +10334,32 @@ function getReportObject_UsersByProduct() {
     return tempObject;
 }
 
-function getReportFilterArray_OutstandingStations() {
+//function getReportFilterArray_OutstandingStations() {
 
-    var arrayFilters = new Array();
-    var arrayObject = new Object();
+//    var arrayFilters = new Array();
+//    var arrayObject = new Object();
 
 
-    return arrayFilters;
-}
-function getReportObject_OutstandingStations() {
+//    return arrayFilters;
+//}
+//function getReportObject_OutstandingStations() {
 
-    var tempObject = new Object();
+//    var tempObject = new Object();
 
-    columnsToDisplay = new Array();
+//    columnsToDisplay = new Array();
 
-    tempObject =
-    {
+//    tempObject =
+//    {
 
-        reportTitle: "Outstanding Stations",
-        apiControllerAction: "none",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: ['station', 'old admin']
-    }
+//        reportTitle: "Outstanding Stations",
+//        apiControllerAction: "none",
+//        apiType: "get",
+//        columnsToDisplay: columnsToDisplay,
+//        product: ['station', 'old admin']
+//    }
 
-    return tempObject;
-}
+//    return tempObject;
+//}
 
 function getReportFilterArray_ListErrors() {
 
