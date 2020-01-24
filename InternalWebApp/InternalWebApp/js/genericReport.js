@@ -10262,7 +10262,23 @@ function getReportFilterArray_TVBReviewUserListing() {
 
     var arrayFilters = new Array();
     var arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
 
     return arrayFilters;
 }
@@ -10276,7 +10292,7 @@ function getReportObject_TVBReviewUserListing() {
     {
 
         reportTitle: "TVB Data Review User Listing",
-        apiControllerAction: "none",
+        apiControllerAction: "/api/TVBReport/GetTVBRecipientListing",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb', 'TVB Data Review', 'old admin']
@@ -10284,6 +10300,7 @@ function getReportObject_TVBReviewUserListing() {
 
     return tempObject;
 }
+
 function getReportFilterArray_UsersByProduct() {
 
     var arrayFilters = new Array();
@@ -10310,6 +10327,7 @@ function getReportObject_UsersByProduct() {
 
     return tempObject;
 }
+
 function getReportFilterArray_OutstandingStations() {
 
     var arrayFilters = new Array();
@@ -10336,6 +10354,7 @@ function getReportObject_OutstandingStations() {
 
     return tempObject;
 }
+
 function getReportFilterArray_ListErrors() {
 
     var arrayFilters = new Array();
