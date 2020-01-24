@@ -2493,7 +2493,7 @@ function getFeatureButtons(featureToken, featureValue)
                         ////make delete button
                         btnValue = "Remove " + obj.Description;
                         parameters = "";
-                        parameters += "'" + featureToken + "'," + obj.FeatureId + ",'" + featureValue + "'";
+                        parameters += "'" + featureToken + "'," + obj.FeatureId + ",'" + featureValue + "'," + obj.CanBeChanged;
 
                         str += '<' + 'input type="button" class="default-button" style="background-color:red;margin-bottom:5px;" value="' + btnValue + '" onclick="deleteFeatureAssignment(' + parameters + ')"/><br/>';
 
@@ -2503,7 +2503,7 @@ function getFeatureButtons(featureToken, featureValue)
                         btnValue = "Add " + obj.Description;
 
                         parameters = "";
-                        parameters += "'" + featureToken + "'," + obj.FeatureId + "," + obj.ConditionId + ",'" + featureValue + "'";
+                        parameters += "'" + featureToken + "'," + obj.FeatureId + "," + obj.ConditionId + ",'" + featureValue + "'," + obj.CanBeChanged;
 
                         str += '<' + 'input type="button" class="default-button" style="background-color:green;margin-bottom:5px;" value="' + btnValue + '" onclick="addFeatureAssignment(' + parameters + ')"/><br/>';
                     }
@@ -2524,8 +2524,12 @@ function getFeatureButtons(featureToken, featureValue)
 
 }
 
-function addFeatureAssignment(featureToken, featureId, conditionId, value)
+function addFeatureAssignment(featureToken, featureId, conditionId, value, canBeChanged)
 {
+    if (canBeChanged == false || canBeChanged == 0) {
+        bootbox.alert('You are not allowed to add this feature.', function () { });
+        return;
+    }
     
     $.ajax({
         url: ServicePrefix + '/api/Feature/AddFeatureByFeatureConditionValue',
@@ -2556,8 +2560,13 @@ function addFeatureAssignment(featureToken, featureId, conditionId, value)
     });
 }
 
-function deleteFeatureAssignment(featureToken, featureId, value)
+function deleteFeatureAssignment(featureToken, featureId, value, canBeChanged)
 {
+    if (canBeChanged == false || canBeChanged == 0)
+    {
+        bootbox.alert('You are not allowed to remove this feature.', function () { });
+        return;
+    }
   
     $.ajax({
         url: ServicePrefix + '/api/Feature/DeleteFeatureByFeatureValue',
