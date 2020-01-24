@@ -265,7 +265,7 @@ reportName.push("rptUnreleasedMarketIssueList");
 
 reportName.push("rptTVBReviewUserListing");
 reportName.push("rptUsersByProduct");
-reportName.push("rptOutstandingStations");
+//reportName.push("rptOutstandingStations");
 reportName.push("rptListErrors");
 
 reportName.push("rptXRYOwnersWithoutRecipients")
@@ -10262,7 +10262,23 @@ function getReportFilterArray_TVBReviewUserListing() {
 
     var arrayFilters = new Array();
     var arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
 
     return arrayFilters;
 }
@@ -10276,7 +10292,7 @@ function getReportObject_TVBReviewUserListing() {
     {
 
         reportTitle: "TVB Data Review User Listing",
-        apiControllerAction: "none",
+        apiControllerAction: "/api/TVBReport/GetTVBRecipientListing",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb', 'TVB Data Review', 'old admin']
@@ -10284,11 +10300,18 @@ function getReportObject_TVBReviewUserListing() {
 
     return tempObject;
 }
+
 function getReportFilterArray_UsersByProduct() {
 
     var arrayFilters = new Array();
     var arrayObject = new Object();
-
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListAll",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
 
     return arrayFilters;
 }
@@ -10302,45 +10325,61 @@ function getReportObject_UsersByProduct() {
     {
 
         reportTitle: "Users by Product",
-        apiControllerAction: "none",
-        apiType: "get",
+        apiControllerAction: "/api/Report/GetAllUsersStationProduct",
+        apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: ['personnel', 'old admin']
     }
 
     return tempObject;
 }
-function getReportFilterArray_OutstandingStations() {
 
-    var arrayFilters = new Array();
-    var arrayObject = new Object();
+//function getReportFilterArray_OutstandingStations() {
+
+//    var arrayFilters = new Array();
+//    var arrayObject = new Object();
 
 
-    return arrayFilters;
-}
-function getReportObject_OutstandingStations() {
+//    return arrayFilters;
+//}
+//function getReportObject_OutstandingStations() {
 
-    var tempObject = new Object();
+//    var tempObject = new Object();
 
-    columnsToDisplay = new Array();
+//    columnsToDisplay = new Array();
 
-    tempObject =
-    {
+//    tempObject =
+//    {
 
-        reportTitle: "Outstanding Stations",
-        apiControllerAction: "none",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: ['station', 'old admin']
-    }
+//        reportTitle: "Outstanding Stations",
+//        apiControllerAction: "none",
+//        apiType: "get",
+//        columnsToDisplay: columnsToDisplay,
+//        product: ['station', 'old admin']
+//    }
 
-    return tempObject;
-}
+//    return tempObject;
+//}
+
 function getReportFilterArray_ListErrors() {
 
     var arrayFilters = new Array();
     var arrayObject = new Object();
+    arrayObject = {
+        token: "ErrorDates",
+        jsCall: "getErrorDates",
+        objectName: "ddlErrorDates",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "ErrorIPAddress",
+        jsCall: null,
+        objectName: "ddlErrorIPAddress",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
 
     return arrayFilters;
 }
@@ -10354,8 +10393,8 @@ function getReportObject_ListErrors() {
     {
 
         reportTitle: "Web Error Report",
-        apiControllerAction: "none",
-        apiType: "get",
+        apiControllerAction: "/api/Error/GetErrorList",
+        apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: ['tech', 'old admin']
     }

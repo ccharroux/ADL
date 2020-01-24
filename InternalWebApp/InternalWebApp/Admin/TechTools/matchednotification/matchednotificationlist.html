@@ -57,6 +57,15 @@
     <!--[if lt IE 9]>
     <script src="js/respond.min.js"></script>
     <![endif]-->
+    <style>
+        a {
+            white-space:nowrap!important;
+        }
+        td
+        {
+            max-width:100px!important;
+        }
+    </style>
 
 </head>
 <body>
@@ -82,7 +91,7 @@
                     <div class="col-md-10 ">
 
                         <label for="ddlDaysBack" class="dropdown-label">Sent Days Back</label>
-                        <select id="ddlDaysBack" class="search-ddl-select dropdown-select"  onchange="getMatchedNotificationList();"></select>
+                        <select id="ddlDaysBack" class="search-ddl-select dropdown-select report-filter"  onchange="getMatchedNotificationList();"></select>
 
 
                     </div>
@@ -101,8 +110,11 @@
                                 <th class="exportColumn">Send Date</th>
                                 <th class="exportColumn">Author</th>
                                 <th class="exportColumn">Date Created</th>
-                                <th class="exportColumn">Approvals</th>
-                                <th class="exportColumn">Assignments</th>
+                                <th class="exportColumn">Approved Date</th>
+                                <th class="exportColumn">Assigned</th>
+                                <th class="exportColumn">Ready For Approval</th>
+
+                                <th class="exportColumn">Delete Date</th>
                                <th></th>
                             </tr>
                         </thead>
@@ -167,9 +179,16 @@
 
         buildTechMenu("TechTools");
 
-        getMatchedNotificationList();
+        loadSearchResults();
+        
 
      });
+
+    function loadSearchResults()
+    {
+        loadReportParameters();
+        getMatchedNotificationList();
+    }
 
     function getDaysBackList() {
 
@@ -210,10 +229,13 @@
                 { "data": 'Subject' },
                 { "data": 'Send Date' },
                 { "data": 'Author' },
-                { "data": 'Date Created' },
+                {
+                    "data": 'Date Created',
+                    "className": "text-align-center"
+                },
 
                 {
-                    "data": 'Approvals',
+                    "data": 'Approved Date',
                     "className" : "text-align-center"
                 },
                 {
@@ -221,41 +243,85 @@
                     "className": "text-align-center"
                 },
                 {
+                
+                    //"data": 'Ready For Approval',
+                    //"className": "text-align-center"
+                    mRender: function (data, type, row) {
+                        var str = '';
+                        if (row['Approved Date'] == null && 
+                            row['Delete Date'] == null)
+                        {
+                            str = str + row['Ready For Approval'];
+                        }
+                        else
+                        {
+                            str = str + "N/A";
+                            
+                        }
+ 
+                        return str;
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": "text-align-center"
+                },
+               {
+                   "data": 'Delete Date',
+                   "className": "text-align-center"
+               },
+                {
                     mRender: function (data, type, row) {
                         var str = ''; //<a href="#" onclick="viewMatchedNotification(' + row['Matched Notification Id'] + ')">View</a>';
 
-                        if (row['Admin'] == false || 
-                            (row['Admin'] == true && row['Ready For Approval'] == true)
-                            ) {
-                            str = str + '&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="editMatchedNotification(' + row['Matched Notification Id'] + ')">View</a>'
-                        }
+                        //if (
+                        //        (row['Admin'] == false) ||
+                        //        (row['Admin'] == true &&
+                        //         row['Ready For Approval'] == true )
+                        //    )
+                        //{
+                        //}
 
-                        if (row['Admin'] == true)
+                        if (row['Admin'] == true &&
+                            row['Approvals'] == 0 && 
+                            row['Ready For Approval'] == false &&
+                            row['Delete Date'] == null)
                         {
-                            if (row['Approvals'] == 0 && 
-                                row['Ready For Approval'] == false) 
-                            {
-                                str = str + '&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="editMatchedNotification(' + row['Matched Notification Id'] + ')">Edit / Assign</a>'
-                                   + '&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="setForApprovalMatchedNotification(' + row['Matched Notification Id'] + ', true)">Ready for Approval</a>' 
-                                   + '&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="deleteMatchedNotification(' + row['Matched Notification Id'] + ')">Delete</a>';
-                            }
+                                str = str + '&nbsp;&nbsp;<a href="#" onclick="editMatchedNotification(' + row['Matched Notification Id'] + ')">Edit</a>';
+                        }
+                        else
+                        {
+                            str = str + '&nbsp;&nbsp;<a href="#" onclick="editMatchedNotification(' + row['Matched Notification Id'] + ')">View</a>'
+
                         }
 
-                        //if (row)
-                        //    if (row['Approvals'] == 0 &&
-                        //        row['Ready For Approval'] == false) {
-                        //        str = str + '&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="editMatchedNotification(' + row['Matched Notification Id'] + ')">Edit / Assign</a>'
-                        //           + '&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="deleteMatchedNotification(' + row['Matched Notification Id'] + ')">Delete</a>';
-                        //    }
+                        if (row['Admin'] == true &&
+                            row['Delete Date'] == null) {
+                            if (
+                                row['Assignments'] > 0 &&
+                                row['Approvals'] == 0 &&
+                                row['Ready For Approval'] == false) {
+                                str = str + '&nbsp;&nbsp;<a href="#" onclick="excludeFromBackButton(); setForApprovalMatchedNotification(' + row['Matched Notification Id'] + ', true)">Ready for Approval</a>';
+                             }
+                        }
+
+ 
 
 
                         if (row['Can Approve'] == true &&
                             row['Ready For Approval'] == true &&
                             row['Approvals'] == 0 &&
-                            row['Assignments'] != 0) {
-                                str = '<a href="#" onclick="approveMatchedNotification(' + row['Matched Notification Id'] + ')">Approve</a>' + str;
-                            }
-                        //}
+                            row['Assignments'] != 0 &&
+                            row['Delete Date'] == null) {
+                            str = '<a href="#" onclick="editMatchedNotification(' + row['Matched Notification Id'] + ')">Approve</a>' + str;
+                        }
+
+                        if (row['Admin'] == true && 
+                            row['Delete Date'] == null
+                            )
+                        {
+                            str = str + '&nbsp;&nbsp;<a href="#" onclick="excludeFromBackButton(); deleteMatchedNotification(' + row['Matched Notification Id'] + ');">Delete</a>';
+                        }
+                        
                         return str;
                     },
                     "orderable": false,
@@ -375,9 +441,13 @@
 
     function deleteMatchedNotification(matchedNotificationId) {
 
-        bootbox.alert('This functionality is still under development.', function () {
-        });
+        bootbox.confirm("Are you sure you want to delete this Matched Notification?<br><br>NOTE: This will remove the message from all users, even if they have already seen it.", function (result) {
 
+            if (result == true) {
+                deleteMatchedNotificationAJAX(matchedNotificationId);
+             }
+        });
+        
     }
     function assignMatchedNotification(matchedNotificationId)
     {
@@ -448,8 +518,8 @@
         bootbox.confirm("Are you sure you want to set this Notification to " + (bApprovalFlag==true ? "Ready For Approval" : "Not Ready For Approval" ) + "?", function (result) {
 
             if (result == true) {
-        $.ajax(url, settings);
-    }
+                $.ajax(url, settings);
+            }
         });
     }
     function setForApprovalMatchedNotificationSuccess(data, textStatus, jQxhr) {
@@ -460,6 +530,51 @@
         else {
 
             bootbox.alert('Matched Notfication Ready for Approval Updated.',
+                function () {
+                    window.location = "/admin/techtools/matchednotification/matchednotificationlist.html";
+                });
+
+        }
+    }
+
+    function deleteMatchedNotificationAJAX(matchedNotificationId) {
+
+        var url = ServicePrefix + "/api/MatchedNotification/";
+        var ajaxObject = new Object;
+
+        url = url + "DeleteMatchedNotification";
+
+        ajaxObject = JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inMatchedNotificationId": matchedNotificationId
+        });
+
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: ajaxObject,
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deleteMatchedNotificationSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+    function deleteMatchedNotificationSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+
+            bootbox.alert('Matched Notfication Deleted.',
                 function () {
                     window.location = "/admin/techtools/matchednotification/matchednotificationlist.html";
                 });
