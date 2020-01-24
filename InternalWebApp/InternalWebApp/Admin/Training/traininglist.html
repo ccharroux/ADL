@@ -41,6 +41,8 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
     <!--Chosen Dropdown-->
     <link rel="stylesheet" href="/css/chosen.min.css" />
+    <!-- FullCalendar -->
+    <link rel="stylesheet" href="/Content/fullcalendar.min.css" />
     <!-- Modernizr JS -->
     <script src="/js/modernizr-2.6.2.min.js"></script>
     <!-- FOR IE9 below -->
@@ -142,6 +144,8 @@
                     </div>
                 </div>
 
+                <div id="divCalendar" class="text-align-center" style="width: 800px; margin: 25px auto 0 auto"></div>
+
                 <!-- start datatable-->
                 <div id="divResults" class="dataTable-top-margin">
                     <table id="dtTrainingList" class="dataTable-border dataTable-headers dataTable-cell-border" style="width: 100%">
@@ -181,6 +185,84 @@
         <!--<div id="map" data-animate-effect="fadeIn"></div>-->
     </div>
 
+    <div id="eventDialog" style="display:none">
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Training Date
+            </div>
+            <div class="col-md-9 text-align-left">
+                <span id="spanTrainingDate"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Training Time
+            </div>
+            <div class="col-md-9 text-align-left">
+                <span id="spanTrainingTime"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Market
+            </div>
+            <div class="col-md-9 text-align-left">
+                <span id="spanMarketName"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Owner
+            </div>
+            <div class="col-md-9 text-align-left">
+                <span id="spanOwnerName"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Trainee
+            </div>
+            <div class="col-md-9 text-align-left">
+                <span id="spanTraineeName"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Trainer
+            </div>
+            <div class="col-md-9 text-align-left">
+                <span id="spanTrainerName"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Topic
+            </div>
+            <div class="col-md-9 text-align-left">
+                <span id="spanTopicName"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Method
+            </div>
+            <div class="col-md-9 text-align-left">
+                <span id="spanMethodName"></span>
+            </div>
+        </div>
+        <div class="row margin-top-50">
+            <div class="col-md-12 text-align-center">
+                <input type="button" value="Edit" onclick="editFromEventDialog();" />
+                &nbsp;
+                <input type="button" value="Delete" onclick="deleteFromEventDialog();" />
+            </div>
+        </div>
+        <div class="hidden">
+            <span id="spanTrainingClusterId"></span>
+            <span id="spanTrainingIndividualId"></span>
+        </div>
+    </div>
+
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
     <!-- jQuery Easing -->
@@ -210,6 +292,9 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <!--Chosen Dropdown-->
     <script src="/js/chosen.jquery.min.js"></script>
+    <!-- FullCalendar (uses Moment) -->
+    <script type="text/javascript" src="/scripts/moment.min.js"></script>
+    <script type="text/javascript" src="/scripts/fullcalendar/fullcalendar.min.js"></script>
 </body>
 </html>
 <script>
@@ -220,6 +305,7 @@
 
     $(document).ready(function () {
         $("#divResults").hide();
+        buildUIDialogs();
 
         loadDefaultDates();
         $("#dtStartDate").datepicker();
@@ -251,6 +337,20 @@
         setLocalStorage("searchPage", window.location);
 
     });
+
+    function buildUIDialogs() {
+        $("#eventDialog").dialog({
+            autoOpen: false,
+            resizable: false,
+            width: 600,
+            height: 400,
+            modal: true,
+            title: 'Event',
+            create: function (event, ui) {
+                $(event.target).parent().css('position', 'fixed');
+            }
+        });
+    }
 
     function loadDefaultDates() {
         var d = new Date();
@@ -707,7 +807,7 @@
                     },
                     "orderable": false,
                     "searchable": false,
-                    "className": "text-align-right"
+                    "className": "text-align-left"
                 }
             ],
             "pagingType": "full_numbers",
@@ -864,9 +964,12 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                if (data.response.status.toUpperCase() === "SUCCESS") {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
                     populateDataTable("dtTrainingList", data);
                     $("#divResults").show();
+                    populateCalendar(data);
                 }
 
             },
@@ -875,6 +978,106 @@
             }
         });
 
+    }
+
+    function populateCalendar(data) {
+        var trainingClusterId;
+        var trainingIndividualId;
+        var trainingTitle;
+        var url;
+        var events = [];
+
+        $.each(data.report.rows, function (index) {
+            trainingClusterId = data.report.rows[index]["Training Cluster ID"];
+            if (trainingClusterId != null) {
+                trainingTitle = data.report.rows[index]["Market"] + " / " + data.report.rows[index]["Owner"];
+                // url = "/admin/training/training.html?isCluster=true&trainingId=" + trainingClusterId;
+            } else {
+                trainingTitle = data.report.rows[index]["Trainee"];
+                // url = "/admin/training/training.html?isCluster=false&trainingId=" + data.report.rows[index]["Training Individual ID"];
+            }
+            trainingTitle += " / " + data.report.rows[index]["Trainer"];
+            trainingTitle += " / " + data.report.rows[index]["Training Topic"];
+            trainingTitle += " / " + data.report.rows[index]["Training Method"];
+
+            events = events.concat([{
+                title: trainingTitle,
+                start: data.report.rows[index]["Training Date Time ISO 8601"],
+                // url: url
+                extendedProps: {
+                    trainingDate: data.report.rows[index]["Training Date"],
+                    trainingTime: data.report.rows[index]["Training Time"],
+                    marketName: data.report.rows[index]["Market"],
+                    ownerName: data.report.rows[index]["Owner"],
+                    traineeName: data.report.rows[index]["Trainee"],
+                    trainerName: data.report.rows[index]["Trainer"],
+                    topicName: data.report.rows[index]["Training Topic"],
+                    methodName: data.report.rows[index]["Training Method"],
+                    trainingClusterId: data.report.rows[index]["Training Cluster ID"],
+                    trainingIndividualId: data.report.rows[index]["Training Individual ID"]
+                }
+            }]);
+        });
+
+        $('#divCalendar').fullCalendar({
+            header: {
+                left: 'prevYear,prev,next,nextYear today',
+                center: 'title',
+                right: 'month,agendaWeek,agendaDay,listYear'
+            },
+            defaultDate: $("#dtEndDate").val(),
+            navLinks: true, // can click day/week names to navigate views
+            editable: true,
+            eventLimit: true, // allow "more" link when too many events
+            events: events,
+            eventClick: function (event, jsEvent, view) {
+                showEventDialog(event.extendedProps);
+            }
+        });
+    }
+
+    function showEventDialog(eventExtendedProps) {
+        $("#spanTrainingDate").text(eventExtendedProps.trainingDate);
+        $("#spanTrainingTime").text((eventExtendedProps.trainingTime == null) ? "unspecified" : eventExtendedProps.trainingTime);
+        $("#spanMarketName").text(eventExtendedProps.marketName);
+        $("#spanOwnerName").text(eventExtendedProps.ownerName);
+        $("#spanTraineeName").text(eventExtendedProps.traineeName);
+        $("#spanTrainerName").text(eventExtendedProps.trainerName);
+        $("#spanTopicName").text(eventExtendedProps.topicName);
+        $("#spanMethodName").text(eventExtendedProps.methodName);
+
+        if (eventExtendedProps.trainingClusterId != null) {
+            $("#spanTrainingClusterId").text(eventExtendedProps.trainingClusterId);
+        }
+        if (eventExtendedProps.trainingIndividualId != null) {
+            $("#spanTrainingIndividualId").text(eventExtendedProps.trainingIndividualId);
+        }
+
+        $("#eventDialog").dialog("open");
+    }
+
+    function closeEventDialog() {
+        $("#eventDialog").dialog("close");
+    }
+
+    function editFromEventDialog() {
+        var trainingClusterId = $("#spanTrainingClusterId").text();
+        if (trainingClusterId != "") {
+            editTraining(true, trainingClusterId);
+        } else {
+            var trainingIndividualId = $("#spanTrainingIndividualId").text();
+            editTraining(false, trainingIndividualId);
+        }
+    }
+
+    function deleteFromEventDialog() {
+        var trainingClusterId = $("#spanTrainingClusterId").text();
+        if (trainingClusterId != "") {
+            deleteTraining(true, trainingClusterId);
+        } else {
+            var trainingIndividualId = $("#spanTrainingIndividualId").text();
+            deleteTraining(false, trainingIndividualId);
+        }
     }
 
     function addTraining() {
@@ -915,6 +1118,7 @@
                             MKAErrorMessageRtn(data.response.errorMessage[0]);
                         }
                         else {
+                            closeEventDialog(); // in case that's where user clicked Delete
                             getTrainingList();
                         }
                     },
