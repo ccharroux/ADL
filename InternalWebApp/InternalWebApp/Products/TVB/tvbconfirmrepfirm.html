@@ -126,23 +126,23 @@
                 <div class="row search-section">
                     <div class="col-md-12">
                         <div class="text-align-center">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label>View</label><br />
                                 <input type="radio" name="view" onclick="swapView(this.value);" value="confirmableData" checked="checked" />&nbsp;Confirm Data&nbsp;
                                 <input type="radio" name="view" onclick="swapView(this.value);" value="declinedData" />&nbsp;Declined Data&nbsp;
                                 <input type="radio" name="view" onclick="showAll();" />&nbsp;Both
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label for="ddlYearPeriod">Year-Period</label><br />
                                 <select id="ddlYearPeriod" onchange="getOwners();"></select><br />
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <div class="repFirm">
                                     <label for="ddlRepFirm">Rep Firm</label><br />
                                     <select id="ddlRepFirm" class="dropdown-select" onchange="getOwners();"></select>
                                 </div>
                             </div>
-                            <div class="col-md-4 form-group rptView rptOwner confirmableData">
+                            <div class="col-md-3 form-group rptView rptOwner  rptOwnerDiv confirmableData">
                                 <label for="ddlOwner" class="dropdown-label rptView rptOwner">Owner</label><br />
                                 <select id="ddlOwner" apiInput="inOwnerId" class="dropdown-select rptView rptOwner" onchange="getData();"></select>
                             </div>
@@ -511,8 +511,10 @@
 
         var repFirmId = $("#ddlRepFirm").val();
         if (repFirmId == "-1") {
-            $("#ddlOwner").html("<option value=''>-- Must select a rep firm first </option>");
+            $(".rptOwnerDiv").hide();
+            $("#ddlOwner").html("<option value=''>-- Select Rep Firm</option>");
             $("#ddlOwner").val('');
+            convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
             return;
         }
 
@@ -551,6 +553,7 @@
             var str = '';
 
             $("#ddlOwner").html("<option value=''>-- Select an Owner </option>");
+            $(".rptOwnerDiv").show();
 
             $.each(data.report.rows, function (index) {
                 var obj = data.report.rows[index];
@@ -1207,7 +1210,14 @@
         $("#declinedDataTable").show();
 
         $("#confirmableDataTable").show();
-
+        var repFirmId = $("#ddlRepFirm").val();
+        if (repFirmId == "-1") {
+            $(".rptOwnerDiv").hide();
+        }
+        else
+        {
+            $(".rptOwnerDiv").show();
+        }
     }
     function swapView(classToShow)
     {

@@ -1249,6 +1249,7 @@ function buildTVBMenu(selectedItem) {
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Confirm") + ' href="" role="button" aria-expanded="false">Confirm <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirm.html?MenuItem=true">Time Sales</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirmrepfirm.html?MenuItem=true">Rep Firm</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += productDashboard('');
