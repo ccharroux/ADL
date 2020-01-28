@@ -2504,29 +2504,25 @@ function getFeatureButtons(featureToken, featureValue)
                 $.each(data.report.rows, function (index) {
                     var obj = data.report.rows[index];
 
-                    var parameters = "";
+                    //var parameters = "";
                     var btnValue = "";
+                    var sStyle = "";
 
                     if (obj.Active == true || obj.Active == 1)
                     {
-                        ////make delete button
                         btnValue = "Remove " + obj.Description;
-                        parameters = "";
-                        parameters += "'" + featureToken + "'," + obj.FeatureId + ",'" + featureValue + "'," + obj.CanBeChanged;
-
-                        str += '<' + 'input type="button" class="default-button" style="background-color:red;margin-bottom:5px;" value="' + btnValue + '" onclick="deleteFeatureAssignment(' + parameters + ')"/><br/>';
-
+                        sStyle = 'background-color:red;margin-bottom:5px;';
                     } else
                     {
-                        ////make add button
                         btnValue = "Add " + obj.Description;
-
-                        parameters = "";
-                        parameters += "'" + featureToken + "'," + obj.FeatureId + "," + obj.ConditionId + ",'" + featureValue + "'," + obj.CanBeChanged;
-
-                        str += '<' + 'input type="button" class="default-button" style="background-color:green;margin-bottom:5px;" value="' + btnValue + '" onclick="addFeatureAssignment(' + parameters + ')"/><br/>';
+                        sStyle = 'background-color:green;margin-bottom:5px;';
                     }
 
+                    str += '<' + 'input type="button" data-feature-active="' + obj.Active + '" data-feature-token="' + featureToken +
+                        '" data-feature-id="' + obj.FeatureId + '" data-feature-value="' + featureValue +
+                        '" data-feature-canbechanged="' + obj.CanBeChanged + '" data-feature-conditionid="' + obj.ConditionId +
+                        '" data-feature-description="' + obj.Description + '" class="feature-button" style="' + sStyle + '" value="' +
+                        btnValue + '" onclick="processFeature(this)"/><br/>';
                 });
 
 
@@ -2543,12 +2539,48 @@ function getFeatureButtons(featureToken, featureValue)
 
 }
 
-function addFeatureAssignment(featureToken, featureId, conditionId, value, canBeChanged)
+function processFeature(objButton)
 {
-    if (canBeChanged == false || canBeChanged == 0) {
-        bootbox.alert('You are not allowed to add this feature.', function () { });
+    //console.log(objButton);
+    //console.log($(objButton).attr("data-feature-id"));
+    //check for allowed to be changed
+    if ($(objButton).attr("data-feature-canbechanged") == false || $(objButton).attr("data-feature-canbechanged") == 0) {
+        bootbox.alert('You are not allowed to modify this feature assignment.', function () { });
         return;
     }
+
+    var msg = "";
+    var featureActive = false;
+    featureActive = $(objButton).attr("data-feature-active");
+
+    if (featureActive == false || featureActive == 0)
+    {
+        msg = "Are you sure that you want to add this feature - " + $(objButton).attr("data-feature-description") + "?";
+    } else
+    {
+        msg = "Are you sure that you want to remove this feature - " + $(objButton).attr("data-feature-description") + "?";
+    }
+
+    bootbox.confirm(msg,function (result) {
+
+            if (result) {
+                if (featureActive == false || featureActive == 0) {
+                    //add
+                    addFeatureAssignment(objButton);
+                } else {
+                    //remove
+                    deleteFeatureAssignment(objButton);
+                }
+            } else {
+                return;
+            }
+            
+        });
+
+}
+
+function addFeatureAssignment(objButton)
+{
     
     $.ajax({
         url: ServicePrefix + '/api/Feature/AddFeatureByFeatureConditionValue',
@@ -2557,9 +2589,9 @@ function addFeatureAssignment(featureToken, featureId, conditionId, value, canBe
         contentType: 'application/json',
         data: JSON.stringify({
             "inApiToken": getLocalStorage("APIToken"),
-            "inFeatureId": featureId,
-            "inConditionId": conditionId,
-            "inFeatureValue": value
+            "inFeatureId": $(objButton).attr("data-feature-id"),
+            "inConditionId": $(objButton).attr("data-feature-conditionid"),
+            "inFeatureValue": $(objButton).attr("data-feature-value")
         }),
         processData: false,
         success: function (data, textStatus, jQxhr) {
@@ -2568,7 +2600,12 @@ function addFeatureAssignment(featureToken, featureId, conditionId, value, canBe
                 MKAErrorMessageRtn(data.response.errorMessage[0]);
             }
             else {
-                getFeatureButtons(featureToken, value);
+                //set active to true
+                $(objButton).attr("data-feature-active", "1");
+                //update the button name
+                $(objButton).prop("value", "Remove " + $(objButton).attr("data-feature-description"));
+                //change the background color to red
+                $(objButton).css('background-color', 'red');
             }
 
 
@@ -2579,14 +2616,9 @@ function addFeatureAssignment(featureToken, featureId, conditionId, value, canBe
     });
 }
 
-function deleteFeatureAssignment(featureToken, featureId, value, canBeChanged)
+function deleteFeatureAssignment(objButton)
 {
-    if (canBeChanged == false || canBeChanged == 0)
-    {
-        bootbox.alert('You are not allowed to remove this feature.', function () { });
-        return;
-    }
-  
+   
     $.ajax({
         url: ServicePrefix + '/api/Feature/DeleteFeatureByFeatureValue',
         dataType: 'json',
@@ -2594,8 +2626,8 @@ function deleteFeatureAssignment(featureToken, featureId, value, canBeChanged)
         contentType: 'application/json',
         data: JSON.stringify({
             "inApiToken": getLocalStorage("APIToken"),
-            "inFeatureId": featureId,
-            "inFeatureValue": value
+            "inFeatureId": $(objButton).attr("data-feature-id"),
+            "inFeatureValue": $(objButton).attr("data-feature-value")
         }),
         processData: false,
         success: function (data, textStatus, jQxhr) {
@@ -2605,7 +2637,12 @@ function deleteFeatureAssignment(featureToken, featureId, value, canBeChanged)
             }
             else
             {
-                getFeatureButtons(featureToken, value);
+                //set active to false
+                $(objButton).attr("data-feature-active", "0");
+                //update the button name
+                $(objButton).prop("value", "Add " + $(objButton).attr("data-feature-description"));
+                //change the background color to green
+                $(objButton).css('background-color', 'green');
             }
 
 
