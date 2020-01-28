@@ -57,7 +57,10 @@
     <![endif]-->
 
     <style>
-
+        .container
+        {
+            width: 90%!important;
+        }
         table 
         {
             border-left: solid 1px #566573!important;
@@ -113,8 +116,7 @@
     </style>
 
 </head>
-<body style="display:none">
-
+<body  style="display:none">
 
     <div id="fh5co-page">
         <header id="fh5co-header" role="banner">
@@ -129,7 +131,7 @@
                         <h2 id="reportTitle"></h2>
                     </div>
                 </div>
-                <div id="divQuickReport" >
+                <div id="divQuickReport" style="padding-right:30px" >
                     <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
                     <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
                  </div>
@@ -470,10 +472,10 @@
         buildMainMenu("");
 
         buildQuickReports(reportObject.product);
-
+ 
         // display filters
         displayFilters(reportFilterArray);
- 
+
         autoRun(reportFilterArray);
 
 
@@ -677,7 +679,7 @@
 
     function loadAdvancedSearch()
     {
-
+ 
         $.blockUI;
 
         var searchResults = getLocalStorage("gSearchResults");
@@ -794,7 +796,7 @@
 
             }
         }
-
+ 
     }
 
     function activateFilter(filterObject) {
@@ -2627,7 +2629,7 @@
         $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
         $("#btnReport").removeClass("flash-button");
 
-        $.ajax({
+        var ajrequest =  $.ajax({
 
             url: ServicePrefix + api,
             dataType: 'json',
@@ -2638,7 +2640,9 @@
             success: function (data, textStatus, jQxhr) {
                 if (data.response.status.toUpperCase() === "SUCCESS") {
 
-                    buildColumnsArray(data);
+                    //gShowHeader = showHeader();
+                    //buildBackButtonGeneric();
+                    buildColumnsArray(data);  
                     setTimeout('getReportDataForNotification(true)', 500);
                 }
                 else
@@ -2652,6 +2656,7 @@
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+
     }
     function destroyDataTable()
     {
@@ -2811,7 +2816,7 @@
             searchTable = $('#dtResults').DataTable();
             searchTable.destroy();
         }
-
+ 
         resetDataTableDOM("dtResults", "dtResultsHolder", "cell-border");
 
         //this code rebuilds the datatable with the updated data from the search 
@@ -3168,12 +3173,7 @@
  
                 }
 
-                //if (displayOnly == true)
-                //{
-
-                //    isThereNotificationData(emailAddressArray);
-                //    return false;
-                //}
+ 
             });
 
         }
@@ -3222,7 +3222,7 @@
 
     function isThereNotificationData(emailAddressArray)
     {
-        if (emailAddressArray.length > 0) {
+        if (emailAddressArray.length > 0 && gShowHeader == true) {
             $("#btnReportData").show();
             setLocalStorage("notificationData", JSON.stringify(emailAddressArray));
         }

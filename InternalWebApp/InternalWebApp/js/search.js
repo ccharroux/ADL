@@ -3,6 +3,7 @@ var apiParameters = "";
 var apiToken = getLocalStorage("APIToken");
 var searchText = "";
 var columns = [];
+var gResults = null;
 
 function getSearchData(searchCriteria) {
     //get session object
@@ -51,7 +52,7 @@ function getSearchData(searchCriteria) {
     //the url is based on what was assigned in the previous switch statement
     //data is assigned the apiparameters also created in the switch statement
     //when call is successful it will call loadSearchResults
-    $.ajax({
+    gResults = $.ajax({
         url: ServicePrefix + api,
         dataType: 'json',
         type: 'post',
@@ -67,6 +68,9 @@ function getSearchData(searchCriteria) {
             genericAjaxError(jqXhr, textStatus, errorThrown);
         }
     });
+
+
+
 }
 
 function loadSearchResults(data, columns) {
@@ -87,6 +91,7 @@ function loadSearchResults(data, columns) {
         searchTable = $('#dtSearchResults').DataTable();
         searchTable.destroy();
     }
+ 
 
     //this code rebuilds the datatable with the updated data from the search 
     //or initial load.

@@ -291,6 +291,7 @@ var navTool = {
 
 $( document ).ready(function() 
 {
+    setTimeout(resetHeaderBackButton, 1500);
 
     environment = getEnvironment();
 
@@ -316,11 +317,28 @@ $( document ).ready(function()
         $("#fh5co-header").prepend("<div class='environment " + environmentClass + "'>" + environment + "</div>");
     }
 
+    var bResetHeaderBackButtonAlreadyRun = false;
+
     $(document).ajaxStop(function () {
-        gShowHeader = showHeader();
-        buildBackButtonGeneric();
+
+        resetHeaderBackButton();
+        bResetHeaderBackButtonAlreadyRun = true;
     });
  
+
+
+    function resetHeaderBackButton()
+    {
+        if (bResetHeaderBackButtonAlreadyRun == false) {
+            $.blockUI();
+            gShowHeader = showHeader();
+            buildBackButtonGeneric();
+        }
+    }
+
+    $(document).ajaxStart(function () {
+ 
+    });
 
     // build a generic back button...
 
