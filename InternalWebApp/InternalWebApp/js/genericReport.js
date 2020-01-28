@@ -269,6 +269,8 @@ reportName.push("rptUsersByProduct");
 reportName.push("rptListErrors");
 
 reportName.push("rptXRYOwnersWithoutRecipients")
+reportName.push("rptMRRImportMarketCategoryWarningTolleranceList")
+
 
 function buildReportArray()
 {
@@ -10424,6 +10426,33 @@ function getReportObject_XRYOwnersWithoutRecipients() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['xry' ]
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRImportMarketCategoryWarningTolleranceList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+    return arrayFilters;
+}
+function getReportObject_MRRImportMarketCategoryWarningTolleranceList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+    tempObject =
+    {
+
+        reportTitle: "MRR Import Warning Tolerance",
+        apiControllerAction: "/api/RevenueCategory/GetMRRImportMarketCategoryWarningTolleranceList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['mrr']
     }
 
     return tempObject;
