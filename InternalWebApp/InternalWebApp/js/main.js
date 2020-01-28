@@ -2526,7 +2526,7 @@ function getFeatureButtons(featureToken, featureValue)
                 });
 
 
-                $("#featureButtons").html(str);
+                $(".featureButtons").html(str);
                
             }
 
@@ -2541,8 +2541,6 @@ function getFeatureButtons(featureToken, featureValue)
 
 function processFeature(objButton)
 {
-    //console.log(objButton);
-    //console.log($(objButton).attr("data-feature-id"));
     //check for allowed to be changed
     if ($(objButton).attr("data-feature-canbechanged") == false || $(objButton).attr("data-feature-canbechanged") == 0) {
         bootbox.alert('You are not allowed to modify feature assignments.', function () { });
