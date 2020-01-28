@@ -2545,7 +2545,7 @@ function processFeature(objButton)
     //console.log($(objButton).attr("data-feature-id"));
     //check for allowed to be changed
     if ($(objButton).attr("data-feature-canbechanged") == false || $(objButton).attr("data-feature-canbechanged") == 0) {
-        bootbox.alert('You are not allowed to modify this feature assignment.', function () { });
+        bootbox.alert('You are not allowed to modify feature assignments.', function () { });
         return;
     }
 
