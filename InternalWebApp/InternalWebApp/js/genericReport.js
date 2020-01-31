@@ -269,7 +269,8 @@ reportName.push("rptUsersByProduct");
 reportName.push("rptListErrors");
 
 reportName.push("rptXRYOwnersWithoutRecipients")
-reportName.push("rptMRRImportMarketCategoryWarningTolleranceList")
+reportName.push("rptMRRImportMarketCategoryWarningToleranceList")
+reportName.push("rptAccountExecutiveStatusMarketOwnerList")
 
 
 function buildReportArray()
@@ -10431,7 +10432,7 @@ function getReportObject_XRYOwnersWithoutRecipients() {
     return tempObject;
 }
 
-function getReportFilterArray_MRRImportMarketCategoryWarningTolleranceList() {
+function getReportFilterArray_MRRImportMarketCategoryWarningToleranceList() {
 
     var arrayFilters = new Array();
     var arrayObject = new Object();
@@ -10439,7 +10440,7 @@ function getReportFilterArray_MRRImportMarketCategoryWarningTolleranceList() {
 
     return arrayFilters;
 }
-function getReportObject_MRRImportMarketCategoryWarningTolleranceList() {
+function getReportObject_MRRImportMarketCategoryWarningToleranceList() {
 
     var tempObject = new Object();
 
@@ -10449,10 +10450,55 @@ function getReportObject_MRRImportMarketCategoryWarningTolleranceList() {
     {
 
         reportTitle: "MRR Import Warning Tolerance",
-        apiControllerAction: "/api/RevenueCategory/GetMRRImportMarketCategoryWarningTolleranceList",
+        apiControllerAction: "/api/RevenueCategory/GetMRRImportMarketCategoryWarningToleranceList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr']
+    }
+
+    return tempObject;
+}
+
+
+function getReportFilterArray_AccountExecutiveStatusMarketOwnerList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_AccountExecutiveStatusMarketOwnerList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+ 
+
+    tempObject =
+    {
+        reportTitle: "Account Executive Account Type List",
+        apiControllerAction: "/api/AccountExecutiveReport/GetAccountExecutiveStatusByMarketOwner",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry', 'Account Executive']
     }
 
     return tempObject;
