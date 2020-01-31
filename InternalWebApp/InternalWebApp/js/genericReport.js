@@ -9066,7 +9066,8 @@ function getReportObject_TimeSalesCompareList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb', 'TVB Data Review', 'old admin'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 
