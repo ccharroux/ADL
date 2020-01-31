@@ -10542,7 +10542,8 @@ function getReportObject_MediaActionList() {
         apiControllerAction: "/api/Report/GetMediaAction",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tech']
+        product: ['tech'],
+        approved: true
     }
 
     return tempObject;
