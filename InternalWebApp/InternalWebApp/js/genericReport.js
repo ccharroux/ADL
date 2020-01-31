@@ -1297,7 +1297,8 @@ function getReportObject_TVBUserListing() {
         apiControllerAction:  "/api/TVBReport/GetTVBUserListing",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product: ['tvb']
+        product: ['tvb'],
+        approved: true
     }
 
     return tempObject;
@@ -8047,7 +8048,8 @@ function getReportObject_TVBOutstandingStationList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 
