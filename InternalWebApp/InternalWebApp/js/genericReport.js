@@ -271,7 +271,7 @@ reportName.push("rptListErrors");
 reportName.push("rptXRYOwnersWithoutRecipients")
 reportName.push("rptMRRImportMarketCategoryWarningToleranceList")
 reportName.push("rptAccountExecutiveStatusMarketOwnerList")
-
+reportName.push("rptMediaActionList")
 
 function buildReportArray()
 {
@@ -10504,4 +10504,47 @@ function getReportObject_AccountExecutiveStatusMarketOwnerList() {
     }
 
     return tempObject;
+}
+
+function getReportFilterArray_MediaActionList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+ 
+
+    return arrayFilters;
+}
+function getReportObject_MediaActionList() {
+
+    var tempObject = new Object();
+ 
+    tempObject =
+    {
+ 
+        reportTitle: "Media Action Report",
+        apiControllerAction: "/api/Report/GetMediaAction",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tech']
+    }
+
+    return tempObject;
+
 }
