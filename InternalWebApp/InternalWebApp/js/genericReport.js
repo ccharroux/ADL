@@ -273,6 +273,10 @@ reportName.push("rptMRRImportMarketCategoryWarningToleranceList")
 reportName.push("rptAccountExecutiveStatusMarketOwnerList")
 reportName.push("rptMediaActionList")
 
+reportName.push("rptAdvertiserListByOwner");
+reportName.push("rptAgencyListByOwner");
+
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -6954,7 +6958,7 @@ function getReportFilterArray_AdvertisersList() {
     }
     arrayFilters.push(arrayObject);
 
-    arrayFilters.push(arrayObject);
+ 
 
     arrayObject = {
         token: "AdvertiserName",
@@ -10549,4 +10553,115 @@ function getReportObject_MediaActionList() {
 
     return tempObject;
 
+}
+
+function getReportFilterArray_AdvertiserListByOwner() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+
+    arrayObject = {
+        token: "MarketAgencyName",
+        objectName: "txtMarketAgencyName",
+        jsCall: null,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+ 
+
+    return arrayFilters;
+}
+
+function getReportObject_AdvertiserListByOwner() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Agency");
+    columnsToDisplay.push("Market");
+
+    tempObject =
+    {
+        reportTitle: "Agency List by Owner",
+        apiControllerAction: "/api/Agency/GetAgencyListByOwner",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['agency', 'xry'] 
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_AgencyListByOwner() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+
+    arrayObject = {
+        token: "MarketAdvertiserName",
+        objectName: "txtMarketAdvertiserName",
+        jsCall: null,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+
+    return arrayFilters;
+}
+
+function getReportObject_AgencyListByOwner() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Advertiser");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Industry");
+
+    tempObject =
+    {
+        reportTitle: "Advertiser List by Owner",
+        apiControllerAction: "/api/Advertiser/GetAdvertiserListByOwner",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['advertiser', 'xry']
+    }
+
+    return tempObject;
 }
