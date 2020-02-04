@@ -329,7 +329,8 @@ $( document ).ready(function()
 
     function resetHeaderBackButton()
     {
-        if (bResetHeaderBackButtonAlreadyRun == false) {
+        if (bResetHeaderBackButtonAlreadyRun == false && apiToken != "")
+        {
             $.blockUI();
             gShowHeader = showHeader();
             buildBackButtonGeneric();
