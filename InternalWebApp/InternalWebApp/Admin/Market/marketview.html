@@ -222,6 +222,26 @@
                                     </div>
                                 </div>
 
+                                <!--
+                                    Possible additions:
+
+                                    MRR release status
+                                    
+                                    XRY options
+                                    * Exclusivity cutoff, e.g. "3 stations" or "2 clusters"
+                                    * Min/max YTD share (do we use them anywhere?)
+                                    * Min newspaper $ (do we use it anywhere?)
+                                    * Operator
+                                    * Query cutoff (do we use it anywhere?)
+                                    * Number of prior years (default = 5)
+
+                                    XRY release status
+
+                                    TVB
+                                    * Note whether affiliation is reported individually or rolled up into Misc/Other
+                                    * Count/list of stations/clusters by type (time sales; rep billing: time sales reused, rep firm, Kantar)
+                                -->
+
                             </div>
 
                         </div>
@@ -402,10 +422,16 @@
                 { "data": 'product' },
                 {
                     mRender: function (data, type, row) {
-                        if (activeProductList.includes(row.product) == false && row.activeDate != null) {
+                        if (activeProductList.includes(row.product) == false && (row.disableDate == null || row.disableDate == "")) {
                             activeProductList.push(row.product);
                         }
-                        return (row.activeDate != null) ? 'Active ' + row.activeDate : ((row.disableDate != null) ? 'Disabled ' + row.disableDate : '');
+                        return (row.activeDate != null && (row.disableDate == null || row.disableDate == ""))
+                            ? 'Active ' + row.activeDate
+                            : (
+                                (row.disableDate != null)
+                                    ? 'Disabled ' + row.disableDate
+                                    : ''
+                            );
                     },
                     "orderable": false,
                     "searchable": true
@@ -1005,7 +1031,6 @@
         }
         else {
 
-            var str = '';
             if (data.report.rows.length == 0) {
                 bootbox.alert('Market not found.\n\r\n\r', function () {
                     goBackToDashboard();
@@ -1066,7 +1091,6 @@
         }
         else {
 
-            var str = '';
             if (data.report.rows.length == 0) {
                 $("#spanMarketSize").text("*** NOT FOUND ***");
                 return;
@@ -1114,7 +1138,6 @@
         }
         else {
 
-            var str = '';
             if (data.report.rows.length == 0) {
                 $("#spanParentMarket").text("*** NOT FOUND ***");
                 return;
