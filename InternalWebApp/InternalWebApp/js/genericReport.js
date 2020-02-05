@@ -269,7 +269,12 @@ reportName.push("rptUsersByProduct");
 reportName.push("rptListErrors");
 
 reportName.push("rptXRYOwnersWithoutRecipients")
-reportName.push("rptMRRImportMarketCategoryWarningTolleranceList")
+reportName.push("rptMRRImportMarketCategoryWarningToleranceList")
+reportName.push("rptAccountExecutiveStatusMarketOwnerList")
+reportName.push("rptMediaActionList")
+
+reportName.push("rptAdvertiserListByOwner");
+reportName.push("rptAgencyListByOwner");
 
 
 function buildReportArray()
@@ -1296,7 +1301,8 @@ function getReportObject_TVBUserListing() {
         apiControllerAction:  "/api/TVBReport/GetTVBUserListing",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product: ['tvb']
+        product: ['tvb'],
+        approved: true
     }
 
     return tempObject;
@@ -6952,7 +6958,7 @@ function getReportFilterArray_AdvertisersList() {
     }
     arrayFilters.push(arrayObject);
 
-    arrayFilters.push(arrayObject);
+ 
 
     arrayObject = {
         token: "AdvertiserName",
@@ -8046,7 +8052,8 @@ function getReportObject_TVBOutstandingStationList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 
@@ -9063,7 +9070,8 @@ function getReportObject_TimeSalesCompareList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb', 'TVB Data Review', 'old admin'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 
@@ -10431,7 +10439,7 @@ function getReportObject_XRYOwnersWithoutRecipients() {
     return tempObject;
 }
 
-function getReportFilterArray_MRRImportMarketCategoryWarningTolleranceList() {
+function getReportFilterArray_MRRImportMarketCategoryWarningToleranceList() {
 
     var arrayFilters = new Array();
     var arrayObject = new Object();
@@ -10439,7 +10447,7 @@ function getReportFilterArray_MRRImportMarketCategoryWarningTolleranceList() {
 
     return arrayFilters;
 }
-function getReportObject_MRRImportMarketCategoryWarningTolleranceList() {
+function getReportObject_MRRImportMarketCategoryWarningToleranceList() {
 
     var tempObject = new Object();
 
@@ -10449,10 +10457,210 @@ function getReportObject_MRRImportMarketCategoryWarningTolleranceList() {
     {
 
         reportTitle: "MRR Import Warning Tolerance",
-        apiControllerAction: "/api/RevenueCategory/GetMRRImportMarketCategoryWarningTolleranceList",
+        apiControllerAction: "/api/RevenueCategory/GetMRRImportMarketCategoryWarningToleranceList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr']
+    }
+
+    return tempObject;
+}
+
+
+function getReportFilterArray_AccountExecutiveStatusMarketOwnerList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_AccountExecutiveStatusMarketOwnerList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+ 
+
+    tempObject =
+    {
+        reportTitle: "Account Executive Account Type List",
+        apiControllerAction: "/api/AccountExecutiveReport/GetAccountExecutiveStatusByMarketOwner",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry', 'Account Executive']
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MediaActionList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+ 
+
+    return arrayFilters;
+}
+function getReportObject_MediaActionList() {
+
+    var tempObject = new Object();
+ 
+    tempObject =
+    {
+ 
+        reportTitle: "Media Action Report",
+        apiControllerAction: "/api/Report/GetMediaAction",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tech'],
+        approved: true
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_AdvertiserListByOwner() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+
+    arrayObject = {
+        token: "MarketAgencyName",
+        objectName: "txtMarketAgencyName",
+        jsCall: null,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+ 
+
+    return arrayFilters;
+}
+
+function getReportObject_AdvertiserListByOwner() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Agency");
+    columnsToDisplay.push("Market");
+
+    tempObject =
+    {
+        reportTitle: "Agency List by Owner",
+        apiControllerAction: "/api/Agency/GetAgencyListByOwner",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['agency', 'xry'] 
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_AgencyListByOwner() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+
+    arrayObject = {
+        token: "MarketAdvertiserName",
+        objectName: "txtMarketAdvertiserName",
+        jsCall: null,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+
+    return arrayFilters;
+}
+
+function getReportObject_AgencyListByOwner() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Advertiser");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Industry");
+
+    tempObject =
+    {
+        reportTitle: "Advertiser List by Owner",
+        apiControllerAction: "/api/Advertiser/GetAdvertiserListByOwner",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['advertiser', 'xry']
     }
 
     return tempObject;
