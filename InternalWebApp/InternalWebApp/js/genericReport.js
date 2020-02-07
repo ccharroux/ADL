@@ -3448,7 +3448,9 @@ function getReportObject_TVBMRRCompare() {
         apiControllerAction: "/api/TVBReport/GetMRRTVBCompare",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb', 'TVB Data Review']
+        product: ['tvb', 'TVB Data Review'],
+        sortable: false,
+        approved: true
     }
 
     return tempObject;
@@ -8794,7 +8796,8 @@ function getReportObject_RepBillingSubmissionStatusList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb', 'TVB Data Review', 'old admin'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 
@@ -9088,7 +9091,8 @@ function getReportFilterArray_TimeSalesCompleteRevenueList() {
         token: "Year",
         jsCall: "getYearList",
         objectName: "ddlYear",
-        required: true
+        required: true,
+        approved: true
     }
     arrayFilters.push(arrayObject);
 
