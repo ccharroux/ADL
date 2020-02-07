@@ -4981,7 +4981,8 @@ function getReportObject_MRRUploadTemplateByOwner() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Data Review'],
-        autoUpdate: false
+        autoUpdate: false,
+        approved: true
     }
 
     return tempObject;
@@ -5049,7 +5050,8 @@ function getReportObject_MRRUploadTemplateByOwnerWithRevenue() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Data Review'],
-        autoUpdate: false
+        autoUpdate: false,
+        approved: true
     }
 
     return tempObject;
