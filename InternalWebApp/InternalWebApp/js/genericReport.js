@@ -617,7 +617,7 @@ function getReportObject_XRAYUsage() {
 
     tempObject =
     {
-        // id: rptXRAYUsage,
+ 
         reportTitle:  "XRay Usage Report",
         apiControllerAction:  "/api/XRAYReport/GetXRayUsage",
         apiType:  "get",
@@ -687,7 +687,7 @@ function getReportObject_MRRUsage() {
 
     tempObject =
     {
-        // id: rptMRRUsage,
+ 
         reportTitle:  "MRR Usage Report",
         apiControllerAction:  "/api/MRRReport/GetMRRUsage",
         apiType:  "get",
@@ -757,12 +757,13 @@ function getReportObject_TVBUsage() {
 
     tempObject =
     {
-        // id: rptTVBUsage,
+ 
         reportTitle:  "TVB Usage Report",
         apiControllerAction:  "/api/TVBReport/GetTVBUsage",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product: ['tvb']
+        product: ['tvb'],
+        approved: true
     }
 
     return tempObject;
@@ -1296,7 +1297,7 @@ function getReportObject_TVBUserListing() {
 
     tempObject =
     {
-        // id: rptTVBUserListing,
+ 
         reportTitle:  "TVB User Listing",
         apiControllerAction:  "/api/TVBReport/GetTVBUserListing",
         apiType:  "get",
@@ -3448,7 +3449,8 @@ function getReportObject_TVBMRRCompare() {
         apiControllerAction: "/api/TVBReport/GetMRRTVBCompare",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb', 'TVB Data Review']
+        product: ['tvb', 'TVB Data Review'],
+        approved: true
     }
 
     return tempObject;
@@ -8794,7 +8796,8 @@ function getReportObject_RepBillingSubmissionStatusList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb', 'TVB Data Review', 'old admin'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 
@@ -9088,7 +9091,8 @@ function getReportFilterArray_TimeSalesCompleteRevenueList() {
         token: "Year",
         jsCall: "getYearList",
         objectName: "ddlYear",
-        required: true
+        required: true,
+        approved: true
     }
     arrayFilters.push(arrayObject);
 
@@ -9343,7 +9347,8 @@ function getReportObject_PersonnelContactListByRepFirm() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb'],
-        sortable: true
+        sortable: true,
+        approved:true
 
     }
 
@@ -10030,7 +10035,6 @@ function getReportObject_XRYImportTypeIssueList() {
  
     tempObject =
     {
-        // id: rptXRAYUsage,
         reportTitle: "XRay Import Issue Type List",
         apiControllerAction: "/api/XRAYReport/GetImportIssueTypeList",
         apiType: "get",
