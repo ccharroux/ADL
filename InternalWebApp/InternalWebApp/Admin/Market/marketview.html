@@ -97,7 +97,7 @@
 
                             <div class="row">
                                 <div class="col-md-4 text-align-left">
-                                    <label for="spanMarket">Market</label>
+                                    <label for="spanMarket"><a href="#" onclick="getMarketChangeHistoryMarketField('MarketName', 'Market Name');">Market</a></label>
                                 </div>
                                 <div class="col-md-8 text-align-left">
                                     <span id="spanMarket"></span>
@@ -106,7 +106,7 @@
 
                             <div class="row">
                                 <div class="col-md-4 text-align-left">
-                                    <label for="spanMediaType">Media Type</label>
+                                    <label for="spanMediaType"><a href="#" onclick="getMarketChangeHistoryMarketField('MediaType', 'Media Type');">Media Type</a></label>
                                 </div>
                                 <div class="col-md-8 text-align-left">
                                     <span id="spanMediaType"></span>
@@ -115,7 +115,7 @@
 
                             <div class="row">
                                 <div class="col-md-4 text-align-left">
-                                    <label for="spanIsPrimary">Primary Market?</label>
+                                    <label for="spanIsPrimary"><a href="#" onclick="getMarketChangeHistoryMarketField('PrimaryMarket', 'Primary Market?');">Primary Market?</a></label>
                                 </div>
                                 <div class="col-md-8 text-align-left">
                                     <span id="spanIsPrimary"></span>
@@ -124,7 +124,7 @@
 
                             <div class="row">
                                 <div class="col-md-4 text-align-left">
-                                    <label for="spanMarketSize">Market Size</label>
+                                    <label for="spanMarketSize"><a href="#" onclick="getMarketChangeHistoryMarketField('MarketSize', 'Market Size');">Market Size</a></label>
                                 </div>
                                 <div class="col-md-8 text-align-left">
                                     <span id="spanMarketSize"></span>
@@ -133,7 +133,7 @@
 
                             <div class="row">
                                 <div class="col-md-4 text-align-left">
-                                    <label for="spanRegion">Region</label>
+                                    <label for="spanRegion"><a href="#" onclick="getMarketChangeHistoryMarketField('Region', 'Region');">Region</a></label>
                                 </div>
                                 <div class="col-md-8 text-align-left">
                                     <span id="spanRegion"></span>
@@ -142,7 +142,7 @@
 
                             <div class="row">
                                 <div class="col-md-4 text-align-left">
-                                    <label for="spanEntityNames">Entity Names</label>
+                                    <label for="spanEntityNames"><a href="#" onclick="getMarketChangeHistoryMarketField('EntityName', 'Entity Names');">Entity Names</a></label>
                                 </div>
                                 <div class="col-md-8 text-align-left">
                                     <span id="spanEntityNames"></span>
@@ -151,10 +151,30 @@
 
                             <div class="row">
                                 <div class="col-md-4 text-align-left">
-                                    <label for="spanComment">Comments</label>
+                                    <label for="spanComment"><a href="#" onclick="getMarketChangeHistoryMarketField('Comment', 'Comments');">Comments</a></label>
                                 </div>
                                 <div class="col-md-8 text-align-left">
                                     <span id="spanComment"></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 text-align-left small">
+                                    (click to see changes)
+                                </div>
+                            </div>
+
+                            <div class="row initiallyHidden" id="divMarketChangeHistoryMarketField"> <!-- dataTable-top-margin makes it too wide -->
+                                <div class="col-md-12 text-align-left">
+                                    <span id="spanMarketChangeHistoryMarketField"></span>
+                                    <table id="dtMarketChangeHistoryMarketField" class="dataTable-border dataTable-headers dataTable-cell-border">
+                                        <thead>
+                                            <tr>
+                                                <th class="exportColumn">Change Date</th>
+                                                <th class="exportColumn">Change Value</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
                                 </div>
                             </div>
 
@@ -389,6 +409,8 @@
 
         setDataTable_MarketProductList();
         setDataTable_StationProductList();
+
+        setDataTable_MarketChangeHistoryMarketField();
 
         $(".initiallyHidden").hide();
 
@@ -1000,6 +1022,95 @@
 
     }
 
+    function setDataTable_MarketChangeHistoryMarketField() {
+        var reportTitle = "Market Change History - Market Field";
+        var exportColumns = returnTableColumnsByClass("dtMarketChangeHistoryMarketField", "exportColumn");
+
+        $("#dtMarketChangeHistoryMarketField").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                { "data": 'Change Date' },
+                { "data": 'Change Value' }
+            ],
+            "order": [
+                [0, "asc"] // Change Date
+            ],
+            "pagingType": "full_numbers",
+            "paging": false,
+            "searching": false,
+            "bInfo": false,
+            "ordering": false,
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'excel',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'print',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //}
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            //initComplete: function () {
+            //    // handled earlier for entire page, don't repeat
+            //    // $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            //},
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            //language: {
+            //    //this changes search box label from Search: to Filter Results:
+            //    search: "Filter Results:"
+            //}
+        });
+
+    }
+
     function getMarket() {
         var url = ServicePrefix + '/api/Market/GetMarket';
 
@@ -1361,6 +1472,50 @@
             $("#divMRRReports").show();
             $("#btnShowOrHideMRRReports").val("Hide MRR reports");
         }
+    }
+
+    function getMarketChangeHistoryMarketField(marketFieldName, marketFieldDescription) {
+        $("#spanMarketChangeHistoryMarketField").text('Change history: ' + marketFieldDescription);
+
+        var url = ServicePrefix + '/api/Market/GetMarketChangeHistoryMarketField';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketID": marketId,
+                "inMarketFieldName": marketFieldName
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketChangeHistoryMarketFieldSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getMarketChangeHistoryMarketFieldSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            bootbox.alert("No changes found");
+            return;
+        }
+
+        populateDataTable("dtMarketChangeHistoryMarketField", data);
+        $("#divMarketChangeHistoryMarketField").show();
+
     }
 
     function genericAjaxError(jQxhr, textStatus, errorThrown) {
