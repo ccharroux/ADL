@@ -140,12 +140,13 @@
                                 <div class="form-group" style="margin-bottom:10px;text-align:center"><!--enctype="multipart/form-data"-->
                                     <form  method="post" id="ajaxUploadForm" novalidate="novalidate">
                                         <input style="margin: 0 auto;" type="file" name='importFile' id="importFile" />
+                                        <input type="button" value="Upload your File" onclick="processFile(event)" />
+                                        <input type="hidden" id="inApiToken" />
                                     </form>
-</div>
+                                </div>
                             </div>
                         </div><br />
-<input type="button" value="Upload your File" onclick="processFile(event)" />
-                        <input type="hidden" id="inApiToken" />
+
 
                 </div>
                 <div class="dataTable-top-margin">
@@ -222,7 +223,7 @@
 
     function processFile(evt) {
 
-
+        apiToken = getLocalStorage("APIToken");
         if ($("#importFile").val().trim() == "") {
             bootbox.alert("You must select a file", function () { });
             return;
@@ -234,7 +235,7 @@
 
         ServicePrefix = 'http://localhost:54064';
         $.ajax({
-            url: ServicePrefix + '/api/XrayImportMedia/ImportMediaFile',
+            url: ServicePrefix + '/api/XrayImportMedia/ImportMediaFile?inApiToken=' + apiToken,
             type: 'POST',
             data: formData,
             async: false,
