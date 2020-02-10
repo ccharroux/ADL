@@ -3614,7 +3614,8 @@ function getReportObject_TVBMarketNielsenRankingList() {
         apiControllerAction: "/api/TVBReport/GetTVBMarketNielsenRankingList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb']
+        product: ['tvb'],
+        approved: true
     }
 
     return tempObject;
@@ -5251,7 +5252,7 @@ function getReportObject_MRRNationwideTVByRegion() {
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Setup Info'],
         autoUpdate: false,
-        sortable: false
+        sortable: false 
     }
 
     return tempObject;
@@ -5396,7 +5397,8 @@ function getReportObject_MRRNationwideRadioByFormat() {
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Setup Info'],
         autoUpdate: false,
-        sortable: false
+        sortable: false,
+        approved: true
     }
 
     return tempObject;
@@ -5469,7 +5471,8 @@ function getReportObject_MRRNationwideRadioByRegion() {
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Setup Info'],
         autoUpdate: false,
-        sortable: false
+        sortable: false,
+        approved: true
     }
 
     return tempObject;
@@ -5541,7 +5544,8 @@ function getReportObject_MRRNationwideRadioBySize() {
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Setup Info'],
         autoUpdate: false,
-        sortable: false
+        sortable: false,
+        approved: true
     }
 
     return tempObject;
@@ -7992,7 +7996,8 @@ function getReportObject_MRROutstandingStationList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Data Review', 'MRR Notifications'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 
@@ -9142,7 +9147,8 @@ function getReportObject_TimeSalesCompleteRevenueList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb', 'TVB Data Review', 'old admin'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 
@@ -9208,7 +9214,8 @@ function getReportObject_TimeSalesPersonnelContactList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 
