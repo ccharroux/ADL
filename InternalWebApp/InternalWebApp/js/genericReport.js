@@ -3561,7 +3561,8 @@ function getReportObject_TVBRepBillingStationList() {
         apiControllerAction: "/api/TVBReport/GetTVBRepBillingStationList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb']
+        product: ['tvb'],
+        approved: true
     }
 
     return tempObject;
