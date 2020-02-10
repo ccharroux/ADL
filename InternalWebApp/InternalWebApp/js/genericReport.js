@@ -81,7 +81,7 @@ reportName.push("rptMRRMarketReportList");
 reportName.push("rptMRROwnerReportList");
 
 reportName.push("rptTVBRepBillingStationList");
-reportName.push("rptTVBTimeSalesStationList");
+ 
 reportName.push("rptTVBMarketNielsenRankingList");
 
 reportName.push("rptOwnerStationGrid");
@@ -3561,37 +3561,14 @@ function getReportObject_TVBRepBillingStationList() {
         apiControllerAction: "/api/TVBReport/GetTVBRepBillingStationList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb']
+        product: ['tvb'],
+        approved: true
     }
 
     return tempObject;
 }
 
-function getReportFilterArray_TVBTimeSalesStationList() {
-
-    var arrayFilters = new Array();
-    var arrayObject = new Object();
-
-    return arrayFilters;
-}
-function getReportObject_TVBTimeSalesStationList() {
-
-    var tempObject = new Object();
-
-    columnsToDisplay = new Array();
-
-
-    tempObject =
-    {
-        reportTitle: "TVB Time Sales Station List",
-        apiControllerAction: "/api/TVBReport/GetTVBTimeSalesStationList",
-        apiType: "get",
-        columnsToDisplay: columnsToDisplay,
-        product: ['tvb', 'old admin']
-    }
-
-    return tempObject;
-}
+ 
 
 function getReportFilterArray_TVBMarketNielsenRankingList() {
 
@@ -5179,7 +5156,8 @@ function getReportObject_MRRNationwideTVByAffiliation() {
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Setup Info'],
         autoUpdate: false,
-        sortable: false
+        sortable: false,
+        approved: true
     }
 
     return tempObject;
@@ -5252,7 +5230,8 @@ function getReportObject_MRRNationwideTVByRegion() {
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Setup Info'],
         autoUpdate: false,
-        sortable: false 
+        sortable: false,
+        approved: true
     }
 
     return tempObject;
@@ -5324,7 +5303,8 @@ function getReportObject_MRRNationwideTVBySize() {
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Setup Info'],
         autoUpdate: false,
-        sortable: false
+        sortable: false,
+        approved: true
     }
 
     return tempObject;
@@ -8905,7 +8885,8 @@ function getReportObject_TimeSalesStationList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 
