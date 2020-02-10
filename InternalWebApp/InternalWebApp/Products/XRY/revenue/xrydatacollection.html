@@ -256,6 +256,20 @@
                             <input type="button" id="btnReport" class="search-button" value="Show" onclick="getDataCollectionList()" />
                         </div>
 
+
+                    </div>
+                </div>
+                <div class="row search-section mediaUpload" style="display:none">
+                    <div class="col-md-12">
+                        <div class="form-group" style="margin-bottom:10px;text-align:center">
+                            <hr />
+                            <form method="post" id="ajaxUploadForm" novalidate="novalidate" enctype="multipart/form-data">
+                                <input style="margin: 0 auto;" type="file" name='importFile' id="importFile" />
+                                <input type="button" value="Upload your File" onclick="importFileRtn(event)" />
+                                <input type="hidden" id="inApiToken" />
+                            </form>
+                            <hr />
+                        </div>
                     </div>
                 </div>
                 <center>
@@ -387,6 +401,8 @@
 
     function setupUI() {
 
+        $(".mediaUpload").hide();
+
         $("#rdoMarket").prop("checked", true);
 
         $('input[type=radio][name=collectionType]').change(function () {
@@ -394,7 +410,8 @@
             $("#ddlMarket").val("").change();
             $("#ddlOwner").val("");
 
-            if (this.value == 'market') {
+            if (this.value == 'market')
+            {
                 //show market dropdown
                 //load stations and show
                 //hide owner dropdown
@@ -403,16 +420,20 @@
                 $(".collection-station").show();
                 $(".collection-owner").hide();
             }
-            else if (this.value == 'owner') {
+            else if (this.value == 'owner')
+            {
                 //show owner dropdown
                 $(".collection-owner").show();
                 //hide market and stations
                 $(".collection-market").hide();
                 $(".collection-station").hide();
-            } else if (this.value == 'thirdParty') {
+            }
+            else if (this.value == 'thirdParty')
+            {
                 $(".collection-owner").hide();
                 $(".collection-market").hide();
                 $(".collection-station").hide();
+                $(".mediaUpload").show();
             } else {
                 //defaulting to market value if the radio button value is lost
                 $(".collection-market").show();
@@ -2828,5 +2849,52 @@
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+    }
+
+    function importFileRtn(evt) {
+
+        apiToken = getLocalStorage("APIToken");
+        if ($("#importFile").val().trim() == "") {
+            bootbox.alert("You must select a file", function () { });
+            return;
+        }
+        $("#inAPIToken").val(apiToken);
+
+        evt.preventDefault();
+        var formData = new FormData(document.forms[0]);
+
+
+        $.ajax({
+            url: ServicePrefix + '/api/XrayImportMedia/ImportMediaFile?inApiToken=' + apiToken,
+            type: 'POST',
+            data: formData,
+            async: false,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (response) {
+                var fn = (response.report.rows[0].fileName == null ? "" : response.report.rows[0].fileName);
+
+                if (fn.length == 0) {
+                    bootbox.alert('Upload Process Failed.\n\r\n\rNo File Produced.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                        //
+                    });
+                }
+                else {
+                    //UpdateTheFile(fn);
+                    bootbox.alert('Upload Process worked.', function () {
+                        //
+                    });
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                bootbox.alert('Upload Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    //window.location = "preprocess.html";
+                });
+            }
+        });
+
+        return false;
     }
 </script>
