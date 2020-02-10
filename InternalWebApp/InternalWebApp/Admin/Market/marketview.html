@@ -49,6 +49,10 @@
     <script src="js/respond.min.js"></script>
     <![endif]-->
     <style>
+        #btnHideMarketChangeHistoryMarketField input[type=button] {
+            margin-bottom: 10px;
+            width: 100px;
+        }
         .parentMarket {
             background-color: #ccc;
         }
@@ -164,14 +168,15 @@
                             <div class="row">
                                 <div class="col-md-4 text-align-left small">
                                     (click to see history)
-                                    <br />
-                                    <a href="#" onclick="hideMarketChangeHistoryMarketField();">(hide history)</a>
                                 </div>
                             </div>
 
                             <div class="row initiallyHidden" id="divMarketChangeHistoryMarketField"> <!-- dataTable-top-margin makes it too wide -->
                                 <div class="col-md-12 text-align-left">
                                     <span id="spanMarketChangeHistoryMarketField"></span>
+                                    <span id="btnHideMarketChangeHistoryMarketField" class="small">
+                                        <input value="Hide" onclick="hideMarketChangeHistoryMarketField();" class="default-button history-button" type="button">
+                                    </span>
                                     <table id="dtMarketChangeHistoryMarketField" class="dataTable-border dataTable-headers dataTable-cell-border">
                                         <thead>
                                             <tr>
@@ -264,6 +269,27 @@
                                             <thead>
                                                 <tr>
                                                     <th class="exportColumn">Unassigned Report</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12 margin-top-10 text-align-center small">
+                                        <input id="btnShowOrHideMarketChangeHistoryMRRMarketReports" value="Show history of MRR market reports" onclick="showOrHideMarketChangeHistoryMRRMarketReports();" class="default-button history-button" type="button">
+                                    </div>
+                                </div>
+
+                                <div class="row initiallyHidden" id="divMarketChangeHistoryMRRMarketReports"> <!-- dataTable-top-margin makes it too wide -->
+                                    <div class="col-md-12 text-align-left">
+                                        Change history: MRR market reports
+                                        <table id="dtMarketChangeHistoryMRRMarketReports" class="dataTable-border dataTable-headers dataTable-cell-border">
+                                            <thead>
+                                                <tr>
+                                                    <th class="exportColumn">Change Date</th>
+                                                    <th class="exportColumn">Report</th>
+                                                    <th class="exportColumn">Added or Removed?</th>
                                                 </tr>
                                             </thead>
                                         </table>
@@ -461,6 +487,7 @@
     var gotMarketChangeHistoryMarketProducts = false;
     var gotMarketChangeHistoryMarketStations = false;
     var gotMarketChangeHistoryMRRMarketCategories = false;
+    var gotMarketChangeHistoryMRRMarketReports = false;
 
     $(document).ready(function ()
     {
@@ -487,6 +514,7 @@
         setDataTable_MarketChangeHistoryMarketProducts();
         setDataTable_MarketChangeHistoryMarketStations();
         setDataTable_MarketChangeHistoryMRRMarketCategories();
+        setDataTable_MarketChangeHistoryMRRMarketReports();
 
         $(".initiallyHidden").hide();
 
@@ -1459,6 +1487,96 @@
 
     }
 
+    function setDataTable_MarketChangeHistoryMRRMarketReports() {
+        var reportTitle = "Market Change History - MRR Market Reports";
+        var exportColumns = returnTableColumnsByClass("dtMarketChangeHistoryMRRMarketReports", "exportColumn");
+
+        $("#dtMarketChangeHistoryMRRMarketReports").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                { "data": 'Change Date' },
+                { "data": 'Report' },
+                { "data": 'Added or Removed' }
+            ],
+            "order": [
+                [0, "asc"] // Change Date
+            ],
+            "pagingType": "full_numbers",
+            "paging": false,
+            "searching": false,
+            "bInfo": false,
+            "ordering": false,
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'excel',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'print',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //}
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            //initComplete: function () {
+            //    // handled earlier for entire page, don't repeat
+            //    // $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            //},
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            //language: {
+            //    //this changes search box label from Search: to Filter Results:
+            //    search: "Filter Results:"
+            //}
+        });
+
+    }
+
     function getMarket() {
         var url = ServicePrefix + '/api/Market/GetMarket';
 
@@ -1858,6 +1976,7 @@
 
         if (data.report.rows.length == 0) {
             bootbox.alert("No changes found");
+            hideMarketChangeHistoryMarketField();
             return;
         }
 
@@ -2035,6 +2154,62 @@
         populateDataTable("dtMarketChangeHistoryMRRMarketCategories", data);
         $("#divMarketChangeHistoryMRRMarketCategories").show();
         gotMarketChangeHistoryMRRMarketCategories = true;
+
+    }
+
+    function showOrHideMarketChangeHistoryMRRMarketReports() {
+        if ($("#divMarketChangeHistoryMRRMarketReports").is(":visible")) {
+            $("#divMarketChangeHistoryMRRMarketReports").hide();
+            $("#btnShowOrHideMarketChangeHistoryMRRMarketReports").val("Show history of MRR market reports");
+        } else {
+            if (gotMarketChangeHistoryMRRMarketReports) {
+                $("#divMarketChangeHistoryMRRMarketReports").show();
+            } else {
+                getMarketChangeHistoryMRRMarketReports();
+            }
+            $("#btnShowOrHideMarketChangeHistoryMRRMarketReports").val("Hide history of MRR market reports");
+        }
+    }
+
+    function getMarketChangeHistoryMRRMarketReports() {
+        var url = ServicePrefix + '/api/MRR/GetMarketChangeHistoryMRRMarketReports';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketChangeHistoryMRRMarketReportsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getMarketChangeHistoryMRRMarketReportsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            bootbox.alert("No changes found");
+            return;
+        }
+
+        populateDataTable("dtMarketChangeHistoryMRRMarketReports", data);
+        $("#divMarketChangeHistoryMRRMarketReports").show();
+        gotMarketChangeHistoryMRRMarketReports = true;
 
     }
 
