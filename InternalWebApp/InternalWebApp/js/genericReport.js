@@ -10427,7 +10427,9 @@ function getReportObject_XRYOwnersWithoutRecipients() {
         apiControllerAction: "/api/XRAYReport/GetOwnersWithoutRecipients",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry' ]
+        product: ['xry'],
+        approved: true
+
     }
 
     return tempObject;
