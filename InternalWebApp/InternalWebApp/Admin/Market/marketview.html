@@ -296,24 +296,117 @@
                                     </div>
                                 </div>
 
+                                <!-- XRY options -->
+
+                                <hr />
+
+                                <div id="divShowOrHideXRYOptions" class="row initiallyHidden">
+                                    <div class="col-md-12 text-align-center">
+                                        <input id="btnShowOrHideXRYOptions" value="Show XRY options" onclick="showOrHideXRYOptions();" class="default-button" type="button">
+                                    </div>
+                                </div>
+
+                                <div id="divXRYOptions" class="initiallyHidden">
+
+                                    <div class="row">
+                                        <div class="col-md-4 text-align-left">
+                                            <label for="spanXRYMinimumForNonExclusive">Minimum for Non-Exclusive</label>
+                                        </div>
+                                        <div class="col-md-8 text-align-left">
+                                            <span id="spanXRYMinimumForNonExclusive"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4 text-align-left">
+                                            <label for="spanXRYOperator">Operator</label>
+                                        </div>
+                                        <div class="col-md-8 text-align-left">
+                                            <span id="spanXRYOperator"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4 text-align-left">
+                                            <label for="spanXRYPriorYears">Prior Years</label>
+                                        </div>
+                                        <div class="col-md-8 text-align-left">
+                                            <span id="spanXRYPriorYears"></span>
+                                        </div>
+                                    </div>
+
+                                    <hr />
+
+                                    <div class="row">
+                                        <div class="col-md-4 col-md-offset-4 text-align-left">
+                                            <h4>First Year-Period</h4>
+                                        </div>
+                                        <div class="col-md-4 text-align-left">
+                                            <h4>Available in Production?</h4>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4 text-align-left">
+                                            <label for="spanXRYAccountTypeFirstYearPeriod">Account Type</label>
+                                        </div>
+                                        <div class="col-md-4 text-align-left">
+                                            <span id="spanXRYAccountTypeFirstYearPeriod"></span>
+                                        </div>
+                                        <div class="col-md-4 text-align-left">
+                                            <span id="spanXRYAccountTypeAvailableInProduction"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4 text-align-left">
+                                            <label for="spanXRYRevenueTypeFirstYearPeriod">Revenue Type</label>
+                                        </div>
+                                        <div class="col-md-4 text-align-left">
+                                            <span id="spanXRYRevenueTypeFirstYearPeriod"></span>
+                                        </div>
+                                        <div class="col-md-4 text-align-left">
+                                            <span id="spanXRYRevenueTypeAvailableInProduction"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!--
-                                    Possible additions:
+                                    >>> Possible additions:
 
                                     MRR release status
                                     
                                     XRY options
-                                    * Exclusivity cutoff, e.g. "3 stations" or "2 clusters"
                                     * Min/max YTD share (do we use them anywhere?)
                                     * Min newspaper $ (do we use it anywhere?)
-                                    * Operator
-                                    * Query cutoff (do we use it anywhere?)
-                                    * Number of prior years (default = 5)
+                                    * Query cutoff (do we use it anywhere, or was it superseded by Number of Prior Years?)
 
                                     XRY release status
 
                                     TVB
                                     * Note whether affiliation is reported individually or rolled up into Misc/Other
                                     * Count/list of stations/clusters by type (time sales; rep billing: time sales reused, rep firm, Kantar)
+
+                                    >>> Possible additions to change history:
+
+                                    Station products active/disabled
+                                    * Add to Station View first
+                                    * Could also add to Market View for all stations currently in market
+                                    * What if market station membership was different at the time? (not common, typically we just disable a station's products)
+
+                                    Reporting/submitting period (by product, though MRR is the only one that should have any per-market differences in practice)
+                                    
+                                    XRY options
+
+                                    >>> Possible additions to change history filters:
+
+                                    Market stations (single station)
+
+                                    MRR market categories (single category)
+                                    * Also "everything that contributes to a category"
+                                    * What about things that used to contribute to a category? (not common)
+
+                                    MRR market reports (single report)
                                 -->
 
                             </div>
@@ -364,6 +457,9 @@
                                                 <th class="exportColumn">Date</th>
                                                 <th class="exportColumn">Stations</th>
                                                 <th class="exportColumn">Clusters</th>
+                                                <th class="exportColumn">Schedule</th>
+                                                <th class="exportColumn">Hold Date</th>
+                                                <th class="exportColumn">Partner</th>
                                             </tr>
                                         </thead>
                                     </table>
@@ -563,7 +659,10 @@
                     "searchable": true
                 },
                 { "data": 'stationCount' },
-                { "data": 'clusterCount' }
+                { "data": 'clusterCount' },
+                { "data": 'submissionSchedule' },
+                { "data": 'holdDate' },
+                { "data": 'partnerFirstName' }
             ],
             "pagingType": "full_numbers",
             "paging": false,
@@ -1586,7 +1685,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inMarketID": marketId
+                "inMarketId": marketId
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -1631,6 +1730,8 @@
 
                 getMarketProducts();
                 getStationProducts();
+
+                getXRYMarketOptions();
             });
 
         }
@@ -1693,7 +1794,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inParentMarketID": parentMarketId
+                "inParentMarketId": parentMarketId
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -1742,7 +1843,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inMarketID": marketId
+                "inMarketId": marketId
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -1780,7 +1881,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inMarketID": marketId
+                "inMarketId": marketId
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -1806,6 +1907,57 @@
 
         gotStationProducts = true;
         showOrHideProducts();
+
+    }
+
+    function getXRYMarketOptions() {
+        var url = ServicePrefix + '/api/XRAYReport/GetMarketXRYOptions'
+            + "?inApiToken=" + getLocalStorage("APIToken")
+            + "&inMarketId=" + marketId;
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getXRYMarketOptionsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getXRYMarketOptionsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        $.each(data.report.rows, function (index) {
+
+            var obj = data.report.rows[index];
+
+            $("#spanXRYMinimumForNonExclusive").text(obj["minimumForNonExclusive"]);
+            $("#spanXRYOperator").text(obj["operator"]);
+            $("#spanXRYPriorYears").text(
+                (obj["numberPriorYears"] == null)
+                    ? "Default (" + obj["defaultNumberPriorYears"] + ")"
+                    : obj["numberPriorYears"]
+            );
+            $("#spanXRYAccountTypeFirstYearPeriod").text(obj["accountTypeFirstYearPeriod"]);
+            $("#spanXRYAccountTypeAvailableInProduction").text(obj["accountTypeAvailableInProduction"]);
+            $("#spanXRYRevenueTypeFirstYearPeriod").text(obj["revenueTypeFirstYearPeriod"]);
+            $("#spanXRYRevenueTypeAvailableInProduction").text(obj["revenueTypeAvailableInProduction"]);
+
+            $("#divShowOrHideXRYOptions").show();
+
+        });
 
     }
 
@@ -1847,7 +1999,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inMarketID": marketId
+                "inMarketId": marketId
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -1883,7 +2035,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inMarketID": marketId
+                "inMarketId": marketId
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -1910,33 +2062,51 @@
 
     }
 
+    function changeValueFromHideToShow(controlId) {
+        $("#" + controlId).val($("#" + controlId).val().replace("Hide", "Show"));
+    }
+
+    function changeValueFromShowToHide(controlId) {
+        $("#" + controlId).val($("#" + controlId).val().replace("Show", "Hide"));
+    }
+
     function showOrHideStationsOwners() {
         if ($("#divStationProductList").is(":visible")) {
             $("#divStationProductList").hide();
-            $("#btnShowOrHideStationsOwners").val("Show stations/owners");
+            changeValueFromHideToShow("btnShowOrHideStationsOwners");
         } else {
             $("#divStationProductList").show();
-            $("#btnShowOrHideStationsOwners").val("Hide stations/owners");
+            changeValueFromShowToHide("btnShowOrHideStationsOwners");
         }
     }
 
     function showOrHideMRRCategories() {
         if ($("#divMRRCategories").is(":visible")) {
             $("#divMRRCategories").hide();
-            $("#btnShowOrHideMRRCategories").val("Show MRR categories");
+            changeValueFromHideToShow("btnShowOrHideMRRCategories");
         } else {
             $("#divMRRCategories").show();
-            $("#btnShowOrHideMRRCategories").val("Hide MRR categories");
+            changeValueFromShowToHide("btnShowOrHideMRRCategories");
         }
     }
 
     function showOrHideMRRReports() {
         if ($("#divMRRReports").is(":visible")) {
             $("#divMRRReports").hide();
-            $("#btnShowOrHideMRRReports").val("Show MRR reports");
+            changeValueFromHideToShow("btnShowOrHideMRRReports");
         } else {
             $("#divMRRReports").show();
-            $("#btnShowOrHideMRRReports").val("Hide MRR reports");
+            changeValueFromShowToHide("btnShowOrHideMRRReports");
+        }
+    }
+
+    function showOrHideXRYOptions() {
+        if ($("#divXRYOptions").is(":visible")) {
+            $("#divXRYOptions").hide();
+            changeValueFromHideToShow("btnShowOrHideXRYOptions");
+        } else {
+            $("#divXRYOptions").show();
+            changeValueFromShowToHide("btnShowOrHideXRYOptions");
         }
     }
 
@@ -1992,14 +2162,14 @@
     function showOrHideMarketChangeHistoryMarketProducts() {
         if ($("#divMarketChangeHistoryMarketProducts").is(":visible")) {
             $("#divMarketChangeHistoryMarketProducts").hide();
-            $("#btnShowOrHideMarketChangeHistoryMarketProducts").val("Show history of market products active/disabled");
+            changeValueFromHideToShow("btnShowOrHideMarketChangeHistoryMarketProducts");
         } else {
             if (gotMarketChangeHistoryMarketProducts) {
                 $("#divMarketChangeHistoryMarketProducts").show();
             } else {
                 getMarketChangeHistoryMarketProducts();
             }
-            $("#btnShowOrHideMarketChangeHistoryMarketProducts").val("Hide history of market products active/disabled");
+            changeValueFromShowToHide("btnShowOrHideMarketChangeHistoryMarketProducts");
         }
     }
 
@@ -2048,14 +2218,14 @@
     function showOrHideMarketChangeHistoryMarketStations() {
         if ($("#divMarketChangeHistoryMarketStations").is(":visible")) {
             $("#divMarketChangeHistoryMarketStations").hide();
-            $("#btnShowOrHideMarketChangeHistoryMarketStations").val("Show history of market stations added/removed");
+            changeValueFromHideToShow("btnShowOrHideMarketChangeHistoryMarketStations");
         } else {
             if (gotMarketChangeHistoryMarketStations) {
                 $("#divMarketChangeHistoryMarketStations").show();
             } else {
                 getMarketChangeHistoryMarketStations();
             }
-            $("#btnShowOrHideMarketChangeHistoryMarketStations").val("Hide history of market stations added/removed");
+            changeValueFromShowToHide("btnShowOrHideMarketChangeHistoryMarketStations");
         }
     }
 
@@ -2104,14 +2274,14 @@
     function showOrHideMarketChangeHistoryMRRMarketCategories() {
         if ($("#divMarketChangeHistoryMRRMarketCategories").is(":visible")) {
             $("#divMarketChangeHistoryMRRMarketCategories").hide();
-            $("#btnShowOrHideMarketChangeHistoryMRRMarketCategories").val("Show history of MRR market categories");
+            changeValueFromHideToShow("btnShowOrHideMarketChangeHistoryMRRMarketCategories");
         } else {
             if (gotMarketChangeHistoryMRRMarketCategories) {
                 $("#divMarketChangeHistoryMRRMarketCategories").show();
             } else {
                 getMarketChangeHistoryMRRMarketCategories();
             }
-            $("#btnShowOrHideMarketChangeHistoryMRRMarketCategories").val("Hide history of MRR market categories");
+            changeValueFromShowToHide("btnShowOrHideMarketChangeHistoryMRRMarketCategories");
         }
     }
 
@@ -2160,14 +2330,14 @@
     function showOrHideMarketChangeHistoryMRRMarketReports() {
         if ($("#divMarketChangeHistoryMRRMarketReports").is(":visible")) {
             $("#divMarketChangeHistoryMRRMarketReports").hide();
-            $("#btnShowOrHideMarketChangeHistoryMRRMarketReports").val("Show history of MRR market reports");
+            changeValueFromHideToShow("btnShowOrHideMarketChangeHistoryMRRMarketReports");
         } else {
             if (gotMarketChangeHistoryMRRMarketReports) {
                 $("#divMarketChangeHistoryMRRMarketReports").show();
             } else {
                 getMarketChangeHistoryMRRMarketReports();
             }
-            $("#btnShowOrHideMarketChangeHistoryMRRMarketReports").val("Hide history of MRR market reports");
+            changeValueFromShowToHide("btnShowOrHideMarketChangeHistoryMRRMarketReports");
         }
     }
 
