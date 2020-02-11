@@ -61,6 +61,9 @@
         .primaryMarket {
             font-weight: bold;
         }
+        .nationwideOwnerGroup {
+            font-weight: bold;
+        }
     </style>
 
 </head>
@@ -278,6 +281,20 @@
 
                             <div class="row"> <!-- dataTable-top-margin makes it too wide -->
                                 <div class="col-md-12 text-align-left">
+                                    <table id="dtOwnerGroups" class="dataTable-border dataTable-headers dataTable-cell-border">
+                                        <thead>
+                                            <tr>
+                                                <th class="exportColumn">Owner Group</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <div class="row"> <!-- dataTable-top-margin makes it too wide -->
+                                <div class="col-md-12 text-align-left">
                                     <table id="dtProducts" class="dataTable-border dataTable-headers dataTable-cell-border">
                                         <thead>
                                             <tr>
@@ -292,8 +309,6 @@
                             <!--
                                 Possible additions:
 
-                                List of owner groups (nationwide first and highlighted, similar to markets)
-
                                 MRR options
                                 * Estimated?
                                 * Above/Below non-participant?
@@ -303,7 +318,6 @@
                                 * Rep billing status (time sales reused, rep firms, Kantar)
 
                                 Change history:
-                                * Station field
                                 * Station markets
                                 * Station products
                                 * (MRR options)
@@ -360,6 +374,7 @@
         buildQuickReports(['station']);
 
         setDataTable_Markets();
+        setDataTable_OwnerGroups();
         setDataTable_Products();
 
         setDataTable_StationChangeHistoryStationField();
@@ -389,7 +404,7 @@
                 { "targets": 1, "visible": false } // isPrimary
             ],
             "order": [
-                [1, "desc"], // primary (isPrimary = 1) first, then secondary (isPrimary = 0)
+                [1, "desc"], // primary (isPrimary = Yes) first, then secondary (isPrimary = No)
                 [0, "asc"] // market name
             ],
             "pagingType": "full_numbers",
@@ -456,6 +471,101 @@
             createdRow: function (row, data, index) {
                 if (data["isPrimary"] == "Yes") {
                     $(row).addClass("primaryMarket");
+                }
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            //language: {
+            //    //this changes search box label from Search: to Filter Results:
+            //    search: "Filter Results:"
+            //}
+        });
+
+    }
+
+    function setDataTable_OwnerGroups() {
+        var reportTitle = "Station Owner Groups";
+        var exportColumns = returnTableColumnsByClass("dtOwnerGroups", "exportColumn");
+
+        $("#dtOwnerGroups").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                { "data": 'ownerGroupName' },
+                { "data": 'isNationwide' }
+            ],
+            "columnDefs": [
+                { "targets": 1, "visible": false } // isNationwide
+            ],
+            "order": [
+                [1, "desc"], // nationwide (isNationwide = Yes) first, then secondary (isNationwide = No)
+                [0, "asc"] // owner group name
+            ],
+            "pagingType": "full_numbers",
+            "paging": false,
+            "searching": false,
+            "bInfo": false,
+            "ordering": false,
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'excel',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'print',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //}
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            //initComplete: function () {
+            //    $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            //},
+            createdRow: function (row, data, index) {
+                if (data["isNationwide"] == "Yes") {
+                    $(row).addClass("nationwideOwnerGroup");
                 }
                 //this adds the class to every row
                 $(row).addClass('single-line-height');
@@ -729,6 +839,7 @@
                 $("#spanBillingNote").text(obj["billingNote"]);
 
                 getStationMarkets();
+                getStationOwnerGroups();
                 getStationProducts();
             });
         }
@@ -1048,6 +1159,41 @@
         }
 
         populateDataTable("dtMarkets", data);
+
+    }
+
+    function getStationOwnerGroups() {
+        var url = ServicePrefix + '/api/Station/GetStationOwnerGroups';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationID": stationId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getStationOwnerGroupsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getStationOwnerGroupsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        populateDataTable("dtOwnerGroups", data);
 
     }
 
