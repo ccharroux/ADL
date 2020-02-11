@@ -5127,6 +5127,14 @@ function getReportFilterArray_MRRNationwideTVByAffiliation() {
     }
     arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "Filter",
+        objectName: "chkFilter",
+        filterValue: "Nationwide",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
     return arrayFilters;
 }
 
@@ -5202,6 +5210,14 @@ function getReportFilterArray_MRRNationwideTVByRegion() {
     }
     arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "Filter",
+        objectName: "chkFilter",
+        filterValue: "Nationwide",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
     return arrayFilters;
 }
 
@@ -5272,6 +5288,14 @@ function getReportFilterArray_MRRNationwideTVBySize() {
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
         required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Filter",
+        objectName: "chkFilter",
+        filterValue: "Nationwide",
+        required: false
     }
     arrayFilters.push(arrayObject);
 
@@ -5349,6 +5373,14 @@ function getReportFilterArray_MRRNationwideRadioByFormat() {
     }
     arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "Filter",
+        objectName: "chkFilter",
+        filterValue: "Nationwide",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
     return arrayFilters;
 }
 
@@ -5423,6 +5455,14 @@ function getReportFilterArray_MRRNationwideRadioByRegion() {
     }
     arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "Filter",
+        objectName: "chkFilter",
+        filterValue: "Nationwide",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
     return arrayFilters;
 }
 
@@ -5493,6 +5533,14 @@ function getReportFilterArray_MRRNationwideRadioBySize() {
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
         required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Filter",
+        objectName: "chkFilter",
+        filterValue: "Nationwide",
+        required: false
     }
     arrayFilters.push(arrayObject);
 
@@ -10427,7 +10475,9 @@ function getReportObject_XRYOwnersWithoutRecipients() {
         apiControllerAction: "/api/XRAYReport/GetOwnersWithoutRecipients",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry' ]
+        product: ['xry'],
+        approved: true
+
     }
 
     return tempObject;
