@@ -188,7 +188,7 @@
                                 </div>
                             </div>
 
-                            <div class="productMRR">
+                            <div class="initiallyHidden productMRR">
 
                                 <!-- MRR categories -->
 
@@ -296,11 +296,15 @@
                                     </div>
                                 </div>
 
+                            </div>
+
+                            <div class="initiallyHidden productXRY">
+
                                 <!-- XRY options -->
 
                                 <hr />
 
-                                <div id="divShowOrHideXRYOptions" class="row initiallyHidden">
+                                <div class="row">
                                     <div class="col-md-12 text-align-center">
                                         <input id="btnShowOrHideXRYOptions" value="Show XRY options" onclick="showOrHideXRYOptions();" class="default-button" type="button">
                                     </div>
@@ -504,11 +508,11 @@
                                             <tr>
                                                 <th class="exportColumn">Station</th>
                                                 <th class="exportColumn">Owner</th>
-                                                <th class="exportColumn productMRR">MRR</th>
-                                                <th class="exportColumn productXRY">XRY</th>
-                                                <th class="exportColumn productTVB">TVB</th>
-                                                <th class="exportColumn productMSS">MSS</th>
-                                                <th class="exportColumn productDMA">DMA</th>
+                                                <th class="exportColumn initiallyHidden productMRR">MRR</th>
+                                                <th class="exportColumn initiallyHidden productXRY">XRY</th>
+                                                <th class="exportColumn initiallyHidden productTVB">TVB</th>
+                                                <th class="exportColumn initiallyHidden productMSS">MSS</th>
+                                                <th class="exportColumn initiallyHidden productDMA">DMA</th>
                                             </tr>
                                         </thead>
                                     </table>
@@ -579,9 +583,8 @@
 <script>
 
     var marketId;
-    var activeProductList = [];
-    var gotMarketProducts = false;
-    var gotStationProducts = false;
+    var activeProductList = []; // store for later use by station/product grid
+    var shownStationProducts = false;
     var gotMarketChangeHistoryMarketProducts = false;
     var gotMarketChangeHistoryMarketStations = false;
     var gotMarketChangeHistoryMRRMarketCategories = false;
@@ -646,6 +649,7 @@
                 { "data": 'product' },
                 {
                     mRender: function (data, type, row) {
+                        // will be used later by station/product grid
                         if (activeProductList.includes(row.product) == false && (row.disableDate == null || row.disableDate == "")) {
                             activeProductList.push(row.product);
                         }
@@ -750,11 +754,11 @@
             "columns": [
                 { "data": 'station' },
                 { "data": 'owner' },
-                { "data": 'MRR', "className": 'productMRR' },
-                { "data": 'XRY', "className": 'productXRY' },
-                { "data": 'TVB', "className": 'productTVB' },
-                { "data": 'MSS', "className": 'productMSS' },
-                { "data": 'DMA', "className": 'productDMA' }
+                { "data": 'MRR', "className": 'initiallyHidden initiallyHiddenStationProduct productMRR' },
+                { "data": 'XRY', "className": 'initiallyHidden initiallyHiddenStationProduct productXRY' },
+                { "data": 'TVB', "className": 'initiallyHidden initiallyHiddenStationProduct productTVB' },
+                { "data": 'MSS', "className": 'initiallyHidden initiallyHiddenStationProduct productMSS' },
+                { "data": 'DMA', "className": 'initiallyHidden initiallyHiddenStationProduct productDMA' }
             ],
             "pagingType": "full_numbers",
             "paging": false,
@@ -1733,7 +1737,6 @@
                 getMarketProducts();
                 getStationProducts();
 
-                getXRYMarketOptions();
             });
 
         }
@@ -1869,8 +1872,30 @@
 
         populateDataTable("dtMarketProductList", data);
 
-        gotMarketProducts = true;
-        showOrHideProducts();
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+
+            if (obj["disableDate"] == null || obj["disableDate"] == "") {
+                $(".product" + obj["product"]).show();
+
+                switch (obj["product"]) {
+                    case "MRR":
+                        setDataTable_MRRCategories();
+                        setDataTable_MRRCategories_RepOffices();
+                        getMRRCategories();
+
+                        setDataTable_MRRReports();
+                        setDataTable_MRRReports_Unassigned();
+                        getMRRReports();
+
+                        break;
+
+                    case "XRY":
+                        getXRYMarketOptions();
+                        break;
+                }
+            }
+        });
 
     }
 
@@ -1907,89 +1932,6 @@
 
         populateDataTable("dtStationProductList", data);
 
-        gotStationProducts = true;
-        showOrHideProducts();
-
-    }
-
-    function getXRYMarketOptions() {
-        var url = ServicePrefix + '/api/XRAYReport/GetMarketXRYOptions'
-            + "?inApiToken=" + getLocalStorage("APIToken")
-            + "&inMarketId=" + marketId;
-
-        var settings = {
-            dataType: 'json',
-            type: 'get',
-            contentType: 'application/json',
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getXRYMarketOptionsSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
-
-    }
-
-    function getXRYMarketOptionsSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        $.each(data.report.rows, function (index) {
-
-            var obj = data.report.rows[index];
-
-            $("#spanXRYMinimumForNonExclusive").text(obj["minimumForNonExclusive"]);
-            $("#spanXRYOperator").text(obj["operator"]);
-            $("#spanXRYPriorYears").text(
-                (obj["numberPriorYears"] == null)
-                    ? "Default (" + obj["defaultNumberPriorYears"] + ")"
-                    : obj["numberPriorYears"]
-            );
-            $("#spanXRYAccountTypeFirstYearPeriod").text(obj["accountTypeFirstYearPeriod"]);
-            $("#spanXRYAccountTypeAvailableInProduction").text(obj["accountTypeAvailableInProduction"]);
-            $("#spanXRYRevenueTypeFirstYearPeriod").text(obj["revenueTypeFirstYearPeriod"]);
-            $("#spanXRYRevenueTypeAvailableInProduction").text(obj["revenueTypeAvailableInProduction"]);
-
-            $("#divShowOrHideXRYOptions").show();
-
-        });
-
-    }
-
-    function showOrHideProducts() {
-        if (gotMarketProducts == false || gotStationProducts == false) {
-            return;
-        }
-
-        var productList = ["MRR", "XRY", "TVB", "MSS", "DMA"];
-        productList.forEach(function (e) {
-            if (activeProductList.includes(e)) {
-                $(".product" + e).show();
-                $(".product" + e).each(function (index) {
-                    if ($(this).text() == "No") {
-                        $(this).addClass("productNotActive");
-                    }
-                });
-                if (e == "MRR") {
-                    setDataTable_MRRCategories();
-                    setDataTable_MRRCategories_RepOffices();
-                    getMRRCategories();
-
-                    setDataTable_MRRReports();
-                    setDataTable_MRRReports_Unassigned();
-                    getMRRReports();
-                }
-            } else {
-                $(".product" + e).hide();
-            }
-        });
     }
 
     function getMRRCategories() {
@@ -2064,6 +2006,55 @@
 
     }
 
+    function getXRYMarketOptions() {
+        var url = ServicePrefix + '/api/XRAYReport/GetMarketXRYOptions'
+            + "?inApiToken=" + getLocalStorage("APIToken")
+            + "&inMarketId=" + marketId;
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getXRYMarketOptionsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getXRYMarketOptionsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        $.each(data.report.rows, function (index) {
+
+            var obj = data.report.rows[index];
+
+            $("#spanXRYMinimumForNonExclusive").text(obj["minimumForNonExclusive"]);
+            $("#spanXRYOperator").text(obj["operator"]);
+            $("#spanXRYPriorYears").text(
+                (obj["numberPriorYears"] == null)
+                    ? "Default (" + obj["defaultNumberPriorYears"] + ")"
+                    : obj["numberPriorYears"]
+            );
+            $("#spanXRYAccountTypeFirstYearPeriod").text(obj["accountTypeFirstYearPeriod"]);
+            $("#spanXRYAccountTypeAvailableInProduction").text(obj["accountTypeAvailableInProduction"]);
+            $("#spanXRYRevenueTypeFirstYearPeriod").text(obj["revenueTypeFirstYearPeriod"]);
+            $("#spanXRYRevenueTypeAvailableInProduction").text(obj["revenueTypeAvailableInProduction"]);
+
+        });
+
+    }
+
     function changeValueFromHideToShow(controlId) {
         $("#" + controlId).val($("#" + controlId).val().replace("Hide", "Show"));
     }
@@ -2079,6 +2070,15 @@
         } else {
             $("#divStationProductList").show();
             changeValueFromShowToHide("btnShowOrHideStationsOwners");
+
+            if (shownStationProducts == false) {
+                $(".initiallyHiddenStationProduct").hide();
+                // activeProductList is populated as side effect of market/product grid
+                activeProductList.forEach(function (e) {
+                    $(".product" + e).show();
+                });
+                shownStationProducts = true;
+            }
         }
     }
 

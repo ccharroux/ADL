@@ -327,12 +327,40 @@
                                 </div>
                             </div>
 
+                            <!-- MRR options -->
+
+                            <hr />
+
+                            <div id="divShowOrHideMRROptions" class="row initiallyHidden">
+                                <div class="col-md-12 text-align-center">
+                                    <input id="btnShowOrHideMRROptions" value="Show MRR options" onclick="showOrHideMRROptions();" class="default-button" type="button">
+                                </div>
+                            </div>
+
+                            <div id="divMRROptions" class="initiallyHidden">
+
+                                <div class="row">
+                                    <div class="col-md-4 text-align-left">
+                                        <label for="spanMRREstimated">Estimated?</label>
+                                    </div>
+                                    <div class="col-md-8 text-align-left">
+                                        <span id="spanMRREstimated"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4 text-align-left">
+                                        <label for="spanMRRAboveBelowNonParticipant">Above/Below Non-Participant?</label>
+                                    </div>
+                                    <div class="col-md-8 text-align-left">
+                                        <span id="spanMRRAboveBelowNonParticipant"></span>
+                                    </div>
+                                </div>
+
+                            </div>
+
                             <!--
                                 Possible additions:
-
-                                MRR options
-                                * Estimated?
-                                * Above/Below non-participant?
 
                                 TVB
                                 * Time sales station?
@@ -1344,6 +1372,62 @@
 
         populateDataTable("dtProducts", data);
 
+        $.each(data.report.rows, function (index) {
+
+            var obj = data.report.rows[index];
+
+            if (obj["active"] == "1") {
+                switch (obj["productId"]) {
+                    case "MRR":
+                        getMRRStationOptions();
+                        break;
+                }
+            }
+
+        });
+
+    }
+
+    function getMRRStationOptions() {
+        var url = ServicePrefix + '/api/MRRReport/GetStationMRROptions'
+            + "?inApiToken=" + getLocalStorage("APIToken")
+            + "&inStationId=" + stationId;
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMRRStationOptionsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getMRRStationOptionsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        $.each(data.report.rows, function (index) {
+
+            var obj = data.report.rows[index];
+
+            $("#spanMRREstimated").text(obj["isEstimated"]);
+            $("#spanMRRAboveBelowNonParticipant").text(obj["isAboveBelowNonParticipant"]);
+
+            $("#divShowOrHideMRROptions").show();
+
+        });
+
     }
 
     function getStationChangeHistoryStationField(stationFieldName, stationFieldDescription) {
@@ -1401,6 +1485,16 @@
 
     function changeValueFromShowToHide(controlId) {
         $("#" + controlId).val($("#" + controlId).val().replace("Show", "Hide"));
+    }
+
+    function showOrHideMRROptions() {
+        if ($("#divMRROptions").is(":visible")) {
+            $("#divMRROptions").hide();
+            changeValueFromHideToShow("btnShowOrHideMRROptions");
+        } else {
+            $("#divMRROptions").show();
+            changeValueFromShowToHide("btnShowOrHideMRROptions");
+        }
     }
 
     function showOrHideStationChangeHistoryStationProducts() {
