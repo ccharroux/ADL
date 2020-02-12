@@ -4310,7 +4310,7 @@ function getReportObject_UsersWithDisabledStationAssigned() {
 
     tempObject =
     {
-        reportTitle: "Users Assigned to Disabled Stations",
+        reportTitle: "MRR Users Assigned to Disabled Stations",
         apiControllerAction: "/api/PersonnelReport/GetUsersWithDisabledStationAssignedList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -5045,7 +5045,7 @@ function getReportFilterArray_MRRMarketRevisionHistory() {
         objectName: "ddlMarket",
         jsCall: "getMarketListByProduct",
         jsCallParameters: ['MRR'],
-        required: true
+        required: false
     }
     arrayFilters.push(arrayObject);
 
@@ -5083,7 +5083,8 @@ function getReportObject_MRRMarketRevisionHistory() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Data Review', 'mrr delivery', 'mrr pre-release'],
-        autoUpdate: false
+        autoUpdate: false,
+        approved: true
     }
 
     return tempObject;
