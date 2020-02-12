@@ -5045,7 +5045,7 @@ function getReportFilterArray_MRRMarketRevisionHistory() {
         objectName: "ddlMarket",
         jsCall: "getMarketListByProduct",
         jsCallParameters: ['MRR'],
-        required: true
+        required: false
     }
     arrayFilters.push(arrayObject);
 
