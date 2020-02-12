@@ -5083,7 +5083,8 @@ function getReportObject_MRRMarketRevisionHistory() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Data Review', 'mrr delivery', 'mrr pre-release'],
-        autoUpdate: false
+        autoUpdate: false,
+        approved: true
     }
 
     return tempObject;
