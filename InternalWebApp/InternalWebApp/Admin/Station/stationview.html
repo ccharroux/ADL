@@ -306,6 +306,27 @@
                                 </div>
                             </div>
 
+                            <div class="row">
+                                <div class="col-md-12 margin-top-10 text-align-center small">
+                                    <input id="btnShowOrHideStationChangeHistoryStationProducts" value="Show history of station products active/disabled" onclick="showOrHideStationChangeHistoryStationProducts();" class="default-button history-button" type="button">
+                                </div>
+                            </div>
+
+                            <div class="row initiallyHidden" id="divStationChangeHistoryStationProducts"> <!-- dataTable-top-margin makes it too wide -->
+                                <div class="col-md-12 text-align-left">
+                                    Change history: Station products
+                                    <table id="dtStationChangeHistoryStationProducts" class="dataTable-border dataTable-headers dataTable-cell-border">
+                                        <thead>
+                                            <tr>
+                                                <th class="exportColumn">Change Date</th>
+                                                <th class="exportColumn">Product</th>
+                                                <th class="exportColumn">Change Value</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+
                             <!--
                                 Possible additions:
 
@@ -319,7 +340,7 @@
 
                                 Change history:
                                 * Station markets
-                                * Station products
+                                * Station owner groups
                                 * (MRR options)
                                 * (TVB stuff)
                             -->
@@ -368,9 +389,13 @@
 
     var stationId = 0;
 
+    var gotStationChangeHistoryStationProducts = false;
+
     $(document).ready(function ()
     {
         buildMainMenu("Stations");
+        stationId = getParameterByName("StationID");
+
         buildQuickReports(['station']);
 
         setDataTable_Markets();
@@ -378,8 +403,7 @@
         setDataTable_Products();
 
         setDataTable_StationChangeHistoryStationField();
-
-        stationId = getParameterByName("StationID");
+        setDataTable_StationChangeHistoryStationProducts();
 
         $(".initiallyHidden").hide();
 
@@ -686,6 +710,96 @@
             "data": [],
             "columns": [
                 { "data": 'Change Date' },
+                { "data": 'Change Value' }
+            ],
+            "order": [
+                [0, "asc"] // Change Date
+            ],
+            "pagingType": "full_numbers",
+            "paging": false,
+            "searching": false,
+            "bInfo": false,
+            "ordering": false,
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'excel',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'print',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //}
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            //initComplete: function () {
+            //    // handled earlier for entire page, don't repeat
+            //    // $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            //},
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            //language: {
+            //    //this changes search box label from Search: to Filter Results:
+            //    search: "Filter Results:"
+            //}
+        });
+
+    }
+
+    function setDataTable_StationChangeHistoryStationProducts() {
+        var reportTitle = "Station Change History - Station Products";
+        var exportColumns = returnTableColumnsByClass("dtStationChangeHistoryStationProducts", "exportColumn");
+
+        $("#dtStationChangeHistoryStationProducts").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                { "data": 'Change Date' },
+                { "data": 'Product' },
                 { "data": 'Change Value' }
             ],
             "order": [
@@ -1279,6 +1393,70 @@
 
     function hideStationChangeHistoryStationField() {
         $("#divStationChangeHistoryStationField").hide();
+    }
+
+    function changeValueFromHideToShow(controlId) {
+        $("#" + controlId).val($("#" + controlId).val().replace("Hide", "Show"));
+    }
+
+    function changeValueFromShowToHide(controlId) {
+        $("#" + controlId).val($("#" + controlId).val().replace("Show", "Hide"));
+    }
+
+    function showOrHideStationChangeHistoryStationProducts() {
+        if ($("#divStationChangeHistoryStationProducts").is(":visible")) {
+            $("#divStationChangeHistoryStationProducts").hide();
+            changeValueFromHideToShow("btnShowOrHideStationChangeHistoryStationProducts");
+        } else {
+            if (gotStationChangeHistoryStationProducts) {
+                $("#divStationChangeHistoryStationProducts").show();
+            } else {
+                getStationChangeHistoryStationProducts();
+            }
+            changeValueFromShowToHide("btnShowOrHideStationChangeHistoryStationProducts");
+        }
+    }
+
+    function getStationChangeHistoryStationProducts() {
+        var url = ServicePrefix + '/api/Station/GetStationChangeHistoryStationProducts';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getStationChangeHistoryStationProductsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getStationChangeHistoryStationProductsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            bootbox.alert("No changes found");
+            return;
+        }
+
+        populateDataTable("dtStationChangeHistoryStationProducts", data);
+        $("#divStationChangeHistoryStationProducts").show();
+        gotStationChangeHistoryStationProducts = true;
+
     }
 
     function genericAjaxError(jQxhr, textStatus, errorThrown) {
