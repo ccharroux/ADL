@@ -4310,7 +4310,7 @@ function getReportObject_UsersWithDisabledStationAssigned() {
 
     tempObject =
     {
-        reportTitle: "Users Assigned to Disabled Stations",
+        reportTitle: "MRR Users Assigned to Disabled Stations",
         apiControllerAction: "/api/PersonnelReport/GetUsersWithDisabledStationAssignedList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
