@@ -275,7 +275,7 @@ reportName.push("rptMediaActionList")
 
 reportName.push("rptAdvertiserListByOwner");
 reportName.push("rptAgencyListByOwner");
-
+reportName.push("rptUsersNotLoggedInSinceList");
 
 function buildReportArray()
 {
@@ -10706,6 +10706,55 @@ function getReportObject_AgencyListByOwner() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['advertiser', 'xry']
+    }
+
+    return tempObject;
+}
+//rptUsersNotLoggedInSinceList
+function getReportFilterArray_UsersNotLoggedInSinceList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_UsersNotLoggedInSinceList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+ 
+
+    tempObject =
+    {
+        reportTitle: "Users Not Logged In Since List",
+        apiControllerAction: "/api/PersonnelReport/GetUsersNotLoggedInSinceList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['personnel']
     }
 
     return tempObject;
