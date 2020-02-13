@@ -275,7 +275,7 @@ reportName.push("rptMediaActionList")
 
 reportName.push("rptAdvertiserListByOwner");
 reportName.push("rptAgencyListByOwner");
-reportName.push("rptUsersNotLoggedInSinceList");
+reportName.push("rptUsersNotLoggedInAfterDateList");
 
 function buildReportArray()
 {
@@ -10710,8 +10710,8 @@ function getReportObject_AgencyListByOwner() {
 
     return tempObject;
 }
-//rptUsersNotLoggedInSinceList
-function getReportFilterArray_UsersNotLoggedInSinceList() {
+ 
+function getReportFilterArray_UsersNotLoggedInAfterDateList() {
     var arrayFilters = new Array();
     var arrayObject = new Object();
 
@@ -10732,9 +10732,9 @@ function getReportFilterArray_UsersNotLoggedInSinceList() {
     arrayFilters.push(arrayObject);
 
     arrayObject = {
-        token: "StartDate",
+        token: "FromDate",
         jsCall: null,
-        objectName: "dtStartDate",
+        objectName: "dtFromDate",
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -10742,7 +10742,7 @@ function getReportFilterArray_UsersNotLoggedInSinceList() {
     return arrayFilters;
 }
 
-function getReportObject_UsersNotLoggedInSinceList() {
+function getReportObject_UsersNotLoggedInAfterDateList() {
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
@@ -10750,7 +10750,7 @@ function getReportObject_UsersNotLoggedInSinceList() {
 
     tempObject =
     {
-        reportTitle: "Users Not Logged In Since List",
+        reportTitle: "Users Not Logged In Since Date List",
         apiControllerAction: "/api/PersonnelReport/GetUsersNotLoggedInSinceList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
