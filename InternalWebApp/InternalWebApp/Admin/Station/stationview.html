@@ -359,12 +359,65 @@
 
                             </div>
 
+                            <!-- TVB options -->
+
+                            <hr />
+
+                            <div id="divShowOrHideTVBOptions" class="row initiallyHidden">
+                                <div class="col-md-12 text-align-center">
+                                    <input id="btnShowOrHideTVBOptions" value="Show TVB options" onclick="showOrHideTVBOptions();" class="default-button" type="button">
+                                </div>
+                            </div>
+
+                            <div id="divTVBOptions" class="initiallyHidden">
+
+                                <div class="row">
+                                    <div class="col-md-4 text-align-left">
+                                        <label for="spanTVBTimeSalesStation">Time Sales Station?</label>
+                                    </div>
+                                    <div class="col-md-8 text-align-left">
+                                        <span id="spanTVBTimeSalesStation"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4 text-align-left">
+                                        <label for="spanTVBRepBillingTimeSalesReused">Rep Billing (Time Sales Reused?)</label>
+                                    </div>
+                                    <div class="col-md-8 text-align-left">
+                                        <span id="spanTVBRepBillingTimeSalesReused"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4 text-align-left">
+                                        <label>Rep Billing (Rep Firms)</label>
+                                    </div>
+                                    <div class="col-md-8 text-align-left">
+                                        <table id="dtTVBRepFirms" class="dataTable-border dataTable-headers dataTable-cell-border initiallyHidden">
+                                            <thead>
+                                                <tr>
+                                                    <th class="exportColumn">Rep Firm</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                        <span id="spanNoTVBRepFirms" class="initiallyHidden">(none)</span>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4 text-align-left">
+                                        <label for="spanTVBRepBillingEstimated">Rep Billing (Estimated?)</label>
+                                    </div>
+                                    <div class="col-md-8 text-align-left">
+                                        <span id="spanTVBRepBillingEstimated"></span>
+                                    </div>
+                                </div>
+
+                            </div>
+
                             <!--
                                 Possible additions:
-
-                                TVB
-                                * Time sales station?
-                                * Rep billing status (time sales reused, rep firms, Kantar)
 
                                 Change history:
                                 * Station markets
@@ -429,6 +482,7 @@
         setDataTable_Markets();
         setDataTable_OwnerGroups();
         setDataTable_Products();
+        setDataTable_TVBRepFirms();
 
         setDataTable_StationChangeHistoryStationField();
         setDataTable_StationChangeHistoryStationProducts();
@@ -653,6 +707,91 @@
                     "orderable": false,
                     "searchable": true
                 },
+            ],
+            "pagingType": "full_numbers",
+            "paging": false,
+            "searching": false,
+            "bInfo": false,
+            "ordering": false,
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'excel',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'print',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //}
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            //initComplete: function () {
+            //    // handled earlier for entire page, don't repeat
+            //    // $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            //},
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            //language: {
+            //    //this changes search box label from Search: to Filter Results:
+            //    search: "Filter Results:"
+            //}
+        });
+
+    }
+
+    function setDataTable_TVBRepFirms() {
+        var reportTitle = "Station TVB Rep Firms";
+        var exportColumns = returnTableColumnsByClass("dtTVBRepFirms", "exportColumn");
+
+        $("#dtTVBRepFirms").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                { "data": 'repFirmName' }
             ],
             "pagingType": "full_numbers",
             "paging": false,
@@ -1377,9 +1516,13 @@
             var obj = data.report.rows[index];
 
             if (obj["active"] == "1") {
-                switch (obj["productId"]) {
+                switch (obj["productId"].toUpperCase()) {
                     case "MRR":
                         getMRRStationOptions();
+                        break;
+                    case "TVB":
+                        getTVBStationOptions();
+                        getTVBStationRepFirms();
                         break;
                 }
             }
@@ -1427,6 +1570,87 @@
             $("#divShowOrHideMRROptions").show();
 
         });
+
+    }
+
+    function getTVBStationOptions() {
+        var url = ServicePrefix + '/api/TVBReport/GetStationTVBOptions'
+            + "?inApiToken=" + getLocalStorage("APIToken")
+            + "&inStationId=" + stationId;
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getTVBStationOptionsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getTVBStationOptionsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        $.each(data.report.rows, function (index) {
+
+            var obj = data.report.rows[index];
+
+            $("#spanTVBTimeSalesStation").text(obj["isTimeSalesStation"]);
+            $("#spanTVBRepBillingTimeSalesReused").text(obj["isTimeSalesReusedForRepBilling"]);
+            $("#spanTVBRepBillingEstimated").text(obj["isRepBillingEstimated"]);
+
+            $("#divShowOrHideTVBOptions").show();
+
+        });
+
+    }
+
+    function getTVBStationRepFirms() {
+        var url = ServicePrefix + '/api/TVBReport/GetStationTVBRepFirmList'
+            + "?inApiToken=" + getLocalStorage("APIToken")
+            + "&inStationId=" + stationId;
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getTVBStationRepFirmsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getTVBStationRepFirmsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length > 0) {
+            populateDataTable("dtTVBRepFirms", data);
+            $("#dtTVBRepFirms").show();
+        } else {
+            $("#spanNoTVBRepFirms").show()
+        }
 
     }
 
@@ -1494,6 +1718,16 @@
         } else {
             $("#divMRROptions").show();
             changeValueFromShowToHide("btnShowOrHideMRROptions");
+        }
+    }
+
+    function showOrHideTVBOptions() {
+        if ($("#divTVBOptions").is(":visible")) {
+            $("#divTVBOptions").hide();
+            changeValueFromHideToShow("btnShowOrHideTVBOptions");
+        } else {
+            $("#divTVBOptions").show();
+            changeValueFromShowToHide("btnShowOrHideTVBOptions");
         }
     }
 
