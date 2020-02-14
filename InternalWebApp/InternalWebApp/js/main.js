@@ -334,6 +334,7 @@ $( document ).ready(function()
             $.blockUI();
             gShowHeader = showHeader();
             buildBackButtonGeneric();
+            unblockHandle = setInterval("$.unblockUI();", 1000);
         }
     }
 
