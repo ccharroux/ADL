@@ -4136,7 +4136,8 @@ function getReportObject_MRRUserMissing() {
         apiControllerAction: "/api/MRRReport/GetMRRUserMissingReportList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr', 'MRR Security and Analysis']
+        product: ['mrr', 'MRR Security and Analysis'],
+        approved: true
     }
 
     return tempObject;
@@ -8888,7 +8889,8 @@ function getReportObject_RepBillingStationList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 
@@ -10348,7 +10350,8 @@ function getReportObject_TVBReviewUserListing() {
         apiControllerAction: "/api/TVBReport/GetTVBRecipientListing",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb', 'TVB Data Review', 'old admin']
+        product: ['tvb', 'TVB Data Review', 'old admin'],
+        approved: true
     }
 
     return tempObject;

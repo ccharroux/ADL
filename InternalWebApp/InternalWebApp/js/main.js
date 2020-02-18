@@ -15,9 +15,9 @@ var gShowHeader = true;
 var release =
 {
     "DEV": "N/A",
-    "STAGING": "1/9/2020",
-    "PRODUCTION": "1/9/2020",
-    "DEMO": "1/9/2020"
+    "STAGING": "2/18/2020",
+    "PRODUCTION": "2/18/2020",
+    "DEMO": "2/18/2020"
 }
 var dateOfCode = new Date();
 release["DEV"] = (dateOfCode.getMonth() + 1) + '-' + dateOfCode.getDate() + '-' + dateOfCode.getFullYear();
