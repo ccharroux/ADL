@@ -1411,15 +1411,14 @@ function getSelectedItemClass(selectedItem, item)
 
 function returnExportColumnHeadingTitle(tableName, data, columnIndex) {
 
-    if ($("#" + tableName + " th").eq(columnIndex).data("export-title") != null
-            &&
+    if ($("#" + tableName + " th").eq(columnIndex).data("export-title") != null &&
         $("#" + tableName + " th").eq(columnIndex).data("export-title").length > 0)
     {
-
         return $("#" + tableName + " th").eq(columnIndex).data("export-title");
-    } else {
-
-        return data;
+    }
+    else
+    {
+        return replaceAll(data, "<br>", " ");
     }
 }
 
@@ -2651,4 +2650,9 @@ function deleteFeatureAssignment(objButton)
             genericAjaxError(jqXhr, textStatus, errorThrown);
         }
     });
+}
+
+function replaceAll(inString, inSubstitution, inReplacement)
+{
+    return inString.replace(new RegExp(inSubstitution, "g"), inReplacement);
 }
