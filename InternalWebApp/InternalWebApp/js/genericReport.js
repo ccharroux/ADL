@@ -10719,7 +10719,8 @@ function getReportFilterArray_UsersNotLoggedInAfterDateList() {
         token: "Owner",
         jsCall: "getOwnerListByProduct",
         objectName: "ddlOwner",
-        required: false
+        required: false,
+        reloadBasedProduct: true,
     }
     arrayFilters.push(arrayObject);
 
