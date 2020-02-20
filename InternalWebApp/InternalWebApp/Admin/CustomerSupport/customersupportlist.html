@@ -75,6 +75,12 @@
             right: 80px;
             z-index: 0;
         }
+
+        .ddlPersonnelPreSelected {
+            width: 400px !important;
+            min-width: 400px !important;
+            max-width: 400px !important;
+        }
     </style>
 </head>
 <body>
@@ -119,7 +125,7 @@
                         </div>
                         <div class="row">
                             <!--<span style="white-space: nowrap">-->
-                            <div class="col-md-3">
+                            <div id="divPersonnel" class="col-md-3">
                                 <label for="ddlPersonnel" class="filterLabel">Personnel</label>
                                 <select id="ddlPersonnel" class="filterControl report-filter"></select>
                                 <!--&nbsp;
@@ -195,6 +201,7 @@
     var gotMediaTypes = false;
     var gotOwners = false;
     var gotMarkets = false;
+    var gotPreSelectedPersonnel = false;
 
     $(document).ready(function () {
         $("#divResults").hide();
@@ -214,7 +221,9 @@
         // Reset this variable
         //setLocalStorage("quickReportQS", null);
 
-        setTimeout(loadLastSearch, 1000);
+        if (getParameterByName("ExternalPersonnelID") == null) {
+            setTimeout(loadLastSearch, 1000);
+        }
 
         setLocalStorage("search", $("#ddlMediaType").val()  );
         setLocalStorage("searchPage", window.location);
@@ -379,6 +388,14 @@
             return;
         }
 
+        if (gotPreSelectedPersonnel == false) {
+            var preSelectedPersonnelId = getParameterByName("ExternalPersonnelID");
+            if (preSelectedPersonnelId != null) {
+                getPreSelectedPersonnel(preSelectedPersonnelId);
+                return;
+            }
+        }
+
         $.ajax({
             url: ServicePrefix + '/api/Personnel/GetPersonnelListByMarketOwner',
             dataType: 'json',
@@ -411,6 +428,57 @@
                     $("#ddlPersonnel").html(str);
 
                     convertToChosenSelect("ddlPersonnel", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getPreSelectedPersonnel(preSelectedPersonnelId) {
+        $.ajax({
+            url: ServicePrefix + '/api/Personnel/GetPersonnel',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": preSelectedPersonnelId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    var str = '';
+                    if (data.report.rows.length == 0) {
+                        str = '<option value="">-- PersonnelID ' + preSelectedPersonnelId + ' Not Found --</option>';
+                    } else {
+                        $.each(data.report.rows, function (index) {
+                            str = str + '<option value="' + data.report.rows[index].personnelId + '">'
+                                + data.report.rows[index].firstName
+                                + ' ' + data.report.rows[index].lastName
+                                + ' (' + data.report.rows[index].email + ')'
+                                + '</option>';
+                        });
+                    }
+
+                    $("#ddlPersonnel").html(str);
+                    $("#ddlPersonnel").addClass("ddlPersonnelPreSelected");
+                    $("#divPersonnel").removeClass("col-md-3");
+                    $("#divPersonnel").addClass("col-md-6");
+
+                    convertToChosenSelect("ddlPersonnel", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    gotPreSelectedPersonnel = true;
+
+                    getCustomerSupportList();
 
                 }
 
