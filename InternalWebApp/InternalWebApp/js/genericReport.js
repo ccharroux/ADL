@@ -275,7 +275,7 @@ reportName.push("rptMediaActionList")
 
 reportName.push("rptAdvertiserListByOwner");
 reportName.push("rptAgencyListByOwner");
-
+reportName.push("rptUsersNotLoggedInAfterDateList");
 
 function buildReportArray()
 {
@@ -4136,7 +4136,8 @@ function getReportObject_MRRUserMissing() {
         apiControllerAction: "/api/MRRReport/GetMRRUserMissingReportList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr', 'MRR Security and Analysis']
+        product: ['mrr', 'MRR Security and Analysis'],
+        approved: true
     }
 
     return tempObject;
@@ -8888,7 +8889,8 @@ function getReportObject_RepBillingStationList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 
@@ -10348,7 +10350,8 @@ function getReportObject_TVBReviewUserListing() {
         apiControllerAction: "/api/TVBReport/GetTVBRecipientListing",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['tvb', 'TVB Data Review', 'old admin']
+        product: ['tvb', 'TVB Data Review', 'old admin'],
+        approved: true
     }
 
     return tempObject;
@@ -10706,6 +10709,56 @@ function getReportObject_AgencyListByOwner() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['advertiser', 'xry']
+    }
+
+    return tempObject;
+}
+ 
+function getReportFilterArray_UsersNotLoggedInAfterDateList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        objectName: "ddlOwner",
+        required: false,
+        reloadBasedProduct: true,
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "FromDate",
+        jsCall: null,
+        objectName: "dtFromDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_UsersNotLoggedInAfterDateList() {
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+ 
+
+    tempObject =
+    {
+        reportTitle: "Users Not Logged In Since Date List",
+        apiControllerAction: "/api/PersonnelReport/GetUsersNotLoggedInSinceList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['personnel']
     }
 
     return tempObject;

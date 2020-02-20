@@ -15,9 +15,9 @@ var gShowHeader = true;
 var release =
 {
     "DEV": "N/A",
-    "STAGING": "1/9/2020",
-    "PRODUCTION": "1/9/2020",
-    "DEMO": "1/9/2020"
+    "STAGING": "2/18/2020",
+    "PRODUCTION": "2/18/2020",
+    "DEMO": "2/18/2020"
 }
 var dateOfCode = new Date();
 release["DEV"] = (dateOfCode.getMonth() + 1) + '-' + dateOfCode.getDate() + '-' + dateOfCode.getFullYear();
@@ -334,6 +334,7 @@ $( document ).ready(function()
             $.blockUI();
             gShowHeader = showHeader();
             buildBackButtonGeneric();
+            unblockHandle = setInterval("$.unblockUI();", 1000);
         }
     }
 
@@ -1410,15 +1411,14 @@ function getSelectedItemClass(selectedItem, item)
 
 function returnExportColumnHeadingTitle(tableName, data, columnIndex) {
 
-    if ($("#" + tableName + " th").eq(columnIndex).data("export-title") != null
-            &&
+    if ($("#" + tableName + " th").eq(columnIndex).data("export-title") != null &&
         $("#" + tableName + " th").eq(columnIndex).data("export-title").length > 0)
     {
-
         return $("#" + tableName + " th").eq(columnIndex).data("export-title");
-    } else {
-
-        return data;
+    }
+    else
+    {
+        return replaceAll(data, "<br>", " ");
     }
 }
 
@@ -2650,4 +2650,9 @@ function deleteFeatureAssignment(objButton)
             genericAjaxError(jqXhr, textStatus, errorThrown);
         }
     });
+}
+
+function replaceAll(inString, inSubstitution, inReplacement)
+{
+    return inString.replace(new RegExp(inSubstitution, "g"), inReplacement);
 }
