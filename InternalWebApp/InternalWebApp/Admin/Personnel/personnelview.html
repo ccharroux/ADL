@@ -227,9 +227,29 @@
                                 </div>
                             </div>
 
+                            <div class="row">
+                                <div class="col-md-12 margin-top-10 text-align-center small">
+                                    <input id="btnShowOrHidePersonnelChangeHistoryPersonnelOwners" value="Show history of personnel owners added/removed" onclick="showOrHidePersonnelChangeHistoryPersonnelOwners();" class="default-button history-button" type="button">
+                                </div>
+                            </div>
+
+                            <div class="row initiallyHidden" id="divPersonnelChangeHistoryPersonnelOwners"> <!-- dataTable-top-margin makes it too wide -->
+                                <div class="col-md-12 text-align-left">
+                                    Change history: Personnel owners
+                                    <table id="dtPersonnelChangeHistoryPersonnelOwners" class="dataTable-border dataTable-headers dataTable-cell-border">
+                                        <thead>
+                                            <tr>
+                                                <th class="exportColumn">Change Date</th>
+                                                <th class="exportColumn">Owner</th>
+                                                <th class="exportColumn">Added or Removed?</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+
                             <!--
                                 Planned addition: change history for
-                                * owners (ClientOwner -> PersonnelOwner)
                                 * MRR roles
                                 * XRY roles
                             -->
@@ -432,6 +452,7 @@
 <script>
 
     var personnelId;
+    var gotPersonnelChangeHistoryPersonnelOwners = false;
     var gotPersonnelChangeHistoryPersonnelProducts = false;
 
     $(document).ready(function ()
@@ -461,6 +482,7 @@
         setDataTable_RolesDMA();
 
         setDataTable_PersonnelChangeHistoryPersonnelField();
+        setDataTable_PersonnelChangeHistoryPersonnelOwners();
         setDataTable_PersonnelChangeHistoryPersonnelProducts();
 
         $(".initiallyHidden").hide();
@@ -1216,6 +1238,96 @@
 
     }
 
+    function setDataTable_PersonnelChangeHistoryPersonnelOwners() {
+        var reportTitle = "Personnel Change History - Personnel Owners";
+        var exportColumns = returnTableColumnsByClass("dtPersonnelChangeHistoryPersonnelOwners", "exportColumn");
+
+        $("#dtPersonnelChangeHistoryPersonnelOwners").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                { "data": 'Change Date' },
+                { "data": 'Owner' },
+                { "data": 'Added or Removed' }
+            ],
+            "order": [
+                [0, "asc"] // Change Date
+            ],
+            "pagingType": "full_numbers",
+            "paging": false,
+            "searching": false,
+            "bInfo": false,
+            "ordering": false,
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'excel',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'print',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //}
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            //initComplete: function () {
+            //    // handled earlier for entire page, don't repeat
+            //    // $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            //},
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            //language: {
+            //    //this changes search box label from Search: to Filter Results:
+            //    search: "Filter Results:"
+            //}
+        });
+
+    }
+
     function setDataTable_PersonnelChangeHistoryPersonnelProducts() {
         var reportTitle = "Personnel Change History - Personnel Products";
         var exportColumns = returnTableColumnsByClass("dtPersonnelChangeHistoryPersonnelProducts", "exportColumn");
@@ -1885,6 +1997,62 @@
 
     function changeValueFromShowToHide(controlId) {
         $("#" + controlId).val($("#" + controlId).val().replace("Show", "Hide"));
+    }
+
+    function showOrHidePersonnelChangeHistoryPersonnelOwners() {
+        if ($("#divPersonnelChangeHistoryPersonnelOwners").is(":visible")) {
+            $("#divPersonnelChangeHistoryPersonnelOwners").hide();
+            changeValueFromHideToShow("btnShowOrHidePersonnelChangeHistoryPersonnelOwners");
+        } else {
+            if (gotPersonnelChangeHistoryPersonnelOwners) {
+                $("#divPersonnelChangeHistoryPersonnelOwners").show();
+            } else {
+                getPersonnelChangeHistoryPersonnelOwners();
+            }
+            changeValueFromShowToHide("btnShowOrHidePersonnelChangeHistoryPersonnelOwners");
+        }
+    }
+
+    function getPersonnelChangeHistoryPersonnelOwners() {
+        var url = ServicePrefix + '/api/Personnel/GetPersonnelChangeHistoryPersonnelOwners';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getPersonnelChangeHistoryPersonnelOwnersSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getPersonnelChangeHistoryPersonnelOwnersSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            bootbox.alert("No changes found");
+            return;
+        }
+
+        populateDataTable("dtPersonnelChangeHistoryPersonnelOwners", data);
+        $("#divPersonnelChangeHistoryPersonnelOwners").show();
+        gotPersonnelChangeHistoryPersonnelOwners = true;
+
     }
 
     function showOrHidePersonnelChangeHistoryPersonnelProducts() {
