@@ -96,6 +96,11 @@
         {
             display: none!important;
         }
+        .ddlTraineePreSelected {
+            width: 400px !important;
+            min-width: 400px !important;
+            max-width: 400px !important;
+        }
     </style>
 </head>
 <body>
@@ -177,7 +182,7 @@
                                 <select multiple="multiple" id="ddlPosition" style="height: 33px !important;" class="filterControlRight report-filter"></select>
                             </div>
                             <!--<span style="white-space: nowrap">-->
-                            <div class="col-md-3">
+                            <div id="divTrainee" class="col-md-3">
                                 <label for="ddlTrainee" class="filterLabel">Trainee</label>
                                 <select id="ddlTrainee" class="filterControlRight report-filter"></select>
                                 <!--&nbsp;
@@ -353,6 +358,14 @@
     var gotMediaTypes = false;
     var gotOwners = false;
     var gotMarkets = false;
+    var gotPreSelectedTrainee = false;
+
+    function isPreSelectedTrainee() {
+        if (getParameterByName("TraineePersonnelID") != null) {
+            return true;
+        }
+        return false;
+    }
 
     $(document).ready(function () {
         $("#divResults").hide();
@@ -382,7 +395,9 @@
         // Reset this variable
         //setLocalStorage("quickReportQS", null);
 
-        setTimeout(loadLastSearch, 1000);
+        if (isPreSelectedTrainee() == false) {
+            setTimeout(loadLastSearch, 1000);
+        }
 
         setLocalStorage("search", $("#ddlMediaType").val()  );
         setLocalStorage("searchPage", window.location);
@@ -411,7 +426,11 @@
         var currentYear = d.getFullYear();
         var lastDayOfTheMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0);
 
-        $("#dtStartDate").val(currentMonth + "/01/" + currentYear);
+        if (isPreSelectedTrainee()) {
+            $("#dtStartDate").val("01/01/1970");
+        } else {
+            $("#dtStartDate").val(currentMonth + "/01/" + currentYear);
+        }
         $("#dtEndDate").val(currentMonth + "/" + lastDayOfTheMonth.getDate() + "/" + currentYear);
 
     }
@@ -726,6 +745,14 @@
             return;
         }
 
+        if (gotPreSelectedTrainee == false) {
+            var preSelectedPersonnelId = getParameterByName("TraineePersonnelID");
+            if (preSelectedPersonnelId != null) {
+                getPreSelectedPersonnel(preSelectedPersonnelId);
+                return;
+            }
+        }
+
         $.ajax({
             url: ServicePrefix + '/api/Personnel/GetPersonnelListByMarketOwner',
             dataType: 'json',
@@ -758,6 +785,57 @@
                     $("#ddlTrainee").html(str);
 
                     convertToChosenSelect("ddlTrainee", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getPreSelectedPersonnel(preSelectedPersonnelId) {
+        $.ajax({
+            url: ServicePrefix + '/api/Personnel/GetPersonnel',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": preSelectedPersonnelId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    var str = '';
+                    if (data.report.rows.length == 0) {
+                        str = '<option value="">-- PersonnelID ' + preSelectedPersonnelId + ' Not Found --</option>';
+                    } else {
+                        $.each(data.report.rows, function (index) {
+                            str = str + '<option value="' + data.report.rows[index].personnelId + '">'
+                                + data.report.rows[index].firstName
+                                + ' ' + data.report.rows[index].lastName
+                                + ' (' + data.report.rows[index].email + ')'
+                                + '</option>';
+                        });
+                    }
+
+                    $("#ddlTrainee").html(str);
+                    $("#ddlTrainee").addClass("ddlTraineePreSelected");
+                    $("#divTrainee").removeClass("col-md-3");
+                    $("#divTrainee").addClass("col-md-6");
+
+                    convertToChosenSelect("ddlPersonnel", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    gotPreSelectedTrainee = true;
+
+                    getTrainingList();
 
                 }
 
@@ -1006,7 +1084,7 @@
                 "inTrainingMethodId": $("#ddlMethod").val(),
                 "inOnlyIndividual": (trainingType == "Individual"),
                 "inOnlyCluster": (trainingType == "Cluster"),
-                "inIncludeInternal": $("#chkIncludeInternal").prop('checked'),
+                "inIncludeInternal": isPreSelectedTrainee() || $("#chkIncludeInternal").prop('checked'),
                 "inOnlyMRRContacts": (userRole == "MRRContact"),
                 "inOnlyMRRRecipients": (userRole == "MRRRecipient"),
                 "inOnlyMRRManagers": (userRole == "MRRManager"),
