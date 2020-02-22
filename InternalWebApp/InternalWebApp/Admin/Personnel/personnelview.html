@@ -248,12 +248,6 @@
                                 </div>
                             </div>
 
-                            <!--
-                                Planned addition: change history for
-                                * MRR roles
-                                * XRY roles
-                            -->
-
                             <hr />
 
                             <div class="row">
@@ -333,11 +327,41 @@
                                 </div>
                             </div>
 
+                            <div class="row">
+                                <div class="col-md-12 margin-top-10 text-align-center small">
+                                    <input id="btnShowOrHidePersonnelChangeHistoryMRRPersonnelRoles" value="Show history of MRR personnel roles added/removed" onclick="showOrHidePersonnelChangeHistoryMRRPersonnelRoles();" class="default-button history-button" type="button">
+                                    <br />
+                                    <select id="ddlMRRRole">
+                                        <option value="Contact">Contact</option>
+                                        <option value="Recipient">Recipient</option>
+                                        <option value="Manager">Manager</option>
+                                    </select>
+                                    - limited to current/prior year - takes a while to load
+                                </div>
+                            </div>
+
+                            <div class="row initiallyHidden" id="divPersonnelChangeHistoryMRRPersonnelRoles"> <!-- dataTable-top-margin makes it too wide -->
+                                <div class="col-md-12 text-align-left">
+                                    Change history: MRR personnel roles
+                                    <table id="dtPersonnelChangeHistoryMRRPersonnelRoles" class="dataTable-border dataTable-headers dataTable-cell-border">
+                                        <thead>
+                                            <tr>
+                                                <th class="exportColumn">Change Date</th>
+                                                <th class="exportColumn">Market</th>
+                                                <th class="exportColumn">Station</th>
+                                                <th class="exportColumn">Owner Group</th>
+                                                <th class="exportColumn">Role</th>
+                                                <th class="exportColumn">Change Value</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+
                             <div id="divRolesXRY" class="initiallyHidden">
                                 <hr />
 
-                                <div class="row">
-                                    <!-- dataTable-top-margin makes it too wide -->
+                                <div class="row"> <!-- dataTable-top-margin makes it too wide -->
                                     <div class="col-md-12 text-align-left">
                                         <table id="dtRolesXRY" class="dataTable-border dataTable-headers dataTable-cell-border">
                                             <thead>
@@ -351,6 +375,8 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- planned addition: change history (XRY roles) -->
 
                             <div id="divRolesTVB" class="initiallyHidden">
                                 <hr />
@@ -454,6 +480,7 @@
     var personnelId;
     var gotPersonnelChangeHistoryPersonnelOwners = false;
     var gotPersonnelChangeHistoryPersonnelProducts = false;
+    var gotPersonnelChangeHistoryMRRPersonnelRoles; // value = role
 
     $(document).ready(function ()
     {
@@ -484,6 +511,7 @@
         setDataTable_PersonnelChangeHistoryPersonnelField();
         setDataTable_PersonnelChangeHistoryPersonnelOwners();
         setDataTable_PersonnelChangeHistoryPersonnelProducts();
+        setDataTable_PersonnelChangeHistoryMRRPersonnelRoles();
 
         $(".initiallyHidden").hide();
 
@@ -1418,6 +1446,98 @@
 
     }
 
+    function setDataTable_PersonnelChangeHistoryMRRPersonnelRoles() {
+        var reportTitle = "Personnel Change History - MRR Personnel Roles";
+        var exportColumns = returnTableColumnsByClass("dtPersonnelChangeHistoryMRRPersonnelRoles", "exportColumn");
+
+        $("#dtPersonnelChangeHistoryMRRPersonnelRoles").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                { "data": 'Change Date' },
+                { "data": 'Market' },
+                { "data": 'Station' },
+                { "data": 'Owner Group' },
+                { "data": 'Role' },
+                { "data": 'Change Value' }
+            ],
+            "order": [
+                [0, "asc"] // Change Date
+            ],
+            "pagingType": "full_numbers",
+            "searching": false,
+            "bInfo": false,
+            "ordering": false,
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'excel',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'print',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //}
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            //initComplete: function () {
+            //    // handled earlier for entire page, don't repeat
+            //    // $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            //},
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            //language: {
+            //    //this changes search box label from Search: to Filter Results:
+            //    search: "Filter Results:"
+            //}
+        });
+
+    }
+
     function isNullOrEmpty(s) {
         return s == null || s.trim() == "";
     }
@@ -1999,15 +2119,15 @@
         $("#" + controlId).val($("#" + controlId).val().replace("Show", "Hide"));
     }
 
-    function showOrHidePersonnelChangeHistoryPersonnelOwners() {
+    function showOrHidePersonnelChangeHistoryPersonnelOwners(role) {
         if ($("#divPersonnelChangeHistoryPersonnelOwners").is(":visible")) {
             $("#divPersonnelChangeHistoryPersonnelOwners").hide();
             changeValueFromHideToShow("btnShowOrHidePersonnelChangeHistoryPersonnelOwners");
         } else {
-            if (gotPersonnelChangeHistoryPersonnelOwners) {
+            if (gotPersonnelChangeHistoryPersonnelOwners == role) {
                 $("#divPersonnelChangeHistoryPersonnelOwners").show();
             } else {
-                getPersonnelChangeHistoryPersonnelOwners();
+                getPersonnelChangeHistoryPersonnelOwners(role);
             }
             changeValueFromShowToHide("btnShowOrHidePersonnelChangeHistoryPersonnelOwners");
         }
@@ -2108,6 +2228,67 @@
         populateDataTable("dtPersonnelChangeHistoryPersonnelProducts", data);
         $("#divPersonnelChangeHistoryPersonnelProducts").show();
         gotPersonnelChangeHistoryPersonnelProducts = true;
+
+    }
+
+    function showOrHidePersonnelChangeHistoryMRRPersonnelRoles() {
+        if ($("#divPersonnelChangeHistoryMRRPersonnelRoles").is(":visible")) {
+            $("#divPersonnelChangeHistoryMRRPersonnelRoles").hide();
+            changeValueFromHideToShow("btnShowOrHidePersonnelChangeHistoryMRRPersonnelRoles");
+        } else {
+            if (gotPersonnelChangeHistoryMRRPersonnelRoles == $("#ddlMRRRole").val()) {
+                $("#divPersonnelChangeHistoryMRRPersonnelRoles").show();
+            } else {
+                getPersonnelChangeHistoryMRRPersonnelRoles();
+            }
+            changeValueFromShowToHide("btnShowOrHidePersonnelChangeHistoryMRRPersonnelRoles");
+        }
+    }
+
+    function getPersonnelChangeHistoryMRRPersonnelRoles() {
+        var d = new Date();
+        var priorYear = d.getFullYear() - 1;
+
+        var url = ServicePrefix + '/api/MRR/GetPersonnelChangeHistoryMRRPersonnelRoles';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelId,
+                "inRole": $("#ddlMRRRole").val(),
+                "inStartDate": priorYear + "-01-01"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getPersonnelChangeHistoryMRRPersonnelRolesSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getPersonnelChangeHistoryMRRPersonnelRolesSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            bootbox.alert("No changes found");
+            return;
+        }
+
+        populateDataTable("dtPersonnelChangeHistoryMRRPersonnelRoles", data);
+        $("#divPersonnelChangeHistoryMRRPersonnelRoles").show();
+        gotPersonnelChangeHistoryMRRPersonnelRoles = $("#ddlMRRRole").val();
 
     }
 
