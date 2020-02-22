@@ -327,6 +327,12 @@
                                 </div>
                             </div>
 
+                            <!--
+                                TODO (MRR, XRY):
+                                * keep progress meter visible until data finishes loading
+                                * on empty result, reset button to 'Show' status
+                            -->
+
                             <div class="row">
                                 <div class="col-md-12 margin-top-10 text-align-center small">
                                     <input id="btnShowOrHidePersonnelChangeHistoryMRRPersonnelRoles" value="Show history of MRR personnel roles added/removed" onclick="showOrHidePersonnelChangeHistoryMRRPersonnelRoles();" class="default-button history-button" type="button">
@@ -376,7 +382,35 @@
                                 </div>
                             </div>
 
-                            <!-- planned addition: change history (XRY roles) -->
+                            <div class="row">
+                                <div class="col-md-12 margin-top-10 text-align-center small">
+                                    <input id="btnShowOrHidePersonnelChangeHistoryXRYPersonnelRoles" value="Show history of XRY personnel roles added/removed" onclick="showOrHidePersonnelChangeHistoryXRYPersonnelRoles();" class="default-button history-button" type="button">
+                                    <br />
+                                    <select id="ddlXRYRole">
+                                        <option value="Contact">Contact</option>
+                                        <option value="Recipient">Recipient</option>
+                                    </select>
+                                    - limited to current/prior year - takes a while to load
+                                </div>
+                            </div>
+
+                            <div class="row initiallyHidden" id="divPersonnelChangeHistoryXRYPersonnelRoles"> <!-- dataTable-top-margin makes it too wide -->
+                                <div class="col-md-12 text-align-left">
+                                    Change history: XRY personnel roles
+                                    <table id="dtPersonnelChangeHistoryXRYPersonnelRoles" class="dataTable-border dataTable-headers dataTable-cell-border">
+                                        <thead>
+                                            <tr>
+                                                <th class="exportColumn">Change Date</th>
+                                                <th class="exportColumn">Market</th>
+                                                <th class="exportColumn">Station</th>
+                                                <th class="exportColumn">Submission</th>
+                                                <th class="exportColumn">Role</th>
+                                                <th class="exportColumn">Change Value</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
 
                             <div id="divRolesTVB" class="initiallyHidden">
                                 <hr />
@@ -481,6 +515,7 @@
     var gotPersonnelChangeHistoryPersonnelOwners = false;
     var gotPersonnelChangeHistoryPersonnelProducts = false;
     var gotPersonnelChangeHistoryMRRPersonnelRoles; // value = role
+    var gotPersonnelChangeHistoryXRYPersonnelRoles; // value = role
 
     $(document).ready(function ()
     {
@@ -512,6 +547,7 @@
         setDataTable_PersonnelChangeHistoryPersonnelOwners();
         setDataTable_PersonnelChangeHistoryPersonnelProducts();
         setDataTable_PersonnelChangeHistoryMRRPersonnelRoles();
+        setDataTable_PersonnelChangeHistoryXRYPersonnelRoles();
 
         $(".initiallyHidden").hide();
 
@@ -1538,6 +1574,98 @@
 
     }
 
+    function setDataTable_PersonnelChangeHistoryXRYPersonnelRoles() {
+        var reportTitle = "Personnel Change History - XRY Personnel Roles";
+        var exportColumns = returnTableColumnsByClass("dtPersonnelChangeHistoryXRYPersonnelRoles", "exportColumn");
+
+        $("#dtPersonnelChangeHistoryXRYPersonnelRoles").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                { "data": 'Change Date' },
+                { "data": 'Market' },
+                { "data": 'Station' },
+                { "data": 'Submission' },
+                { "data": 'Role' },
+                { "data": 'Change Value' }
+            ],
+            "order": [
+                [0, "asc"] // Change Date
+            ],
+            "pagingType": "full_numbers",
+            "searching": false,
+            "bInfo": false,
+            "ordering": false,
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'excel',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'print',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //}
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            //initComplete: function () {
+            //    // handled earlier for entire page, don't repeat
+            //    // $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            //},
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            //language: {
+            //    //this changes search box label from Search: to Filter Results:
+            //    search: "Filter Results:"
+            //}
+        });
+
+    }
+
     function isNullOrEmpty(s) {
         return s == null || s.trim() == "";
     }
@@ -2289,6 +2417,67 @@
         populateDataTable("dtPersonnelChangeHistoryMRRPersonnelRoles", data);
         $("#divPersonnelChangeHistoryMRRPersonnelRoles").show();
         gotPersonnelChangeHistoryMRRPersonnelRoles = $("#ddlMRRRole").val();
+
+    }
+
+    function showOrHidePersonnelChangeHistoryXRYPersonnelRoles() {
+        if ($("#divPersonnelChangeHistoryXRYPersonnelRoles").is(":visible")) {
+            $("#divPersonnelChangeHistoryXRYPersonnelRoles").hide();
+            changeValueFromHideToShow("btnShowOrHidePersonnelChangeHistoryXRYPersonnelRoles");
+        } else {
+            if (gotPersonnelChangeHistoryXRYPersonnelRoles == $("#ddlXRYRole").val()) {
+                $("#divPersonnelChangeHistoryXRYPersonnelRoles").show();
+            } else {
+                getPersonnelChangeHistoryXRYPersonnelRoles();
+            }
+            changeValueFromShowToHide("btnShowOrHidePersonnelChangeHistoryXRYPersonnelRoles");
+        }
+    }
+
+    function getPersonnelChangeHistoryXRYPersonnelRoles() {
+        var d = new Date();
+        var priorYear = d.getFullYear() - 1;
+
+        var url = ServicePrefix + '/api/XRAY/GetPersonnelChangeHistoryXRYPersonnelRoles';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelId,
+                "inRole": $("#ddlXRYRole").val(),
+                "inStartDate": priorYear + "-01-01"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getPersonnelChangeHistoryXRYPersonnelRolesSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getPersonnelChangeHistoryXRYPersonnelRolesSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            bootbox.alert("No changes found");
+            return;
+        }
+
+        populateDataTable("dtPersonnelChangeHistoryXRYPersonnelRoles", data);
+        $("#divPersonnelChangeHistoryXRYPersonnelRoles").show();
+        gotPersonnelChangeHistoryXRYPersonnelRoles = $("#ddlXRYRole").val();
 
     }
 
