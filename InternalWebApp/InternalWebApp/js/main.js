@@ -403,7 +403,9 @@ $(document).ready(function () {
         gExcludeFromBackButton = false;
     });
 
-    //need to exclude admin/login/login.html
+    //DEV-6732
+    //added functionality to look for internal messages on page ready
+    //need to exclude admin/login/login.html since api wouldn't have personnelid
     var sPage = window.location.pathname;
     var bIsLoginPage = sPage.indexOf("login.html") > -1 ? true : false;
     if (!bIsLoginPage) {
@@ -2520,6 +2522,7 @@ function getInternalMatchedNotification() {
         processData: false,
         success: function (data, textStatus, jQxhr) {
             if (data.report.rows.length > 0) {
+                //the API only returns 1 row. We only want to display 1 message
                 var obj = data.report.rows[0];
 
                 var sSubject = obj.Subject;
@@ -2530,6 +2533,8 @@ function getInternalMatchedNotification() {
                     sSubject = "";
                 }
 
+                //this message contains the HTML for displaying the message
+                //basically it creates a form with inputs ect to be used when updating the viewed date
                 var sMessage =
                     '<form id="notification-form" class="form" role="form"><input type="hidden" id="hidNotificationId" value="' +
                         obj.MatchedNotificationPersonnelId + '"/><label id="lblMessage">' + obj.Message + '</label></form>';
@@ -2587,13 +2592,9 @@ function setMatchedNotificationAsRead(inMatchedNotificationPersonnelId) {
                 MKAErrorMessageRtn(data.response.errorMessage[0]);
             }
             //else {
-            //    //what do i want it to here
             //    //in theory the page should just be loaded already
             //    //shouldn't be anything to do here
-
             //}
-
-
         },
         error: function (jqXhr, textStatus, errorThrown) {
             genericAjaxError(jqXhr, textStatus, errorThrown);
