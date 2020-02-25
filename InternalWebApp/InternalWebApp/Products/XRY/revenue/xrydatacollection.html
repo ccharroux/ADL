@@ -1739,7 +1739,7 @@
 
         if ($("#rdoThirdParty").is(':checked')) {
             columnsToDisplay.push({
-                "title": "Advertisers Matched",
+                "title": "Adv. Matched",
                 "visible": true,
                 "mData": "Advertisers Matched",
                 "orderable": true,
@@ -2866,31 +2866,36 @@
         var url = ServicePrefix + '/api/XrayImportMedia/ImportMediaFile?inApiToken=' + apiToken;
         url = url + "&inYear=" + $("#ddlYear").val() + "&inPeriod=" + $("#ddlPeriod").val();
 
+        $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
+        clearTimeout(unblockHandle);
+
         $.ajax({
             url: url,
             type: 'POST',
             data: formData,
-            async: false,
+            //async: false,
             cache: false,
             contentType: false,
             enctype: 'multipart/form-data',
             processData: false,
             success: function (response) {
-                var fn = (response.report.rows[0].fileName == null ? "" : response.report.rows[0].fileName);
 
-                if (fn.length == 0) {
-                    bootbox.alert('Upload Process Failed.\n\r\n\rNo File Produced.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                        //
-                    });
+                getDataCollectionList();
+                console.log(response);
+
+                if (response.response.status != "SUCCESS")
+                {
+                    console.log(response.response.errorMessage);
+                    bootbox.alert('Upload Process Failed.\n\r\n\r' + response.response.errorMessage[0] + '\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
                 }
-                else {
-                    //UpdateTheFile(fn);
-                    bootbox.alert('Upload Process worked.', function () {
-                        //
-                    });
+                else
+                {
+                    getDataCollectionList();
+                    bootbox.alert('Upload Process worked.', function () {});
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
+   
                 bootbox.alert('Upload Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
                     //window.location = "preprocess.html";
                 });
