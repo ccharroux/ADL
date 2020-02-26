@@ -57,6 +57,10 @@
     <![endif]-->
 
     <style>
+        .red-text
+        {
+            color: red!important;
+        }
         .monthEndButton {
             width: 220px;
         }
@@ -265,7 +269,7 @@
                             <hr />
                             <form method="post" id="ajaxUploadForm" novalidate="novalidate" enctype="multipart/form-data">
                                 <input style="margin: 0 auto;" type="file" name='importFile' id="importFile" />
-                                <input type="button" value="Upload your File" onclick="importFileRtn(event)" />
+                                <input type="button" value="Upload your File" onclick="importFileQuestions(event)" />
                                 <input type="hidden" id="inApiToken" />
                             </form>
                             <hr />
@@ -308,6 +312,14 @@
                         <div id="noDataFound" style="display: none; color: red">No data found</div>
                     </div>
                 </div>
+                <!-- datatable -->
+                <div style="width:100%; margin:auto;display:none" class="rejectionClass">
+                    <div class="dataTable-top-margin">
+                        <h2>Rejections</h2>
+                        <table id="dtResultsRejections" class="cell-border dataTable-border dataTable-headers dataTable-cell-border"></table>
+ 
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -346,6 +358,9 @@
 </body>
 </html>
 <script>
+
+    var DoWeHaveRecords = false;
+    var HasPeriodAlreayBeenReleased = false;
 
     var gMediaStatusCount = 0;
     //var arrayAcceptableStationStatus = ['posted', 'not active'];
@@ -1640,7 +1655,9 @@
 
     //start data table functionality
     //get datatable columns and load data functionality
-    function getDataColumns() {
+    function getDataColumns()
+    {
+        DoWeHaveRecords = false;
         var columnsToDisplay = new Array();
 
         //columnsToDisplay.push({
@@ -1682,13 +1699,14 @@
                 "className": "text-align-center"
             });
 
+
             columnsToDisplay.push({
                 "title": "Media Period",
                 "visible": true,
                 "mData": "Media Period",
                 "orderable": true,
                 "searchable": true,
-                "className": "text-align-center"
+                "className": "text-align-center red-text"
             });
         }
 
@@ -1800,11 +1818,17 @@
                 var parameters = "";
                 var url = "";
 
-                if (type === 'display') {
+                if (type === 'display')
+                {
+                    if (row["Number of Records"] > 0)
+                    {
+                        DoWeHaveRecords = true;
+                    }
                     var status = getRowStatus(row, "statusOnly");
 
                     //if (status == "Disabled Rev")
-                    if (row['linkDisabledRpt'] != undefined && row['linkDisabledRpt'] == true) {
+                    if (row['linkDisabledRpt'] != undefined && row['linkDisabledRpt'] == true)
+                    {
                         if ($("#rdoThirdParty").is(':checked') == true) {
                             url = "";
                             url = '/utilities/genericreport/genericreport.html?BuildBackButton=true';
@@ -1814,7 +1838,9 @@
                             url = url + "&period=" + $("#ddlPeriod").val();
 
                             actions += "<a href='" + url + "'>Disabled Report</a><br/>";
-                        } else {
+                        }
+                        else
+                        {
                             url = "";
                             url = '/utilities/genericreport/genericreport.html?BuildBackButton=true';
                             url = url + "&reportTitle=" + "Revenue with Disabled Advertisers/Agencies";
@@ -1851,7 +1877,9 @@
                             parameters += ",\"" + $("#ddlYear").val() + "\"";
 
                             actions += "<a href='#' onclick='postMediaRevenueProcess(" + parameters + ");'>Post</a><br/>";
-                        } else {
+                        }
+                        else
+                        {
                             parameters = "";
                             parameters += row["stationId"] + "," + row["marketId"];
                             parameters += ",\"" + $("#ddlPeriod").val() + "\"";
@@ -2083,6 +2111,8 @@
 
     function getDataCollectionList(bSilent) {
 
+        $("#dtResultsRejections").hide();
+        $(".rejectionClass").hide();
         //based on radio button call different functions
         //if third party go to new function
         //else put the following code in a new function
@@ -2091,17 +2121,26 @@
             bSilent = false;
         }
 
-        if ($("#rdoThirdParty").is(':checked')) {
-            getMediaData(bSilent);
+        HasPeriodAlreayBeenReleased = false;
+        // sets the variable HasPeriodAlreayBeenReleased
+        getReleaseDateForPeriod();
 
-        } else {
+        if ($("#rdoThirdParty").is(':checked'))
+        {
+            getMediaData(bSilent);
+        }
+        else
+        {
             getMarketStationOwnerData(bSilent);
         }
 
     }
 
-    function getMediaData(bSilent) {
-        if (validateFilters(bSilent) == false) {
+    function getMediaData(bSilent)
+    {
+
+        if (validateFilters(bSilent) == false)
+        {
             return;
         }
 
@@ -2115,7 +2154,6 @@
         queryString += "inApiToken=" + getLocalStorage("APIToken");
         queryString += "&inPeriod=" + $("#ddlPeriod").val();
         queryString += "&inYear=" + $("#ddlYear").val();
-
 
         var collectionStatusApi = "/api/XRAYRevenue/GetReformatListMedia" + queryString;
 
@@ -2143,8 +2181,10 @@
 
     }
 
-    function loadMediaCollectionStatusData(data) {
+    function loadMediaCollectionStatusData(data)
+    {
         var columns = getDataColumns();
+
         loadResults(data, columns);
     }
 
@@ -2199,8 +2239,47 @@
         var columns = getDataColumns();
         loadResults(data, columns);
     }
+    function loadRejectionData(data)
+    {
+        //get columns
+        var columnsToDisplay = new Array();
+        columnsToDisplay.push({
+            "title": "Row No",
+            "visible": true,
+            "mData": "Row No",
+            "orderable": true,
+            "searchable": true,
+            'className': "text-align-left"
+        });
+        columnsToDisplay.push({
+            "title": "Market",
+            "visible": true,
+            "mData": "Market",
+            "orderable": true,
+            "searchable": true,
+            'className': "text-align-left"
+        });
+        columnsToDisplay.push({
+            "title": "Advertiser",
+            "visible": true,
+            "mData": "Parent Company",
+            "orderable": true,
+            "searchable": true,
+            'className': "text-align-left"
+        });
+        columnsToDisplay.push({
+            "title": "Reason",
+            "visible": true,
+            "mData": "Failed Rule Reason",
+            "orderable": true,
+            "searchable": true,
+            'className': "text-align-left"
+        });
+        loadResultsRejections(data, columnsToDisplay);
+    }
 
-    function loadResults(data, columns) {
+    function loadResultsRejections(data, columns)
+    {
         //data is the data from the ajax call
         //columns is the array that was built previously
 
@@ -2214,7 +2293,69 @@
         //again with new results from the search.
         //if you try to destroy before it is a datatable, an error will occur.
         //this code will only destroy it if the table is a datatable.
-        if ($.fn.DataTable.isDataTable('#dtResults')) {
+        if ($.fn.DataTable.isDataTable('#dtResultsRejections')) {
+            searchTable = $('#dtResultsRejections').DataTable();
+            searchTable.clear().draw();
+            searchTable.destroy();
+        }
+
+        //this code rebuilds the datatable with the updated data from the search
+        //or initial load.
+        $("#dtResultsRejections").show();
+        $(".rejectionClass").show();
+
+        searchTable = $("#dtResultsRejections").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "order": [],
+            //"data": results,
+            "columns": columns,
+            "select": true,
+            language: {
+                search: "Filter Results:"
+            }//,
+            //"buttons": [
+            //    {
+            //        extend: 'excel',
+            //        title: "Media Import Rejections",
+            //        exportOptions: {
+            //            columns: columns
+            //        }
+            //    },
+            //    {
+            //        extend: 'print',
+            //        title: "Media Import Rejections",
+            //        exportOptions: {
+            //            columns: columns
+
+            //        }
+            //    }
+            //]
+        });
+
+        //re-drawing the table with the new data
+        searchTable.rows.add(results).draw();
+ 
+
+    }
+
+    function loadResults(data, columns)
+    {
+        //data is the data from the ajax call
+        //columns is the array that was built previously
+
+        //assigns the data from the ajax call
+        var results = data["report"]["rows"];
+
+        //creating a variable that will used for datatable functions later
+        var searchTable;
+
+        //if the datatable already exists need to destroy it before building it
+        //again with new results from the search.
+        //if you try to destroy before it is a datatable, an error will occur.
+        //this code will only destroy it if the table is a datatable.
+        if ($.fn.DataTable.isDataTable('#dtResults'))
+        {
             searchTable = $('#dtResults').DataTable();
             searchTable.clear().draw();
             searchTable.destroy();
@@ -2698,7 +2839,8 @@
                 }
                 else
                 {
-                    postRevenueByMediaMarketYearPeriod();
+                    //postRevenueByMediaMarketYearPeriod();
+                    unpostMediaRevenueProcess();
                 }
 
             },
@@ -2740,7 +2882,8 @@
         });
     }
 
-    function unpostMediaRevenueProcess(marketId, market, period, year, mediaType) {
+    function unpostMediaRevenueProcess(marketId, market, period, year, mediaType)
+    {
         
         workingMarketId = marketId;
         workingMediaType = mediaType;
@@ -2749,8 +2892,14 @@
         workingMarketName = market;
         workingMediaTypeFullName = mediaType.toUpperCase() == 'T' ? "Television" : "Newspaper";
 
-        getMarketPeriodYearLatestRevisionForUnposting(workingMarketId, workingPeriod, workingYear,
-            workingStationId, workingMarketName, workingMediaTypeFullName);
+        getMarketPeriodYearLatestRevisionForUnposting(
+                                                        workingMarketId,
+                                                        workingPeriod,
+                                                        workingYear,
+                                                        workingStationId,
+                                                        workingMarketName,
+                                                        workingMediaTypeFullName
+                                                    );
 
         //updateMarketYearPeriodPostedStatusForUnposting
         //updateMediaYearPeriodPostedStatusForUnposting
@@ -2851,6 +3000,44 @@
         });
     }
 
+    function getReleaseDateForPeriod()
+    {
+        HasPeriodAlreayBeenReleased = false;
+
+        var parms = "?inApiToken=" + getLocalStorage("APIToken");
+        parms = parms + "&inYear=" + $("#ddlYear").val();
+        parms = parms + "&inPeriod=" + $("#ddlPeriod").val();
+
+        $.ajax({
+            url: ServicePrefix + '/api/XRay/GetReleaseDateByPeriod' + parms,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                    return false;
+                }
+                else {
+                    $.each(data.report.rows, function (index)
+                    {
+                       HasPeriodAlreayBeenReleased = (data.report.rows[index]['Release Date'].length > 0 ? true : false);
+                    });
+                }
+ 
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+                return false;
+            }
+        });
+   
+    }
+
+
+
     function importFileRtn(evt) {
 
         apiToken = getLocalStorage("APIToken");
@@ -2862,6 +3049,8 @@
 
         evt.preventDefault();
         var formData = new FormData(document.forms[0]);
+
+        //ServicePrefix = "http://localhost:54064";
 
         var url = ServicePrefix + '/api/XrayImportMedia/ImportMediaFile?inApiToken=' + apiToken;
         url = url + "&inYear=" + $("#ddlYear").val() + "&inPeriod=" + $("#ddlPeriod").val();
@@ -2891,7 +3080,8 @@
                 else
                 {
                     getDataCollectionList();
-                    bootbox.alert('Upload Process worked.', function () {});
+                    bootbox.alert('Upload Process worked.', function () { });
+                    loadRejectionData(response);
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -2903,5 +3093,73 @@
         });
 
         return false;
+    }
+    function doYouWantToStartARevision(event)
+    {
+        var strMessage = "One or more markets have already been released. <br><br>Doing this will require re-release of those markets.<br><br> Are you sure you want to go foraward with this?";
+
+            bootbox.dialog({
+                message: strMessage,
+                title: "Revision",
+                buttons:
+                {
+
+                    btnYes: {
+                        label: "Yes",
+                        callback: function () {
+                            importFileRtn(event);
+                        }
+                    },
+                    btnCancel: {
+                        label: "No",
+                        callback: function () {
+                            return;
+                        }
+                    }
+                }
+            });
+ 
+    }
+    function importFileQuestions(event) {
+
+        if (DoWeHaveRecords == false)
+        {
+            importFileRtn(event);
+            return;
+        }
+
+        if (DoWeHaveRecords == true)
+        {
+            var strMessage  = "Do you want to overwrite this period data?";
+
+            bootbox.dialog({
+                message: strMessage,
+                title: "Overwrite Data",
+                buttons:
+                {
+                    
+                    btnYes: {
+                        label: "Yes",
+                        callback: function () {
+                            if (HasPeriodAlreayBeenReleased == false) {
+                                importFileRtn(event);
+                            }
+                            else
+                            {
+                                doYouWantToStartARevision(event);
+                            }
+                        }
+                    },
+                    btnCancel: {
+                        label: "No",
+                        callback: function () {
+                            return;
+                        }
+                    }
+                }
+            });
+        }
+
+
     }
 </script>
