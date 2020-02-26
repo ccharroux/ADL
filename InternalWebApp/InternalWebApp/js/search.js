@@ -532,7 +532,9 @@ function buildAdvertiserSearch(searchCriteria)
 
     columns.push({
         "mRender": function (data, type, row) {
-            return '<a href="#" onclick="linkAdvertiserByLink(' + row.advertiserId + ')">Link Advertiser</a>';
+            var str = '<a href="#" onclick="EditMarketAdvertiser(' + row.advertiserId + ')">Edit</a>&nbsp;&nbsp;';
+            str = str + '<a href="#" onclick="linkAdvertiserByLink(' + row.advertiserId + ')">Link Advertiser</a>';
+            return str;
         },
         "orderable": false,
         "searchable": false,
@@ -594,7 +596,9 @@ function buildAgencySearch(searchCriteria) {
 
     columns.push({
         "mRender": function (data, type, row) {
-            return '<a href="#" onclick="linkAgencyByLink(' + row.agencyId + ')">Link Agency</a>';
+            var str = '<a href="#" onclick="EditMarketAgency(' + row.agencyId + ')">Edit</a>&nbsp;&nbsp;';
+                str = str + '<a href="#" onclick="linkAgencyByLink(' + row.agencyId + ')">Link Agency</a>';
+            return str;
         },
         "bSortable": false,
         "searchable": false,
@@ -974,7 +978,9 @@ function buildLinkAdvertiserSearch(searchCriteria) {
 
     columns.push({
         "mRender": function (data, type, row) {
-            return '<a href="#" onclick="linkNewAdvertiserByLink(' + row.advertiserId + ')">Link Advertiser</a>';
+            var str = '<a href="#" onclick="EditMarketAdvertiser(' + row.advertiserId + ')">Edit</a>&nbsp;&nbsp;';
+            str = str + '<a href="#" onclick="linkNewAdvertiserByLink(' + row.advertiserId + ')">Link Advertiser</a>';
+            return str;
         },
         "orderable": false,
         "searchable": false,
@@ -983,4 +989,16 @@ function buildLinkAdvertiserSearch(searchCriteria) {
 
     $("#previousPage").html(searchCriteria["advertiserName"]);
 
+}
+function EditMarketAdvertiser(id) {
+    window.location = '/admin/advertiser/advertiser.html?AdvertiserID=' + id;
+}
+function MatchingAdvertisers() {
+    window.location = '/products/xry/revenue/xrymatch.html?MatchPage=adv&MenuItem=false';
+}
+function EditMarketAgency(id) {
+    window.location = '/admin/agency/agency.html?AgencyID=' + id;
+}
+function MatchingAgencies() {
+    window.location = '/products/xry/revenue/xrymatch.html?MatchPage=agy&MenuItem=false';
 }
