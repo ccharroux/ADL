@@ -229,6 +229,7 @@
 
     $(document).ready(function () {
 
+
         buildXRYMenu("Revenue");
 
         clearLocalStorage();
@@ -256,6 +257,8 @@
         setLocalStorage("newAdvertiserMatch", "");
         setLocalStorage("newAgencyMatch", "");
         setLocalStorage("newMediaMatch", "");
+        setLocalStorage("StandardInputId", "");
+
     }
 
     function getParameters() {
@@ -476,14 +479,14 @@
                 if (row["linkedAdvertiserId"] > 0) {
                     action = "";
                     action += "editStationAdvertiser(";
-                    action += "'" + row["Station Category"] + "','" + row["Station Agency"] + "'," + row["linkedAdvertiserId"] + ");";
+                    action += "'" + row["Station Category"] + "','" + row["Station Agency"] + "'," + row["linkedAdvertiserId"] + "," + row["Standard Input ID"] + ");";
                     return '<a href="#" onclick="' + action + '">Edit&nbsp;Station&nbsp;Advertiser</a>';
                 } else {
                     action = "";
                     action += "createStationAdvertiser(";
                     action += row["marketId"] + "," + row["ownerId"] + "," + row["stationId"] + ",";
                     action += "'" + row["Station Advertiser"] + "','" + row["Station Category"] + "','" + row["Station Advertiser Code"] + "'";
-                    action += ",'" + row["Station Agency"] + "'," + row["linkedAdvertiserId"] + ");";
+                    action += ",'" + row["Station Agency"] + "'," + row["linkedAdvertiserId"] + "," + row["Standard Input ID"] + ");";
                     return '<a href="#" onclick="' + action + '">Match&nbsp;Station&nbsp;Advertiser</a>';
                 }
             },
@@ -555,13 +558,13 @@
                 if (row["linkedAgencyId"] > 0) {
                     action = "";
                     action += "editStationAgency(";
-                    action += "'" + row["Station Category"] + "','" + row["Station Advertiser"] + "'," + row["linkedAgencyId"] + ");";
+                    action += "'" + row["Station Category"] + "','" + row["Station Advertiser"] + "'," + row["linkedAgencyId"] + "," + row["Standard Input ID"] + ");";
                     return '<a href="#" onclick="' + action + '">Edit&nbsp;Station&nbsp;Agency</a>';
                 } else {
                     action += "createStationAgency(";
                     action += row["marketId"] + "," + row["ownerId"] + "," + row["stationId"] + ",";
                     action += "'" + row["Station Agency"] + "','" + row["Station Category"] + "','" + row["Station Agency Code"] + "'";
-                    action += ",'" + row["Station Advertiser"] + "'," + row["linkedAgencyId"] + ");";
+                    action += ",'" + row["Station Advertiser"] + "'," + row["linkedAgencyId"] + "," + row["Standard Input ID"] + ");";
                     return '<a href="#" onclick="' + action + '">Match&nbsp;Station&nbsp;Agency</a>';
                 }
             },
@@ -678,7 +681,7 @@
 
     }
 
-    function editStationAdvertiser(category, stationAgency, linkedAdvertiserId) {
+    function editStationAdvertiser(category, stationAgency, linkedAdvertiserId, standardInputId) {
         /*
          * load object
          * save object to local storage
@@ -687,7 +690,7 @@
          */
 
         //use what is passed in for the edit functionality
-
+        setLocalStorage("StandardInputId", standardInputId);
         var queryString = buildPreviousPageQueryString();
 
         var advertiserMatchData =
@@ -707,7 +710,7 @@
 
     }
 
-    function createStationAgency(marketId, ownerId, stationId, agencyName, category, stationAgencyCode, stationAdvertiser, linkedAgencyId) {
+    function createStationAgency(marketId, ownerId, stationId, agencyName, category, stationAgencyCode, stationAdvertiser, linkedAgencyId, standardInputId) {
         /*
          * load object
          * save object to local storage
@@ -715,7 +718,7 @@
          * add flag to notate coming from this page
          */
 
-
+        setLocalStorage("StandardInputId", standardInputId);
         var queryString = buildPreviousPageQueryString();
 
         var agencyMatchData =
@@ -739,14 +742,14 @@
         window.location = "/admin/stationagency/stationagency.html?StationAgencyID=" + linkedAgencyId + "&AgyMatch=true";
     }
 
-    function editStationAgency(category, stationAdvertiser, linkedAgencyId) {
+    function editStationAgency(category, stationAdvertiser, linkedAgencyId, standardInputId) {
         /*
          * load object
          * save object to local storage
          * redirect to station agency CRUD page
          * add flag to notate coming from this page
          */
-
+        setLocalStorage("StandardInputId", standardInputId);
         var queryString = buildPreviousPageQueryString();
 
         var agencyMatchData =
@@ -765,7 +768,7 @@
         window.location = "/admin/stationagency/stationagency.html?StationAgencyID=" + linkedAgencyId + "&AgyMatch=true";
     }
 
-    function createMediaAdvertiser(marketId, mediaTypeId, mediaAdvertiser, category, mediaAdvertiserCode, linkedAdvertiserId)
+    function createMediaAdvertiser(marketId, mediaTypeId, mediaAdvertiser, category, mediaAdvertiserCode, linkedAdvertiserId, standardInputId)
     {
         var advertiserMatchData =
         {
@@ -786,7 +789,7 @@
 
     function editMediaAdvertiser(category, linkedAdvertiserId)
     {
-
+        setLocalStorage("StandardInputId", standardInputId);
         //var queryString = buildPreviousPageQueryString();
 
         var advertiserMatchData =
