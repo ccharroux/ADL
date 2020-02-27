@@ -287,7 +287,10 @@ var navTool = {
 // Internal Admin Section
 //---------------------------------
 
-$(document).ready(function () {
+$(document).ready(function ()
+{
+ 
+
     setTimeout(resetHeaderBackButton, 1500);
 
     environment = getEnvironment();
@@ -319,8 +322,6 @@ $(document).ready(function () {
         resetHeaderBackButton();
         bResetHeaderBackButtonAlreadyRun = true;
     });
-
-
 
     function resetHeaderBackButton() {
         if (bResetHeaderBackButtonAlreadyRun == false && apiToken != "") {
@@ -451,7 +452,7 @@ function buildPopupComponent() {
 
         var str = '<div id="componentDialog" class="componentDialogClass" title="cc" display="none">';
         str = str + '<center>';
-        str = str + '<iframe id="componentIFrame" src="" width="100%" height="500">';
+        str = str + '<iframe id="componentIFrame" src="" width="100%" height="800">';
         str = str + '     Sorry your browser does not support inline frames.';
         str = str + '  </iframe>';
         str = str + '</center>';
@@ -471,9 +472,9 @@ function instantiatePopupComponent() {
 
     $("#componentDialog").dialog({
         autoOpen: false,
-        resizable: false,
+        resizable: true,
         width: dWidth,
-        height: 600,
+        height:900,
         top: dHeight,
         modal: false,
         dialogClass: 'componentDialogClass'
@@ -513,6 +514,7 @@ function addDialogComponents() {
     link.href = '//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css';
 
     // Append link element to HTML head 
+ 
     head.appendChild(link);
 
     var d = '<div id="favoritesDialog" style="display:none" title="Favorite">';
@@ -540,9 +542,12 @@ function addDialogComponents() {
     d = d + '          </ul>';
     d = d + '      </div>';
     d = d + '&nbsp;<span><input id="btnAddAsFavorite" type="button"  value="Add as Favorite" onclick="showFavoriteDialog();"/></span>';
+   
     d = d + '</div>';
     //d = d + '&nbsp;<input class="favoriteButtonClass" type="button" value="My Favorites" onclick="window.location=\'/admin/login/dashboard.html\'"/>';
     $("body").append(d);
+    $("body").append('&nbsp;<div class="workArea"><input id="enableWorkArea" type="button"  value="Work Area" onclick="enableWorkArea();"/></div>');
+
     getFavoritesForQuickList();
     setTimeout(buildFavoritesDialog, 250);
 
@@ -2600,4 +2605,9 @@ function setMatchedNotificationAsRead(inMatchedNotificationPersonnelId) {
             genericAjaxError(jqXhr, textStatus, errorThrown);
         }
     });
+}
+
+function enableWorkArea()
+{
+    showComponentDialog('/admin/login/dashboard.html?MenuItem=true', 'Media Internal');
 }
