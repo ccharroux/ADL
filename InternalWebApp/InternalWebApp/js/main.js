@@ -452,7 +452,7 @@ function buildPopupComponent() {
 
         var str = '<div id="componentDialog" class="componentDialogClass" title="cc" display="none">';
         str = str + '<center>';
-        str = str + '<iframe id="componentIFrame" src="" width="100%" height="800">';
+        str = str + '<iframe id="componentIFrame" src="" width="100%" height="500">';
         str = str + '     Sorry your browser does not support inline frames.';
         str = str + '  </iframe>';
         str = str + '</center>';
@@ -474,7 +474,7 @@ function instantiatePopupComponent() {
         autoOpen: false,
         resizable: true,
         width: dWidth,
-        height:900,
+        height:600,
         top: dHeight,
         modal: false,
         dialogClass: 'componentDialogClass'
@@ -2609,5 +2609,5 @@ function setMatchedNotificationAsRead(inMatchedNotificationPersonnelId) {
 
 function enableWorkArea()
 {
-    showComponentDialog('/admin/login/dashboard.html?MenuItem=true', 'Media Internal');
+    window.open('/admin/login/dashboard.html?MenuItem=true', '_blank', "height=800,width:800");
 }
