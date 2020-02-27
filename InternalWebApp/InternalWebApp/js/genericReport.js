@@ -277,6 +277,9 @@ reportName.push("rptAdvertiserListByOwner");
 reportName.push("rptAgencyListByOwner");
 reportName.push("rptUsersNotLoggedInAfterDateList");
 
+reportName.push("rptStandardInputList");
+
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -10746,7 +10749,8 @@ function getReportFilterArray_UsersNotLoggedInAfterDateList() {
     return arrayFilters;
 }
 
-function getReportObject_UsersNotLoggedInAfterDateList() {
+function getReportObject_UsersNotLoggedInAfterDateList()
+{
     var tempObject = new Object();
 
     var columnsToDisplay = new Array();
@@ -10759,6 +10763,89 @@ function getReportObject_UsersNotLoggedInAfterDateList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['personnel']
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_StandardInputList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationListByGeneralFilters",
+        objectName: "ddlStation",
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
+        reloadBasedProduct: false,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_StandardInputList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Advertiser Raw");
+    columnsToDisplay.push("Advertiser");
+    columnsToDisplay.push("Agency Raw");
+    columnsToDisplay.push("Agency");
+
+    columnsToDisplay.push("Revenue");
+
+    columnsToDisplay.push("Category");
+    columnsToDisplay.push("Account Type");
+    columnsToDisplay.push("Revenue Type");
+
+    tempObject =
+    {
+        reportTitle: "Standard Input List",
+        apiControllerAction: "/api/XrayReport/GetStandardInputList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry', 'advertiser', 'agency']
     }
 
     return tempObject;
