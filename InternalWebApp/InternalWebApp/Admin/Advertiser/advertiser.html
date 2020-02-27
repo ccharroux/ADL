@@ -44,7 +44,12 @@
     <!--[if lt IE 9]>
         <script src="js/respond.min.js"></script>
     <![endif]-->
-
+    <style>
+        .nonBold
+        {
+            font-weight: 400!important;
+        }
+    </style>
 </head>
 <body>
     <div id="fh5co-page">
@@ -234,6 +239,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="default-button-section">
                         <div class="row input-row">
                             <div class="col-md-3">
@@ -244,8 +250,96 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div>                    
+
                     <!-- End Buttons-->
+                    <!-- Standard Input Area-->
+                    <div class="standardInputArea" style="display:none">
+                        <hr />
+                        <h1>Standard Input Data</h1>
+                        <div class="row input-row">
+                            <div class="col-md-3 text-align-left">
+                                <label>Station</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <label id="lblStation" class="nonBold"></label>
+                            </div>
+                        </div>
+                        <div class="row input-row">
+                            <div class="col-md-3 text-align-left">
+                                <label>Owner</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <label id="lblOwner" class="nonBold"></label>
+                            </div>
+                        </div>
+                        <div class="row input-row">
+                            <div class="col-md-3 text-align-left">
+                                <label>Advertiser</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <label id="lblAdvertiser" class="nonBold"></label>
+                            </div>
+                        </div>
+                        <div class="row input-row">
+                            <div class="col-md-3 text-align-left">
+                                <label>Advertiser Raw</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <label id="lblAdvertiserRaw" class="nonBold"></label>
+                            </div>
+                        </div>
+                        <div class="row input-row">
+                            <div class="col-md-3 text-align-left">
+                                <label>Agency</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <label id="lblAgency" class="nonBold"></label>
+                            </div>
+                        </div>
+                        <div class="row input-row">
+                            <div class="col-md-3 text-align-left">
+                                <label>Agency Raw</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <label id="lblAgencyRaw" class="nonBold"></label>
+                            </div>
+                        </div>
+
+                        <div class="row input-row">
+                            <div class="col-md-3 text-align-left">
+                                <label>Revenue</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <label id="lblRevenue" class="nonBold"></label>
+                            </div>
+                        </div>
+                        <div class="row input-row">
+                            <div class="col-md-3 text-align-left">
+                                <label>Category</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <label id="lblCategory" class="nonBold"></label>
+                            </div>
+                        </div>
+                        <div class="row input-row">
+                            <div class="col-md-3 text-align-left">
+                                <label>Account Type</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <label id="lblAccountType" class="nonBold"></label>
+                            </div>
+                        </div>
+                        <div class="row input-row">
+                            <div class="col-md-3 text-align-left">
+                                <label>Revenue Type</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <label id="lblRevenueType" class="nonBold"></label>
+                            </div>
+                        </div>
+                        <hr />
+                    </div>
                 </div>
             </div>
         </div>
@@ -301,6 +395,15 @@
         $("#ddlIndustry").change(function () {
             getSubIndustryList($(this).val(), '');
         });
+
+ 
+        if (getLocalStorage("StandardInputId") != "") {
+            $(".standardInputArea").show();
+            getStandardInputData(getLocalStorage("StandardInputId"));
+        }
+        else {
+            $(".standardInputArea").hide();
+        }
     });
 
     function getMarketList() {
@@ -1084,6 +1187,55 @@
             goBackToDashboard();
         }
 
+    }
+
+    function getStandardInputData(id)
+    {
+        $.ajax({
+            url: ServicePrefix + '/api/XrayReport/GetStandardInputList?inApiToken=' + getLocalStorage("APIToken") + '&inStandardInputId=' + id,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+ 
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+
+                    if (data.report.rows.length > 0) {
+                        $("#lblOwner").html(data.report.rows[0].Owner);
+                        $("#lblAdvertiserRaw").html(data.report.rows[0]["Advertiser Raw"]);
+                        $("#lblAgencyRaw").html(data.report.rows[0]["Agency Raw"]);
+                        $("#lblAdvertiser").html(data.report.rows[0]["Advertiser"]);
+                        $("#lblAgency").html(data.report.rows[0]["Agency"]);
+                        $("#lblStation").html(data.report.rows[0]["Station"]);
+                        $("#lblRevenue").html(data.report.rows[0]["Revenue"]);
+                        $("#lblCategory").html(data.report.rows[0]["Category"]);
+                        $("#lblAccountType").html(data.report.rows[0]["Account Type"]);
+                        $("#lblRevenueType").html(data.report.rows[0]["Revenue Type"]);
+                        //$("#ddlMarket").text(data.report.rows[0].Market);
+                        if (advertiserId == 0) {
+                            var regExp = /\(([^)]+)\)/;
+                            var matches = regExp.exec(data.report.rows[0].Market);
+                            var marketId = matches[1];
+                            $("#ddlMarket").val(marketId);
+                            $("#txtAdvertiserName").val(data.report.rows[0]['Advertiser Raw']);
+
+                        }
+                        console.log(data);
+                    }
+                    else
+                    {
+                        $("#standardInputArea").hide();
+                    }
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
     }
 
 </script>
