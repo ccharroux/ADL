@@ -184,7 +184,14 @@ function fixAdvertiser() {
     });
 }
 
-function linkAgencyByLink(agencyId) {
+function linkAgencyByLink(agencyId, marketId) {
+
+    if (marketId != searchCriteria["marketID"])
+    {
+        var errorMessage = "You cannot link to an agency from another market.";
+        bootbox.alert(errorMessage, function () { });
+        return;
+    }
 
     var rowId = $('#dtSearchResults').dataTable()
         .fnFindCellRowIndexes(agencyId, 0);
@@ -553,10 +560,10 @@ function buildAdvertiserSearch(searchCriteria)
 }
 
 function buildAgencySearch(searchCriteria) {
-    if ($('.search-all-markets:visible').is(':checked')) {
-        bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
-        });
-    }
+    //if ($('.search-all-markets:visible').is(':checked')) {
+    //    bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
+    //    });
+    //}
 
     //figure out change for station agency page
     if ($('.search-text:visible').val().length > 0) {
@@ -567,7 +574,7 @@ function buildAgencySearch(searchCriteria) {
 
     apiParameters = {
         "inApiToken": apiToken,
-        "inMarketId": searchCriteria["marketID"],
+        "inMarketId": $('.search-all-markets:visible').is(':checked') ? "-1" : searchCriteria["marketID"],
         "inAgencyName": searchText,
         "inShowDisabled": false
     }
@@ -604,7 +611,7 @@ function buildAgencySearch(searchCriteria) {
     columns.push({
         "mRender": function (data, type, row) {
             var str = '<a href="#" onclick="EditMarketAgency(' + row.agencyId + ')">Edit</a>&nbsp;&nbsp;';
-                str = str + '<a href="#" onclick="linkAgencyByLink(' + row.agencyId + ')">Link Agency</a>';
+                str = str + '<a href="#" onclick="linkAgencyByLink(' + row.agencyId + ',' + row.marketId + ')">Link Agency</a>';
             return str;
         },
         "bSortable": false,
