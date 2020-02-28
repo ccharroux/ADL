@@ -33,6 +33,7 @@ function getSearchData(searchCriteria) {
             //    buildLinkAgencySearch(searchCriteria);
             //    break;
         case "LINKADV":
+            //should allow cross market search
             buildLinkAdvertiserSearch(searchCriteria);
             break;
         case "PERSONNEL":
@@ -356,11 +357,17 @@ function assignParentAgencyAudit() {
     window.location = searchPage;
 }
 
-function linkNewAdvertiserByLink(advertiserId) {
+function linkNewAdvertiserByLink(advertiserId, marketId) {
+
+    if (marketId != searchCriteria["marketID"])
+    {
+        var errorMessage = "You cannot link to an advertiser from another market.";
+        bootbox.alert(errorMessage, function () { });
+        return;
+    }
+
     var rowId = $('#dtSearchResults').dataTable()
         .fnFindCellRowIndexes(advertiserId, 0);
-
-    //console.log(rowId);
 
     var table = $('#dtSearchResults').DataTable();
     table.row(rowId).select();
@@ -612,10 +619,8 @@ function buildAgencySearch(searchCriteria) {
 }
 
 function buildParentAdvertiserSearch(searchCriteria) {
-    if ($('.search-all-markets:visible').is(':checked')) {
-        bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
-        });
-    }
+    
+    $(".search-check-box").hide();
 
     if ($('.search-text:visible').val().length > 0) {
         searchText = $('.search-text:visible').val();
@@ -739,10 +744,7 @@ function buildParentAdvertiserAuditSearch(searchCriteria) {
 
 function buildParentAgencySearch(searchCriteria) {
 
-    if ($('.search-all-markets:visible').is(':checked')) {
-        bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
-        });
-    }
+    $(".search-check-box").hide();
 
     if ($('.search-text:visible').val().length > 0) {
         searchText = $('.search-text:visible').val();
@@ -909,10 +911,10 @@ function buildPersonnelSearch(searchCriteria) {
 }
 
 function buildLinkAdvertiserSearch(searchCriteria) {
-    if ($('.search-all-markets:visible').is(':checked')) {
-        bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
-        });
-    }
+    //if ($('.search-all-markets:visible').is(':checked')) {
+    //    bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
+    //    });
+    //}
 
     if ($('.search-text:visible').val().length > 0) {
         searchText = $('.search-text:visible').val();
@@ -924,7 +926,7 @@ function buildLinkAdvertiserSearch(searchCriteria) {
 
     apiParameters = {
         "inApiToken": apiToken,
-        "inMarketId": searchCriteria["marketID"],
+        "inMarketId": $('.search-all-markets:visible').is(':checked') ? "-1" : searchCriteria["marketID"],
         "inAdvertiserName": searchText,
         "inShowDisabled": false
     }
@@ -979,7 +981,7 @@ function buildLinkAdvertiserSearch(searchCriteria) {
     columns.push({
         "mRender": function (data, type, row) {
             var str = '<a href="#" onclick="EditMarketAdvertiser(' + row.advertiserId + ')">Edit</a>&nbsp;&nbsp;';
-            str = str + '<a href="#" onclick="linkNewAdvertiserByLink(' + row.advertiserId + ')">Link Advertiser</a>';
+            str = str + '<a href="#" onclick="linkNewAdvertiserByLink(' + row.advertiserId + ',' + row.marketId + ')">Link Advertiser</a>';
             return str;
         },
         "orderable": false,
