@@ -133,8 +133,13 @@ function cancelSearch() {
     }
 }
 
-function linkAdvertiserByLink(advertiserId) {
+function linkAdvertiserByLink(advertiserId, marketId) {
 
+    if (marketId != searchCriteria["marketID"]) {
+        var errorMessage = "You cannot link to an advertiser from another market.";
+        bootbox.alert(errorMessage, function () { });
+        return;
+    }
     //finds the datatable rowid
     var rowId = $('#dtSearchResults').dataTable()
         .fnFindCellRowIndexes(advertiserId, 0);
@@ -474,10 +479,10 @@ function linkParentAgency() {
 
 function buildAdvertiserSearch(searchCriteria)
 {
-    if ($('.search-all-markets:visible').is(':checked')) {
-        bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
-        });
-    }
+    //if ($('.search-all-markets:visible').is(':checked')) {
+    //    bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
+    //    });
+    //}
 
     if ($('.search-text:visible').val().length > 0)
     {
@@ -492,7 +497,7 @@ function buildAdvertiserSearch(searchCriteria)
 
     apiParameters = {
         "inApiToken": apiToken,
-        "inMarketId": searchCriteria["marketID"],
+        "inMarketId": $('.search-all-markets:visible').is(':checked') ? "-1" : searchCriteria["marketID"],
         "inAdvertiserName": searchText,
         "inShowDisabled": false
     }
@@ -547,7 +552,7 @@ function buildAdvertiserSearch(searchCriteria)
     columns.push({
         "mRender": function (data, type, row) {
             var str = '<a href="#" onclick="EditMarketAdvertiser(' + row.advertiserId + ')">Edit</a>&nbsp;&nbsp;';
-            str = str + '<a href="#" onclick="linkAdvertiserByLink(' + row.advertiserId + ')">Link Advertiser</a>';
+            str = str + '<a href="#" onclick="linkAdvertiserByLink(' + row.advertiserId + ',' + row.marketId + ')">Link Advertiser</a>';
             return str;
         },
         "orderable": false,
