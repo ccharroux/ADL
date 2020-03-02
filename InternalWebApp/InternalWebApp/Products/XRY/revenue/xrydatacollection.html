@@ -263,14 +263,25 @@
 
                     </div>
                 </div>
+                <div class="row search-section Upload" style="display:none">
+                    <div class="col-md-12">
+                        <div class="form-group" style="margin-bottom:10px;text-align:center">
+                            <hr />
+                            <form method="post" id="ajaxUploadForm" name="ajaxUploadForm" novalidate="novalidate" enctype="multipart/form-data">
+                                <input style="margin: 0 auto;" type="file" name='importFile' id="importFile" />
+                                <input type="button" value="Upload your File" onclick="importFileQuestions(event)" />
+                            </form>
+                            <hr />
+                        </div>
+                    </div>
+                </div>
                 <div class="row search-section mediaUpload" style="display:none">
                     <div class="col-md-12">
                         <div class="form-group" style="margin-bottom:10px;text-align:center">
                             <hr />
-                            <form method="post" id="ajaxUploadForm" novalidate="novalidate" enctype="multipart/form-data">
-                                <input style="margin: 0 auto;" type="file" name='importFile' id="importFile" />
-                                <input type="button" value="Upload your File" onclick="importFileQuestions(event)" />
-                                <input type="hidden" id="inApiToken" />
+                            <form method="post" id="ajaxUploadFormMedia" name="ajaxUploadFormMedia" novalidate="novalidate" enctype="multipart/form-data">
+                                <input style="margin: 0 auto;" type="file" name='importFileMedia' id="importFileMedia" />
+                                <input type="button" value="Upload your File" onclick="importFileQuestionsMedia(event)" />
                             </form>
                             <hr />
                         </div>
@@ -406,7 +417,10 @@
     function loadAdvancedSearch() {
         //$.blockUI;
         loadReportParameters();
-        runReportFromAdvancedSearch();
+ 
+        if (validateFilters(true) == true) {
+            runReportFromAdvancedSearch();
+        }
     }
 
     function runReportFromAdvancedSearch() {
@@ -417,10 +431,13 @@
     function setupUI() {
 
         $(".mediaUpload").hide();
+        $(".Upload").hide();
 
         $("#rdoMarket").prop("checked", true);
 
         $('input[type=radio][name=collectionType]').change(function () {
+            $(".mediaUpload").hide();
+            $(".Upload").hide();
 
             $("#ddlMarket").val("").change();
             $("#ddlOwner").val("");
@@ -442,6 +459,7 @@
                 //hide market and stations
                 $(".collection-market").hide();
                 $(".collection-station").hide();
+                $(".Upload").show();
             }
             else if (this.value == 'thirdParty')
             {
@@ -454,6 +472,7 @@
                 $(".collection-market").show();
                 $(".collection-station").show();
                 $(".collection-owner").hide();
+
             }
 
 
@@ -2067,8 +2086,10 @@
         //current issue is the chosen being visible
         //if market ddlmarket needs a value
         //if owner ddlowner needs a value
-        if ($("#rdoOwner").is(':checked')) {
-            if ($("#ddlOwner").val().trim() == "") {
+        if ($("#rdoOwner").is(':checked'))
+        {
+            if ($("#ddlOwner").val().trim() == "")
+            {
                 msg = "Please select an owner.";
                 if (bSilent == false) {
                     bootbox.alert(msg, function () { });
@@ -2076,8 +2097,11 @@
                 loopBreak = false;
                 return false;
             }
-        } else if ($("#rdoMarket").is(':checked')) {
-            if ($("#ddlMarket").val().trim() == "") {
+        }
+        else if ($("#rdoMarket").is(':checked'))
+        {
+            if ($("#ddlMarket").val().trim() == "")
+            {
                 msg = "Please select a market.";
                 if (bSilent == false) {
                     bootbox.alert(msg, function () { });
@@ -2086,9 +2110,10 @@
                 return false;
             }
         }
-
+ 
         //year and period regardless
-        if ($("#ddlYear").val().trim() == "") {
+        if ($("#ddlYear").val().trim() == "")
+        {
             msg = "Please select a year.";
             if (bSilent == false) {
                 bootbox.alert(msg, function () { });
@@ -2097,7 +2122,8 @@
             return false;
         }
 
-        if ($("#ddlPeriod").val().trim() == "") {
+        if ($("#ddlPeriod").val().trim() == "")
+        {
             msg = "Please select a period.";
             if (bSilent == false) {
                 bootbox.alert(msg, function () { });
@@ -2119,6 +2145,11 @@
 
         if (!bSilent) {
             bSilent = false;
+        }
+
+        if (validateFilters(bSilent) == false)
+        {
+            return;
         }
 
         HasPeriodAlreayBeenReleased = false;
@@ -3038,17 +3069,28 @@
 
 
 
-    function importFileRtn(evt) {
+    function importFileRtnMedia(evt) {
 
         apiToken = getLocalStorage("APIToken");
-        if ($("#importFile").val().trim() == "") {
+
+        if ($("#importFileMedia").val().trim() == "") {
             bootbox.alert("You must select a file", function () { });
+            return;
+        }
+
+        if ($("#ddlYear").val().trim() == "") {
+            bootbox.alert("You must select a year", function () { });
+            return;
+        }
+
+        if ($("#ddlPeriod").val().trim() == "") {
+            bootbox.alert("You must select a Period", function () { });
             return;
         }
         $("#inAPIToken").val(apiToken);
 
         evt.preventDefault();
-        var formData = new FormData(document.forms[0]);
+        var formData = new FormData(document.forms['ajaxUploadFormMedia']);
 
         //ServicePrefix = "http://localhost:54064";
 
@@ -3056,6 +3098,7 @@
         url = url + "&inYear=" + $("#ddlYear").val() + "&inPeriod=" + $("#ddlPeriod").val();
 
         $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
+
         clearTimeout(unblockHandle);
 
         $.ajax({
@@ -3094,6 +3137,7 @@
 
         return false;
     }
+
     function doYouWantToStartARevision(event)
     {
         var strMessage = "One or more markets have already been released. <br><br>Doing this will require re-release of those markets.<br><br> Are you sure you want to go foraward with this?";
@@ -3107,7 +3151,7 @@
                     btnYes: {
                         label: "Yes",
                         callback: function () {
-                            importFileRtn(event);
+                            importFileRtnMedia(event);
                         }
                     },
                     btnCancel: {
@@ -3120,11 +3164,11 @@
             });
  
     }
-    function importFileQuestions(event) {
+    function importFileQuestionsMedia(event) {
 
         if (DoWeHaveRecords == false)
         {
-            importFileRtn(event);
+            importFileRtnMedia(event);
             return;
         }
 
@@ -3142,10 +3186,122 @@
                         label: "Yes",
                         callback: function () {
                             if (HasPeriodAlreayBeenReleased == false) {
-                                importFileRtn(event);
+                                importFileRtnMedia(event);
                             }
                             else
                             {
+                                doYouWantToStartARevision(event);
+                            }
+                        }
+                    },
+                    btnCancel: {
+                        label: "No",
+                        callback: function () {
+                            return;
+                        }
+                    }
+                }
+            });
+        }
+
+
+    }
+
+    function importFileRtn(evt) {
+
+        apiToken = getLocalStorage("APIToken");
+
+        if ($("#ddlOwner").val().trim() == "") {
+            bootbox.alert("You must select an Owner", function () { });
+            return;
+        }
+
+        if ($("#importFile").val().trim() == "") {
+            bootbox.alert("You must select a file", function () { });
+            return;
+        }
+
+        if ($("#ddlYear").val().trim() == "") {
+            bootbox.alert("You must select a year", function () { });
+            return;
+        }
+
+        if ($("#ddlPeriod").val().trim() == "") {
+            bootbox.alert("You must select a Period", function () { });
+            return;
+        }
+        $("#inAPIToken").val(apiToken);
+
+        evt.preventDefault();
+        var formData = new FormData(document.forms['ajaxUploadForm']);
+
+        //ServicePrefix = "http://localhost:54064";
+
+        var url = ServicePrefix + '/api/XrayImport/ImportFile?inApiToken=' + apiToken;
+        url = url + "&inYear=" + $("#ddlYear").val() + "&inPeriod=" + $("#ddlPeriod").val();
+        url = url + "&inOwnerId=" + $("#ddlOwner").val();
+
+        $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
+
+        clearTimeout(unblockHandle);
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            //async: false,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (response) {
+
+                getDataCollectionList();
+                console.log(response);
+
+                if (response.response.status != "SUCCESS") {
+                    console.log(response.response.errorMessage);
+                    bootbox.alert('Upload Process Failed.\n\r\n\r' + response.response.errorMessage[0] + '\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
+                }
+                else {
+                    getDataCollectionList();
+                    bootbox.alert('Upload Process worked.', function () { });
+                    loadRejectionData(response);
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+
+                bootbox.alert('Upload Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                    //window.location = "preprocess.html";
+                });
+            }
+        });
+
+        return false;
+    }
+    function importFileQuestions(event) {
+
+        if (DoWeHaveRecords == false) {
+            importFileRtn(event);
+            return;
+        }
+
+        if (DoWeHaveRecords == true) {
+            var strMessage = "Do you want to overwrite this period data?";
+
+            bootbox.dialog({
+                message: strMessage,
+                title: "Overwrite Data",
+                buttons:
+                {
+
+                    btnYes: {
+                        label: "Yes",
+                        callback: function () {
+                            if (HasPeriodAlreayBeenReleased == false) {
+                                importFileRtn(event);
+                            }
+                            else {
                                 doYouWantToStartARevision(event);
                             }
                         }
