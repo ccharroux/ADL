@@ -237,7 +237,7 @@
 
                         <div class="form-group rptView collection-owner vertical-center">
                             <label for="ddlOwner" class="requiredText dropdown-label rptView"> * Owner</label>
-                            <select id="ddlOwner" apiInput="inOwnerId" onchange="" class="mkaRequired dropdown-select rptView report-filter"></select>
+                            <select id="ddlOwner" apiInput="inOwnerId" onchange="loadMarketListByOwner()" class="mkaRequired dropdown-select rptView report-filter"></select>
                         </div>
 
                         <div class="form-group rptView collection-station vertical-center">
@@ -267,6 +267,18 @@
                     <div class="col-md-12">
                         <div class="form-group" style="margin-bottom:10px;text-align:center">
                             <hr />
+                            <label for="ddlMarketUpload" class="dropdown-label">Market: </label>
+                            <select class="dropdown-select" onchange="getStationListByGeneralFilters()" id="ddlMarketUpload">
+                                <option value="">All Markets</option>
+                            </select>
+                            <label for="ddlStationUpload"class="dropdown-label">Station: </label>
+                            <select class="dropdown-select" id="ddlStationUpload"> 
+                                <option value="">All Stations</option>
+                            </select>
+                            <label for="ddlSubmissionUpload" class="dropdown-label">Submission: </label>
+                            <select class="dropdown-select" id="ddlSubmissionUpload">
+                                <option value="">All Submissions</option>
+                            </select>                            
                             <form method="post" id="ajaxUploadForm" name="ajaxUploadForm" novalidate="novalidate" enctype="multipart/form-data">
                                 <input style="margin: 0 auto;" type="file" name='importFile' id="importFile" />
                                 <input type="button" value="Upload your File" onclick="importFileQuestions(event)" />
@@ -3332,6 +3344,102 @@
             });
         }
 
+
+    }
+
+    function loadMarketListByOwner() {
+
+        if ($("#ddlOwner").val() == "")
+        {
+            $("#ddlMarketUpload").html("");
+            return;
+        }
+
+        var url = ServicePrefix + '/api/Market/GetMarketListByOwnerProduct';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerId": $("#ddlOwner").val(),
+                "inProductId": 'XRY'
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                loadMarketListByOwnerSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function loadMarketListByOwnerSuccess(data, textStatus, jQxhr)
+    {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage);
+        } else {
+
+            var str = '<option value="">All Markets</option>';
+
+            $.each(data.report.rows, function (index) {
+                str = str + '<option value="' + data.report.rows[index].MarketId + '">' + data.report.rows[index].Market + '</option>';
+            });
+
+            $("#ddlMarketUpload").html(str);
+            convertToChosenSelect("ddlMarketUpload", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+            getStationListByGeneralFilters();
+        }
+    }
+
+    function getStationListByGeneralFilters( ) {
+        var control = this.objectName;
+
+        var str = '';
+        str = '<option value="">All Stations</option>';
+        $("ddlStationUpload").html(str);
+
+        $.ajax({
+            url: ServicePrefix + '/api/Station/GetStationListByGeneralFilters',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProduct": 'XRY',
+                "inMarketId": $("#ddlMarketUpload").val(),
+                "inOwnerId": $("#ddlOwner").val(),
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+   
+                    $.each(data.report.rows, function (index) {
+                        str = str + '<option value="' + data.report.rows[index]["Station Id"] + '">' + data.report.rows[index].Station + '</option>';
+                    });
+
+                    $("#ddlStationUpload").html(str);
+
+                    convertToChosenSelect("ddlStationUpload", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
 
     }
 </script>
