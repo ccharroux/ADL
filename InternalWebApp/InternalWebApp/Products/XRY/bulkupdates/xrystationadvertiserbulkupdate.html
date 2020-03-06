@@ -130,13 +130,13 @@
                     <div class="col-md-12" style="margin-bottom: 20px;">
 
                         <label for="ddlMarket" class="dropdown-label" style="color: red;"> * Market</label>
-                        <select id="ddlMarket" onchange="getOwnerList(['ddlOwner'], this.options[this.selectedIndex].value, '-1');" class="dropdown-select report-filter mkaRequired"></select>
+                        <select id="ddlMarket" onchange="getOwnerList(['ddlOwner'], this.options[this.selectedIndex].value, '-1');" class="dropdown-select report-filter mkaRequired" errorMessage="Please select a Market to search."></select>
 
                         <label for="txtStationAdvertiser" class="dropdown-label"> ** Station Advertiser</label>
-                        <input type="text" id="txtStationAdvertiser" maxlength="50" class="report-filter" errorMessage="Please enter a Station Advertiser Name to search." />
+                        <input type="text" id="txtStationAdvertiser" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter a Station Advertiser Name to search." />
 
                         <label for="txtMarketAdvertiser" class="dropdown-label"> ** Market Advertiser</label>
-                        <input type="text" id="txtMarketAdvertiser" maxlength="50" class="report-filter" errorMessage="Please enter a Market Advertiser Name to search." />
+                        <input type="text" id="txtMarketAdvertiser" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter a Market Advertiser Name to search." />
 
                     </div>
 
@@ -468,7 +468,7 @@
         var sUrl = ServicePrefix + "/api/StationAdvertiserAudit/GetStationAdvertiserAuditList?";
         sUrl += "inApiToken=" + getLocalStorage("APIToken");
         sUrl += "&inStationAdvertiserName=" + $("#txtStationAdvertiser").val();
-        sUrl += "&inMarketAdvertiserName" + $("#txtMarketAdvertiser").val();
+        sUrl += "&inMarketAdvertiserName=" + $("#txtMarketAdvertiser").val();
         sUrl += "&inMarketId=" + $("#ddlMarket").val();
         sUrl += "&inIndustryId=" + $("#ddlIndustry").val();
         sUrl += "&inSubIndustryId=" + $("#ddlSubIndustry").val();
@@ -767,7 +767,59 @@
     function searchValidationPassed()
     {
         //add the required one but also either or fields
-        return true;
+        //return true;
+
+        var loopBreak = true;
+        $(".mkaRequired").each(function (index, el) {
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            // Text
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+            // Select
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == "-1") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+        });
+
+        if (loopBreak == false)
+        {
+            return loopBreak;
+        }
+
+        var bMultiFieldCompleted = false;
+
+        $(".multi-field-search").each(function(index, el)
+        {
+            var eID = "#" + $(el).attr("id");
+           
+            if ($(eID).val().length > 0)
+            {
+                bMultiFieldCompleted = true;
+            }
+
+        });
+
+        if (bMultiFieldCompleted == false)
+        {
+            var errorMessage = "Please complete at least one of the fields notated with **.";
+            bootbox.alert(errorMessage, function () { });
+            loopBreak = false;
+            return false;
+        }
+
+        return loopBreak;
     }
 
     function updateStationAdvertisers() {
