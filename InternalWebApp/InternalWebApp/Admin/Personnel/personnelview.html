@@ -56,6 +56,9 @@
         .history-button {
             background-color: #1cc684 !important;
         }
+        .historySection {
+            background-color: lightgray;
+        }
     </style>
 </head>
 <body>
@@ -182,7 +185,7 @@
                                 </div>
                             </div>
 
-                            <div class="row initiallyHidden" id="divPersonnelChangeHistoryPersonnelField">
+                            <div class="row initiallyHidden historySection" id="divPersonnelChangeHistoryPersonnelField">
                                 <!-- dataTable-top-margin makes it too wide -->
                                 <div class="col-md-12 text-align-left">
                                     <span id="spanPersonnelChangeHistoryPersonnelField"></span>
@@ -233,7 +236,7 @@
                                 </div>
                             </div>
 
-                            <div class="row initiallyHidden" id="divPersonnelChangeHistoryPersonnelOwners"> <!-- dataTable-top-margin makes it too wide -->
+                            <div class="row initiallyHidden historySection" id="divPersonnelChangeHistoryPersonnelOwners"> <!-- dataTable-top-margin makes it too wide -->
                                 <div class="col-md-12 text-align-left">
                                     Change history: Personnel owners
                                     <table id="dtPersonnelChangeHistoryPersonnelOwners" class="dataTable-border dataTable-headers dataTable-cell-border">
@@ -294,7 +297,7 @@
                                 </div>
                             </div>
 
-                            <div class="row initiallyHidden" id="divPersonnelChangeHistoryPersonnelProducts"> <!-- dataTable-top-margin makes it too wide -->
+                            <div class="row initiallyHidden historySection" id="divPersonnelChangeHistoryPersonnelProducts"> <!-- dataTable-top-margin makes it too wide -->
                                 <div class="col-md-12 text-align-left">
                                     Change history: Personnel products
                                     <table id="dtPersonnelChangeHistoryPersonnelProducts" class="dataTable-border dataTable-headers dataTable-cell-border">
@@ -327,12 +330,6 @@
                                 </div>
                             </div>
 
-                            <!--
-                                TODO (MRR, XRY):
-                                * keep progress meter visible until data finishes loading
-                                * on empty result, reset button to 'Show' status
-                            -->
-
                             <div class="row">
                                 <div class="col-md-12 margin-top-10 text-align-center small">
                                     <input id="btnShowOrHidePersonnelChangeHistoryMRRPersonnelRoles" value="Show history of MRR personnel roles added/removed" onclick="showOrHidePersonnelChangeHistoryMRRPersonnelRoles();" class="default-button history-button" type="button">
@@ -346,7 +343,7 @@
                                 </div>
                             </div>
 
-                            <div class="row initiallyHidden" id="divPersonnelChangeHistoryMRRPersonnelRoles"> <!-- dataTable-top-margin makes it too wide -->
+                            <div class="row initiallyHidden historySection" id="divPersonnelChangeHistoryMRRPersonnelRoles"> <!-- dataTable-top-margin makes it too wide -->
                                 <div class="col-md-12 text-align-left">
                                     Change history: MRR personnel roles
                                     <table id="dtPersonnelChangeHistoryMRRPersonnelRoles" class="dataTable-border dataTable-headers dataTable-cell-border">
@@ -394,7 +391,7 @@
                                 </div>
                             </div>
 
-                            <div class="row initiallyHidden" id="divPersonnelChangeHistoryXRYPersonnelRoles"> <!-- dataTable-top-margin makes it too wide -->
+                            <div class="row initiallyHidden historySection" id="divPersonnelChangeHistoryXRYPersonnelRoles"> <!-- dataTable-top-margin makes it too wide -->
                                 <div class="col-md-12 text-align-left">
                                     Change history: XRY personnel roles
                                     <table id="dtPersonnelChangeHistoryXRYPersonnelRoles" class="dataTable-border dataTable-headers dataTable-cell-border">
@@ -519,6 +516,12 @@
 
     $(document).ready(function ()
     {
+
+        // possible future improvements:
+        // * activate only before an AJAX call expected to run long, deactivate after
+        // * display a timer and/or Cancel button after 10 seconds
+        bLongQuery = true;
+        clearTimeout(unblockHandle);
 
         buildMainMenu("Personnel");
         personnelId = getParameterByName("PersonnelID");
@@ -2191,6 +2194,7 @@
     }
 
     function getPersonnelChangeHistoryPersonnelField(personnelFieldName, personnelFieldDescription) {
+
         $("#spanPersonnelChangeHistoryPersonnelField").text('Change history: ' + personnelFieldDescription);
 
         var url = ServicePrefix + '/api/Personnel/GetPersonnelChangeHistoryPersonnelField';
@@ -2218,7 +2222,6 @@
     }
 
     function getPersonnelChangeHistoryPersonnelFieldSuccess(data, textStatus, jQxhr) {
-
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -2232,7 +2235,6 @@
 
         populateDataTable("dtPersonnelChangeHistoryPersonnelField", data);
         $("#divPersonnelChangeHistoryPersonnelField").show();
-
     }
 
     function hidePersonnelChangeHistoryPersonnelField() {
@@ -2262,6 +2264,7 @@
     }
 
     function getPersonnelChangeHistoryPersonnelOwners() {
+
         var url = ServicePrefix + '/api/Personnel/GetPersonnelChangeHistoryPersonnelOwners';
 
         var settings = {
@@ -2286,21 +2289,20 @@
     }
 
     function getPersonnelChangeHistoryPersonnelOwnersSuccess(data, textStatus, jQxhr) {
-
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
-        if (data.report.rows.length == 0) {
-            bootbox.alert("No changes found");
-            return;
-        }
+        // even if empty, do these steps anyway to keep the UI consistent and avoid accidental redundant database calls
 
         populateDataTable("dtPersonnelChangeHistoryPersonnelOwners", data);
         $("#divPersonnelChangeHistoryPersonnelOwners").show();
         gotPersonnelChangeHistoryPersonnelOwners = true;
 
+        if (data.report.rows.length == 0) {
+            bootbox.alert("No changes found");
+        }
     }
 
     function showOrHidePersonnelChangeHistoryPersonnelProducts() {
@@ -2318,6 +2320,7 @@
     }
 
     function getPersonnelChangeHistoryPersonnelProducts() {
+
         var url = ServicePrefix + '/api/Personnel/GetPersonnelChangeHistoryPersonnelProducts';
 
         var settings = {
@@ -2342,14 +2345,8 @@
     }
 
     function getPersonnelChangeHistoryPersonnelProductsSuccess(data, textStatus, jQxhr) {
-
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        if (data.report.rows.length == 0) {
-            bootbox.alert("No changes found");
             return;
         }
 
@@ -2357,6 +2354,9 @@
         $("#divPersonnelChangeHistoryPersonnelProducts").show();
         gotPersonnelChangeHistoryPersonnelProducts = true;
 
+        if (data.report.rows.length == 0) {
+            bootbox.alert("No changes found");
+        }
     }
 
     function showOrHidePersonnelChangeHistoryMRRPersonnelRoles() {
@@ -2374,6 +2374,7 @@
     }
 
     function getPersonnelChangeHistoryMRRPersonnelRoles() {
+
         var d = new Date();
         var priorYear = d.getFullYear() - 1;
 
@@ -2403,14 +2404,8 @@
     }
 
     function getPersonnelChangeHistoryMRRPersonnelRolesSuccess(data, textStatus, jQxhr) {
-
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        if (data.report.rows.length == 0) {
-            bootbox.alert("No changes found");
             return;
         }
 
@@ -2418,6 +2413,9 @@
         $("#divPersonnelChangeHistoryMRRPersonnelRoles").show();
         gotPersonnelChangeHistoryMRRPersonnelRoles = $("#ddlMRRRole").val();
 
+        if (data.report.rows.length == 0) {
+            bootbox.alert("No changes found");
+        }
     }
 
     function showOrHidePersonnelChangeHistoryXRYPersonnelRoles() {
@@ -2464,14 +2462,8 @@
     }
 
     function getPersonnelChangeHistoryXRYPersonnelRolesSuccess(data, textStatus, jQxhr) {
-
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        if (data.report.rows.length == 0) {
-            bootbox.alert("No changes found");
             return;
         }
 
@@ -2479,6 +2471,9 @@
         $("#divPersonnelChangeHistoryXRYPersonnelRoles").show();
         gotPersonnelChangeHistoryXRYPersonnelRoles = $("#ddlXRYRole").val();
 
+        if (data.report.rows.length == 0) {
+            bootbox.alert("No changes found");
+        }
     }
 
     function genericAjaxError(jQxhr, textStatus, errorThrown) {
