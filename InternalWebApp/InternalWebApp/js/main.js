@@ -987,7 +987,14 @@ function goBackToDashboard() {
 function MKAErrorMessageRtn(message, url) {
 
     var newMessage = "";
-    if (message.toLowerCase().indexOf('token is invalid') > -1) {
+
+ 
+    if (!message)
+    {
+        message = "";
+    }
+
+    if (message.toString().toLowerCase().indexOf('token is invalid') > -1) {
         newMessage = "Your Token has expired - Please login again";
         bootbox.alert(newMessage, function () {
 

@@ -271,8 +271,8 @@
                             <select class="dropdown-select" onchange="getStationListByGeneralFilters()" id="ddlMarketUpload">
                                 <option value="">All Markets</option>
                             </select>
-                            <label for="ddlStationUpload"class="dropdown-label">Station: </label>
-                            <select class="dropdown-select" id="ddlStationUpload"> 
+                            <label for="ddlStationUpload" class="dropdown-label">Station: </label>
+                            <select class="dropdown-select" id="ddlStationUpload" onchange="getSubmissionList()"> 
                                 <option value="">All Stations</option>
                             </select>
                             <label for="ddlSubmissionUpload" class="dropdown-label">Submission: </label>
@@ -2100,7 +2100,7 @@
         //if owner ddlowner needs a value
         if ($("#rdoOwner").is(':checked'))
         {
-            if ($("#ddlOwner").val().trim() == "")
+            if ($("#ddlOwner").val() == "")
             {
                 msg = "Please select an owner.";
                 if (bSilent == false) {
@@ -3268,6 +3268,9 @@
         var url = ServicePrefix + '/api/XrayImport/ImportFile?inApiToken=' + apiToken;
         url = url + "&inYear=" + $("#ddlYear").val() + "&inPeriod=" + $("#ddlPeriod").val();
         url = url + "&inOwnerId=" + $("#ddlOwner").val();
+        url = url + "&inMarketId=" + $("#ddlMarketUpload").val();
+        url = url + "&inStationId=" + $("#ddlStationUpload").val();
+        url = url + "&inSubmissionId=" + $("#ddlSubmissionUpload").val();
 
         $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
 
@@ -3285,7 +3288,6 @@
             success: function (response) {
 
                 getDataCollectionList();
-                console.log(response);
 
                 if (response.response.status != "SUCCESS") {
                     console.log(response.response.errorMessage);
@@ -3349,9 +3351,15 @@
 
     function loadMarketListByOwner() {
 
+        $("#ddlMarketUpload").html("<option value=''>All Markets</option>");
+        $("#ddlSubmissionUpload").html('<option value="">All Submissions</option>');
+        $("#ddlStationUpload").html('<option value="">All Stations</option>');
+        convertToChosenSelect("ddlMarketUpload", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+        convertToChosenSelect("ddlSubmissionUpload", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+        convertToChosenSelect("ddlStationUpload", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
         if ($("#ddlOwner").val() == "")
         {
-            $("#ddlMarketUpload").html("");
             return;
         }
 
@@ -3388,7 +3396,7 @@
             var str = '<option value="">All Markets</option>';
 
             $.each(data.report.rows, function (index) {
-                str = str + '<option value="' + data.report.rows[index].MarketId + '">' + data.report.rows[index].Market + '</option>';
+                str = str + '<option value="' + data.report.rows[index].MarketId + '">' + data.report.rows[index].Market +' ('+ data.report.rows[index].MarketId + ')' + '</option>';
             });
 
             $("#ddlMarketUpload").html(str);
@@ -3397,12 +3405,19 @@
         }
     }
 
-    function getStationListByGeneralFilters( ) {
-        var control = this.objectName;
+    function getStationListByGeneralFilters()
+    {
+ 
 
         var str = '';
         str = '<option value="">All Stations</option>';
-        $("ddlStationUpload").html(str);
+        $("#ddlSubmissionUpload").html('<option value="">All Submissions</option>');
+        convertToChosenSelect("ddlSubmissionUpload", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        if ($("#ddlOwner").val() == "")
+        {
+            return;
+        }
 
         $.ajax({
             url: ServicePrefix + '/api/Station/GetStationListByGeneralFilters',
@@ -3413,7 +3428,7 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inProduct": 'XRY',
                 "inMarketId": $("#ddlMarketUpload").val(),
-                "inOwnerId": $("#ddlOwner").val(),
+                "inOwnerId": $("#ddlOwner").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -3425,7 +3440,7 @@
 
    
                     $.each(data.report.rows, function (index) {
-                        str = str + '<option value="' + data.report.rows[index]["Station Id"] + '">' + data.report.rows[index].Station + '</option>';
+                        str = str + '<option value="' + data.report.rows[index]["Station Id"] + '">' + data.report.rows[index].Station + ' (' + data.report.rows[index]["Station Id"] + ')' + '</option>';
                     });
 
                     $("#ddlStationUpload").html(str);
@@ -3442,4 +3457,67 @@
         });
 
     }
+
+    function getSubmissionList() {
+
+        $("#ddlSubmissionUpload").html('<option value="">All Submissions</option>');
+        convertToChosenSelect("ddlSubmissionUpload", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        if ($("#ddlStationUpload").val() == "")
+        {
+            return;
+        }
+
+        var url = ServicePrefix + '/api/ReInput/GetReInputList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": $("#ddlStationUpload").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getSubmissionListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getSubmissionListSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            var str = '<option value="">All Submissions</option>';
+
+            $("#ddlSubmissionUpload").html(str);
+ 
+            $.each(data.report.rows, function (index) {
+
+                var obj = data.report.rows[index];
+
+                str = str + '<option value="';
+                str = str + obj.submissionId;
+                str = str + '">';
+                str = str + obj.description + ' (' + obj.submissionId + ')';
+                str = str + '</option>';
+
+            });
+
+            $("#ddlSubmissionUpload").html(str);
+ 
+            convertToChosenSelect("ddlSubmissionUpload", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        }
+
+    }
+
 </script>
