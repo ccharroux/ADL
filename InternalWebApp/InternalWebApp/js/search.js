@@ -33,6 +33,7 @@ function getSearchData(searchCriteria) {
             //    buildLinkAgencySearch(searchCriteria);
             //    break;
         case "LINKADV":
+            //should allow cross market search
             buildLinkAdvertiserSearch(searchCriteria);
             break;
         case "PERSONNEL":
@@ -132,8 +133,13 @@ function cancelSearch() {
     }
 }
 
-function linkAdvertiserByLink(advertiserId) {
+function linkAdvertiserByLink(advertiserId, marketId) {
 
+    if (marketId != searchCriteria["marketID"]) {
+        var errorMessage = "You cannot link to an advertiser from another market.";
+        bootbox.alert(errorMessage, function () { });
+        return;
+    }
     //finds the datatable rowid
     var rowId = $('#dtSearchResults').dataTable()
         .fnFindCellRowIndexes(advertiserId, 0);
@@ -183,7 +189,14 @@ function fixAdvertiser() {
     });
 }
 
-function linkAgencyByLink(agencyId) {
+function linkAgencyByLink(agencyId, marketId) {
+
+    if (marketId != searchCriteria["marketID"])
+    {
+        var errorMessage = "You cannot link to an agency from another market.";
+        bootbox.alert(errorMessage, function () { });
+        return;
+    }
 
     var rowId = $('#dtSearchResults').dataTable()
         .fnFindCellRowIndexes(agencyId, 0);
@@ -356,11 +369,17 @@ function assignParentAgencyAudit() {
     window.location = searchPage;
 }
 
-function linkNewAdvertiserByLink(advertiserId) {
+function linkNewAdvertiserByLink(advertiserId, marketId) {
+
+    if (marketId != searchCriteria["marketID"])
+    {
+        var errorMessage = "You cannot link to an advertiser from another market.";
+        bootbox.alert(errorMessage, function () { });
+        return;
+    }
+
     var rowId = $('#dtSearchResults').dataTable()
         .fnFindCellRowIndexes(advertiserId, 0);
-
-    //console.log(rowId);
 
     var table = $('#dtSearchResults').DataTable();
     table.row(rowId).select();
@@ -460,10 +479,10 @@ function linkParentAgency() {
 
 function buildAdvertiserSearch(searchCriteria)
 {
-    if ($('.search-all-markets:visible').is(':checked')) {
-        bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
-        });
-    }
+    //if ($('.search-all-markets:visible').is(':checked')) {
+    //    bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
+    //    });
+    //}
 
     if ($('.search-text:visible').val().length > 0)
     {
@@ -478,7 +497,7 @@ function buildAdvertiserSearch(searchCriteria)
 
     apiParameters = {
         "inApiToken": apiToken,
-        "inMarketId": searchCriteria["marketID"],
+        "inMarketId": $('.search-all-markets:visible').is(':checked') ? "-1" : searchCriteria["marketID"],
         "inAdvertiserName": searchText,
         "inShowDisabled": false
     }
@@ -532,7 +551,9 @@ function buildAdvertiserSearch(searchCriteria)
 
     columns.push({
         "mRender": function (data, type, row) {
-            return '<a href="#" onclick="linkAdvertiserByLink(' + row.advertiserId + ')">Link Advertiser</a>';
+            var str = '<a href="#" onclick="EditMarketAdvertiser(' + row.advertiserId + ')">Edit</a>&nbsp;&nbsp;';
+            str = str + '<a href="#" onclick="linkAdvertiserByLink(' + row.advertiserId + ',' + row.marketId + ')">Link Advertiser</a>';
+            return str;
         },
         "orderable": false,
         "searchable": false,
@@ -544,10 +565,10 @@ function buildAdvertiserSearch(searchCriteria)
 }
 
 function buildAgencySearch(searchCriteria) {
-    if ($('.search-all-markets:visible').is(':checked')) {
-        bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
-        });
-    }
+    //if ($('.search-all-markets:visible').is(':checked')) {
+    //    bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
+    //    });
+    //}
 
     //figure out change for station agency page
     if ($('.search-text:visible').val().length > 0) {
@@ -558,7 +579,7 @@ function buildAgencySearch(searchCriteria) {
 
     apiParameters = {
         "inApiToken": apiToken,
-        "inMarketId": searchCriteria["marketID"],
+        "inMarketId": $('.search-all-markets:visible').is(':checked') ? "-1" : searchCriteria["marketID"],
         "inAgencyName": searchText,
         "inShowDisabled": false
     }
@@ -594,7 +615,9 @@ function buildAgencySearch(searchCriteria) {
 
     columns.push({
         "mRender": function (data, type, row) {
-            return '<a href="#" onclick="linkAgencyByLink(' + row.agencyId + ')">Link Agency</a>';
+            var str = '<a href="#" onclick="EditMarketAgency(' + row.agencyId + ')">Edit</a>&nbsp;&nbsp;';
+                str = str + '<a href="#" onclick="linkAgencyByLink(' + row.agencyId + ',' + row.marketId + ')">Link Agency</a>';
+            return str;
         },
         "bSortable": false,
         "searchable": false,
@@ -608,10 +631,8 @@ function buildAgencySearch(searchCriteria) {
 }
 
 function buildParentAdvertiserSearch(searchCriteria) {
-    if ($('.search-all-markets:visible').is(':checked')) {
-        bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
-        });
-    }
+    
+    $(".search-check-box").hide();
 
     if ($('.search-text:visible').val().length > 0) {
         searchText = $('.search-text:visible').val();
@@ -735,10 +756,7 @@ function buildParentAdvertiserAuditSearch(searchCriteria) {
 
 function buildParentAgencySearch(searchCriteria) {
 
-    if ($('.search-all-markets:visible').is(':checked')) {
-        bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
-        });
-    }
+    $(".search-check-box").hide();
 
     if ($('.search-text:visible').val().length > 0) {
         searchText = $('.search-text:visible').val();
@@ -905,10 +923,10 @@ function buildPersonnelSearch(searchCriteria) {
 }
 
 function buildLinkAdvertiserSearch(searchCriteria) {
-    if ($('.search-all-markets:visible').is(':checked')) {
-        bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
-        });
-    }
+    //if ($('.search-all-markets:visible').is(':checked')) {
+    //    bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
+    //    });
+    //}
 
     if ($('.search-text:visible').val().length > 0) {
         searchText = $('.search-text:visible').val();
@@ -920,7 +938,7 @@ function buildLinkAdvertiserSearch(searchCriteria) {
 
     apiParameters = {
         "inApiToken": apiToken,
-        "inMarketId": searchCriteria["marketID"],
+        "inMarketId": $('.search-all-markets:visible').is(':checked') ? "-1" : searchCriteria["marketID"],
         "inAdvertiserName": searchText,
         "inShowDisabled": false
     }
@@ -974,7 +992,9 @@ function buildLinkAdvertiserSearch(searchCriteria) {
 
     columns.push({
         "mRender": function (data, type, row) {
-            return '<a href="#" onclick="linkNewAdvertiserByLink(' + row.advertiserId + ')">Link Advertiser</a>';
+            var str = '<a href="#" onclick="EditMarketAdvertiser(' + row.advertiserId + ')">Edit</a>&nbsp;&nbsp;';
+            str = str + '<a href="#" onclick="linkNewAdvertiserByLink(' + row.advertiserId + ',' + row.marketId + ')">Link Advertiser</a>';
+            return str;
         },
         "orderable": false,
         "searchable": false,
@@ -983,4 +1003,16 @@ function buildLinkAdvertiserSearch(searchCriteria) {
 
     $("#previousPage").html(searchCriteria["advertiserName"]);
 
+}
+function EditMarketAdvertiser(id) {
+    window.location = '/admin/advertiser/advertiser.html?AdvertiserID=' + id;
+}
+function MatchingAdvertisers() {
+    window.location = '/products/xry/revenue/xrymatch.html?MatchPage=adv&MenuItem=false';
+}
+function EditMarketAgency(id) {
+    window.location = '/admin/agency/agency.html?AgencyID=' + id;
+}
+function MatchingAgencies() {
+    window.location = '/products/xry/revenue/xrymatch.html?MatchPage=agy&MenuItem=false';
 }

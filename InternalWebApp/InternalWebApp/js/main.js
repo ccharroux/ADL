@@ -7,7 +7,7 @@ const gMediaTypeNetwork = "NETWORK";
 const gMediaTypeSurvey = "SURVEY";
 
 const gChosenParams = {
-    allowSearchContains: true, 
+    allowSearchContains: true,
     allowSplitWordSearch: false
 }
 var gShowHeader = true;
@@ -30,193 +30,193 @@ var gExcludeFromBackButton = false;
 const gBackButtonArrayLimit = 5;
 
 ; (function () {
-	
-	'use strict';
 
-	var isMobile = {
-		Android: function() {
-			return navigator.userAgent.match(/Android/i);
-		},
-			BlackBerry: function() {
-			return navigator.userAgent.match(/BlackBerry/i);
-		},
-			iOS: function() {
-			return navigator.userAgent.match(/iPhone|iPad|iPod/i);
-		},
-			Opera: function() {
-			return navigator.userAgent.match(/Opera Mini/i);
-		},
-			Windows: function() {
-			return navigator.userAgent.match(/IEMobile/i);
-		},
-			any: function() {
-			return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
-		}
-	};
+    'use strict';
 
-	var fullHeight = function() {
+    var isMobile = {
+        Android: function () {
+            return navigator.userAgent.match(/Android/i);
+        },
+        BlackBerry: function () {
+            return navigator.userAgent.match(/BlackBerry/i);
+        },
+        iOS: function () {
+            return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+        },
+        Opera: function () {
+            return navigator.userAgent.match(/Opera Mini/i);
+        },
+        Windows: function () {
+            return navigator.userAgent.match(/IEMobile/i);
+        },
+        any: function () {
+            return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+        }
+    };
 
-		if ( !isMobile.any() ) {
-			$('.js-fullheight').css('height', $(window).height());
-			$(window).resize(function(){
-				$('.js-fullheight').css('height', $(window).height());
-			});
-		}
+    var fullHeight = function () {
 
-	};
+        if (!isMobile.any()) {
+            $('.js-fullheight').css('height', $(window).height());
+            $(window).resize(function () {
+                $('.js-fullheight').css('height', $(window).height());
+            });
+        }
 
-
-	var centerBlock = function() {
-		$('.fh5co-section-with-image .fh5co-box').css('margin-top', -($('.fh5co-section-with-image .fh5co-box').outerHeight()/2));
-	  	$(window).resize(function(){
-	  		$('.fh5co-section-with-image .fh5co-box').css('margin-top', -($('.fh5co-section-with-image .fh5co-box').outerHeight()/2));
-	  	});
-	};
-
-	var responseHeight = function() {
-		setTimeout(function(){
-			$('.js-responsive > .v-align').css('height', $('.js-responsive > img').height());
-		}, 1);
-		
-		$(window).resize(function(){
-			setTimeout(function(){
-				$('.js-responsive > .v-align').css('height', $('.js-responsive > img').height());
-			}, 1);
-		})
-	};
+    };
 
 
-	var mobileMenuOutsideClick = function() {
+    var centerBlock = function () {
+        $('.fh5co-section-with-image .fh5co-box').css('margin-top', -($('.fh5co-section-with-image .fh5co-box').outerHeight() / 2));
+        $(window).resize(function () {
+            $('.fh5co-section-with-image .fh5co-box').css('margin-top', -($('.fh5co-section-with-image .fh5co-box').outerHeight() / 2));
+        });
+    };
 
-		$(document).click(function (e) {
-	    var container = $("#fh5co-offcanvas, .js-fh5co-nav-toggle");
-	    if (!container.is(e.target) && container.has(e.target).length === 0) {
+    var responseHeight = function () {
+        setTimeout(function () {
+            $('.js-responsive > .v-align').css('height', $('.js-responsive > img').height());
+        }, 1);
 
-	    	if ( $('body').hasClass('offcanvas-visible') ) {
-
-    			$('body').removeClass('offcanvas-visible');
-    			$('.js-fh5co-nav-toggle').removeClass('active');
-				
-	    	}
-	    
-	    	
-	    }
-		});
-
-	};
-
-
-	var offcanvasMenu = function() {
-		$('body').prepend('<div id="fh5co-offcanvas" />');
-		$('#fh5co-offcanvas').prepend('<ul id="fh5co-side-links">');
-		$('body').prepend('<a href="#" class="js-fh5co-nav-toggle fh5co-nav-toggle"><i></i></a>');
-		$('#fh5co-offcanvas').append($('#fh5co-header nav').clone());
-	};
+        $(window).resize(function () {
+            setTimeout(function () {
+                $('.js-responsive > .v-align').css('height', $('.js-responsive > img').height());
+            }, 1);
+        })
+    };
 
 
-	var burgerMenu = function() {
+    var mobileMenuOutsideClick = function () {
 
-		$('body').on('click', '.js-fh5co-nav-toggle', function(event){
-			var $this = $(this);
+        $(document).click(function (e) {
+            var container = $("#fh5co-offcanvas, .js-fh5co-nav-toggle");
+            if (!container.is(e.target) && container.has(e.target).length === 0) {
 
-			$('body').toggleClass('fh5co-overflow offcanvas-visible');
-			$this.toggleClass('active');
-			event.preventDefault();
+                if ($('body').hasClass('offcanvas-visible')) {
 
-		});
+                    $('body').removeClass('offcanvas-visible');
+                    $('.js-fh5co-nav-toggle').removeClass('active');
 
-		$(window).resize(function() {
-			if ( $('body').hasClass('offcanvas-visible') ) {
-		   	$('body').removeClass('offcanvas-visible');
-		   	$('.js-fh5co-nav-toggle').removeClass('active');
-		   }
-		});
-
-		$(window).scroll(function(){
-			if ( $('body').hasClass('offcanvas-visible') ) {
-		   	$('body').removeClass('offcanvas-visible');
-		   	$('.js-fh5co-nav-toggle').removeClass('active');
-		   }
-		});
-
-	};
+                }
 
 
-	var toggleBtnColor = function() {
-		if ( $('#fh5co-hero').length > 0 ) {	
-			$('#fh5co-hero').waypoint( function( direction ) {
-				if( direction === 'down' ) {
-					$('.fh5co-nav-toggle').addClass('dark');
-				}
-			} , { offset: - $('#fh5co-hero').height() } );
+            }
+        });
 
-			$('#fh5co-hero').waypoint( function( direction ) {
-				if( direction === 'up' ) {
-					$('.fh5co-nav-toggle').removeClass('dark');
-				}
-			} , { 
-				offset:  function() { return -$(this.element).height() + 0; }
-			} );
-		}
-	};
+    };
 
 
+    var offcanvasMenu = function () {
+        $('body').prepend('<div id="fh5co-offcanvas" />');
+        $('#fh5co-offcanvas').prepend('<ul id="fh5co-side-links">');
+        $('body').prepend('<a href="#" class="js-fh5co-nav-toggle fh5co-nav-toggle"><i></i></a>');
+        $('#fh5co-offcanvas').append($('#fh5co-header nav').clone());
+    };
 
-	var contentWayPoint = function() {
-		var i = 0;
-		$('.animate-box').waypoint( function( direction ) {
 
-			if( direction === 'down' && !$(this.element).hasClass('animated') ) {
-				
-				i++;
+    var burgerMenu = function () {
 
-				$(this.element).addClass('item-animate');
-				setTimeout(function(){
+        $('body').on('click', '.js-fh5co-nav-toggle', function (event) {
+            var $this = $(this);
 
-					$('body .animate-box.item-animate').each(function(k){
-						var el = $(this);
-						setTimeout( function () {
-							var effect = el.data('animate-effect');
-							if ( effect === 'fadeIn') {
-								el.addClass('fadeIn animated');
-							} else if ( effect === 'fadeInLeft') {
-								el.addClass('fadeInLeft animated');
-							} else if ( effect === 'fadeInRight') {
-								el.addClass('fadeInRight animated');
-							} else {
-								el.addClass('fadeInUp animated');
-							}
+            $('body').toggleClass('fh5co-overflow offcanvas-visible');
+            $this.toggleClass('active');
+            event.preventDefault();
 
-							el.removeClass('item-animate');
-						},  k * 200, 'easeInOutExpo' );
-					});
-					
-				}, 100);
-				
-			}
+        });
 
-		} , { offset: '85%' } );
-	};
+        $(window).resize(function () {
+            if ($('body').hasClass('offcanvas-visible')) {
+                $('body').removeClass('offcanvas-visible');
+                $('.js-fh5co-nav-toggle').removeClass('active');
+            }
+        });
 
-	
+        $(window).scroll(function () {
+            if ($('body').hasClass('offcanvas-visible')) {
+                $('body').removeClass('offcanvas-visible');
+                $('.js-fh5co-nav-toggle').removeClass('active');
+            }
+        });
 
-	
-	$(function(){
-		fullHeight();
-		centerBlock();
-		responseHeight()
-		mobileMenuOutsideClick();
-		offcanvasMenu();
-		burgerMenu();
-		toggleBtnColor();
-		contentWayPoint();
-	});
+    };
+
+
+    var toggleBtnColor = function () {
+        if ($('#fh5co-hero').length > 0) {
+            $('#fh5co-hero').waypoint(function (direction) {
+                if (direction === 'down') {
+                    $('.fh5co-nav-toggle').addClass('dark');
+                }
+            }, { offset: -$('#fh5co-hero').height() });
+
+            $('#fh5co-hero').waypoint(function (direction) {
+                if (direction === 'up') {
+                    $('.fh5co-nav-toggle').removeClass('dark');
+                }
+            }, {
+                offset: function () { return -$(this.element).height() + 0; }
+            });
+        }
+    };
+
+
+
+    var contentWayPoint = function () {
+        var i = 0;
+        $('.animate-box').waypoint(function (direction) {
+
+            if (direction === 'down' && !$(this.element).hasClass('animated')) {
+
+                i++;
+
+                $(this.element).addClass('item-animate');
+                setTimeout(function () {
+
+                    $('body .animate-box.item-animate').each(function (k) {
+                        var el = $(this);
+                        setTimeout(function () {
+                            var effect = el.data('animate-effect');
+                            if (effect === 'fadeIn') {
+                                el.addClass('fadeIn animated');
+                            } else if (effect === 'fadeInLeft') {
+                                el.addClass('fadeInLeft animated');
+                            } else if (effect === 'fadeInRight') {
+                                el.addClass('fadeInRight animated');
+                            } else {
+                                el.addClass('fadeInUp animated');
+                            }
+
+                            el.removeClass('item-animate');
+                        }, k * 200, 'easeInOutExpo');
+                    });
+
+                }, 100);
+
+            }
+
+        }, { offset: '85%' });
+    };
+
+
+
+
+    $(function () {
+        fullHeight();
+        centerBlock();
+        responseHeight()
+        mobileMenuOutsideClick();
+        offcanvasMenu();
+        burgerMenu();
+        toggleBtnColor();
+        contentWayPoint();
+    });
 
 
 }());
 var unblockHandle;
 
- 
+
 var delayForLastPage = 1 * 1000;
 var maxHoldEntries = 10;
 var bLongQuery = false;
@@ -224,8 +224,8 @@ var environment = "";
 var gDataTableDefaultRows = 50;
 var gSearchTextPlaceholder = "Enter search text here...";
 var navTool = {
-    buildNavComponent: function(parentContainer, parentElement, functionToRun, bAllowAllSelection) { 
-        
+    buildNavComponent: function (parentContainer, parentElement, functionToRun, bAllowAllSelection) {
+
         var para = document.createElement("div");
         para.setAttribute("style", "text-align:center");
         var node = document.createElement("a");
@@ -246,16 +246,14 @@ var navTool = {
         var newElement = para;
         var oldElement = document.getElementById(parentElement);
         document.getElementById(parentContainer).appendChild(newElement);
-        
+
     },
-    goWhere: function (obj, direction, functionToRun, allowAllSelection)
-    {
+    goWhere: function (obj, direction, functionToRun, allowAllSelection) {
         var e = document.getElementById(obj);
 
         if (direction == -1) {
 
-            if (e.selectedIndex == 1)
-            {
+            if (e.selectedIndex == 1) {
                 e.selectedIndex = (allowAllSelection ? 0 : e.length - 1);
             }
             else {
@@ -278,7 +276,7 @@ var navTool = {
             }
 
         }
- 
+
         // Create a new 'change' event
         var event = new Event('change');
         e.dispatchEvent(event);
@@ -289,25 +287,25 @@ var navTool = {
 // Internal Admin Section
 //---------------------------------
 
-$( document ).ready(function() 
+$(document).ready(function ()
 {
+ 
+
     setTimeout(resetHeaderBackButton, 1500);
 
     environment = getEnvironment();
 
     var environmentClass = "environment";
 
-    if (environment.length > 0)
-    {
+    if (environment.length > 0) {
 
-        if ((environment.indexOf("DEV") > -1) || (environment.indexOf("LOCAL") > -1))
-        {        
+        if ((environment.indexOf("DEV") > -1) || (environment.indexOf("LOCAL") > -1)) {
             environmentClass = environmentClass + "DEV";
         }
-        if  (environment.indexOf("STAGING") > -1)   {
+        if (environment.indexOf("STAGING") > -1) {
             environmentClass = environmentClass + "STAGING";
         }
-        if  (environment.indexOf("DEMO") > -1)   {
+        if (environment.indexOf("DEMO") > -1) {
             environmentClass = environmentClass + "DEMO";
         }
         if (environment.indexOf("PRODUCTION") > -1) {
@@ -324,13 +322,9 @@ $( document ).ready(function()
         resetHeaderBackButton();
         bResetHeaderBackButtonAlreadyRun = true;
     });
- 
 
-
-    function resetHeaderBackButton()
-    {
-        if (bResetHeaderBackButtonAlreadyRun == false && apiToken != "")
-        {
+    function resetHeaderBackButton() {
+        if (bResetHeaderBackButtonAlreadyRun == false && apiToken != "") {
             $.blockUI();
             gShowHeader = showHeader();
             buildBackButtonGeneric();
@@ -339,7 +333,7 @@ $( document ).ready(function()
     }
 
     $(document).ajaxStart(function () {
- 
+
     });
 
     // build a generic back button...
@@ -350,82 +344,82 @@ $( document ).ready(function()
 
 
     // Block UI Stuff
-    $.blockUI.defaults.css.paddingTop='25px';
-	$.blockUI.defaults.fadeOut = 500;
-	$.blockUI.defaults.message ='<h4>Just a moment...</h4>';
-	
+    $.blockUI.defaults.css.paddingTop = '25px';
+    $.blockUI.defaults.fadeOut = 500;
+    $.blockUI.defaults.message = '<h4>Just a moment...</h4>';
 
-	if (bLongQuery == false) {
-	    // Force unblock after 10 seconds
- 
-	    unblockHandle = setInterval("$.unblockUI();", 10000);
-	}
+
+    if (bLongQuery == false) {
+        // Force unblock after 10 seconds
+
+        unblockHandle = setInterval("$.unblockUI();", 10000);
+    }
 
     // Set Ajax
-	$(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
+    $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
 
-	var apiToken = "";
-	var bDoLoginCheck = true;
+    var apiToken = "";
+    var bDoLoginCheck = true;
 
-	for (var i=0; i < nonLoggedInPages.length; i++)
-	{
-	    if (window.location.toString().toLowerCase().indexOf(nonLoggedInPages[i].toLowerCase()) > -1 )
-	    {
-	        bDoLoginCheck = false;
-	        break;
-	    }
-	}
+    for (var i = 0; i < nonLoggedInPages.length; i++) {
+        if (window.location.toString().toLowerCase().indexOf(nonLoggedInPages[i].toLowerCase()) > -1) {
+            bDoLoginCheck = false;
+            break;
+        }
+    }
 
-	if (bDoLoginCheck == true)
-    {
-	    var apiToken = window.localStorage.getItem("APIToken");
-		
-	    if (apiToken == null || apiToken.length == 0) {
-	        logout();
-	    }
-	    else {
-	        // Check Time goes here
-	        var bTimedOut = false;
-	        bTimedOut = checkTokenTime();
+    if (bDoLoginCheck == true) {
+        var apiToken = window.localStorage.getItem("APIToken");
 
-	        if (bTimedOut == true) {
-	            logout();
-	        }
-	        else {
-	            updateTokenTime();
-	        }
-	    }
-		
-	}
+        if (apiToken == null || apiToken.length == 0) {
+            logout();
+        }
+        else {
+            // Check Time goes here
+            var bTimedOut = false;
+            bTimedOut = checkTokenTime();
 
-	if (bDoLoginCheck == true)
-	{
-	    // add favorites
-	    addDialogComponents();
-	}
+            if (bTimedOut == true) {
+                logout();
+            }
+            else {
+                updateTokenTime();
+            }
+        }
 
-	setTimeout(getLastPage, delayForLastPage);
+    }
 
-    $(window).on("beforeunload", function (e)
-    {
-        if (gExcludeFromBackButton == false)
-        {
+    if (bDoLoginCheck == true) {
+        // add favorites
+        addDialogComponents();
+    }
+
+    setTimeout(getLastPage, delayForLastPage);
+
+    $(window).on("beforeunload", function (e) {
+        if (gExcludeFromBackButton == false) {
             buildBackButton();
         }
 
         gExcludeFromBackButton = false;
     });
-     
+
+    //DEV-6732
+    //added functionality to look for internal messages on page ready
+    //need to exclude admin/login/login.html since api wouldn't have personnelid
+    var sPage = window.location.pathname;
+    var bIsLoginPage = sPage.indexOf("login.html") > -1 ? true : false;
+    if (!bIsLoginPage) {
+        getInternalMatchedNotification();
+    }
 });
 
 
-function showHeader()
-{
+function showHeader() {
     var hideHeader = getParameterByName("hideHeader");
     var returnVal = false;
 
-    if (!hideHeader == false && hideHeader.toLowerCase() == "true")
-    {
+    if (!hideHeader == false && hideHeader.toLowerCase() == "true") {
         $("#fh5co-page").css("marginTop", "20px");
         $("#fh5co-header").hide();
         $("#divQuickReport").hide();
@@ -443,17 +437,15 @@ function showHeader()
 
     return returnVal;
 }
-function showComponentDialog(url, title)
-{
+function showComponentDialog(url, title) {
 
     $("#componentDialog").dialog("close");
     $("#componentIFrame").attr("src", url);
     $("#componentDialog").dialog("open");
     $("#componentDialog").dialog({ "title": title });
-    
+
 }
-function buildPopupComponent()
-{
+function buildPopupComponent() {
     var hideHeader = getParameterByName("hideHeader");
 
     if (!hideHeader) {
@@ -470,29 +462,27 @@ function buildPopupComponent()
         setTimeout(instantiatePopupComponent, 250);
     }
 }
-function instantiatePopupComponent()
-{	   
-    
+function instantiatePopupComponent() {
+
     var wWidth = $(window).width();
     var dWidth = wWidth * 0.95;
     var wHeight = $(window).height();
     var dHeight = (wHeight * 0.5) + 50;
     var dTop = $(window).height() - dHeight;
- 
+
     $("#componentDialog").dialog({
         autoOpen: false,
-        resizable: false,
+        resizable: true,
         width: dWidth,
-        height: 600,
+        height:600,
         top: dHeight,
         modal: false,
         dialogClass: 'componentDialogClass'
     });
- 
+
 }
 
-function showFavoriteDialog()
-{
+function showFavoriteDialog() {
 
     $("#favId").val("0");
     $("#favURL").val(window.location.toString());
@@ -500,8 +490,7 @@ function showFavoriteDialog()
     $("#favoritesDialog").dialog("open");
 
 }
-function addDialogComponents()
-{
+function addDialogComponents() {
     //    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     //    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
@@ -525,6 +514,7 @@ function addDialogComponents()
     link.href = '//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css';
 
     // Append link element to HTML head 
+ 
     head.appendChild(link);
 
     var d = '<div id="favoritesDialog" style="display:none" title="Favorite">';
@@ -552,17 +542,19 @@ function addDialogComponents()
     d = d + '          </ul>';
     d = d + '      </div>';
     d = d + '&nbsp;<span><input id="btnAddAsFavorite" type="button"  value="Add as Favorite" onclick="showFavoriteDialog();"/></span>';
+   
     d = d + '</div>';
     //d = d + '&nbsp;<input class="favoriteButtonClass" type="button" value="My Favorites" onclick="window.location=\'/admin/login/dashboard.html\'"/>';
     $("body").append(d);
+    $("body").append('&nbsp;<div class="workArea"><input id="enableWorkArea" type="button"  value="Work Area" onclick="enableWorkArea();"/></div>');
+
     getFavoritesForQuickList();
     setTimeout(buildFavoritesDialog, 250);
 
     buildPopupComponent();
- 
+
 }
-function getFavoritesForQuickList()
-{
+function getFavoritesForQuickList() {
     $("#favoritesQuickList").append('<li class="display-block"><a href="/admin/login/dashboard.html">Favorites Page</a></li>');
 
     $.ajax({
@@ -581,11 +573,10 @@ function getFavoritesForQuickList()
             }
             else {
 
-                $.each(data.report.rows, function (index)
-                {
+                $.each(data.report.rows, function (index) {
                     var title = data.report.rows[index].Title;
                     var url = data.report.rows[index].URL;
-                     $("#favoritesQuickList").append('<li class="display-block"><a href="' + url + '">' + title + '</a></li>');
+                    $("#favoritesQuickList").append('<li class="display-block"><a href="' + url + '">' + title + '</a></li>');
                 });
 
 
@@ -598,17 +589,15 @@ function getFavoritesForQuickList()
             genericAjaxError(jqXhr, textStatus, errorThrown);
         }
     });
- 
+
 
 
 
 }
-function cancelFavorite()
-{
+function cancelFavorite() {
     $("#favoritesDialog").dialog("close");
 }
-function saveFavorite()
-{
+function saveFavorite() {
 
     var bPassedTest = true;
 
@@ -625,19 +614,16 @@ function saveFavorite()
     }
 
 
-    if (bPassedTest == true)
-    {
+    if (bPassedTest == true) {
         updateFavorite($("#favId").val());
     }
 
 }
-function updateFavorite(id)
-{
+function updateFavorite(id) {
     //filling out url for ajax call
     var url = ServicePrefix + '/api/InternalFavorite/InsertInternalFavorite';
 
-    if (id > 0)
-    {
+    if (id > 0) {
         url = ServicePrefix + '/api/InternalFavorite/UpdateInternalFavorite';
     }
 
@@ -653,8 +639,7 @@ function updateFavorite(id)
             "inURL": $("#favURL").val().trim().replace("localhost:51116", "devmediainternal.millerkaplan.com")
         }),
         processData: false,
-        success: function (data, textStatus, jQxhr)
-        {
+        success: function (data, textStatus, jQxhr) {
             $("#favoritesDialog").dialog("close");
             bootbox.alert('Favorite has been ' + (id == 0 ? 'saved' : 'updated') + '.', function () {
                 if ((id > 0) || ($("#favURL").val().trim().toLowerCase().indexOf('/admin/login/dashboard.html') > -1)) {
@@ -670,12 +655,11 @@ function updateFavorite(id)
         }
     };
 
- 
+
     //ajax call
     $.ajax(url, settings);
 }
-function editFavorite(title, url, id)
-{
+function editFavorite(title, url, id) {
 
     $("#favId").val(id);
     $("#favURL").val(url);
@@ -707,9 +691,9 @@ function deleteFavorite(id) {
                 success: function (data, textStatus, jQxhr) {
                     $("#favoritesDialog").dialog("close");
                     //bootbox.alert('Favorite has been deleted.', function () {
-                        window.location = "/admin/login/dashboard.html";
+                    window.location = "/admin/login/dashboard.html";
                     //});
-                    
+
 
                 },
                 error: function (jqXhr, textStatus, errorThrown) {
@@ -739,27 +723,25 @@ function clearTimeoutIfAny() {
         timeoutObject = null;
     }
 }
-function buildFavoritesDialog()
-{
+function buildFavoritesDialog() {
     var count = 0;
     var maxTries = 10;
 
-    while(true) {
+    while (true) {
         try {
-             $("#favoritesDialog").dialog({
+            $("#favoritesDialog").dialog({
                 autoOpen: false,
                 resizable: false,
                 width: 600,
                 height: 300,
                 modal: true
-             });
-             break;
+            });
+            break;
             // break out of loop, or return, on success
         } catch (e) {
             // handle exception
-           // console.log(e);
-            if (++count == maxTries)
-            {
+            // console.log(e);
+            if (++count == maxTries) {
                 $("#btnAddAsFavorite").hide();
                 break;
             }
@@ -767,11 +749,10 @@ function buildFavoritesDialog()
     }
 
 
- 
+
 }
 
-function getEnvironment()
-{
+function getEnvironment() {
     var environment = "&nbsp;PRODUCTION as of " + release['PRODUCTION'];
 
     var loc = window.location.toString().toLocaleLowerCase();
@@ -796,36 +777,31 @@ function getEnvironment()
     return environment;
 
 }
-function getLastPage()
-{
+function getLastPage() {
     var lastPage = new Object();
-    
+
 
     var bFoundTitle = false;
 
     lastPage.url = window.location.href;
 
-    $('h2').each(function ()
-    {
+    $('h2').each(function () {
         if (bFoundTitle == false) {
-            lastPage.PageTitle =  $(this).text();
+            lastPage.PageTitle = $(this).text();
             bFoundTitle = true;
         }
     });
 
-    if (bFoundTitle)
-    {
+    if (bFoundTitle) {
 
         var lastPageList = getLocalStorage("latestRequestArray");
- 
 
-        if (lastPageList.length > 0)
-        {
+
+        if (lastPageList.length > 0) {
 
             var lastPageArray = JSON.parse(lastPageList);
-            if (duplicateURL(lastPageArray, lastPage.url) == true)
-            {
- 
+            if (duplicateURL(lastPageArray, lastPage.url) == true) {
+
                 return;
             }
 
@@ -833,7 +809,7 @@ function getLastPage()
 
                 if (lastPageArray.length >= maxHoldEntries) {
                     lastPageArray.shift();
-                 }
+                }
 
                 lastPageArray.push(lastPage);
 
@@ -852,14 +828,11 @@ function getLastPage()
     }
 
 }
-function duplicateURL(lastPageArray, url)
-{
+function duplicateURL(lastPageArray, url) {
     var bRet = false;
 
-    for (var i = 0; i < lastPageArray.length; i++)
-    {
-        if (lastPageArray[i].url == url)
-        {
+    for (var i = 0; i < lastPageArray.length; i++) {
+        if (lastPageArray[i].url == url) {
             return true;
         }
     }
@@ -869,7 +842,7 @@ function duplicateURL(lastPageArray, url)
 function isThisProduction() {
 
     var bRet = true;
-    
+
     if ((environment.indexOf("DEV") > -1) ||
        (environment.indexOf("LOCAL") > -1) ||
        (environment.indexOf("STAGING") > -1)) {
@@ -878,11 +851,9 @@ function isThisProduction() {
 
     return bRet;
 }
-function checkTokenTime()
-{
+function checkTokenTime() {
 
-    if (getLocalStorage("APITokenTime") == "")
-    {
+    if (getLocalStorage("APITokenTime") == "") {
         return true;
     }
 
@@ -892,38 +863,30 @@ function checkTokenTime()
 
     //console.log(timeWithoutAction);
 
-    if (timeWithoutAction > gTimeToExpire)
-    {
+    if (timeWithoutAction > gTimeToExpire) {
         return true;
     }
-    else
-    {
+    else {
         return false;
     }
 }
-function updateTokenTime()
-{
+function updateTokenTime() {
     var d = new Date();
     var n = d.getTime();
     setLocalStorage("APITokenTime", n.toString());
 }
-function setLocalStorage(key, value)
-{
+function setLocalStorage(key, value) {
     window.localStorage.setItem(key, (value == null ? "" : value));
 }
-function getLocalStorage(key)
-{
-    try 
-    {
+function getLocalStorage(key) {
+    try {
         return (window.localStorage.getItem(key) == null ? "" : window.localStorage.getItem(key).toString());
     }
-    catch (err)
-    {
+    catch (err) {
         return "";
     }
 }
-function removeLocalStorage(key)
-{
+function removeLocalStorage(key) {
     try {
         window.localStorage.removeItem(key);
     }
@@ -936,7 +899,7 @@ function logout() {
 
     var bSaveLinks = false;
     var lastPageList = getLocalStorage("latestRequestArray");
- 
+
     if (lastPageList.length > 0) {
         var lastPageArray = JSON.parse(lastPageList);
         if (!lastPageArray.length == false) {
@@ -946,14 +909,13 @@ function logout() {
 
     window.localStorage.clear();
 
-    if (bSaveLinks)
-    {
+    if (bSaveLinks) {
         setLocalStorage("latestRequestArray", JSON.stringify(lastPageArray));
 
     }
     var whereAreYou = window.location.toString();
 
-   // var counter = whereAreYou.replace("//", "/").split('/').length - 1;
+    // var counter = whereAreYou.replace("//", "/").split('/').length - 1;
 
     var locationToRedirect = "/admin/login/login.html";
 
@@ -963,17 +925,14 @@ function logout() {
 // Miscellaneous 
 // not sure if we will use these
 
-function generateRpt(auditID)
-{
-	window.open(ServicePrefix + '/api/Report/GetFile?inApiToken=' + window.localStorage.getItem("APIToken") +'&inAuditID=' + auditID);
+function generateRpt(auditID) {
+    window.open(ServicePrefix + '/api/Report/GetFile?inApiToken=' + window.localStorage.getItem("APIToken") + '&inAuditID=' + auditID);
 }
-function show(div)
-{
-	$("#" + div).show();
+function show(div) {
+    $("#" + div).show();
 }
-function hide(div)
-{
-	$("#" + div).hide();
+function hide(div) {
+    $("#" + div).hide();
 }
 
 function getParameterByName(name, url) {
@@ -998,16 +957,13 @@ function getParameterByName(name, url) {
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-function extractDateOnly(inDate)
-{
+function extractDateOnly(inDate) {
     var arrDate = inDate.split('T');
 
-    if (arrDate.length > 0)
-    {
+    if (arrDate.length > 0) {
         return arrDate[0];
     }
-    else
-    {
+    else {
         return (inDate == null ? "&nbsp;" : inDate);
     }
 }
@@ -1016,8 +972,7 @@ function goBackToDashboard() {
     var search = getLocalStorage("search");
     var searchPage = getLocalStorage("searchPage");
 
-    if (searchPage.length > 0)
-    {
+    if (searchPage.length > 0) {
         var cleanPage = searchPage.split('?');
         if (cleanPage.length > 0) {
             window.location = cleanPage[0] + (search.length > 0 ? "?search=" + search : "");
@@ -1029,27 +984,22 @@ function goBackToDashboard() {
     window.location = "/admin/login/dashboard.html";
 }
 
-function MKAErrorMessageRtn(message, url)
-{
+function MKAErrorMessageRtn(message, url) {
 
     var newMessage = "";
-    if (message.toLowerCase().indexOf('token is invalid') > -1)
-    {
+    if (message.toLowerCase().indexOf('token is invalid') > -1) {
         newMessage = "Your Token has expired - Please login again";
-        bootbox.alert(newMessage, function ()
-        {
-            
+        bootbox.alert(newMessage, function () {
+
         });
         window.location = "/admin/login/login.html";
     }
-    else if (message.toLowerCase().indexOf('authentication failed') > -1)
-    {
+    else if (message.toLowerCase().indexOf('authentication failed') > -1) {
         newMessage = "Authentication Failed";
         $("#password").val('');
-        bootbox.alert(newMessage, function () {});
+        bootbox.alert(newMessage, function () { });
     }
-    else
-    {
+    else {
         bootbox.alert('Process Failed.\n\r\n\r' + message + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () { });
     }
 }
@@ -1097,7 +1047,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/admin/ownership/ownershiplist.html?MenuItem=true" role="button" aria-expanded="false">Ownerships </a>';
     menuItems += '                  <li style="display:block;"><a href="/admin/ownershipgroup/ownershipgrouplist.html?MenuItem=true">Groups</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/parentownership/parentownershiplist.html?MenuItem=true">Parents</a></li>';
-    menuItems += '              </ul>';  
+    menuItems += '              </ul>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="/admin/login/dashboard.html?MenuItem=true">Virtual Groups</a></li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Settings") + ' role="button" aria-expanded="false">Settings <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
@@ -1117,7 +1067,7 @@ function buildMainMenu(selectedItem) {
 }
 
 function buildXRYMenu(selectedItem) {
-    
+
     var menuItems = '';
 
     menuItems += '<h1><a href="/admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
@@ -1166,11 +1116,11 @@ function buildXRYMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html?MenuItem=true">Parent Advertiser</a></li>';
 
     menuItems += '                  <li style="display:block;"><a href="/admin/agency/agencylist.html?MenuItem=true" role="button" aria-expanded="false">Market Agency</a></li>';
- 
+
     menuItems += '                  <li style="display:block;"><a href="/admin/stationagency/stationagencylist.html?MenuItem=true">Station Agency</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/parentagency/parentagencylist.html?MenuItem=true">Parent Agency</a></li>';
- 
-    
+
+
 
     menuItems += '                  <li style="display:block;"><a href="/admin/industry/industrylist.html?MenuItem=true">Industry</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/subindustry/subindustrylist.html?MenuItem=true">Sub Industry</a></li>';
@@ -1316,7 +1266,7 @@ function buildDMAMenu(selectedItem) {
 
     menuItems += '<ul>';
 
-//    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="/Products/DMA/dmarelease.html">Release</a></li>';
+    //    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="/Products/DMA/dmarelease.html">Release</a></li>';
     menuItems += buildGenericReportsLink2(selectedItem);
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
@@ -1348,13 +1298,11 @@ function buildDMAMenu(selectedItem) {
 
 }
 
-function productDashboard(productId)
-{
+function productDashboard(productId) {
     var strOut = '';
     var style = '';
 
-    switch(productId.toLowerCase()) 
-    {
+    switch (productId.toLowerCase()) {
         case '':
             strOut = '<a href="/admin/login/dashboard.html?MenuItem=true">Dashboard</a>';
             break;
@@ -1380,10 +1328,9 @@ function productDashboard(productId)
             break;
     }
 
-    return '<li style="' + style +'">' + strOut + '</li>';
+    return '<li style="' + style + '">' + strOut + '</li>';
 }
-function buildGenericReportsLink(selectedItem)
-{
+function buildGenericReportsLink(selectedItem) {
     var strOut = '';
     var style = '';
 
@@ -1399,8 +1346,7 @@ function buildGenericReportsLink2(selectedItem) {
 
     return '<li style="' + style + '">' + strOut + '</li>';
 }
-function getSelectedItemClass(selectedItem, item)
-{
+function getSelectedItemClass(selectedItem, item) {
     if (selectedItem.toLowerCase() == item.toLowerCase()) {
         return 'class="active"';
     }
@@ -1412,12 +1358,10 @@ function getSelectedItemClass(selectedItem, item)
 function returnExportColumnHeadingTitle(tableName, data, columnIndex) {
 
     if ($("#" + tableName + " th").eq(columnIndex).data("export-title") != null &&
-        $("#" + tableName + " th").eq(columnIndex).data("export-title").length > 0)
-    {
+        $("#" + tableName + " th").eq(columnIndex).data("export-title").length > 0) {
         return $("#" + tableName + " th").eq(columnIndex).data("export-title");
     }
-    else
-    {
+    else {
         return replaceAll(data, "<br>", " ");
     }
 }
@@ -1446,8 +1390,7 @@ function returnProductListLinks(row) {
 
 
 
-function populateDataTable(tableName, data)
-{
+function populateDataTable(tableName, data) {
     var tableJson;
 
     if (data.response.status.toUpperCase() === "SUCCESS") {
@@ -1460,13 +1403,13 @@ function populateDataTable(tableName, data)
         MKAErrorMessageRtn(data.response.errorMessage[0]);
         tableJson = data;
     }
- 
+
     var table = $("#" + tableName).DataTable();
- 
+
     table.clear().draw();
- 
+
     table.rows.add(tableJson).draw();
- 
+
 
 }
 
@@ -1561,26 +1504,23 @@ function getYearList() {
         console.log("This page is not converted to use Chosen selects yet.");
     }
 
-    if (typeof paramRevenueYear == 'undefined' || paramRevenueYear == null)
-    {
+    if (typeof paramRevenueYear == 'undefined' || paramRevenueYear == null) {
         return;
     }
- 
+
     if (paramRevenueYear.length > 0) {
         $("#ddlYear").val(paramRevenueYear);
     }
- 
+
 
 }
-function getPeriodList(inType, inDefaultSelect)
-{
- 
+function getPeriodList(inType, inDefaultSelect) {
+
     if (!inType) {
         inType = 'all';
     }
 
-    if (!inDefaultSelect)
-    {
+    if (!inDefaultSelect) {
         inDefaultSelect = "";
     }
 
@@ -1626,14 +1566,11 @@ function getPeriodList(inType, inDefaultSelect)
         }
     }
 
-    if (inType == 'quarters' || inType == 'all')
-    {
-        for (var i = 1; i <= 4; i++)
-        {
+    if (inType == 'quarters' || inType == 'all') {
+        for (var i = 1; i <= 4; i++) {
             str = str + '<option value="Q' + i.toString();
 
-            if (thisQuarter == i)
-            {
+            if (thisQuarter == i) {
                 str = str + " selected ";
             }
 
@@ -1643,17 +1580,16 @@ function getPeriodList(inType, inDefaultSelect)
 
     $("#ddlPeriod").html(str);
 
- 
+
     try {
         convertToChosenSelect("ddlPeriod", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
     }
     catch (err) {
         console.log("This page is not converted to use Chosen selects yet.");
     }
- 
 
-    if (typeof paramRevenuePeriod == "undefined" || paramRevenuePeriod == null)
-    {
+
+    if (typeof paramRevenuePeriod == "undefined" || paramRevenuePeriod == null) {
         return;
     }
 
@@ -1666,24 +1602,21 @@ function getPeriodList(inType, inDefaultSelect)
 
 //This will trigger the chosen:update event when "val(new_val)" called
 //only if the object has a chosen version of the object.
-(function($){
+(function ($) {
     var originalVal = $.fn.val;
-    $.fn.val = function(){
+    $.fn.val = function () {
 
         var prev;
 
-        if (arguments.length > 0)
-        {
-            prev = originalVal.apply(this,[]);
+        if (arguments.length > 0) {
+            prev = originalVal.apply(this, []);
         }
 
         var result = originalVal.apply(this, arguments);
 
-        if ($(this).selector != undefined && $(this).selector.length > 0)
-        {
+        if ($(this).selector != undefined && $(this).selector.length > 0) {
             var chosenExists = checkIfChosenExistsForSelector($(this).selector);
-            if (chosenExists)
-            {
+            if (chosenExists) {
                 $(this.selector).trigger('chosen:updated');
             }
         }
@@ -1728,12 +1661,10 @@ function checkIfChosenObjectExists(object) {
 
 }
 
-function determineLocationOfDMAReport(url, title)
-{
+function determineLocationOfDMAReport(url, title) {
 
- 
-    if (!gHideHeader == false && gHideHeader == "true" && url.toLowerCase().indexOf("direct=true") == -1) 
-    {     
+
+    if (!gHideHeader == false && gHideHeader == "true" && url.toLowerCase().indexOf("direct=true") == -1) {
         url += "&hideHeader=true";
         window.location = url;
         $("#componentDialog").dialog({ "title": title });
@@ -1753,7 +1684,7 @@ function checkIfChosenExistsForSelector(selector) {
             return false;
         }
     }
-    catch(err) {
+    catch (err) {
         return false;
     }
 }
@@ -1763,11 +1694,9 @@ function scrollToAnchor(aid) {
     $('html,body').animate({ scrollTop: aTag.offset().top }, 'slow');
 }
 
-function resetDataTableDOM(tableToDestroyId, divOfTableId, classOfTable)
-{
+function resetDataTableDOM(tableToDestroyId, divOfTableId, classOfTable) {
 
-    if (!classOfTable)
-    {
+    if (!classOfTable) {
         classOfTable = "stripe";
     }
 
@@ -1817,8 +1746,7 @@ function buildMarketWrapper(inData) {
 
     return ret;
 }
-function buildUserWrapper(inData)
-{
+function buildUserWrapper(inData) {
 
     var bIDIncluded = false;
 
@@ -1980,14 +1908,12 @@ function buildAdvertiserWrapper(inData) {
 
     return ret;
 }
-function buildCustomLink(objectName, data, bSortable, className )
-{
+function buildCustomLink(objectName, data, bSortable, className) {
     var column = new Object();
 
     var hideHeader = getParameterByName("hideHeader");
 
-    if (!hideHeader == false && hideHeader.toLowerCase() == "true")
-    {
+    if (!hideHeader == false && hideHeader.toLowerCase() == "true") {
         column = {
             "title": objectName,
             "visible": true,
@@ -1998,17 +1924,14 @@ function buildCustomLink(objectName, data, bSortable, className )
         return column;
     }
 
-    if (objectName == "User")
-    {
+    if (objectName == "User") {
         column = {
             "title": objectName,
             "visible": true,
             "mRender": function (data, type, row) {
-                if (row.User != null)
-                {
+                if (row.User != null) {
                     return buildUserWrapper(row.User);
-                } else
-                {
+                } else {
                     return '';
                 }
             },
@@ -2023,8 +1946,7 @@ function buildCustomLink(objectName, data, bSortable, className )
             "title": objectName,
             "visible": true,
             "mRender": function (data, type, row) {
-                if (row.Contact != null)
-                {
+                if (row.Contact != null) {
                     return buildUserWrapper(row.Contact);
                 } else {
                     return '';
@@ -2040,13 +1962,10 @@ function buildCustomLink(objectName, data, bSortable, className )
         column = {
             "title": objectName,
             "visible": true,
-            "mRender": function (data, type, row)
-            {
-                if (row.Market != null)
-                {
+            "mRender": function (data, type, row) {
+                if (row.Market != null) {
                     return buildMarketWrapper(row.Market);
-                } else
-                {
+                } else {
                     return "";
                 }
             },
@@ -2061,11 +1980,9 @@ function buildCustomLink(objectName, data, bSortable, className )
             "title": objectName,
             "visible": true,
             "mRender": function (data, type, row) {
-                if (row.Owner != null)
-                {
+                if (row.Owner != null) {
                     return buildOwnerWrapper(row.Owner);
-                } else
-                {
+                } else {
                     return '';
                 }
             },
@@ -2074,17 +1991,15 @@ function buildCustomLink(objectName, data, bSortable, className )
         };
         return column;
     }
-    
+
     if (objectName == "Station") {
         column = {
             "title": objectName,
             "visible": true,
             "mRender": function (data, type, row) {
-                if (row.Station != null)
-                {
+                if (row.Station != null) {
                     return buildStationWrapper(row.Station);
-                } else
-                {
+                } else {
                     return '';
                 }
             },
@@ -2131,10 +2046,10 @@ function buildCustomLink(objectName, data, bSortable, className )
     // standard column build
     column = {
         "title": objectName,
-        "visible": true,          
-        "className": className,  
+        "visible": true,
+        "className": className,
         "mRender": function (data, type, row) {
- 
+
             var textClassName = "";
             var ret = "";
 
@@ -2143,18 +2058,15 @@ function buildCustomLink(objectName, data, bSortable, className )
             if (row[objectName] != null &&
                 row[objectName] != "" &&
                 isNaN(row[objectName].toString().replace("$", "").replace(new RegExp('\,'), '')
-                ) == false)
-            {
-                if (row[objectName].toString().indexOf("-") > -1)
-                {
+                ) == false) {
+                if (row[objectName].toString().indexOf("-") > -1) {
                     textClassName = "redText";
                 }
             }
             // negative %
             if (row[objectName] != null &&
                 row[objectName] != "" &&
-                isNaN(row[objectName].toString().replace("%", "").replace(new RegExp('\,'), '')) == false)
-            {
+                isNaN(row[objectName].toString().replace("%", "").replace(new RegExp('\,'), '')) == false) {
                 if (row[objectName].toString().indexOf("%") > -1) {
                     if (row[objectName].toString().indexOf("-") > -1) {
                         textClassName = "redText";
@@ -2164,37 +2076,31 @@ function buildCustomLink(objectName, data, bSortable, className )
 
             ret = row[objectName];
 
-            if (textClassName.length > 0)
-            {
-                ret = '<div class="'+textClassName+'">' + row[objectName] + "</div>";
+            if (textClassName.length > 0) {
+                ret = '<div class="' + textClassName + '">' + row[objectName] + "</div>";
             }
 
             return ret;
         },
-        "orderable": bSortable 
-  
+        "orderable": bSortable
+
     };
- 
- 
+
+
 
     return column;
 }
 
-function getReportParameters()
-{
+function getReportParameters() {
     //need to modify this to work with all pages including reports and lists
     var reportParams = {}
 
-    $(".report-filter").each(function(index, value)
-    {
+    $(".report-filter").each(function (index, value) {
 
-        if (this.tagName.toLowerCase() == "select")
-        {
+        if (this.tagName.toLowerCase() == "select") {
             reportParams[this.id] = this.value;
-        }else if (this.tagName.toLowerCase() == "input")
-        {
-            switch(this.type.toLowerCase())
-            {
+        } else if (this.tagName.toLowerCase() == "input") {
+            switch (this.type.toLowerCase()) {
                 case "radio":
                     reportParams[this.id] = this.checked;
                     break;
@@ -2215,21 +2121,17 @@ function getReportParameters()
 
 // Back Button Stuff START
 
-function hasBackButtonData()
-{
+function hasBackButtonData() {
 
-    if (getLocalStorage("backButtonData").length > 0)
-    {
+    if (getLocalStorage("backButtonData").length > 0) {
         return true;
-    } else
-    {
+    } else {
         return false;
     }
 
 }
 
-function buildBackButton()
-{
+function buildBackButton() {
     var backButtonData = {};
     var currentPageData = getReportParameters();
 
@@ -2238,9 +2140,8 @@ function buildBackButton()
         backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
         backButtonData["drilldown"].push(currentPageData);
 
-        if (backButtonData["drilldown"].length > gBackButtonArrayLimit)
-        {
-            backButtonData["drilldown"].splice(0,1);
+        if (backButtonData["drilldown"].length > gBackButtonArrayLimit) {
+            backButtonData["drilldown"].splice(0, 1);
         }
 
         setLocalStorage("backButtonData", JSON.stringify(backButtonData));
@@ -2256,102 +2157,82 @@ function buildBackButton()
 
 }
 
-function initializeBackButton()
-{
-     setLocalStorage("backButtonData", "");
+function initializeBackButton() {
+    setLocalStorage("backButtonData", "");
 }
 
-function removeBackButtonLastItem()
-{
+function removeBackButtonLastItem() {
     var backButtonData = {};
-    if (getLocalStorage("backButtonData").length > 0)
-    {
+    if (getLocalStorage("backButtonData").length > 0) {
         backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
 
 
         backButtonData["drilldown"].pop();
 
-        if (backButtonData["drilldown"].length > 0)
-        {
+        if (backButtonData["drilldown"].length > 0) {
             setLocalStorage("backButtonData", JSON.stringify(backButtonData));
-        } else
-        {
+        } else {
             initializeBackButton();
         }
     }
 }
 
-function removeCurrentPageItem(pageName)
-{
+function removeCurrentPageItem(pageName) {
     var backButtonData = {};
-    if (getLocalStorage("backButtonData").length > 0)
-    {
+    if (getLocalStorage("backButtonData").length > 0) {
         backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
 
-        for (var i = 0; i < backButtonData["drilldown"].length; i++)
-        {
+        for (var i = 0; i < backButtonData["drilldown"].length; i++) {
             var index = backButtonData["drilldown"][i].previousPage.indexOf(pageName);
-            if (index > -1)
-            {
+            if (index > -1) {
                 backButtonData["drilldown"].splice(i, 1);
                 break;
             }
         }
 
-        if (backButtonData["drilldown"].length > 0)
-        {
+        if (backButtonData["drilldown"].length > 0) {
             setLocalStorage("backButtonData", JSON.stringify(backButtonData));
         }
-        else
-        {
+        else {
             initializeBackButton();
         }
 
     }
 }
 
-function getBackButtonDataByPage(pageName)
-{
+function getBackButtonDataByPage(pageName) {
 
     var backButtonData = {};
-    if (getLocalStorage("backButtonData").length > 0)
-    {
+    if (getLocalStorage("backButtonData").length > 0) {
         backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
 
 
-        for (var i = 0; i < backButtonData["drilldown"].length; i++)
-        {
+        for (var i = 0; i < backButtonData["drilldown"].length; i++) {
             var index = backButtonData["drilldown"][i].previousPage.indexOf(pageName);
-            if (index > -1)
-            {
+            if (index > -1) {
                 return backButtonData["drilldown"][i];
             }
         }
 
         return {};
-    } else
-    {
+    } else {
         return backButtonData;
     }
 }
 
-function getBackButtonLastItem()
-{
+function getBackButtonLastItem() {
     var backButtonData = {};
-    if (getLocalStorage("backButtonData").length > 0)
-    {
+    if (getLocalStorage("backButtonData").length > 0) {
         backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
 
         return backButtonData["drilldown"][backButtonData["drilldown"].length - 1];
 
-    } else
-    {
+    } else {
         return backButtonData;
     }
 }
 
-function getBackButtonPage()
-{
+function getBackButtonPage() {
     var backButtonData = {};
     var backButtonLink = "";
 
@@ -2362,17 +2243,14 @@ function getBackButtonPage()
 
     }
 
-    if (backButtonLink != null && backButtonLink.length > 0)
-    {
+    if (backButtonLink != null && backButtonLink.length > 0) {
         return backButtonLink;
-    } else
-    {
+    } else {
         return gDefaultBackPage;
     }
 }
 
-function updatedGoBack()
-{
+function updatedGoBack() {
     console.log('----------------');
     console.log($.parseJSON(getLocalStorage("backButtonData")));
 
@@ -2380,16 +2258,13 @@ function updatedGoBack()
     window.location = getBackButtonPage();
 }
 
-function excludeFromBackButton()
-{
+function excludeFromBackButton() {
     gExcludeFromBackButton = true;
 }
 
-function cleanupBackButton(pageName)
-{
+function cleanupBackButton(pageName) {
 
-    if (!pageName)
-    {
+    if (!pageName) {
         pageName = window.location.pathname;
     }
 
@@ -2397,16 +2272,14 @@ function cleanupBackButton(pageName)
 
     removeCurrentPageItem(pageName);
 
-    if (bMenuItem)
-    {
+    if (bMenuItem) {
         initializeBackButton();
     }
 }
 
 function loadReportParameters() {
 
-    if (hasBackButtonData() == false)
-    {
+    if (hasBackButtonData() == false) {
         return;
     }
 
@@ -2434,39 +2307,33 @@ function loadReportParameters() {
 }
 
 function buildBackButtonGeneric() {
-    if (gShowHeader == false)
-    {
+    if (gShowHeader == false) {
         $("#btnBack").hide();
         return;
     }
     // cleanup can go here...
     var menuItem = getParameterByName("MenuItem");
 
-    if (getLocalStorage("backButtonData").length > 0 && (!menuItem ||menuItem.length == 0))
-    {
+    if (getLocalStorage("backButtonData").length > 0 && (!menuItem || menuItem.length == 0)) {
         if ($("#btnBack").length == 0) {
             var backButton = '<input type="button" id="btnBack" class="search-button" value="Back" onclick="updatedGoBack()">';
             $("#fh5co-contact-section").prepend("<div style='padding-right: 35px;float:right; margin-top:10px'>" + backButton + "</div>");
         }
     }
-    else
-    {
+    else {
         $("#btnBack").hide();
     }
 
 }
 // Back Button Stuff END
 
-function getReportIdByToken(inValue)
-{
+function getReportIdByToken(inValue) {
     //get the item by the key with a value
 
-    for (var i = 0; i < reportObjectArray.length; i++) 
-    {
+    for (var i = 0; i < reportObjectArray.length; i++) {
 
-        if (reportObjectArray[i]['reportTitle'].toLowerCase() === inValue.toLowerCase()) 
-        {
-             return i;
+        if (reportObjectArray[i]['reportTitle'].toLowerCase() === inValue.toLowerCase()) {
+            return i;
         }
     }
 
@@ -2474,8 +2341,7 @@ function getReportIdByToken(inValue)
 
 }
 
-function getFeatureButtons(featureToken, featureValue)
-{
+function getFeatureButtons(featureToken, featureValue) {
     //loop through results to build the buttons
     //active will be remove
     //  will pass featureid and value
@@ -2501,7 +2367,7 @@ function getFeatureButtons(featureToken, featureValue)
             else {
 
                 var str = '';
-               
+
                 $.each(data.report.rows, function (index) {
                     var obj = data.report.rows[index];
 
@@ -2509,12 +2375,10 @@ function getFeatureButtons(featureToken, featureValue)
                     var btnValue = "";
                     var sStyle = "";
 
-                    if (obj.Active == true || obj.Active == 1)
-                    {
+                    if (obj.Active == true || obj.Active == 1) {
                         btnValue = "Remove " + obj.Description;
                         sStyle = 'background-color:red;margin-bottom:5px;';
-                    } else
-                    {
+                    } else {
                         btnValue = "Add " + obj.Description;
                         sStyle = 'background-color:green;margin-bottom:5px;';
                     }
@@ -2528,7 +2392,7 @@ function getFeatureButtons(featureToken, featureValue)
 
 
                 $(".featureButtons").html(str);
-               
+
             }
 
 
@@ -2540,8 +2404,7 @@ function getFeatureButtons(featureToken, featureValue)
 
 }
 
-function processFeature(objButton)
-{
+function processFeature(objButton) {
     //check for allowed to be changed
     if ($(objButton).attr("data-feature-canbechanged") == false || $(objButton).attr("data-feature-canbechanged") == 0) {
         bootbox.alert('You are not allowed to modify feature assignments.', function () { });
@@ -2552,35 +2415,32 @@ function processFeature(objButton)
     var featureActive = false;
     featureActive = $(objButton).attr("data-feature-active");
 
-    if (featureActive == false || featureActive == 0)
-    {
+    if (featureActive == false || featureActive == 0) {
         msg = "Are you sure that you want to add this feature - " + $(objButton).attr("data-feature-description") + "?";
-    } else
-    {
+    } else {
         msg = "Are you sure that you want to remove this feature - " + $(objButton).attr("data-feature-description") + "?";
     }
 
-    bootbox.confirm(msg,function (result) {
+    bootbox.confirm(msg, function (result) {
 
-            if (result) {
-                if (featureActive == false || featureActive == 0) {
-                    //add
-                    addFeatureAssignment(objButton);
-                } else {
-                    //remove
-                    deleteFeatureAssignment(objButton);
-                }
+        if (result) {
+            if (featureActive == false || featureActive == 0) {
+                //add
+                addFeatureAssignment(objButton);
             } else {
-                return;
+                //remove
+                deleteFeatureAssignment(objButton);
             }
-            
-        });
+        } else {
+            return;
+        }
+
+    });
 
 }
 
-function addFeatureAssignment(objButton)
-{
-    
+function addFeatureAssignment(objButton) {
+
     $.ajax({
         url: ServicePrefix + '/api/Feature/AddFeatureByFeatureConditionValue',
         dataType: 'json',
@@ -2615,9 +2475,8 @@ function addFeatureAssignment(objButton)
     });
 }
 
-function deleteFeatureAssignment(objButton)
-{
-   
+function deleteFeatureAssignment(objButton) {
+
     $.ajax({
         url: ServicePrefix + '/api/Feature/DeleteFeatureByFeatureValue',
         dataType: 'json',
@@ -2634,8 +2493,7 @@ function deleteFeatureAssignment(objButton)
             if (data.response.status != "SUCCESS") {
                 MKAErrorMessageRtn(data.response.errorMessage[0]);
             }
-            else
-            {
+            else {
                 //set active to false
                 $(objButton).attr("data-feature-active", "0");
                 //update the button name
@@ -2652,7 +2510,104 @@ function deleteFeatureAssignment(objButton)
     });
 }
 
-function replaceAll(inString, inSubstitution, inReplacement)
-{
+function replaceAll(inString, inSubstitution, inReplacement) {
     return inString.replace(new RegExp(inSubstitution, "g"), inReplacement);
+}
+
+function getInternalMatchedNotification() {
+    var url = "?inApiToken=" + getLocalStorage("APIToken");
+    url += "&inInternalOnly=1";
+
+    $.ajax({
+        url: ServicePrefix + '/api/MatchedNotification/GetNextNotificationForUser' + url,
+        dataType: 'json',
+        type: 'get',
+        contentType: 'application/json',
+
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+            if (data.report.rows.length > 0) {
+                //the API only returns 1 row. We only want to display 1 message
+                var obj = data.report.rows[0];
+
+                var sSubject = obj.Subject;
+
+                if (sSubject != null && sSubject.length > 50) {
+                    sSubject = sSubject.substring(0, 51) + "...";
+                } else if (sSubject == undefined || sSubject == null) {
+                    sSubject = "";
+                }
+
+                //this message contains the HTML for displaying the message
+                //basically it creates a form with inputs ect to be used when updating the viewed date
+                var sMessage =
+                    '<form id="notification-form" class="form" role="form"><input type="hidden" id="hidNotificationId" value="' +
+                        obj.MatchedNotificationPersonnelId + '"/><label id="lblMessage">' + obj.Message + '</label></form>';
+
+
+                var modal = bootbox.dialog({
+                    title: sSubject,
+                    message: sMessage,
+                    buttons: [
+                        {
+                            label: "Ok",
+                            className: "btn btn-primary",
+                            callback: function () {
+                                var iReadNotificationId = modal.find('form #hidNotificationId').val();
+                                setMatchedNotificationAsRead(iReadNotificationId);
+                            }
+                        }
+                    ],
+                    show: false,
+                    onEscape: function () {
+                        var iReadNotificationId = modal.find('form #hidNotificationId').val();
+                        setMatchedNotificationAsRead(iReadNotificationId);
+                        modal.modal("hide");
+                    }
+                });
+
+                $(modal).find(".modal-body").css("max-height", "500px");
+                $(modal).find(".modal-body").css("overflow-y", "auto");
+
+                modal.modal("show");
+            }
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    });
+
+}
+
+function setMatchedNotificationAsRead(inMatchedNotificationPersonnelId) {
+
+    $.ajax({
+        url: ServicePrefix + '/api/MatchedNotification/UpdateMatchedNotificationAsViewed',
+        dataType: 'json',
+        type: 'post',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inMatchedNotificationPersonnelId": inMatchedNotificationPersonnelId
+        }),
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+
+            if (data.response.status != "SUCCESS") {
+                MKAErrorMessageRtn(data.response.errorMessage[0]);
+            }
+            //else {
+            //    //in theory the page should just be loaded already
+            //    //shouldn't be anything to do here
+            //}
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    });
+}
+
+function enableWorkArea()
+{
+    window.open('/admin/login/dashboard.html?MenuItem=true', '_blank', "height=800,width:800");
 }

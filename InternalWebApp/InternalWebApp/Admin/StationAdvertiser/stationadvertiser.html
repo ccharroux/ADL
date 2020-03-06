@@ -124,6 +124,9 @@
                             <input type="hidden" id="txtOldMarketAdvertiserId" />
                             <input type="hidden" id="txtOldMarketAdvertiserName" />
                             <input class="mkaRequired field-width-325 disabled margin-right-10" type="text" id="txtMarketAdvertiser" disabled="disabled" errorMessage="Please use the Search Market Advertiser to link a Market Advertiser." />
+                            <span>
+                                <input id="editMarketAdvertiser" value="Edit" style="width:120px" onclick="editMarketAdvertiser(); updateStationAdvertiser();" class="default-button" type="button">
+                            </span>
                             <span id="advertiserMergeMessage" class="hidden to-be-linked-message">* Will be linked and revenues merged</span>
                             <span id="advertiserLinkMessage" class="hidden to-be-linked-message" style="display: inline-block; vertical-align: top;">* Will be linked but <br />revenues will not be merged</span>
                         </div>
@@ -135,9 +138,27 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input class="field-width-325 disabled" type="text" id="txtMarketAdvertiserId" disabled="disabled" />
+
                         </div>
                     </div>
 
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtMarketIndustry">Market Industry</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input class="field-width-325 disabled" type="text" id="txtMarketIndustry" disabled="disabled" />
+                        </div>
+                    </div>
+
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtMarketSubIndustry">Market Sub-Industry</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input class="field-width-325 disabled" type="text" id="txtMarketSubIndustry" disabled="disabled" />
+                        </div>
+                    </div>
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <div>
@@ -283,6 +304,7 @@
     var bIsNew = false;
     var bIsAdvMatch = false;
     var bIsFromReport = false;
+    var marketAdvertiserId = 0;
 
     $(document).ready(function () {
 
@@ -292,7 +314,7 @@
 
         bIsAdvMatch = getParameterByName("AdvMatch") == null ? false : getParameterByName("AdvMatch").toLowerCase() == "true";
         bIsFromReport = getParameterByName("FromReport") == null ? false : getParameterByName("FromReport");
-        //console.log(bIsAdvMatch);
+ 
 
         bIsNew = stationAdvertiserId <= 0;
 
@@ -409,15 +431,19 @@
     }
 
     function getStationAdvertiser() {
-        if (stationAdvertiserId <= 0) {
+        if (stationAdvertiserId <= 0)
+        {
 
-            if (bIsAdvMatch) {
+            if (bIsAdvMatch)
+            {
                 loadMatchData();
             }
 
             loadMarketAdvertiserSearchResults();
             $('.change-date').hide();
             initializeActiveDate();
+
+            $("#editMarketAdvertiser").hide();
 
             return;
         }
@@ -526,6 +552,19 @@
                         $('#txtMarketAdvertiser').val(obj["advertiserName"]);
                         $('#txtOldMarketAdvertiserId').val(obj["advertiserId"]);
                         $('#txtMarketAdvertiserId').val(obj["advertiserId"]);
+                        marketAdvertiserId = obj["advertiserId"];
+
+                        if (marketAdvertiserId == 0 || marketAdvertiserId == null)
+                        {
+                            $("#editMarketAdvertiser").hide();
+                        }
+                        else
+                        {
+                            $("#editMarketAdvertiser").show();
+                        }
+
+                        $('#txtMarketIndustry').val(obj["Industry Name"]);
+                        $('#txtMarketSubIndustry').val(obj["SubIndustry Name"]);
 
                     });
 
@@ -710,7 +749,7 @@
                     }
 
                     //add function to update using the match functionality
-                    //console.log(bIsAdvMatch);
+ 
                     if (bIsAdvMatch || bIsAdvMatch == "true") {
                         //call function to update the match
                         //how to handle when done in case the user wants to do more updates
@@ -866,7 +905,7 @@
     function updateStationAdvertiserMatch() {
         //this will call the api to update the matching
 
-        //console.log("updateStationAdvertiserMatch");
+ 
 
         $.ajax({
             url: ServicePrefix + '/api/XRAYRevenue/UpdateMatchStationAdvertiser',
@@ -889,7 +928,7 @@
                 }
                 else {
 
-                    //console.log($("#txtPreviousPageLocation").val());
+ 
                     bootbox.alert("The station advertiser has been matched.", function () {
                         //window.location = $("#txtPreviousPageLocation").val();
                         //window.location = getBackButtonPage();
@@ -935,5 +974,10 @@
             goBackToDashboard();
         }
 
+    }
+    function editMarketAdvertiser()
+    {
+ 
+        window.location = '/admin/advertiser/advertiser.html?AdvertiserID=' + marketAdvertiserId;
     }
 </script>

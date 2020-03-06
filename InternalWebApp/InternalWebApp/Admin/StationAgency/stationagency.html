@@ -119,6 +119,9 @@
                             <input type="hidden" id="txtOldMarketAgencyId" value="" />
                             <input type="hidden" id="txtOldMarketAgencyName" value="" />
                             <input class="mkaRequired field-width-325 disabled" type="text" id="txtMarketAgency" disabled="disabled" errorMessage="Please use the Search Market Agency to link a Market Agency." />
+                            <span>
+                                <input id="editMarketAgency" value="Edit" style="width:120px" onclick="editMarketAgency(); updateStationAgency();" class="default-button" type="button">
+                            </span>
                             <span id="marketAgencyMergeMessage" class="hidden to-be-linked-message">* Will be linked and revenues merged</span>
                             <span id="marketAgencyLinkMessage" class="hidden to-be-linked-message" style="display: inline-block; vertical-align: top;">* Will be linked but <br />revenues will not be merged</span>
                         </div>
@@ -270,6 +273,7 @@
     var bIsNew = false;
     var bIsAgyMatch = false;
     var bIsFromReport = false;
+    var marketAgencyId = 0;
 
     $(document).ready(function () {
 
@@ -411,7 +415,8 @@
 
     function getStationAgency() {
 
-        if (stationAgencyId <= 0) {
+        if (stationAgencyId <= 0)
+        {
             loadMarketAgencySearchResults();
             initializeActiveDate();
             $('.change-date').hide();
@@ -419,6 +424,8 @@
             if (bIsAgyMatch) {
                 loadMatchData();
             }
+
+            $("#editMarketAgency").hide();
 
             return;
         }
@@ -524,6 +531,14 @@
 
                         $("#txtOldMarketAgencyId").val(obj["agencyId"]);
                         $('#txtMarketAgencyId').val(obj["agencyId"]);
+                        marketAgencyId = obj["agencyId"];
+
+                        if (marketAgencyId == 0 || marketAgencyId == null) {
+                            $("#editMarketAgency").hide();
+                        }
+                        else {
+                            $("#editMarketAgency").show();
+                        }
 
                     });
 
@@ -906,5 +921,9 @@
             goBackToDashboard();
         }
 
+    }
+    function editMarketAgency() {
+
+        window.location = '/admin/agency/agency.html?AgencyID=' + marketAgencyId;
     }
 </script>
