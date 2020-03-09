@@ -988,7 +988,6 @@ function MKAErrorMessageRtn(message, url) {
 
     var newMessage = "";
 
- 
     if (!message)
     {
         message = "";
@@ -1001,7 +1000,7 @@ function MKAErrorMessageRtn(message, url) {
         });
         window.location = "/admin/login/login.html";
     }
-    else if (message.toLowerCase().indexOf('authentication failed') > -1) {
+    else if (message.toString().toLowerCase().indexOf('authentication failed') > -1) {
         newMessage = "Authentication Failed";
         $("#password").val('');
         bootbox.alert(newMessage, function () { });
@@ -2617,4 +2616,7 @@ function setMatchedNotificationAsRead(inMatchedNotificationPersonnelId) {
 function enableWorkArea()
 {
     window.open('/admin/login/dashboard.html?MenuItem=true', '_blank', "height=800,width:800");
+}
+function formatNumber(num) {
+    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 }
