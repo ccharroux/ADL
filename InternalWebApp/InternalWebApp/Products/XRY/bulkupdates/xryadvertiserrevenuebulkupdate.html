@@ -172,13 +172,12 @@
                             <!--
                             turn these into search boxes    
                             -->
-                            <input type="hidden" id="txtUpdateMarketAdvertiserId" value=""/>
+                            <input type="hidden" id="txtUpdateMarketAdvertiserId" class="report-filter" value=""/>
                             <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label>
-                            <input type="text" id="txtUpdateMarketAdvertiser" style="width: 450px;" maxlength="50" class="report-filter"/>
-                            
-                            <input type="hidden" id="txtMarketAgencyId" value=""/>
+                            <input type="text" id="txtUpdateMarketAdvertiser" onclick="excludeFromBackButton(); getMarketAdvertiser();" readonly="readonly" style="width: 450px;" maxlength="50" class="report-filter"/>
+                            <input type="hidden" id="txtUpdateMarketAgencyId" class="report-filter" value=""/>
                             <label for="txtUpdateMarketAgency" class="dropdown-label">Market Agency</label>
-                            <input type="text" id="txtUpdateMarketAgency" style="width: 450px;" maxlength="50" class="report-filter"/>
+                            <input type="text" id="txtUpdateMarketAgency" onclick="excludeFromBackButton(); getMarketAgency();" readonly="readonly" style="width: 450px;" maxlength="50" class="report-filter"/>
 
                             <input type="button" class="search-button" value="Update" onclick="updateAdvertiserRevenue();"/>
                         </div>
@@ -408,7 +407,8 @@
 
         columnsToDisplay.push({
             "mRender": function (data, type, row) {
-                return '<a href="#" onclick="alert(\'link clicked\');">Link</a> ';
+                return '<a href="#" onclick="loadUpdateInformation(' + row.advertiserId + ',\'' + row.AdvertiserWithoutId + '\',' +
+                    row.agencyId + ',\'' + row.AgencyWithoutId + '\');">Link</a> ';
             },
             "orderable": false,
             "searchable": false
@@ -515,7 +515,13 @@
         });
     }
 
-
+    function loadUpdateInformation(advertiserId, advertiserName, agencyId, agencyName)
+    {
+        $("#txtUpdateMarketAdvertiserId").val(advertiserId);
+        $("#txtUpdateMarketAdvertiser").val(advertiserName);
+        $("#txtUpdateMarketAgencyId").val(agencyId);
+        $("#txtUpdateMarketAgency").val(agencyName);
+    }
 
     function loadDefaultDates() {
         var d = new Date();
@@ -596,6 +602,21 @@
         bootbox.alert(errorMessage, function () { });
 
         return;
+    }
+
+    function getMarketAdvertiser()
+    {
+        //linkadv
+        $(".report-filter").each(function()
+        {
+            console.log($(this).attr("id") + "," + $(this).val());
+        });
+    }
+
+    function getMarketAgency()
+    {
+        //linkagency
+
     }
 
 </script>
