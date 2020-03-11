@@ -392,6 +392,7 @@
 <script>
 
     var importProcessArray = new Array();
+    var importProcessCommentArray = new Array();
 
     var gEvent;
     var DoWeHaveRecords = false;
@@ -3316,6 +3317,11 @@
                 $.each(importProcessArray, function (index, val) {
                     url = url + "&" + $.param(val);
                 });
+ 
+
+                $.each(importProcessCommentArray, function (index, val) {
+                    url = url + "&" + $.param(val);
+                });
 
                 $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
 
@@ -3492,7 +3498,11 @@
                 if (row["Release Date"] != null)
                 {
                     output = output + "<input class='processRevision' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' type='radio' value='revision'/>&nbsp;Create Revision<br>";
-                    output = output + "<input class='processRevision' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='txtProcessRevision_" + row["MarketId"] + "' style='width:100%' type='text' value=''/><br>";
+                    output = output + "<label>Client Comment</label><br>";
+                    output = output + "<input class='processRevision' market='" + row["MarketId"] + "' id='txtClientComment_" + row["MarketId"] + "' style='width:100%' maxwidth='150' type='text' value=''/><br>";
+                    output = output + "<label>Internal Comment</label><br>";
+                    output = output + "<input class='processRevision' market='" + row["MarketId"] + "' id='txtInternalComment_" + row["MarketId"] + "' style='width:100%' type='text' maxwidth='100' value=''/><br>";
+                    output = output + "<input class='processRevision' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' checked='checked' type='radio' value='overwrite'/>&nbsp;Overwrite existing data<br>";
                     output = output + "<input class='processRevision' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' checked='checked' type='radio' value='ignore'/>&nbsp;Ignore this Market<br>";
                 }
                 else if (row["Records"] > 0)
@@ -3589,7 +3599,8 @@
 
             var control = 'input[name="processImport_' + market + '"]:checked';
 
-            if (!$(control).val()) {
+            if (!$(control).val())
+            {
                 bOkayToShowButton = false;
             }
         });
@@ -3600,31 +3611,61 @@
         }
 
     }
+
+ 
+
     function processImportForm()
     {
-        $("#dialogImportCheck").dialog("close");
-        importProcessArray = new Array();
+        
+        const promise = new Promise((resolve, reject) =>
+        {
+            $("#dialogImportCheck").dialog("close");
 
-        $('.processImportDiv').each(function (i, obj) {
+            importProcessArray = new Array();
+            importProcessCommentArray = new Array();
 
-            var obj = new Object();
-            var marketId = $(this).attr('market');
-            obj["inBehaviorMarketId"] = marketId;
+            $('.processImportDiv').each(function (i, obj) {
 
-            var control = 'input[name="processImport_' + marketId + '"]:checked';
+                var obj = new Object();
+                var marketId = $(this).attr('market');
+                obj["inBehaviorMarketId"] = marketId;
 
-            obj["inBehavior"] = $(control).val();
+                var control = 'input[name="processImport_' + marketId + '"]:checked';
 
-            importProcessArray.push(obj);
+                obj["inBehavior"] = $(control).val();
+
+                if ($(control).val() == "revision") {
+                    var objText = new Object();
+                    objText["inClientComment"] = $("#txtClientComment_" + marketId).val();
+                    objText["inInternalComment"] = $("#txtInternalComment_" + marketId).val();
+
+                    if (objText["inInternalComment"] == "") {
+                        //bootbox.alert("You must enter an Internal Comment for a revision", function () { return; });
+                        reject("You must enter an Internal Comment for a revision");
+                    }
+                    else if (objText["inClientComment"] == "") {
+                        //bootbox.alert("You must enter a Client Comment for a revision", function () { return; });
+                        reject("You must enter a Client Comment for a revision");
+                    }
+                    importProcessCommentArray.push(objText)
+
+                }
+
+                importProcessArray.push(obj);
+            });
+
+            resolve("OK");
         });
-
- 
-
- 
-
-
-        importFileRtn();
-
+        
+        promise.then
+        (
+                    (data) =>  {
+                                    importFileRtn();
+                                },
+                    (error) =>  {
+                                    bootbox.alert(error, function () { return; });
+                                }
+        );
     }
 
     function loadMarketListByOwner() {
