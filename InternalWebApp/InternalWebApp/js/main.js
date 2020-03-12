@@ -1489,7 +1489,7 @@ function removeCharacter(object, charToRemove) {
 function getYearList() {
 
     var str = '';
-    str = '<option value="">-- Select a Year --</option>';
+    str = '<option value="">-- Select a Year</option>';
 
     var thisYear = (new Date()).getFullYear();
 
@@ -1535,7 +1535,7 @@ function getPeriodList(inType, inDefaultSelect) {
     var thisMonth = (new Date()).getMonth();
 
     var str = '';
-    str = '<option value="">-- Select a Period --</option>';
+    str = '<option value="">-- Select a Period</option>';
 
     if (inType == 'months' || inType == 'all') {
         for (var i = 1; i <= 12; i++) {

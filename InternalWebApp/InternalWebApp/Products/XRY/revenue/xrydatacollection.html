@@ -348,7 +348,14 @@
         </div>
     </div>
     <div id="dialogImportCheck" title="Import">
-        <div style="width:100%;color:red;text-align:center">Select an option for each market</div>
+        <div style="margin:10px 10px 10px 10px;width:100%;color:red;text-align:center">
+            <div style="margin:5px 5px 5px 5px;">Select an individual option for each market or make a bulk selection by using buttons.</div>
+            <input type="button" value="Overwrite existing data" onclick="bulkSelectImportOptions('overwrite')" /> &nbsp;
+            <input type="button" value="Add missing data" onclick="bulkSelectImportOptions('add')" /> &nbsp;
+            <input type="button" value="Create a Revision" onclick="bulkSelectImportOptions('revision')" /> &nbsp;
+            <input type="button" value="Ignore this Market" onclick="bulkSelectImportOptions('ignore')" /> &nbsp;
+            <input type="button" value="Process" onclick="bulkSelectImportOptions('process')" /> &nbsp;
+        </div>
         <center>
             <table id="dtImportCheck" class="cell-border dataTable-border dataTable-headers dataTable-cell-border"></table>
             <div style="padding: 20px 20px 20px 20px">
@@ -1715,6 +1722,7 @@
     //get datatable columns and load data functionality
     function getDataColumns()
     {
+ 
         DoWeHaveRecords = false;
         var columnsToDisplay = new Array();
 
@@ -2190,6 +2198,9 @@
         {
             return;
         }
+
+        rowStatusArrayCtr = new Array();
+        rowStatusArray = new Array();
 
         HasPeriodAlreayBeenReleased = false;
         // sets the variable HasPeriodAlreayBeenReleased
@@ -3277,25 +3288,7 @@
  
         apiToken = getLocalStorage("APIToken");
 
-        if ($("#ddlOwner").val().trim() == "") {
-            bootbox.alert("You must select an Owner", function () { });
-            return;
-        }
 
-        if ($("#importFile").val().trim() == "") {
-            bootbox.alert("You must select a file", function () { });
-            return;
-        }
-
-        if ($("#ddlYear").val().trim() == "") {
-            bootbox.alert("You must select a year", function () { });
-            return;
-        }
-
-        if ($("#ddlPeriod").val().trim() == "") {
-            bootbox.alert("You must select a Period", function () { });
-            return;
-        }
         $("#inAPIToken").val(apiToken);
 
         bootbox.confirm('You are about to import data for ' + $("#ddlYear").val() + '-' + $("#ddlPeriod").val() + "<br><br>" + 'Are you sure you want to proceed?', function (result) {
@@ -3305,15 +3298,13 @@
                 gEvent.preventDefault();
                 var formData = new FormData(document.forms['ajaxUploadForm']);
 
-                ServicePrefix = "http://localhost:54064";
-
                 var url = ServicePrefix + '/api/XrayImport/ImportFile?inApiToken=' + apiToken;
                 url = url + "&inYear=" + $("#ddlYear").val() + "&inPeriod=" + $("#ddlPeriod").val();
                 url = url + "&inOwnerId=" + $("#ddlOwner").val();
                 url = url + "&inMarketId=" + $("#ddlMarketUpload").val();
                 url = url + "&inStationId=" + $("#ddlStationUpload").val();
                 url = url + "&inSubmissionId=" + $("#ddlSubmissionUpload").val();
-                //url = url + "&inMarketBehavior=";
+
                 $.each(importProcessArray, function (index, val) {
                     url = url + "&" + $.param(val);
                 });
@@ -3347,7 +3338,7 @@
                         else {
                             getDataCollectionList();
                             bootbox.alert('Upload Process worked.', function () { });
-                            loadRejectionData(response);
+                            loadRejectionData(response); 
                         }
                     },
                     error: function (jqXhr, textStatus, errorThrown) {
@@ -3368,6 +3359,26 @@
     function importFileQuestions() {
 
         gEvent = event;
+
+        if ($("#ddlOwner").val().trim() == "") {
+            bootbox.alert("You must select an Owner", function () { });
+            return;
+        }
+
+        if ($("#importFile").val().trim() == "") {
+            bootbox.alert("You must select a file", function () { });
+            return;
+        }
+
+        if ($("#ddlYear").val().trim() == "") {
+            bootbox.alert("You must select a year", function () { });
+            return;
+        }
+
+        if ($("#ddlPeriod").val().trim() == "") {
+            bootbox.alert("You must select a Period", function () { });
+            return;
+        }
 
         var url = ServicePrefix + '/api/XrayImport/GetImportMarketStatusByOwner?inApiToken=' + getLocalStorage("APIToken");
         url = url + "&inYear=" + $("#ddlYear").val() + "&inPeriod=" + $("#ddlPeriod").val();
@@ -3448,7 +3459,11 @@
     }
 
 
-    function loadImportCheckData(data) {
+    function loadImportCheckData(data)
+    {
+
+        $("#btnProcessImport").hide();
+
         //get columns
         var columnsToDisplay = new Array();
         columnsToDisplay.push({
@@ -3497,22 +3512,22 @@
                 output = output + "<div class='processImportDiv' market='" + row["MarketId"] + "'>";
                 if (row["Release Date"] != null)
                 {
-                    output = output + "<input class='processRevision' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' type='radio' value='revision'/>&nbsp;Create Revision<br>";
+                    output = output + "<input class='processImport' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' type='radio' value='revision' />&nbsp;Create a Revision<br>";
                     output = output + "<label>Client Comment</label><br>";
                     output = output + "<input class='processRevision' market='" + row["MarketId"] + "' id='txtClientComment_" + row["MarketId"] + "' style='width:100%' maxwidth='150' type='text' value=''/><br>";
                     output = output + "<label>Internal Comment</label><br>";
-                    output = output + "<input class='processRevision' market='" + row["MarketId"] + "' id='txtInternalComment_" + row["MarketId"] + "' style='width:100%' type='text' maxwidth='100' value=''/><br>";
-                    output = output + "<input class='processRevision' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' checked='checked' type='radio' value='overwrite'/>&nbsp;Overwrite existing data<br>";
-                    output = output + "<input class='processRevision' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' checked='checked' type='radio' value='ignore'/>&nbsp;Ignore this Market<br>";
+                    output = output + "<input class='processImport' market='" + row["MarketId"] + "' id='txtInternalComment_" + row["MarketId"] + "' style='width:100%' type='text' maxwidth='100' value=''/><br>";
+                    output = output + "<input class='processImport' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' type='radio' value='overwrite' />&nbsp;Overwrite existing data<br>";
+                    output = output + "<input class='processImport' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "'  type='radio' value='ignore' />&nbsp;Ignore this Market<br>";
                 }
                 else if (row["Records"] > 0)
                 {
-                    output = output + "<input class='processImport' onclick='resetImportButtons()'  market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' checked='checked' type='radio' value='overwrite'/>&nbsp;Overwrite existing data<br>";
-                    output = output + "<input class='processImport' onclick='resetImportButtons()'  market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' type='radio' value='add'/>&nbsp;Add missing data<br>";
-                    output = output + "<input class='processImport' onclick='resetImportButtons()'  market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' type='radio' value='ignore'/>&nbsp;Ignore this Market";
+                    output = output + "<input class='processImport' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' type='radio' value='overwrite' />&nbsp;Overwrite existing data<br>";
+                    output = output + "<input class='processImport' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' type='radio' value='add' />&nbsp;Add missing data<br>";
+                    output = output + "<input class='processImport' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' type='radio' value='ignore' />&nbsp;Ignore this Market";
                 }
                 else  {
-                    output = output + "<input class='processImport' onclick='resetImportButtons()'  market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' checked='checked' type='radio' value='process'/>&nbsp;Process";
+                    output = output + "<input class='processImport' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "'  type='radio' value='process' />&nbsp;Process";
                 }
 
                 output = output + "</div>";
@@ -3839,4 +3854,15 @@
 
     }
 
+    function bulkSelectImportOptions(value)
+    {
+
+        console.log(value);
+        $('.processImportDiv').each(function (i, obj) {
+            var market = $(this).attr('market');
+            $('input[name="processImport_' + market + '"][value="' + value + '"]').prop('checked', true);
+
+        });
+        resetImportButtons();
+    }
 </script>
