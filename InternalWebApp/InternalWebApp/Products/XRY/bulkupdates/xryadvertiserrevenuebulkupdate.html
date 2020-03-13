@@ -240,6 +240,8 @@
         getMarketsByProduct();
         getOwnerList(["ddlOwner"], "-1", "-1");
 
+        //loadLastSearch();
+        setTimeout('loadLastSearch()', 1000);
     });
 
     function getMarketsByProduct() {
@@ -606,17 +608,75 @@
 
     function getMarketAdvertiser()
     {
-        //linkadv
+
+        var searchCriteriaObj = {
+            "searchToken": "BULKADV",
+            "searchPage": window.location
+        }
+
         $(".report-filter").each(function()
         {
-            console.log($(this).attr("id") + "," + $(this).val());
+            var control = $(this).attr("id");
+
+            //need to ignore the _chosen controls
+            if (control.indexOf("_chosen") == -1)
+            {
+                //console.log($(this).attr("id") + "," + $(this).val());
+                searchCriteriaObj[control] = $(this).val();
+            }
         });
+
+        setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
+
+        window.location = "/utilities/search.html";
+
     }
 
     function getMarketAgency()
     {
         //linkagency
+        var searchCriteriaObj = {
+            "searchToken": "BULKAGENCY",
+            "searchPage": window.location
+        }
 
+        $(".report-filter").each(function () {
+            var control = $(this).attr("id");
+
+            //need to ignore the _chosen controls
+            if (control.indexOf("_chosen") == -1) {
+                //console.log($(this).attr("id") + "," + $(this).val());
+                searchCriteriaObj[control] = $(this).val();
+            }
+        });
+
+        setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
+
+        window.location = "/utilities/search.html";
+
+    }
+
+    function loadLastSearch()
+    {
+        if (getLocalStorage("gSearchResults").length <= 0) {
+            return;
+        }
+
+        var searchResults = $.parseJSON(getLocalStorage("gSearchResults"));
+
+        $.each(searchResults, function (index, element)
+        {
+            $("#" + index).val(element);
+        });
+
+        getOwnerList(["ddlOwner"], searchResults["ddlMarket"], searchResults["ddlOwner"]);
+
+
+        //load the list
+        //will need to keep track of the selected values of before
+
+        setTimeout('searchForAdvertiserRevenue()', 1000);
+        //after list loaded go and load previous ones checked.
     }
 
 </script>
