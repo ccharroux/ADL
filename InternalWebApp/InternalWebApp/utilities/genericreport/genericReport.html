@@ -68,6 +68,15 @@
                                     
         }
 
+        th#dtResults
+        {
+            min-width:120px;
+
+        }
+        td#dtResults
+        {
+            min-width:120px;
+        }
         th
         {            
  
@@ -2665,8 +2674,16 @@
         $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
         $("#btnReport").removeClass("flash-button");
  
+        if (bLongQuery == false) {
+            // Force unblock after 10 seconds
 
-            var ajrequest = $.ajax({
+            unblockHandle = setInterval("$.unblockUI();", 10000);
+        }
+        else {
+            clearTimeout(unblockHandle);
+        }
+
+        var ajrequest = $.ajax({
 
             url: ServicePrefix + api,
             dataType: 'json',
@@ -3368,15 +3385,17 @@
         {
             value = "";
         }
+        $('#dtResults').DataTable().search(value).draw();
+      //  $('input[type=search]').each(function ()
+      //  {
+      //      $(this).unbind("keyup");
+      //      $(this).val(value);
+      //      $(this).keyup();
 
-        $('input[type=search]').each(function () {
-            $(this).unbind("keyup");
-            $(this).val(value);
-            $(this).keyup();
-            $(this).keyup(function () {
-                $("#chkFilter").prop("checked", "");
-            });
- 
-        });
+        //    $(this).keyup(function () {
+        //        $("#chkFilter").prop("checked", "");
+        //    });
+
+        //});
     }
 </script>

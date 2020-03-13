@@ -15,9 +15,9 @@ var gShowHeader = true;
 var release =
 {
     "DEV": "N/A",
-    "STAGING": "2/18/2020",
-    "PRODUCTION": "2/18/2020",
-    "DEMO": "2/18/2020"
+    "STAGING": "3/16/2020",
+    "PRODUCTION": "3/16/2020",
+    "DEMO": "3/16/2020"
 }
 var dateOfCode = new Date();
 release["DEV"] = (dateOfCode.getMonth() + 1) + '-' + dateOfCode.getDate() + '-' + dateOfCode.getFullYear();
@@ -354,7 +354,10 @@ $(document).ready(function ()
 
         unblockHandle = setInterval("$.unblockUI();", 10000);
     }
-
+    else
+    {
+        clearTimeout(unblockHandle);
+    }
     // Set Ajax
     $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
 

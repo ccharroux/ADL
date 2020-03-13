@@ -3297,7 +3297,7 @@ function getReportFilterArray_TVBMarketStationRelease() {
         jsCall: "getMarketListByProduct",
         jsCallParameters: ['TVB'],
         objectName: "ddlMarket",
-        required: true
+        required: false
     }
     arrayFilters.push(arrayObject);
 
@@ -4772,7 +4772,7 @@ function getReportFilterArray_MRRMarketDistributionList() {
         objectName: "ddlProduct",
         jsCall: "getProductList",
         jsCallParameters: ['MRR'],
-        required: false
+        required: true
     }
     arrayFilters.push(arrayObject);
 
@@ -4783,7 +4783,7 @@ function getReportFilterArray_MRRMarketDistributionList() {
         objectName: "ddlMarket",
         jsCall: "getMarketListByProduct",
         jsCallParameters: ['MRR'],
-        required: false
+        required: true
     }
     arrayFilters.push(arrayObject);
 
@@ -4825,7 +4825,7 @@ function getReportObject_MRRMarketDistributionList() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-
+    bLongQuery = true;
 
     tempObject =
     {
@@ -4834,7 +4834,8 @@ function getReportObject_MRRMarketDistributionList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'mrr delivery'],
-        autoUpdate: false
+        autoUpdate: false,
+        approved: true
     }
 
     return tempObject;
@@ -7846,7 +7847,8 @@ function getReportObject_UsersNotSetupInSystem()
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['personnel'],
-        sortable : true
+        sortable: true,
+        approved: true 
 
     }
 
@@ -7901,7 +7903,8 @@ function getReportObject_MRRComplimentaryMarketRevenueEntry()
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Setup Info'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 
@@ -9668,7 +9671,8 @@ function getReportObject_SweeperLogMRRRevenue() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tech', 'mrr', 'MRR Security and Analysis'],
-        autoUpdate: false
+        autoUpdate: false,
+        approved: true
     }
 
     return tempObject;
