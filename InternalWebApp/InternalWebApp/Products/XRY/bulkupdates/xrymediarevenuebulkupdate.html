@@ -152,7 +152,7 @@
                         <label for="dtEndDate" class="dropdown-label ">End Date</label>
                         <input type="text" id="dtEndDate" class="report-filter" style="max-width: 100px;">
 
-                        <input type="button" class="search-button" value="Search" onclick="clearUpdateFields(); searchForAdvertiserRevenue();" />
+                        <input type="button" class="search-button" value="Search" onclick="clearUpdateFields(); searchForMediaRevenue();" />
                     </div>
                 </div>
 
@@ -227,7 +227,7 @@
         getMediaAdvertiserMediaTypeList();
 
         ////loadLastSearch();
-        //setTimeout('loadLastSearch()', 1000);
+        setTimeout('loadLastSearch()', 1000);
     });
 
     function getMarketsByProduct() {
@@ -313,7 +313,7 @@
 
     }
 
-    function searchForAdvertiserRevenue()
+    function searchForMediaRevenue()
     {
         //api/MediaAdvertiserAudit/GetMediaRevenueResearchList
         if (searchValidationPassed() == false) {
@@ -381,13 +381,13 @@
             "searchable": false
         });
 
-        //columnsToDisplay.push({
-        //    "title": "advertiserId",
-        //    "visible": false,
-        //    "mData": "advertiserId",
-        //    "orderable": false,
-        //    "searchable": false
-        //});
+        columnsToDisplay.push({
+            "title": "advertiserId",
+            "visible": false,
+            "mData": "advertiserId",
+            "orderable": false,
+            "searchable": false
+        });
 
         columnsToDisplay.push({
             "title": "Market",
@@ -477,26 +477,66 @@
     }
 
     function loadSelectedTableItems() {
-        //if (selectedTableItems.length == 0) {
-        //    return;
-        //}
+        if (selectedTableItems.length == 0) {
+            return;
+        }
 
-        //var tbResults = $("#dtResults").DataTable();
+        var tbResults = $("#dtResults").DataTable();
 
-        //for (var i = 0; i < selectedTableItems.length; i++) {
-        //    var selectedItem = selectedTableItems[i];
-        //    tbResults.rows(function (idx, data, node) {
-        //        if (data.advertiserId === selectedItem.advertiserId && data.stationId == selectedItem.stationId &&
-        //            data.Period == selectedItem.period && data.agencyId == selectedItem.agencyId &&
-        //            data.Revenue == selectedItem.revenue && data["Account Type"] == selectedItem.accountType) {
-        //            tbResults.row(idx).select();
-        //        }
-        //    });
-        //}
+        for (var i = 0; i < selectedTableItems.length; i++) {
+            var selectedItem = selectedTableItems[i];
+            tbResults.rows(function (idx, data, node) {
+                if (data.advertiserId === selectedItem.advertiserId && data.Period == selectedItem.period &&
+                    data.Revenue == selectedItem.revenue && data["Media Code"] == selectedItem.mediaCode) {
+                    tbResults.row(idx).select();
+                }
+            });
+        }
 
-        //selectedTableItems = new Array();
+        selectedTableItems = new Array();
     }
 
+    function searchMarketAdvertiser()
+    {
+        var searchCriteriaObj = {
+            "searchToken": "BULKADV",
+            "searchPage": window.location,
+            "searchHeading": "Advertiser Search for Media Revenue Audit"
+        }
+
+        $(".report-filter").each(function () {
+            var control = $(this).attr("id");
+            if (control.indexOf("_chosen") == -1) {
+                searchCriteriaObj[control] = $(this).val();
+            }
+        });
+
+        var tbResults = $("#dtResults").DataTable();
+        var aSelectedItems = new Array();
+        for (var i = 0; i < tbResults.rows('.selected').data().length; i++) {
+            aSelectedItems.push({
+                "advertiserId": tbResults.rows('.selected').data()[i].advertiserId,
+                "period": tbResults.rows('.selected').data()[i].Period,
+                "revenue": tbResults.rows('.selected').data()[i].Revenue,
+                "mediaCode": tbResults.rows('.selected').data()[i]["Media Code"]
+            });
+        }
+
+        searchCriteriaObj["selectedItems"] = aSelectedItems;
+
+        setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
+
+        window.location = "/utilities/search.html";
+
+
+    }
+
+
+    function loadUpdateInformation(advertiserId, advertiserName)
+    {
+        $("#txtUpdateMarketAdvertiserId").val(advertiserId);
+        $("#txtUpdateMarketAdvertiser").val(advertiserName);
+    }
 
     function clearUpdateFields() {
         $("#txtUpdateMarketAdvertiserId").val("");
@@ -574,6 +614,32 @@
         }
 
         return loopBreak;
+    }
+
+    function loadLastSearch() {
+        if (getLocalStorage("gSearchResults").length <= 0) {
+            return;
+        }
+
+        var searchResults = $.parseJSON(getLocalStorage("gSearchResults"));
+
+        $.each(searchResults, function (index, element) {
+            $("#" + index).val(element);
+        });
+
+        selectedTableItems = searchResults["selectedItems"];
+
+        setLocalStorage("gSearchResults", "");
+
+        setTimeout('searchForMediaRevenue()', 1000);
+
+    }
+
+    function updateMediaAdvertiserRevenue() {
+        var errorMessage = "This bulk update functionality is still under development.";
+        bootbox.alert(errorMessage, function () { });
+
+        return;
     }
 
 </script>
