@@ -3308,6 +3308,15 @@ function getReportFilterArray_TVBMarketStationRelease() {
     arrayFilters.push(arrayObject);
 
     arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['tvb'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
         token: "Year",
         jsCall: "getYearList",
         objectName: "ddlYear",
@@ -3333,6 +3342,7 @@ function getReportObject_TVBMarketStationRelease() {
 
     columnsToDisplay.push("Contact");
     columnsToDisplay.push("Market");
+    columnsToDisplay.push("Owner");
     columnsToDisplay.push("Station");
     columnsToDisplay.push("Reminders");
     columnsToDisplay.push("Input On");
