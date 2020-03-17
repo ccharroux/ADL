@@ -279,6 +279,12 @@ reportName.push("rptUsersNotLoggedInAfterDateList");
 
 reportName.push("rptStandardInputList");
 
+reportName.push("rptQueryMarketCounts");
+reportName.push("rptQueryUserCounts");
+reportName.push("rptQueryCountsByOwnerMarket");
+reportName.push("rptQueryDetailByOwnerMarket");
+
+ 
 
 function buildReportArray()
 {
@@ -3297,7 +3303,7 @@ function getReportFilterArray_TVBMarketStationRelease() {
         jsCall: "getMarketListByProduct",
         jsCallParameters: ['TVB'],
         objectName: "ddlMarket",
-        required: false
+        required: true
     }
     arrayFilters.push(arrayObject);
 
@@ -10850,6 +10856,258 @@ function getReportObject_StandardInputList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['xry', 'advertiser', 'agency']
+    }
+
+    return tempObject;
+}
+ 
+function getReportFilterArray_QueryMarketCounts()
+{
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+ 
+
+    return arrayFilters;
+}
+function getReportObject_QueryMarketCounts() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "XRAY Query Market Counts",
+        apiControllerAction: "/api/XrayReport/GetQueryMarketCounts",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry']
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_QueryUserCounts() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+
+
+    return arrayFilters;
+}
+function getReportObject_QueryUserCounts() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "XRAY Query User Counts",
+        apiControllerAction: "/api/XrayReport/GetQueryUserCounts",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry']
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_QueryCountsByOwnerMarket() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+
+
+    return arrayFilters;
+}
+function getReportObject_QueryCountsByOwnerMarket() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "XRAY Query Market Counts by Market/Owner",
+        apiControllerAction: "/api/XrayReport/GetQueryCountsByOwnerMarket",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry']
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_QueryDetailByOwnerMarket() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "StartDate",
+        jsCall: null,
+        objectName: "dtStartDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "EndDate",
+        jsCall: null,
+        objectName: "dtEndDate",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_QueryDetailByOwnerMarket() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "XRAY Query Details by Market/Owner",
+        apiControllerAction: "/api/XrayReport/GetQueryDetailByOwnerMarket",
+
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry']
     }
 
     return tempObject;
