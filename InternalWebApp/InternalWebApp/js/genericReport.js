@@ -693,6 +693,7 @@ function getReportObject_MRRUsage() {
     columnsToDisplay.push("Market");
     columnsToDisplay.push("Owner Group");
     columnsToDisplay.push("Email");
+    columnsToDisplay.push("Output Format");
 
     tempObject =
     {
