@@ -57,6 +57,10 @@
             margin-left: 10px;
             margin-right: 5px;
         }
+
+        .listDialogInput {
+            width: 100% !important;
+        }
     </style>
 </head>
 <body>
@@ -129,7 +133,8 @@
                 Creator
             </div>
             <div class="col-md-9 text-align-left">
-                <select id="ddlListDialogCreator"></select>
+                <select id="ddlListDialogCreator" class="listDialogInput listDialogNew"></select>
+                <span id="spanListDialogCreator" class="listDialogEdit"></span>
             </div>
         </div>
         <div class="row">
@@ -137,14 +142,14 @@
                 Name
             </div>
             <div class="col-md-9 text-align-left">
-                <input type="text" id="txtListDialogName" />
+                <input type="text" id="txtListDialogName" class="listDialogInput" />
             </div>
         </div>
-        <div class="row">
+        <div class="row margin-top-10">
             <div class="col-md-12 text-align-center">
-                <button id="btnListDialogSave" class="btn btn-primary">Save</button>
-                <button id="btnListDialogReset" class="btn btn-warning">Reset</button>
-                <button id="btnListDialogCancel" class="btn btn-danger">Cancel</button>
+                <button id="btnListDialogSave" class="btn btn-primary" onclick="listDialogSave();">Save basic info</button>
+                <button id="btnListDialogReset" class="btn btn-warning" onclick="listDialogReset();">Reset basic info</button>
+                <button id="btnListDialogClose" class="btn btn-danger" onclick="listDialogClose();">Close</button>
             </div>
         </div>
         <div class="row">
@@ -153,8 +158,36 @@
             </div>
         </div>
         <div class="row">
+            <!-- start datatable-->
+            <div class="col-md-12 text-align-center dataTable-top-margin">
+                <table id="dtRelationshipListMembers" class="dataTable-border dataTable-headers dataTable-cell-border" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th class="exportColumn">Name</th>
+                            <th class="exportColumn">Market(s)</th>
+                            <th class="exportColumn">Owner(s)</th>
+                            <th class="exportColumn">Title</th>
+                            <th class="exportColumn">Phone</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <!--<tfoot>
+                        <tr>
+                            <th>Name</th>
+                            <th>Market(s)</th>
+                            <th>Owner(s)</th>
+                            <th>Title</th>
+                            <th>Phone</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>-->
+                </table>
+            </div>
+            <!-- end datatable -->
+        </div>
+        <div class="row">
             <div class="col-md-12 text-align-center">
-                TODO list of members (View / Edit / Remove from list), search potential members (Add to list)
+                TODO search potential members (each row has "Add to list" link)
             </div>
         </div>
     </div>
@@ -194,16 +227,18 @@
     var gotCreators = false;
     var gotPotentialCreators = false;
 
+    var currentRelationshipListId = null;
+
     $(document).ready(function () {
         $("#divResults").hide();
         buildUIDialogs();
 
         getCreatorList();
-        getPotentialCreatorList();
 
         setEventListeners();
 
         setDataTable();
+        setDataTable_ListMembers();
 
         clearSearchButtonSetup();
 
@@ -222,8 +257,8 @@
         $("#listDialog").dialog({
             autoOpen: false,
             resizable: false,
-            width: 600,
-            height: 400,
+            width: 1200,
+            height: 600,
             modal: true,
             title: 'Relationship List',
             create: function (event, ui) {
@@ -311,7 +346,7 @@
         var str = '<option value="">-- Select a Personnel --</option>';
         $.each(data.report.rows, function (index) {
             str = str + '<option value="' + data.report.rows[index].PersonnelId + '"';
-            str = str + '>' + data.report.rows[index].User + ' (' + data.report.rows[index].PersonnelId + ')' + '</option>'; // User does not include ID
+            str = str + '>' + data.report.rows[index].User + ' (' + data.report.rows[index].Email + ')' + '</option>';
             if (data.report.rows[index].PersonnelId == previousSelection) {
                 previousSelectionFound = true;
             }
@@ -370,7 +405,7 @@
                 { "data": 'MemberCount' },
                 {
                     mRender: function (data, type, row) {
-                        return 'TODO something with ' + row.RelationshipListID;
+                        return '<a href="#" onclick="viewList(' + row.RelationshipListID + ')">View/Edit</a>';
                     },
                     "orderable": false,
                     "searchable": false,
@@ -445,6 +480,103 @@
         });
     }
 
+    function setDataTable_ListMembers() {
+        var reportTitle = "Relationship List Members";
+        var exportColumns = returnTableColumnsByClass("dtRelationshipListMembers", "exportColumn");
+
+        $("#dtRelationshipListMembers").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "order": [
+                [0, 'asc'] // Name
+            ],
+            "columns": [
+                { "data": 'Name' },
+                { "data": 'Market' },
+                { "data": 'Owner' },
+                { "data": 'Title' },
+                { "data": 'Phone' },
+                {
+                    mRender: function (data, type, row) {
+                        return '<a href="/admin/personnel/personnelview.html?PersonnelID=' + row.PersonnelID + '">View</a>'
+                            + ' | <a href="/admin/personnel/personnel.html?PersonnelID=' + row.PersonnelID + '">Edit</a>'
+                            + ' | <a href="#" onclick="removeMember(' + row.PersonnelID + ');">Remove</a>';
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": "text-align-left"
+                }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtRelationshipListMembers", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               {
+                   extend: 'excel',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtRelationshipListMembers", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtRelationshipListMembers", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtRelationshipListMembers", data, columnIdx);
+                           }
+                       }
+                   }
+               }
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            initComplete: function () {
+                // only one DataTable per page should do this, as it affects all of them by class
+                // $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+    }
+
     function clearSearchButtonSetup() {
         $("body").on("click", "#clear_search_button", function () {
             var table = $("#dtRelationshipLists").DataTable();
@@ -490,5 +622,96 @@
 
         populateDataTable("dtRelationshipLists", data);
         $("#divResults").show();
+    }
+
+    function viewList(relationshipListId) {
+        currentRelationshipListId = relationshipListId;
+
+        viewListBasicInfo();
+        viewListMembers();
+
+        $(".listDialogNew").hide();
+        $(".listDialogEdit").show();
+
+        $("#listDialog").dialog("open");
+    }
+
+    function viewListBasicInfo() {
+        var url = ServicePrefix + '/api/Relationship/GetRelationshipList'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inRelationshipListId=' + currentRelationshipListId;
+
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            success: function (data, textStatus, jQxhr) {
+                viewListBasicInfoSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function viewListBasicInfoSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var obj = data.report.rows[0];
+
+        $("#spanListDialogCreator").text(obj.ListCreator);
+        $("#txtListDialogName").val(obj.RelationshipListName);
+    }
+
+    // TODO addList -> getPotentialCreatorList();
+
+    function viewListMembers() {
+        var url = ServicePrefix + '/api/Relationship/GetRelationshipListMembers'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inRelationshipListId=' + currentRelationshipListId;
+
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            success: function (data, textStatus, jQxhr) {
+                viewListMembersSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function viewListMembersSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        populateDataTable("dtRelationshipListMembers", data);
+    }
+
+    function listDialogSave() {
+        // TODO implement
+        bootbox.alert("Not yet implemented");
+    }
+
+    function listDialogReset() {
+        viewListBasicInfo();
+    }
+
+    function listDialogClose() {
+        $("#listDialog").dialog("close");
+    }
+
+    function removeMember(personnelId) {
+        // TODO implement
+        bootbox.alert("Not yet implemented");
     }
 </script>
