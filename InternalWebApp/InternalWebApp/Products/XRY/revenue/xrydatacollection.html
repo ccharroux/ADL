@@ -271,8 +271,8 @@
                             <select class="dropdown-select" onchange="getStationListByGeneralFilters()" id="ddlMarketUpload">
                                 <option value="">All Markets</option>
                             </select>
-                            <label for="ddlStationUpload"class="dropdown-label">Station: </label>
-                            <select class="dropdown-select" id="ddlStationUpload"> 
+                            <label for="ddlStationUpload" class="dropdown-label">Station: </label>
+                            <select class="dropdown-select" id="ddlStationUpload" onchange="getSubmissionList()"> 
                                 <option value="">All Stations</option>
                             </select>
                             <label for="ddlSubmissionUpload" class="dropdown-label">Submission: </label>
@@ -280,7 +280,8 @@
                                 <option value="">All Submissions</option>
                             </select>                            
                             <form method="post" id="ajaxUploadForm" name="ajaxUploadForm" novalidate="novalidate" enctype="multipart/form-data">
-                                <input style="margin: 0 auto;" type="file" name='importFile' id="importFile" />
+                                <hr />
+                                <input style="margin: 0 auto;padding-bottom:10px" type="file" name='importFile' id="importFile" />
                                 <input type="button" value="Upload your File" onclick="importFileQuestions(event)" />
                             </form>
                             <hr />
@@ -346,7 +347,22 @@
             </div>
         </div>
     </div>
-
+    <div id="dialogImportCheck" title="Import">
+        <div style="margin:10px 10px 10px 10px;width:100%;color:red;text-align:center">
+            <div style="margin:5px 5px 5px 5px;">Select an individual option for each market or make a bulk selection by using buttons.</div>
+            <input type="button" value="Overwrite existing data" onclick="bulkSelectImportOptions('overwrite')" /> &nbsp;
+            <input type="button" value="Add missing data" onclick="bulkSelectImportOptions('add')" /> &nbsp;
+            <input type="button" value="Create a Revision" onclick="bulkSelectImportOptions('revision')" /> &nbsp;
+            <input type="button" value="Ignore this Market" onclick="bulkSelectImportOptions('ignore')" /> &nbsp;
+            <input type="button" value="Process" onclick="bulkSelectImportOptions('process')" /> &nbsp;
+        </div>
+        <center>
+            <table id="dtImportCheck" class="cell-border dataTable-border dataTable-headers dataTable-cell-border"></table>
+            <div style="padding: 20px 20px 20px 20px">
+                <input type="button" value="Process" id="btnProcessImport" onclick="processImportForm()" />  
+            </div>
+        </center>
+    </div>
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
     <!-- jQuery Easing -->
@@ -382,6 +398,10 @@
 </html>
 <script>
 
+    var importProcessArray = new Array();
+    var importProcessCommentArray = new Array();
+
+    var gEvent;
     var DoWeHaveRecords = false;
     var HasPeriodAlreayBeenReleased = false;
 
@@ -410,6 +430,7 @@
         buildXRYMenu("Revenue");
         buildQuickReports(['xry']);
         setupUI();
+        buildUIDialogs();
 
         //load periods
         loadPeriods();
@@ -421,7 +442,20 @@
         setAutoRun();
 
     });
-
+    function buildUIDialogs() {
+        $(function () {
+            $("#dialogImportCheck").dialog({
+                autoOpen: false,
+                resizable: false,
+                width: 1200,
+                height: 750,
+                modal: true,
+                create: function (event, ui) {
+                    $(event.target).parent().css('position', 'fixed');
+                }
+            });
+        });
+    }
     function setAutoRun() {
         setTimeout('loadAdvancedSearch()', 1000);
     }
@@ -1688,6 +1722,7 @@
     //get datatable columns and load data functionality
     function getDataColumns()
     {
+ 
         DoWeHaveRecords = false;
         var columnsToDisplay = new Array();
 
@@ -2100,7 +2135,7 @@
         //if owner ddlowner needs a value
         if ($("#rdoOwner").is(':checked'))
         {
-            if ($("#ddlOwner").val().trim() == "")
+            if ($("#ddlOwner").val() == "")
             {
                 msg = "Please select an owner.";
                 if (bSilent == false) {
@@ -2163,6 +2198,9 @@
         {
             return;
         }
+
+        rowStatusArrayCtr = new Array();
+        rowStatusArray = new Array();
 
         HasPeriodAlreayBeenReleased = false;
         // sets the variable HasPeriodAlreayBeenReleased
@@ -3097,7 +3135,7 @@
 
 
 
-    function importFileRtnMedia(evt) {
+    function importFileRtnMedia() {
 
         apiToken = getLocalStorage("APIToken");
 
@@ -3117,56 +3155,63 @@
         }
         $("#inAPIToken").val(apiToken);
 
-        evt.preventDefault();
+        gEvent.preventDefault();
+
         var formData = new FormData(document.forms['ajaxUploadFormMedia']);
 
-        //ServicePrefix = "http://localhost:54064";
+ 
+        bootbox.confirm('You are about to import data for ' + $("#ddlYear").val() + '-' + $("#ddlPeriod").val() + "<br><br>" + 'Are you sure you want to proceed?', function (result) {
+         
+            if (result )
+            {
+                var url = ServicePrefix + '/api/XrayImportMedia/ImportMediaFile?inApiToken=' + apiToken;
+                url = url + "&inYear=" + $("#ddlYear").val() + "&inPeriod=" + $("#ddlPeriod").val();
 
-        var url = ServicePrefix + '/api/XrayImportMedia/ImportMediaFile?inApiToken=' + apiToken;
-        url = url + "&inYear=" + $("#ddlYear").val() + "&inPeriod=" + $("#ddlPeriod").val();
+                $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
 
-        $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
+                clearTimeout(unblockHandle);
 
-        clearTimeout(unblockHandle);
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    //async: false,
+                    cache: false,
+                    contentType: false,
+                    enctype: 'multipart/form-data',
+                    processData: false,
+                    success: function (response) {
 
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: formData,
-            //async: false,
-            cache: false,
-            contentType: false,
-            enctype: 'multipart/form-data',
-            processData: false,
-            success: function (response) {
+                        getDataCollectionList();
+ 
 
-                getDataCollectionList();
-                console.log(response);
-
-                if (response.response.status != "SUCCESS")
-                {
-                    console.log(response.response.errorMessage);
-                    bootbox.alert('Upload Process Failed.\n\r\n\r' + response.response.errorMessage[0] + '\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
-                }
-                else
-                {
-                    getDataCollectionList();
-                    bootbox.alert('Upload Process worked.', function () { });
-                    loadRejectionData(response);
-                }
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
+                        if (response.response.status != "SUCCESS")
+                        {
+                            console.log(response.response.errorMessage);
+                            bootbox.alert('Upload Process Failed.\n\r\n\r' + response.response.errorMessage[0] + '\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
+                        }
+                        else
+                        {
+                            getDataCollectionList();
+                            bootbox.alert('Upload Process worked.', function () { });
+                            loadRejectionData(response);
+                        }
+                    },
+                    error: function (jqXhr, textStatus, errorThrown) {
    
-                bootbox.alert('Upload Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    //window.location = "preprocess.html";
+                        bootbox.alert('Upload Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                            //window.location = "preprocess.html";
+                        });
+                    }
                 });
             }
         });
 
+
         return false;
     }
 
-    function doYouWantToStartARevision(event)
+    function doYouWantToStartARevision()
     {
         var strMessage = "One or more markets have already been released. <br><br>Doing this will require re-release of those markets.<br><br> Are you sure you want to go foraward with this?";
 
@@ -3179,7 +3224,7 @@
                     btnYes: {
                         label: "Yes",
                         callback: function () {
-                            importFileRtnMedia(event);
+                            importFileRtnMedia();
                         }
                     },
                     btnCancel: {
@@ -3192,11 +3237,14 @@
             });
  
     }
-    function importFileQuestionsMedia(event) {
+    function importFileQuestionsMedia(event)
+    {
+
+        gEvent = event;
 
         if (DoWeHaveRecords == false)
         {
-            importFileRtnMedia(event);
+            importFileRtnMedia();
             return;
         }
 
@@ -3214,11 +3262,11 @@
                         label: "Yes",
                         callback: function () {
                             if (HasPeriodAlreayBeenReleased == false) {
-                                importFileRtnMedia(event);
+                                importFileRtnMedia();
                             }
                             else
                             {
-                                doYouWantToStartARevision(event);
+                                doYouWantToStartARevision();
                             }
                         }
                     },
@@ -3235,9 +3283,84 @@
 
     }
 
-    function importFileRtn(evt) {
-
+    function importFileRtn()
+    {
+ 
         apiToken = getLocalStorage("APIToken");
+
+
+        $("#inAPIToken").val(apiToken);
+
+        bootbox.confirm('You are about to import data for ' + $("#ddlYear").val() + '-' + $("#ddlPeriod").val() + "<br><br>" + 'Are you sure you want to proceed?', function (result) {
+         
+            if (result )
+            {
+                gEvent.preventDefault();
+                var formData = new FormData(document.forms['ajaxUploadForm']);
+
+                //ServicePrefix = "http://localhost:54064";
+
+                var url = ServicePrefix + '/api/XrayImport/ImportFile?inApiToken=' + apiToken;
+                url = url + "&inYear=" + $("#ddlYear").val() + "&inPeriod=" + $("#ddlPeriod").val();
+                url = url + "&inOwnerId=" + $("#ddlOwner").val();
+                url = url + "&inMarketId=" + $("#ddlMarketUpload").val();
+                url = url + "&inStationId=" + $("#ddlStationUpload").val();
+                url = url + "&inSubmissionId=" + $("#ddlSubmissionUpload").val();
+
+                $.each(importProcessArray, function (index, val) {
+                    url = url + "&" + $.param(val);
+                });
+ 
+
+                $.each(importProcessCommentArray, function (index, val) {
+                    url = url + "&" + $.param(val);
+                });
+
+                $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
+
+                clearTimeout(unblockHandle);
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    //async: false,
+                    cache: false,
+                    contentType: false,
+                    enctype: 'multipart/form-data',
+                    processData: false,
+                    success: function (response) {
+
+                        getDataCollectionList();
+
+                        if (response.response.status != "SUCCESS") {
+                            console.log(response.response.errorMessage);
+                            bootbox.alert('Upload Process Failed.\n\r\n\r' + response.response.errorMessage[0] + '\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
+                        }
+                        else {
+                            getDataCollectionList();
+                            bootbox.alert('Upload Process worked.', function () { });
+                            loadRejectionData(response); 
+                        }
+                    },
+                    error: function (jqXhr, textStatus, errorThrown) {
+
+                        bootbox.alert('Upload Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
+                            //window.location = "preprocess.html";
+                        });
+                    }
+                });
+
+
+
+            }
+        });
+
+        return false;
+    }
+    function importFileQuestions() {
+
+        gEvent = event;
 
         if ($("#ddlOwner").val().trim() == "") {
             bootbox.alert("You must select an Owner", function () { });
@@ -3258,100 +3381,320 @@
             bootbox.alert("You must select a Period", function () { });
             return;
         }
-        $("#inAPIToken").val(apiToken);
 
-        evt.preventDefault();
-        var formData = new FormData(document.forms['ajaxUploadForm']);
-
-        ServicePrefix = "http://localhost:54064";
-
-        var url = ServicePrefix + '/api/XrayImport/ImportFile?inApiToken=' + apiToken;
+        var url = ServicePrefix + '/api/XrayImport/GetImportMarketStatusByOwner?inApiToken=' + getLocalStorage("APIToken");
         url = url + "&inYear=" + $("#ddlYear").val() + "&inPeriod=" + $("#ddlPeriod").val();
         url = url + "&inOwnerId=" + $("#ddlOwner").val();
+        url = url + "&inMarketId=" + $("#ddlMarketUpload").val();
+        url = url + "&inStationId=" + $("#ddlStationUpload").val();
+        url = url + "&inSubmissionId=" + $("#ddlSubmissionUpload").val();
 
-        $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
-
-        clearTimeout(unblockHandle);
-
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: formData,
-            //async: false,
-            cache: false,
-            contentType: false,
-            enctype: 'multipart/form-data',
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
             processData: false,
-            success: function (response) {
+            success: function (data, textStatus, jQxhr) {
 
-                getDataCollectionList();
-                console.log(response);
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage);
+                } else
+                {
+                    if (data.report.rows.length > 0)
+                    {
+ 
+                        $("#dialogImportCheck").dialog("open");
+                        loadImportCheckData(data);
+                    }
+                    else
+                    {
+                        importFileRtn();
+                    }
+                }
 
-                if (response.response.status != "SUCCESS") {
-                    console.log(response.response.errorMessage);
-                    bootbox.alert('Upload Process Failed.\n\r\n\r' + response.response.errorMessage[0] + '\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
-                }
-                else {
-                    getDataCollectionList();
-                    bootbox.alert('Upload Process worked.', function () { });
-                    loadRejectionData(response);
-                }
             },
-            error: function (jqXhr, textStatus, errorThrown) {
+            error: function (jQxhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        };
 
-                bootbox.alert('Upload Process Failed.\n\r\n\r' + errorThrown + '.\n\r\n\rDevelopement has been notified and is looking into this issue.', function () {
-                    //window.location = "preprocess.html";
-                });
+        $.ajax(url, settings);
+
+
+
+        //if (DoWeHaveRecords == false) {
+        //    importFileRtn(event);
+        //    return;
+        //}
+
+        //if (DoWeHaveRecords == true) {
+        //    var strMessage = "Do you want to overwrite this period data?";
+
+        //    bootbox.dialog({
+        //        message: strMessage,
+        //        title: "Overwrite Data",
+        //        buttons:
+        //        {
+
+        //            btnYes: {
+        //                label: "Yes",
+        //                callback: function () {
+        //                    if (HasPeriodAlreayBeenReleased == false) {
+        //                        importFileRtn(event);
+        //                    }
+        //                    else {
+        //                        doYouWantToStartARevision(event);
+        //                    }
+        //                }
+        //            },
+        //            btnCancel: {
+        //                label: "No",
+        //                callback: function () {
+        //                    return;
+        //                }
+        //            }
+        //        }
+        //    });
+        //}
+
+
+    }
+
+
+    function loadImportCheckData(data)
+    {
+
+        $("#btnProcessImport").hide();
+
+        //get columns
+        var columnsToDisplay = new Array();
+        columnsToDisplay.push({
+            "title": "Market",
+            "visible": true,
+            "mData": "Market",
+            "orderable": false,
+            "searchable": true,
+            'className': "text-align-left"
+        });
+        columnsToDisplay.push({
+            "title": "Release Date",
+            "visible": true,
+            "mData": "Release Date",
+            "orderable": false,
+            "searchable": true,
+            'className': "text-align-center"
+        });
+
+        columnsToDisplay.push({
+            "title": "Revision",
+            "visible": true,
+            "mData": "Revision",
+            "orderable": false,
+            "searchable": true,
+            'className': "text-align-center"
+        });
+        
+        columnsToDisplay.push({
+            "title": "Records",
+            "visible": true,
+            "mRender": function (data, type, row) {
+                return formatNumber(row["Records"]);
+            },
+            "orderable": false,
+            "searchable": true,
+            'className': "text-align-center"
+        });
+ 
+        columnsToDisplay.push({
+            "title": "Options",
+            "visible": true,
+            "mRender": function (data, type, row) {
+
+                var output = "";
+                output = output + "<div class='processImportDiv' market='" + row["MarketId"] + "'>";
+                if (row["Release Date"] != null)
+                {
+                    output = output + "<input class='processImport' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' type='radio' value='revision' />&nbsp;Create a Revision<br>";
+                    output = output + "<label>Client Comment</label><br>";
+                    output = output + "<input class='processRevision' market='" + row["MarketId"] + "' id='txtClientComment_" + row["MarketId"] + "' style='width:100%' maxwidth='150' type='text' value=''/><br>";
+                    output = output + "<label>Internal Comment</label><br>";
+                    output = output + "<input class='processImport' market='" + row["MarketId"] + "' id='txtInternalComment_" + row["MarketId"] + "' style='width:100%' type='text' maxwidth='100' value=''/><br>";
+                    output = output + "<input class='processImport' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' type='radio' value='overwrite' />&nbsp;Overwrite existing data<br>";
+
+                }
+                else if (row["Records"] > 0)
+                {
+                    output = output + "<input class='processImport' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' type='radio' value='overwrite' />&nbsp;Overwrite existing data<br>";
+                    output = output + "<input class='processImport' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "' type='radio' value='add' />&nbsp;Add missing data<br>";
+                }
+                else  {
+                    output = output + "<input class='processImport' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "'  type='radio' value='process' />&nbsp;Process<br>";
+                }
+                output = output + "<input class='processImport' onclick='resetImportButtons()' market='" + row["MarketId"] + "' name='processImport_" + row["MarketId"] + "'  type='radio' value='ignore' />&nbsp;Ignore this Market";
+                output = output + "</div>";
+
+                return output;
+            },
+            "orderable": false,
+            "searchable": true,
+            'className': "text-align-left"
+        });
+
+        loadResultsImportCheckData(data, columnsToDisplay);
+    }
+
+    function loadResultsImportCheckData(data, columns) {
+        //data is the data from the ajax call
+        //columns is the array that was built previously
+        var control = "#dtImportCheck";
+
+        //assigns the data from the ajax call
+        var results = data["report"]["rows"];
+
+        //creating a variable that will used for datatable functions later
+        var searchTable;
+
+        //if the datatable already exists need to destroy it before building it
+        //again with new results from the search.
+        //if you try to destroy before it is a datatable, an error will occur.
+        //this code will only destroy it if the table is a datatable.
+        if ($.fn.DataTable.isDataTable(control)) {
+            searchTable = $(control).DataTable();
+            searchTable.clear().draw();
+            searchTable.destroy();
+        }
+
+        //this code rebuilds the datatable with the updated data from the search
+        //or initial load.
+        $(control).show();
+ 
+
+        searchTable = $(control).DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "order": [],
+            //"data": results,
+            "columns": columns,
+            "select": true,
+            language: {
+                search: "Filter Results:"
+            },
+            "buttons": [
+                //{
+                //    extend: 'excel',
+                //    title: "Media Import Rejections",
+                //    exportOptions: {
+                //        columns: columns
+                //    }
+                //},
+                //{
+                //    extend: 'print',
+                //    title: "Media Import Rejections",
+                //    exportOptions: {
+                //        columns: columns
+
+                //    }
+                //}
+            ]
+        });
+
+        //re-drawing the table with the new data
+        searchTable.rows.add(results).draw();
+
+
+    }
+    function resetImportButtons()
+    {
+        var bOkayToShowButton = true;
+
+        $("#btnProcessImport").hide();
+
+        $('.processImportDiv').each(function (i, obj) {
+
+            var market = $(this).attr('market');
+
+            var control = 'input[name="processImport_' + market + '"]:checked';
+
+            if (!$(control).val())
+            {
+                bOkayToShowButton = false;
             }
         });
 
-        return false;
+        if (bOkayToShowButton == true)
+        {
+            $("#btnProcessImport").show();
+        }
+
     }
-    function importFileQuestions(event) {
 
-        if (DoWeHaveRecords == false) {
-            importFileRtn(event);
-            return;
-        }
+ 
 
-        if (DoWeHaveRecords == true) {
-            var strMessage = "Do you want to overwrite this period data?";
+    function processImportForm()
+    {
+        
+        const promise = new Promise((resolve, reject) =>
+        {
+            $("#dialogImportCheck").dialog("close");
 
-            bootbox.dialog({
-                message: strMessage,
-                title: "Overwrite Data",
-                buttons:
-                {
+            importProcessArray = new Array();
+            importProcessCommentArray = new Array();
 
-                    btnYes: {
-                        label: "Yes",
-                        callback: function () {
-                            if (HasPeriodAlreayBeenReleased == false) {
-                                importFileRtn(event);
-                            }
-                            else {
-                                doYouWantToStartARevision(event);
-                            }
-                        }
-                    },
-                    btnCancel: {
-                        label: "No",
-                        callback: function () {
-                            return;
-                        }
+            $('.processImportDiv').each(function (i, obj) {
+
+                var obj = new Object();
+                var marketId = $(this).attr('market');
+                obj["inBehaviorMarketId"] = marketId;
+
+                var control = 'input[name="processImport_' + marketId + '"]:checked';
+
+                obj["inBehavior"] = $(control).val();
+
+                if ($(control).val() == "revision") {
+                    var objText = new Object();
+                    objText["inClientComment"] = $("#txtClientComment_" + marketId).val();
+                    objText["inInternalComment"] = $("#txtInternalComment_" + marketId).val();
+
+                    if (objText["inInternalComment"] == "") {
+                        //bootbox.alert("You must enter an Internal Comment for a revision", function () { return; });
+                        reject("You must enter an Internal Comment for a revision");
                     }
+                    else if (objText["inClientComment"] == "") {
+                        //bootbox.alert("You must enter a Client Comment for a revision", function () { return; });
+                        reject("You must enter a Client Comment for a revision");
+                    }
+                    importProcessCommentArray.push(objText)
+
                 }
+
+                importProcessArray.push(obj);
             });
-        }
 
-
+            resolve("OK");
+        });
+        
+        promise.then
+        (
+                    (data) =>  {
+                                    importFileRtn();
+                                },
+                    (error) =>  {
+                                    bootbox.alert(error, function () { return; });
+                                }
+        );
     }
 
     function loadMarketListByOwner() {
 
+        $("#ddlMarketUpload").html("<option value=''>All Markets</option>");
+        $("#ddlSubmissionUpload").html('<option value="">All Submissions</option>');
+        $("#ddlStationUpload").html('<option value="">All Stations</option>');
+        convertToChosenSelect("ddlMarketUpload", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+        convertToChosenSelect("ddlSubmissionUpload", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+        convertToChosenSelect("ddlStationUpload", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
         if ($("#ddlOwner").val() == "")
         {
-            $("#ddlMarketUpload").html("");
             return;
         }
 
@@ -3388,7 +3731,7 @@
             var str = '<option value="">All Markets</option>';
 
             $.each(data.report.rows, function (index) {
-                str = str + '<option value="' + data.report.rows[index].MarketId + '">' + data.report.rows[index].Market + '</option>';
+                str = str + '<option value="' + data.report.rows[index].MarketId + '">' + data.report.rows[index].Market +' ('+ data.report.rows[index].MarketId + ')' + '</option>';
             });
 
             $("#ddlMarketUpload").html(str);
@@ -3397,12 +3740,19 @@
         }
     }
 
-    function getStationListByGeneralFilters( ) {
-        var control = this.objectName;
+    function getStationListByGeneralFilters()
+    {
+ 
 
         var str = '';
         str = '<option value="">All Stations</option>';
-        $("ddlStationUpload").html(str);
+        $("#ddlSubmissionUpload").html('<option value="">All Submissions</option>');
+        convertToChosenSelect("ddlSubmissionUpload", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        if ($("#ddlOwner").val() == "")
+        {
+            return;
+        }
 
         $.ajax({
             url: ServicePrefix + '/api/Station/GetStationListByGeneralFilters',
@@ -3413,7 +3763,7 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inProduct": 'XRY',
                 "inMarketId": $("#ddlMarketUpload").val(),
-                "inOwnerId": $("#ddlOwner").val(),
+                "inOwnerId": $("#ddlOwner").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -3425,7 +3775,7 @@
 
    
                     $.each(data.report.rows, function (index) {
-                        str = str + '<option value="' + data.report.rows[index]["Station Id"] + '">' + data.report.rows[index].Station + '</option>';
+                        str = str + '<option value="' + data.report.rows[index]["Station Id"] + '">' + data.report.rows[index].Station + ' (' + data.report.rows[index]["Station Id"] + ')' + '</option>';
                     });
 
                     $("#ddlStationUpload").html(str);
@@ -3441,5 +3791,79 @@
             }
         });
 
+    }
+
+    function getSubmissionList() {
+
+        $("#ddlSubmissionUpload").html('<option value="">All Submissions</option>');
+        convertToChosenSelect("ddlSubmissionUpload", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        if ($("#ddlStationUpload").val() == "")
+        {
+            return;
+        }
+
+        var url = ServicePrefix + '/api/ReInput/GetReInputList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": $("#ddlStationUpload").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getSubmissionListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getSubmissionListSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            var str = '<option value="">All Submissions</option>';
+
+            $("#ddlSubmissionUpload").html(str);
+ 
+            $.each(data.report.rows, function (index) {
+
+                var obj = data.report.rows[index];
+
+                str = str + '<option value="';
+                str = str + obj.submissionId;
+                str = str + '">';
+                str = str + obj.description + ' (' + obj.submissionId + ')';
+                str = str + '</option>';
+
+            });
+
+            $("#ddlSubmissionUpload").html(str);
+ 
+            convertToChosenSelect("ddlSubmissionUpload", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        }
+
+    }
+
+    function bulkSelectImportOptions(value)
+    {
+
+        console.log(value);
+        $('.processImportDiv').each(function (i, obj) {
+            var market = $(this).attr('market');
+            $('input[name="processImport_' + market + '"][value="' + value + '"]').prop('checked', true);
+
+        });
+        resetImportButtons();
     }
 </script>

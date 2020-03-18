@@ -45,6 +45,12 @@ function getSearchData(searchCriteria) {
         case "PARENTAGENCYAUDIT":
             buildParentAgencyAuditSearch(searchCriteria);
             break;
+        case "BULKADV":
+            buildAdvertiserAuditSearch(searchCriteria);
+            break;
+        case "BULKAGENCY":
+            buildAgencyAuditSearch(searchCriteria);
+            break;
         default:
     }
 
@@ -1015,4 +1021,239 @@ function EditMarketAgency(id) {
 }
 function MatchingAgencies() {
     window.location = '/products/xry/revenue/xrymatch.html?MatchPage=agy&MenuItem=false';
+}
+
+function buildAdvertiserAuditSearch(searchCriteria)
+{
+    $(".search-check-box").hide();
+
+    //this should be the update advertiser name
+    if ($('.search-text:visible').val().length > 0) {
+        searchText = $('.search-text:visible').val();
+    } else {
+        searchText = searchCriteria["txtUpdateMarketAdvertiser"];
+    }
+
+    apiParameters = {
+        "inApiToken": apiToken,
+        "inMarketId": searchCriteria["ddlMarket"],
+        "inAdvertiserName": searchText,
+        "inShowDisabled": false
+    }
+    api = "/api/Advertiser/GetAdvertiserList";
+
+    //setup the columns to be used in the datatable
+    //title sets the column name
+    //visible determines if the column will show in the datatable or not
+    //data links the column to the data that comes back in the results
+    //orderable determines if the column can be sorted or not
+    //see https://datatables.net/reference/option/columns
+    columns = [];
+
+    columns.push({
+        "title": "AdvertiserID",
+        "visible": false,
+        "mData": "advertiserId",
+        "orderable": false
+    });
+
+    columns.push({
+        "title": "Advertiser",
+        "mData": "advertiser",
+        "orderable": true
+    });
+
+    columns.push({
+        "title": "MarketID",
+        "visible": false,
+        "mData": "marketId",
+        "orderable": false
+    });
+
+    columns.push({
+        "title": "Market",
+        "mData": "market",
+        "orderable": true
+    });
+
+    columns.push({
+        "title": "Industry",
+        "data": "industry",
+        "orderable": true
+    });
+
+    columns.push({
+        "title": "Sub Industry",
+        "data": "subIndustry",
+        "orderable": true
+    });
+
+    columns.push({
+        "mRender": function (data, type, row) {
+            var str = '<a href="#" onclick="EditMarketAdvertiser(' + row.advertiserId + ')">Edit</a>&nbsp;&nbsp;';
+            str = str + '<a href="#" onclick="linkBulkAdvertiserByLink(' + row.advertiserId + ',' + row.marketId + ')">Link Advertiser</a>';
+            return str;
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    $("#previousPage").html(searchCriteria["txtUpdateMarketAdvertiser"]);
+
+}
+
+function linkBulkAdvertiserByLink(advertiserId, marketId)
+{
+    if (marketId != searchCriteria["ddlMarket"]) {
+        var errorMessage = "You cannot link to an advertiser from another market.";
+        bootbox.alert(errorMessage, function () { });
+        return;
+    }
+
+    var rowId = $('#dtSearchResults').dataTable()
+        .fnFindCellRowIndexes(advertiserId, 0);
+
+    var table = $('#dtSearchResults').DataTable();
+    table.row(rowId).select();
+
+    linkBulkAdvertiser();
+}
+
+function linkBulkAdvertiser() {
+    var searchTable = $('#dtSearchResults').DataTable();
+    if (searchTable.rows('.selected').any() === false) {
+        bootbox.alert('Select an advertiser to assign.', function () {
+        });
+        return;
+    }
+
+    var rowData = searchTable.rows('.selected').data();
+    var searchResults = {};
+
+    for (var key in searchCriteria) {
+        searchResults[key] = searchCriteria[key];
+    }
+
+    searchResults["txtUpdateMarketAdvertiserId"] = rowData[0].advertiserId;
+    searchResults["txtUpdateMarketAdvertiser"] = rowData[0].advertiser;
+
+    setLocalStorage("gSearchResults", JSON.stringify(searchResults));
+
+    //sends user back to page that called the search page
+    var searchPage = searchCriteria["searchPage"]["href"];
+    window.location = searchPage;
+}
+
+function buildAgencyAuditSearch(searchCriteria)
+{
+    $(".search-check-box").hide();
+
+    //this should be the update agency name
+    if ($('.search-text:visible').val().length > 0) {
+        searchText = $('.search-text:visible').val();
+    } else {
+        searchText = searchCriteria["txtUpdateMarketAgency"];
+    }
+
+    apiParameters = {
+        "inApiToken": apiToken,
+        "inMarketId": searchCriteria["ddlMarket"],
+        "inAgencyName": searchText,
+        "inShowDisabled": false
+    }
+    api = "/api/Agency/GetAgencyList";
+
+    columns = [];
+
+    columns.push({
+        "sTitle": "AgencyID",
+        "bVisible": false,
+        "mData": "agencyId",
+        "bSortable": false
+    });
+
+    columns.push({
+        "sTitle": "Agency Name",
+        "mData": "agencyName",
+        "bSortable": true
+    });
+
+    columns.push({
+        "sTitle": "MarketID",
+        "bVisible": false,
+        "mData": "marketId",
+        "bSortable": false
+    });
+
+    columns.push({
+        "sTitle": "Market Name",
+        "mData": "marketName",
+        "bSortable": true
+    });
+
+    columns.push({
+        "mRender": function (data, type, row) {
+            var str = '<a href="#" onclick="EditMarketAgency(' + row.agencyId + ')">Edit</a>&nbsp;&nbsp;';
+            str = str + '<a href="#" onclick="linkBulkAgencyByLink(' + row.agencyId + ',' + row.marketId + ')">Link Agency</a>';
+            return str;
+        },
+        "bSortable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+
+    //may need to add account type to the api to be returned
+    $("#previousPage").html(searchCriteria["txtUpdateMarketAgency"]);
+
+
+}
+
+function linkBulkAgencyByLink(agencyId, marketId)
+{
+    if (marketId != searchCriteria["ddlMarket"]) {
+        var errorMessage = "You cannot link to an agency from another market.";
+        bootbox.alert(errorMessage, function () { });
+        return;
+    }
+
+    var rowId = $('#dtSearchResults').dataTable()
+        .fnFindCellRowIndexes(agencyId, 0);
+
+    var table = $('#dtSearchResults').DataTable();
+    table.row(rowId).select();
+
+    linkBulkAgency();
+}
+
+function linkBulkAgency()
+{
+    //leaving this code here in case need to add the link button back in
+    var searchTable = $('#dtSearchResults').DataTable();
+    if (searchTable.rows('.selected').any() === false) {
+        bootbox.alert('Select an agency to link.', function () {
+        });
+        return;
+    }
+
+    var rowData = searchTable.rows('.selected').data();
+    var searchResults = {};
+
+    //loops through the search criteria that was initially sent 
+    //to the search page. This reloads it into a json object and
+    //loads it into local storage.
+    //the page that the window location is sent to will load this data from local storage.
+    for (var key in searchCriteria) {
+        searchResults[key] = searchCriteria[key];
+    }
+
+    searchResults['txtUpdateMarketAgencyId'] = rowData[0].agencyId;
+    searchResults['txtUpdateMarketAgency'] = rowData[0].agencyName;
+
+    setLocalStorage("gSearchResults", JSON.stringify(searchResults));
+
+    //sends user back to page that called the search page
+    var searchPage = searchCriteria["searchPage"]["href"];
+    window.location = searchPage;
 }

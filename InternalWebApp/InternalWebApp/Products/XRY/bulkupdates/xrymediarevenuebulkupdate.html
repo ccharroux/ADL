@@ -47,6 +47,8 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css" />
 
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
     <link rel="stylesheet" href="/css/chosen.min.css" />
 
     <!-- Modernizr JS -->
@@ -54,7 +56,7 @@
 
     <!-- FOR IE9 below -->
     <!--[if lt IE 9]>
-    <script src="js/respond.min.js"></script>
+        <script src="js/respond.min.js"></script>
     <![endif]-->
 
     <style>
@@ -116,7 +118,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Market Agencies Bulk Updates</h2>
+                        <h2>Media Revenue Research Bulk Updates</h2>
                     </div>
                 </div>
 
@@ -124,75 +126,57 @@
                     <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
                     <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
                 </div>
-
                 <div class="row search-section">
 
                     <div class="col-md-12" style="margin-bottom: 20px;">
-                        <label for="txtMarketAgency" class="dropdown-label" style="color: red;"> * Market Agency</label>
-                        <input type="text" id="txtMarketAgency" maxlength="50" class="report-filter mkaRequired" errorMessage="Please enter a Market Agency Name to search." />
 
-                        <label for="ddlMarket" class="dropdown-label">Market</label>
-                        <select id="ddlMarket" class="dropdown-select report-filter"></select>
+                        <label for="ddlMarket" class="dropdown-label" style="color: red;"> * Market</label>
+                        <select id="ddlMarket" class="dropdown-select report-filter mkaRequired" errorMessage="Please select a Market to search."></select>
 
-                        <label for="ddlMediaType" class="dropdown-label" style="color: red;"> * Media Type</label>
-                        <select id="ddlMediaType" class="dropdown-select report-filter mkaRequired" errorMessage="Please select a Media Type in order to search."></select>
+                        <label for="txtMarketAdvertiser" class="dropdown-label" style="color: red;"> * Market Advertiser</label>
+                        <input type="text" id="txtMarketAdvertiser" maxlength="50" class="report-filter multi-field-search mkaRequired" errorMessage="Please enter a Media Advertiser Name to search." />
+                        
+                        <label for="ddlMediaType" class="dropdown-label">Media Type</label>
+                        <select id="ddlMediaType" apiInput="inMediaTypeId" onchange="" class="dropdown-select rptView report-filter"></select>
 
                     </div>
 
                 </div>
-                
+
                 <div class="row search-section">
+                    <div class="col-md-12">
 
-                    <div class="col-md-12" style="margin-bottom: 20px;">
-                        <label for="ddlParentAgency" class="dropdown-label">Parent Advertiser</label>
-                        <select id="ddlParentAgency" class="dropdown-select report-filter"></select>
+                        <label for="dtStartDate" class="dropdown-label ">Start Date</label>
+                        <input type="text" id="dtStartDate" class="report-filter" style="max-width: 100px;">
 
-                        <input type="button" class="search-button" value="Search" onclick="searchForMarketAgency();" />
+                        <label for="dtEndDate" class="dropdown-label ">End Date</label>
+                        <input type="text" id="dtEndDate" class="report-filter" style="max-width: 100px;">
 
+                        <input type="button" class="search-button" value="Search" onclick="clearUpdateFields(); searchForMediaRevenue();" />
                     </div>
-
                 </div>
 
                 <div id="matchInfo" style="border: 1px solid black; border-radius: 10px; margin: 10px auto;">
                     <h3 style="text-align: center; margin-bottom: 10px;">Update Information</h3>
                     <div class="row">
                         <div class="col-md-12" style="margin-bottom: 10px;">
-                            <input type="hidden" id="txtUpdateOldMarketAgencyName"/>
-                            <label for="txtUpdateMarketAgency" class="dropdown-label">Market Agency</label>
-                            <input type="text" id="txtUpdateMarketAgency" style="width: 450px;" maxlength="50" class="report-filter"/>
-
-                            <label for="ddlUpdateAccountType" class="dropdown-label">Account Type</label>
-                            <select id="ddlUpdateAccountType" class="dropdown-select report-filter"></select>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12" style="margin-bottom: 10px;">
-                            <label for="ddlUpdateParentAgency" class="dropdown-label">Parent Agency</label>
-                            <select id="ddlUpdateParentAgency" class="dropdown-select report-filter"></select>
-
-                            <input type="button" class="search-button" value="Update" onclick="updateMarketAgencies();" />
+                            <input type="hidden" id="txtUpdateMarketAdvertiserId" class="report-filter" value="" />
+                            <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label>
+                            <input type="text" id="txtUpdateMarketAdvertiser" onclick="excludeFromBackButton(); searchMarketAdvertiser();" readonly="readonly" style="width: 450px;" maxlength="50" class="report-filter" />
+                            <input type="button" class="search-button" value="Update" onclick="updateMediaAdvertiserRevenue();" />
                         </div>
                     </div>
                 </div>
 
                 <div class="row">
-                    <!--
-                    2 datatables
-                    1 search results
-                    1 to select for bulk updates
-                    -->
-                    <div id="dtResultsHolder" class="col-md-5">
+                    <div id="dtResultsHolder" class="col-md-12">
                         <table id="dtResults" class="cell-border"></table>
                     </div>
-                    <div class="col-md-2">&nbsp;</div>
-                    <div id="dtUpdatesHolder" class="col-md-5">
-                        <table id="dtUpdates" class="cell-border"></table>
-                    </div>
                 </div>
+
             </div>
         </div>
     </div>
-
 
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
@@ -223,25 +207,26 @@
     <script type="text/javascript" src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/api/fnFindCellRowIndexes.js"></script>
 
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
     <!--Chosen Dropdown-->
     <script src="/js/chosen.jquery.min.js">
     </script>
 </body>
 </html>
 <script>
+    var selectedTableItems = new Array();
+
     $(document).ready(function () {
         //this menu will change
         buildXRYMenu("Utility");
+        loadDefaultDates();
+        setupDatePickers();
 
-        //load markets by product
         getMarketsByProduct();
-        //load media type
-        getMediaTypes();
-        //load parent advertiser
-        getParentAgencyList(["ddlParentAgency", "ddlUpdateParentAgency"], "-1");
-        //get account type
-        getAccountTypes(["ddlUpdateAccountType"], "-1");
+        getMediaAdvertiserMediaTypeList();
 
+        setTimeout('loadLastSearch()', 1000);
     });
 
     function getMarketsByProduct() {
@@ -288,10 +273,10 @@
         });
     }
 
-    function getMediaTypes() {
+    function getMediaAdvertiserMediaTypeList() {
 
         $.ajax({
-            url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
+            url: ServicePrefix + '/api/MediaAdvertiser/GetMediaAdvertiserMediaTypeList',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
@@ -300,124 +285,47 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
+
                 if (data.response.status != "SUCCESS") {
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
-                } else {
-                    var str = '';
-                    str = '<option value="-1">-- Select a Media Type</option>';
-                    $.each(data.report.rows, function (index) {
-                        var obj = data.report.rows[index];
-                        str = str + '<option value="' + obj.MediaTypeID + '">' + obj.MediaTypeName + '</option>';
-                    });
-
-                    $("#ddlMediaType").html(str);
-
-                    convertToChosenSelect("ddlMediaType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-                }
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        });
-
-    }
-
-    function getParentAgencyList(controls, parentAgencyId) {
-
-        if (parentAgencyId == undefined || parentAgencyId == null)
-        {
-            parentAgencyId = "-1";
-        }
-
-        $.ajax({
-            url: ServicePrefix + '/api/ParentAgency/GetParentAgencyList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inShowDisabled": false
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-
                 }
                 else {
 
                     var str = '';
-                    str = '<option value="-1">-- Select a Parent Agency</option>';
+                    str = '<option value="" selected>Both</option>';
                     $.each(data.report.rows, function (index) {
-                        var obj = data.report.rows[index];
-                        str = str + '<option value="' + obj.parentAgencyId + '">' + obj.parentAgencyName + '</option>';
+
+                        str = str + '<option value="' + data.report.rows[index].mediaTypeId + '">' + data.report.rows[index].mediaType + '</option>';
+
                     });
 
-                    for (var i = 0; i < controls.length; i++) {
-                        $("#" + controls[i]).html(str);
-                        convertToChosenSelect(controls[i], gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-                        $("#" + controls[i]).val(parentAgencyId);
-                    }
+                    $("#ddlMediaType").html(str);
 
-                }
-
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function getAccountTypes(controls, accountTypeId)
-    {
-        $.ajax({
-            url: ServicePrefix + '/api/AccountType/GetAccountTypeList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                } else {
-                    var str = '';
-                    str = '<option value="-1">-- Select an Account Type</option>';
-                    $.each(data.report.rows, function (index) {
-                        var obj = data.report.rows[index];
-                        str = str + '<option value="' + obj.accountTypeId + '">' + obj.accountTypeName + '</option>';
-                    });
-
-
-                    for (var i = 0; i < controls.length; i++) {
-                        $("#" + controls[i]).html(str);
-                        convertToChosenSelect(controls[i], gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-                        $("#" + controls[i]).val(accountTypeId);
-                    }
+                    convertToChosenSelect('ddlMediaType', gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
                 }
             },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+
     }
 
-    function searchForMarketAgency()
+    function searchForMediaRevenue()
     {
-        //add any validations needed for required fields
+        //api/MediaAdvertiserAudit/GetMediaRevenueResearchList
         if (searchValidationPassed() == false) {
             return;
         }
 
-        var sUrl = ServicePrefix + "/api/AgencyAudit/GetAgencyAuditList?";
+        var sUrl = ServicePrefix + "/api/MediaAdvertiserAudit/GetMediaRevenueResearchList?";
         sUrl += "inApiToken=" + getLocalStorage("APIToken");
-        sUrl += "&inAgencyName=" + $("#txtMarketAgency").val();
+        sUrl += "&inAdvertiserName=" + $("#txtMarketAdvertiser").val();
         sUrl += "&inMarketId=" + $("#ddlMarket").val();
         sUrl += "&inMediaTypeId=" + $("#ddlMediaType").val();
-        sUrl += "&inParentAgencyId=" + $("#ddlParentAgency").val();
+        sUrl += "&inStartDate=" + $("#dtStartDate").val();
+        sUrl += "&inEndDate=" + $("#dtEndDate").val();
 
         $.ajax({
             url: sUrl,
@@ -432,13 +340,13 @@
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 } else {
                     loadResultsData(data);
-                    loadMatchingData(data);
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 MKAErrorMessageRtn(errorThrown);
             }
         });
+
     }
 
     function loadResultsData(data) {
@@ -446,6 +354,9 @@
         var columns = getResultsColumns();
         //load the data
         loadResultsDataTable(data, columns);
+
+        //load selected id
+        loadSelectedTableItems();
     }
 
     function getResultsColumns() {
@@ -453,17 +364,26 @@
         //create a radio button with onclick populate the info section
         columnsToDisplay.push({
             "mRender": function (data, type, row) {
-                return '<input type="radio" name="agencies" onclick="loadUpdateInformation(' + row.agencyId + ',\'' + row.AgencyWithoutId + '\',' +
-                    row.accountTypeId + ',' + row.parentAgencyId + ');markAsNotSelectable(' + row.agencyId + ');">';
+                return " ";
+            },
+            "title":
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", //putting in the spaces for now so the width would be set
+            "orderable": false,
+            "searchable": false
+        });
+
+        columnsToDisplay.push({
+            "mRender": function (data, type, row) {
+                return '<a href="#" onclick="loadUpdateInformation(' + row.advertiserId + ',\'' + row.AdvertiserWithoutId + '\');">Link</a>';
             },
             "orderable": false,
             "searchable": false
         });
 
         columnsToDisplay.push({
-            "title": "agencyId",
+            "title": "advertiserId",
             "visible": false,
-            "mData": "agencyId",
+            "mData": "advertiserId",
             "orderable": false,
             "searchable": false
         });
@@ -474,24 +394,49 @@
             "mData": "Market",
             "orderable": true
         });
+
         columnsToDisplay.push({
-            "title": "Agency",
+            "title": "Advertiser",
             "visible": true,
-            "mData": "Agency",
+            "mData": "Advertiser",
             "orderable": true
         });
+
         columnsToDisplay.push({
-            "title": "Parent Agency",
+            "title": "Media Code",
             "visible": true,
-            "mData": "Parent Agency",
+            "mData": "Media Code",
             "orderable": true
         });
+
         columnsToDisplay.push({
-            "title": "Account Type",
+            "title": "Period",
             "visible": true,
-            "mData": "Account Type",
+            "mData": "Period",
             "orderable": true
         });
+
+        columnsToDisplay.push({
+            "title": "Revenue",
+            "visible": true,
+            "mData": "Revenue",
+            "orderable": true
+        });
+
+        columnsToDisplay.push({
+            "title": "Posted By",
+            "visible": true,
+            "mData": "Posted By",
+            "orderable": true
+        });
+
+        columnsToDisplay.push({
+            "title": "Date Posted",
+            "visible": true,
+            "mData": "Date Posted",
+            "orderable": true
+        });
+
 
         return columnsToDisplay;
     }
@@ -516,103 +461,6 @@
             "order": [],
             "data": results,
             "columns": columns,
-            "select": true,
-            language: {
-                search: "Filter Results:"
-            },
-            "buttons": [
-            ]
-        });
-
-        //add on select and have it do code
-        searchTable.on('select', function (e, dt, type, indexes) {
-            if (type === 'row') {
-
-                //click the radio button or call the functions
-
-
-            }
-        });
-
-    }
-
-    function loadMatchingData(data) {
-        //get columns
-        var columns = getMatchingColumns();
-        //load the data
-        loadMatchingDataTable(data, columns);
-    }
-
-    function getMatchingColumns() {
-        var columnsToDisplay = new Array();
-
-        columnsToDisplay.push({
-            "mRender": function (data, type, row) {
-                return " ";
-            },
-            "title": "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", //putting in the spaces for now so the width would be set
-            "orderable": false,
-            "searchable": false
-        });
-
-        columnsToDisplay.push({
-            "title": "agencyId",
-            "visible": false,
-            "mData": "agencyId",
-            "orderable": false,
-            "searchable": false
-        });
-
-        columnsToDisplay.push({
-            "title": "Market",
-            "visible": true,
-            "mData": "Market",
-            "orderable": true
-        });
-
-        columnsToDisplay.push({
-            "title": "Agency",
-            "visible": true,
-            "mData": "Agency",
-            "orderable": true
-        });
-
-        columnsToDisplay.push({
-            "title": "Parent Agency",
-            "visible": true,
-            "mData": "Parent Agency",
-            "orderable": true
-        });
-
-        columnsToDisplay.push({
-            "title": "Account Type",
-            "visible": true,
-            "mData": "Account Type",
-            "orderable": true
-        });
-
-        return columnsToDisplay;
-    }
-
-    function loadMatchingDataTable(data, columns) {
-        var results = data["report"]["rows"];
-
-        //creating a variable that will used for datatable functions later
-        var matchTable;
-
-        if ($.fn.DataTable.isDataTable('#dtUpdates')) {
-            matchTable = $('#dtUpdates').DataTable();
-            matchTable.destroy();
-        }
-
-        resetDataTableDOM("dtUpdates", "dtUpdatesHolder", "cell-border");
-
-        matchTable = $("#dtUpdates").DataTable({
-            "dom": "Blfrtip",
-            "pageLength": gDataTableDefaultRows,
-            "order": [],
-            "data": results,
-            "columns": columns,
             "columnDefs": [{
                 orderable: false,
                 targets: 0,
@@ -625,52 +473,99 @@
             "buttons": [
             ]
         });
+    }
 
+    function loadSelectedTableItems() {
+        if (selectedTableItems.length == 0) {
+            return;
+        }
 
-        matchTable.on('select', function (e, dt, type, indexes) {
-            if (type === 'row') {
-                var rows = matchTable.rows(indexes).nodes();
-                $.each($(rows),
-                    function () {
-                        if ($(this).hasClass('not-selectable')) {
-                            matchTable.row($(this)).deselect();
-                        }
-                    }
-                );
+        var tbResults = $("#dtResults").DataTable();
+
+        for (var i = 0; i < selectedTableItems.length; i++) {
+            var selectedItem = selectedTableItems[i];
+            tbResults.rows(function (idx, data, node) {
+                if (data.advertiserId === selectedItem.advertiserId && data.Period == selectedItem.period &&
+                    data.Revenue == selectedItem.revenue && data["Media Code"] == selectedItem.mediaCode) {
+                    tbResults.row(idx).select();
+                }
+            });
+        }
+
+        selectedTableItems = new Array();
+    }
+
+    function searchMarketAdvertiser()
+    {
+        var searchCriteriaObj = {
+            "searchToken": "BULKADV",
+            "searchPage": window.location,
+            "searchHeading": "Advertiser Search for Media Revenue Audit"
+        }
+
+        $(".report-filter").each(function () {
+            var control = $(this).attr("id");
+            if (control.indexOf("_chosen") == -1) {
+                searchCriteriaObj[control] = $(this).val();
             }
         });
+
+        var tbResults = $("#dtResults").DataTable();
+        var aSelectedItems = new Array();
+        for (var i = 0; i < tbResults.rows('.selected').data().length; i++) {
+            aSelectedItems.push({
+                "advertiserId": tbResults.rows('.selected').data()[i].advertiserId,
+                "period": tbResults.rows('.selected').data()[i].Period,
+                "revenue": tbResults.rows('.selected').data()[i].Revenue,
+                "mediaCode": tbResults.rows('.selected').data()[i]["Media Code"]
+            });
+        }
+
+        searchCriteriaObj["selectedItems"] = aSelectedItems;
+
+        setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
+
+        window.location = "/utilities/search.html";
+
+
     }
 
-    function loadUpdateInformation(marketAgencyId, marketAgencyName, accountTypeId, parentAgencyId)
+
+    function loadUpdateInformation(advertiserId, advertiserName)
     {
-        $("#txtUpdateOldMarketAgencyName").val(marketAgencyName);
-        $("#txtUpdateMarketAgency").val(marketAgencyName);
-        $("#ddlUpdateParentAgency").val(parentAgencyId);
-        $("#ddlUpdateAccountType").val(accountTypeId);
+        $("#txtUpdateMarketAdvertiserId").val(advertiserId);
+        $("#txtUpdateMarketAdvertiser").val(advertiserName);
+    }
+
+    function clearUpdateFields() {
+        $("#txtUpdateMarketAdvertiserId").val("");
+        $("#txtUpdateMarketAdvertiser").val("");
+    }
+
+    function loadDefaultDates() {
+        var d = new Date();
+        var currentMonth = d.getMonth() + 1;
+        var currentYear = d.getFullYear();
+        var lastDayOfTheMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+
+        $("#dtStartDate").val(currentMonth + "/01/" + currentYear);
+        $("#dtEndDate").val(currentMonth + "/" + lastDayOfTheMonth.getDate() + "/" + currentYear);
 
     }
 
-    function markAsNotSelectable(agencyId) {
-
-        var updateTable = $('#dtUpdates').DataTable();
-        var rows = updateTable.rows('.not-selectable').nodes();
-
-        $.each($(rows),
-            function () {
-                if ($(this).hasClass('not-selectable')) {
-                    $(updateTable.row($(this)).node()).removeClass('not-selectable');
-                }
-            }
-        );
-
-        var updateRowId = $('#dtUpdates').dataTable().fnFindCellRowIndexes(agencyId, 1);
-        $(updateTable.row(updateRowId).node()).addClass('not-selectable');
-        updateTable.row(updateRowId).deselect();
+    function setupDatePickers() {
+        // setup date pickers
+        $(function () {
+            $("#dtStartDate").datepicker();
+            $("#dtEndDate").datepicker();
+        });
 
     }
 
-    function searchValidationPassed()
-    {
+    function searchValidationPassed() {
+        //add the required one but also either or fields
+        //return true;
+
         var loopBreak = true;
         $(".mkaRequired").each(function (index, el) {
             var eID = "#" + $(el).attr("id");
@@ -695,13 +590,55 @@
             }
         });
 
+        if (loopBreak == false) {
+            return loopBreak;
+        }
+
+        var bMultiFieldCompleted = false;
+
+        $(".multi-field-search").each(function (index, el) {
+            var eID = "#" + $(el).attr("id");
+
+            if ($(eID).val().length > 0) {
+                bMultiFieldCompleted = true;
+            }
+
+        });
+
+        if (bMultiFieldCompleted == false) {
+            var errorMessage = "Please complete at least one of the fields notated with **.";
+            bootbox.alert(errorMessage, function () { });
+            loopBreak = false;
+            return false;
+        }
+
         return loopBreak;
     }
 
-    function updateMarketAgencies() {
+    function loadLastSearch() {
+        if (getLocalStorage("gSearchResults").length <= 0) {
+            return;
+        }
+
+        var searchResults = $.parseJSON(getLocalStorage("gSearchResults"));
+
+        $.each(searchResults, function (index, element) {
+            $("#" + index).val(element);
+        });
+
+        selectedTableItems = searchResults["selectedItems"];
+
+        setLocalStorage("gSearchResults", "");
+
+        setTimeout('searchForMediaRevenue()', 1000);
+
+    }
+
+    function updateMediaAdvertiserRevenue() {
         var errorMessage = "This bulk update functionality is still under development.";
         bootbox.alert(errorMessage, function () { });
 
         return;
     }
+
 </script>

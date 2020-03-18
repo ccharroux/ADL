@@ -15,9 +15,9 @@ var gShowHeader = true;
 var release =
 {
     "DEV": "N/A",
-    "STAGING": "2/18/2020",
-    "PRODUCTION": "2/18/2020",
-    "DEMO": "2/18/2020"
+    "STAGING": "3/16/2020",
+    "PRODUCTION": "3/16/2020",
+    "DEMO": "3/16/2020"
 }
 var dateOfCode = new Date();
 release["DEV"] = (dateOfCode.getMonth() + 1) + '-' + dateOfCode.getDate() + '-' + dateOfCode.getFullYear();
@@ -354,7 +354,10 @@ $(document).ready(function ()
 
         unblockHandle = setInterval("$.unblockUI();", 10000);
     }
-
+    else
+    {
+        clearTimeout(unblockHandle);
+    }
     // Set Ajax
     $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
 
@@ -987,14 +990,20 @@ function goBackToDashboard() {
 function MKAErrorMessageRtn(message, url) {
 
     var newMessage = "";
-    if (message.toLowerCase().indexOf('token is invalid') > -1) {
+
+    if (!message)
+    {
+        message = "";
+    }
+
+    if (message.toString().toLowerCase().indexOf('token is invalid') > -1) {
         newMessage = "Your Token has expired - Please login again";
         bootbox.alert(newMessage, function () {
 
         });
         window.location = "/admin/login/login.html";
     }
-    else if (message.toLowerCase().indexOf('authentication failed') > -1) {
+    else if (message.toString().toLowerCase().indexOf('authentication failed') > -1) {
         newMessage = "Authentication Failed";
         $("#password").val('');
         bootbox.alert(newMessage, function () { });
@@ -1056,6 +1065,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/admin/position/positionlist.html?MenuItem=true">Positions</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/region/regionlist.html?MenuItem=true">Regions</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/revenuecategory/revenuecategorylist.html?MenuItem=true">Revenue Categories</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/training/traininglist.html?MenuItem=true">Training</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html?MenuItem=true">Tech Tools</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
@@ -1482,7 +1492,7 @@ function removeCharacter(object, charToRemove) {
 function getYearList() {
 
     var str = '';
-    str = '<option value="">-- Select a Year --</option>';
+    str = '<option value="">-- Select a Year</option>';
 
     var thisYear = (new Date()).getFullYear();
 
@@ -1528,7 +1538,7 @@ function getPeriodList(inType, inDefaultSelect) {
     var thisMonth = (new Date()).getMonth();
 
     var str = '';
-    str = '<option value="">-- Select a Period --</option>';
+    str = '<option value="">-- Select a Period</option>';
 
     if (inType == 'months' || inType == 'all') {
         for (var i = 1; i <= 12; i++) {
@@ -2610,4 +2620,7 @@ function setMatchedNotificationAsRead(inMatchedNotificationPersonnelId) {
 function enableWorkArea()
 {
     window.open('/admin/login/dashboard.html?MenuItem=true', '_blank', "height=800,width:800");
+}
+function formatNumber(num) {
+    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 }
