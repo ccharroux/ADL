@@ -187,8 +187,38 @@
         </div>
         <div class="row">
             <div class="col-md-12 text-align-center">
-                TODO search potential members (each row has "Add to list" link)
+                Search for new members by partial name or email:
+                <input type="text" id="txtPartialText" />
+                <button id="btnSearch" class="btn btn-info" onclick="searchNewMembers();">Search</button>
             </div>
+        </div>
+        <div id="divNewMembersResults" class="row">
+            <!-- start datatable-->
+            <div class="col-md-12 text-align-center dataTable-top-margin">
+                <table id="dtRelationshipListNewMembers" class="dataTable-border dataTable-headers dataTable-cell-border" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th class="exportColumn">Name</th>
+                            <th class="exportColumn">Market(s)</th>
+                            <th class="exportColumn">Owner(s)</th>
+                            <th class="exportColumn">Title</th>
+                            <th class="exportColumn">Phone</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <!--<tfoot>
+                    <tr>
+                        <th>Name</th>
+                        <th>Market(s)</th>
+                        <th>Owner(s)</th>
+                        <th>Title</th>
+                        <th>Phone</th>
+                        <th></th>
+                    </tr>
+                </tfoot>-->
+                </table>
+            </div>
+            <!-- end datatable -->
         </div>
     </div>
     <!-- jQuery -->
@@ -224,9 +254,6 @@
 </html>
 <script>
 
-    var gotCreators = false;
-    var gotPotentialCreators = false;
-
     var currentRelationshipListId = null;
 
     $(document).ready(function () {
@@ -239,6 +266,7 @@
 
         setDataTable();
         setDataTable_ListMembers();
+        setDataTable_ListNewMembers();
 
         clearSearchButtonSetup();
 
@@ -258,7 +286,7 @@
             autoOpen: false,
             resizable: false,
             width: 1200,
-            height: 600,
+            height: 800,
             modal: true,
             title: 'Relationship List',
             create: function (event, ui) {
@@ -309,8 +337,6 @@
 
         convertToChosenSelect("ddlCreator", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
-        gotCreators = true;
-
         if (previousSelectionFound) {
             $("#ddlCreator").val(previousSelection);
         }
@@ -355,8 +381,6 @@
         $("#ddlListDialogCreator").html(str);
 
         convertToChosenSelect("ddlListDialogCreator", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-        gotPotentialCreators = true;
 
         if (previousSelectionFound) {
             $("#ddlListDialogCreator").val(previousSelection);
@@ -501,7 +525,7 @@
                     mRender: function (data, type, row) {
                         return '<a href="/admin/personnel/personnelview.html?PersonnelID=' + row.PersonnelID + '">View</a>'
                             + ' | <a href="/admin/personnel/personnel.html?PersonnelID=' + row.PersonnelID + '">Edit</a>'
-                            + ' | <a href="#" onclick="removeMember(' + row.PersonnelID + ');">Remove</a>';
+                            + ' | <a href="#" onclick="removeMember(' + row.PersonnelID + ',\'' + encodeURI(row.Name) + '\');">Remove</a>'; // pass name so we don't have to look it up again for the confirmation prompt
                     },
                     "orderable": false,
                     "searchable": false,
@@ -553,6 +577,103 @@
                        format: {
                            header: function (data, columnIdx) {
                                return returnExportColumnHeadingTitle("dtRelationshipListMembers", data, columnIdx);
+                           }
+                       }
+                   }
+               }
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            initComplete: function () {
+                // only one DataTable per page should do this, as it affects all of them by class
+                // $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+    }
+
+    function setDataTable_ListNewMembers() {
+        var reportTitle = "Relationship List Potential New Members";
+        var exportColumns = returnTableColumnsByClass("dtRelationshipListNewMembers", "exportColumn");
+
+        $("#dtRelationshipListNewMembers").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "order": [
+                [0, 'asc'] // Name
+            ],
+            "columns": [
+                { "data": 'Name' },
+                { "data": 'Market' },
+                { "data": 'Owner' },
+                { "data": 'Title' },
+                { "data": 'Phone' },
+                {
+                    mRender: function (data, type, row) {
+                        return '<a href="/admin/personnel/personnelview.html?PersonnelID=' + row.PersonnelID + '">View</a>'
+                            + ' | <a href="/admin/personnel/personnel.html?PersonnelID=' + row.PersonnelID + '">Edit</a>'
+                            + ' | <a href="#" onclick="addMember(' + row.PersonnelID + ',\'' + encodeURI(row.Name) + '\');">Add</a>'; // pass name so we don't have to look it up again for the confirmation prompt
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": "text-align-left"
+                }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtRelationshipListNewMembers", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               {
+                   extend: 'excel',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtRelationshipListNewMembers", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtRelationshipListNewMembers", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtRelationshipListNewMembers", data, columnIdx);
                            }
                        }
                    }
@@ -629,6 +750,7 @@
 
         viewListBasicInfo();
         viewListMembers();
+        $("#divNewMembersResults").hide();
 
         $(".listDialogNew").hide();
         $(".listDialogEdit").show();
@@ -710,8 +832,105 @@
         $("#listDialog").dialog("close");
     }
 
-    function removeMember(personnelId) {
-        // TODO implement
-        bootbox.alert("Not yet implemented");
+    function removeMember(personnelId, personnelNameEncoded) {
+        bootbox.confirm('Remove ' + decodeURI(personnelNameEncoded) + ' from this list?', function (result) {
+            if (result) {
+                $.ajax({
+                    url: ServicePrefix + '/api/Relationship/DeleteRelationshipListMember',
+                    dataType: 'json',
+                    type: 'post',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        "inApiToken": getLocalStorage("APIToken"),
+                        "inRelationshipListId": currentRelationshipListId,
+                        "inPersonnelId": personnelId
+                    }),
+                    processData: false,
+                    success: function (data, textStatus, jQxhr) {
+                        if (data.response.status != "SUCCESS") {
+                            MKAErrorMessageRtn(data.response.errorMessage[0]);
+                        }
+                        else {
+                            viewListMembers();
+                            if ($("#divNewMembersResults").is(":visible")) {
+                                searchNewMembers();
+                            }
+                        }
+                    },
+                    error: function (jqXhr, textStatus, errorThrown) {
+                        genericAjaxError(jqXhr, textStatus, errorThrown);
+                    }
+                });
+            }
+        });
     }
+
+    function searchNewMembers() {
+        var partialText = $("#txtPartialText").val().toString().trim();
+        if (partialText == "") {
+            bootbox.alert("No partial text entered");
+            return;
+        }
+
+        var url = ServicePrefix + '/api/Relationship/GetRelationshipListMembers'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inRelationshipListId=' + currentRelationshipListId
+            + '&inPotentialMembers=true'
+            + '&inPartialText=' + encodeURI(partialText);
+        
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            success: function (data, textStatus, jQxhr) {
+                searchNewMembersSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function searchNewMembersSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        populateDataTable("dtRelationshipListNewMembers", data);
+        $("#divNewMembersResults").show();
+    }
+
+    function addMember(personnelId, personnelNameEncoded) {
+        bootbox.confirm('Add ' + decodeURI(personnelNameEncoded) + ' to this list?', function (result) {
+            if (result) {
+                $.ajax({
+                    url: ServicePrefix + '/api/Relationship/InsertRelationshipListMember',
+                    dataType: 'json',
+                    type: 'post',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        "inApiToken": getLocalStorage("APIToken"),
+                        "inRelationshipListId": currentRelationshipListId,
+                        "inPersonnelId": personnelId
+                    }),
+                    processData: false,
+                    success: function (data, textStatus, jQxhr) {
+                        if (data.response.status != "SUCCESS") {
+                            MKAErrorMessageRtn(data.response.errorMessage[0]);
+                        }
+                        else {
+                            viewListMembers();
+                            searchNewMembers();
+                        }
+                    },
+                    error: function (jqXhr, textStatus, errorThrown) {
+                        genericAjaxError(jqXhr, textStatus, errorThrown);
+                    }
+                });
+            }
+        });
+    }
+
 </script>
