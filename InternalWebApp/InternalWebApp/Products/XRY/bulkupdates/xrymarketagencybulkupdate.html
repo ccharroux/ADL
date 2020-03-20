@@ -170,7 +170,7 @@
                             <label for="ddlUpdateParentAgency" class="dropdown-label">Parent Agency</label>
                             <select id="ddlUpdateParentAgency" class="dropdown-select report-filter"></select>
 
-                            <input type="button" class="search-button" value="Update" onclick="updateMarketAgencies();" />
+                            <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startMarketAgencyUpdateProcess();" />
                         </div>
                     </div>
                 </div>
@@ -638,6 +638,20 @@
                     }
                 );
             }
+
+            var count = matchTable.rows({ selected: true }).count();
+            if (count > 0) {
+                $("#btnUpdate").show();
+            }
+
+        });
+
+        matchTable.on('deselect', function (e, dt, type, indexes) {
+
+            var count = matchTable.rows({ selected: true }).count();
+            if (count == 0) {
+                $("#btnUpdate").hide();
+            }
         });
     }
 
@@ -645,8 +659,8 @@
     {
         $("#txtUpdateOldMarketAgencyName").val(marketAgencyName);
         $("#txtUpdateMarketAgency").val(marketAgencyName);
-        $("#ddlUpdateParentAgency").val(parentAgencyId);
-        $("#ddlUpdateAccountType").val(accountTypeId);
+        $("#ddlUpdateParentAgency").val(parentAgencyId || "-1");
+        $("#ddlUpdateAccountType").val(accountTypeId || "-1");
 
     }
 
@@ -698,10 +712,104 @@
         return loopBreak;
     }
 
-    function updateMarketAgencies() {
-        var errorMessage = "This bulk update functionality is still under development.";
-        bootbox.alert(errorMessage, function () { });
+    function startMarketAgencyUpdateProcess()
+    {
+        //need to check if something is being changed before letting the update go through
+        if (validateUpdateFields() == false) {
+            return;
+        }
 
+        var updateAgencyIds = new Array();
+
+        var updatesTable = $("#dtUpdates").DataTable();
+
+        updatesTable.rows({ selected: true }).every(function () {
+            var d = this.data();
+            updateAgencyIds.push(d.agencyId);
+        });
+
+        //added functionality to turn the update button on/off based on selected.
+        //adding this check just to be safe.
+        if (updateAgencyIds.length == 0) {
+            bootbox.alert("You must select at least 1 agency to update.", function () { });
+            return;
+        }
+
+        var msg = "Are you sure that you want to update the selected record(s)?<br/>";
+        msg += "They will be updated to the following values:<br/><ul>";
+
+        if ($("#txtUpdateMarketAgency").val() != "") {
+            msg += "<li>Agency Name - " + $("#txtUpdateMarketAgency").val() + "</li>";
+        }
+
+        if ($("#ddlUpdateAccountType").val() != "-1") {
+            msg += "<li>Account Type - " + $("#ddlUpdateAccountType option:selected").text() + "</li>";
+        }
+
+        if ($("#ddlUpdateParentAgency").val() != "-1") {
+            msg += "<li>Parent Agency - " + $("#ddlUpdateParentAgency option:selected").text() + "</li>";
+        }
+
+        msg += "</ul>";
+
+        bootbox.confirm(msg, function (result) {
+            if (result) {
+                updateMarketAgencies(updateAgencyIds);
+            } else {
+                return;
+            }
+        });
+    }
+
+    function updateMarketAgencies(updateAgencyIds)
+    {
         return;
+
+        $.ajax({
+            url: ServicePrefix + '/api/XRAYRevenue/UpdateExistingAgency',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inUpdateAgencyIdList": updateAgencyIds,
+                "inNewAgencyName": $("#txtUpdateMarketAgency").val().length == 0 ? "" : $("#txtUpdateMarketAgency").val(),
+                "inNewAccountTypeId": $("#ddlUpdateAccountType").val() == "-1" ? "" : $("#ddlUpdateAccountType").val(),
+                "inNewParentAgencyId": $("#ddlUpdateParentAgency").val() == "-1" ? "" : $("#ddlUpdateParentAgency").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    bootbox.alert("All agencies have been updated.", function () { });
+                    searchForMarketAgency();
+                    clearUpdateFields();
+                }
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function validateUpdateFields() {
+
+        if ($("#txtUpdateMarketAgency").val() == "" &&
+            $("#ddlUpdateAccountType").val() == -1 &&
+            ($("#ddlUpdateParentAgency").val() == null || $("#ddlUpdateParentAgency").val() == -1)) {
+            bootbox.alert("You must chose at least 1 field to update.", function () { });
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function clearUpdateFields() {
+        $("#txtUpdateMarketAgency").val("");
+        $("#ddlUpdateAccountType").val("-1");
+        $("#ddlUpdateParentAgency").val("-1");
+        $("#btnUpdate").hide();
     }
 </script>
