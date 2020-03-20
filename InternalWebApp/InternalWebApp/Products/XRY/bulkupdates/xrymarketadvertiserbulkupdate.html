@@ -170,7 +170,7 @@
                     <h3 style="text-align: center; margin-bottom: 10px;">Update Information</h3>
                     <div class="row">
                         <div class="col-md-12" style="margin-bottom: 10px;">
-                            <input type="hidden" id="txtUpdateOldMarketAdvertiserName" value=""/>
+                            <input type="hidden" id="txtUpdateOldMarketAdvertiserName" value="" />
                             <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label>
                             <input type="text" id="txtUpdateMarketAdvertiser" style="width: 450px;" maxlength="50" class="report-filter" />
 
@@ -185,7 +185,7 @@
                         <div class="col-md-12" style="margin-bottom: 10px;">
                             <label for="ddlUpdateParentAdvertiser" class="dropdown-label">Parent Advertiser</label>
                             <select id="ddlUpdateParentAdvertiser" class="dropdown-select report-filter"></select>
-                            <input type="button" class="search-button" value="Update" onclick="updateMarketAdvertisers();" />
+                            <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startMarketAdvertiserUpdateProcess();" />
                         </div>
                     </div>
                 </div>
@@ -261,6 +261,7 @@
         getSubIndustries(["ddlSubIndustry", "ddlUpdateSubIndustry"], "-1", "-1");
         //load parent advertiser
         getParentAdvertiserList(["ddlParentAdvertiser", "ddlUpdateParentAdvertiser"], "-1");
+
 
     });
 
@@ -492,8 +493,7 @@
 
     function getParentAdvertiserList(controls, parentAdvertiserId) { //pass control, parentadvertiserid
 
-        if (parentAdvertiserId == undefined || parentAdvertiserId == null)
-        {
+        if (parentAdvertiserId == undefined || parentAdvertiserId == null) {
             parentAdvertiserId = "-1";
         }
 
@@ -672,7 +672,7 @@
         //add on select and have it do code
         searchTable.on('select', function (e, dt, type, indexes) {
             if (type === 'row') {
-                
+
                 //click the radio button or call the functions
 
 
@@ -784,17 +784,35 @@
                         if ($(this).hasClass('not-selectable')) {
                             matchTable.row($(this)).deselect();
                         }
+
                     }
                 );
             }
+
+            var count = matchTable.rows({ selected: true }).count();
+            if (count > 0) {
+                $("#btnUpdate").show();
+            }
+
         });
+
+
+        matchTable.on('deselect', function (e, dt, type, indexes) {
+           
+            var count = matchTable.rows({ selected: true }).count();
+            if (count == 0)
+            {
+                $("#btnUpdate").hide();
+            }
+        });
+
     }
 
-    function loadUpdateInformation(marketAdvertiserId, marketAdvertiserName, industryId, subIndustryId, parentAdvertiserId)
-    {
+    function loadUpdateInformation(marketAdvertiserId, marketAdvertiserName, industryId, subIndustryId, parentAdvertiserId) {
         $("#txtUpdateOldMarketAdvertiserName").val(marketAdvertiserName);
         $("#txtUpdateMarketAdvertiser").val(marketAdvertiserName);
-        $("#ddlUpdateParentAdvertiser").val(parentAdvertiserId);
+        console.log(parentAdvertiserId);
+        $("#ddlUpdateParentAdvertiser").val(parentAdvertiserId || "-1");
         $("#ddlUpdateIndustry").val(industryId);
         getSubIndustries(["ddlUpdateSubIndustry"], industryId, subIndustryId);
 
@@ -847,11 +865,127 @@
         return loopBreak;
     }
 
-    function updateMarketAdvertisers() {
-        var errorMessage = "This bulk update functionality is still under development.";
-        bootbox.alert(errorMessage, function () { });
+    function startMarketAdvertiserUpdateProcess()
+    {
+        //need to check if something is being changed before letting the update go through
+        if (validateUpdateFields() == false) {
+            return;
+        }
 
-        return;
+        var updateAdvertiserIds = new Array();
+
+        var updatesTable = $("#dtUpdates").DataTable();
+
+        updatesTable.rows({ selected: true }).every(function () {
+            var d = this.data();
+            updateAdvertiserIds.push(d.advertiserId);
+        });
+
+        //added functionality to turn the update button on/off based on selected.
+        //adding this check just to be safe.
+        if (updateAdvertiserIds.length == 0) {
+            bootbox.alert("You must select at least 1 advertiser to update.", function () { });
+            return;
+        }
+
+
+        var msg = "Are you sure that you want to update the selected record(s)?<br/>";
+        msg += "They will be updated to the following values:<br/><ul>";
+
+        if ($("#txtUpdateMarketAdvertiser").val() != "")
+        {
+            msg += "<li>Advertiser Name - " + $("#txtUpdateMarketAdvertiser").val() + "</li>";
+        }
+
+        if ($("#ddlUpdateIndustry").val() != "-1")
+        {
+            msg += "<li>Industry - " + $("#ddlUpdateIndustry option:selected").text() + "</li>";
+        }
+
+        if ($("#ddlUpdateSubIndustry").val() != "-1")
+        {
+            msg += "<li>SubIndustry - " + $("#ddlUpdateSubIndustry option:selected").text() + "</li>";
+        }
+
+        if ($("#ddlUpdateParentAdvertiser").val() != "-1")
+        {
+            msg += "<li>Parent Advertiser - " + $("#ddlUpdateParentAdvertiser option:selected").text() + "</li>";
+        }
+
+        msg += "</ul>";
+
+        bootbox.confirm(msg, function (result)
+        {
+            if (result)
+            {
+                updateMarketAdvertisers();
+            } else
+            {
+                return;
+            }
+        });
     }
 
+    function updateMarketAdvertisers() {
+
+        
+        //need to validate the new name doesn't exists in these markets.
+        //display a message and continue
+
+        //call /api/XRAYRevenue/UpdateExistingAdvertiser
+        $.ajax({
+            url: ServicePrefix + '/api/XRAYRevenue/UpdateExistingAdvertiser',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inUpdateAdvertiserIdList": updateAdvertiserIds,
+                "inNewAdvertiserName": $("#txtUpdateMarketAdvertiser").val().length == 0 ? "" : $("#txtUpdateMarketAdvertiser").val(),
+                "inNewIndustryId": $("#ddlUpdateIndustry").val() == "-1" ? "" : $("#ddlUpdateIndustry").val(),
+                "inNewSubIndustryId": $("#ddlUpdateSubIndustry").val() == "-1" ? "" : $("#ddlUpdateSubIndustry").val(),
+                "inNewParentAdvertiserId": $("#ddlUpdateParentAdvertiser").val() == "-1" ? "" : $("#ddlUpdateParentAdvertiser").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    bootbox.alert("All advertisers have been updated.", function () { });
+                    searchForMarketAdvertiser();
+                    clearUpdateFields();
+                }
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+
+
+    function validateUpdateFields()
+    {
+ 
+        if ($("#txtUpdateMarketAdvertiser").val() == "" &&
+            $("#ddlUpdateIndustry").val() == -1 &&
+            $("#ddlUpdateSubIndustry").val() == -1 &&
+            ($("#ddlUpdateParentAdvertiser").val() == null || $("#ddlUpdateParentAdvertiser").val() == -1))
+        {
+            bootbox.alert("You must chose at least 1 field to update.", function () { });
+            return false;
+        } else
+        {
+            return true;
+        }
+    }
+
+    function clearUpdateFields() {
+        $("#txtUpdateMarketAdvertiser").val("");
+        $("#ddlUpdateIndustry").val("-1");
+        getSubIndustries(["ddlUpdateSubIndustry"], "-1", "-1");
+        $("#ddlUpdateParentAdvertiser").val("-1");
+        $("#btnUpdate").hide();
+    }
 </script>
