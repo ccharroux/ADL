@@ -185,7 +185,7 @@
                         <div class="col-md-12" style="margin-bottom: 10px;">
                             <label for="ddlUpdateParentAdvertiser" class="dropdown-label">Parent Advertiser</label>
                             <select id="ddlUpdateParentAdvertiser" class="dropdown-select report-filter"></select>
-                            <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="updateMarketAdvertisers();" />
+                            <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startMarketAdvertiserUpdateProcess();" />
                         </div>
                     </div>
                 </div>
@@ -865,11 +865,10 @@
         return loopBreak;
     }
 
-    function updateMarketAdvertisers() {
-
+    function startMarketAdvertiserUpdateProcess()
+    {
         //need to check if something is being changed before letting the update go through
-        if (validateUpdateFields() == false)
-        {
+        if (validateUpdateFields() == false) {
             return;
         }
 
@@ -884,11 +883,54 @@
 
         //added functionality to turn the update button on/off based on selected.
         //adding this check just to be safe.
-        if (updateAdvertiserIds.length == 0)
-        {
+        if (updateAdvertiserIds.length == 0) {
             bootbox.alert("You must select at least 1 advertiser to update.", function () { });
             return;
         }
+
+
+        var msg = "Are you sure that you want to update the selected record(s)?<br/>";
+        msg += "They will be updated to the following values:<br/><ul>";
+
+        if ($("#txtUpdateMarketAdvertiser").val() != "")
+        {
+            msg += "<li>Advertiser Name - " + $("#txtUpdateMarketAdvertiser").val() + "</li>";
+        }
+
+        if ($("#ddlUpdateIndustry").val() != "-1")
+        {
+            msg += "<li>Industry - " + $("#ddlUpdateIndustry option:selected").text() + "</li>";
+        }
+
+        if ($("#ddlUpdateSubIndustry").val() != "-1")
+        {
+            msg += "<li>SubIndustry - " + $("#ddlUpdateSubIndustry option:selected").text() + "</li>";
+        }
+
+        if ($("#ddlUpdateParentAdvertiser").val() != "-1")
+        {
+            msg += "<li>Parent Advertiser - " + $("#ddlUpdateParentAdvertiser option:selected").text() + "</li>";
+        }
+
+        msg += "</ul>";
+
+        bootbox.confirm(msg, function (result)
+        {
+            if (result)
+            {
+                updateMarketAdvertisers();
+            } else
+            {
+                return;
+            }
+        });
+    }
+
+    function updateMarketAdvertisers() {
+
+        
+        //need to validate the new name doesn't exists in these markets.
+        //display a message and continue
 
         //call /api/XRAYRevenue/UpdateExistingAdvertiser
         $.ajax({
@@ -920,6 +962,8 @@
         });
 
     }
+
+
 
     function validateUpdateFields()
     {
