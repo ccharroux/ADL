@@ -214,11 +214,14 @@
                                 <th class="exportColumn">Trainer</th>
                                 <th class="exportColumn">Training Topic</th>
                                 <th class="exportColumn">Training Method</th>
+                                <th class="exportColumn">Notes</th>
+                                <th class="exportColumn"># Individuals</th>
+                                <th class="exportColumn"># Clusters</th>
+                                <th class="exportColumn"># Groups</th>
                                 <th class="exportColumn">Personnel</th>
                                 <th class="exportColumn">Market</th>
                                 <th class="exportColumn">Owner</th>
                                 <th class="exportColumn">Group</th>
-                                <th class="exportColumn">Notes</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -229,11 +232,14 @@
                                 <th>Trainer</th>
                                 <th>Training Topic</th>
                                 <th>Training Method</th>
+                                <th>Notes</th>
+                                <th># Individuals</th>
+                                <th># Clusters</th>
+                                <th># Groups</th>
                                 <th>Personnel</th>
                                 <th>Market</th>
                                 <th>Owner</th>
                                 <th>Group</th>
-                                <th>Notes</th>
                                 <th></th>
                             </tr>
                         </tfoot>-->
@@ -327,6 +333,7 @@
         </div>
         <div class="hidden">
             <span id="spanTrainingEventId"></span>
+            <span id="spanTrainingEventSummary"></span>
         </div>
     </div>
 
@@ -873,6 +880,44 @@
         //});
     }
 
+    function getTrainingEventSummary(obj) {
+        var str = obj["Trainer"];
+        str += " / " + obj["Training Topic"];
+        str += " / " + obj["Training Method"];
+
+        if (obj["Individual Trainees"] == 1) {
+            str += " / " + obj["Trainee"];
+        }
+        if (obj["Individual Trainees"] > 1) {
+            str += " / " + obj["Individual Trainees"] + " individual trainees";
+        }
+
+        if (obj["Cluster Trainees"] == 1) {
+            str += " / " + obj["Market"] + " / " + obj["Owner"];
+        }
+        if (obj["Cluster Trainees"] > 1) {
+            str += " / " + obj["Cluster Trainees"] + " clusters";
+        }
+
+        if (obj["Owner Group Trainees"] == 1) {
+            str += " / " + obj["Owner"] + " / " + obj["Owner Group"];
+        }
+        if (obj["Owner Group Trainees"] > 1) {
+            str += " / " + obj["Owner Group Trainees"] + " owner groups";
+        }
+
+        return str;
+    }
+
+    function getTrainingEventSummaryWithDateTime(obj) {
+        var str = obj["Training Date"];
+        if (obj["Training Time"] != null) {
+            str += " / " + obj["Training Time"];
+        }
+
+        return str + " / " + getTrainingEventSummary(obj);
+    }
+
     function setDataTable() {
         var reportTitle = "Training List";
         var exportColumns = returnTableColumnsByClass("dtTrainingList", "exportColumn");
@@ -888,15 +933,18 @@
                 { "data": 'Trainer' },
                 { "data": 'Training Topic' },
                 { "data": 'Training Method' },
+                { "data": 'Notes' },
+                { "data": 'Individual Trainees' },
+                { "data": 'Cluster Trainees' },
+                { "data": 'Owner Group Trainees' },
                 { "data": 'Trainee' },
                 { "data": 'Market' },
                 { "data": 'Owner' },
                 { "data": 'Owner Group' },
-                { "data": 'Notes' },
                 {
                     mRender: function (data, type, row) {
                         var trainingEventId = row["Training Event ID"];
-                        return '<a href="#" onclick="editTraining(' + trainingEventId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteTraining(' + trainingEventId + ')">Delete</a>';
+                        return '<a href="#" onclick="editTraining(' + trainingEventId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteTraining(' + trainingEventId + ',\'' + encodeURI(getTrainingEventSummaryWithDateTime(row)) + '\')">Delete</a>';
                     },
                     "orderable": false,
                     "searchable": false,
@@ -1026,13 +1074,6 @@
             positionList = positionList.substr(delimiter.length);
         }
 
-        /* TODO
-        ensure that SP combines multiple rows with same TrainerEventID and sets the following if relevant count > 1:
-        Personnel = "(# individuals)"
-        Market = "(# markets)"
-        Owner = "(# owners)"
-        Owner Group = "(# owner groups)"
-        */
         $.ajax({
             url: ServicePrefix + '/api/Training/GetTraining',
             dataType: 'json',
@@ -1086,10 +1127,8 @@
 
             trainingEventId = obj["Training Event ID"];
 
-            trainingTitle = obj["Trainer"];
-            trainingTitle += " / " + obj["Training Topic"];
-            trainingTitle += " / " + obj["Training Method"];
-            // TODO add trainee/market/owner/group
+            trainingTitle = getTrainingEventSummary(obj);
+            trainingEventSummary = getTrainingEventSummaryWithDateTime(obj);
 
             events = events.concat([{
                 title: trainingTitle,
@@ -1105,13 +1144,13 @@
                     marketName: obj["Market"],
                     ownerName: obj["Owner"],
                     ownerGroupName: obj["Owner Group"],
-                    trainingEventId: obj["Training Event ID"]
+                    trainingEventId: obj["Training Event ID"],
+                    trainingEventSummary: trainingEventSummary
                 }
             }]);
         });
 
-        if ($('#divCalendar'))
-        {
+        if ($('#divCalendar')) {
             $('#divCalendar').fullCalendar('destroy');
         }
 
@@ -1157,6 +1196,7 @@
         $("#spanOwnerName").text(eventExtendedProps.ownerName);
         $("#spanOwnerGroupName").text(eventExtendedProps.ownerGroupName);
         $("#spanTrainingEventId").text(eventExtendedProps.trainingEventId);
+        $("#spanTrainingEventSummary").text(eventExtendedProps.trainingEventSummary);
 
         $("#eventDialog").dialog("open");
     }
@@ -1172,7 +1212,8 @@
 
     function deleteFromEventDialog() {
         var trainingEventId = $("#spanTrainingEventId").text();
-        deleteTraining(trainingEventId);
+        var trainingEventSummary = $("#spanTrainingEventSummary").text();
+        deleteTraining(trainingEventId, trainingEventSummary);
     }
 
     function addTraining() {
@@ -1183,9 +1224,8 @@
         window.location = "/admin/training/training.html?trainingEventId=" + trainingEventId;
     }
 
-    function deleteTraining(trainingEventId) {
-        // TODO include specs in message
-        bootbox.confirm('Delete this training entry?', function (result) {
+    function deleteTraining(trainingEventId, trainingEventSummary) {
+        bootbox.confirm('Delete this training entry? (' + decodeURI(trainingEventSummary) + ')', function (result) {
             if (result) {
                 deleteTrainingConfirmed(trainingEventId);
             }
