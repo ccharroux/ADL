@@ -166,7 +166,7 @@
                     <h3 style="text-align: center; margin-bottom: 10px;">Update Information</h3>
                     <div class="row">
                         <div class="col-md-12" style="margin-bottom: 10px;">
-                            <input type="hidden" id="txtUpdateMarketAdvertiserId" value=""/>
+                            <input type="hidden" id="txtUpdateMarketAdvertiserId" value="" />
                             <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label>
                             <input type="text" id="txtUpdateMarketAdvertiser" readonly="readonly" style="width: 450px;" maxlength="50" class="report-filter" />
 
@@ -176,17 +176,17 @@
                             <label for="ddlUpdateSubIndustry" class="dropdown-label">Sub Industry</label>
                             <select id="ddlUpdateSubIndustry" disabled="disabled" class="dropdown-select report-filter"></select>
 
-                            <input type="button" class="search-button" value="Update" onclick="updateStationAdvertisers();" />
+                            <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startStationAdvertiserUpdate();" />
                         </div>
                     </div>
                 </div>
 
                 <div class="row">
                     <!--
-        2 datatables
-        1 search results
-        1 to select for bulk updates
-        -->
+                    2 datatables
+                    1 search results
+                    1 to select for bulk updates
+                    -->
                     <div id="dtResultsHolder" class="col-md-5">
                         <table id="dtResults" class="cell-border"></table>
                     </div>
@@ -731,12 +731,25 @@
                         }
                     }
                 );
+
+                var count = matchTable.rows({ selected: true }).count();
+                if (count > 0) {
+                    $("#btnUpdate").show();
+                }
             }
         });
+
+        matchTable.on('deselect', function (e, dt, type, indexes) {
+
+            var count = matchTable.rows({ selected: true }).count();
+            if (count == 0) {
+                $("#btnUpdate").hide();
+            }
+        });
+
     }
 
-    function loadUpdateInformation(stationAdvertiserId, marketAdvertiserId, marketAdvertiserName, industryId, subIndustryId)
-    {
+    function loadUpdateInformation(stationAdvertiserId, marketAdvertiserId, marketAdvertiserName, industryId, subIndustryId) {
         $("#txtUpdateMarketAdvertiserId").val(marketAdvertiserId);
         $("#txtUpdateMarketAdvertiser").val(marketAdvertiserName);
         $("#ddlUpdateIndustry").val(industryId);
@@ -764,8 +777,7 @@
     }
 
 
-    function searchValidationPassed()
-    {
+    function searchValidationPassed() {
         //add the required one but also either or fields
         //return true;
 
@@ -793,26 +805,22 @@
             }
         });
 
-        if (loopBreak == false)
-        {
+        if (loopBreak == false) {
             return loopBreak;
         }
 
         var bMultiFieldCompleted = false;
 
-        $(".multi-field-search").each(function(index, el)
-        {
+        $(".multi-field-search").each(function (index, el) {
             var eID = "#" + $(el).attr("id");
-           
-            if ($(eID).val().length > 0)
-            {
+
+            if ($(eID).val().length > 0) {
                 bMultiFieldCompleted = true;
             }
 
         });
 
-        if (bMultiFieldCompleted == false)
-        {
+        if (bMultiFieldCompleted == false) {
             var errorMessage = "Please complete at least one of the fields notated with **.";
             bootbox.alert(errorMessage, function () { });
             loopBreak = false;
@@ -822,10 +830,146 @@
         return loopBreak;
     }
 
-    function updateStationAdvertisers() {
+    function startStationAdvertiserUpdate() {
+        //need to check if something is being changed before letting the update go through
+        if (validateUpdateFields() == false) {
+            return;
+        }
+
+        var updateStationAdvertiserIds = new Array();
+
+        var updatesTable = $("#dtUpdates").DataTable();
+
+        updatesTable.rows({ selected: true }).every(function () {
+            var d = this.data();
+            updateStationAdvertiserIds.push({
+                "inStationId": d.stationId,
+                "inStationAdvertiserName": d.StationAdvertiserWithoutId
+            });
+        });
+
+        //added functionality to turn the update button on/off based on selected.
+        //adding this check just to be safe.
+        if (updateStationAdvertiserIds.length == 0) {
+            bootbox.alert("You must select at least 1 station advertiser to update.", function () { });
+            return;
+        }
+
+        var msg = "Are you sure that you want to update the selected record(s)?<br/>";
+        msg += "They will be updated to the following values:<br/><ul>";
+
+        if ($("#txtUpdateMarketAdvertiser").val() != "") {
+            msg += "<li>Market Advertiser Name - " + $("#txtUpdateMarketAdvertiser").val() + "</li>";
+        }
+
+        if ($("#ddlUpdateIndustry").val() != "-1") {
+            msg += "<li>Industry - " + $("#ddlUpdateIndustry option:selected").text() + "</li>";
+        }
+
+        if ($("#ddlUpdateSubIndustry").val() != "-1") {
+            msg += "<li>Sub Industry - " + $("#ddlUpdateSubIndustry option:selected").text() + "</li>";
+        }
+
+        msg += "</ul>";
+
+        msg += "Shall these station's revenue histories be merged to " + $("#txtUpdateMarketAdvertiser").val() + "? This action is irreversible.<br/>";
+        msg += "Press Yes to link market advertiser and merge revenue.<br/>";
+        msg += "Press No to link market advertiser only going forward.";
+
+        //build a custom dialog to be yes/no/cancel
+
+        var bLinkRevenue = false;
+
+        var dialog = bootbox.dialog({
+            title: "Merge Station Advertiser Revenue",
+            message: msg,
+            size: 'large',
+            buttons: {
+                yes: {
+                    label: "Yes",
+                    className: 'btn-primary',
+                    callback: function () {
+                        bLinkRevenue = true;
+                        updateStationAdvertisers(updateStationAdvertiserIds, bLinkRevenue);
+                    }
+                },
+                no: {
+                    label: "No",
+                    className: '',
+                    callback: function ()
+                    {
+                        bLinkRevenue = false;
+                        updateStationAdvertisers(updateStationAdvertiserIds, bLinkRevenue);
+                    }
+                },
+                cancel: {
+                    label: "Cancel",
+                    className: '',
+                    callback: function ()
+                    {
+                        return;
+                    }
+                }
+            },
+            onEscape: function () {
+                dialog.modal("hide");
+                return;
+            }
+        });
+    }
+
+    function updateStationAdvertisers(updateStationAdvertiserIds, bLinkRevenue) {
         var errorMessage = "This bulk update functionality is still under development.";
         bootbox.alert(errorMessage, function () { });
 
+        console.log(updateStationAdvertiserIds);
+        console.log(bLinkRevenue);
+
         return;
+
+        $.ajax({
+            url: ServicePrefix + '/api/XRAYRevenue/UpdateExistingAgency',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationAdvertiserList": updateStationAdvertiserIds,
+                "inNewAdvertiserId": $("#txtUpdateMarketAdvertiserId").val(),
+                "inLinkRevenue": bLinkRevenue
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    bootbox.alert("All station advertisers have been updated.", function () { });
+                    searchForStationAdvertiser();
+                    clearUpdateFields();
+                }
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function validateUpdateFields() {
+        // these values can't be changes but leaving the edit in place in case things change
+        if ($("#txtUpdateMarketAdvertiser").val() == "" &&
+            $("#ddlUpdateIndustry").val() == -1 &&
+            ($("#ddlUpdateSubIndustry").val() == null || $("#ddlUpdateSubIndustry").val() == -1)) {
+            bootbox.alert("You must chose at least 1 field to update.", function () { });
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function clearUpdateFields() {
+        $("#txtUpdateMarketAdvertiser").val("");
+        $("#ddlUpdateIndustry").val("-1");
+        $("#ddlUpdateSubIndustry").val("-1");
+        $("#btnUpdate").hide();
     }
 </script>
