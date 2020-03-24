@@ -148,6 +148,7 @@
                     </div>
 
                 </div>
+
                 <div class="row search-section">
                     <div class="col-md-12">
                         <label for="ddlAccountType" class="dropdown-label">Account Type</label>
@@ -157,6 +158,12 @@
                         <select id="ddlOwner" class="dropdown-select report-filter"></select>
 
                         <input type="button" class="search-button" value="Search" onclick="searchForStationAgency();" />
+                    </div>
+                </div>
+                
+                <div class="row search-section">
+                    <div class="col-md-12 multi-field-message-area">
+                        <p class="multi-field-message" style="text-align: center;">** At least one of the following fields needs to be completed: Station Agency or Market Agency.</p>
                     </div>
                 </div>
 
@@ -171,7 +178,7 @@
                             <label for="ddlUpdateAccountType" class="dropdown-label">Account Type</label>
                             <select id="ddlUpdateAccountType" disabled="disabled" class="dropdown-select report-filter"></select>
 
-                            <input type="button" class="search-button" value="Update" onclick="updateStationAgencies();" />
+                            <input type="button"  id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startStationAgencyUpdate();" />
                         </div>
                     </div>
                 </div>
@@ -426,7 +433,7 @@
         //create a radio button with onclick populate the info section
         columnsToDisplay.push({
             "mRender": function (data, type, row) {
-                return '<input type="radio" name="agencies" onclick="loadUpdateInformation(' + row.stationAgencyId + ',' + row.marketAgencyId +
+                return '<input type="radio" id="rdo_' + row.stationAgencyId + '" name="agencies" onclick="loadUpdateInformation(' + row.stationAgencyId + ',' + row.marketAgencyId +
                     ',\'' + row.MarketAgencyWithoutId + '\',' + row.accountTypeId + ');markAsNotSelectable(' + row.stationAgencyId + ');">';
             },
             "orderable": false,
@@ -515,10 +522,11 @@
         //add on select and have it do code
         searchTable.on('select', function (e, dt, type, indexes) {
             if (type === 'row') {
-
-                //click the radio button or call the functions
-
-
+                //this will trigger the click of the radio button
+                if (type === 'row') {
+                    var d = dt.data();
+                    $("#rdo_" + d.stationAgencyId).click();
+                }
             }
         });
 
@@ -637,8 +645,22 @@
                         }
                     }
                 );
+
+                var count = matchTable.rows({ selected: true }).count();
+                if (count > 0) {
+                    $("#btnUpdate").show();
+                }
             }
         });
+
+        matchTable.on('deselect', function (e, dt, type, indexes) {
+
+            var count = matchTable.rows({ selected: true }).count();
+            if (count == 0) {
+                $("#btnUpdate").hide();
+            }
+        });
+
     }
 
     function loadUpdateInformation(stationAgencyId, marketAgencyId, marketAgencyName, accountTypeId) {
@@ -721,12 +743,139 @@
         return loopBreak;
     }
 
-    function updateStationAgencies()
+    function startStationAgencyUpdate()
+    {
+        if (validateUpdateFields() == false) {
+            return;
+        }
+
+        //load array of station agencies based on the api, etc.
+        var updateStationAgencyIds = new Array();
+
+        var updatesTable = $("#dtUpdates").DataTable();
+
+        updatesTable.rows({ selected: true }).every(function () {
+            var d = this.data();
+            updateStationAgencyIds.push({
+                "inStationId": d.stationId,
+                "inStationAgencyName": d.StationAAgencyWithoutId
+            });
+        });
+
+        if (updateStationAgencyIds.length == 0) {
+            bootbox.alert("You must select at least 1 station agency to update.", function () { });
+            return;
+        }
+
+        var bLinkRevenue = false;
+
+        //create message with changes
+        //also add wording for linking revenue
+        var msg = "Are you sure that you want to update the selected record(s)?<br/>";
+        msg += "They will be updated to the following values:<br/><ul>";
+
+        if ($("#txtUpdateMarketAdvertiser").val() != "") {
+            msg += "<li>Market Agency Name - " + $("#txtUpdateMarketAgency").val() + "</li>";
+        }
+
+        if ($("#ddlUpdateAccountType").val() != "-1") {
+            msg += "<li>Account Type - " + $("#ddlUpdateAccountType option:selected").text() + "</li>";
+        }
+
+        msg += "</ul>";
+
+        msg += "Shall these station's revenue histories be merged to " + $("#txtUpdateMarketAgency").val() + "? This action is irreversible.<br/>";
+        msg += "Press Yes to link market advertiser and merge revenue.<br/>";
+        msg += "Press No to link market advertiser only going forward.";
+
+        var dialog = bootbox.dialog({
+            title: "Merge Station Advertiser Revenue",
+            message: msg,
+            size: 'large',
+            buttons: {
+                yes: {
+                    label: "Yes",
+                    className: 'btn-primary',
+                    callback: function () {
+                        bLinkRevenue = true;
+                        updateStationAgencies(updateStationAgencyIds, bLinkRevenue);
+                    }
+                },
+                no: {
+                    label: "No",
+                    className: '',
+                    callback: function () {
+                        bLinkRevenue = false;
+                        updateStationAgencies(updateStationAgencyIds, bLinkRevenue);
+                    }
+                },
+                cancel: {
+                    label: "Cancel",
+                    className: '',
+                    callback: function () {
+                        return;
+                    }
+                }
+            },
+            onEscape: function () {
+                dialog.modal("hide");
+                return;
+            }
+        });
+
+    }
+
+
+    function updateStationAgencies(updateStationAgencyIds, bLinkRevenue)
     {
         var errorMessage = "This bulk update functionality is still under development.";
         bootbox.alert(errorMessage, function () { });
 
         return;
+
+        $.ajax({
+            url: ServicePrefix + '/api/XRAYRevenue/UpdateExistingStationAgency',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationAdvertiserList": updateStationAgencyIds,
+                "inNewAgencyId": $("#txtUpdateMarketAgencyId").val(),
+                "inLinkRevenue": bLinkRevenue
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    bootbox.alert("All station advertisers have been updated.", function () { });
+                    searchForStationAgency();
+                    clearUpdateFields();
+                }
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function validateUpdateFields() {
+        // these values can't be changes but leaving the edit in place in case things change
+        if ($("#txtUpdateMarketAgency").val() == "" &&
+            $("#ddlUpdateAccountType").val() == -1 ) {
+            bootbox.alert("You must chose at least 1 field to update.", function () { });
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function clearUpdateFields() {
+        $("#txtUpdateMarketAgencyId").val("");
+        $("#txtUpdateMarketAgency").val("");
+        $("#ddlAccountType").val("-1");
+        $("#btnUpdate").hide();
     }
 
 </script>
