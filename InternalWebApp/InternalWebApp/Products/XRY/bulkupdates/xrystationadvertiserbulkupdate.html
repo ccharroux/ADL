@@ -508,7 +508,7 @@
         //create a radio button with onclick populate the info section
         columnsToDisplay.push({
             "mRender": function (data, type, row) {
-                return '<input type="radio" name="advertisers" onclick="loadUpdateInformation(' + row.stationAdvertiserId + ',' + row.marketAdvertiserId +
+                return '<input type="radio" id="rdo_' + row.stationAdvertiserId + '" name="advertisers" onclick="loadUpdateInformation(' + row.stationAdvertiserId + ',' + row.marketAdvertiserId +
                     ',\'' + row.MarketAdvertiserWithoutId + '\',' + row.industryId + ',' + row.subIndustryId + ');markAsNotSelectable(' + row.stationAdvertiserId + ');">';
             },
             "orderable": false,
@@ -602,11 +602,10 @@
 
         //add on select and have it do code
         searchTable.on('select', function (e, dt, type, indexes) {
+            //this will trigger the click of the radio button
             if (type === 'row') {
-
-                //click the radio button or call the functions
-
-
+                var d = dt.data();
+                $("#rdo_" + d.stationAdvertiserId).click();
             }
         });
 
@@ -919,13 +918,6 @@
     }
 
     function updateStationAdvertisers(updateStationAdvertiserIds, bLinkRevenue) {
-        //var errorMessage = "This bulk update functionality is still under development.";
-        //bootbox.alert(errorMessage, function () { });
-
-        //console.log(updateStationAdvertiserIds);
-        //console.log(bLinkRevenue);
-
-        //return;
 
         $.ajax({
             url: ServicePrefix + '/api/XRAYRevenue/UpdateExistingStationAdvertiser',
