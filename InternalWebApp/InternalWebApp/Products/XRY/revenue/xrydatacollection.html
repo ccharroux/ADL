@@ -348,6 +348,33 @@
         </div>
     </div>
     <div id="dialogImportCheck" title="Import">
+ 
+        <div class="row" stryle="margin-top: 20px;">
+            <div class="col-md-3">
+                <label for="selectedOwner">Owner:&nbsp;</label>
+                <span id="selectedOwner"></span>
+            </div>
+            <div class="col-md-3">
+                <label for="selectedMarket">
+                    Market:&nbsp;
+                </label>
+                <span id="selectedMarket"></span>
+            </div>
+            <div class="col-md-3">
+                <label for="selectedStation">
+                    Station:&nbsp;
+                </label>
+                <span id="selectedStation"></span>
+            </div>
+            <div class="col-md-3">
+                <label for="selectedSubmission">
+                    Submission:&nbsp;
+                </label>
+                <span id="selectedSubmission"></span>
+            </div>
+
+        </div>
+        <hr />
         <div style="margin:10px 10px 10px 10px;width:100%;color:red;text-align:center">
             <div style="margin:5px 5px 5px 5px;">Select an individual option for each market or make a bulk selection by using buttons.</div>
             <input type="button" value="Overwrite existing data" onclick="bulkSelectImportOptions('overwrite')" /> &nbsp;
@@ -470,6 +497,7 @@
     }
 
     function runReportFromAdvancedSearch() {
+
         setTimeout('getDataCollectionList(true)', 1000);
     }
 
@@ -950,7 +978,6 @@
 
                         }
                     );
-
                     //reload the page.
                     getDataCollectionList();
 
@@ -1596,7 +1623,6 @@
                                 //reloading the datatable
                             }
                         });
-
                         getDataCollectionList();
 
                     } else {
@@ -1664,7 +1690,6 @@
                                 //reloading the datatable
                             }
                         });
-
                         getDataCollectionList();
 
                     } else {
@@ -1704,15 +1729,8 @@
 
     function changeAvailability(stationId, marketId, ownerId, stationName, mediaType, submissionId) {
 
-        //setLocalStorage("tempStationMarketId", marketId);
-        //setLocalStorage("tempStationOwnerId", ownerId);
-        //setLocalStorage("tempStationName", stationName);
-        //setLocalStorage("tempStationMedia", mediaType);
-
-        //window.location = "/products/xry/xrystationproduct.html?StationID=" + stationId;
         var reportParams = getReportParameters();
 
-        //console.log(reportParams);
         setLocalStorage("reportActionData", JSON.stringify(reportParams));
 
         window.location = "/products/xry/xrystationsubmission.html?StationID=" + stationId + "&SubmissionID=" + submissionId + "&FromReport=true";
@@ -2468,7 +2486,7 @@
         {
             columnsExport.push(x);
         }
-        console.log(columnsExport);
+
 
         searchTable = $("#dtResults").DataTable({
             "dom": "Blfrtip",
@@ -2605,10 +2623,13 @@
         //}
 
 
-        if (type === 'display') {
+        if (type === 'display')
+        {
             var index = rowStatusArray.findIndex(getStatus);
 
-            if (index === -1) {
+
+            if (index === -1)
+            {
                 rowStatusArrayCtr.push(1);
                 rowStatusArray.push(status);
             }
@@ -2617,7 +2638,8 @@
             }
         }
 
-        if (type === 'statusOnly') {
+        if (type === 'statusOnly')
+        {
             return status;
         }
         else {
@@ -2796,7 +2818,7 @@
         //////return true;
     }
     function updateStatus(token) {
-        console.log(token);
+
     }
 
 
@@ -3093,7 +3115,7 @@
 
                         }
                     );
-
+   
                     //reload the page.
                     getDataCollectionList();
                 }
@@ -3191,7 +3213,6 @@
                     success: function (response) {
 
                         getDataCollectionList();
- 
 
                         if (response.response.status != "SUCCESS")
                         {
@@ -3200,7 +3221,7 @@
                         }
                         else
                         {
-                            getDataCollectionList();
+ 
                             bootbox.alert('Upload Process worked.', function () { });
                             loadRejectionData(response);
                         }
@@ -3306,7 +3327,7 @@
                 gEvent.preventDefault();
                 var formData = new FormData(document.forms['ajaxUploadForm']);
 
-                //ServicePrefix = "http://localhost:54064";
+                ServicePrefix = "http://localhost:54064";
 
                 var url = ServicePrefix + '/api/XrayImport/ImportFile?inApiToken=' + apiToken;
                 url = url + "&inYear=" + $("#ddlYear").val() + "&inPeriod=" + $("#ddlPeriod").val();
@@ -3348,7 +3369,6 @@
                             bootbox.alert('Upload Process Failed.\n\r\n\r' + response.response.errorMessage[0] + '\n\r\n\rDevelopement has been notified and is looking into this issue.', function () { });
                         }
                         else {
-                            getDataCollectionList();
                             bootbox.alert('Upload Process worked.', function () { });
                             loadRejectionData(response); 
                         }
@@ -3550,6 +3570,11 @@
             'className': "text-align-left"
         });
 
+        $("#selectedOwner").html($("#ddlOwner option:selected").text());
+        $("#selectedMarket").html($("#ddlMarketUpload option:selected").text());
+        $("#selectedStation").html($("#ddlStationUpload option:selected").text());
+        $("#selectedSubmission").html($("#ddlSubmissionUpload option:selected").text());
+
         loadResultsImportCheckData(data, columnsToDisplay);
     }
 
@@ -3642,7 +3667,8 @@
 
     function processImportForm()
     {
-        
+
+
         const promise = new Promise((resolve, reject) =>
         {
             $("#dialogImportCheck").dialog("close");
@@ -3868,7 +3894,7 @@
     function bulkSelectImportOptions(value)
     {
 
-        console.log(value);
+        //console.log(value);
         $('.processImportDiv').each(function (i, obj) {
             var market = $(this).attr('market');
             $('input[name="processImport_' + market + '"][value="' + value + '"]').prop('checked', true);
