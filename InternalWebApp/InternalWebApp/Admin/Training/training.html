@@ -35,6 +35,10 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
+    <!-- DataTables style  -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
     <!--Chosen Dropdown-->
     <link rel="stylesheet" href="/css/chosen.min.css" />
     <!-- Timepicker -->
@@ -56,6 +60,9 @@
         select, .chosen-container {
             width: 300px !important;
         }
+        .selectTrainer {
+            width: 500px !important;
+        }
     </style>
 </head>
 <body>
@@ -69,7 +76,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2><span id="spanTitle"></span></h2>
+                        <h2><span id="spanTitle"></span></h2> <!-- text varies based on whether we're adding or editing -->
                     </div>
                 </div>
                 <div id="divQuickReport">
@@ -100,69 +107,13 @@
                         </div>
                     </div>
 
-                    <!-- Media Type -->
-                    <div class="row input-row"> <!-- for individual training, used to filter trainee list -->
-                        <div class="col-md-3 text-align-left">
-                            <label for="ddlMediaType">Media Type</label>
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <select id="ddlMediaType" onchange="mediaTypeChanged();"></select>
-                        </div>
-                    </div>
-
-                    <!-- Owner -->
-                    <div class="row input-row"> <!-- for individual training, used to filter trainee list; listed first because filtering by market is slower (especially when not also filtering by owner) -->
-                        <div class="col-md-3 text-align-left">
-                            <label for="ddlOwner">Owner</label>
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <select id="ddlOwner" class="mkaRequiredForClusterTraining" errorMessage="You must select an owner." onchange="getTrainees();"></select>
-                        </div>
-                    </div>
-
-                    <!-- Market -->
-                    <div class="row input-row"> <!-- for individual training, used to filter trainee list -->
-                        <div class="col-md-3 text-align-left">
-                            <label for="ddlMarket">Market</label>
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <select id="ddlMarket" class="mkaRequiredForClusterTraining" errorMessage="You must select a market." onchange="getTrainees();"></select>
-                        </div>
-                    </div>
-
-                    <!-- Training Type -->
-                    <div id="divTrainingType" class="row input-row">
-                        <div class="col-md-3 text-align-left">
-                            <label for="ddlTrainingType">Training Type</label>
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <select id="ddlTrainingType" class="mkaRequired" onchange="gotTrainingType();" errorMessage="You must select a training type.">
-                                <option value="">(select a training type)</option>
-                                <option value="Individual">Individual</option>
-                                <option value="Cluster">Cluster</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Trainee -->
-                    <div class="row input-row individualTrainingRow">
-                        <div class="col-md-3 text-align-left">
-                            <label for="ddlTrainee"><span id="spanTrainee"></span></label>
-                        </div>
-                        <div class="col-md-9 text-align-left individualTraining">
-                            <select id="ddlTrainee" class="mkaRequiredForIndividualTraining" errorMessage="You must select a trainee."></select>
-                            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                            <input type="checkbox" id="chkIncludeInternal" onchange="getTrainees();" />
-                            &nbsp; Include internal users
-                        </div>
-                    </div>
-
+                    <!-- Trainer -->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="ddlTrainer">Trainer</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlTrainer" class="mkaRequired" errorMessage="You must select a trainer."></select>
+                            <select id="ddlTrainer" class="mkaRequired selectTrainer" errorMessage="You must select a trainer."></select>
                         </div>
                     </div>
 
@@ -205,14 +156,134 @@
                             </div>
                             <div class="col-md-9 text-align-left">
                                 <div>
-                                    <input value="Update" onclick="excludeFromBackButton(); updateTrainingDetail();" class="default-button" type="button">
+                                    <button id="btnSave" onclick="excludeFromBackButton(); saveTrainingEvent();" class="btn btn-success"></button> <!-- text varies based on whether we're adding or editing -->
+                                    <button id="btnReset" onclick="getTrainingEvent();" class="btn btn-warning">Reset</button>
+                                    <button id="btnCancel" onclick="returnToList();" class="btn btn-danger">Cancel</button>
+                                    <button id="btnDelete" onclick="deleteTrainingEvent();" class="btn btn-danger editMode">Delete</button>
                                 </div>
-                                <!--<div class="back-button-div">
-                                    <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button">
-                                </div>-->
                             </div>
                         </div>
                     </div>
+
+                    <div id="divTrainees" class="editMode"> <!-- must save event before adding trainees -->
+                    <!-- TODO possibly relax this requirement later: accumulate trainees to add, add event, get ID of event just added, then add trainees -->
+
+                        <hr />
+
+                        <div class="row">
+                            <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
+                                <h3>Trainees</h3>
+                            </div>
+                        </div>
+
+                        <!-- Media Type -->
+                        <div class="row input-row">
+                            <div class="col-md-3 text-align-left">
+                                <label for="ddlMediaType">Media Type</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <select id="ddlMediaType" onchange="mediaTypeChanged();"></select>
+                            </div>
+                        </div>
+
+                        <!-- Owner (listed first because filtering personnel by market is slower, especially when not also filtering by owner) -->
+                        <div class="row input-row">
+                            <div class="col-md-3 text-align-left">
+                                <label for="ddlOwner">Owner</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <select id="ddlOwner" class="mkaRequiredCluster" errorMessage="You must select an owner." onchange="getIndividuals(); getOwnerGroups();"></select>
+                            </div>
+                        </div>
+
+                        <!-- Market -->
+                        <!-- TODO add checkbox to filter this by owner -->
+                        <div class="row input-row">
+                            <div class="col-md-3 text-align-left">
+                                <label for="ddlMarket">Market</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <select id="ddlMarket" class="mkaRequiredCluster" errorMessage="You must select a market." onchange="getIndividuals();"></select>
+                            </div>
+                        </div>
+
+                        <!-- Group -->
+                        <!-- TODO filter ddlTrainee by this? -->
+                        <!-- TODO make this a multi-select? -->
+                        <div class="row input-row">
+                            <div class="col-md-3 text-align-left">
+                                <label for="ddlOwnerGroup">Owner Group</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <select id="ddlOwnerGroup" class="mkaRequiredOwnerGroup" errorMessage="You must select an owner group."></select>
+                            </div>
+                        </div>
+
+                        <!-- Individual -->
+                        <!-- TODO make this a multi-select? -->
+                        <div class="row input-row">
+                            <div class="col-md-3 text-align-left">
+                                <label for="ddlTrainee">Individual Trainee</label>
+                            </div>
+                            <div class="col-md-9 text-align-left">
+                                <select id="ddlTrainee" class="mkaRequiredIndividual" errorMessage="You must select an individual trainee."></select>
+                                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                <input type="checkbox" id="chkIncludeInternal" onchange="getIndividuals();" />
+                                &nbsp; Include internal users
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <!-- Buttons -->
+                        <div class="default-button-section">
+                            <div class="row input-row">
+                                <div class="col-md-3">
+                                </div>
+                                <div class="col-md-9 text-align-left">
+                                    <div>
+                                        <button id="btnAddIndividual" onclick="addTraineeIndividual();" class="btn btn-success">Add Individual</button>
+                                        <button id="btnAddCluster" onclick="addTraineeCluster();" class="btn btn-success">Add Cluster</button>
+                                        <button id="btnAddOwnerGroup" onclick="addTraineeOwnerGroup();" class="btn btn-success">Add Owner Group</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- List of current trainees -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="dataTable-top-margin">
+                                    <table id="dtTrainees" class="dataTable-border dataTable-headers dataTable-cell-border" style="width: 100%">
+                                        <thead>
+                                            <tr>
+                                                <th class="exportColumn">Type</th>
+                                                <th class="exportColumn">Name</th>
+                                                <th class="exportColumn">Email</th>
+                                                <th class="exportColumn">Market</th>
+                                                <th class="exportColumn">Owner</th>
+                                                <th class="exportColumn">Group</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <!--<tfoot>
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Market</th>
+                                                <th>Owner</th>
+                                                <th>Group</th>
+                                                <th></th>
+                                            </tr>
+                                        </tfoot>-->
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -235,6 +306,15 @@
     <script src="/js/main.js"></script>
     <!-- genericReport JS -->
     <script src="/js/genericReport.js"></script>
+    <!-- DataTables JS -->
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
     <!-- jQuery UI -->
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <!--Chosen Dropdown-->
@@ -245,25 +325,23 @@
 </html>
 <script>
 
-    var isCluster;
-    var trainingId;
+    var trainingEventId;
 
-    var gotMarkets = false;
-    var gotOwners = false;
-    var gotTrainees = false;
     var gotTrainers = false;
     var gotTopics = false;
     var gotMethods = false;
-    var needToUpdateTraineesWhenVisible = false;
-    var gotTrainingDetail = false;
+    var gotTrainingEvent = false;
+
+    var gotOwners = false;
+    var gotMarkets = false;
+    var gotIndividuals = false;
+    var gotOwnerGroups = false;
 
     $(document).ready(function ()
     {
-
         buildMainMenu("Training");
 
-        isCluster = stringToBoolean(getParameterByName("isCluster"));
-        trainingId = getParameterByName("trainingId");
+        trainingEventId = getParameterByName("trainingEventId");
 
         // local storage for quick reports
         //if (marketId > 0)
@@ -278,15 +356,18 @@
         buildQuickReports(['training']);
 
         checkForInsertOrUpdate();
+
         getTrainingDate();
         getTrainingTime();
-        getMediaTypes(); // success -> get markets and owners, then trainees
+
         getTrainers();
         getTopics();
         getMethods();
+        // success on all of these -> event detail -> media types, owners, markets, individuals, groups
+
+        setDataTable();
 
         loadFeatureButtons();
-
     });
 
     function stringToBoolean(val) {
@@ -299,21 +380,24 @@
         return val;
     }
 
-    function getEditTrainingType() {
-        return isCluster ? "Cluster" : "Individual";
-    }
-
     function checkForInsertOrUpdate() {
-        if (trainingId == null) {
+        if (trainingEventId == null) {
             // insert
             $("#spanTitle").text("Add Training");
+            $("#btnSave").text("Save and add trainees");
+            $(".editMode").hide();
         } else {
             // update
             $("#spanTitle").text("Edit Training");
-            $("#ddlTrainingType").val(getEditTrainingType());
-            $("#divTrainingType").hide();
+            $("#btnSave").text("Save");
+            $(".editMode").show();
+            getMediaTypes();
+            getOwners();
+            getMarkets();
+            // individuals loaded after owners/markets
+            // owner groups loaded after owners
+            getCurrentTrainees();
         }
-        gotTrainingType();
     }
 
     function getTrainingDate() {
@@ -354,10 +438,319 @@
         }
     }
 
-    function getMediaTypes() {
-        var url = ServicePrefix + '/api/MediaType/GetMediaTypeList';
+    function getTrainers() {
+        $.ajax({
+            url: ServicePrefix + '/api/PersonnelReport/GetInternalUserList'
+                + '?inApiToken=' + getLocalStorage("APIToken")
+                + '&inWebUsersOnly=true',
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getTrainersSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
 
-        var settings = {
+    function getTrainersSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '<option value="">-- Select a Trainer --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str = str + '<option value="' + obj.PersonnelId + '"';
+            if (trainingEventId == null && obj.IsCurrentPersonnel == "Yes") {
+                str = str + ' selected';
+            }
+            str = str + '>' + obj.User + ' (' + obj.Email + ')' + '</option>';
+        });
+
+        $("#ddlTrainer").html(str);
+
+        convertToChosenSelect("ddlTrainer", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotTrainers = true;
+        getTrainingEvent();
+    }
+
+    function getTopics() {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/GetTrainingTopics',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getTopicsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getTopicsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '<option value="">-- Select a Topic --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str = str + '<option value="' + obj.trainingTopicId + '">' + obj.trainingTopicDescription + '</option>';
+        });
+
+        $("#ddlTopic").html(str);
+
+        convertToChosenSelect("ddlTopic", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotTopics = true;
+        getTrainingEvent();
+    }
+
+    function getMethods() {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/GetTrainingMethods',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMethodsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getMethodsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '<option value="">-- Select a Method --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str = str + '<option value="' + obj.trainingMethodId + '">' + obj.trainingMethodDescription + '</option>';
+        });
+
+        $("#ddlMethod").html(str);
+
+        convertToChosenSelect("ddlMethod", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotMethods = true;
+        getTrainingEvent();
+    }
+
+    function setDataTable() {
+        var reportTitle = "Trainees";
+        var exportColumns = returnTableColumnsByClass("dtTrainees", "exportColumn");
+
+        $("#dtTrainees").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "order": [
+                [0, 'asc'], // Type
+            ],
+            "columns": [
+                { "data": 'TraineeType' },
+                { "data": 'PersonnelName' },
+                { "data": 'Email' },
+                { "data": 'MarketName' },
+                { "data": 'OwnerName' },
+                { "data": 'OwnerGroupName' },
+                {
+                    mRender: function (data, type, row) {
+                        var traineeType = row["TraineeType"].toString().toLowerCase();
+                        if (traineeType.includes("individual")) {
+                            var personnelId = row["PersonnelID"];
+                            var traineeSummary = row["PersonnelName"] + ' (' + row["Email"] + ')';
+                            return '<a href="#" onclick="deleteTraineeIndividual(' + personnelId + ',\'' + encodeURI(traineeSummary) + '\')">Delete</a>';
+                        }
+                        if (traineeType.includes("cluster")) {
+                            var marketId = row["MarketID"];
+                            var ownerId = row["OwnerID"];
+                            var traineeSummary = row["MarketName"] + ' / ' + row["OwnerName"];
+                            return '<a href="#" onclick="deleteTraineeCluster(' + marketId + ',' + ownerId + ',\'' + encodeURI(traineeSummary) + '\')">Delete</a>';
+                        }
+                        if (traineeType.includes("owner group")) {
+                            var ownerGroupId = row["OwnerGroupID"];
+                            var traineeSummary = row["OwnerGroupName"];
+                            return '<a href="#" onclick="deleteTraineeOwnerGroup(' + ownerGroupId + ',\'' + encodeURI(traineeSummary) + '\')">Delete</a>';
+                        }
+                        return ''; // should never happen
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": "text-align-left"
+                }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtTrainees", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               {
+                   extend: 'excel',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtTrainees", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtTrainees", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtTrainees", data, columnIdx);
+                           }
+                       }
+                   }
+               }
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            initComplete: function () {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+    }
+
+    function getTrainingEvent() {
+        // new entry
+        if (trainingEventId == null) {
+            return;
+        }
+
+        // each get-X calls this function on success, but only proceed once all of them have succeeded
+        if (
+               gotTrainers == false
+            || gotTopics == false
+            || gotMethods == false
+        ) {
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Training/GetTrainingEvent',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inTrainingEventId": trainingEventId
+            }),
+            success: function (data, textStatus, jQxhr) {
+                getTrainingEventSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getTrainingEventSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var obj = data.report.rows[0];
+
+        $("#dtTrainingDate").val(obj["Training Date"]);
+
+        $("#tmTrainingTime").val(obj["Training Time"]);
+        if ($("#tmTrainingTime").val() == "") {
+            $("#chkTrainingTimeUnspecified").prop("checked", true);
+        } else {
+            $("#chkTrainingTimeUnspecified").prop("checked", false); // needed for Reset button
+            adjustTrainingTimeFormat();
+        }
+        adjustTrainingTimeDisplay(); // needed for Reset button as well as events with unspecified time
+
+        setTrainerFromDetail(
+            obj["Trainer Personnel ID"],
+            obj["Trainer"]
+        );
+
+        $("#ddlTopic").val(obj["Training Topic ID"]);
+        $("#ddlMethod").val(obj["Training Method ID"]);
+        $("#txtNotes").val(obj["Notes"]);
+
+        gotTrainingEvent = true;
+    }
+
+    function setTrainerFromDetail(trainerPersonnelId, trainerName) {
+        // if ID is already in list, then just select it
+        $("#ddlTrainer").val(trainerPersonnelId);
+        if ($("#ddlTrainer").val() == trainerPersonnelId) {
+            return;
+        }
+
+        // otherwise, add it to the list (it was presumably omitted because it's now inactive) and then select it
+        var str = $("#ddlTrainer").html();
+        str = str + '<option value="' + trainerPersonnelId + '">*INACTIVE* ' + trainerName + '</option>'; // name includes ID
+        $("#ddlTrainer").html(str);
+        $("#ddlTrainer").val(trainerPersonnelId);
+    }
+
+    function getMediaTypes() {
+        $.ajax({
+            url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
@@ -371,86 +764,38 @@
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
-        };
-
-        $.ajax(url, settings);
-
+        });
     }
 
     function getMediaTypesSuccess(data, textStatus, jQxhr) {
-
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
-        }
-        else {
-
-            var str = '';
-            str = '<option value="-1">-- Select a Media Type</option>';
-            $.each(data.report.rows, function (index) {
-
-                str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
-
-            });
-
-            $("#ddlMediaType").html(str);
-
-            convertToChosenSelect("ddlMediaType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-            mediaTypeChanged();
-
+            return;
         }
 
+        var str = '<option value="">-- All Media Types --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str = str + '<option value="' + obj.MediaTypeID + '">' + obj.MediaTypeName + '</option>';
+        });
+
+        $("#ddlMediaType").html(str);
+
+        convertToChosenSelect("ddlMediaType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        mediaTypeChanged();
     }
 
     function mediaTypeChanged() {
-        getMarkets();
+        gotOwners = false;
+        gotMarkets = false;
+        gotIndividuals = false;
+        gotOwnerGroups = false;
+
         getOwners();
-    }
-
-    function getMarkets() {
-        $.ajax({
-            url: ServicePrefix + '/api/Market/GetMarketList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inMediaTypeId": $("#ddlMediaType").val(),
-                "inActiveOnly": true
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    var currentMarketId = $("#ddlMarket").val();
-                    if (currentMarketId == 0) { // workaround because database still contains MarketID 0
-                        currentMarketId = -1;
-                    }
-                    var str = '';
-                    str = '<option value="">-- Select a Market --</option>';
-                    $.each(data.report.rows, function (index) {
-                        str = str + '<option value="' + data.report.rows[index].marketId + '"' + (data.report.rows[index].marketId == currentMarketId ? ' selected' : '') + '>' + data.report.rows[index].marketName + '</option>'; // marketName also includes ID
-                    });
-
-                    $("#ddlMarket").html(str);
-
-                    convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-                    gotMarkets = true;
-                    getTrainees();
-                    getTrainingDetail();
-
-                }
-
-
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
+        getMarkets();
+        // individuals loaded after owners/markets
+        // owner groups loaded after owners
     }
 
     function getOwners() {
@@ -466,32 +811,7 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    var currentOwnerId = $("#ddlOwner").val();
-                    var str = '';
-                    str = '<option value="">-- Select an Owner --</option>';
-                    $.each(data.report.rows, function (index) {
-
-
-                        str = str + '<option value="' + data.report.rows[index].OwnerID + '"' + (data.report.rows[index].OwnerID == currentOwnerId ? ' selected' : '') + '>' + data.report.rows[index].OwnerName + ' (' + data.report.rows[index].OwnerID + ')' + '</option>'; // OwnerName does not include ID
-
-                    });
-
-                    $("#ddlOwner").html(str);
-
-                    convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-                    gotOwners = true;
-                    getTrainees();
-                    getTrainingDetail();
-
-                }
-
-
+                getOwnersSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -499,50 +819,86 @@
         });
     }
 
-    function gotTrainingType() {
-        if (trainingId != null) {
-            if (isCluster) {
-                $(".individualTrainingRow").hide();
-            } else {
-                $(".clusterTrainingRow").hide();
-            }
+    function getOwnersSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
         }
 
-        $(".individualTraining").hide();
-        $(".mkaRequiredForIndividualTraining").removeClass("mkaRequired");
-        $(".clusterTraining").hide();
-        $(".mkaRequiredForClusterTraining").removeClass("mkaRequired");
+        var currentOwnerId = $("#ddlOwner").val();
 
-        switch ($("#ddlTrainingType").val()) {
-            case "Individual":
-                if (needToUpdateTraineesWhenVisible) {
-                    needToUpdateTraineesWhenVisible = false;
-                    getTrainees();
-                }
-                $(".individualTraining").show();
-                $(".mkaRequiredForIndividualTraining").addClass("mkaRequired");
-                $("#spanTrainee").text("Trainee");
-                break;
-            case "Cluster":
-                $(".clusterTraining").show();
-                $(".mkaRequiredForClusterTraining").addClass("mkaRequired");
-                $("#spanTrainee").html("&nbsp;"); // keep row height same to minimize shifting of other controls
-                break;
-        }
+        var str = '<option value="">-- All Owners --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str = str + '<option value="' + obj.OwnerID + '"'
+                + (obj.OwnerID == currentOwnerId ? ' selected' : '')
+                + '>' + obj.OwnerName + ' (' + obj.OwnerID + ')' + '</option>'; // OwnerName does not include ID
+        });
+
+        $("#ddlOwner").html(str);
+
+        convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotOwners = true;
+
+        getIndividuals();
+        getOwnerGroups();
     }
 
-    function getTrainees() {
-        if (isCluster) { // editing cluster training, so skip ahead to post-success logic
-            postGetTrainees();
+    function getMarkets() {
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMediaTypeId": $("#ddlMediaType").val(),
+                "inActiveOnly": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getMarketsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
-        if ($("#ddlTrainingType").val() != "Individual") { // trainee list not currently visible, set a flag that it needs to be updated if/when it becomes visible
-            needToUpdateTraineesWhenVisible = true;
-            return;
+        var currentMarketId = $("#ddlMarket").val();
+        if (currentMarketId == 0) { // workaround in case database still contains MarketID 0
+            currentMarketId = -1;
         }
 
-        if (gotMarkets == false || gotOwners == false) {
+        var str = '<option value="">-- Select a Market --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str = str + '<option value="' + obj.marketId + '"'
+                + (obj.marketId == currentMarketId ? ' selected' : '')
+                + '>' + obj.marketName + '</option>'; // marketName also includes ID
+        });
+
+        $("#ddlMarket").html(str);
+
+        convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotMarkets = true;
+
+        getIndividuals();
+    }
+
+    function getIndividuals() {
+        if (
+               gotMarkets == false
+            || gotOwners == false
+        ) {
             return;
         }
 
@@ -559,31 +915,7 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    var currentTraineeId = $("#ddlTrainee").val();
-                    var str = '';
-                    if (data.report.rows.length == 0 && $("#ddlOwner").val() == "" && $("#ddlMarket").val() == "" && trainingId == null) {
-                        str = '<option value="">-- First select Market and/or Owner --</option>';
-                    } else {
-                        str = '<option value="">-- Select a Trainee --</option>';
-                        $.each(data.report.rows, function (index) {
-                            str = str + '<option value="' + data.report.rows[index].personnelId + '"' + (data.report.rows[index].personnelId == currentTraineeId ? ' selected' : '') + '>' + data.report.rows[index].name + '</option>'; // name includes ID
-                        });
-                    }
-
-                    $("#ddlTrainee").html(str);
-
-                    convertToChosenSelect("ddlTrainee", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-                    postGetTrainees();
-
-                }
-
-
+                getIndividualsSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -591,308 +923,94 @@
         });
     }
 
-    function postGetTrainees() {
-        gotTrainees = true;
-        getTrainingDetail();
-    }
-
-    function getTrainers() {
-        $.ajax({
-            url: ServicePrefix + '/api/PersonnelReport/GetInternalUserList'
-                + '?inApiToken=' + getLocalStorage("APIToken")
-                + '&inWebUsersOnly=true',
-            dataType: 'json',
-            type: 'get',
-            contentType: 'application/json',
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    var str = '';
-                    str = '<option value="">-- Select a Trainer --</option>';
-                    $.each(data.report.rows, function (index) {
-                        str = str + '<option value="' + data.report.rows[index].PersonnelId + '"';
-                        if (trainingId == null && data.report.rows[index].IsCurrentPersonnel == "Yes") {
-                            str = str + ' selected';
-                        }
-                        str = str + '>' + data.report.rows[index].User + ' (' + data.report.rows[index].PersonnelId + ')' + '</option>'; // User does not include ID
-                    });
-
-                    $("#ddlTrainer").html(str);
-
-                    convertToChosenSelect("ddlTrainer", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-                    gotTrainers = true;
-                    getTrainingDetail();
-
-                }
-
-
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function getTopics() {
-        $.ajax({
-            url: ServicePrefix + '/api/Training/GetTrainingTopics',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-
-                    var str = '';
-                    str = '<option value="">-- Select a Topic --</option>';
-                    $.each(data.report.rows, function (index) {
-                        str = str + '<option value="' + data.report.rows[index].trainingTopicId + '">' + data.report.rows[index].trainingTopicDescription + '</option>';
-                    });
-
-                    $("#ddlTopic").html(str);
-
-                    convertToChosenSelect("ddlTopic", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-                    gotTopics = true;
-                    getTrainingDetail();
-
-                }
-
-
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function getMethods() {
-        $.ajax({
-            url: ServicePrefix + '/api/Training/GetTrainingMethods',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-
-                    var str = '';
-                    str = '<option value="">-- Select a Method --</option>';
-                    $.each(data.report.rows, function (index) {
-                        str = str + '<option value="' + data.report.rows[index].trainingMethodId + '">' + data.report.rows[index].trainingMethodDescription + '</option>';
-                    });
-
-                    $("#ddlMethod").html(str);
-
-                    convertToChosenSelect("ddlMethod", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-                    gotMethods = true;
-                    getTrainingDetail();
-
-                }
-
-
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function getTrainingDetail() {
-        // new entry
-        if (trainingId == null) {
+    function getIndividualsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
-        // each get-X calls this function on success, but only proceed once all of them have succeeded
-        if (
-               gotMarkets == false
-            || gotOwners == false
-            || gotTrainees == false
-            || gotTrainers == false
-            || gotTopics == false
-            || gotMethods == false
-        ) {
-            return;
-        }
-
-        // already got detail (avoid infinite loop due to indirect effects)
-        if (gotTrainingDetail) {
-            return;
-        }
-
-        var trainingType = getEditTrainingType();
-        var params;
-        if (isCluster) {
-            params = JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inTrainingClusterId": trainingId
-            });
+        var str = '';
+        if (data.report.rows.length == 0 && $("#ddlOwner").val() == "" && $("#ddlMarket").val() == "") {
+            str = '<option value="">-- First select Market and/or Owner --</option>';
         } else {
-            params = JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inTrainingIndividualId": trainingId
+            var currentTraineeId = $("#ddlTrainee").val();
+
+            str = '<option value="">-- Select a Trainee --</option>';
+            $.each(data.report.rows, function (index) {
+                var obj = data.report.rows[index];
+                str = str + '<option value="' + obj.personnelId + '"'
+                    + (obj.personnelId == currentTraineeId ? ' selected' : '')
+                    + '>' + obj.name + '</option>'; // name includes ID
             });
         }
-        $.ajax({
-            url: ServicePrefix + '/api/Training/GetTraining' + trainingType + 'Detail',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: params,
-            success: function (data, textStatus, jQxhr) {
 
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    gotTrainingDetail = true;
-
-                    $("#dtTrainingDate").val(data.report.rows[0]["Training Date"]);
-
-                    $("#tmTrainingTime").val(data.report.rows[0]["Training Time"]);
-                    if ($("#tmTrainingTime").val() == "") {
-                        $("#chkTrainingTimeUnspecified").prop("checked", true);
-                        adjustTrainingTimeDisplay();
-                    } else {
-                        adjustTrainingTimeFormat();
-                    }
-
-                    if (isCluster) {
-                        setOwnerFromDetail(
-                            data.report.rows[0]["Owner ID"],
-                            data.report.rows[0]["Owner"]
-                        );
-                        setMarketFromDetail(
-                            data.report.rows[0]["Market ID"],
-                            data.report.rows[0]["Market"]
-                        );
-                        setMediaTypeFromOwner();
-                    } else {
-                        setTraineeFromDetail(
-                            data.report.rows[0]["Trainee Personnel ID"],
-                            data.report.rows[0]["Trainee"]
-                        );
-                        setOwnerFromTrainee();
-                    }
-
-                    setTrainerFromDetail(
-                        data.report.rows[0]["Trainer Personnel ID"],
-                        data.report.rows[0]["Trainer"]
-                    );
-
-                    $("#ddlTopic").val(data.report.rows[0]["Training Topic ID"]);
-                    $("#ddlMethod").val(data.report.rows[0]["Training Method ID"]);
-                    $("#txtNotes").val(data.report.rows[0]["Notes"]);
-                }
-
-
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function setOwnerFromDetail(ownerId, ownerName) {
-        $("#ddlOwner").val(ownerId);
-        if ($("#ddlOwner").val() == ownerId) {
-            return;
-        }
-
-        var str = $("#ddlOwner").html();
-        str = str + '<option value="' + ownerId + '">*INACTIVE* ' + ownerName + '</option>'; // name includes ID
-        $("#ddlOwner").html(str);
-        $("#ddlOwner").val(ownerId);
-    }
-
-    function setMarketFromDetail(marketId, marketName) {
-        $("#ddlMarket").val(marketId);
-        if ($("#ddlMarket").val() == marketId) {
-            return;
-        }
-
-        var str = $("#ddlMarket").html();
-        str = str + '<option value="' + marketId + '">*INACTIVE* ' + marketName + '</option>'; // name includes ID
-        $("#ddlMarket").html(str);
-        $("#ddlMarket").val(marketId);
-    }
-
-    function setTraineeFromDetail(traineePersonnelId, traineeName) {
-        $("#ddlTrainee").val(traineePersonnelId);
-        if ($("#ddlTrainee").val() == traineePersonnelId) {
-            return;
-        }
-
-        var str = $("#ddlTrainee").html();
-        str = str + '<option value="' + traineePersonnelId + '">*INACTIVE* ' + traineeName + '</option>'; // name includes email
         $("#ddlTrainee").html(str);
-        $("#ddlTrainee").val(traineePersonnelId);
+
+        convertToChosenSelect("ddlTrainee", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotIndividuals = true;
     }
 
-    function setTrainerFromDetail(trainerPersonnelId, trainerName) {
-        $("#ddlTrainer").val(trainerPersonnelId);
-        if ($("#ddlTrainer").val() == trainerPersonnelId) {
+    function getOwnerGroups() {
+        $.ajax({
+            url: ServicePrefix + '/api/OwnerGroup/GetOwnerGroupListByOwner',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMediaTypeId": $("#ddlMediaType").val(),
+                "inOwnerId": $("#ddlOwner").val(),
+                "inActiveOnly": false,
+                "inIncludeNationwide": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOwnerGroupsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getOwnerGroupsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
-        var str = $("#ddlTrainer").html();
-        str = str + '<option value="' + trainerPersonnelId + '">*INACTIVE* ' + trainerName + '</option>'; // name includes ID
-        $("#ddlTrainer").html(str);
-        $("#ddlTrainer").val(trainerPersonnelId);
+        var currentOwnerGroupId = $("#ddlOwnerGroup").val();
+
+        var str = '<option value="">-- All Owner Groups --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str = str + '<option value="' + obj.ownerGroupId + '"'
+                + (obj.ownerGroupId == currentOwnerGroupId ? ' selected' : '')
+                + '>' + obj.ownerGroupName + ' (' + obj.ownerGroupId + ')' + '</option>'; // ownerGroupName does not include ID
+        });
+
+        $("#ddlOwnerGroup").html(str);
+
+        convertToChosenSelect("ddlOwnerGroup", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotOwnerGroups = true;
     }
 
-    function setOwnerFromTrainee() {
+    // TODO PersonnelID 14768 is XRY recipient for multiple markets, why doesn't Market column show "# markets"?
+    function getCurrentTrainees() {
         $.ajax({
-            url: ServicePrefix + '/api/Personnel/GetPersonnelAssignedOwnershipList',
+            url: ServicePrefix + '/api/Training/GetTrainingEventTrainees',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inPersonnelId": $("#ddlTrainee").val()
+                "inTrainingEventId": trainingEventId
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    var minimumOwnerId = 32768; // OwnerID is smallint which tops out at 32767
-                    var currentOwnerId;
-                    $.each(data.report.rows, function (index) {
-                        currentOwnerId = data.report.rows[index].ownerId;
-                        if (minimumOwnerId > currentOwnerId) {
-                            minimumOwnerId = currentOwnerId;
-                        }
-                    });
-                    if (minimumOwnerId < 32768) {
-                        $("#ddlOwner").val(minimumOwnerId);
-                        setMediaTypeFromOwner();
-                        getTrainees();
-                    }
-                }
+                getCurrentTraineesSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -900,30 +1018,40 @@
         });
     }
 
-    function setMediaTypeFromOwner() {
-        $.ajax({
-            url: ServicePrefix + '/api/Owner/GetOwner',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inOwnerId": $("#ddlOwner").val()
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
+    function getCurrentTraineesSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
 
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+        populateDataTable("dtTrainees", data);
+    }
+
+    function validationPassed(validationClass) {
+        var everythingOkay = true;
+
+        $("." + validationClass).each(function (index, el) {
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+                    bootbox.alert(errorMessage);
+                    everythingOkay = false;
+                    return false;
                 }
-                else {
-                    $("#ddlMediaType").val(data.report.rows[0]["Media Type ID"]);
+            }
+
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == "") {
+                    bootbox.alert(errorMessage);
+                    everythingOkay = false;
+                    return false;
                 }
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+
+        return everythingOkay;
     }
 
     function getTrainingDateTime() {
@@ -934,64 +1062,21 @@
         return str;
     }
 
-    function validationPassed() {
-
-        var loopBreak = true;
-        $(".mkaRequired").each(function (index, el) {
-
-            var eID = "#" + $(el).attr("id");
-            var errorMessage = $(el).attr("errorMessage");
-
-            if ($(eID).prop('tagName').toLowerCase() == "input") {
-                if ($(eID).val().trim() == "") {
-                    bootbox.alert(errorMessage, function () { });
-                    loopBreak = false;
-                    return false;
-                }
-
-            }
-
-            if ($(eID).prop('tagName').toLowerCase() == "select") {
-                if ($(eID).val() == "-1") {
-                    bootbox.alert(errorMessage, function () { });
-                    loopBreak = false;
-                    return false;
-                }
-            }
-
-        });
-
-        return loopBreak;
-    }
-
-    function updateTrainingDetail() {
-        if (validationPassed() == false) {
+    function saveTrainingEvent() {
+        if (validationPassed("mkaRequired") == false) {
             return;
         }
 
-        switch ($("#ddlTrainingType").val()) {
-            case "Individual":
-                if (trainingId == null) {
-                    insertIndividualTraining();
-                } else {
-                    updateIndividualTraining();
-                }
-                break;
-            case "Cluster":
-                if (trainingId == null) {
-                    insertClusterTraining();
-                } else {
-                    updateClusterTraining();
-                }
-                break;
-            default:
-                bootbox.alert("Must select training type first");
+        if (trainingEventId == null) {
+            insertTrainingEvent();
+        } else {
+            updateTrainingEvent();
         }
     }
 
-    function insertIndividualTraining() {
+    function insertTrainingEvent() {
         $.ajax({
-            url: ServicePrefix + '/api/Training/InsertIndividualTraining',
+            url: ServicePrefix + '/api/Training/InsertTrainingEvent',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
@@ -1000,19 +1085,12 @@
                 "inTrainingTopicId": $("#ddlTopic").val(),
                 "inTrainingMethodId": $("#ddlMethod").val(),
                 "inTrainingDate": getTrainingDateTime(),
-                "inPersonnelId": $("#ddlTrainee").val(),
-                "inInternalPersonnelId": $("#ddlTrainer").val(),
+                "inTrainerPersonnelId": $("#ddlTrainer").val(),
                 "inNotes": $("#txtNotes").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    bootbox.alert("Insert Individual Training successful.");
-                }
+                insertTrainingEventSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -1020,31 +1098,39 @@
         });
     }
 
-    function updateIndividualTraining() {
+    function insertTrainingEventSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get new training event ID");
+            return;
+        }
+
+        trainingEventId = data.report.rows[0].trainingEventId;
+        window.location = "/admin/training/training.html?TrainingEventID=" + trainingEventId;
+    }
+
+    function updateTrainingEvent() {
         $.ajax({
-            url: ServicePrefix + '/api/Training/UpdateIndividualTraining',
+            url: ServicePrefix + '/api/Training/UpdateTrainingEvent',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inTrainingIndividualId": trainingId,
+                "inTrainingEventId": trainingEventId,
                 "inTrainingTopicId": $("#ddlTopic").val(),
                 "inTrainingMethodId": $("#ddlMethod").val(),
                 "inTrainingDate": getTrainingDateTime(),
-                "inPersonnelId": $("#ddlTrainee").val(),
-                "inInternalPersonnelId": $("#ddlTrainer").val(),
+                "inTrainerPersonnelId": $("#ddlTrainer").val(),
                 "inNotes": $("#txtNotes").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    bootbox.alert("Update Individual Training successful.");
-                }
+                updateTrainingEventSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -1052,31 +1138,137 @@
         });
     }
 
-    function insertClusterTraining() {
+    function updateTrainingEventSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert("Training event updated successfully.");
+    }
+
+    function returnToList() {
+        window.location = "/admin/training/traininglist.html";
+    }
+
+    function deleteTrainingEvent() {
+        bootbox.confirm('Delete this training event?', function (result) {
+            if (result) {
+                deleteTrainingEventConfirmed();
+            }
+        });
+    }
+
+    function deleteTrainingEventConfirmed() {
         $.ajax({
-            url: ServicePrefix + '/api/Training/InsertClusterTraining',
+            url: ServicePrefix + '/api/Training/DeleteTrainingEvent',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
+                "inTrainingEventId": trainingEventId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deleteTrainingEventSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function deleteTrainingEventSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        returnToList();
+    }
+
+    function addTraineeIndividual() {
+        if (
+               gotTrainingEvent == false
+            || gotIndividuals == false
+        ) {
+            return;
+        }
+
+        if (validationPassed("mkaRequiredIndividual") == false) {
+            return;
+        }
+
+        // TODO sanity-check ahead of time:
+        // already a trainee for this event
+        // not active for any product
+        // not active for the topic's product (would require adding ProductID to TrainingTopic table)
+
+        $.ajax({
+            url: ServicePrefix + '/api/Training/InsertTrainingEventTraineeIndividual',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inTrainingEventId": trainingEventId,
+                "inPersonnelId": $("#ddlTrainee").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                addTraineeIndividualSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function addTraineeIndividualSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        getCurrentTrainees();
+
+        $("#ddlTrainee").val("");
+    }
+
+    function addTraineeCluster() {
+        if (
+               gotTrainingEvent == false
+            || gotMarkets == false
+            || gotOwners == false
+        ) {
+            return;
+        }
+
+        if (validationPassed("mkaRequiredCluster") == false) {
+            return;
+        }
+
+        // TODO sanity-check ahead of time:
+        // already a trainee for this event
+        // no stations match owner and market
+        // no matching station/market/owner is active for any product
+        // no matching station/market/owner is active for the topic's product
+
+        $.ajax({
+            url: ServicePrefix + '/api/Training/InsertTrainingEventTraineeCluster',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inTrainingEventId": trainingEventId,
                 "inMarketId": $("#ddlMarket").val(),
-                "inOwnerId": $("#ddlOwner").val(),
-                "inTrainingTopicId": $("#ddlTopic").val(),
-                "inTrainingMethodId": $("#ddlMethod").val(),
-                "inTrainingDate": getTrainingDateTime(),
-                "inInternalPersonnelId": $("#ddlTrainer").val(),
-                "inNotes": $("#txtNotes").val()
+                "inOwnerId": $("#ddlOwner").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    bootbox.alert("Insert Cluster Training successful.");
-                }
+                addTraineeClusterSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -1084,37 +1276,178 @@
         });
     }
 
-    function updateClusterTraining() {
+    function addTraineeClusterSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        getCurrentTrainees();
+
+        // leave market/owner unchanged, user may want to select another cluster where one of them is the same
+    }
+
+    function addTraineeOwnerGroup() {
+        if (
+               gotTrainingEvent == false
+            || gotOwnerGroups == false
+        ) {
+            return;
+        }
+
+        if (validationPassed("mkaRequiredOwnerGroup") == false) {
+            return;
+        }
+
+        // TODO sanity-check ahead of time:
+        // already a trainee for this event
+        // not active for any product
+        // not active for the topic's product (would require adding ProductID to TrainingTopic table)
+
         $.ajax({
-            url: ServicePrefix + '/api/Training/UpdateClusterTraining',
+            url: ServicePrefix + '/api/Training/InsertTrainingEventTraineeOwnerGroup',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inTrainingClusterId": trainingId,
-                "inMarketId": $("#ddlMarket").val(),
-                "inOwnerId": $("#ddlOwner").val(),
-                "inTrainingTopicId": $("#ddlTopic").val(),
-                "inTrainingMethodId": $("#ddlMethod").val(),
-                "inTrainingDate": getTrainingDateTime(),
-                "inInternalPersonnelId": $("#ddlTrainer").val(),
-                "inNotes": $("#txtNotes").val()
+                "inTrainingEventId": trainingEventId,
+                "inOwnerGroupId": $("#ddlOwnerGroup").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    bootbox.alert("Update Cluster Training successful.");
-                }
+                addTraineeOwnerGroupSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+    }
+
+    function addTraineeOwnerGroupSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        getCurrentTrainees();
+
+        $("#ddlOwnerGroup").val("");
+    }
+
+    function deleteTraineeIndividual(personnelId, traineeSummary) {
+        bootbox.confirm('Delete this individual trainee? (' + decodeURI(traineeSummary) + ')', function (result) {
+            if (result) {
+                deleteTraineeIndividualConfirmed(personnelId);
+            }
+        });
+    }
+
+    function deleteTraineeIndividualConfirmed(personnelId) {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/DeleteTrainingEventTraineeIndividual',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inTrainingEventId": trainingEventId,
+                "inPersonnelId": personnelId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deleteTraineeIndividualSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function deleteTraineeIndividualSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        getCurrentTrainees();
+    }
+
+    function deleteTraineeCluster(marketId, ownerId, traineeSummary) {
+        bootbox.confirm('Delete this cluster trainee? (' + decodeURI(traineeSummary) + ')', function (result) {
+            if (result) {
+                deleteTraineeClusterConfirmed(marketId, ownerId);
+            }
+        });
+    }
+
+    function deleteTraineeClusterConfirmed(marketId, ownerId) {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/DeleteTrainingEventTraineeCluster',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inTrainingEventId": trainingEventId,
+                "inMarketId": marketId,
+                "inOwnerId": ownerId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deleteTraineeClusterSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function deleteTraineeClusterSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        getCurrentTrainees();
+    }
+
+    function deleteTraineeOwnerGroup(ownerGroupId, traineeSummary) {
+        bootbox.confirm('Delete this owner group trainee? (' + decodeURI(traineeSummary) + ')', function (result) {
+            if (result) {
+                deleteTraineeOwnerGroupConfirmed(ownerGroupId);
+            }
+        });
+    }
+
+    function deleteTraineeOwnerGroupConfirmed(ownerGroupId) {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/DeleteTrainingEventTraineeOwnerGroup',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inTrainingEventId": trainingEventId,
+                "inOwnerGroupId": ownerGroupId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deleteTraineeOwnerGroupSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function deleteTraineeOwnerGroupSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        getCurrentTrainees();
     }
 
     function loadFeatureButtons()
@@ -1124,7 +1457,7 @@
         //}
     }
 
-    function genericAjaxError(jQxhr, textStatus, errorThrown) {
-        MKAErrorMessageRtn(errorThrown);
-    }
+    //function genericAjaxError(jQxhr, textStatus, errorThrown) {
+    //    MKAErrorMessageRtn(errorThrown);
+    //}
 </script>
