@@ -166,7 +166,7 @@
                     </div>
 
                     <div id="divTrainees" class="editMode"> <!-- must save event before adding trainees -->
-                    <!-- TODO possibly relax this requirement later: accumulate trainees to add, add event, get ID of event just added, then add trainees -->
+                    <!-- possibly relax this requirement later: accumulate trainees to add, add event, get ID of event just added, then add trainees -->
 
                         <hr />
 
@@ -197,7 +197,7 @@
                         </div>
 
                         <!-- Market -->
-                        <!-- TODO add checkbox to filter this by owner -->
+                        <!-- possibly add checkbox to filter this by owner -->
                         <div class="row input-row">
                             <div class="col-md-3 text-align-left">
                                 <label for="ddlMarket">Market</label>
@@ -208,8 +208,8 @@
                         </div>
 
                         <!-- Group -->
-                        <!-- TODO filter ddlTrainee by this? -->
-                        <!-- TODO make this a multi-select? -->
+                        <!-- possibly filter ddlTrainee by this -->
+                        <!-- possibly make this a multi-select -->
                         <div class="row input-row">
                             <div class="col-md-3 text-align-left">
                                 <label for="ddlOwnerGroup">Owner Group</label>
@@ -220,7 +220,7 @@
                         </div>
 
                         <!-- Individual -->
-                        <!-- TODO make this a multi-select? -->
+                        <!-- possibly make this a multi-select -->
                         <div class="row input-row">
                             <div class="col-md-3 text-align-left">
                                 <label for="ddlTrainee">Individual Trainee</label>
@@ -877,7 +877,7 @@
             currentMarketId = -1;
         }
 
-        var str = '<option value="">-- Select a Market --</option>';
+        var str = '<option value="">-- All Markets --</option>';
         $.each(data.report.rows, function (index) {
             var obj = data.report.rows[index];
             str = str + '<option value="' + obj.marketId + '"'
@@ -935,7 +935,7 @@
         } else {
             var currentTraineeId = $("#ddlTrainee").val();
 
-            str = '<option value="">-- Select a Trainee --</option>';
+            str = '<option value="">-- No Trainee Selected --</option>';
             $.each(data.report.rows, function (index) {
                 var obj = data.report.rows[index];
                 str = str + '<option value="' + obj.personnelId + '"'
@@ -997,7 +997,8 @@
         gotOwnerGroups = true;
     }
 
-    // TODO PersonnelID 14768 is XRY recipient for multiple markets, why doesn't Market column show "# markets"?
+    // currently this cross-references from individual to owner, but only if exactly one; SP may be adjusted later to say e.g. "2 owners"
+    // currently this does not cross-reference from individual to market(s); SP may be adjusted later to do so, preferably after implementing a PersonnelMarketRoles table
     function getCurrentTrainees() {
         $.ajax({
             url: ServicePrefix + '/api/Training/GetTrainingEventTrainees',
@@ -1200,11 +1201,54 @@
             return;
         }
 
-        // TODO sanity-check ahead of time:
-        // already a trainee for this event
-        // not active for any product
-        // not active for the topic's product (would require adding ProductID to TrainingTopic table)
+        $.ajax({
+            url: ServicePrefix + '/api/Training/GetTrainingEventValidTraineeIndividual'
+                + "?inApiToken=" + getLocalStorage("APIToken")
+                + "&inTrainingEventId=" + trainingEventId
+                + "&inPersonnelId=" + $("#ddlTrainee").val(),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            success: function (data, textStatus, jQxhr) {
+                addTraineeIndividualValidateSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
 
+    function addTraineeIndividualValidateSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get block/warn status");
+            return;
+        }
+
+        var obj = data.report.rows[0];
+
+        if (obj.block) {
+            bootbox.alert(obj.messages);
+            return;
+        }
+
+        if (obj.warn) {
+            bootbox.confirm(obj.messages.toString().replace('\r\n', '<br />') + '<br /> Add anyway?', function (result) {
+                if (result) {
+                    addTraineeIndividualPassedValidation();
+                }
+            });
+            return;
+        }
+
+        addTraineeIndividualPassedValidation();
+    }
+
+    function addTraineeIndividualPassedValidation() {
         $.ajax({
             url: ServicePrefix + '/api/Training/InsertTrainingEventTraineeIndividual',
             dataType: 'json',
@@ -1249,12 +1293,55 @@
             return;
         }
 
-        // TODO sanity-check ahead of time:
-        // already a trainee for this event
-        // no stations match owner and market
-        // no matching station/market/owner is active for any product
-        // no matching station/market/owner is active for the topic's product
+        $.ajax({
+            url: ServicePrefix + '/api/Training/GetTrainingEventValidTraineeCluster'
+                + "?inApiToken=" + getLocalStorage("APIToken")
+                + "&inTrainingEventId=" + trainingEventId
+                + "&inMarketId=" + $("#ddlMarket").val()
+                + "&inOwnerId=" + $("#ddlOwner").val(),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            success: function (data, textStatus, jQxhr) {
+                addTraineeClusterValidateSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
 
+    function addTraineeClusterValidateSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get block/warn status");
+            return;
+        }
+
+        var obj = data.report.rows[0];
+
+        if (obj.block) {
+            bootbox.alert(obj.messages);
+            return;
+        }
+
+        if (obj.warn) {
+            bootbox.confirm(obj.messages.toString().replace('\r\n', '<br />') + '<br /> Add anyway?', function (result) {
+                if (result) {
+                    addTraineeClusterPassedValidation();
+                }
+            });
+            return;
+        }
+
+        addTraineeClusterPassedValidation();
+    }
+
+    function addTraineeClusterPassedValidation() {
         $.ajax({
             url: ServicePrefix + '/api/Training/InsertTrainingEventTraineeCluster',
             dataType: 'json',
@@ -1299,11 +1386,54 @@
             return;
         }
 
-        // TODO sanity-check ahead of time:
-        // already a trainee for this event
-        // not active for any product
-        // not active for the topic's product (would require adding ProductID to TrainingTopic table)
+        $.ajax({
+            url: ServicePrefix + '/api/Training/GetTrainingEventValidTraineeOwnerGroup'
+                + "?inApiToken=" + getLocalStorage("APIToken")
+                + "&inTrainingEventId=" + trainingEventId
+                + "&inOwnerGroupId=" + $("#ddlOwnerGroup").val(),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            success: function (data, textStatus, jQxhr) {
+                addTraineeOwnerGroupValidateSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
 
+    function addTraineeOwnerGroupValidateSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get block/warn status");
+            return;
+        }
+
+        var obj = data.report.rows[0];
+
+        if (obj.block) {
+            bootbox.alert(obj.messages);
+            return;
+        }
+
+        if (obj.warn) {
+            bootbox.confirm(obj.messages.toString().replace('\r\n', '<br />') + '<br /> Add anyway?', function (result) {
+                if (result) {
+                    addTraineeOwnerGroupPassedValidation();
+                }
+            });
+            return;
+        }
+
+        addTraineeOwnerGroupPassedValidation();
+    }
+
+    function addTraineeOwnerGroupPassedValidation() {
         $.ajax({
             url: ServicePrefix + '/api/Training/InsertTrainingEventTraineeOwnerGroup',
             dataType: 'json',
