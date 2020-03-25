@@ -283,7 +283,7 @@ reportName.push("rptQueryMarketCounts");
 reportName.push("rptQueryUserCounts");
 reportName.push("rptQueryCountsByOwnerMarket");
 reportName.push("rptQueryDetailByOwnerMarket");
-
+reportName.push("rptImportScriptListByOwner");
  
 
 function buildReportArray()
@@ -4360,7 +4360,7 @@ function getReportObject_XRAYImportScript() {
 
     tempObject =
     {
-        reportTitle: "XRay Import User Script List",
+        reportTitle: "Import Station Script List",
         apiControllerAction: "/api/XRAYReport/GetXRAYImportScriptList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
@@ -4629,7 +4629,8 @@ function getReportObject_MRRRevenueWithoutSubmitterList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Security and Analysis'],
-        autoUpdate: false
+        autoUpdate: false,
+        approved: true
     }
 
     return tempObject;
@@ -11115,6 +11116,44 @@ function getReportObject_QueryDetailByOwnerMarket() {
     {
         reportTitle: "XRAY Query Details by Market/Owner",
         apiControllerAction: "/api/XrayReport/GetQueryDetailByOwnerMarket",
+
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry']
+    }
+
+    return tempObject;
+}
+
+ 
+function getReportFilterArray_ImportScriptListByOwner() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+ 
+
+    return arrayFilters;
+}
+function getReportObject_ImportScriptListByOwner() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Import Script List by Owner",
+        apiControllerAction: "/api/XrayReport/GetImportScriptListByOwner",
 
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
