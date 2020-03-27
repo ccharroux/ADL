@@ -144,7 +144,7 @@
 
                 <div class="row search-section">
                     <div class="col-md-12">
-                        <label for="ddlMediaType" class="dropdown-label">Mdia Type</label>
+                        <label for="ddlMediaType" class="dropdown-label">Media Type</label>
                         <select id="ddlMediaType" class="dropdown-select report-filter"></select>
 
                         <input type="button" class="search-button" value="Search" onclick="searchForMediaAdvertiser();" />
@@ -160,11 +160,13 @@
                     <h3 style="text-align: center; margin-bottom: 10px;">Update Information</h3>
                     <div class="row">
                         <div class="col-md-12" style="margin-bottom: 10px;">
-                            <input type="hidden" id="txtUpdateMarketAdvertiserId" value="" />
+                            <input type="hidden" id="txtUpdateMarketId" value="" />
+                            <input type="hidden" id="txtUpdateMarket" value=""/>
+                            <input type="hidden" id="txtUpdateMarketAdvertiserId" value=""/>
                             <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label>
-                            <input type="text" id="txtUpdateMarketAdvertiser" readonly="readonly" style="width: 450px;" maxlength="50" class="report-filter" />
+                            <input type="text" id="txtUpdateMarketAdvertiser" readonly="readonly" style="width: 450px;" maxlength="50" class="report-filter"/>
 
-                            <input type="button" class="search-button" value="Update" onclick="updateMediaAdvertisers();" />
+                            <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startMediaAdvertiserUpdate();"/>
                         </div>
                     </div>
                 </div>
@@ -229,7 +231,7 @@
         //load markets by product
         getMarketsByProduct();
         //load media types
-        getMediaAdvertiserMediaTypeList();
+        getMediaAdvertiserMediaTypeList(["ddlMediaType"], "-1");
 
     });
 
@@ -278,7 +280,7 @@
     }
 
 
-    function getMediaAdvertiserMediaTypeList() {
+    function getMediaAdvertiserMediaTypeList(controls,mediaTypeId) {
 
         $.ajax({
             url: ServicePrefix + '/api/MediaAdvertiser/GetMediaAdvertiserMediaTypeList',
@@ -304,9 +306,15 @@
 
                     });
 
-                    $("#ddlMediaType").html(str);
+                    //$("#ddlMediaType").html(str);
 
-                    convertToChosenSelect('ddlMediaType', gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+                    //convertToChosenSelect('ddlMediaType', gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    for (var i = 0; i < controls.length; i++) {
+                        $("#" + controls[i]).append(str);
+                        convertToChosenSelect(controls[i], gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+                        $("#" + controls[i]).val(mediaTypeId);
+                    }
 
                 }
 
@@ -372,8 +380,8 @@
         //create a radio button with onclick populate the info section
         columnsToDisplay.push({
             "mRender": function (data, type, row) {
-                return '<input type="radio" name="advertisers" onclick="loadUpdateInformation(' + row.mediaAdvertiserId + ',' + row.marketAdvertiserId +
-                    ',\'' + row.MarketAdvertiserWithoutId + '\');markAsNotSelectable(' + row.mediaAdvertiserId + ');">';
+                return '<input type="radio" id="rdo_' + row.mediaAdvertiserId + '" name="advertisers" onclick="loadUpdateInformation(' + row.mediaAdvertiserId + ',' + row.marketAdvertiserId +
+                    ',\'' + row.MarketAdvertiserWithoutId + '\',\'' + row.Market + '\',' + row.marketId + ');markAsNotSelectable(' + row.mediaAdvertiserId + ');">';
             },
             "orderable": false,
             "searchable": false
@@ -457,10 +465,9 @@
         //add on select and have it do code
         searchTable.on('select', function (e, dt, type, indexes) {
             if (type === 'row') {
-
-                //click the radio button or call the functions
-
-
+                //this will trigger the click of the radio button
+                var d = dt.data();
+                $("#rdo_" + d.mediaAdvertiserId).click();
             }
         });
 
@@ -577,16 +584,28 @@
                         }
                     }
                 );
+
+                var count = matchTable.rows({ selected: true }).count();
+                if (count > 0) {
+                    $("#btnUpdate").show();
+                }
+            }
+        });
+
+        matchTable.on('deselect', function (e, dt, type, indexes) {
+
+            var count = matchTable.rows({ selected: true }).count();
+            if (count == 0) {
+                $("#btnUpdate").hide();
             }
         });
     }
 
-
-
-    function loadUpdateInformation(mediaAdvertiserId, marketAdvertiserId, marketAdvertiserName) {
+    function loadUpdateInformation(mediaAdvertiserId, marketAdvertiserId, marketAdvertiserName, market, marketId) {
         $("#txtUpdateMarketAdvertiserId").val(marketAdvertiserId);
         $("#txtUpdateMarketAdvertiser").val(marketAdvertiserName);
-
+        $("#txtUpdateMarket").val(market);
+        $("#txtUpdateMarketId").val(marketId);
     }
 
     function markAsNotSelectable(mediaAdvertiserId) {
@@ -661,12 +680,139 @@
         return loopBreak;
     }
 
-    function updateMediaAdvertisers()
+    function startMediaAdvertiserUpdate()
     {
-        var errorMessage = "This bulk update functionality is still under development.";
-        bootbox.alert(errorMessage, function () { });
+        if (validateUpdateFields() == false) {
+            return;
+        }
 
-        return;
+        //load array of station agencies based on the api, etc.
+        var updateMediaAdvertiserIds = new Array();
+
+        var updatesTable = $("#dtUpdates").DataTable();
+
+        updatesTable.rows({ selected: true }).every(function () {
+            var d = this.data();
+            updateMediaAdvertiserIds.push({
+                "inOldMediaAdvertiserName": d.MediaAdvertiserWithoutId,
+                "inOldMediaTypeId": d.mediaTypeId
+            });
+        });
+
+        if (updateMediaAdvertiserIds.length == 0) {
+            bootbox.alert("You must select at least 1 media advertiser to update.", function () { });
+            return;
+        }
+
+        var bLinkRevenue = false;
+
+        //create message with changes
+        //also add wording for linking revenue
+        var msg = "Are you sure that you want to update the selected record(s) in Market - " + $("#txtUpdateMarket").val() + "?<br/>";
+        msg += "They will be updated to the following values:<br/><ul>";
+
+        if ($("#txtUpdateMarketAdvertiser").val() != "") {
+            msg += "<li>Market Advertiser Name - " + $("#txtUpdateMarketAdvertiser").val() + "</li>";
+        }
+
+        msg += "</ul>";
+
+        msg += "Shall the media advertiser's revenue histories be merged to " + $("#txtUpdateMarketAdvertiser").val() + "? This action is irreversible.<br/>";
+        msg += "Press Yes to link media advertiser and merge revenue.<br/>";
+        msg += "Press No to link media advertiser only going forward.";
+
+        var dialog = bootbox.dialog({
+            title: "Merge Media Advertiser Revenue",
+            message: msg,
+            size: 'large',
+            buttons: {
+                yes: {
+                    label: "Yes",
+                    className: 'btn-primary',
+                    callback: function () {
+                        bLinkRevenue = true;
+                        updateMediaAdvertisers(updateMediaAdvertiserIds, bLinkRevenue);
+                    }
+                },
+                no: {
+                    label: "No",
+                    className: '',
+                    callback: function () {
+                        bLinkRevenue = false;
+                        updateMediaAdvertisers(updateMediaAdvertiserIds, bLinkRevenue);
+                    }
+                },
+                cancel: {
+                    label: "Cancel",
+                    className: '',
+                    callback: function () {
+                        return;
+                    }
+                }
+            },
+            onEscape: function () {
+                dialog.modal("hide");
+                return;
+            }
+        });
+
+    }
+
+    function updateMediaAdvertisers(updateMediaAdvertiserIds, bLinkRevenue)
+    {
+        //console.log(updateMediaAdvertiserIds);
+
+        //var errorMessage = "This bulk update functionality is still under development.";
+        //bootbox.alert(errorMessage, function () { });
+
+        //return;
+
+        $.ajax({
+            url: ServicePrefix + '/api/XRAYRevenue/UpdateExistingMediaAdvertiser',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMediaAdvertiserList": updateMediaAdvertiserIds,
+                "inNewAdvertiserId": $("#txtUpdateMarketAdvertiserId").val(),
+                "inLinkRevenue": bLinkRevenue,
+                "inMarketId": $("#txtUpdateMarketId").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    bootbox.alert("All media advertisers have been updated.", function () { });
+                    searchForMediaAdvertiser();
+                    clearUpdateFields();
+                }
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        });
+
+
+    }
+
+    function validateUpdateFields() {
+        // these values can't be changes but leaving the edit in place in case things change
+        if ($("#txtUpdateMarketAdvertiser").val() == "") {
+            bootbox.alert("You must chose at least 1 field to update.", function () { });
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function clearUpdateFields() {
+        $("#txtUpdateMarketAdvertiserId").val("");
+        $("#txtUpdateMarketAdvertiser").val("");
+        $("#txtUpdateMarket").val("");
+        $("#txtUpdateMarketId").val("");
+        $("#btnUpdate").hide();
     }
 
 </script>
