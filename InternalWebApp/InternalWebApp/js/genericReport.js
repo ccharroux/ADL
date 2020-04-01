@@ -11238,7 +11238,7 @@ function getReportObject_StandardInputNotIncludedList() {
 
     tempObject =
     {
-        reportTitle: "Standard Input List",
+        reportTitle: "Standard Input Not Included List",
         apiControllerAction: "/api/XrayReport/GetStandardInputNotIncludedList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
