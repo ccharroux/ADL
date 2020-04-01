@@ -285,6 +285,7 @@ reportName.push("rptQueryCountsByOwnerMarket");
 reportName.push("rptQueryDetailByOwnerMarket");
 reportName.push("rptImportScriptListByOwner");
  
+reportName.push("rptStandardInputNotIncludedList");
 
 function buildReportArray()
 {
@@ -4083,7 +4084,8 @@ function getReportObject_DuplicateUser() {
         apiControllerAction: "/api/PersonnelReport/GetDuplicateUserList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['personnel']
+        product: ['personnel'],
+        approved: true
     }
 
     return tempObject;
@@ -4364,7 +4366,7 @@ function getReportObject_XRAYImportScript() {
         apiControllerAction: "/api/XRAYReport/GetXRAYImportScriptList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry']
+        product: ['xry', 'xry imports']
     }
 
     return tempObject;
@@ -10105,7 +10107,7 @@ function getReportObject_XRYImportTypeIssueList() {
         apiControllerAction: "/api/XRAYReport/GetImportIssueTypeList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry', 'XRY Data Review']
+        product: ['xry', 'XRY Data Review', 'xry imports']
     }
 
     return tempObject;
@@ -10867,7 +10869,7 @@ function getReportObject_StandardInputList() {
         apiControllerAction: "/api/XrayReport/GetStandardInputList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry', 'advertiser', 'agency']
+        product: ['xry', 'advertiser', 'agency', 'xry imports']
     }
 
     return tempObject;
@@ -11157,7 +11159,90 @@ function getReportObject_ImportScriptListByOwner() {
 
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry']
+        product: ['xry', 'xry imports']
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_StandardInputNotIncludedList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationListByGeneralFilters",
+        objectName: "ddlStation",
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
+        reloadBasedProduct: false,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_StandardInputNotIncludedList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Advertiser Raw");
+    columnsToDisplay.push("Advertiser");
+    columnsToDisplay.push("Agency Raw");
+    columnsToDisplay.push("Agency");
+
+    columnsToDisplay.push("Revenue");
+
+    columnsToDisplay.push("Category");
+    columnsToDisplay.push("Account Type");
+    columnsToDisplay.push("Revenue Type");
+
+    tempObject =
+    {
+        reportTitle: "Standard Input List",
+        apiControllerAction: "/api/XrayReport/GetStandardInputNotIncludedList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry', 'advertiser', 'agency', 'xry imports']
     }
 
     return tempObject;
