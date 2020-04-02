@@ -96,7 +96,7 @@
                     </div>
 
                     <!-- Media Type -->
-                    <div class="row input-row">
+                    <div class="row input-row hideIfPersonnelFromQueryString">
                         <div class="col-md-3 text-align-left">
                             <label for="ddlMediaType">Media Type</label>
                         </div>
@@ -106,7 +106,7 @@
                     </div>
 
                     <!-- Owner -->
-                    <div class="row input-row">
+                    <div class="row input-row hideIfPersonnelFromQueryString">
                         <!-- listed first because filtering by market is slower (especially when not also filtering by owner) -->
                         <div class="col-md-3 text-align-left">
                             <label for="ddlOwner">Owner</label>
@@ -117,7 +117,7 @@
                     </div>
 
                     <!-- Market -->
-                    <div class="row input-row">
+                    <div class="row input-row hideIfPersonnelFromQueryString">
                         <div class="col-md-3 text-align-left">
                             <label for="ddlMarket">Market</label>
                         </div>
@@ -133,9 +133,11 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <select id="ddlExternalPersonnel" class="mkaRequired" errorMessage="You must select an external personnel."></select>
-                            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                            <input type="checkbox" id="chkIncludeInternal" onchange="getExternalPersonnel();" />
-                            &nbsp; Include internal users
+                            <span class="hideIfPersonnelFromQueryString">
+                                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                <input type="checkbox" id="chkIncludeInternal" onchange="getExternalPersonnel();" />
+                                &nbsp; Include internal users
+                            </span>
                         </div>
                     </div>
 
@@ -230,7 +232,6 @@
 
     $(document).ready(function ()
     {
-
         buildMainMenu("CustomerSupport");
 
         customerSupportContactId = getParameterByName("customerSupportContactId");
@@ -250,12 +251,19 @@
         checkForInsertOrUpdate();
         getCustomerSupportContactDate();
         getCustomerSupportContactTime();
-        getMediaTypes(); // success -> get markets and owners, then personnel
+
+        var personnelId = getParameterByName("personnelId");
+        if (customerSupportContactId == null && personnelId != null && personnelId.trim() != "") {
+            $(".hideIfPersonnelFromQueryString").hide();
+            getExternalPersonnelFromQueryString(personnelId);
+        } else {
+            getMediaTypes(); // success -> get markets and owners, then personnel
+        }
+
         getInternalPersonnel();
         getCustomerSupportTypes();
 
         loadFeatureButtons();
-
     });
 
     function stringToBoolean(val) {
@@ -336,32 +344,25 @@
         };
 
         $.ajax(url, settings);
-
     }
 
     function getMediaTypesSuccess(data, textStatus, jQxhr) {
-
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
-        }
-        else {
-
-            var str = '';
-            str = '<option value="-1">-- Select a Media Type</option>';
-            $.each(data.report.rows, function (index) {
-
-                str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
-
-            });
-
-            $("#ddlMediaType").html(str);
-
-            convertToChosenSelect("ddlMediaType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-            mediaTypeChanged();
-
+            return;
         }
 
+        var str = '<option value="-1">-- Select a Media Type</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str += '<option value="' + obj.MediaTypeID + '">' + obj.MediaTypeName + '</option>';
+        });
+
+        $("#ddlMediaType").html(str);
+
+        convertToChosenSelect("ddlMediaType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        mediaTypeChanged();
     }
 
     function mediaTypeChanged() {
@@ -382,37 +383,40 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    var currentMarketId = $("#ddlMarket").val();
-                    if (currentMarketId == 0) { // workaround because database still contains MarketID 0
-                        currentMarketId = -1;
-                    }
-                    var str = '';
-                    str = '<option value="">-- Select a Market --</option>';
-                    $.each(data.report.rows, function (index) {
-                        str = str + '<option value="' + data.report.rows[index].marketId + '"' + (data.report.rows[index].marketId == currentMarketId ? ' selected' : '') + '>' + data.report.rows[index].marketName + '</option>'; // marketName also includes ID
-                    });
-
-                    $("#ddlMarket").html(str);
-
-                    convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-                    gotMarkets = true;
-                    getExternalPersonnel();
-                    getCustomerSupportContactDetail();
-
-                }
-
-
+                getMarketsSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+    }
+
+    function getMarketsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var currentMarketId = $("#ddlMarket").val();
+        if (currentMarketId == 0) { // workaround because database still contains MarketID 0
+            currentMarketId = -1;
+        }
+
+        var str = '<option value="">-- Select a Market --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str += '<option value="' + obj.marketId + '"'
+                + (obj.marketId == currentMarketId ? ' selected' : '')
+                + '>' + obj.marketName + '</option>'; // marketName also includes ID
+        });
+
+        $("#ddlMarket").html(str);
+
+        convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotMarkets = true;
+        getExternalPersonnel();
+        getCustomerSupportContactDetail();
     }
 
     function getOwners() {
@@ -428,37 +432,37 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    var currentOwnerId = $("#ddlOwner").val();
-                    var str = '';
-                    str = '<option value="">-- Select an Owner --</option>';
-                    $.each(data.report.rows, function (index) {
-
-
-                        str = str + '<option value="' + data.report.rows[index].OwnerID + '"' + (data.report.rows[index].OwnerID == currentOwnerId ? ' selected' : '') + '>' + data.report.rows[index].OwnerName + ' (' + data.report.rows[index].OwnerID + ')' + '</option>'; // OwnerName does not include ID
-
-                    });
-
-                    $("#ddlOwner").html(str);
-
-                    convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-                    gotOwners = true;
-                    getExternalPersonnel();
-                    getCustomerSupportContactDetail();
-
-                }
-
-
+                getOwnersSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+    }
+
+    function getOwnersSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var currentOwnerId = $("#ddlOwner").val();
+
+        var str = '<option value="">-- Select an Owner --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str = str + '<option value="' + obj.OwnerID + '"'
+                + (obj.OwnerID == currentOwnerId ? ' selected' : '')
+                + '>' + obj.OwnerName + ' (' + obj.OwnerID + ')' + '</option>'; // OwnerName does not include ID
+        });
+
+        $("#ddlOwner").html(str);
+
+        convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotOwners = true;
+        getExternalPersonnel();
+        getCustomerSupportContactDetail();
     }
 
     function getExternalPersonnel() {
@@ -479,37 +483,84 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    var currentPersonnelId = $("#ddlExternalPersonnel").val();
-                    var str = '';
-                    if (data.report.rows.length == 0 && $("#ddlOwner").val() == "" && $("#ddlMarket").val() == "" && customerSupportContactId == null) {
-                        str = '<option value="">-- First select Market and/or Owner --</option>';
-                    } else {
-                        str = '<option value="">-- Select a Personnel --</option>';
-                        $.each(data.report.rows, function (index) {
-                            str = str + '<option value="' + data.report.rows[index].personnelId + '"' + (data.report.rows[index].personnelId == currentPersonnelId ? ' selected' : '') + '>' + data.report.rows[index].name + '</option>'; // name includes ID
-                        });
-                    }
-
-                    $("#ddlExternalPersonnel").html(str);
-
-                    convertToChosenSelect("ddlExternalPersonnel", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-                    gotExternalPersonnel = true;
-                    getCustomerSupportContactDetail();
-
-                }
-
-
+                getExternalPersonnelSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+    }
+
+    function getExternalPersonnelSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var currentPersonnelId = $("#ddlExternalPersonnel").val();
+
+        var str = '';
+        if (data.report.rows.length == 0 && $("#ddlOwner").val() == "" && $("#ddlMarket").val() == "" && customerSupportContactId == null) {
+            str = '<option value="">-- First select Market and/or Owner --</option>';
+        } else {
+            str = '<option value="">-- Select a Personnel --</option>';
+            $.each(data.report.rows, function (index) {
+                var obj = data.report.rows[index];
+                str = str + '<option value="' + obj.personnelId + '"'
+                    + (obj.personnelId == currentPersonnelId ? ' selected' : '')
+                    + '>' + obj.name + '</option>'; // name includes ID
+            });
+        }
+
+        $("#ddlExternalPersonnel").html(str);
+
+        convertToChosenSelect("ddlExternalPersonnel", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotExternalPersonnel = true;
+        getCustomerSupportContactDetail();
+    }
+
+    function getExternalPersonnelFromQueryString(personnelId) {
+        $.ajax({
+            url: ServicePrefix + '/api/Personnel/GetPersonnel',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getExternalPersonnelFromQueryStringSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getExternalPersonnelFromQueryStringSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get pre-selected personnel data");
+            return;
+        }
+
+        var obj = data.report.rows[0];
+
+        var str = '<option value="' + obj.personnelId + '">'
+            + obj.firstName + ' ' + obj.lastName + ' (' + obj.email + ')</option>';
+
+        $("#ddlExternalPersonnel").html(str);
+
+        convertToChosenSelect("ddlExternalPersonnel", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotExternalPersonnel = true;
     }
 
     function getInternalPersonnel() {
@@ -522,36 +573,35 @@
             contentType: 'application/json',
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    var str = '';
-                    str = '<option value="">-- Select a Personnel --</option>';
-                    $.each(data.report.rows, function (index) {
-                        str = str + '<option value="' + data.report.rows[index].PersonnelId + '"';
-                        if (customerSupportContactId == null && data.report.rows[index].IsCurrentPersonnel == "Yes") {
-                            str = str + ' selected';
-                        }
-                        str = str + '>' + data.report.rows[index].User + ' (' + data.report.rows[index].PersonnelId + ')' + '</option>'; // User does not include ID
-                    });
-
-                    $("#ddlInternalPersonnel").html(str);
-
-                    convertToChosenSelect("ddlInternalPersonnel", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-                    gotInternalPersonnel = true;
-                    getCustomerSupportContactDetail();
-
-                }
-
-
+                getInternalPersonnelSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+    }
+
+    function getInternalPersonnelSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '';
+        str = '<option value="">-- Select a Personnel --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str += '<option value="' + obj.PersonnelId + '"'
+                + (customerSupportContactId == null && obj.IsCurrentPersonnel == "Yes" ? ' selected' : '')
+                + '>' + obj.User + ' (' + obj.PersonnelId + ')' + '</option>'; // User does not include ID
+        });
+
+        $("#ddlInternalPersonnel").html(str);
+
+        convertToChosenSelect("ddlInternalPersonnel", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotInternalPersonnel = true;
+        getCustomerSupportContactDetail();
     }
 
     function getCustomerSupportTypes() {
@@ -565,33 +615,36 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-
-                    var str = '';
-                    str = '<option value="">-- Select a Customer Support Type --</option>';
-                    $.each(data.report.rows, function (index) {
-                        str = str + '<option value="' + data.report.rows[index].customerSupportTypeId + '">' + data.report.rows[index].customerSupportTypeDescription + '</option>';
-                    });
-
-                    $("#ddlCustomerSupportType").html(str);
-
-                    convertToChosenSelect("ddlCustomerSupportType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-                    gotCustomerSupportTypes = true;
-                    getCustomerSupportContactDetail();
-
-                }
-
-
+                getCustomerSupportTypesSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+    }
+
+    function getCustomerSupportTypesSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var defaultCustomerSupportContactType = getParameterByName("customerSupportType").toLowerCase();
+
+        var str = '<option value="">-- Select a Customer Support Type --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str += '<option value="' + obj.customerSupportTypeId + '"'
+                + (obj.customerSupportTypeDescription.toLowerCase() == defaultCustomerSupportContactType ? ' selected' : '')
+                + '>' + obj.customerSupportTypeDescription + '</option>';
+        });
+
+        $("#ddlCustomerSupportType").html(str);
+
+        convertToChosenSelect("ddlCustomerSupportType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotCustomerSupportTypes = true;
+        getCustomerSupportContactDetail();
     }
 
     function getCustomerSupportContactDetail() {
@@ -626,43 +679,51 @@
                 "inCustomerSupportContactId": customerSupportContactId
             }),
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    gotCustomerSupportContactDetail = true;
-
-                    $("#dtCustomerSupportContactDate").val(data.report.rows[0]["Customer Support Contact Date"]);
-
-                    $("#tmCustomerSupportContactTime").val(data.report.rows[0]["Customer Support Contact Time"]);
-                    if ($("#tmCustomerSupportContactTime").val() == "") {
-                        $("#chkCustomerSupportContactTimeUnspecified").prop("checked", true);
-                        adjustCustomerSupportContactTimeDisplay();
-                    } else {
-                        adjustCustomerSupportContactTimeFormat();
-                    }
-
-                    setExternalPersonnelFromDetail(
-                        data.report.rows[0]["External Personnel ID"],
-                        data.report.rows[0]["External Personnel"]
-                    );
-                    setOwnerFromExternalPersonnel();
-
-                    setInternalPersonnelFromDetail(
-                        data.report.rows[0]["Internal Personnel ID"],
-                        data.report.rows[0]["Internal Personnel"]
-                    );
-
-                    $("#txtNotes").val(data.report.rows[0]["Description"]);
-                }
-
-
+                getCustomerSupportContactDetailSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+    }
+
+    function getCustomerSupportContactDetailSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get customer support contact detail");
+            return;
+        }
+
+        gotCustomerSupportContactDetail = true;
+
+        var obj = data.report.rows[0];
+
+        $("#dtCustomerSupportContactDate").val(obj["Customer Support Contact Date"]);
+
+        $("#tmCustomerSupportContactTime").val(obj["Customer Support Contact Time"]);
+        if ($("#tmCustomerSupportContactTime").val() == "") {
+            $("#chkCustomerSupportContactTimeUnspecified").prop("checked", true);
+            adjustCustomerSupportContactTimeDisplay();
+        } else {
+            adjustCustomerSupportContactTimeFormat();
+        }
+
+        setExternalPersonnelFromDetail(
+            obj["External Personnel ID"],
+            obj["External Personnel"]
+        );
+        setOwnerFromExternalPersonnel();
+
+        setInternalPersonnelFromDetail(
+            obj["Internal Personnel ID"],
+            obj["Internal Personnel"]
+        );
+
+        $("#txtNotes").val(obj["Description"]);
     }
 
     function setOwnerFromDetail(ownerId, ownerName) {
@@ -725,30 +786,34 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    var minimumOwnerId = 32768; // OwnerID is smallint which tops out at 32767
-                    var currentOwnerId;
-                    $.each(data.report.rows, function (index) {
-                        currentOwnerId = data.report.rows[index].ownerId;
-                        if (minimumOwnerId > currentOwnerId) {
-                            minimumOwnerId = currentOwnerId;
-                        }
-                    });
-                    if (minimumOwnerId < 32768) {
-                        $("#ddlOwner").val(minimumOwnerId);
-                        setMediaTypeFromOwner();
-                        getExternalPersonnel();
-                    }
-                }
+                setOwnerFromExternalPersonnelSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+    }
+
+    function setOwnerFromExternalPersonnelSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var minimumOwnerId = 32768; // OwnerID is smallint which tops out at 32767
+        var currentOwnerId;
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            currentOwnerId = obj.ownerId;
+            if (minimumOwnerId > currentOwnerId) {
+                minimumOwnerId = currentOwnerId;
+            }
+        });
+        if (minimumOwnerId < 32768) {
+            $("#ddlOwner").val(minimumOwnerId);
+            setMediaTypeFromOwner();
+            getExternalPersonnel();
+        }
     }
 
     function setMediaTypeFromOwner() {
@@ -763,18 +828,27 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    $("#ddlMediaType").val(data.report.rows[0]["Media Type ID"]);
-                }
+                setMediaTypeFromOwnerSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+    }
+
+    function setMediaTypeFromOwnerSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get media type from owner");
+            return;
+        }
+
+        var obj = data.report.rows[0];
+        $("#ddlMediaType").val(obj["Media Type ID"]);
     }
 
     function getCustomerSupportContactDateTime() {
@@ -786,10 +860,8 @@
     }
 
     function validationPassed() {
-
         var loopBreak = true;
         $(".mkaRequired").each(function (index, el) {
-
             var eID = "#" + $(el).attr("id");
             var errorMessage = $(el).attr("errorMessage");
 
@@ -799,7 +871,6 @@
                     loopBreak = false;
                     return false;
                 }
-
             }
 
             if ($(eID).prop('tagName').toLowerCase() == "select") {
@@ -809,9 +880,7 @@
                     return false;
                 }
             }
-
         });
-
         return loopBreak;
     }
 
@@ -843,17 +912,22 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    bootbox.alert("Insert Customer Support Contact successful - need to implement return to list and show same external personnel");
-                }
+                insertCustomerSupportContactSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
+        });
+    }
+
+    function insertCustomerSupportContactSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert("Insert Customer Support Contact successful", function () {
+            updatedGoBack();
         });
     }
 
@@ -874,17 +948,22 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-                    bootbox.alert("Update Customer Support Contact successful - need to implement return to list and show same external personnel");
-                }
+                updateCustomerSupportContact(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
+        });
+    }
+
+    function updateCustomerSupportContact(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert("Update Customer Support Contact successful", function () {
+            updatedGoBack();
         });
     }
 
