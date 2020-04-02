@@ -81,26 +81,49 @@
             position: relative;
         }
 
-            table.dataTable tbody td.select-checkbox:before,
-            table.dataTable tbody td.select-checkbox:after,
-            table.dataTable thead th.select-checkbox:before,
-            table.dataTable thead th.select-checkbox:after {
-                display: block;
-                position: absolute;
-                top: auto !important;
-                left: 50%;
-                width: 16px;
-                height: 16px;
-                box-sizing: border-box;
-            }
+        table.dataTable tbody td.select-checkbox:before,
+        table.dataTable tbody td.select-checkbox:after,
+        table.dataTable thead th.select-checkbox:before,
+        table.dataTable thead th.select-checkbox:after
+        {
+            display: block;
+            position: absolute;
+            top: auto !important;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            box-sizing: border-box;
+        }
 
-            table.dataTable tbody td.select-checkbox:before {
-                content: ' ';
-                margin-top: -6px;
-                margin-left: -8px;
-                border: 1px solid black;
-                border-radius: 3px;
-            }
+        table.dataTable tbody td.select-checkbox:before {
+            content: ' ';
+            margin-top: -6px;
+            margin-left: -8px;
+            border: 1px solid black;
+            border-radius: 3px;
+        }
+
+        table.dataTable tr.selected td.select-checkbox::after, table.dataTable tr.selected th.select-checkbox::after {
+    margin-top: -9px;
+    margin-left: -7px;
+}
+        
+        table.dataTable tbody th, table.dataTable tbody td 
+        {
+
+            font-size: 13px !important;
+
+        }
+        table.dataTable thead th, table.dataTable thead td {
+
+            font-size: 13px !important;
+        }
+        .not-selectable
+        {
+            background-color: red!important;
+        }
+
+
     </style>
 
 </head>
@@ -465,6 +488,9 @@
             return;
         }
 
+        // call this to keep block up...
+        setThisQueryToRunLongNoAutoUnBlock();
+
         var sUrl = ServicePrefix + "/api/StationAdvertiserAudit/GetStationAdvertiserAuditList?";
         sUrl += "inApiToken=" + getLocalStorage("APIToken");
         sUrl += "&inStationAdvertiserName=" + $("#txtStationAdvertiser").val();
@@ -542,12 +568,12 @@
             "orderable": true
         });
 
-        columnsToDisplay.push({
-            "title": "Station Code",
-            "visible": true,
-            "mData": "Station Code",
-            "orderable": true
-        });
+        //columnsToDisplay.push({
+        //    "title": "Station Code",
+        //    "visible": true,
+        //    "mData": "Station Code",
+        //    "orderable": true
+        //});
 
         columnsToDisplay.push({
             "title": "Market Advertiser",
@@ -621,6 +647,8 @@
     function getMatchingColumns() {
         var columnsToDisplay = new Array();
 
+        // This column represents the 
+        // the checkbox
         columnsToDisplay.push({
             "mRender": function (data, type, row) {
                 return " ";
@@ -657,12 +685,12 @@
             "orderable": true
         });
 
-        columnsToDisplay.push({
-            "title": "Station Code",
-            "visible": true,
-            "mData": "Station Code",
-            "orderable": true
-        });
+        //columnsToDisplay.push({
+        //    "title": "Station Code",
+        //    "visible": true,
+        //    "mData": "Station Code",
+        //    "orderable": true
+        //});
 
         columnsToDisplay.push({
             "title": "Market Advertiser",
@@ -700,6 +728,11 @@
 
         resetDataTableDOM("dtUpdates", "dtUpdatesHolder", "cell-border");
 
+
+        // NOTE: the select and select-checkbox
+        // parameters indicate this data table 
+        // uses the built in checkbox funtionality
+
         matchTable = $("#dtUpdates").DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
@@ -721,7 +754,10 @@
 
 
         matchTable.on('select', function (e, dt, type, indexes) {
-            if (type === 'row') {
+
+            if (type === 'row')
+            {
+
                 var rows = matchTable.rows(indexes).nodes();
                 $.each($(rows),
                     function () {
@@ -749,29 +785,40 @@
     }
 
     function loadUpdateInformation(stationAdvertiserId, marketAdvertiserId, marketAdvertiserName, industryId, subIndustryId) {
+
+        $.blockUI();
+
         $("#txtUpdateMarketAdvertiserId").val(marketAdvertiserId);
         $("#txtUpdateMarketAdvertiser").val(marketAdvertiserName);
         $("#ddlUpdateIndustry").val(industryId);
+
         getSubIndustries(["ddlUpdateSubIndustry"], industryId, subIndustryId);
+
 
     }
 
     function markAsNotSelectable(stationAdvertiserId) {
 
+
+
+        $.blockUI();
+ 
         var updateTable = $('#dtUpdates').DataTable();
         var rows = updateTable.rows('.not-selectable').nodes();
 
-        $.each($(rows),
-            function () {
-                if ($(this).hasClass('not-selectable')) {
-                    $(updateTable.row($(this)).node()).removeClass('not-selectable');
-                }
-            }
-        );
+ 
+        $('#dtUpdates tr').removeClass('selected');
+        $('#dtUpdates tr').removeClass('not-selectable');
+        $("#dtUpdates tr").attr("background-color", "white");
+        updateTable.rows().deselect()
+
+        $("#btnUpdate").hide();
 
         var updateRowId = $('#dtUpdates').dataTable().fnFindCellRowIndexes(stationAdvertiserId, 1);
         $(updateTable.row(updateRowId).node()).addClass('not-selectable');
         updateTable.row(updateRowId).deselect();
+
+        $.unblockUI();
 
     }
 
@@ -847,6 +894,8 @@
             });
         });
 
+
+
         //added functionality to turn the update button on/off based on selected.
         //adding this check just to be safe.
         if (updateStationAdvertiserIds.length == 0) {
@@ -854,6 +903,7 @@
             return;
         }
 
+        console.log(updateStationAdvertiserIds);
         var msg = "Are you sure that you want to update the selected record(s)?<br/>";
         msg += "They will be updated to the following values:<br/><ul>";
 
