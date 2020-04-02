@@ -84,7 +84,7 @@
         table.dataTable tbody td.select-checkbox:before,
         table.dataTable tbody td.select-checkbox:after,
         table.dataTable thead th.select-checkbox:before,
-        table.dataTable thead th.select-checkbox:after 
+        table.dataTable thead th.select-checkbox:after
         {
             display: block;
             position: absolute;
@@ -102,6 +102,11 @@
             border: 1px solid black;
             border-radius: 3px;
         }
+
+        table.dataTable tr.selected td.select-checkbox::after, table.dataTable tr.selected th.select-checkbox::after {
+    margin-top: -9px;
+    margin-left: -7px;
+}
         
         table.dataTable tbody th, table.dataTable tbody td 
         {
@@ -117,6 +122,8 @@
         {
             background-color: red!important;
         }
+
+
     </style>
 
 </head>
@@ -640,6 +647,8 @@
     function getMatchingColumns() {
         var columnsToDisplay = new Array();
 
+        // This column represents the 
+        // the checkbox
         columnsToDisplay.push({
             "mRender": function (data, type, row) {
                 return " ";
@@ -719,6 +728,11 @@
 
         resetDataTableDOM("dtUpdates", "dtUpdatesHolder", "cell-border");
 
+
+        // NOTE: the select and select-checkbox
+        // parameters indicate this data table 
+        // uses the built in checkbox funtionality
+
         matchTable = $("#dtUpdates").DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
@@ -740,7 +754,10 @@
 
 
         matchTable.on('select', function (e, dt, type, indexes) {
-            if (type === 'row') {
+
+            if (type === 'row')
+            {
+
                 var rows = matchTable.rows(indexes).nodes();
                 $.each($(rows),
                     function () {
@@ -792,18 +809,10 @@
  
         $('#dtUpdates tr').removeClass('selected');
         $('#dtUpdates tr').removeClass('not-selectable');
-        $("#dtUpdates tr").removeAttr("selected");
         $("#dtUpdates tr").attr("background-color", "white");
+        updateTable.rows().deselect()
 
-        //$.each($(rows),
-        //    function () {
-        //        if ($(this).hasClass('not-selectable')) {
-        //            $(updateTable.row($(this)).node()).removeClass('not-selectable');
-        //        }
-        //    }
-        //);
-
-        //$("#btnUpdate").hide();
+        $("#btnUpdate").hide();
 
         var updateRowId = $('#dtUpdates').dataTable().fnFindCellRowIndexes(stationAdvertiserId, 1);
         $(updateTable.row(updateRowId).node()).addClass('not-selectable');
