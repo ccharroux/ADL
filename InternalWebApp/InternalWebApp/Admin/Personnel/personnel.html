@@ -1292,10 +1292,74 @@
     }
 
     function resetPassword() {
-        bootbox.alert('This functionality is still under development.', function () {
-        });
+        var url = ServicePrefix + '/api/Personnel/GetPersonnelOkayToResetPasswordFromInternal'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inPersonnelId=' + personnelID;
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                resetPasswordCheckOkaySuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+        $.ajax(url, settings);
     }
 
+    function resetPasswordCheckOkaySuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            bootbox.alert("Can't reset password: Failed to get result from GetPersonnelOkayToResetPasswordFromInternal");
+            return;
+        }
+
+        if (data.report.rows[0].okayToReset <= 0) {
+            var failureReason = data.report.rows[0].failureReason;
+            if (failureReason == null || failureReason.trim() == "") {
+                failureReason = "(unknown)";
+            }
+            bootbox.alert("Can't reset password: " + failureReason);
+            return;
+        }
+
+        var url = ServicePrefix + '/api/Personnel/ResetPasswordFromInternal';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelID
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                resetPasswordSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+        $.ajax(url, settings);
+    }
+
+    function resetPasswordSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert("Password reset initiated successfully.");
+    }
 
     function goToAssignments() {
         setPageParameters();
