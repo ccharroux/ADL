@@ -150,11 +150,11 @@
                         <label for="ddlOwner" class="dropdown-label">Owner</label>
                         <select id="ddlOwner" class="dropdown-select report-filter"></select>
 
-                        <label for="dtStartDate" class="dropdown-label ">Start Date</label>
-                        <input type="text" id="dtStartDate" class="report-filter" style="max-width: 100px;">
+                        <label for="dtStartDate" class="dropdown-label" style="color: red;"> * Start Date</label>
+                        <input type="text" id="dtStartDate" class="report-filter mkaRequired" style="max-width: 100px;" errorMessage="Please enter a Start Date to search.">
 
-                        <label for="dtEndDate" class="dropdown-label ">End Date</label>
-                        <input type="text" id="dtEndDate" class="report-filter" style="max-width: 100px;">
+                        <label for="dtEndDate" class="dropdown-label" style="color: red;"> * End Date</label>
+                        <input type="text" id="dtEndDate" class="report-filter mkaRequired" style="max-width: 100px;" errorMessage="Please enter a End Date to search.">
 
                         <input type="button" class="search-button" value="Search" onclick="clearUpdateFields(); searchForAdvertiserRevenue();" />
                     </div>
@@ -165,10 +165,10 @@
                     </div>
                 </div>
 
-                <div id="matchInfo" style="border: 1px solid black; border-radius: 10px; margin: 10px auto;">
-                    <h3 style="text-align: center; margin-bottom: 10px;">Update Information</h3>
+                <div id="matchInfo" class="match-info">
+                    <h3 class="match-info-header">Update Information</h3>
                     <div class="row">
-                        <div class="col-md-12" style="margin-bottom: 10px;">
+                        <div class="col-md-12 match-info-row">
                             <!--
                             turn these into search boxes
                             -->
@@ -179,7 +179,7 @@
                             <label for="txtUpdateMarketAgency" class="dropdown-label">Market Agency</label>
                             <input type="text" id="txtUpdateMarketAgency" onclick="excludeFromBackButton(); searchMarketAgency();" readonly="readonly" style="width: 450px;" maxlength="50" class="report-filter" />
 
-                            <input type="button" class="search-button" value="Update" onclick="updateAdvertiserRevenue();" />
+                            <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startAdvertiserRevenueUpdate();" />
                         </div>
                     </div>
                 </div>
@@ -422,6 +422,14 @@
         });
 
         columnsToDisplay.push({
+            "title": "revenueXrayId",
+            "visible": false,
+            "mData": "revenueXrayId",
+            "orderable": false,
+            "searchable": false
+        });
+
+        columnsToDisplay.push({
             "title": "advertiserId",
             "visible": false,
             "mData": "advertiserId",
@@ -544,6 +552,24 @@
             "buttons": [
             ]
         });
+
+        searchTable.on('select', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                var count = searchTable.rows({ selected: true }).count();
+                if (count > 0) {
+                    $("#btnUpdate").show();
+                }
+            }
+        });
+
+        searchTable.on('deselect', function (e, dt, type, indexes) {
+
+            var count = searchTable.rows({ selected: true }).count();
+            if (count == 0) {
+                $("#btnUpdate").hide();
+            }
+        });
+
     }
 
     function loadSelectedTableItems() {
@@ -556,9 +582,13 @@
         for (var i = 0; i < selectedTableItems.length; i++) {
             var selectedItem = selectedTableItems[i];
             tbResults.rows(function (idx, data, node) {
-                if (data.advertiserId === selectedItem.advertiserId && data.stationId == selectedItem.stationId &&
-                    data.Period == selectedItem.period && data.agencyId == selectedItem.agencyId &&
-                    data.Revenue == selectedItem.revenue && data["Account Type"] == selectedItem.accountType) {
+                //if (data.advertiserId === selectedItem.advertiserId && data.stationId == selectedItem.stationId &&
+                //    data.Period == selectedItem.period && data.agencyId == selectedItem.agencyId &&
+                //    data.Revenue == selectedItem.revenue && data["Account Type"] == selectedItem.accountType) {
+                //    tbResults.row(idx).select();
+                //}
+                if (data.revenueXrayId === selectedItem.revenueXrayId)
+                {
                     tbResults.row(idx).select();
                 }
             });
@@ -644,14 +674,29 @@
             return false;
         }
 
+        try {
+            //not doing anything with the date variable
+            //when trying to parse an invalid date, the function will throw an error to catch
+            var startDate = $.datepicker.parseDate('mm/dd/yy', $('#dtStartDate').val());
+        } catch (err) {
+            var errorMessage = "Please input a valid Start Date.";
+            bootbox.alert(errorMessage, function () { });
+            loopBreak = false;
+            return false;
+        }
+
+        try {
+            //not doing anything with the date variable
+            //when trying to parse an invalid date, the function will throw an error to catch            
+            var endDate = $.datepicker.parseDate('mm/dd/yy', $('#dtEndDate').val());
+        } catch (err) {
+            var errorMessage = "Please input a valid End Date.";
+            bootbox.alert(errorMessage, function () { });
+            loopBreak = false;
+            return false;
+        }
+
         return loopBreak;
-    }
-
-    function updateAdvertiserRevenue() {
-        var errorMessage = "This bulk update functionality is still under development.";
-        bootbox.alert(errorMessage, function () { });
-
-        return;
     }
 
     function searchMarketAdvertiser() {
@@ -673,12 +718,13 @@
         var aSelectedItems = new Array();
         for (var i = 0; i < tbResults.rows('.selected').data().length; i++) {
             aSelectedItems.push({
-                "advertiserId": tbResults.rows('.selected').data()[i].advertiserId,
-                "stationId": tbResults.rows('.selected').data()[i].stationId,
-                "period": tbResults.rows('.selected').data()[i].Period,
-                "agencyId": tbResults.rows('.selected').data()[i].agencyId,
-                "revenue": tbResults.rows('.selected').data()[i].Revenue,
-                "accountType": tbResults.rows('.selected').data()[i]["Account Type"]
+                //"advertiserId": tbResults.rows('.selected').data()[i].advertiserId,
+                //"stationId": tbResults.rows('.selected').data()[i].stationId,
+                //"period": tbResults.rows('.selected').data()[i].Period,
+                //"agencyId": tbResults.rows('.selected').data()[i].agencyId,
+                //"revenue": tbResults.rows('.selected').data()[i].Revenue,
+                //"accountType": tbResults.rows('.selected').data()[i]["Account Type"]
+                "revenueXrayId": tbResults.rows('.selected').data()[i].revenueXrayId
             });
         }
 
@@ -712,12 +758,13 @@
         var aSelectedItems = new Array();
         for (var i = 0; i < tbResults.rows('.selected').data().length; i++) {
             aSelectedItems.push({
-                "advertiserId": tbResults.rows('.selected').data()[i].advertiserId,
-                "stationId": tbResults.rows('.selected').data()[i].stationId,
-                "period": tbResults.rows('.selected').data()[i].Period,
-                "agencyId": tbResults.rows('.selected').data()[i].agencyId,
-                "revenue": tbResults.rows('.selected').data()[i].Revenue,
-                "accountType": tbResults.rows('.selected').data()[i]["Account Type"]
+                //"advertiserId": tbResults.rows('.selected').data()[i].advertiserId,
+                //"stationId": tbResults.rows('.selected').data()[i].stationId,
+                //"period": tbResults.rows('.selected').data()[i].Period,
+                //"agencyId": tbResults.rows('.selected').data()[i].agencyId,
+                //"revenue": tbResults.rows('.selected').data()[i].Revenue,
+                //"accountType": tbResults.rows('.selected').data()[i]["Account Type"]
+                "revenueXrayId": tbResults.rows('.selected').data()[i].revenueXrayId
             });
         }
 
@@ -756,6 +803,120 @@
 
         setTimeout('searchForAdvertiserRevenue()', 1000);
 
+    }
+
+    function startAdvertiserRevenueUpdate()
+    {
+
+        if (validateUpdateFields() == false) {
+            return;
+        }
+
+        var updateAdvertiserRevenueIds = new Array();
+
+        var updatesTable = $("#dtResults").DataTable();
+
+        updatesTable.rows({ selected: true }).every(function () {
+            var d = this.data();
+            updateAdvertiserRevenueIds.push(d.revenueXrayId);
+        });
+
+        //console.log(updateAdvertiserRevenueIds);
+
+        if (updateAdvertiserRevenueIds.length == 0) {
+            bootbox.alert("You must select at least 1 advertiser to update.", function () { });
+            return;
+        }
+
+        //create message with changes
+        //also add wording for linking revenue
+        var msg = "This action will redirect the Advertisers revenue records for the stations, periods and dollar amounts highlighted.<br/>";
+        msg += "They will be updated to the following values:<br/><ul>";
+
+        if ($("#txtUpdateMarketAdvertiser").val() != "") {
+            msg += "<li>Market Advertiser Name - " + $("#txtUpdateMarketAdvertiser").val() + "</li>";
+        }
+
+        if ($("#txtUpdateMarketAdvertiser").val() != "") {
+            msg += "<li>Market Agency Name - " + $("#txtUpdateMarketAgency").val() + "</li>";
+        }
+
+        msg += "</ul>";
+
+        msg += "Shall these revenue records be redirected? <br/>";
+        msg += "Press OK to redirect revenues or Cancel to abort.<br/>";
+      
+
+        var dialog = bootbox.dialog({
+            title: "Merge Advertiser Revenue",
+            message: msg,
+            size: 'large',
+            buttons: {
+                yes: {
+                    label: "Ok",
+                    className: 'btn-primary',
+                    callback: function () {
+                        updateAdvertiserRevenue(updateAdvertiserRevenueIds);
+                    }
+                },
+                cancel: {
+                    label: "Cancel",
+                    className: '',
+                    callback: function () {
+                        return;
+                    }
+                }
+            },
+            onEscape: function () {
+                dialog.modal("hide");
+                return;
+            }
+        });
+
+    }
+
+    function updateAdvertiserRevenue(updateAdvertiserRevenueIds) {
+        //var errorMessage = "This bulk update functionality is still under development.";
+        //bootbox.alert(errorMessage, function () { });
+
+        //return;
+
+        $.ajax({
+            url: ServicePrefix + '/api/XRAYRevenue/RedirectRevenueAdvertiser',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inNewAdvId": $("#txtUpdateMarketAdvertiserId").val(),
+                "inNewAgId": $("#txtUpdateMarketAgencyId").val(),
+                "RevenueXrayIdList": updateAdvertiserRevenueIds
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    bootbox.alert("All advertiser revenue have been redirected.", function () { });
+                    searchForAdvertiserRevenue();
+                    clearUpdateFields();
+                }
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function validateUpdateFields() {
+        // these values can't be changes but leaving the edit in place in case things change
+        if ($("#txtUpdateMarketAdvertiser").val() == "" || $("#txtUpdateMarketAgency").val() == "") {
+            bootbox.alert("The Market Advertiser and Agency need to be completed in order to update.", function () { });
+            return false;
+        } else {
+            return true;
+        }
     }
 
 </script>

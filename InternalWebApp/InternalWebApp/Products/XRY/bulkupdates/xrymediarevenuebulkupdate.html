@@ -146,24 +146,24 @@
                 <div class="row search-section">
                     <div class="col-md-12">
 
-                        <label for="dtStartDate" class="dropdown-label ">Start Date</label>
-                        <input type="text" id="dtStartDate" class="report-filter" style="max-width: 100px;">
+                        <label for="dtStartDate" class="dropdown-label" style="color: red;"> * Start Date</label>
+                        <input type="text" id="dtStartDate" class="report-filter mkaRequired" style="max-width: 100px;" errorMessage="Please enter a Start Date to search.">
 
-                        <label for="dtEndDate" class="dropdown-label ">End Date</label>
-                        <input type="text" id="dtEndDate" class="report-filter" style="max-width: 100px;">
+                        <label for="dtEndDate" class="dropdown-label" style="color: red;"> * End Date</label>
+                        <input type="text" id="dtEndDate" class="report-filter mkaRequired" style="max-width: 100px;" errorMessage="Please enter a End Date to search.">
 
                         <input type="button" class="search-button" value="Search" onclick="clearUpdateFields(); searchForMediaRevenue();" />
                     </div>
                 </div>
 
-                <div id="matchInfo" style="border: 1px solid black; border-radius: 10px; margin: 10px auto;">
-                    <h3 style="text-align: center; margin-bottom: 10px;">Update Information</h3>
+                <div id="matchInfo" class="match-info">
+                    <h3 class="match-info-header">Update Information</h3>
                     <div class="row">
-                        <div class="col-md-12" style="margin-bottom: 10px;">
+                        <div class="col-md-12 match-info-row">
                             <input type="hidden" id="txtUpdateMarketAdvertiserId" class="report-filter" value="" />
                             <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label>
                             <input type="text" id="txtUpdateMarketAdvertiser" onclick="excludeFromBackButton(); searchMarketAdvertiser();" readonly="readonly" style="width: 450px;" maxlength="50" class="report-filter" />
-                            <input type="button" class="search-button" value="Update" onclick="updateMediaAdvertiserRevenue();" />
+                            <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startMediaAdvertiserRevenueUpdate();" />
                         </div>
                     </div>
                 </div>
@@ -381,6 +381,14 @@
         });
 
         columnsToDisplay.push({
+            "title": "revenueXrayId",
+            "visible": false,
+            "mData": "revenueXrayId",
+            "orderable": false,
+            "searchable": false
+        });
+
+        columnsToDisplay.push({
             "title": "advertiserId",
             "visible": false,
             "mData": "advertiserId",
@@ -473,6 +481,24 @@
             "buttons": [
             ]
         });
+
+        searchTable.on('select', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                var count = searchTable.rows({ selected: true }).count();
+                if (count > 0) {
+                    $("#btnUpdate").show();
+                }
+            }
+        });
+
+        searchTable.on('deselect', function (e, dt, type, indexes) {
+
+            var count = searchTable.rows({ selected: true }).count();
+            if (count == 0) {
+                $("#btnUpdate").hide();
+            }
+        });
+
     }
 
     function loadSelectedTableItems() {
@@ -485,8 +511,12 @@
         for (var i = 0; i < selectedTableItems.length; i++) {
             var selectedItem = selectedTableItems[i];
             tbResults.rows(function (idx, data, node) {
-                if (data.advertiserId === selectedItem.advertiserId && data.Period == selectedItem.period &&
-                    data.Revenue == selectedItem.revenue && data["Media Code"] == selectedItem.mediaCode) {
+                //if (data.advertiserId === selectedItem.advertiserId && data.Period == selectedItem.period &&
+                //    data.Revenue == selectedItem.revenue && data["Media Code"] == selectedItem.mediaCode) {
+                //    tbResults.row(idx).select();
+                //}
+                if (data.revenueXrayId === selectedItem.revenueXrayId)
+                {
                     tbResults.row(idx).select();
                 }
             });
@@ -514,10 +544,11 @@
         var aSelectedItems = new Array();
         for (var i = 0; i < tbResults.rows('.selected').data().length; i++) {
             aSelectedItems.push({
-                "advertiserId": tbResults.rows('.selected').data()[i].advertiserId,
-                "period": tbResults.rows('.selected').data()[i].Period,
-                "revenue": tbResults.rows('.selected').data()[i].Revenue,
-                "mediaCode": tbResults.rows('.selected').data()[i]["Media Code"]
+                //"advertiserId": tbResults.rows('.selected').data()[i].advertiserId,
+                //"period": tbResults.rows('.selected').data()[i].Period,
+                //"revenue": tbResults.rows('.selected').data()[i].Revenue,
+                //"mediaCode": tbResults.rows('.selected').data()[i]["Media Code"]
+                "revenueXrayId": tbResults.rows('.selected').data()[i].revenueXrayId
             });
         }
 
@@ -612,6 +643,31 @@
             return false;
         }
 
+        try
+        {
+            //not doing anything with the date variable
+            //when trying to parse an invalid date, the function will throw an error to catch
+            var startDate = $.datepicker.parseDate('mm/dd/yy', $('#dtStartDate').val());
+        } catch (err)
+        {
+            var errorMessage = "Please input a valid Start Date.";
+            bootbox.alert(errorMessage, function () { });
+            loopBreak = false;
+            return false;
+        }
+
+        try
+        {
+            //not doing anything with the date variable
+            //when trying to parse an invalid date, the function will throw an error to catch            
+            var endDate = $.datepicker.parseDate('mm/dd/yy', $('#dtEndDate').val());
+        } catch (err) {
+            var errorMessage = "Please input a valid End Date.";
+            bootbox.alert(errorMessage, function () { });
+            loopBreak = false;
+            return false;
+        }
+
         return loopBreak;
     }
 
@@ -634,11 +690,109 @@
 
     }
 
-    function updateMediaAdvertiserRevenue() {
-        var errorMessage = "This bulk update functionality is still under development.";
-        bootbox.alert(errorMessage, function () { });
+    function startMediaAdvertiserRevenueUpdate()
+    {
+        if (validateUpdateFields() == false) {
+            return;
+        }
 
-        return;
+        var updateMediaAdvertiserRevenueIds = new Array();
+
+        var updatesTable = $("#dtResults").DataTable();
+
+        updatesTable.rows({ selected: true }).every(function () {
+            var d = this.data();
+            updateMediaAdvertiserRevenueIds.push(d.revenueXrayId);
+        });
+
+
+        if (updateMediaAdvertiserRevenueIds.length == 0) {
+            bootbox.alert("You must select at least 1 media advertiser to update.", function () { });
+            return;
+        }
+
+        //create message with changes
+        //also add wording for linking revenue
+        var msg = "This action will redirect the newspaper and television revenue records for the periods and dollar amounts highlighted.<br/>";
+        msg += "They will be updated to the following value:<br/><ul>";
+
+        if ($("#txtUpdateMarketAdvertiser").val() != "") {
+            msg += "<li>Market Advertiser Name - " + $("#txtUpdateMarketAdvertiser").val() + "</li>";
+        }
+
+        msg += "</ul>";
+
+        msg += "Shall these revenue records be redirected? <br/>";
+        msg += "Press OK to redirect revenues or Cancel to abort.<br/>";
+
+
+        var dialog = bootbox.dialog({
+            title: "Merge Advertiser Revenue",
+            message: msg,
+            size: 'large',
+            buttons: {
+                yes: {
+                    label: "Ok",
+                    className: 'btn-primary',
+                    callback: function () {
+                        updateMediaAdvertiserRevenue(updateMediaAdvertiserRevenueIds);
+                    }
+                },
+                cancel: {
+                    label: "Cancel",
+                    className: '',
+                    callback: function () {
+                        return;
+                    }
+                }
+            },
+            onEscape: function () {
+                dialog.modal("hide");
+                return;
+            }
+        });
+       
     }
 
+    function updateMediaAdvertiserRevenue(updateMediaAdvertiserRevenueIds) {
+        //var errorMessage = "This bulk update functionality is still under development.";
+        //bootbox.alert(errorMessage, function () { });
+
+        //return;
+
+        $.ajax({
+            url: ServicePrefix + '/api/XRAYRevenue/RedirectRevenueMediaAdvertiser',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inNewAdvId": $("#txtUpdateMarketAdvertiserId").val(),
+                "RevenueXrayIdList": updateMediaAdvertiserRevenueIds
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    bootbox.alert("All media revenue has been redirected.", function () { });
+                    searchForMediaRevenue();
+                    clearUpdateFields();
+                }
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function validateUpdateFields() {
+        // these values can't be changes but leaving the edit in place in case things change
+        if ($("#txtUpdateMarketAdvertiser").val() == "") {
+            bootbox.alert("The Market Advertiser needs to be completed in order to update.", function () { });
+            return false;
+        } else {
+            return true;
+        }
+    }
 </script>
