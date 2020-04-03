@@ -137,6 +137,16 @@
                         </div>
                     </div>
 
+                    <!-- Status -->
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="ddlStatus">Status</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <select id="ddlStatus" class="mkaRequired" errorMessage="You must select a status."></select>
+                        </div>
+                    </div>
+
                     <!-- Notes -->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
@@ -330,6 +340,7 @@
     var gotTrainers = false;
     var gotTopics = false;
     var gotMethods = false;
+    var gotStatuses = false;
     var gotTrainingEvent = false;
 
     var gotOwners = false;
@@ -363,6 +374,7 @@
         getTrainers();
         getTopics();
         getMethods();
+        getStatuses();
         // success on all of these -> event detail -> media types, owners, markets, individuals, groups
 
         setDataTable();
@@ -558,6 +570,45 @@
         getTrainingEvent();
     }
 
+    function getStatuses() {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/GetTrainingStatuses',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getStatusesSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getStatusesSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '<option value="">-- Select a Status --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str = str + '<option value="' + obj.trainingStatusId + '">' + obj.trainingStatusDescription + '</option>';
+        });
+
+        $("#ddlStatus").html(str);
+
+        convertToChosenSelect("ddlStatus", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotStatuses = true;
+        getTrainingEvent();
+    }
+
     function setDataTable() {
         var reportTitle = "Trainees";
         var exportColumns = returnTableColumnsByClass("dtTrainees", "exportColumn");
@@ -681,6 +732,7 @@
                gotTrainers == false
             || gotTopics == false
             || gotMethods == false
+            || gotStatuses == false
         ) {
             return;
         }
@@ -729,6 +781,7 @@
 
         $("#ddlTopic").val(obj["Training Topic ID"]);
         $("#ddlMethod").val(obj["Training Method ID"]);
+        $("#ddlStatus").val(obj["Training Status ID"]);
         $("#txtNotes").val(obj["Notes"]);
 
         gotTrainingEvent = true;
@@ -1085,6 +1138,7 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inTrainingTopicId": $("#ddlTopic").val(),
                 "inTrainingMethodId": $("#ddlMethod").val(),
+                "inTrainingStatusId": $("#ddlStatus").val(),
                 "inTrainingDate": getTrainingDateTime(),
                 "inTrainerPersonnelId": $("#ddlTrainer").val(),
                 "inNotes": $("#txtNotes").val()
@@ -1125,6 +1179,7 @@
                 "inTrainingEventId": trainingEventId,
                 "inTrainingTopicId": $("#ddlTopic").val(),
                 "inTrainingMethodId": $("#ddlMethod").val(),
+                "inTrainingStatusId": $("#ddlStatus").val(),
                 "inTrainingDate": getTrainingDateTime(),
                 "inTrainerPersonnelId": $("#ddlTrainer").val(),
                 "inNotes": $("#txtNotes").val()
