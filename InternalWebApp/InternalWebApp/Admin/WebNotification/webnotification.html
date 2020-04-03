@@ -95,11 +95,10 @@
                             <option value="recipientsonly">Recipients Only</option>
                         </select>
                     </div>
- 
+
                     <div class="col-md-2">
                         <label for="txtPersonnel" class="search-ddl-label">Personnel</label><br />
-                        <input id="txtPersonnel" class="field-width-210" onclick="excludeFromBackButton(); getPersonnel();" readonly />&nbsp;&nbsp;
-                        <a class="" href="#" onclick="clearSelection('Personnel')">X</a>
+                        <input id="txtPersonnel" class="field-width-210" onclick="excludeFromBackButton(); getPersonnel();" readonly />&nbsp;<a class="" href="#" onclick="clearSelection('Personnel')">X</a>
                     </div>
                     <div class="col-md-2">
                         <label for="ddlMarket" class="search-ddl-label">Market</label><br />
@@ -212,7 +211,7 @@
         convertToChosenSelect("ddlNumberOfDays", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
         loadReportParameters();
-        
+
     });
 
     function resetFilters(filter) {
@@ -382,11 +381,14 @@
         //Adding column of checkboxes to first column
         columns.push({
             mRender: function (data, type, row) {
-                return '<input type="checkbox" onclick="userSelected(' + row["Personnel ID"] + ')" />';
+                if (row["Status"].toUpperCase() == "PENDING") {
+                    return '<input type="checkbox" onclick="userSelected(' + row["Personnel ID"] + ')" />';
+                }
+                return '';
             },
             "orderable": false,
             "searchabble": false,
-            "className": "chkColumn"
+            "className": "chkColumn text-align-center"
         });
 
 
@@ -415,11 +417,15 @@
 
         columns.push({
             mRender: function (data, type, row) {
-                return '<a href="#" onclick="sendIndividualEmail(' + row["Personnel ID"] + ')">Send</a>';
+                if (row["Status"].toUpperCase() == "PENDING") {
+                    return '<a href="#" onclick="sendIndividualEmail(\'' + row["Personnel ID"] + '\',\'' + row["Email"] + '\',\'' + row["Token"] + '\')">Send</a> <a href="#" onclick="deletePendingNotification()>Delete</a>';
+                }
+                return '';
+
             },
             "orderable": false,
             "searchable": false,
-            "className": "text-align-right"
+            "className": "text-align-center"
         });
 
         loadResults(dataObj, columns, dataTable);
@@ -608,10 +614,9 @@
 
     }
 
-    function getOwnerListSuccess(data, textStauts, jQxhr) {
+    function getOwnerListSuccess(data, textStauts, jQxhr) { 
 
-        if (data.response.status != "SUCCESS")
-        {
+        if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
         }
 
@@ -642,6 +647,9 @@
             "txtPersonnel": $("#txtPersonnel").html(),
             "ddlStatus": $("#ddlStatus").val(),
             "ddlRoles": $("#ddlRoles").val(),
+            "ddlNumberOfDays": $("#ddlNumberOfDays").val(),
+            "ddlMarket": $("#ddlMarket").val(),
+            "ddlOwner": $("#ddlOwner").val(),
             "searchPage": window.location
         }
 
@@ -649,6 +657,7 @@
 
         window.location = "/utilities/search.html";
     }
+
 
     function loadAdvancedSearch() {
 
@@ -672,13 +681,16 @@
 
             $("#txtPersonnel").val(searchCriteria["txtPersonnel"]);
             $("#hdnPersonnelId").val(searchCriteria["personnelId"]);
+            $("#ddlMarket").val(searchCriteria["ddlMarket"]);
+            $("#ddlOwner").val(searchCriteria["ddlOwner"]);
+            $("#ddlNumberOfDays").val(searchCriteria["ddlNumberOfDays"]);
 
             searchCriteria["txtPersonnel"] = "";
             searchCriteria["personnelId"] = "";
             searchCriteria["ddlStatus"] = "";
             searchCriteria["ddlFilter"] = "";
 
-            
+
         } else {
             loadReportParameters();
         }
@@ -707,8 +719,165 @@
         updateSelectedCount();
     }
 
-    function sendIndividualEmail() {
-        bootbox.alert("This functionality is currently in development.");
+    function sendIndividualEmail(personnelId, email, token) {
+
+        //validation
+        if (personnelId.trim() == "") {
+            bootbox.alert("Error. Personnel Id is missing for this record.");
+            return;
+        }
+
+        if (email.trim() == "") {
+            bootbox.alert("Error. Email is missing for this record.");
+            return;
+        }
+
+        if (token.trim() == "") {
+            bootbox.alert("Error. Email Token is missing for this record.");
+            return;
+        }
+
+        //check SAML Status then send email
+
+        checkSAMLStatus(personnelId, email, token);
+       
     }
+
+    function checkSAMLStatus(personnelId, email, token) {
+
+        var url = ServicePrefix + '/api/Personnel/GetPersonnelSAMLStatus';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+               checkSAMLStatusSuccess(data, textStatus, jQxhr, personnelId, email, token);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function checkSAMLStatusSuccess(data, textStatus, jQxhr, personnelId, email, token) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            var isSAMLCompatible = false;
+        
+            if (data.report.rows[0].passwordOrSAML == 1) {
+                isSAMLCompatible = true;
+            }
+
+            //personnel is SAML compatible
+            //ask user is they want to use the
+            //saml version of the email
+            if (isSAMLCompatible == true) {
+                var strMessage = 'This user is SAML campatible, send the SAML version of this email?';
+
+                bootbox.dialog({
+                    message: strMessage,
+                    buttons: {
+                        btnCancel: {
+                            label: "Cancel",
+                            callback: function () {
+                                bootbox.alert("Process has been canceled. No emails have been sent.");
+                                return;
+                            }
+                        },
+                        btnNo: {
+                            label: "No",
+                            callback: function () {
+                                 sendEmail(personnelId, email, token, false);
+                             
+                            }
+                        },
+                        btnYes: {
+                            label: "Yes",
+                            callback: function () {
+                                  sendEmail(personnelId, email, token, true);                              
+                            }
+                        }
+                    }
+                });
+            }
+            else {
+                //User is not saml compatible
+                //send regular email
+                sendEmail(personnelId, email, token, false);
+            }
+
+        }
+    }
+
+    function sendEmail(personnelId, email, token, isSAMLEmail) {
+
+
+        var url = ServicePrefix + '/api/Notification/InitiateWebNotification';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelID": personnelId,
+                "inNotificationToken": token,
+                "inEmail": email,
+                "inSAMLUser": isSAMLEmail
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                sendEmailSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function sendEmailSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+
+            $.each(data.report.rows, function (index) {
+
+                bootbox.alert("Email has been sent.", function () {
+
+                    var searchCriteriaObj = {
+                        "searchToken": "PERSONNEL",
+                        "txtPersonnel": $("#txtPersonnel").html(),
+                        "ddlStatus": $("#ddlStatus").val(),
+                        "ddlRoles": $("#ddlRoles").val(),
+                        "ddlNumberOfDays": $("#ddlNumberOfDays").val(),
+                        "ddlMarket": $("#ddlMarket").val(),
+                        "ddlOwner": $("#ddlOwner").val(),
+                        "searchPage": window.location
+                    }
+
+                    setLocalStorage("gSearchResults", JSON.stringify(searchCriteriaObj));
+
+                    //Reload page
+                    window.location = "/admin/webnotification/webnotification.html?MenuItem=true";
+
+                });
+
+            });
+
+        }
+    }
+
+
 
 </script>
