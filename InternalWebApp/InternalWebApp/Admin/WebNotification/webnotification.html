@@ -418,7 +418,7 @@
         columns.push({
             mRender: function (data, type, row) {
                 if (row["Status"].toUpperCase() == "PENDING") {
-                    return '<a href="#" onclick="sendIndividualEmail(\'' + row["Personnel ID"] + '\',\'' + row["Email"] + '\',\'' + row["Token"] + '\')">Send</a> <a href="#" onclick="deletePendingNotification()>Delete</a>';
+                    return '<a href="#" onclick="initiateSendEmail(\'' + row["Personnel ID"] + '\',\'' + row["Email"] + '\',\'' + row["Token"] + '\')">Send</a> <a href="#" onclick="deletePendingNotification()>Delete</a>';
                 }
                 return '';
 
@@ -719,7 +719,7 @@
         updateSelectedCount();
     }
 
-    function sendIndividualEmail(personnelId, email, token) {
+    function initiateSendEmail(personnelId, email, token) {
 
         //validation
         if (personnelId.trim() == "") {
@@ -737,8 +737,7 @@
             return;
         }
 
-        //check SAML Status then send email
-
+        //check SAML Status 
         checkSAMLStatus(personnelId, email, token);
        
     }
@@ -771,52 +770,84 @@
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
         } else {
-            var isSAMLCompatible = false;
-        
-            if (data.report.rows[0].passwordOrSAML == 1) {
-                isSAMLCompatible = true;
-            }
 
-            //personnel is SAML compatible
-            //ask user is they want to use the
-            //saml version of the email
-            if (isSAMLCompatible == true) {
-                var strMessage = 'This user is SAML campatible, send the SAML version of this email?';
-
-                bootbox.dialog({
-                    message: strMessage,
-                    buttons: {
-                        btnCancel: {
-                            label: "Cancel",
-                            callback: function () {
-                                bootbox.alert("Process has been canceled. No emails have been sent.");
-                                return;
-                            }
-                        },
-                        btnNo: {
-                            label: "No",
-                            callback: function () {
-                                 sendEmail(personnelId, email, token, false);
-                             
-                            }
-                        },
-                        btnYes: {
-                            label: "Yes",
-                            callback: function () {
-                                  sendEmail(personnelId, email, token, true);                              
-                            }
-                        }
-                    }
-                });
+            switch (data.report.rows[0].passwordOrSAML) {
+                case 1:
+                    //SAML ONLY
+                    showSAMLOnlyMessage(personnelId, email, token);
+                    break;
+                case 2:
+                    //SAML or Regular
+                    showSAMLOrRegularMessage(personnelId, email, token);
+                    break;
+                case 0:
+                    //Regular Only
+                    sendEmail(personnelId, email, token, false);
+                    break;
+                default:
+                    bootbox.alert("There was an issue when checking the SAML status of this user.");
+                    break;
             }
-            else {
-                //User is not saml compatible
-                //send regular email
-                sendEmail(personnelId, email, token, false);
-            }
-
+            
         }
     }
+
+    function showSAMLOnlyMessage(personnelId, email, token) {
+        var strMessage = 'This personnel is a SAML only user. If this is wrong, please click cancel and put in a request to change this. If this is correct, click Continue to send the SAML version of this email.';
+
+        bootbox.dialog({
+            message: strMessage,
+            buttons: {
+                btnCancel: {
+                    label: "Cancel",
+                    callback: function (){
+                        bootbox.alert("Process has been canceled. No emails have been sent.");
+                        return;
+                    }
+                },
+                btnContinue: {
+                    label: "Continue",
+                    callback: function(){
+                        sendEmail(personnelId, email, token, true);
+                    }
+                }
+            }
+        });
+
+    }
+
+    function showSAMLOrRegularMessage(personnelId, email, token) {
+        var strMessage = 'This user is SAML compatible, please select either the SAML version or Regular version for this email.';
+
+        bootbox.dialog({
+            message: strMessage,
+            buttons: {
+                btnCancel: {
+                    label: "Cancel",
+                    callback: function () {
+                        bootbox.alert("Process has been canceled. No emails have been sent.");
+                        return;
+                    }
+                },
+                btnSAMLEmail: {
+                    label: "SAML",
+                    callback: function () {
+                        sendEmail(personnelId, email, token, true);
+                    }
+                },
+                btnRegularEmail: {
+                    label: "Regular",
+                    callback: function () {
+                        sendEmail(personnelId, email, token, false);
+                    }
+                }
+            }
+        });
+
+    }
+
+
+
 
     function sendEmail(personnelId, email, token, isSAMLEmail) {
 
