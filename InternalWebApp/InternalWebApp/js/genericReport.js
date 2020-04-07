@@ -1505,6 +1505,20 @@ function getReportObject_Training() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
+    columnsToDisplay.push("Training Date");
+    columnsToDisplay.push("Training Time");
+    columnsToDisplay.push("Trainer");
+    columnsToDisplay.push("Training Topic");
+    columnsToDisplay.push("Training Method");
+    columnsToDisplay.push("Training Status");
+    columnsToDisplay.push("Notes");
+    columnsToDisplay.push("Individual Trainees");
+    columnsToDisplay.push("Cluster Trainees");
+    columnsToDisplay.push("Owner Group Trainees");
+    columnsToDisplay.push("Trainee");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Owner Group");
 
     tempObject =
     {
