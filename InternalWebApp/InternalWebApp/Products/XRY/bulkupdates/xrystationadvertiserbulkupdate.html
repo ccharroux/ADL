@@ -58,13 +58,11 @@
     <![endif]-->
 
     <style>
-        select
-        {
+        select {
             width: 266px !important;
         }
 
-        #txtStationAdvertiser, #txtMarketAdvertiser
-        {
+        #txtStationAdvertiser, #txtMarketAdvertiser {
             width: 266px !important;
         }
 
@@ -91,49 +89,47 @@
             position: relative;
         }
 
-        table.dataTable tbody td.select-checkbox:before,
-        table.dataTable tbody td.select-checkbox:after,
-        table.dataTable thead th.select-checkbox:before,
-        table.dataTable thead th.select-checkbox:after
-        {
-            display: block;
-            position: absolute;
-            top: auto !important;
-            left: 50%;
-            width: 16px;
-            height: 16px;
-            box-sizing: border-box;
-        }
+            table.dataTable tbody td.select-checkbox:before,
+            table.dataTable tbody td.select-checkbox:after,
+            table.dataTable thead th.select-checkbox:before,
+            table.dataTable thead th.select-checkbox:after {
+                display: block;
+                position: absolute;
+                top: auto !important;
+                left: 50%;
+                width: 16px;
+                height: 16px;
+                box-sizing: border-box;
+            }
 
-        table.dataTable tbody td.select-checkbox:before {
-            content: ' ';
-            margin-top: -6px;
-            margin-left: -8px;
-            border: 1px solid black;
-            border-radius: 3px;
-        }
+            table.dataTable tbody td.select-checkbox:before {
+                content: ' ';
+                margin-top: -6px;
+                margin-left: -8px;
+                border: 1px solid black;
+                border-radius: 3px;
+            }
 
         table.dataTable tr.selected td.select-checkbox::after, table.dataTable tr.selected th.select-checkbox::after {
-    margin-top: -9px;
-    margin-left: -7px;
-}
-        
-        table.dataTable tbody th, table.dataTable tbody td 
-        {
-
-            font-size: 13px !important;
-
+            margin-top: -9px;
+            margin-left: -7px;
         }
+
+        table.dataTable tbody th, table.dataTable tbody td {
+            font-size: 13px !important;
+        }
+
         table.dataTable thead th, table.dataTable thead td {
-
             font-size: 13px !important;
         }
-        .not-selectable
-        {
-            background-color: red!important;
+
+        .not-selectable {
+            background-color: red !important;
         }
 
-
+        th.select-checkbox {
+            width: 15px;
+        }
     </style>
 
 </head>
@@ -159,7 +155,7 @@
                 </div>
 
                 <div class="row search-section">
-                    <div  class="row" style="margin-bottom: 20px;">
+                    <div class="row" style="margin-bottom: 20px;">
                         <div class="col-md-3">
                             <label for="ddlMarket" class="dropdown-label" style="color: red;"> * Market</label><br />
                             <select id="ddlMarket" onchange="getOwnerList(['ddlOwner'], this.options[this.selectedIndex].value, '-1');" class="dropdown-select report-filter mkaRequired" errorMessage="Please select a Market to search."></select>
@@ -216,10 +212,10 @@
                     </div>
                     <div class="row">
                         <!--
-            2 datatables
-            1 search results
-            1 to select for bulk updates
-            -->
+                        2 datatables
+                        1 search results
+                        1 to select for bulk updates
+                        -->
                         <div id="dtResultsHolder" class="col-md-5">
                             <table id="dtResults" class="cell-border"></table>
                         </div>
@@ -229,9 +225,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
         </div>
     </div>
-
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
     <!-- jQuery Easing -->
@@ -441,7 +437,7 @@
         if (marketId == null || marketId == "-1")
         {
 
- 
+
             var strSub = "<option value='-1'> -- Select an Owner</option>";
 
             for (var i = 0; i < controls.length; i++)
@@ -553,7 +549,7 @@
         columnsToDisplay.push({
             "mRender": function (data, type, row) {
                 return '<input type="radio" id="rdo_' + row.stationAdvertiserId + '" name="advertisers" onclick="loadUpdateInformation(' + row.stationAdvertiserId + ',' + row.marketAdvertiserId +
-                    ',\'' + row.MarketAdvertiserWithoutId + '\',' + row.industryId + ',' + row.subIndustryId + ');markAsNotSelectable(' + row.stationAdvertiserId + ');">';
+                    ',\'' + row.MarketAdvertiserWithoutId + '\',' + row.industryId + ',' + row.subIndustryId + '); markAsNotSelectable(' + row.stationAdvertiserId + '); fixResultsSelect(' + row.stationAdvertiserId + ');">';
             },
             "orderable": false,
             "searchable": false
@@ -640,7 +636,22 @@
             "order": [],
             "data": results,
             "columns": columns,
-            "select": true,
+            //This allows everything in the 1st column to be centered.
+            "columnDefs": [
+                {
+                    "className": "dt-center",
+                    "targets": 0
+                }
+            ],
+            "select": {
+                //this makes the table single select
+                //the selector option here makes the first
+                //column not selectable. the radio button can
+                //still be clicked. by having this column selectable,
+                //it was causing the load of update information happen twice.
+                style: 'single',
+                selector: 'td:not(:first-child)'
+            },
             language: {
                 search: "Filter Results:"
             },
@@ -651,10 +662,8 @@
         //add on select and have it do code
         searchTable.on('select', function (e, dt, type, indexes) {
             //this will trigger the click of the radio button
-            if (type === 'row') {
-                var d = dt.data();
-                $("#rdo_" + d.stationAdvertiserId).click();
-            }
+            var d = dt.data();
+            $("#rdo_" + d.stationAdvertiserId).click();
         });
 
     }
@@ -669,13 +678,9 @@
     function getMatchingColumns() {
         var columnsToDisplay = new Array();
 
-        // This column represents the 
-        // the checkbox
+        // This column represents the
+        // the checkbox. Must be here to display the checkbox.
         columnsToDisplay.push({
-            "mRender": function (data, type, row) {
-                return " ";
-            },
-            "title": "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", //putting in the spaces for now so the width would be set
             "orderable": false,
             "searchable": false
         });
@@ -694,12 +699,14 @@
             "mData": "Market",
             "orderable": true
         });
+
         columnsToDisplay.push({
             "title": "Station",
             "visible": true,
             "mData": "Station",
             "orderable": true
         });
+
         columnsToDisplay.push({
             "title": "Station Advertiser",
             "visible": true,
@@ -756,9 +763,12 @@
 
 
         // NOTE: the select and select-checkbox
-        // parameters indicate this data table 
-        // uses the built in checkbox funtionality
-
+        // parameters indicate this data table
+        // uses the built in checkbox funtionality.
+        //
+        // by using the defaultContent,
+        // you don't need to use the mRender in the
+        // column definition
         matchTable = $("#dtUpdates").DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
@@ -766,8 +776,9 @@
             "data": results,
             "columns": columns,
             "columnDefs": [{
-                orderable: false,
                 targets: 0,
+                defaultContent: '',
+                orderable: false,
                 className: 'select-checkbox'
             }],
             "select": "multi",
@@ -831,18 +842,16 @@
 
     function markAsNotSelectable(stationAdvertiserId) {
 
-
-
         $.blockUI();
- 
+
         var updateTable = $('#dtUpdates').DataTable();
         var rows = updateTable.rows('.not-selectable').nodes();
 
- 
+
         $('#dtUpdates tr').removeClass('selected');
         $('#dtUpdates tr').removeClass('not-selectable');
         $("#dtUpdates tr").attr("background-color", "white");
-        updateTable.rows().deselect()
+        updateTable.rows().deselect();
 
         $("#dtUpdates_filter input").show();
         $("#dtUpdates_filter label").show();
@@ -936,7 +945,7 @@
             bootbox.alert("You must select at least 1 station advertiser to update.", function () { });
             return;
         }
- 
+
         var msg = "Are you sure that you want to update the selected record(s)?<br/>";
         msg += "They will be updated to the following values:<br/><ul>";
 
@@ -1052,5 +1061,22 @@
         $("#dtUpdates_filter input").show();
         $("#dtUpdates_filter label").show();
 
+    }
+
+    // NOTE: created this function to update the selected row
+    // on the results table. I made the radio button cell non-selectable
+    // because it was causing the click event to happen twice.
+    // This caused an issue with the wrong row being highlighted.
+    function fixResultsSelect(stationAdvertiserId)
+    {
+        $.blockUI();
+
+        var resultTable = $('#dtResults').DataTable();
+        resultTable.rows().deselect();
+
+        var resultRowId = $('#dtResults').dataTable().fnFindCellRowIndexes(stationAdvertiserId, 1);
+        $(resultTable.row(resultRowId).node()).addClass('selected');
+
+        $.unblockUI();
     }
 </script>

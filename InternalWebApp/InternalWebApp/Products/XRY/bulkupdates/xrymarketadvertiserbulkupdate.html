@@ -101,6 +101,27 @@
                 border: 1px solid black;
                 border-radius: 3px;
             }
+
+        table.dataTable tr.selected td.select-checkbox::after, table.dataTable tr.selected th.select-checkbox::after {
+            margin-top: -9px;
+            margin-left: -7px;
+        }
+
+        table.dataTable tbody th, table.dataTable tbody td {
+            font-size: 13px !important;
+        }
+
+        table.dataTable thead th, table.dataTable thead td {
+            font-size: 13px !important;
+        }
+
+        .not-selectable {
+            background-color: red !important;
+        }
+
+        th.select-checkbox {
+            width: 15px;
+        }
     </style>
 
 </head>
@@ -126,82 +147,95 @@
                 </div>
 
                 <div class="row search-section">
-                    <!--
-                    advertiser name
-                    media code (radio, radio and tv, etc)
-                    market
-                    media type (radio, newspaper, television, etc)
-                    industry
-                    subindustry
-                    parent
+                    <div class="row" style="margin-bottom: 20px;">
 
-                    search button
-                    -->
-                    <div class="col-md-12" style="margin-bottom: 20px;">
-                        <label for="txtMarketAdvertiser" class="dropdown-label" style="color: red;"> * Market Advertiser</label>
-                        <input type="text" id="txtMarketAdvertiser" maxlength="50" class="report-filter mkaRequired" errorMessage="Please enter a Market Advertiser Name to search." />
+                        <!--
+                        advertiser name
+                        media code (radio, radio and tv, etc)
+                        market
+                        media type (radio, newspaper, television, etc)
+                        industry
+                        subindustry
+                        parent
 
-                        <label for="ddlMediaCode" class="dropdown-label">Media Code</label>
-                        <select id="ddlMediaCode" class="dropdown-select report-filter"></select>
+                        search button
+                        -->
+                        <div class="col-md-3">
+                            <label for="ddlMarket" class="dropdown-label">Market</label><br />
+                            <select id="ddlMarket" class="dropdown-select report-filter"></select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="txtMarketAdvertiser" class="dropdown-label" style="color: red;"> * Market Advertiser</label><br />
+                            <input type="text" id="txtMarketAdvertiser" maxlength="50" class="report-filter mkaRequired" errorMessage="Please enter a Market Advertiser Name to search." />
+                        </div>
+                        <div class="col-md-3">
+                            <label for="ddlMediaCode" class="dropdown-label">Media Code</label><br />
+                            <select id="ddlMediaCode" class="dropdown-select report-filter"></select>
+                        </div>
 
-                        <label for="ddlMarket" class="dropdown-label">Market</label>
-                        <select id="ddlMarket" class="dropdown-select report-filter"></select>
-
-                        <label for="ddlMediaType" class="dropdown-label">Media Type</label>
-                        <select id="ddlMediaType" class="dropdown-select report-filter"></select>
-                    </div>
-                </div>
-                <div class="row search-section">
-                    <div class="col-md-12">
-                        <label for="ddlIndustry" class="dropdown-label">Industry</label>
-                        <select id="ddlIndustry" onchange="getSubIndustries(['ddlSubIndustry'],this.options[this.selectedIndex].value);" class="dropdown-select report-filter"></select>
-
-                        <label for="ddlSubIndustry" class="dropdown-label">Sub Industry</label>
-                        <select id="ddlSubIndustry" class="dropdown-select report-filter"></select>
-
-                        <label for="ddlParentAdvertiser" class="dropdown-label">Parent Advertiser</label>
-                        <select id="ddlParentAdvertiser" class="dropdown-select report-filter"></select>
-
-                        <input type="button" class="search-button" value="Search" onclick="searchForMarketAdvertiser();" />
-                    </div>
-                </div>
-
-                <div id="matchInfo" class="match-info">
-                    <h3 class="match-info-header">Update Information</h3>
-                    <div class="row">
-                        <div class="col-md-12 match-info-row">
-                            <input type="hidden" id="txtUpdateOldMarketAdvertiserName" value="" />
-                            <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label>
-                            <input type="text" id="txtUpdateMarketAdvertiser" style="width: 450px;" maxlength="50" class="report-filter" />
-
-                            <label for="ddlUpdateIndustry" class="dropdown-label">Industry</label>
-                            <select id="ddlUpdateIndustry" onchange="getSubIndustries(['ddlUpdateSubIndustry'], this.options[this.selectedIndex].value);" class="dropdown-select report-filter"></select>
-
-                            <label for="ddlUpdateSubIndustry" class="dropdown-label">Sub Industry</label>
-                            <select id="ddlUpdateSubIndustry" class="dropdown-select report-filter"></select>
+                        <div class="col-md-3">
+                            <label for="ddlMediaType" class="dropdown-label">Media Type</label><br />
+                            <select id="ddlMediaType" class="dropdown-select report-filter"></select>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12 match-info-row">
-                            <label for="ddlUpdateParentAdvertiser" class="dropdown-label">Parent Advertiser</label>
-                            <select id="ddlUpdateParentAdvertiser" class="dropdown-select report-filter"></select>
-                            <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startMarketAdvertiserUpdateProcess();" />
+                        <div class="col-md-3">
+                            <label for="ddlIndustry" class="dropdown-label">Industry</label><br />
+                            <select id="ddlIndustry" onchange="getSubIndustries(['ddlSubIndustry'],this.options[this.selectedIndex].value);" class="dropdown-select report-filter"></select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="ddlSubIndustry" class="dropdown-label">Sub Industry</label><br />
+                            <select id="ddlSubIndustry" class="dropdown-select report-filter"></select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="ddlParentAdvertiser" class="dropdown-label">Parent Advertiser</label><br />
+                            <select id="ddlParentAdvertiser" class="dropdown-select report-filter"></select>
+                        </div>
+                        <div class="col-md-3">
+                            <div style="display:table-cell; float:right">
+                                <label class="dropdown-label">&nbsp;</label><br />
+                                <input type="button" class="search-button" value="Search" onclick="clearUpdateFields(); searchForMarketAdvertiser();" />
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="row">
-                    <!--
-                    2 datatables
-                    1 search results
-                    1 to select for bulk updates
-                    -->
-                    <div id="dtResultsHolder" class="col-md-5">
-                        <table id="dtResults" class="cell-border"></table>
+                    <div id="matchInfo" class="match-info">
+                        <h3 class="match-info-header">Update Information</h3>
+                        <div class="row">
+                            <div class="col-md-12 match-info-row">
+                                <input type="hidden" id="txtUpdateOldMarketAdvertiserName" value="" />
+                                <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label>
+                                <input type="text" id="txtUpdateMarketAdvertiser" style="width: 450px;" maxlength="50" class="report-filter" />
+
+                                <label for="ddlUpdateIndustry" class="dropdown-label">Industry</label>
+                                <select id="ddlUpdateIndustry" onchange="getSubIndustries(['ddlUpdateSubIndustry'], this.options[this.selectedIndex].value);" class="dropdown-select report-filter"></select>
+
+                                <label for="ddlUpdateSubIndustry" class="dropdown-label">Sub Industry</label>
+                                <select id="ddlUpdateSubIndustry" class="dropdown-select report-filter"></select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 match-info-row">
+                                <label for="ddlUpdateParentAdvertiser" class="dropdown-label">Parent Advertiser</label>
+                                <select id="ddlUpdateParentAdvertiser" class="dropdown-select report-filter"></select>
+                                <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startMarketAdvertiserUpdateProcess();" />
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-2">&nbsp;</div>
-                    <div id="dtUpdatesHolder" class="col-md-5">
-                        <table id="dtUpdates" class="cell-border"></table>
+
+                    <div class="row">
+                        <!--
+                        2 datatables
+                        1 search results
+                        1 to select for bulk updates
+                        -->
+                        <div id="dtResultsHolder" class="col-md-5">
+                            <table id="dtResults" class="cell-border"></table>
+                        </div>
+                        <div class="col-md-2">&nbsp;</div>
+                        <div id="dtUpdatesHolder" class="col-md-5">
+                            <table id="dtUpdates" class="cell-border"></table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -542,6 +576,9 @@
             return;
         }
 
+        // call this to keep block up...
+        setThisQueryToRunLongNoAutoUnBlock();
+
         var sUrl = ServicePrefix + "/api/AdvertiserAudit/GetAdvertiserAuditList?";
         sUrl += "inApiToken=" + getLocalStorage("APIToken");
         sUrl += "&inAdvertiserName=" + $("#txtMarketAdvertiser").val();
@@ -588,7 +625,7 @@
             "mRender": function (data, type, row) {
                 return '<input type="radio" name="advertisers" id="rdo_' + row.advertiserId +
                     '" onclick="loadUpdateInformation(' + row.advertiserId + ',\'' + row.AdvertiserWithoutId + '\',' +
-                    row.industryId + ',' + row.subIndustryId + ',' + row.parentAdvertiserId + ');markAsNotSelectable(' + row.advertiserId + ');">'; //advertiserid, advertiser name, industryid, subindustryid, parentadvertiserid
+                    row.industryId + ',' + row.subIndustryId + ',' + row.parentAdvertiserId + '); markAsNotSelectable(' + row.advertiserId + '); fixResultsSelect(' + row.advertiserId + ');">'; //advertiserid, advertiser name, industryid, subindustryid, parentadvertiserid
             },
             "orderable": false,
             "searchable": false
@@ -633,12 +670,6 @@
             "orderable": true
         });
 
-        //advertiserid (hidden)
-        //advertiser name
-        //industry
-        //sub industry
-        //parent advertiser (hidden)
-
         return columnsToDisplay;
     }
 
@@ -662,7 +693,22 @@
             "order": [],
             "data": results,
             "columns": columns,
-            "select": true,
+            //This allows everything in the 1st column to be centered.
+            "columnDefs": [
+                {
+                    "className": "dt-center",
+                    "targets": 0
+                }
+            ],
+            "select": {
+                //this makes the table single select
+                //the selector option here makes the first
+                //column not selectable. the radio button can
+                //still be clicked. by having this column selectable,
+                //it was causing the load of update information happen twice.
+                style: 'single',
+                selector: 'td:not(:first-child)'
+            },
             language: {
                 search: "Filter Results:"
             },
@@ -691,11 +737,9 @@
     function getMatchingColumns() {
         var columnsToDisplay = new Array();
 
+        // This column represents the
+        // the checkbox. Must be here to display the checkbox.
         columnsToDisplay.push({
-            "mRender": function (data, type, row) {
-                return " ";
-            },
-            "title": "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", //putting in the spaces for now so the width would be set
             "orderable": false,
             "searchable": false
         });
@@ -708,31 +752,34 @@
             "searchable": false
         });
 
-
         columnsToDisplay.push({
             "title": "Market",
             "visible": true,
             "mData": "Market",
             "orderable": true
         });
+
         columnsToDisplay.push({
             "title": "Advertiser",
             "visible": true,
             "mData": "Advertiser",
             "orderable": true
         });
+
         columnsToDisplay.push({
             "title": "Industry",
             "visible": true,
             "mData": "Industry",
             "orderable": true
         });
+
         columnsToDisplay.push({
             "title": "Sub Industry",
             "visible": true,
             "mData": "Sub Industry",
             "orderable": true
         });
+
         columnsToDisplay.push({
             "title": "Parent Advertiser",
             "visible": true,
@@ -756,6 +803,13 @@
 
         resetDataTableDOM("dtUpdates", "dtUpdatesHolder", "cell-border");
 
+        // NOTE: the select and select-checkbox
+        // parameters indicate this data table
+        // uses the built in checkbox funtionality.
+        //
+        // by using the defaultContent,
+        // you don't need to use the mRender in the
+        // column definition
         matchTable = $("#dtUpdates").DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
@@ -763,8 +817,9 @@
             "data": results,
             "columns": columns,
             "columnDefs": [{
-                orderable: false,
                 targets: 0,
+                defaultContent: '',
+                orderable: false,
                 className: 'select-checkbox'
             }],
             "select": "multi",
@@ -791,6 +846,8 @@
 
             var count = matchTable.rows({ selected: true }).count();
             if (count > 0) {
+                $("#dtUpdates_filter input").hide();
+                $("#dtUpdates_filter label").hide();
                 $("#btnUpdate").show();
             }
 
@@ -798,10 +855,11 @@
 
 
         matchTable.on('deselect', function (e, dt, type, indexes) {
-           
+
             var count = matchTable.rows({ selected: true }).count();
-            if (count == 0)
-            {
+            if (count == 0) {
+                $("#dtUpdates_filter input").show();
+                $("#dtUpdates_filter label").show();
                 $("#btnUpdate").hide();
             }
         });
@@ -809,30 +867,40 @@
     }
 
     function loadUpdateInformation(marketAdvertiserId, marketAdvertiserName, industryId, subIndustryId, parentAdvertiserId) {
+
+        $.blockUI();
+
         $("#txtUpdateOldMarketAdvertiserName").val(marketAdvertiserName);
         $("#txtUpdateMarketAdvertiser").val(marketAdvertiserName);
         $("#ddlUpdateParentAdvertiser").val(parentAdvertiserId || "-1");
         $("#ddlUpdateIndustry").val(industryId || "-1");
+
         getSubIndustries(["ddlUpdateSubIndustry"], industryId, subIndustryId);
 
+        $("#dtResults_filter input").hide();
+        $("#dtResults_filter label").hide();
     }
 
     function markAsNotSelectable(advertiserId) {
 
+        $.blockUI();
+
         var updateTable = $('#dtUpdates').DataTable();
         var rows = updateTable.rows('.not-selectable').nodes();
 
-        $.each($(rows),
-            function () {
-                if ($(this).hasClass('not-selectable')) {
-                    $(updateTable.row($(this)).node()).removeClass('not-selectable');
-                }
-            }
-        );
+
+        $('#dtUpdates tr').removeClass('selected');
+        $('#dtUpdates tr').removeClass('not-selectable');
+        $("#dtUpdates tr").attr("background-color", "white");
+        updateTable.rows().deselect();
+
+        $("#btnUpdate").hide();
 
         var updateRowId = $('#dtUpdates').dataTable().fnFindCellRowIndexes(advertiserId, 1);
         $(updateTable.row(updateRowId).node()).addClass('not-selectable');
         updateTable.row(updateRowId).deselect();
+
+        $.unblockUI();
 
     }
 
@@ -864,25 +932,27 @@
         return loopBreak;
     }
 
-    function startMarketAdvertiserUpdateProcess()
-    {
+    function startMarketAdvertiserUpdateProcess() {
         //need to check if something is being changed before letting the update go through
         if (validateUpdateFields() == false) {
             return;
         }
 
-        var updateAdvertiserIds = new Array();
+        var updateAdvertisersList = new Array();
 
         var updatesTable = $("#dtUpdates").DataTable();
 
         updatesTable.rows({ selected: true }).every(function () {
             var d = this.data();
-            updateAdvertiserIds.push(d.advertiserId);
+            updateAdvertisersList.push({
+                "inUpdateAdvertiserId": d.advertiserId,
+                "inUpdateMarketId": d.marketId
+            });
         });
 
         //added functionality to turn the update button on/off based on selected.
         //adding this check just to be safe.
-        if (updateAdvertiserIds.length == 0) {
+        if (updateAdvertisersList.length == 0) {
             bootbox.alert("You must select at least 1 advertiser to update.", function () { });
             return;
         }
@@ -891,47 +961,35 @@
         var msg = "Are you sure that you want to update the selected record(s)?<br/>";
         msg += "They will be updated to the following values:<br/><ul>";
 
-        if ($("#txtUpdateMarketAdvertiser").val() != "")
-        {
+        if ($("#txtUpdateMarketAdvertiser").val() != "") {
             msg += "<li>Advertiser Name - " + $("#txtUpdateMarketAdvertiser").val() + "</li>";
         }
 
-        if ($("#ddlUpdateIndustry").val() != "-1")
-        {
+        if ($("#ddlUpdateIndustry").val() != "-1") {
             msg += "<li>Industry - " + $("#ddlUpdateIndustry option:selected").text() + "</li>";
         }
 
-        if ($("#ddlUpdateSubIndustry").val() != "-1")
-        {
+        if ($("#ddlUpdateSubIndustry").val() != "-1") {
             msg += "<li>SubIndustry - " + $("#ddlUpdateSubIndustry option:selected").text() + "</li>";
         }
 
-        if ($("#ddlUpdateParentAdvertiser").val() != "-1")
-        {
+        if ($("#ddlUpdateParentAdvertiser").val() != "-1") {
             msg += "<li>Parent Advertiser - " + $("#ddlUpdateParentAdvertiser option:selected").text() + "</li>";
         }
 
         msg += "</ul>";
 
-        bootbox.confirm(msg, function (result)
-        {
-            if (result)
-            {
-                updateMarketAdvertisers(updateAdvertiserIds);
-            } else
-            {
+        bootbox.confirm(msg, function (result) {
+            if (result) {
+                updateMarketAdvertisers(updateAdvertisersList);
+            } else {
                 return;
             }
         });
     }
 
-    function updateMarketAdvertisers(updateAdvertiserIds) {
+    function updateMarketAdvertisers(updateAdvertisersList) {
 
-        
-        //need to validate the new name doesn't exists in these markets.
-        //display a message and continue
-
-        //call /api/XRAYRevenue/UpdateExistingAdvertiser
         $.ajax({
             url: ServicePrefix + '/api/XRAYRevenue/UpdateExistingAdvertiser',
             dataType: 'json',
@@ -939,7 +997,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inUpdateAdvertiserIdList": updateAdvertiserIds,
+                "inUpdateAdvertiserList": updateAdvertisersList,
                 "inNewAdvertiserName": $("#txtUpdateMarketAdvertiser").val().length == 0 ? "" : $("#txtUpdateMarketAdvertiser").val(),
                 "inNewIndustryId": $("#ddlUpdateIndustry").val() == "-1" ? "" : $("#ddlUpdateIndustry").val(),
                 "inNewSubIndustryId": $("#ddlUpdateSubIndustry").val() == "-1" ? "" : $("#ddlUpdateSubIndustry").val(),
@@ -962,20 +1020,15 @@
 
     }
 
+    function validateUpdateFields() {
 
-
-    function validateUpdateFields()
-    {
- 
         if ($("#txtUpdateMarketAdvertiser").val() == "" &&
             $("#ddlUpdateIndustry").val() == -1 &&
             $("#ddlUpdateSubIndustry").val() == -1 &&
-            ($("#ddlUpdateParentAdvertiser").val() == null || $("#ddlUpdateParentAdvertiser").val() == -1))
-        {
+            ($("#ddlUpdateParentAdvertiser").val() == null || $("#ddlUpdateParentAdvertiser").val() == -1)) {
             bootbox.alert("You must chose at least 1 field to update.", function () { });
             return false;
-        } else
-        {
+        } else {
             return true;
         }
     }
@@ -985,6 +1038,25 @@
         $("#ddlUpdateIndustry").val("-1");
         getSubIndustries(["ddlUpdateSubIndustry"], "-1", "-1");
         $("#ddlUpdateParentAdvertiser").val("-1");
+
         $("#btnUpdate").hide();
+        $("#dtUpdates_filter input").show();
+        $("#dtUpdates_filter label").show();
+    }
+
+    // NOTE: created this function to update the selected row
+    // on the results table. I made the radio button cell non-selectable
+    // because it was causing the click event to happen twice.
+    // This caused an issue with the wrong row being highlighted.
+    function fixResultsSelect(advertiserId) {
+        $.blockUI();
+
+        var resultTable = $('#dtResults').DataTable();
+        resultTable.rows().deselect();
+
+        var resultRowId = $('#dtResults').dataTable().fnFindCellRowIndexes(advertiserId, 1);
+        $(resultTable.row(resultRowId).node()).addClass('selected');
+
+        $.unblockUI();
     }
 </script>
