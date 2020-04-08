@@ -193,9 +193,9 @@
                     <div class="col-md-12">
                         <!-- fix spacing on the radio buttons instead of spaces -->
                         <div class="form-group rptView vertical-center">
-                            <input type="radio" name="collectionType" id="rdoOwner" value="owner" class="report-filter"  checked="checked"><label class="rdo-label rtpViewRight" for="rdoOwner">Owner</label>
+                            <input type="radio" name="collectionType" id="rdoOwner" value="owner" class="report-filter" ><label class="rdo-label rtpViewRight" for="rdoOwner">Owner</label>
                             &nbsp;&nbsp;
-                            <input type="radio" name="collectionType" id="rdoMarket" value="market" class="report-filter"><label class="rdo-label rtpViewRight" for="rdoMarket">Market</label>
+                            <input type="radio" name="collectionType" id="rdoMarket" value="market" class="report-filter" checked="checked"><label class="rdo-label rtpViewRight" for="rdoMarket">Market</label>
                             &nbsp;&nbsp;
                             <input type="radio" name="collectionType" id="rdoThirdParty" value="thirdParty" class="report-filter"><label class="rdo-label rtpViewRight" for="rdoThirdParty">Third Party</label>
                         </div>
@@ -507,7 +507,7 @@
         $(".mediaUpload").hide();
         $(".Upload").hide();
 
-        $("#rdoOwner").prop("checked", true);
+        $("#rdoMarket").prop("checked", true);
 
         $('input[type=radio][name=collectionType]').change(function () {
             $(".mediaUpload").hide();
@@ -3412,6 +3412,14 @@
             return;
         }
 
+
+        if ($("#ddlStationUpload").val().trim() != "") {
+            if ($("#ddlSubmissionUpload").val().trim() == "") {
+                bootbox.alert("You must select a Submission when Importing a single Station", function () { });
+                return;
+            }
+        }
+
         var url = ServicePrefix + '/api/XrayImport/GetImportMarketStatusByOwner?inApiToken=' + getLocalStorage("APIToken");
         url = url + "&inYear=" + $("#ddlYear").val() + "&inPeriod=" + $("#ddlPeriod").val();
         url = url + "&inOwnerId=" + $("#ddlOwner").val();
@@ -3765,13 +3773,22 @@
         } else {
 
             var str = '<option value="">All Markets</option>';
-
+            var ctr = 0;
+            var marketToSelect = '';
             $.each(data.report.rows, function (index) {
+                ctr++;
+                marketToSelect = data.report.rows[index].MarketId;
                 str = str + '<option value="' + data.report.rows[index].MarketId + '">' + data.report.rows[index].Market +' ('+ data.report.rows[index].MarketId + ')' + '</option>';
             });
 
             $("#ddlMarketUpload").html(str);
+            if (ctr == 1) {
+                $("#ddlMarketUpload").val(marketToSelect);
+
+            }
             convertToChosenSelect("ddlMarketUpload", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+
             getStationListByGeneralFilters();
         }
     }
@@ -3809,14 +3826,22 @@
                 }
                 else {
 
-   
+                    var ctr = 0;
+                    var stationToSelect = '';
+
                     $.each(data.report.rows, function (index) {
+                        ctr++;
+                        stationToSelect = data.report.rows[index]["Station Id"];
                         str = str + '<option value="' + data.report.rows[index]["Station Id"] + '">' + data.report.rows[index].Station + ' (' + data.report.rows[index]["Station Id"] + ')' + '</option>';
                     });
 
                     $("#ddlStationUpload").html(str);
-
+                    if (ctr == 1) {
+                        $("#ddlStationUpload").val(stationToSelect);
+                        getSubmissionList();
+                    }
                     convertToChosenSelect("ddlStationUpload", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
 
                 }
 
@@ -3870,10 +3895,17 @@
             var str = '<option value="">All Submissions</option>';
 
             $("#ddlSubmissionUpload").html(str);
+            var ctr = 0;
+            var submissionToSelect = '';
  
             $.each(data.report.rows, function (index) {
 
+ 
+
                 var obj = data.report.rows[index];
+
+                ctr++;
+                submissionToSelect = obj.submissionId;
 
                 str = str + '<option value="';
                 str = str + obj.submissionId;
@@ -3884,7 +3916,10 @@
             });
 
             $("#ddlSubmissionUpload").html(str);
- 
+            if (ctr == 1) {
+                $("#ddlSubmissionUpload").val(submissionToSelect);
+
+            }
             convertToChosenSelect("ddlSubmissionUpload", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
         }
