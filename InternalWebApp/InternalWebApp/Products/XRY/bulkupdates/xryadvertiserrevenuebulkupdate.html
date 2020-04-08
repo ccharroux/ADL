@@ -103,6 +103,23 @@
                 border: 1px solid black;
                 border-radius: 3px;
             }
+
+        table.dataTable tr.selected td.select-checkbox::after, table.dataTable tr.selected th.select-checkbox::after {
+            margin-top: -9px;
+            margin-left: -7px;
+        }
+
+        table.dataTable tbody th, table.dataTable tbody td {
+            font-size: 13px !important;
+        }
+
+        table.dataTable thead th, table.dataTable thead td {
+            font-size: 13px !important;
+        }
+
+        th.select-checkbox {
+            width: 15px;
+        }
     </style>
 
 </head>
@@ -129,67 +146,76 @@
 
                 <div class="row search-section">
 
-                    <div class="col-md-12" style="margin-bottom: 20px;">
-
-                        <label for="ddlMarket" class="dropdown-label" style="color: red;"> * Market</label>
-                        <select id="ddlMarket" class="dropdown-select report-filter mkaRequired" onchange="getOwnerList(['ddlOwner'], this.options[this.selectedIndex].value, '-1');" errorMessage="Please select a Market to search."></select>
-
-                        <label for="txtMarketAdvertiser" class="dropdown-label"> ** Market Advertiser</label>
-                        <input type="text" id="txtMarketAdvertiser" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter an Advertiser Name to search." />
-
-                        <label for="txtMarketAgency" class="dropdown-label"> ** Market Agency</label>
-                        <input type="text" id="txtMarketAgency" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter an Agency Name to search." />
-
+                    <div class="row" style="margin-bottom: 20px;">
+                        <div class="col-md-3">
+                            <label for="ddlMarket" class="dropdown-label" style="color: red;"> * Market</label><br />
+                            <select id="ddlMarket" class="dropdown-select report-filter mkaRequired" onchange="getOwnerList(['ddlOwner'], this.options[this.selectedIndex].value, '-1');" errorMessage="Please select a Market to search."></select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="ddlOwner" class="dropdown-label">Owner</label><br />
+                            <select id="ddlOwner" class="dropdown-select report-filter"></select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="dtStartDate" class="dropdown-label" style="color: red;"> * Start Date</label><br />
+                            <input type="text" id="dtStartDate" class="report-filter mkaRequired" style="max-width: 100px;" errorMessage="Please enter a Start Date to search.">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="dtEndDate" class="dropdown-label" style="color: red;"> * End Date</label><br />
+                            <input type="text" id="dtEndDate" class="report-filter mkaRequired" style="max-width: 100px;" errorMessage="Please enter a End Date to search.">
+                        </div>
                     </div>
 
-                </div>
 
-                <div class="row search-section">
-                    <div class="col-md-12">
-
-                        <label for="ddlOwner" class="dropdown-label">Owner</label>
-                        <select id="ddlOwner" class="dropdown-select report-filter"></select>
-
-                        <label for="dtStartDate" class="dropdown-label" style="color: red;"> * Start Date</label>
-                        <input type="text" id="dtStartDate" class="report-filter mkaRequired" style="max-width: 100px;" errorMessage="Please enter a Start Date to search.">
-
-                        <label for="dtEndDate" class="dropdown-label" style="color: red;"> * End Date</label>
-                        <input type="text" id="dtEndDate" class="report-filter mkaRequired" style="max-width: 100px;" errorMessage="Please enter a End Date to search.">
-
-                        <input type="button" class="search-button" value="Search" onclick="clearUpdateFields(); searchForAdvertiserRevenue();" />
-                    </div>
-                </div>
-                <div class="row search-section">
-                    <div class="col-md-12 multi-field-message-area">
-                        <p class="multi-field-message" style="text-align: center;">** At least one of the following fields needs to be completed: Market Advertiser or Market Agency.</p>
-                    </div>
-                </div>
-
-                <div id="matchInfo" class="match-info">
-                    <h3 class="match-info-header">Update Information</h3>
                     <div class="row">
-                        <div class="col-md-12 match-info-row">
-                            <!--
-                            turn these into search boxes
-                            -->
-                            <input type="hidden" id="txtUpdateMarketAdvertiserId" class="report-filter" value="" />
-                            <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label>
-                            <input type="text" id="txtUpdateMarketAdvertiser" onclick="excludeFromBackButton(); searchMarketAdvertiser();" readonly="readonly" style="width: 450px;" maxlength="50" class="report-filter" />
-                            <input type="hidden" id="txtUpdateMarketAgencyId" class="report-filter" value="" />
-                            <label for="txtUpdateMarketAgency" class="dropdown-label">Market Agency</label>
-                            <input type="text" id="txtUpdateMarketAgency" onclick="excludeFromBackButton(); searchMarketAgency();" readonly="readonly" style="width: 450px;" maxlength="50" class="report-filter" />
 
-                            <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startAdvertiserRevenueUpdate();" />
+                        <div class="col-md-3">
+                            <label for="txtMarketAdvertiser" class="dropdown-label"> ** Market Advertiser</label><br />
+                            <input type="text" id="txtMarketAdvertiser" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter an Advertiser Name to search." />
+                        </div>
+                        <div class="col-md-3">
+                            <label for="txtMarketAgency" class="dropdown-label"> ** Market Agency</label><br />
+                            <input type="text" id="txtMarketAgency" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter an Agency Name to search." />
+                        </div>
+
+                        <div class="col-md-6">
+                            <div style="display:table-cell; float:right">
+                                <label class="dropdown-label">&nbsp;</label><br />
+                                <input type="button" class="search-button" value="Search" onclick="clearUpdateFields(); searchForAdvertiserRevenue();" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 multi-field-message-area">
+                            <p class="multi-field-message" style="text-align: left;">&nbsp;** At least one of the following fields needs to be completed: Market Advertiser or Market Agency.</p>
+                        </div>
+                    </div>
+
+                    <div id="matchInfo" class="match-info">
+                        <h3 class="match-info-header">Update Information</h3>
+                        <div class="row">
+                            <div class="col-md-12 match-info-row">
+                                <!--
+                                turn these into search boxes
+                                -->
+                                <input type="hidden" id="txtUpdateMarketAdvertiserId" class="report-filter" value="" />
+                                <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label>
+                                <input type="text" id="txtUpdateMarketAdvertiser" onclick="excludeFromBackButton(); searchMarketAdvertiser();" readonly="readonly" style="width: 450px;" maxlength="50" class="report-filter" />
+                                <input type="hidden" id="txtUpdateMarketAgencyId" class="report-filter" value="" />
+                                <label for="txtUpdateMarketAgency" class="dropdown-label">Market Agency</label>
+                                <input type="text" id="txtUpdateMarketAgency" onclick="excludeFromBackButton(); searchMarketAgency();" readonly="readonly" style="width: 450px;" maxlength="50" class="report-filter" />
+
+                                <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startAdvertiserRevenueUpdate();" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div id="dtResultsHolder" class="col-md-12">
+                            <table id="dtResults" class="cell-border"></table>
                         </div>
                     </div>
                 </div>
-
-                <div class="row">
-                    <div id="dtResultsHolder" class="col-md-12">
-                        <table id="dtResults" class="cell-border"></table>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>
@@ -270,8 +296,6 @@
                         var str = '';
 
                         $("#ddlMarket").html("<option value='-1'> -- Select a Market</option>");
-
-                        //var holdOwnerID = "0";
 
                         $.each(data.report.rows, function (index) {
                             var obj = data.report.rows[index];
@@ -358,6 +382,9 @@
             return;
         }
 
+        // call this to keep block up...
+        setThisQueryToRunLongNoAutoUnBlock();
+
         var sUrl = ServicePrefix + "/api/AdvertiserAudit/GetAdvertiserRevenueResearchList?";
         sUrl += "inApiToken=" + getLocalStorage("APIToken");
         sUrl += "&inAdvertiserName=" + $("#txtMarketAdvertiser").val();
@@ -401,13 +428,10 @@
 
     function getResultsColumns() {
         var columnsToDisplay = new Array();
-        //create a radio button with onclick populate the info section
+
+        // This column represents the
+        // the checkbox. Must be here to display the checkbox.
         columnsToDisplay.push({
-            "mRender": function (data, type, row) {
-                return " ";
-            },
-            "title":
-                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", //putting in the spaces for now so the width would be set
             "orderable": false,
             "searchable": false
         });
@@ -534,6 +558,13 @@
 
         resetDataTableDOM("dtResults", "dtResultsHolder", "cell-border");
 
+        // NOTE: the select and select-checkbox
+        // parameters indicate this data table
+        // uses the built in checkbox funtionality.
+        //
+        // by using the defaultContent,
+        // you don't need to use the mRender in the
+        // column definition
         searchTable = $("#dtResults").DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
@@ -541,8 +572,9 @@
             "data": results,
             "columns": columns,
             "columnDefs": [{
-                orderable: false,
                 targets: 0,
+                defaultContent: '',
+                orderable: false,
                 className: 'select-checkbox'
             }],
             "select": "multi",
@@ -557,6 +589,8 @@
             if (type === 'row') {
                 var count = searchTable.rows({ selected: true }).count();
                 if (count > 0) {
+                    $("#dtResults_filter input").hide();
+                    $("#dtResults_filter label").hide();
                     $("#btnUpdate").show();
                 }
             }
@@ -566,12 +600,18 @@
 
             var count = searchTable.rows({ selected: true }).count();
             if (count == 0) {
-                $("#btnUpdate").hide();
+                clearUpdateFields();
+                $("#dtResults_filter input").show();
+                $("#dtResults_filter label").show();
             }
         });
 
     }
 
+    // This function repopulates the selected rows
+    // when coming back from searching for
+    // a market advertiser or agency for the
+    // bulk update.
     function loadSelectedTableItems() {
         if (selectedTableItems.length == 0) {
             return;
@@ -582,13 +622,7 @@
         for (var i = 0; i < selectedTableItems.length; i++) {
             var selectedItem = selectedTableItems[i];
             tbResults.rows(function (idx, data, node) {
-                //if (data.advertiserId === selectedItem.advertiserId && data.stationId == selectedItem.stationId &&
-                //    data.Period == selectedItem.period && data.agencyId == selectedItem.agencyId &&
-                //    data.Revenue == selectedItem.revenue && data["Account Type"] == selectedItem.accountType) {
-                //    tbResults.row(idx).select();
-                //}
-                if (data.revenueXrayId === selectedItem.revenueXrayId)
-                {
+                if (data.revenueXrayId === selectedItem.revenueXrayId) {
                     tbResults.row(idx).select();
                 }
             });
@@ -598,10 +632,17 @@
     }
 
     function loadUpdateInformation(advertiserId, advertiserName, agencyId, agencyName) {
+        $.blockUI();
+
         $("#txtUpdateMarketAdvertiserId").val(advertiserId);
         $("#txtUpdateMarketAdvertiser").val(advertiserName);
         $("#txtUpdateMarketAgencyId").val(agencyId);
         $("#txtUpdateMarketAgency").val(agencyName);
+
+        $("#dtResults_filter input").hide();
+        $("#dtResults_filter label").hide();
+
+        $.unblockUI();
     }
 
     function loadDefaultDates() {
@@ -625,8 +666,6 @@
     }
 
     function searchValidationPassed() {
-        //add the required one but also either or fields
-        //return true;
 
         var loopBreak = true;
         $(".mkaRequired").each(function (index, el) {
@@ -687,7 +726,7 @@
 
         try {
             //not doing anything with the date variable
-            //when trying to parse an invalid date, the function will throw an error to catch            
+            //when trying to parse an invalid date, the function will throw an error to catch
             var endDate = $.datepicker.parseDate('mm/dd/yy', $('#dtEndDate').val());
         } catch (err) {
             var errorMessage = "Please input a valid End Date.";
@@ -718,12 +757,6 @@
         var aSelectedItems = new Array();
         for (var i = 0; i < tbResults.rows('.selected').data().length; i++) {
             aSelectedItems.push({
-                //"advertiserId": tbResults.rows('.selected').data()[i].advertiserId,
-                //"stationId": tbResults.rows('.selected').data()[i].stationId,
-                //"period": tbResults.rows('.selected').data()[i].Period,
-                //"agencyId": tbResults.rows('.selected').data()[i].agencyId,
-                //"revenue": tbResults.rows('.selected').data()[i].Revenue,
-                //"accountType": tbResults.rows('.selected').data()[i]["Account Type"]
                 "revenueXrayId": tbResults.rows('.selected').data()[i].revenueXrayId
             });
         }
@@ -737,7 +770,7 @@
     }
 
     function searchMarketAgency() {
-        //linkagency
+
         var searchCriteriaObj = {
             "searchToken": "BULKAGENCY",
             "searchPage": window.location,
@@ -753,17 +786,9 @@
 
         var tbResults = $("#dtResults").DataTable();
 
-        console.log(tbResults.rows('.selected').data());
-
         var aSelectedItems = new Array();
         for (var i = 0; i < tbResults.rows('.selected').data().length; i++) {
             aSelectedItems.push({
-                //"advertiserId": tbResults.rows('.selected').data()[i].advertiserId,
-                //"stationId": tbResults.rows('.selected').data()[i].stationId,
-                //"period": tbResults.rows('.selected').data()[i].Period,
-                //"agencyId": tbResults.rows('.selected').data()[i].agencyId,
-                //"revenue": tbResults.rows('.selected').data()[i].Revenue,
-                //"accountType": tbResults.rows('.selected').data()[i]["Account Type"]
                 "revenueXrayId": tbResults.rows('.selected').data()[i].revenueXrayId
             });
         }
@@ -776,12 +801,15 @@
 
     }
 
-    function clearUpdateFields()
-    {
+    function clearUpdateFields() {
         $("#txtUpdateMarketAdvertiserId").val("");
         $("#txtUpdateMarketAdvertiser").val("");
         $("#txtUpdateMarketAgencyId").val("");
         $("#txtUpdateMarketAgency").val("");
+
+        $("#btnUpdate").hide();
+        $("#dtResults_filter input").show();
+        $("#dtResults_filter label").show();
     }
 
     function loadLastSearch() {
@@ -805,8 +833,7 @@
 
     }
 
-    function startAdvertiserRevenueUpdate()
-    {
+    function startAdvertiserRevenueUpdate() {
 
         if (validateUpdateFields() == false) {
             return;
@@ -821,7 +848,6 @@
             updateAdvertiserRevenueIds.push(d.revenueXrayId);
         });
 
-        //console.log(updateAdvertiserRevenueIds);
 
         if (updateAdvertiserRevenueIds.length == 0) {
             bootbox.alert("You must select at least 1 advertiser to update.", function () { });
@@ -845,7 +871,7 @@
 
         msg += "Shall these revenue records be redirected? <br/>";
         msg += "Press OK to redirect revenues or Cancel to abort.<br/>";
-      
+
 
         var dialog = bootbox.dialog({
             title: "Merge Advertiser Revenue",
@@ -876,10 +902,6 @@
     }
 
     function updateAdvertiserRevenue(updateAdvertiserRevenueIds) {
-        //var errorMessage = "This bulk update functionality is still under development.";
-        //bootbox.alert(errorMessage, function () { });
-
-        //return;
 
         $.ajax({
             url: ServicePrefix + '/api/XRAYRevenue/RedirectRevenueAdvertiser',
