@@ -1137,6 +1137,19 @@ function buildXRYMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/admin/nielsenmarketname/nielsenmarketnamelist.html?MenuItem=true">Nielson Market</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
+
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Audit") + ' href="" role="button" aria-expanded="false">Audit <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="/products/xry/bulkupdates/xrymarketadvertiserbulkupdate.html?MenuItem=true">Market Advertiser Audit</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/xry/bulkupdates/xrystationadvertiserbulkupdate.html?MenuItem=true">Station Advertiser Audit</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/xry/bulkupdates/xrymediaadvertiserbulkupdate.html?MenuItem=true">Media Advertiser Audit</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/xry/bulkupdates/xrymarketagencybulkupdate.html?MenuItem=true">Market Agency Audit</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/xry/bulkupdates/xrystationagencybulkupdate.html?MenuItem=true">Station Agency Audit</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/xry/bulkupdates/xryadvertiserrevenuebulkupdate.html?MenuItem=true">Advertiser Revenue Research Audit</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/products/xry/bulkupdates/xrymediarevenuebulkupdate.html?MenuItem=true">Media Revenue Research Audit</a></li>';
+    menuItems += '              </ul>';
+    menuItems += '        </li>';
+
     menuItems += productDashboard('');
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
     menuItems += '    </ul>';
