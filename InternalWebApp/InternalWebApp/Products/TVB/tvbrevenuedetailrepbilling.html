@@ -177,6 +177,14 @@
                             <div id="divExternalCommentText"></div>
                         </div>
                     </div>
+                    <div class="col-md-6" style="text-align:center">
+                        <div style="padding-top:5px" id="rankSection">
+                            <input type="button" style="width:200px" class="marketHistoryButton" onclick="rankYearPeriod();" value="Rank All Markets" /> for <span id="spanQuarterEndMonthName"></span>
+                        </div>
+                        <div style="display:none;padding-top:5px" id="unrankSection">
+                            <input type="button" style="width:200px" class="marketHistoryButton" onclick="unrankYearPeriod();" value="Un-rank market (revision)" />
+                        </div>
+                    </div>
                 </div>
 
                 <!-- start datatable-->
@@ -905,6 +913,26 @@
         return $("#ddlYearPeriod").val().toString().substr(4, 2);
     }
 
+    function currentRevenueQuarterEndMonth() {
+        var crp = currentRevenuePeriod();
+        if (crp <= "03") return "03";
+        if (crp <= "06") return "06";
+        if (crp <= "09") return "09";
+        if (crp <= "12") return "12";
+        return "??"; // should never happen
+    }
+
+    function currentRevenueQuarterEndMonthName() {
+        var crqem = currentRevenueQuarterEndMonth();
+        switch (crqem) {
+            case "03": return "March";
+            case "06": return "June";
+            case "09": return "September";
+            case "12": return "December";
+            default: return "(unknown)"; // should never happen
+        }
+    }
+
     function currentSource() {
         return $("#ddlSource").val();
     }
@@ -1213,7 +1241,7 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inYear": currentRevenueYear(),
-                "inPeriod": currentRevenuePeriod()
+                "inPeriod": currentRevenueQuarterEndMonth()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -1242,8 +1270,11 @@
 
         clearTimeoutIfAny();
 
+        var quarterEndMonthName = currentRevenueQuarterEndMonthName();
+        $("#spanQuarterEndMonthName").text(quarterEndMonthName);
+
         // null means no MarketHistory record created yet
-        var message = (data.report.rows[0].revision === null ? '' : "<strong>Revision:</strong> " + data.report.rows[0].revision + ', ');
+        var message = quarterEndMonthName + ' ' + (data.report.rows[0].revision === null ? '' : "<strong>Revision:</strong> " + data.report.rows[0].revision + ', ');
 
         if (message.length == 0) {
             message = "Preparing";
@@ -1560,7 +1591,7 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inYear": currentRevenueYear(),
-                "inPeriod": currentRevenuePeriod()
+                "inPeriod": currentRevenueQuarterEndMonth()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -1824,7 +1855,7 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inYear": currentRevenueYear(),
-                "inPeriod": currentRevenuePeriod()
+                "inPeriod": currentRevenueQuarterEndMonth()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -1906,7 +1937,7 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inYear": currentRevenueYear(),
-                "inPeriod": currentRevenuePeriod()
+                "inPeriod": currentRevenueQuarterEndMonth()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -1969,7 +2000,7 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inYear": currentRevenueYear(),
-                "inPeriod": currentRevenuePeriod(),
+                "inPeriod": currentRevenueQuarterEndMonth(),
                 "inLeaveOldDataAvailable": leaveOldDataAvailable
             }),
             processData: false,
