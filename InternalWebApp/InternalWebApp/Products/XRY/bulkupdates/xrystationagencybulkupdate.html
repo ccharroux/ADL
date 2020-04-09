@@ -101,6 +101,43 @@
                 border: 1px solid black;
                 border-radius: 3px;
             }
+
+        table.dataTable tr.selected td.select-checkbox::after, table.dataTable tr.selected th.select-checkbox::after {
+            margin-top: -9px;
+            margin-left: -7px;
+        }
+
+        table.dataTable tbody th, table.dataTable tbody td {
+            font-size: 13px !important;
+        }
+
+        table.dataTable thead th, table.dataTable thead td {
+            font-size: 13px !important;
+        }
+
+        .not-selectable {
+            background-color: red !important;
+        }
+
+        th.select-checkbox {
+            width: 15px;
+        }
+
+        select.report-filter {
+            width: 240px !important;
+        }
+
+        select.dropdown-select {
+            width: 240px !important;
+        }
+
+        input[type=text] {
+            width: 240px !important;
+        }
+
+        select#dtResults_length, select#dtUpdates_length {
+            width: 60px !important;
+        }
     </style>
 </head>
 <body>
@@ -115,7 +152,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Station Agencies Bulk Updates</h2>
+                        <h2>Station Agency Bulk Updates</h2>
                     </div>
                 </div>
 
@@ -134,70 +171,75 @@
                 -->
                 <div class="row search-section">
 
-                    <div class="col-md-12" style="margin-bottom: 20px;">
-
-                        <label for="ddlMarket" class="dropdown-label" style="color: red;"> * Market</label>
-                        <select id="ddlMarket" onchange="getOwnerList(['ddlOwner'], this.options[this.selectedIndex].value, '-1');" class="dropdown-select report-filter mkaRequired" errorMessage="Please select a Market to search."></select>
-
-                        <label for="txtStationAgency" class="dropdown-label"> ** Station Agency</label>
-                        <input type="text" id="txtStationAgency" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter a Station Advertiser Name to search." />
-
-                        <label for="txtMarketAgency" class="dropdown-label"> ** Market Agency</label>
-                        <input type="text" id="txtMarketAgency" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter a Market Advertiser Name to search." />
-
+                    <div class="row" style="margin-bottom: 20px;">
+                        <div class="col-md-2">
+                            <label for="ddlMarket" class="dropdown-label" style="color: red;"> * Market</label><br />
+                            <select id="ddlMarket" onchange="getOwnerList(['ddlOwner'], this.options[this.selectedIndex].value, '-1');" class="dropdown-select report-filter mkaRequired" errorMessage="Please select a Market to search."></select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="ddlOwner" class="dropdown-label">Owner</label><br />
+                            <select id="ddlOwner" class="dropdown-select report-filter"></select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="txtStationAgency" class="dropdown-label"> ** Station Agency</label><br />
+                            <input type="text" id="txtStationAgency" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter a Station Advertiser Name to search." />
+                        </div>
+                        <div class="col-md-2">
+                            <label for="txtMarketAgency" class="dropdown-label"> ** Market Agency</label><br />
+                            <input type="text" id="txtMarketAgency" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter a Market Advertiser Name to search." />
+                        </div>
+                        <div class="col-md-2">
+                            <label for="ddlAccountType" class="dropdown-label">Account Type</label><br />
+                            <select id="ddlAccountType" class="dropdown-select report-filter"></select>
+                        </div>
+                        <div class="col-md-2">
+                            <div style="display:table-cell; float:right">
+                                <label class="dropdown-label">&nbsp;</label><br />
+                                <input type="button" class="search-button" value="Search" onclick="clearUpdateFields(); searchForStationAgency();" />
+                            </div>
+                        </div>
                     </div>
 
-                </div>
-
-                <div class="row search-section">
-                    <div class="col-md-12">
-                        <label for="ddlAccountType" class="dropdown-label">Account Type</label>
-                        <select id="ddlAccountType" class="dropdown-select report-filter"></select>
-
-                        <label for="ddlOwner" class="dropdown-label">Owner</label>
-                        <select id="ddlOwner" class="dropdown-select report-filter"></select>
-
-                        <input type="button" class="search-button" value="Search" onclick="clearUpdateFields(); searchForStationAgency();" />
-                    </div>
-                </div>
-
-                <div class="row search-section">
-                    <div class="col-md-12 multi-field-message-area">
-                        <p class="multi-field-message" style="text-align: center;">** At least one of the following fields needs to be completed: Station Agency or Market Agency.</p>
-                    </div>
-                </div>
-
-                <div id="matchInfo" class="match-info">
-                    <h3 class="match-info-header">Update Information</h3>
                     <div class="row">
-                        <div class="col-md-12 match-info-row">
-                            <input type="hidden" id="txtUpdateMarketAgencyId" value="" />
-                            <label for="txtUpdateMarketAgency" class="dropdown-label">Market Agency</label>
-                            <input type="text" id="txtUpdateMarketAgency" readonly="readonly" style="width: 450px;" maxlength="50" class="report-filter" />
+                        <div class="col-md-12 multi-field-message-area">
+                            <p class="multi-field-message" style="text-align: left;">&nbsp;** At least one of the following fields needs to be completed: Station Agency or Market Agency.</p>
+                        </div>
+                    </div>
 
-                            <label for="ddlUpdateAccountType" class="dropdown-label">Account Type</label>
-                            <select id="ddlUpdateAccountType" disabled="disabled" class="dropdown-select report-filter"></select>
+                    <div id="matchInfo" class="match-info">
+                        <h3 class="match-info-header">Update Information</h3>
+                        <div class="row">
+                            <div class="col-md-2 match-info-row">
+                                <input type="hidden" id="txtUpdateMarketAgencyId" value="" />
+                                <label for="txtUpdateMarketAgency" class="dropdown-label">Market Agency</label><br/>
+                                <input type="text" id="txtUpdateMarketAgency" readonly="readonly" style="width: 450px;" maxlength="50" class="report-filter" />
+                            </div>
+                            <div class="col-md-2 match-info-row">
+                                <label for="ddlUpdateAccountType" class="dropdown-label">Account Type</label><br/>
+                                <select id="ddlUpdateAccountType" disabled="disabled" class="dropdown-select report-filter"></select>
+                            </div>
+                            <div class="col-md-8 match-info-row"style="text-align:right">
+                                <label for="btnUpdate" class="dropdown-label">&nbsp;</label><br />
+                                <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startStationAgencyUpdate();" />
+                            </div>
+                        </div>
+                    </div>
 
-                            <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startStationAgencyUpdate();" />
+                    <div class="row">
+                        <!--
+                        2 datatables
+                        1 search results
+                        1 to select for bulk updates
+                        -->
+                        <div id="dtResultsHolder" class="col-md-5">
+                            <table id="dtResults" class="cell-border"></table>
+                        </div>
+                        <div class="col-md-2">&nbsp;</div>
+                        <div id="dtUpdatesHolder" class="col-md-5">
+                            <table id="dtUpdates" class="cell-border"></table>
                         </div>
                     </div>
                 </div>
-
-                <div class="row">
-                    <!--
-                    2 datatables
-                    1 search results
-                    1 to select for bulk updates
-                    -->
-                    <div id="dtResultsHolder" class="col-md-5">
-                        <table id="dtResults" class="cell-border"></table>
-                    </div>
-                    <div class="col-md-2">&nbsp;</div>
-                    <div id="dtUpdatesHolder" class="col-md-5">
-                        <table id="dtUpdates" class="cell-border"></table>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>
@@ -239,8 +281,7 @@
 </html>
 <script>
     $(document).ready(function () {
-        //this menu will change
-        buildXRYMenu("Utility");
+        buildXRYMenu("Audit");
         getMarketsByProduct();
         getAccountTypes(["ddlAccountType", "ddlUpdateAccountType"], "-1");
         getOwnerList(["ddlOwner"], "-1", "-1");
@@ -386,9 +427,13 @@
     }
 
     function searchForStationAgency() {
+
         if (searchValidationPassed() == false) {
             return;
         }
+
+        // call this to keep block up...
+        setThisQueryToRunLongNoAutoUnBlock();
 
         var sUrl = ServicePrefix + "/api/StationAgencyAudit/GetStationAgencyAuditList?";
         sUrl += "inApiToken=" + getLocalStorage("APIToken");
@@ -433,7 +478,7 @@
         columnsToDisplay.push({
             "mRender": function (data, type, row) {
                 return '<input type="radio" id="rdo_' + row.stationAgencyId + '" name="agencies" onclick="loadUpdateInformation(' + row.stationAgencyId + ',' + row.marketAgencyId +
-                    ',\'' + row.MarketAgencyWithoutId + '\',' + row.accountTypeId + ');markAsNotSelectable(' + row.stationAgencyId + ');">';
+                    ',\'' + row.MarketAgencyWithoutId + '\',' + row.accountTypeId + '); markAsNotSelectable(' + row.stationAgencyId + '); fixResultsSelect(' + row.stationAgencyId + ');">';
             },
             "orderable": false,
             "searchable": false
@@ -466,12 +511,12 @@
             "orderable": true
         });
 
-        columnsToDisplay.push({
-            "title": "Station Agency Code",
-            "visible": true,
-            "mData": "Station Agency Code",
-            "orderable": true
-        });
+        //columnsToDisplay.push({
+        //    "title": "Station Agency Code",
+        //    "visible": true,
+        //    "mData": "Station Agency Code",
+        //    "orderable": true
+        //});
 
         columnsToDisplay.push({
             "title": "Market Agency",
@@ -510,7 +555,22 @@
             "order": [],
             "data": results,
             "columns": columns,
-            "select": true,
+            //This allows everything in the 1st column to be centered.
+            "columnDefs": [
+                {
+                    "className": "dt-center",
+                    "targets": 0
+                }
+            ],
+            "select": {
+                //this makes the table single select
+                //the selector option here makes the first
+                //column not selectable. the radio button can
+                //still be clicked. by having this column selectable,
+                //it was causing the load of update information happen twice.
+                style: 'single',
+                selector: 'td:not(:first-child)'
+            },
             language: {
                 search: "Filter Results:"
             },
@@ -540,11 +600,9 @@
     function getMatchingColumns() {
         var columnsToDisplay = new Array();
 
+        // This column represents the
+        // the checkbox. Must be here to display the checkbox.
         columnsToDisplay.push({
-            "mRender": function (data, type, row) {
-                return " ";
-            },
-            "title": "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", //putting in the spaces for now so the width would be set
             "orderable": false,
             "searchable": false
         });
@@ -576,12 +634,12 @@
             "orderable": true
         });
 
-        columnsToDisplay.push({
-            "title": "Station Agency Code",
-            "visible": true,
-            "mData": "Station Agency Code",
-            "orderable": true
-        });
+        //columnsToDisplay.push({
+        //    "title": "Station Agency Code",
+        //    "visible": true,
+        //    "mData": "Station Agency Code",
+        //    "orderable": true
+        //});
 
         columnsToDisplay.push({
             "title": "Market Agency",
@@ -613,6 +671,13 @@
 
         resetDataTableDOM("dtUpdates", "dtUpdatesHolder", "cell-border");
 
+        // NOTE: the select and select-checkbox
+        // parameters indicate this data table
+        // uses the built in checkbox funtionality.
+        //
+        // by using the defaultContent,
+        // you don't need to use the mRender in the
+        // column definition
         matchTable = $("#dtUpdates").DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
@@ -620,8 +685,9 @@
             "data": results,
             "columns": columns,
             "columnDefs": [{
-                orderable: false,
                 targets: 0,
+                defaultContent: '',
+                orderable: false,
                 className: 'select-checkbox'
             }],
             "select": "multi",
@@ -646,6 +712,8 @@
 
                 var count = matchTable.rows({ selected: true }).count();
                 if (count > 0) {
+                    $("#dtUpdates_filter input").hide();
+                    $("#dtUpdates_filter label").hide();
                     $("#btnUpdate").show();
                 }
             }
@@ -655,6 +723,8 @@
 
             var count = matchTable.rows({ selected: true }).count();
             if (count == 0) {
+                $("#dtUpdates_filter input").show();
+                $("#dtUpdates_filter label").show();
                 $("#btnUpdate").hide();
             }
         });
@@ -662,27 +732,41 @@
     }
 
     function loadUpdateInformation(stationAgencyId, marketAgencyId, marketAgencyName, accountTypeId) {
+
+        $.blockUI();
+
         $("#txtUpdateMarketAgencyId").val(marketAgencyId);
         $("#txtUpdateMarketAgency").val(marketAgencyName);
         $("#ddlUpdateAccountType").val(accountTypeId);
+
+        $("#dtResults_filter input").hide();
+        $("#dtResults_filter label").hide();
+
+        $.unblockUI();
     }
 
     function markAsNotSelectable(stationAgencyId) {
 
+        $.blockUI();
+
         var updateTable = $('#dtUpdates').DataTable();
         var rows = updateTable.rows('.not-selectable').nodes();
 
-        $.each($(rows),
-            function () {
-                if ($(this).hasClass('not-selectable')) {
-                    $(updateTable.row($(this)).node()).removeClass('not-selectable');
-                }
-            }
-        );
+
+        $('#dtUpdates tr').removeClass('selected');
+        $('#dtUpdates tr').removeClass('not-selectable');
+        $("#dtUpdates tr").attr("background-color", "white");
+        updateTable.rows().deselect();
+
+        $("#dtUpdates_filter input").show();
+        $("#dtUpdates_filter label").show();
+        $("#btnUpdate").hide();
 
         var updateRowId = $('#dtUpdates').dataTable().fnFindCellRowIndexes(stationAgencyId, 1);
         $(updateTable.row(updateRowId).node()).addClass('not-selectable');
         updateTable.row(updateRowId).deselect();
+
+        $.unblockUI();
 
     }
 
@@ -824,10 +908,6 @@
 
 
     function updateStationAgencies(updateStationAgencyIds, bLinkRevenue) {
-        //var errorMessage = "This bulk update functionality is still under development.";
-        //bootbox.alert(errorMessage, function () { });
-
-        //return;
 
         $.ajax({
             url: ServicePrefix + '/api/XRAYRevenue/UpdateExistingStationAgency',
@@ -860,7 +940,7 @@
         // these values can't be changes but leaving the edit in place in case things change
         if ($("#txtUpdateMarketAgency").val() == "" &&
             $("#ddlUpdateAccountType").val() == -1) {
-            bootbox.alert("You must chose at least 1 field to update.", function () { });
+            bootbox.alert("You must choose at least 1 field to update.", function () { });
             return false;
         } else {
             return true;
@@ -871,7 +951,26 @@
         $("#txtUpdateMarketAgencyId").val("");
         $("#txtUpdateMarketAgency").val("");
         $("#ddlUpdateAccountType").val("-1");
+
         $("#btnUpdate").hide();
+        $("#dtUpdates_filter input").show();
+        $("#dtUpdates_filter label").show();
+    }
+
+    // NOTE: created this function to update the selected row
+    // on the results table. I made the radio button cell non-selectable
+    // because it was causing the click event to happen twice.
+    // This caused an issue with the wrong row being highlighted.
+    function fixResultsSelect(stationAgencyId) {
+        $.blockUI();
+
+        var resultTable = $('#dtResults').DataTable();
+        resultTable.rows().deselect();
+
+        var resultRowId = $('#dtResults').dataTable().fnFindCellRowIndexes(stationAgencyId, 1);
+        $(resultTable.row(resultRowId).node()).addClass('selected');
+
+        $.unblockUI();
     }
 
 </script>
