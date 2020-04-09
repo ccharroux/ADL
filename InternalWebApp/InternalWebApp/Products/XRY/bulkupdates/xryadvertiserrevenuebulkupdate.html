@@ -167,7 +167,6 @@
 
 
                     <div class="row">
-
                         <div class="col-md-3">
                             <label for="txtMarketAdvertiser" class="dropdown-label"> ** Market Advertiser</label><br />
                             <input type="text" id="txtMarketAdvertiser" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter an Advertiser Name to search." />
@@ -194,17 +193,21 @@
                     <div id="matchInfo" class="match-info">
                         <h3 class="match-info-header">Update Information</h3>
                         <div class="row">
-                            <div class="col-md-12 match-info-row">
+                            <div class="col-md-3 match-info-row">
                                 <!--
                                 turn these into search boxes
                                 -->
                                 <input type="hidden" id="txtUpdateMarketAdvertiserId" class="report-filter" value="" />
-                                <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label>
+                                <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label><br />
                                 <input type="text" id="txtUpdateMarketAdvertiser" onclick="excludeFromBackButton(); searchMarketAdvertiser();" readonly="readonly" style="width: 450px;" maxlength="50" class="report-filter" />
+                            </div>
+                            <div class="col-md-3 match-info-row">
                                 <input type="hidden" id="txtUpdateMarketAgencyId" class="report-filter" value="" />
-                                <label for="txtUpdateMarketAgency" class="dropdown-label">Market Agency</label>
+                                <label for="txtUpdateMarketAgency" class="dropdown-label">Market Agency</label><br />
                                 <input type="text" id="txtUpdateMarketAgency" onclick="excludeFromBackButton(); searchMarketAgency();" readonly="readonly" style="width: 450px;" maxlength="50" class="report-filter" />
-
+                            </div>
+                            <div class="col-md-6 match-info-row" style="text-align:right">
+                                <label class="dropdown-label">&nbsp;</label><br />
                                 <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startAdvertiserRevenueUpdate();" />
                             </div>
                         </div>
@@ -215,6 +218,7 @@
                             <table id="dtResults" class="cell-border"></table>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -376,6 +380,25 @@
 
     }
 
+    function loadDefaultDates() {
+        var d = new Date();
+        var currentMonth = d.getMonth() + 1;
+        var currentYear = d.getFullYear();
+        var lastDayOfTheMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+
+        $("#dtStartDate").val(currentMonth + "/01/" + currentYear);
+        $("#dtEndDate").val(currentMonth + "/" + lastDayOfTheMonth.getDate() + "/" + currentYear);
+
+    }
+
+    function setupDatePickers() {
+        // setup date pickers
+        $(function () {
+            $("#dtStartDate").datepicker();
+            $("#dtEndDate").datepicker();
+        });
+
+    }
 
     function searchForAdvertiserRevenue() {
 
@@ -572,12 +595,14 @@
             "order": [],
             "data": results,
             "columns": columns,
-            "columnDefs": [{
-                targets: 0,
-                defaultContent: '',
-                orderable: false,
-                className: 'select-checkbox'
-            }],
+            "columnDefs": [
+                {
+                    targets: 0,
+                    defaultContent: '',
+                    orderable: false,
+                    className: 'select-checkbox'
+                }
+            ],
             "select": "multi",
             "language": {
                 search: "Filter Results:"
@@ -646,25 +671,6 @@
         $.unblockUI();
     }
 
-    function loadDefaultDates() {
-        var d = new Date();
-        var currentMonth = d.getMonth() + 1;
-        var currentYear = d.getFullYear();
-        var lastDayOfTheMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0);
-
-        $("#dtStartDate").val(currentMonth + "/01/" + currentYear);
-        $("#dtEndDate").val(currentMonth + "/" + lastDayOfTheMonth.getDate() + "/" + currentYear);
-
-    }
-
-    function setupDatePickers() {
-        // setup date pickers
-        $(function () {
-            $("#dtStartDate").datepicker();
-            $("#dtEndDate").datepicker();
-        });
-
-    }
 
     function searchValidationPassed() {
 
@@ -754,7 +760,17 @@
             }
         });
 
+        if (!$.fn.DataTable.isDataTable('#dtResults')) {
+            return;
+        }
+
         var tbResults = $("#dtResults").DataTable();
+
+        if (tbResults.rows('.selected').data().length == 0)
+        {
+            return;
+        }
+
         var aSelectedItems = new Array();
         for (var i = 0; i < tbResults.rows('.selected').data().length; i++) {
             aSelectedItems.push({
@@ -785,7 +801,15 @@
             }
         });
 
+        if (!$.fn.DataTable.isDataTable('#dtResults')) {
+            return;
+        }
+
         var tbResults = $("#dtResults").DataTable();
+
+        if (tbResults.rows('.selected').data().length == 0) {
+            return;
+        }
 
         var aSelectedItems = new Array();
         for (var i = 0; i < tbResults.rows('.selected').data().length; i++) {
@@ -802,18 +826,9 @@
 
     }
 
-    function clearUpdateFields() {
-        $("#txtUpdateMarketAdvertiserId").val("");
-        $("#txtUpdateMarketAdvertiser").val("");
-        $("#txtUpdateMarketAgencyId").val("");
-        $("#txtUpdateMarketAgency").val("");
+    function loadLastSearch()
+    {
 
-        $("#btnUpdate").hide();
-        $("#dtResults_filter input").show();
-        $("#dtResults_filter label").show();
-    }
-
-    function loadLastSearch() {
         if (getLocalStorage("gSearchResults").length <= 0) {
             return;
         }
@@ -941,5 +956,19 @@
             return true;
         }
     }
+
+    function clearUpdateFields() {
+        $("#txtUpdateMarketAdvertiserId").val("");
+        $("#txtUpdateMarketAdvertiser").val("");
+        $("#txtUpdateMarketAgencyId").val("");
+        $("#txtUpdateMarketAgency").val("");
+
+        $("#btnUpdate").hide();
+        $("#dtResults_filter input").show();
+        $("#dtResults_filter label").show();
+
+    }
+
+
 
 </script>
