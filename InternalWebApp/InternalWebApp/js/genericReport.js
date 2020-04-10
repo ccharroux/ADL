@@ -4140,11 +4140,12 @@ function getReportObject_MRRWithoutManager() {
 
     tempObject =
     {
-        reportTitle: "MRR Missing Manager List",
+        reportTitle: "MRR Station Missing Administrator List",
         apiControllerAction: "/api/MRRReport/GetMRRWithoutManagerList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr', 'MRR Security and Analysis', 'mrr pre-release']
+        product: ['mrr', 'MRR Security and Analysis', 'mrr pre-release'],
+        approved: true
     }
 
     return tempObject;

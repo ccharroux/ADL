@@ -108,11 +108,11 @@
         }
 
         table.dataTable tbody th, table.dataTable tbody td {
-            font-size: 13px !important;
+            font-size: 14px !important;
         }
 
         table.dataTable thead th, table.dataTable thead td {
-            font-size: 13px !important;
+            font-size: 14px !important;
         }
 
         .not-selectable {
@@ -121,6 +121,23 @@
 
         th.select-checkbox {
             width: 15px;
+        }
+
+        select.report-filter
+        {
+            width: 240px !important;
+        }
+        select.dropdown-select
+        {
+            width: 240px !important;
+        }
+        input[type=text]
+        {
+            width: 240px !important;
+        }
+        select#dtResults_length, select#dtUpdates_length
+        {
+            width: 60px!important;
         }
     </style>
 
@@ -148,26 +165,23 @@
 
                 <div class="row search-section">
                     <div class="row" style="margin-bottom: 20px;">
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label for="ddlMarket" class="dropdown-label" style="color: red;"> * Market</label><br />
                             <select id="ddlMarket" class="dropdown-select report-filter mkaRequired" errorMessage="Please select a Market to search."></select>
                         </div>
-                        <div class="col-md-3">
-                            <label for="ddlMediaType" class="dropdown-label">Media Type</label><br />
-                            <select id="ddlMediaType" class="dropdown-select report-filter"></select>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label for="txtMediaAdvertiser" class="dropdown-label"> ** Media Advertiser</label><br />
                             <input type="text" id="txtMediaAdvertiser" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter a Media Advertiser Name to search." />
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label for="txtMarketAdvertiser" class="dropdown-label"> ** Market Advertiser</label><br />
                             <input type="text" id="txtMarketAdvertiser" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter a Market Advertiser Name to search." />
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-2">
+                            <label for="ddlMediaType" class="dropdown-label">Media Type</label><br />
+                            <select id="ddlMediaType" class="dropdown-select report-filter"></select>
+                        </div>
+                        <div class="col-md-4">
                             <div style="display:table-cell; float:right">
                                 <label class="dropdown-label">&nbsp;</label><br />
                                 <input type="button" class="search-button" value="Search" onclick="clearUpdateFields(); searchForMediaAdvertiser();" />
@@ -176,20 +190,22 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12 multi-field-message-area">
-                            <p class="multi-field-message" style="text-align: left;">&nbsp;** At least one of the following fields needs to be completed: Media Advertiser or Market Advertiser.</p>
+                            <p class="multi-field-message" style="text-align: left;">&nbsp;** At least one of the following fields needs to be entered: Media Advertiser or Market Advertiser.</p>
                         </div>
                     </div>
 
                     <div id="matchInfo" class="match-info">
                         <h3 class="match-info-header">Update Information</h3>
                         <div class="row">
-                            <div class="col-md-12 match-info-row">
+                            <div class="col-md-2 match-info-row">
                                 <input type="hidden" id="txtUpdateMarketId" value="" />
                                 <input type="hidden" id="txtUpdateMarket" value="" />
                                 <input type="hidden" id="txtUpdateMarketAdvertiserId" value="" />
-                                <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label>
-                                <input type="text" id="txtUpdateMarketAdvertiser" readonly="readonly" style="width: 450px;" maxlength="50" class="report-filter" />
-
+                                <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label><br/>
+                                <input type="text" id="txtUpdateMarketAdvertiser" readonly="readonly" style="width: 450px !important;" maxlength="50" class="report-filter" />
+                            </div>
+                            <div class="col-md-10 match-info-row" style="text-align:right">
+                                <label for="btnUpdate" class="dropdown-label">&nbsp;</label><br />
                                 <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startMediaAdvertiserUpdate();" />
                             </div>
                         </div>
@@ -201,11 +217,11 @@
                         1 search results
                         1 to select for bulk updates
                         -->
-                        <div id="dtResultsHolder" class="col-md-5">
+                        <div id="dtResultsHolder" class="col-md-6">
                             <table id="dtResults" class="cell-border"></table>
                         </div>
-                        <div class="col-md-2">&nbsp;</div>
-                        <div id="dtUpdatesHolder" class="col-md-5">
+                        <!--<div class="col-md-2">&nbsp;</div>-->
+                        <div id="dtUpdatesHolder" class="col-md-6">
                             <table id="dtUpdates" class="cell-border"></table>
                         </div>
                     </div>
@@ -231,7 +247,8 @@
     <script src="/js/config.js"></script>
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
-
+    <!-- genericReport JS -->
+    <script src="/js/genericReport.js"></script>
     <!--Data Tables-->
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
@@ -255,6 +272,8 @@
         getMarketsByProduct();
         //load media types
         getMediaAdvertiserMediaTypeList(["ddlMediaType"], "-1");
+
+        buildQuickReports(['xry']);
 
     });
 
@@ -426,12 +445,12 @@
             "orderable": true
         });
 
-        columnsToDisplay.push({
-            "title": "Media Advertiser Code",
-            "visible": true,
-            "mData": "Media Advertiser Code",
-            "orderable": true
-        });
+        //columnsToDisplay.push({
+        //    "title": "Media Advertiser Code",
+        //    "visible": true,
+        //    "mData": "Media Advertiser Code",
+        //    "orderable": true
+        //});
 
         columnsToDisplay.push({
             "title": "Market Advertiser",
@@ -544,12 +563,12 @@
             "orderable": true
         });
 
-        columnsToDisplay.push({
-            "title": "Media Advertiser Code",
-            "visible": true,
-            "mData": "Media Advertiser Code",
-            "orderable": true
-        });
+        //columnsToDisplay.push({
+        //    "title": "Media Advertiser Code",
+        //    "visible": true,
+        //    "mData": "Media Advertiser Code",
+        //    "orderable": true
+        //});
 
         columnsToDisplay.push({
             "title": "Market Advertiser",
