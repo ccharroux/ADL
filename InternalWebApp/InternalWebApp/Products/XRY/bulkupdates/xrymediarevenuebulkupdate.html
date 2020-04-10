@@ -60,6 +60,16 @@
     <![endif]-->
 
     <style>
+        .linkColumn
+        {
+            width: 3px !important;
+        }
+
+        .periodColumn
+        {
+            width: 2px !important;
+        }
+
         table {
             border-left: solid 1px #566573 !important;
             border-bottom: solid 1px #566573 !important;
@@ -103,6 +113,40 @@
                 border: 1px solid black;
                 border-radius: 3px;
             }
+
+        table.dataTable tr.selected td.select-checkbox::after, table.dataTable tr.selected th.select-checkbox::after {
+            margin-top: -9px;
+            margin-left: -7px;
+        }
+
+        table.dataTable tbody th, table.dataTable tbody td {
+            font-size: 14px !important;
+        }
+
+        table.dataTable thead th, table.dataTable thead td {
+            font-size: 14px !important;
+        }
+
+        th.select-checkbox {
+            width: 15px;
+        }
+
+        select.report-filter
+        {
+            width: 240px !important;
+        }
+        select.dropdown-select
+        {
+            width: 240px !important;
+        }
+        input[type=text]
+        {
+            width: 240px !important;
+        }
+        select#dtResults_length, select#dtUpdates_length
+        {
+            width: 60px!important;
+        }
     </style>
 
 </head>
@@ -127,53 +171,61 @@
                     <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
                 </div>
                 <div class="row search-section">
-
-                    <div class="col-md-12" style="margin-bottom: 20px;">
-
-                        <label for="ddlMarket" class="dropdown-label" style="color: red;"> * Market</label>
-                        <select id="ddlMarket" class="dropdown-select report-filter mkaRequired" errorMessage="Please select a Market to search."></select>
-
-                        <label for="txtMarketAdvertiser" class="dropdown-label" style="color: red;"> * Market Advertiser</label>
-                        <input type="text" id="txtMarketAdvertiser" maxlength="50" class="report-filter multi-field-search mkaRequired" errorMessage="Please enter a Media Advertiser Name to search." />
-                        
-                        <label for="ddlMediaType" class="dropdown-label">Media Type</label>
-                        <select id="ddlMediaType" apiInput="inMediaTypeId" onchange="" class="dropdown-select rptView report-filter"></select>
-
+                    <div class="row" style="margin-bottom: 20px;">
+                        <div class="col-md-2">
+                            <label for="ddlMarket" class="dropdown-label" style="color: red;"> * Market</label><br/>
+                            <select id="ddlMarket" class="dropdown-select report-filter mkaRequired" errorMessage="Please select a Market to search."></select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="txtMarketAdvertiser" class="dropdown-label" style="color: red;"> * Market Advertiser</label><br/>
+                            <input type="text" id="txtMarketAdvertiser" maxlength="50" class="report-filter multi-field-search mkaRequired" errorMessage="Please enter a Media Advertiser Name to search." />
+                        </div>
+                        <div class="col-md-2">
+                            <label for="ddlMediaType" class="dropdown-label">Media Type</label><br/>
+                            <select id="ddlMediaType" apiInput="inMediaTypeId" class="dropdown-select rptView report-filter"></select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="dtStartDate" class="dropdown-label" style="color: red;"> * Start Date</label><br/>
+                            <input type="text" id="dtStartDate" class="report-filter mkaRequired" style="text-align:center; max-width: 100px;" errorMessage="Please enter a Start Date to search.">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="dtEndDate" class="dropdown-label" style="color: red;"> * End Date</label><br/>
+                            <input type="text" id="dtEndDate" class="report-filter mkaRequired" style="text-align: center; max-width: 100px;" errorMessage="Please enter a End Date to search.">
+                        </div>
+                        <div class="col-md-2">
+                            <div style="display:table-cell; float:right">
+                                <label class="dropdown-label">&nbsp;</label><br />
+                                <input type="button" class="search-button" value="Search" onclick="clearUpdateFields();searchForMediaRevenue();" />
+                            </div>
+                        </div>
                     </div>
 
-                </div>
-
-                <div class="row search-section">
-                    <div class="col-md-12">
-
-                        <label for="dtStartDate" class="dropdown-label" style="color: red;"> * Start Date</label>
-                        <input type="text" id="dtStartDate" class="report-filter mkaRequired" style="max-width: 100px;" errorMessage="Please enter a Start Date to search.">
-
-                        <label for="dtEndDate" class="dropdown-label" style="color: red;"> * End Date</label>
-                        <input type="text" id="dtEndDate" class="report-filter mkaRequired" style="max-width: 100px;" errorMessage="Please enter a End Date to search.">
-
-                        <input type="button" class="search-button" value="Search" onclick="clearUpdateFields(); searchForMediaRevenue();" />
+                    <div id="matchInfo" class="match-info">
+                        <h3 class="match-info-header">Update Information</h3>
+                        <div class="row">
+                            <div class="col-md-3 match-info-row">
+                                <input type="hidden" id="txtUpdateMarketAdvertiserId" class="report-filter" value="" />
+                                <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label><br/>
+                                <input type="text" id="txtUpdateMarketAdvertiser" onclick="excludeFromBackButton(); searchMarketAdvertiser();" readonly="readonly" style="width: 450px !important;" maxlength="50" class="report-filter" />
+                            </div>
+                            <div class="col-md-9 match-info-row" style="text-align:right">
+                                <label class="dropdown-label">&nbsp;</label><br />
+                                <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startMediaAdvertiserRevenueUpdate();" />
+                            </div>
+                        </div>
+                        <div class="row" id="updateInformationInstuctions" style="display:none">
+                            <div class="col-md-12">
+                                Click the Market Advertiser box to search for Update Information.
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <div id="matchInfo" class="match-info">
-                    <h3 class="match-info-header">Update Information</h3>
                     <div class="row">
-                        <div class="col-md-12 match-info-row">
-                            <input type="hidden" id="txtUpdateMarketAdvertiserId" class="report-filter" value="" />
-                            <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label>
-                            <input type="text" id="txtUpdateMarketAdvertiser" onclick="excludeFromBackButton(); searchMarketAdvertiser();" readonly="readonly" style="width: 450px !important;" maxlength="50" class="report-filter" />
-                            <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startMediaAdvertiserRevenueUpdate();" />
+                        <div id="dtResultsHolder" class="col-md-12">
+                            <table id="dtResults" class="cell-border"></table>
                         </div>
                     </div>
                 </div>
-
-                <div class="row">
-                    <div id="dtResultsHolder" class="col-md-12">
-                        <table id="dtResults" class="cell-border"></table>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>
@@ -255,8 +307,6 @@
 
                         $("#ddlMarket").html("<option value='-1'> -- Select a Market</option>");
 
-                        //var holdOwnerID = "0";
-
                         $.each(data.report.rows, function (index) {
                             var obj = data.report.rows[index];
                             str = "<option value='" + obj.marketId + "'>" + obj.marketName + " (" + obj.marketId + ")" + "</option>";
@@ -314,12 +364,34 @@
 
     }
 
-    function searchForMediaRevenue()
-    {
-        //api/MediaAdvertiserAudit/GetMediaRevenueResearchList
+    function loadDefaultDates() {
+        var d = new Date();
+        var currentMonth = d.getMonth() + 1;
+        var currentYear = d.getFullYear();
+        var lastDayOfTheMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+
+        $("#dtStartDate").val(currentMonth + "/01/" + currentYear);
+        $("#dtEndDate").val(currentMonth + "/" + lastDayOfTheMonth.getDate() + "/" + currentYear);
+
+    }
+
+    function setupDatePickers() {
+        // setup date pickers
+        $(function () {
+            $("#dtStartDate").datepicker();
+            $("#dtEndDate").datepicker();
+        });
+
+    }
+
+    function searchForMediaRevenue() {
+        
         if (searchValidationPassed() == false) {
             return;
         }
+
+        // call this to keep block up...
+        setThisQueryToRunLongNoAutoUnBlock();
 
         var sUrl = ServicePrefix + "/api/MediaAdvertiserAudit/GetMediaRevenueResearchList?";
         sUrl += "inApiToken=" + getLocalStorage("APIToken");
@@ -363,13 +435,10 @@
 
     function getResultsColumns() {
         var columnsToDisplay = new Array();
-        //create a radio button with onclick populate the info section
+
+        // This column represents the
+        // the checkbox. Must be here to display the checkbox.
         columnsToDisplay.push({
-            "mRender": function (data, type, row) {
-                return " ";
-            },
-            "title":
-                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", //putting in the spaces for now so the width would be set
             "orderable": false,
             "searchable": false
         });
@@ -379,7 +448,8 @@
                 return '<a href="#" onclick="loadUpdateInformation(' + row.advertiserId + ',\'' + row.AdvertiserWithoutId + '\');">Link</a>';
             },
             "orderable": false,
-            "searchable": false
+            "searchable": false,
+            "className": "text-align-center linkColumn"
         });
 
         columnsToDisplay.push({
@@ -465,6 +535,13 @@
 
         resetDataTableDOM("dtResults", "dtResultsHolder", "cell-border");
 
+        // NOTE: the select and select-checkbox
+        // parameters indicate this data table
+        // uses the built in checkbox funtionality.
+        //
+        // by using the defaultContent,
+        // you don't need to use the mRender in the
+        // column definition
         searchTable = $("#dtResults").DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
@@ -472,8 +549,9 @@
             "data": results,
             "columns": columns,
             "columnDefs": [{
-                orderable: false,
                 targets: 0,
+                defaultContent: '',
+                orderable: false,
                 className: 'select-checkbox'
             }],
             "select": "multi",
@@ -488,7 +566,10 @@
             if (type === 'row') {
                 var count = searchTable.rows({ selected: true }).count();
                 if (count > 0) {
+                    $("#dtResults_filter input").hide();
+                    $("#dtResults_filter label").hide();
                     $("#btnUpdate").show();
+                    $("#updateInformationInstuctions").show();
                 }
             }
         });
@@ -497,12 +578,18 @@
 
             var count = searchTable.rows({ selected: true }).count();
             if (count == 0) {
-                $("#btnUpdate").hide();
+                clearUpdateFields();
+                $("#dtResults_filter input").show();
+                $("#dtResults_filter label").show();
             }
         });
 
     }
 
+    // This function repopulates the selected rows
+    // when coming back from searching for
+    // a market advertiser for the
+    // bulk update.
     function loadSelectedTableItems() {
         if (selectedTableItems.length == 0) {
             return;
@@ -513,12 +600,7 @@
         for (var i = 0; i < selectedTableItems.length; i++) {
             var selectedItem = selectedTableItems[i];
             tbResults.rows(function (idx, data, node) {
-                //if (data.advertiserId === selectedItem.advertiserId && data.Period == selectedItem.period &&
-                //    data.Revenue == selectedItem.revenue && data["Media Code"] == selectedItem.mediaCode) {
-                //    tbResults.row(idx).select();
-                //}
-                if (data.revenueXrayId === selectedItem.revenueXrayId)
-                {
+                if (data.revenueXrayId === selectedItem.revenueXrayId) {
                     tbResults.row(idx).select();
                 }
             });
@@ -527,78 +609,20 @@
         selectedTableItems = new Array();
     }
 
-    function searchMarketAdvertiser()
-    {
-        var searchCriteriaObj = {
-            "searchToken": "BULKADV",
-            "searchPage": window.location,
-            "searchHeading": "Advertiser Search for Media Revenue Audit"
-        }
+    function loadUpdateInformation(advertiserId, advertiserName) {
+        $.blockUI();
 
-        $(".report-filter").each(function () {
-            var control = $(this).attr("id");
-            if (control.indexOf("_chosen") == -1) {
-                searchCriteriaObj[control] = $(this).val();
-            }
-        });
-
-        var tbResults = $("#dtResults").DataTable();
-        var aSelectedItems = new Array();
-        for (var i = 0; i < tbResults.rows('.selected').data().length; i++) {
-            aSelectedItems.push({
-                //"advertiserId": tbResults.rows('.selected').data()[i].advertiserId,
-                //"period": tbResults.rows('.selected').data()[i].Period,
-                //"revenue": tbResults.rows('.selected').data()[i].Revenue,
-                //"mediaCode": tbResults.rows('.selected').data()[i]["Media Code"]
-                "revenueXrayId": tbResults.rows('.selected').data()[i].revenueXrayId
-            });
-        }
-
-        searchCriteriaObj["selectedItems"] = aSelectedItems;
-
-        setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
-
-        window.location = "/utilities/search.html";
-
-
-    }
-
-
-    function loadUpdateInformation(advertiserId, advertiserName)
-    {
         $("#txtUpdateMarketAdvertiserId").val(advertiserId);
         $("#txtUpdateMarketAdvertiser").val(advertiserName);
-    }
 
-    function clearUpdateFields() {
-        $("#txtUpdateMarketAdvertiserId").val("");
-        $("#txtUpdateMarketAdvertiser").val("");
-    }
+        $("#dtResults_filter input").hide();
+        $("#dtResults_filter label").hide();
 
-    function loadDefaultDates() {
-        var d = new Date();
-        var currentMonth = d.getMonth() + 1;
-        var currentYear = d.getFullYear();
-        var lastDayOfTheMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0);
-
-        $("#dtStartDate").val(currentMonth + "/01/" + currentYear);
-        $("#dtEndDate").val(currentMonth + "/" + lastDayOfTheMonth.getDate() + "/" + currentYear);
-
-    }
-
-    function setupDatePickers() {
-        // setup date pickers
-        $(function () {
-            $("#dtStartDate").datepicker();
-            $("#dtEndDate").datepicker();
-        });
-
+        $.unblockUI();
     }
 
     function searchValidationPassed() {
-        //add the required one but also either or fields
-        //return true;
-
+     
         var loopBreak = true;
         $(".mkaRequired").each(function (index, el) {
             var eID = "#" + $(el).attr("id");
@@ -645,23 +669,20 @@
             return false;
         }
 
-        try
-        {
+        try {
             //not doing anything with the date variable
             //when trying to parse an invalid date, the function will throw an error to catch
             var startDate = $.datepicker.parseDate('mm/dd/yy', $('#dtStartDate').val());
-        } catch (err)
-        {
+        } catch (err) {
             var errorMessage = "Please input a valid Start Date.";
             bootbox.alert(errorMessage, function () { });
             loopBreak = false;
             return false;
         }
 
-        try
-        {
+        try {
             //not doing anything with the date variable
-            //when trying to parse an invalid date, the function will throw an error to catch            
+            //when trying to parse an invalid date, the function will throw an error to catch
             var endDate = $.datepicker.parseDate('mm/dd/yy', $('#dtEndDate').val());
         } catch (err) {
             var errorMessage = "Please input a valid End Date.";
@@ -671,6 +692,46 @@
         }
 
         return loopBreak;
+    }
+
+    function searchMarketAdvertiser() {
+        var searchCriteriaObj = {
+            "searchToken": "BULKADV",
+            "searchPage": window.location,
+            "searchHeading": "Advertiser Search for Media Revenue Audit"
+        }
+
+        $(".report-filter").each(function () {
+            var control = $(this).attr("id");
+            if (control.indexOf("_chosen") == -1) {
+                searchCriteriaObj[control] = $(this).val();
+            }
+        });
+
+        if (!$.fn.DataTable.isDataTable('#dtResults')) {
+            return;
+        }
+
+        var tbResults = $("#dtResults").DataTable();
+
+        if (tbResults.rows('.selected').data().length == 0) {
+            return;
+        }
+
+        var aSelectedItems = new Array();
+        for (var i = 0; i < tbResults.rows('.selected').data().length; i++) {
+            aSelectedItems.push({
+                "revenueXrayId": tbResults.rows('.selected').data()[i].revenueXrayId
+            });
+        }
+
+        searchCriteriaObj["selectedItems"] = aSelectedItems;
+
+        setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
+
+        window.location = "/utilities/search.html";
+
+
     }
 
     function loadLastSearch() {
@@ -692,8 +753,8 @@
 
     }
 
-    function startMediaAdvertiserRevenueUpdate()
-    {
+    function startMediaAdvertiserRevenueUpdate() {
+
         if (validateUpdateFields() == false) {
             return;
         }
@@ -709,7 +770,7 @@
 
 
         if (updateMediaAdvertiserRevenueIds.length == 0) {
-            bootbox.alert("You must select at least 1 media advertiser to update.", function () { });
+            bootbox.alert("You must select at least 1 advertiser to update.", function () { });
             return;
         }
 
@@ -753,15 +814,11 @@
                 return;
             }
         });
-       
+
     }
 
     function updateMediaAdvertiserRevenue(updateMediaAdvertiserRevenueIds) {
-        //var errorMessage = "This bulk update functionality is still under development.";
-        //bootbox.alert(errorMessage, function () { });
-
-        //return;
-
+  
         $.ajax({
             url: ServicePrefix + '/api/XRAYRevenue/RedirectRevenueMediaAdvertiser',
             dataType: 'json',
@@ -796,5 +853,15 @@
         } else {
             return true;
         }
+    }
+
+    function clearUpdateFields() {
+        $("#txtUpdateMarketAdvertiserId").val("");
+        $("#txtUpdateMarketAdvertiser").val("");
+
+        $("#btnUpdate").hide();
+        $("#updateInformationInstuctions").hide();
+        $("#dtResults_filter input").show();
+        $("#dtResults_filter label").show();
     }
 </script>
