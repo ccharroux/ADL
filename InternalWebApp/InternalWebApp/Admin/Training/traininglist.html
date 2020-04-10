@@ -206,9 +206,12 @@
                         </div>
                     </div>
                 </div>
-                <div id="divCalendar" class="text-align-center" style="width: 800px; margin: 25px auto 0 auto"></div>
+                <div class="searchResults text-align-center" style="width: 100%">
+                    (click on event to view full details / edit / delete)
+                </div>
+                <div id="divCalendar" class="searchResults text-align-center" style="width: 800px; margin: 25px auto 0 auto"></div>
                 <!-- start datatable-->
-                <div id="divResults" class="dataTable-top-margin">
+                <div id="divResults" class="searchResults dataTable-top-margin">
                     <table id="dtTrainingList" class="dataTable-border dataTable-headers dataTable-cell-border" style="width: 100%">
                         <thead>
                             <tr>
@@ -400,7 +403,7 @@
     }
 
     $(document).ready(function () {
-        $("#divResults").hide();
+        $(".searchResults").hide();
         buildUIDialogs();
 
         loadDefaultDates();
@@ -1160,7 +1163,7 @@
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 } else {
                     populateDataTable("dtTrainingList", data);
-                    $("#divResults").show();
+                    $(".searchResults").show();
                     populateCalendar(data);
                 }
             },
@@ -1226,9 +1229,17 @@
             editable: true,
             eventLimit: true, // allow "more" link when too many events
             events: events,
+            // if eventLimit is hit, these events are not triggered unless user clicked on "+N more" first
+            //eventMouseover: function (event, jsEvent, view) {
+            // jsEvent.pageX, jsEvent.pageY = mouse coordinates
+            // $("#divCalendarEventSummary").html(event.extendedProps.trainingEventSummary);
+            //},
+            //eventMouseout: function (event, jsEvent, view) {
+            //    $("#divCalendarEventSummary").html("");
+            //}
             eventClick: function (event, jsEvent, view) {
                 showEventDialog(event.extendedProps);
-            }
+            },
         });
 
         //$('#divCalendar').fullCalendar({
