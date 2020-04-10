@@ -47,9 +47,9 @@
     <script src="js/respond.min.js"></script>
     <![endif]-->
     <style>
-        .actionCol
+        .smallCol
         {
-            width: 20px!important;
+            width: 60px !important;
         }
         .filterLabel {
             margin-left: 10px;
@@ -136,7 +136,7 @@
                                     Include internal users-->
                                 <!--</span>-->
                             </div>
-                            <div class="col-md-4" style="text-align:left">
+                            <div class="col-md-4" style="text-align:right">
                                 <label  class="filterLabel">&nbsp;</label><br />
                                 <input type="button" value="Show" onclick="getCustomerSupportList();" />
                             </div>
@@ -147,22 +147,12 @@
                     <table id="dtCustomerSupportList" class="dataTable-border dataTable-headers dataTable-cell-border" style="width: 100%">
                         <thead>
                             <tr>
-                                <th class="exportColumn">Contact Date/Time</th>
-                                <th class="exportColumn">Contacted By</th>
-                                <th class="exportColumn">Type</th>
-                                <th class="exportColumn">Description</th>
-                                <th></th>
+                                <th class="exportColumn smallCol">Contact Date/Time</th>
+                                <th class="exportColumn smallCol">Contacted By</th>
+                                <th class="exportColumn">Communication</th>
+                                <th class="smallCol"  ></th>
                             </tr>
                         </thead>
-                        <!--<tfoot>
-                            <tr>
-                                <th>Contact Date/Time</th>
-                                <th>Contacted By</th>
-                                <th>Type</th>
-                                <th>Description</th>
-                                <th></th>
-                            </tr>
-                        </tfoot>-->
                     </table>
                 </div>
                 <!-- end datatable -->
@@ -531,27 +521,46 @@
             // "order": [[0, 'desc']], // Contact Date/Time
             "ordering": false, // SP pre-sorts by actual (not stringified) date/time
             "columns": [
-                { "data": 'ContactDateTime' },
-                { "data": 'ContactedBy' },
-                { "data": 'Type' },
-                { "data": 'Description' },
                 {
                     mRender: function (data, type, row) {
+                        //return row["ContactDateTime"];
+                        return  row["ContactDateTime"];
+                    },
+                    "className": "smallCol"
+                },
+                {
+                    "data": 'ContactedBy',
+                    "className": "smallCol"
+                },
+                {
+                    mRender: function (data, type, row) {
+
+                        return row["Type"] + " / " + row["Description"].toString().replace("<p>", "").replace("</p>", "");
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": "text-align-left"
+                },
+                {
+                    mRender: function (data, type, row)
+                    {
                         var customerSupportContactId = row["CustomerSupportContactID"];
                         if (customerSupportContactId != null) {
                             return '<a href="#" onclick="editCustomerSupportContact(' + customerSupportContactId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteCustomerSupportContact(' + customerSupportContactId + ')">Delete</a>';
                         }
-
-                        var trainingEventId = row["TrainingEventID"];
-                        if (trainingEventId != null) {
-                            return '<a href="#" onclick="editTrainingEvent(' + trainingEventId + ')">View/Edit/Delete</a>';
+                        else {
+                            var trainingEventId = row["TrainingEventID"];
+                            if (trainingEventId != null) {
+                                return '<a href="#" onclick="editTrainingEvent(' + trainingEventId + ')">View/Edit/Delete</a>';
+                            }
+                            else {
+                                return "";
+                            }
                         }
-
-                        return "";
                     },
                     "orderable": false,
                     "searchable": false,
-                    "className": "text-align-center actionCol"
+                    "className": "smallCol text-align-center "
                 }
             ],
             "pagingType": "full_numbers",
@@ -620,6 +629,8 @@
                 search: "Filter Results:"
             }
         });
+
+
 
     }
 

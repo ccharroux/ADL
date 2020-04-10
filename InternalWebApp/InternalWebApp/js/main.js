@@ -1433,7 +1433,8 @@ function populateDataTable(tableName, data) {
     table.clear().draw();
 
     table.rows.add(tableJson).draw();
-
+     
+    table.columns.adjust().draw();
 
 }
 

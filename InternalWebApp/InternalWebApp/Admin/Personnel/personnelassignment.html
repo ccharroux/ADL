@@ -117,10 +117,15 @@
 
                 <!-- search / filter area -->
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-10">
                         <label for="ddlProduct" class="search-ddl-label">Product</label>
                         <select id="ddlProduct" class="search-ddl-select" style="" onchange="loadScreenForProductChange()"></select>
                         <input value="Corporate Assignment" onclick="corporateAssignInitiate();" style="display:none;" id="btnCorporateAssignInitiate" class="default-button" type="button">
+                    </div>
+                    <div class="col-md-2 text-align-center">
+                        <div class="gray-label width-130">
+                            <span id="spnWebStatus"></span>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-12" id="marketChoice" style="display:none">
@@ -366,6 +371,7 @@
 
     var personnelId = 0;
     var nameOfUser = "";
+    var emailAddress = "";
 
     var columns = [];
     var columnsToDisplay = new Array();
@@ -382,6 +388,8 @@
         buildUIDialogs();
 
         loadProductList();
+        getPersonnelWebSetup();
+        
 
         gDataTableDefaultRows = 10;
     });
@@ -409,6 +417,7 @@
         if (getLocalStorage("gPageParameters").length > 0) {
             var pageParameters = $.parseJSON(getLocalStorage("gPageParameters"));
             nameOfUser = pageParameters["personnelName"];
+            emailAddress = pageParameters["emailAddress"];
         }
 
     }
@@ -689,14 +698,50 @@
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                     return;
                 }
+                //bootbox.alert(successMessage);
 
-                bootbox.alert(successMessage);
-                loadPersonnelAssignmentList("dtPersonnelAssignmentList");
+                if ($("#spnWebStatus").text() == "") {
+                    //Ask user if they want to send setup email
+                    showSetupEmailDialog(successMessage);
+
+                } else {
+                    bootbox.alert(successMessage);
+                    loadPersonnelAssignmentList("dtPersonnelAssignmentList");
+
+                }
 
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 MKAErrorMessageRtn(errorThrown);
 
+            }
+        });
+
+    }
+
+    function showSetupEmailDialog(successMessage) {
+
+        var strMessage = successMessage + ". This user does not have a web account, send setup email?"
+
+        //ask if they want to send setup email now
+        //if yes saml check, continue email
+        bootbox.dialog({
+            message: strMessage,
+            buttons: {
+                btnNo: {
+                    label: "No",
+                    callback: function () {
+                        //create pending record.
+                        insertPendingNotification();
+                    }
+                },
+                btnYes: {
+                    label: "Yes",
+                    callback: function () {
+                        //SAML check
+                        checkSAMLStatus();
+                    }
+                }
             }
         });
 
@@ -2592,5 +2637,268 @@
     function userExitedDialog() {
         console.log("user has exited dialog.");
     }
+
+    function getPersonnelWebSetup() {
+
+        var url = ServicePrefix + '/api/Personnel/GetPersonnelWebSetupStatus';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getPersonnelWebSetupSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        }
+
+        $.ajax(url, settings);
+
+    }
+
+    function getPersonnelWebSetupSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
+
+            });
+        } else {
+
+            $.each(data.report.rows, function (index) {
+                var obj = data.report.rows[index];
+                var status = -1;
+
+
+                if (obj.status != null) {
+                    if (obj.status == 0) {
+                        status = 0;
+                    }
+                    if (obj.status == 2) {
+                        status = 2;
+                    }
+                }
+                if (obj.notificationStatus != null && obj.notificationStatus == 1) {
+                    status = 1
+                }
+
+                if (status == 0) {
+                    $("#spnWebStatus").text("WEB User");
+                }
+                if (status == 2) {
+                    $("#spnWebStatus").text("Notified");
+                }
+                if (status == 1) {
+                    $("#spnWebStatus").text("Pending");
+                }
+                             
+            });
+        }
+    }
+
+
+    function checkSAMLStatus() {
+
+        var url = ServicePrefix + '/api/Personnel/GetPersonnelSAMLStatus';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                checkSAMLStatusSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function checkSAMLStatusSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+
+            switch (data.report.rows[0].passwordOrSAML) {
+                case 1:
+                    //SAML ONLY
+                    showSAMLOnlyMessage();
+                    break;
+                case 2:
+                    //SAML or Regular
+                    showSAMLOrRegularMessage();
+                    break;
+                case 0:
+                    //Regular Only
+                    sendInitialSetupEmail(false);
+                    break;
+                default:
+                    bootbox.alert("There was an issue when checking the SAML status of this user.");
+                    break;
+            }
+
+        }
+    }
+
+    function showSAMLOnlyMessage(personnelId, email, token) {
+        var strMessage = 'This personnel is a SAML only user. If this is wrong, please click cancel and put in a request to change this. If this is correct, click Continue to send the SAML version of this email.';
+
+        bootbox.dialog({
+            message: strMessage,
+            buttons: {
+                btnCancel: {
+                    label: "Cancel",
+                    callback: function () {
+                        bootbox.alert("Process has been canceled. No emails have been sent.", function () {
+                            //Process cancelled, pending record created.
+                            insertPendingNotification();
+                        });             
+                    }
+                },
+                btnContinue: {
+                    label: "Continue",
+                    callback: function () {
+                        sendInitialEmail(true);
+                    }
+                }
+            }
+        });
+
+    }
+
+
+    function showSAMLOrRegularMessage() {
+        var strMessage = 'This user is SAML compatible, please select either the SAML version or Regular version for this email.';
+
+        bootbox.dialog({
+            message: strMessage,
+            buttons: {
+                btnCancel: {
+                    label: "Cancel",
+                    callback: function () {
+                        bootbox.alert("Process has been canceled. No emails have been sent.", function () {
+                            //Process cancelled, pending record created.
+                            insertPendingNotification();
+                        });
+
+                    }
+                },
+                btnSAMLEmail: {
+                    label: "SAML",
+                    callback: function () {
+                        sendInitialSetupEmail(true);
+                    }
+                },
+                btnRegularEmail: {
+                    label: "Regular",
+                    callback: function () {
+                        sendInitialSetupEmail(false);
+                    }
+                }
+            }
+        });
+
+    }
+
+
+
+    function sendInitialSetupEmail(isSAMLEmail) {
+
+        var url = ServicePrefix + '/api/Notification/InitiateWebNotification';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelID": personnelId,
+                "inNotificationToken": "InitialPersonnelClientSetup",
+                "inEmail": emailAddress,
+                "inSAMLUser": isSAMLEmail
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                sendInitialSetupEmailSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+        
+        $.ajax(url, settings);
+
+    }
+
+    function sendInitialSetupEmailSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            $.each(data.report.rows, function (index) {
+
+                bootbox.alert("Email has been sent.", function () {
+                    loadPersonnelAssignmentList("dtPersonnelAssignmentList");
+                    getPersonnelWebSetup();
+                });
+
+
+            });
+        }
+
+    }
+
+    function insertPendingNotification() {
+
+        var url = ServicePrefix + '/api/Personnel/InsertPersonnelNotification';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelId,
+                "inActionToken": "InitialPersonnelClientSetup"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                insertPendingNotificationSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function insertPendingNotificationSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+
+            bootbox.alert("Pending record has been created for this user.", function () {
+                loadPersonnelAssignmentList("dtPersonnelAssignmentList");
+                getPersonnelWebSetup();
+
+            });
+
+        }
+    }
+
 
 </script>
