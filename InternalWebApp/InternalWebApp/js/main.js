@@ -1435,6 +1435,7 @@ function populateDataTable(tableName, data) {
     table.rows.add(tableJson).draw();
 
 
+
 }
 
 //ajax error function
