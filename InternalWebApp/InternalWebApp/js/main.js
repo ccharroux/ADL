@@ -1066,6 +1066,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/admin/region/regionlist.html?MenuItem=true">Regions</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/revenuecategory/revenuecategorylist.html?MenuItem=true">Revenue Categories</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/training/traininglist.html?MenuItem=true">Training</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/customersupport/customersupportlist.html?MenuItem=true">Customer Support</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html?MenuItem=true">Tech Tools</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
