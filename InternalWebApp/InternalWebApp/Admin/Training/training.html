@@ -242,7 +242,7 @@
                                 <label for="ddlTrainee">Individual Trainee</label>
                             </div>
                             <div class="col-md-9 text-align-left">
-                                <select id="ddlTrainee" class="mkaRequiredIndividual" errorMessage="You must select an individual trainee."></select>
+                                <select id="ddlTrainee" class="mkaRequiredIndividual" errorMessage="You must select at least one individual trainee." multiple></select>
                                 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
                                 <input type="checkbox" id="chkIncludeInternal" onchange="getIndividuals();" />
                                 &nbsp; Include internal users
@@ -258,7 +258,7 @@
                                 </div>
                                 <div class="col-md-9 text-align-left">
                                     <div>
-                                        <input type="button" id="btnAddIndividual" onclick="addTraineeIndividual();" class="addTraineeButton" value="Add Individual" />
+                                        <input type="button" id="btnAddIndividual" onclick="addTraineeIndividual();" class="addTraineeButton" value="Add Individual(s)" />
                                         <input type="button" id="btnAddCluster" onclick="addTraineeCluster();" class="addTraineeButton" value="Add Cluster" />
                                         <input type="button" id="btnAddOwnerGroup" onclick="addTraineeOwnerGroup();" class="addTraineeButton" value="Add Owner Group" />
                                     </div>
@@ -1007,12 +1007,14 @@
         }
 
         var str = '';
+        var placeholderText = '';
         if (data.report.rows.length == 0 && $("#ddlOwner").val() == "" && $("#ddlMarket").val() == "") {
-            str = '<option value="">-- First select Market and/or Owner --</option>';
+            placeholderText = '-- First select Market and/or Owner --';
         } else {
+            placeholderText = '-- No Individuals Selected --';
+
             var currentTraineeId = $("#ddlTrainee").val();
 
-            str = '<option value="">-- No Trainee Selected --</option>';
             $.each(data.report.rows, function (index) {
                 var obj = data.report.rows[index];
                 str = str + '<option value="' + obj.personnelId + '"'
@@ -1023,6 +1025,7 @@
 
         $("#ddlTrainee").html(str);
 
+        $("#ddlTrainee").attr("data-placeholder", placeholderText);
         convertToChosenSelect("ddlTrainee", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
         gotIndividuals = true;
@@ -1280,16 +1283,27 @@
             return;
         }
 
+        var personnelList = new Array();
+        $("#ddlTrainee > option:selected").each(function () {
+            var personnelObject = new Object(); // must reinitialize even if variable declared outside loop, to keep list elements distinct
+            personnelObject["inPersonnelId"] = this.value;
+            personnelList.push(personnelObject);
+        });
+
+        alert('Debug ' + getLocalStorage("APIToken"));
         $.ajax({
-            url: ServicePrefix + '/api/Training/GetTrainingEventValidTraineeIndividual'
-                + "?inApiToken=" + getLocalStorage("APIToken")
-                + "&inTrainingEventId=" + trainingEventId
-                + "&inPersonnelId=" + $("#ddlTrainee").val(),
+            url: ServicePrefix + '/api/Training/GetTrainingEventValidTraineeIndividualList',
             dataType: 'json',
-            type: 'get',
+            type: 'post',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inTrainingEventId": trainingEventId,
+                "inPersonnelList": personnelList
+            }),
+            processData: false,
             contentType: 'application/json',
             success: function (data, textStatus, jQxhr) {
-                addTraineeIndividualValidateSuccess(data, textStatus, jQxhr);
+                addTraineeIndividualValidateSuccess(data, textStatus, jQxhr, personnelList);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -1297,7 +1311,7 @@
         });
     }
 
-    function addTraineeIndividualValidateSuccess(data, textStatus, jQxhr) {
+    function addTraineeIndividualValidateSuccess(data, textStatus, jQxhr, personnelList) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -1318,25 +1332,25 @@
         if (obj.warn) {
             bootbox.confirm(obj.messages.toString().replace('\r\n', '<br />') + '<br /> Add anyway?', function (result) {
                 if (result) {
-                    addTraineeIndividualPassedValidation();
+                    addTraineeIndividualPassedValidation(personnelList);
                 }
             });
             return;
         }
 
-        addTraineeIndividualPassedValidation();
+        addTraineeIndividualPassedValidation(personnelList);
     }
 
-    function addTraineeIndividualPassedValidation() {
+    function addTraineeIndividualPassedValidation(personnelList) {
         $.ajax({
-            url: ServicePrefix + '/api/Training/InsertTrainingEventTraineeIndividual',
+            url: ServicePrefix + '/api/Training/InsertTrainingEventTraineeIndividualList',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inTrainingEventId": trainingEventId,
-                "inPersonnelId": $("#ddlTrainee").val()
+                "inPersonnelList": personnelList
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
