@@ -134,7 +134,7 @@
                             <div class="row" style="height:70px;"  >
                                 <div class="col-md-3">
                                     <label class="filterLabel" style="width:100% !important">Dates (From-To)</label><br />
-                                    <input type="text" id="dtStartDate" class="filterControlDate report-filter" />
+                                    <input type="text" id="dtStartDate" style="margin-left: 10px;" class="filterControlDate report-filter" />
                                     <label for="dtEndDate"> - </label>
                                     <input type="text" id="dtEndDate" class="filterControlDate report-filter" />
                                 </div>
@@ -434,6 +434,7 @@
 
         setLocalStorage("search", $("#ddlMediaType").val()  );
         setLocalStorage("searchPage", window.location);
+        convertToChosenSelect("ddlType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
     });
 
     function buildUIDialogs() {
@@ -848,7 +849,7 @@
 
         var str = '<option value="">-- All Trainees --</option>';
         if (data.report.rows.length == 0 && $("#ddlOwner").val() == "" && $("#ddlMarket").val() == "") {
-            str = str + '<option value="n/a">-- Select market and/or owner to get a list of possible trainees --</option>';
+            str = str + '<option value="n/a">-- Select market and/or owner first--</option>';
         } else {
             $.each(data.report.rows, function (index) {
                 str = str + '<option value="' + data.report.rows[index].personnelId + '"' + (data.report.rows[index].personnelId == currentTraineeId ? ' selected' : '') + '>' + data.report.rows[index].name + '</option>'; // name includes ID
@@ -1124,6 +1125,7 @@
             $("#ddlPosition").val().forEach(position => positionList += delimiter + position);
             positionList = positionList.substr(delimiter.length);
         }
+        $.blockUI();
 
         $.ajax({
             url: ServicePrefix + '/api/Training/GetTraining',
