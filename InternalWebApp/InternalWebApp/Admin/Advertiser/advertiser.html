@@ -116,16 +116,6 @@
                         </div>
                     </div>
 
-                    <!--<div class="row input-row">
-                        <div class="col-md-3 text-align-left">
-                            <label for="ddlParentAdvertiser" class="">Parent Advertiser</label>
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <input type="hidden" id="oldParentAdvertiserId" value=""/>
-                            <select id="ddlParentAdvertiser" class="field-width-325" style="" errorMessage=""></select>
-                        </div>
-                    </div>-->
-
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="txtParentAdvertiserName" class="">Parent Advertiser</label>
@@ -800,7 +790,7 @@
         }
 
         if ($("#txtLinkedAdvertiserId").val().length > 0 &&
-            $("#oldLinkedAdvertiserId").val() !== $("#txtLinkedAdvertiserId").val()) {
+            $("#txtAdvertiserId").val() !== $("#txtLinkedAdvertiserId").val()) {
             //if cancel return
             //else set bLinkAdvertiser to true
             var advertiserMessage = "You are about to move " +
@@ -846,7 +836,7 @@
                 "inSubIndustryId": $("#ddlSubIndustry").val(),
                 "inLinkedParentAdvertiserId": $("#txtParentAdvertiserId").val(),
                 "inMarketId": $("#ddlMarket").val(),
-                "inLinkedAdvertiserId": $("#txtLinkedAdvertiserId").val(),
+                "inLinkedAdvertiserId": bLinkAdvertiser ? $("#txtLinkedAdvertiserId").val() : null,
                 "inMediaCodeId": $("#ddlMediaCode").val(),
                 "inIsNew": bIsNew,
                 "inLinkAdvertiser": bLinkAdvertiser
@@ -945,37 +935,6 @@
 
        
     }
-
-    //leaving the function here but shouldn't be needed
-    //function disableParentAdvertiser() {
-    //    $.ajax({
-    //        url: ServicePrefix + '/api/ParentAdvertiser/DisableParentAdvertiser',
-    //        dataType: 'json',
-    //        type: 'post',
-    //        contentType: 'application/json',
-    //        data: JSON.stringify({
-    //            "inApiToken": getLocalStorage("APIToken"),
-    //            "inOldParentAdvertiserId": $("#oldParentAdvertiserId").val()
-    //        }),
-    //        processData: false,
-    //        success: function (data, textStatus, jQxhr) {
-
-    //            if (data.response.status != "SUCCESS") {
-    //                MKAErrorMessageRtn(data.response.errorMessage[0]);
-    //            }
-    //            else {
-    //                if (bLinkAdvertiser) {
-    //                    linkAdvertiser();
-    //                } else {
-    //                    window.location = "/admin/advertiser/advertiser.html?AdvertiserID=" + $("#txtAdvertiserId").val();
-    //                }
-    //            }
-    //        },
-    //        error: function (jqXhr, textStatus, errorThrown) {
-    //            MKAErrorMessageRtn(errorThrown);
-    //        }
-    //    });
-    //}
 
     function linkAdvertiser() {
 
@@ -1089,6 +1048,7 @@
 
         var searchResults = $.parseJSON(getLocalStorage("gSearchResults"));
 
+        console.log(searchResults);
  
 
         $("#ddlMarket").val(searchResults["marketID"]);
@@ -1102,8 +1062,8 @@
         getSubIndustryList(searchResults["industryID"], searchResults["subIndustryID"]);
         $("#oldParentAdvertiserId").val(searchResults["oldParentAdvertiserID"]);
         $("#oldParentAdvertiserName").val(searchResults["oldParentAdvertiserName"]);
-        $("#txtParentAdvertiserId").val(searchResults["linkParentAdvertiserID"]);
-        $("#txtParentAdvertiserName").val(searchResults["linkParentAdvertiserName"]);
+        $("#txtParentAdvertiserId").val(searchResults["parentAdvertiserID"]);
+        $("#txtParentAdvertiserName").val(searchResults["parentAdvertiserName"]);
         $("#ddlMediaCode").val(searchResults["mediaCodeID"]);
         $("#oldLinkedAdvertiserId").val(searchResults["oldLinkedAdvertiserID"]);
         $("#txtLinkedAdvertiserId").val(searchResults["linkedAdvertiserID"]);
@@ -1136,7 +1096,10 @@
                         bLinkParentAdvertiser = true;
                         $("#parentLinkedMessage").removeClass("hidden");
                         $("#txtParentAdvertiserName").addClass("to-be-linked");
-                    } else {
+                    } else
+                    {
+                        $("#txtParentAdvertiserId").val($("#oldParentAdvertiserId").val());
+                        $("#txtParentAdvertiserName").val($("#oldParentAdvertiserName").val());
                         $("#parentLinkedMessage").addClass("hidden");
                         $("#txtParentAdvertiserName").removeClass("to-be-linked");
                         return;
