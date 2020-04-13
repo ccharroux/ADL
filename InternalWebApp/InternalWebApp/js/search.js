@@ -314,8 +314,8 @@ function linkParentAdvertiser() {
         searchResults[key] = searchCriteria[key];
     }
 
-    searchResults["parentAdvertiserID"] = rowData[0].parentAdvertiserId;
-    searchResults["parentAdvertiserName"] = rowData[0].parentAdvertiserName;
+    searchResults["linkParentAdvertiserID"] = rowData[0].parentAdvertiserId;
+    searchResults["linkParentAdvertiserName"] = rowData[0].parentAdvertiserName;
 
     setLocalStorage("gSearchResults", JSON.stringify(searchResults));
 
@@ -643,7 +643,7 @@ function buildParentAdvertiserSearch(searchCriteria) {
     if ($('.search-text:visible').val().length > 0) {
         searchText = $('.search-text:visible').val();
     } else {
-        searchText = searchCriteria["parentAdvertiserName"].length > 0 ? searchCriteria["parentAdvertiserName"] : searchCriteria["advertiserName"];
+        searchText = searchCriteria["linkParentAdvertiserName"].length > 0 ? searchCriteria["linkParentAdvertiserName"] : searchCriteria["advertiserName"];
     }
 
 
@@ -767,7 +767,7 @@ function buildParentAgencySearch(searchCriteria) {
     if ($('.search-text:visible').val().length > 0) {
         searchText = $('.search-text:visible').val();
     } else {
-        searchText = searchCriteria["parentAgencyName"].length > 0 ? searchCriteria["parentAgencyName"] : searchCriteria["agencyName"];
+        searchText = searchCriteria["linkParentAgencyName"].length > 0 ? searchCriteria["linkParentAgencyName"] : searchCriteria["agencyName"];
     }
 
     apiParameters = {
@@ -803,7 +803,7 @@ function buildParentAgencySearch(searchCriteria) {
     });
 
     //need to document this more
-    $("#previousPage").html(searchCriteria["parentAgencyName"].length > 0 ? searchCriteria["parentAgencyName"] : searchCriteria["agencyName"]);
+    $("#previousPage").html(searchCriteria["linkParentAgencyName"].length > 0 ? searchCriteria["linkParentAgencyName"] : searchCriteria["agencyName"]);
 }
 
 function buildParentAgencyAuditSearch(searchCriteria) {
