@@ -314,8 +314,8 @@ function linkParentAdvertiser() {
         searchResults[key] = searchCriteria[key];
     }
 
-    searchResults["linkParentAdvertiserID"] = rowData[0].parentAdvertiserId;
-    searchResults["linkParentAdvertiserName"] = rowData[0].parentAdvertiserName;
+    searchResults["parentAdvertiserID"] = rowData[0].parentAdvertiserId;
+    searchResults["parentAdvertiserName"] = rowData[0].parentAdvertiserName;
 
     setLocalStorage("gSearchResults", JSON.stringify(searchResults));
 
@@ -434,7 +434,7 @@ function linkNewAdvertiser() {
     }
 
     searchResults["linkedAdvertiserID"] = rowData[0].advertiserId;
-    searchResults["linkedAdvertiserName"] = rowData[0].advertiserName;
+    searchResults["linkedAdvertiserName"] = rowData[0].advertiser;
 
     setLocalStorage("gSearchResults", JSON.stringify(searchResults));
 
