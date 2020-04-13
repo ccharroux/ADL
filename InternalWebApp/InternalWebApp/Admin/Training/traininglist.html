@@ -1162,11 +1162,15 @@
             success: function (data, textStatus, jQxhr) {
                 if (data.response.status != "SUCCESS") {
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
-                } else {
-                    populateDataTable("dtTrainingList", data);
-                    $(".searchResults").show();
-                    populateCalendar(data);
+                    return;
                 }
+                if (data.report.rows.length == 0) {
+                    bootbox.alert("No matching events found");
+                    return;
+                }
+                populateDataTable("dtTrainingList", data);
+                $(".searchResults").show();
+                populateCalendar(data);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
