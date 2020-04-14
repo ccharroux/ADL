@@ -1121,6 +1121,14 @@ function getReportFilterArray_UserListing() {
         required: false
     }
     arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
     return arrayFilters;
 }
 function getReportObject_UserListing() {
@@ -1139,11 +1147,11 @@ function getReportObject_UserListing() {
     tempObject =
     {
         // id: rptUserListing,
-        reportTitle:  "User Listing",
+        reportTitle:  "XRAY User Listing",
         apiControllerAction:  "/api/PersonnelReport/GetUserListing",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-       product: ['personnel']
+        product: ['personnel', 'xry']
     }
 
     return tempObject;
@@ -1288,6 +1296,14 @@ function getReportFilterArray_TVBUserListing() {
         jsCallParameters: ['TVB'],
         objectName:  "ddlOwner",
         required:  false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Position",
+        jsCall: "getPositionList",
+        objectName: "ddlPosition",
+        required: false
     }
     arrayFilters.push(arrayObject);
 
