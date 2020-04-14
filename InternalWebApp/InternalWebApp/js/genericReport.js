@@ -287,6 +287,8 @@ reportName.push("rptImportScriptListByOwner");
  
 reportName.push("rptStandardInputNotIncludedList");
 
+reportName.push("rptMRRUserListing");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -1092,10 +1094,20 @@ function getReportFilterArray_UserListing() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token:  "Market",
-        jsCall:  "getMarketListAll",
-        objectName:  "ddlMarket",
-        required:  false
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: false
     }
     arrayFilters.push(arrayObject);
 
@@ -1107,17 +1119,19 @@ function getReportFilterArray_UserListing() {
     }
     arrayFilters.push(arrayObject);
 
-    arrayObject = {
-        token:  "Owner",
-        jsCall:  "getOwnerList",
-        objectName:  "ddlOwner",
-        required:  false
-    }
-    arrayFilters.push(arrayObject);
+ 
     arrayObject = {
         token: "Position",
         jsCall: "getPositionList",
         objectName: "ddlPosition",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -1139,11 +1153,11 @@ function getReportObject_UserListing() {
     tempObject =
     {
         // id: rptUserListing,
-        reportTitle:  "User Listing",
-        apiControllerAction:  "/api/PersonnelReport/GetUserListing",
+        reportTitle:  "XRAY User Listing",
+        apiControllerAction:  "/api/XRAYReport/GetXRAYUserListing",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-       product: ['personnel']
+        product: ['personnel', 'xry']
     }
 
     return tempObject;
@@ -1288,6 +1302,14 @@ function getReportFilterArray_TVBUserListing() {
         jsCallParameters: ['TVB'],
         objectName:  "ddlOwner",
         required:  false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Position",
+        jsCall: "getPositionList",
+        objectName: "ddlPosition",
+        required: false
     }
     arrayFilters.push(arrayObject);
 
@@ -11261,4 +11283,79 @@ function getReportObject_StandardInputNotIncludedList() {
     }
 
     return tempObject;
+}
+function getReportFilterArray_MRRUserListing() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['MRR'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['MRR'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Personnel",
+        jsCall: null,
+        objectName: "hidPersonnel",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+ 
+    arrayObject = {
+        token: "Position",
+        jsCall: "getPositionList",
+        objectName: "ddlPosition",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_MRRUserListing() {
+
+    var tempObject = new Object();
+
+    //columnsToDisplay = new Array();
+    //columnsToDisplay.push("Access Level");
+    //columnsToDisplay.push("User")
+    //columnsToDisplay.push("Email");
+    //columnsToDisplay.push("Phone");
+    //columnsToDisplay.push("Position");
+    //columnsToDisplay.push("Market");
+    //columnsToDisplay.push("Owner");
+
+    tempObject =
+    {
+        // id: rptUserListing,
+        reportTitle: "MRR User Listing",
+        apiControllerAction: "/api/MRRReport/GetMRRUserListing",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['personnel', 'mrr']
+    }
+
+    return tempObject;
+
 }
