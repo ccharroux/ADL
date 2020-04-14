@@ -11,11 +11,11 @@ else if (window.location.toString().toLowerCase().indexOf("stagingmediainternal.
     bNonProd = true;
 }
 else if (window.location.toString().toLowerCase().indexOf("demomediainternal.millerkaplan.com") > -1) {
-    ServicePrefix = "https://demoservices.millerkaplan.com/";
+    ServicePrefix = "https://demoservicesinternal.millerkaplan.com/";
     bNonProd = false;
 }
 else if (window.location.toString().toLowerCase().indexOf("mediainternal.millerkaplan.com") > -1) {
-    ServicePrefix = "https://services.millerkaplan.com/";
+    ServicePrefix = "https://servicesinternal.millerkaplan.com/";
     bNonProd = false;
 }
 
