@@ -101,7 +101,7 @@
                             <label for="ddlMediaType">Media Type</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlMediaType" onchange="mediaTypeChanged();"></select>
+                            <select id="ddlMediaType" class="viewOnlyOnEdit" onchange="mediaTypeChanged();"></select>
                         </div>
                     </div>
 
@@ -112,17 +112,20 @@
                             <label for="ddlOwner">Owner</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlOwner" onchange="getExternalPersonnel();"></select>
+                            <div class="hiddenOnEdit"> <!-- done at this level so that the chosen DDL is created within it -->
+                                <select id="ddlOwner" onchange="getExternalPersonnel();"></select>
+                            </div>
+                            <span id="spanOwner" class="hiddenOnNew"></span>
                         </div>
                     </div>
 
                     <!-- Market -->
-                    <div class="row input-row hideIfPersonnelFromQueryString">
+                    <div class="row input-row hiddenOnEdit">
                         <div class="col-md-3 text-align-left">
                             <label for="ddlMarket">Market</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlMarket" onchange="getExternalPersonnel();"></select>
+                            <select id="ddlMarket" class="viewOnlyOnEdit" onchange="getExternalPersonnel();"></select>
                         </div>
                     </div>
 
@@ -132,8 +135,8 @@
                             <label for="ddlExternalPersonnel">Outside User</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlExternalPersonnel" class="mkaRequired" errorMessage="You must select an external personnel."></select>
-                            <span class="hideIfPersonnelFromQueryString">
+                            <select id="ddlExternalPersonnel" class="mkaRequired viewOnlyOnEdit" errorMessage="You must select an external personnel."></select>
+                            <span style="display: none"> <!-- class="hideIfPersonnelFromQueryString" -->
                                 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
                                 <input type="checkbox" id="chkIncludeInternal" checked="checked" onchange="getExternalPersonnel();" />
                                 &nbsp; Include internal users
@@ -167,7 +170,7 @@
                             <label for="txtNotes">Notes</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <textarea id="txtNotes" style="width: 900px"></textarea>
+                            <textarea id="txtNotes" class="viewOnlyIfNotYours" style="width: 900px"></textarea>
                         </div>
                     </div>
 
@@ -231,6 +234,8 @@
     var gotCustomerSupportTypes = false;
     var gotCustomerSupportContactDetail = false;
 
+    var personnelIdCurrentlyLoggedIn = -1; // set as side effect of populating ddlInternallPersonnel
+
     $(document).ready(function ()
     {
         buildMainMenu("CustomerSupport");
@@ -281,9 +286,13 @@
         if (customerSupportContactId == null) {
             // insert
             $("#spanTitle").text("Add Customer Support Contact");
+            $(".hiddenOnNew").hide();
+            $(".hiddenOnEdit").show();
         } else {
             // update
             $("#spanTitle").text("Edit Customer Support Contact");
+            $(".hiddenOnNew").show();
+            $(".hiddenOnEdit").hide();
             $(".viewOnlyOnEdit").prop("disabled", true);
         }
     }
@@ -596,6 +605,9 @@
             str += '<option value="' + obj.PersonnelId + '"'
                 + (customerSupportContactId == null && obj.IsCurrentPersonnel == "Yes" ? ' selected' : '')
                 + '>' + obj.User + ' (' + obj.PersonnelId + ')' + '</option>'; // User does not include ID
+            if (obj.IsCurrentPersonnel == "Yes") {
+                personnelIdCurrentlyLoggedIn = obj.PersonnelId;
+            }
         });
 
         $("#ddlInternalPersonnel").html(str);
@@ -731,6 +743,10 @@
         $("#ddlCustomerSupportType").val(obj["Customer Support Type ID"]);
 
         $("#txtNotes").val(obj["Description"].replace("<p>", "").replace("</p>", ""));
+
+        if (obj["Internal Personnel ID"] != personnelIdCurrentlyLoggedIn) {
+            $(".viewOnlyIfNotYours").prop("disabled", true);
+        }
     }
 
     function setOwnerFromDetail(ownerId, ownerName) {
@@ -808,16 +824,24 @@
         }
 
         var minimumOwnerId = 32768; // OwnerID is smallint which tops out at 32767
+        var minimumOwnerName = '';
         var currentOwnerId;
         $.each(data.report.rows, function (index) {
             var obj = data.report.rows[index];
             currentOwnerId = obj.ownerId;
             if (minimumOwnerId > currentOwnerId) {
                 minimumOwnerId = currentOwnerId;
+                minimumOwnerName = obj.ownerName;
             }
         });
         if (minimumOwnerId < 32768) {
-            $("#ddlOwner").val(minimumOwnerId);
+            $("#ddlOwner").val(minimumOwnerId); // hidden, but value still used by code
+
+            if (data.report.rows.length > 1) {
+                minimumOwnerName += " and " + (data.report.rows.length - 1) + " other" + (data.report.rows.length > 2 ? "s" : "");
+            }
+            $("#spanOwner").text(minimumOwnerName);
+
             setMediaTypeFromOwner();
             getExternalPersonnel();
         }
