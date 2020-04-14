@@ -97,7 +97,6 @@
                         </div>
                         <div class="col-md-3 text-align-right">
                             <input style="width:120px" value="List" onclick="backToList();" class="default-button" type="button">
-
                         </div>
                     </div>
 
@@ -106,8 +105,11 @@
                         <div class="col-md-3 text-align-left">
                             <label for="txtMessage">Message</label>
                         </div>
-                        <div class="col-md-9 text-align-left">
+                        <div class="col-md-6 text-align-left">
                             <textarea cols="20" rows="50" style="height:200px; width:600px" class="mkaRequired  mkaEditable" id="txtMessage" errorMessage="You must enter a Message."></textarea>
+                        </div>
+                        <div class="col-md-3 text-align-right">
+                            <input style="width:120px" value="Clone" onclick="excludeFromBackButton(); updateMatchedNotification(true);" class="default-button" type="button">
                         </div>
                     </div>
 
@@ -587,11 +589,25 @@
         }
     }
 
-    function updateMatchedNotification() {
+    function updateMatchedNotification(cloneFlag) {
+
+        if (!cloneFlag)
+        {
+            cloneFlag = false;
+        }
+
+
         $("#txtMessage").val(tinymce.activeEditor.getContent({ format: 'html' }));
 
         if (validationPassed() == false) {
             return;
+        }
+
+        var cloneSubject = "CLONE: " + $("#txtSubject").val().trim();
+
+        if (cloneSubject.length > 100)
+        {
+            cloneSubject = cloneSubject.substring(0, 99);
         }
 
         var url = ServicePrefix + "/api/MatchedNotification/UpdateMatchedNotification";
@@ -602,15 +618,15 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inSubject": $("#txtSubject").val().trim(),
+                "inSubject": cloneFlag ? cloneSubject : $("#txtSubject").val().trim(),
                 "inMessage": $("#txtMessage").val().trim(),
-                "inMatchedNotificationId": matchedNotificationId,
+                "inMatchedNotificationId": cloneFlag ? 0 : matchedNotificationId,
                 "inLink": $("#txtLink").val().trim(),
                 "inInternalNotes": $("#txtInternalNotes").val().trim()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                updateMatchedNotificationSuccess(data, textStatus, jQxhr);
+                updateMatchedNotificationSuccess(data, textStatus, jQxhr, cloneFlag);
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
@@ -621,14 +637,29 @@
 
     }
 
-    function updateMatchedNotificationSuccess(data, textStatus, jQxhr) {
+    function updateMatchedNotificationSuccess(data, textStatus, jQxhr, cloneFlag) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
         }
-        else {
+        else
+        {
+            var msg = "";
 
-            bootbox.alert('Matched Notfication ' + (matchedNotificationId == 0 ? 'Add' : 'Update') + ' was successful.',
+            if (!cloneFlag)
+            {
+                cloneFlag = false;
+            }
+
+            if (cloneFlag)
+            {
+                msg = 'Matched Notfication Clone was successful.';
+            } else
+            {
+                msg = 'Matched Notfication ' + (matchedNotificationId == 0 ? 'Add' : 'Update') + ' was successful.';
+            }
+
+            bootbox.alert(msg,
                 function () {
                     window.location = "/admin/techtools/matchednotification/matchednotificationlist.html";
                 });
@@ -917,4 +948,5 @@
     function backToList() {
         window.location = "/admin/techtools/matchednotification/matchednotificationlist.html";
     }
+
 </script>
