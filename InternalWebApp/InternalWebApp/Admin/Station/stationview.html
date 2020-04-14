@@ -57,6 +57,12 @@
         .changeValue {
             width: 500px;
         }
+        .changeStationProduct {
+            width: 100px;
+        }
+        .changeStationProductValue {
+            width: 100px;
+        }
         .differentFullName {
             background-color: lightgray;
         }
@@ -342,21 +348,19 @@
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-12 margin-top-10 text-align-center small">
-                                    <input id="btnShowOrHideStationChangeHistoryStationProducts" value="Show history of station products active/disabled" onclick="showOrHideStationChangeHistoryStationProducts();" class="default-button history-button" type="button">
-                                </div>
+                            <div class="margin-top-10" style="float: right">
+                                <input id="btnShowOrHideStationChangeHistoryStationProducts" value="Show history" onclick="showOrHideStationChangeHistoryStationProducts();" class="default-button history-button" type="button">
                             </div>
+                            <h4 class="text-center margin-top-10">Products - History</h4>
 
                             <div class="row initiallyHidden" id="divStationChangeHistoryStationProducts"> <!-- dataTable-top-margin makes it too wide -->
                                 <div class="col-md-12 text-align-left">
-                                    Change history: Station products
-                                    <table id="dtStationChangeHistoryStationProducts" class="dataTable-border dataTable-headers dataTable-cell-border">
+                                    <table id="dtStationChangeHistoryStationProducts" class="dataTable-border dataTable-headers dataTable-cell-border fullWidth">
                                         <thead>
                                             <tr>
-                                                <th class="exportColumn">Change Date</th>
-                                                <th class="exportColumn">Product</th>
-                                                <th class="exportColumn">Change Value</th>
+                                                <th class="exportColumn changeDate">Change Date</th>
+                                                <th class="exportColumn changeStationProduct">Product</th>
+                                                <th class="exportColumn changeStationProductValue">Change Value</th>
                                             </tr>
                                         </thead>
                                     </table>
@@ -367,13 +371,12 @@
 
                             <hr />
 
-                            <div id="divShowOrHideMRROptions" class="row initiallyHidden">
-                                <div class="col-md-12 text-align-center">
-                                    <input id="btnShowOrHideMRROptions" value="Show MRR options" onclick="showOrHideMRROptions();" class="default-button" type="button">
-                                </div>
+                            <div style="float: right">
+                                <input id="btnShowHideMRR" value="Show" onclick="showOrHideMRR();" class="default-button" type="button">
                             </div>
+                            <h3 class="text-center">MRR</h3>
 
-                            <div id="divMRROptions" class="initiallyHidden">
+                            <div id="divMRR" class="initiallyHidden">
 
                                 <div class="row">
                                     <div class="col-md-4 text-align-left">
@@ -1003,9 +1006,9 @@
             "pageLength": gDataTableDefaultRows,
             "data": [],
             "columns": [
-                { "data": 'Change Date' },
-                { "data": 'Product' },
-                { "data": 'Change Value' }
+                { "data": 'Change Date', "className": "changeDate" },
+                { "data": 'Product', "className": "changeStationProduct" },
+                { "data": 'Change Value', "className": "changeStationProductValue" }
             ],
             "order": [
                 [0, "asc"] // Change Date
@@ -1548,7 +1551,12 @@
             var obj = data.report.rows[index];
 
             if (obj["active"] == "1") {
-                switch (obj["productId"].toUpperCase()) {
+                var productId = obj["productId"];
+
+                $("#div" + productId).show();
+                changeValueFromShowToHide("btnShowHide" + productId);
+
+                switch (productId) {
                     case "MRR":
                         getMRRStationOptions();
                         break;
@@ -1599,7 +1607,7 @@
             $("#spanMRREstimated").text(obj["isEstimated"]);
             $("#spanMRRAboveBelowNonParticipant").text(obj["isAboveBelowNonParticipant"]);
 
-            $("#divShowOrHideMRROptions").show();
+            $("#divShowOrHideMRR").show();
 
         });
 
@@ -1743,13 +1751,13 @@
         $("#" + controlId).val($("#" + controlId).val().replace("Show", "Hide"));
     }
 
-    function showOrHideMRROptions() {
-        if ($("#divMRROptions").is(":visible")) {
-            $("#divMRROptions").hide();
-            changeValueFromHideToShow("btnShowOrHideMRROptions");
+    function showOrHideMRR() {
+        if ($("#divMRR").is(":visible")) {
+            $("#divMRR").hide();
+            changeValueFromHideToShow("btnShowOrHideMRR");
         } else {
-            $("#divMRROptions").show();
-            changeValueFromShowToHide("btnShowOrHideMRROptions");
+            $("#divMRR").show();
+            changeValueFromShowToHide("btnShowOrHideMRR");
         }
     }
 
