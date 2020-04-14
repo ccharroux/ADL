@@ -99,6 +99,24 @@
         #dtMRRStationReports, #dtMRRStationReports_Unassigned, #dtMRRClusterReports, #dtMRRClusterReports_Unassigned {
             min-width: 300px;
         }
+        .tvbReportingStationStation {
+            width: 150px;
+        }
+        .tvbReportingStationOwner {
+            width: 200px;
+        }
+        .tvbReportingStationTimeSales {
+            width: 100px;
+        }
+        .tvbReportingStationReuseTimeSales {
+            width: 100px;
+        }
+        .tvbReportingStationRepFirms {
+            width: 150px;
+        }
+        .tvbReportingStationEstimate {
+            width: 100px;
+        }
     </style>
 </head>
 <body>
@@ -433,7 +451,36 @@
 
                             <div id="divTVB" class="initiallyHidden productTVB">
 
-                                <h4 class="text-center">Reporting Markets</h4>
+                                <div>
+                                    <div class="row">
+                                        <div class="col-md-4 text-align-left">
+                                            <label for="spanTVBRank">Rank</label>
+                                        </div>
+                                        <div class="col-md-8 text-align-left">
+                                            <span id="spanTVBRank"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4 text-align-left">
+                                            <label for="spanTVBRankGroup">Rank Group</label>
+                                        </div>
+                                        <div class="col-md-8 text-align-left">
+                                            <span id="spanTVBRankGroup"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4 text-align-left">
+                                            <label for="spanTVBRankYearPeriod">As of</label>
+                                        </div>
+                                        <div class="col-md-8 text-align-left">
+                                            <span id="spanTVBRankYearPeriod"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h4 class="text-center margin-top-10">Reporting Markets</h4>
 
                                 <div id="divTVBReportingMarkets">
 
@@ -445,6 +492,33 @@
                                                     <tr>
                                                         <th class="exportColumn">Primary Market</th>
                                                         <th class="exportColumn">Reporting Market</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <h4 class="text-center margin-top-10">Reporting Stations</h4>
+
+                                <div id="divTVBReportingStations">
+
+                                    <div class="row">
+                                        <!-- dataTable-top-margin makes it too wide -->
+                                        <div class="col-md-12 text-align-left">
+                                            <table id="dtTVBReportingStations" class="dataTable-border dataTable-headers dataTable-cell-border fullWidth">
+                                                <thead>
+                                                    <tr class="tableRowWithBlankHeader">
+                                                        <th class="exportColumn tvbReportingStationStation" rowspan="2">Station</th>
+                                                        <th class="exportColumn tvbReportingStationOwner" rowspan="2">Owner</th>
+                                                        <th class="exportColumn tvbReportingStationTimeSales" rowspan="2">Time Sales</th>
+                                                        <th colspan="3" class="text-center">Rep Billing</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="exportColumn tvbReportingStationReuseTimeSales">Reuse Time Sales</th>
+                                                        <th class="exportColumn tvbReportingStationRepFirms">Rep Firms</th>
+                                                        <th class="exportColumn tvbReportingStationEstimate">Estimate (Kantar)</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -466,9 +540,6 @@
                                 * Query cutoff (do we use it anywhere, or was it superseded by Number of Prior Years?)
 
                                 XRY release status
-
-                                TVB
-                                * Count/list of stations/clusters by type (time sales; rep billing: time sales reused, rep firm, Kantar)
 
                                 >>> Possible additions to change history:
 
@@ -1567,6 +1638,97 @@
 
     }
 
+    function setDataTable_TVBReportingStations() {
+        var reportTitle = "TVB Reporting Stations";
+        var exportColumns = returnTableColumnsByClass("dtTVBReportingStations", "exportColumn");
+
+        $("#dtTVBReportingStations").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                { "data": 'station', "className": "tvbReportingStationStation" },
+                { "data": 'owner', "className": "tvbReportingStationOwner" },
+                { "data": 'timeSalesStation', "className": "tvbReportingStationTimeSales" },
+                { "data": 'repBillingFromTimeSales', "className": "tvbReportingStationReuseTimeSales" },
+                { "data": 'repBillingFromRepFirms', "className": "tvbReportingStationRepFirms" },
+                { "data": 'repBillingFromEstimate', "className": "tvbReportingStationEstimate" }
+            ],
+            "pagingType": "full_numbers",
+            "paging": false,
+            "searching": false,
+            "bInfo": false,
+            "ordering": false,
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'excel',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'print',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //}
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            //initComplete: function () {
+            //    // handled earlier for entire page, don't repeat
+            //    // $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            //},
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //    //this changes search box label from Search: to Filter Results:
+                //    search: "Filter Results:"
+                "emptyTable": "Market is reported individually"
+            }
+        });
+
+    }
+
     function setDataTable_MarketChangeHistoryMarketField() {
         var reportTitle = "Market Change History - Market Field";
         var exportColumns = returnTableColumnsByClass("dtMarketChangeHistoryMarketField", "exportColumn");
@@ -2235,7 +2397,10 @@
 
                     case "TVB":
                         setDataTable_TVBReportingMarkets();
+                        setDataTable_TVBReportingStations();
                         getTVBReportingMarkets();
+                        getTVBRankGroup();
+                        getTVBReportingStations();
                         break;
                 }
             }
@@ -2408,6 +2573,46 @@
 
     }
 
+    function getTVBRankGroup() {
+        var url = ServicePrefix + '/api/TVBReport/GetMarketTVBRankGroup'
+            + "?inApiToken=" + getLocalStorage("APIToken")
+            + "&inMarketId=" + marketId;
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getTVBRankGroupSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getTVBRankGroupSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        $.each(data.report.rows, function (index) {
+
+            var obj = data.report.rows[index];
+
+            $("#spanTVBRank").text(obj["rank"]);
+            $("#spanTVBRankGroup").text(obj["rankGroup"]);
+            $("#spanTVBRankYearPeriod").text(obj["rankPeriod"] + '/' + obj["rankYear"]);
+
+        });
+    }
+
     function getTVBReportingMarkets() {
         var url = ServicePrefix + '/api/TVBReport/GetMarketTVBReportingMarkets'
             + "?inApiToken=" + getLocalStorage("APIToken")
@@ -2438,6 +2643,38 @@
         }
 
         populateDataTable("dtTVBReportingMarkets", data);
+    }
+
+    function getTVBReportingStations() {
+        var url = ServicePrefix + '/api/TVBReport/GetMarketTVBReportingStations'
+            + "?inApiToken=" + getLocalStorage("APIToken")
+            + "&inMarketId=" + marketId;
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getTVBReportingStationsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getTVBReportingStationsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        populateDataTable("dtTVBReportingStations", data);
     }
 
     function changeValueFromHideToShow(controlId) {
