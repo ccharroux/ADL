@@ -322,6 +322,8 @@
                             str = str + '&nbsp;&nbsp;<a href="#" onclick="excludeFromBackButton(); deleteMatchedNotification(' + row['Matched Notification Id'] + ');">Delete</a>';
                         }
                         
+                        str = str + '&nbsp;&nbsp;<a href="#" onclick="excludeFromBackButton(); cloneMatchedNotification(' + row['Matched Notification Id'] + ');">Clone</a>';
+
                         return str;
                     },
                     "orderable": false,
@@ -582,5 +584,108 @@
 
         }
     }
+
+    function cloneMatchedNotification(matchedNotificationId)
+    {
+        //get the current one
+        ///api/MatchedNotification/GetMatchedNotification
+        var url = ServicePrefix + '/api/MatchedNotification/GetMatchedNotification';
+        url = url + "?inApiToken=" + getLocalStorage("APIToken");
+        url = url + "&inMatchedNotificationId=" + matchedNotificationId;
+
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                cloneGetMatchedNotificationSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+
+    }
+
+    function cloneGetMatchedNotificationSuccess(data, textStatus, jQxhr)
+    {
+        if (data.response.status != "SUCCESS")
+        {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else
+        {
+
+            //populate fields
+            //add CLONE to beginning of subject
+            $.each(data.report.rows,
+                function(index)
+                {
+                    var subject = "CLONE: " + data.report.rows[index].Subject;
+
+                    if (subject.length > 100)
+                    {
+                        subject = subject.substring(0, 99);
+                    }
+
+                    var message = data.report.rows[index].Message;
+                    var matchedNotificationId = 0;
+                    var link = data.report.rows[index].Link;
+                    var internalNotes = data.report.rows[index]["Internal Notes"];
+
+                    createCloneMatchedNotification(subject, message, matchedNotificationId, link, internalNotes);
+                });
+        }
+    }
+
+    function createCloneMatchedNotification(subject, message, matchedNotificationId, link, internalNotes)
+    {
+        
+        var url = ServicePrefix + "/api/MatchedNotification/UpdateMatchedNotification";
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inSubject": subject.trim(),
+                "inMessage": message.trim(),
+                "inMatchedNotificationId": matchedNotificationId,
+                "inLink": link.trim(),
+                "inInternalNotes": internalNotes.trim()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                createCloneMatchedNotificationSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function createCloneMatchedNotificationSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+
+            bootbox.alert('Matched Notification Clone was successful.',
+                function () {
+                    window.location = "/admin/techtools/matchednotification/matchednotificationlist.html";
+                });
+
+        }
+    }
+
 </script>
 
