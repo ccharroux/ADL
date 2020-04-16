@@ -56,7 +56,33 @@
         <script src="js/respond.min.js"></script>
     <![endif]-->
 
+    <style>
+        .requiredText {
+            color: red !important;
+        }
 
+        .vertical-center {
+            vertical-align: middle;
+        }
+
+        table {
+            border-left: solid 1px #566573 !important;
+            border-bottom: solid 1px #566573 !important;
+        }
+
+        th {
+            /*border-bottom: solid 1px black!important;*/
+            border-right: solid 1px black !important;
+            color: white !important;
+            background-color: #566573 !important;
+            border-top: solid 1px black !important;
+        }
+
+        td {
+            border-right: solid 1px #566573 !important;
+            border-top: solid 1px #566573 !important;
+        }
+    </style>
 
 </head>
 <body>
@@ -71,7 +97,7 @@
             <div class="container">
                 <div class="row" id="reportTitleRow">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2 id="pageTitle">X-Ray Import Column Mapping Rule List</h2>
+                        <h2 id="pageTitle">X-Ray Import Mapping Column Rule List</h2>
                     </div>
                 </div>
                 <div id="divQuickReport">
@@ -79,7 +105,33 @@
                     <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
                 </div>
 
+                <div class="row search-section">
+                    <div>
+                        <div class="col-md-4">
+                            <label for="ddlScript" class="requiredText dropdown-label rptView"> * Script</label><br />
+                            <select id="ddlScript" apiInput="inScriptId" onchange="" class="mkaRequired dropdown-select rptView report-filter" errorMessage="Please select a Script to search."></select>
+                        </div>
+                        <div class="col-md-4">
+                            <div style="display:table-cell; text-align: right;">
+                                <label class="dropdown-label">&nbsp;</label><br />
+                                <input type="button" class="search-button" value="Search" onclick="getColumnMappingRules();" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div style="display:table-cell; float: right;">
+                                <label class="dropdown-label">&nbsp;</label><br />
+                                <input type="button" value="+" class="addNewButton addNewButton-list-pages vertical-center" onclick="editMatchedNotification(0)" />
+                            </div>
+                        </div>
+                    </div>
 
+                    <div class="row">
+                        <div id="dtResultsHolder" class="col-md-12 dataTable-top-margin">
+                            <table id="dtResults" class="cell-border"></table>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
@@ -122,5 +174,197 @@
 
         buildXRYMenu("Utility");
         buildQuickReports(['xry']);
+
+        //get list of scripts
+        getScriptsList();
+
+        //load last search eventually
     });
+
+    function getScriptsList() {
+        var control = "ddlScript";
+
+        $.ajax({
+            url: ServicePrefix + '/api/DataInput/GetDataInputList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Script --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].dataInputId + '">' + data.report.rows[index].inputSystem + ' (' + data.report.rows[index].dataInputId + ')' + '</option>';
+
+                    });
+
+                    $("#" + control).html(str);
+                    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function getColumnMappingRules() {
+
+        //add validation to make sure required fields are completed
+
+        var sUrl = ServicePrefix + "/api/XrayImport/GetImportMappingColumnRulesList?";
+        sUrl += "inApiToken=" + getLocalStorage("APIToken");
+        sUrl += "&inScriptId=" + $("#ddlScript").val();
+
+        $.ajax({
+            url: sUrl,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    loadResultsData(data);
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
+    }
+
+    function loadResultsData(data) {
+        //get columns
+        var columns = getResultsColumns();
+        //load the data
+        loadResultsDataTable(data, columns);
+    }
+
+    function getResultsColumns() {
+        var columnsToDisplay = new Array();
+
+        columnsToDisplay.push({
+            "title": "columnRuleId",
+            "visible": false,
+            "mData": "columnRuleId",
+            "orderable": false,
+            "searchable": false
+        });
+
+        columnsToDisplay.push({
+            "title": "scriptId",
+            "visible": false,
+            "mData": "scriptId",
+            "orderable": false,
+            "searchable": false
+        });
+
+        columnsToDisplay.push({
+            "title": "Description",
+            "visible": true,
+            "mData": "Rule Description",
+            "orderable": true,
+            "className": "exportColumn"
+        });
+
+        columnsToDisplay.push({
+            "title": "Required",
+            "visible": true,
+            "mData": "Required",
+            "orderable": true,
+            "className": "exportColumn"
+        });
+
+        columnsToDisplay.push({
+            "title": "Owner",
+            "visible": true,
+            "mData": "Owner",
+            "orderable": true,
+            "className": "exportColumn"
+        });
+
+        columnsToDisplay.push({
+            "title": "Market",
+            "visible": true,
+            "mData": "Market",
+            "orderable": true,
+            "className": "exportColumn"
+        });
+
+        columnsToDisplay.push({
+            "title": "Delete Date",
+            "visible": true,
+            "mData": "Delete Date",
+            "orderable": true,
+            "className": "exportColumn"
+        });
+
+        // add action column here
+
+        columnsToDisplay.push({
+            "mRender": function (data, type, row) {
+                return ' ';
+            },
+            "orderable": false,
+            "searchable": false,
+            "className": "text-align-right"
+        });
+
+        return columnsToDisplay;
+    }
+
+    function loadResultsDataTable(data, columns) {
+
+        var results = data["report"]["rows"];
+
+        //creating a variable that will used for datatable functions later
+        var searchTable;
+
+        if ($.fn.DataTable.isDataTable('#dtResults')) {
+            searchTable = $('#dtResults').DataTable();
+            searchTable.destroy();
+        }
+
+        resetDataTableDOM("dtResults", "dtResultsHolder", "cell-border");
+
+        searchTable = $("#dtResults").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "order": [],
+            "data": results,
+            "columns": columns,
+            "pagingType": "full_numbers",
+            "buttons": [
+            ],
+            initComplete: function () {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            "language": {
+                search: "Filter Results:"
+            }
+        });
+    }
+
 </script>
