@@ -1141,6 +1141,8 @@ function buildXRYMenu(selectedItem) {
 
     menuItems += '                  <li class="dropdown" style="display:block"><a' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="true">Imports <span style="margin-right:10px;" class="caret"></span></a>'
     menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
+    menuItems += '                          <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html?MenuItem=true">Data Scripts</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html?MenuItem=true">Import Setup</a></li>';
     menuItems += '                          <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html?MenuItem=true">Data Mapping</a></li>';
     menuItems += '                          <li style="display:block;"><a href="/admin/agency/agencylist.html?MenuItem=true" role="button" aria-expanded="false">Column Mapping</a></li>';
     menuItems += '                      </ul>';
