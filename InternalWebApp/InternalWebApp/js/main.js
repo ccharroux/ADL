@@ -1761,7 +1761,7 @@ function buildMarketWrapper(inData) {
 
         if (ID.length > 0) {
             if (isNaN(ID) == false) {
-                ret = "<a href='#' onclick='window.location=\"/admin/market/market.html?marketId=" + ID + "\"'>";
+                ret = "<a href='#' onclick='window.location=\"/admin/market/marketview.html?marketId=" + ID + "\"'>";
                 ret = ret + inData
                 ret = ret + "</a>";
             }
@@ -1795,7 +1795,7 @@ function buildUserWrapper(inData) {
 
         if (ID.length > 0) {
             if (isNaN(ID) == false) {
-                ret = "<a href='#' onclick='window.location=\"/admin/personnel/personnel.html?personnelID=" + ID + "\"'>";
+                ret = "<a href='#' onclick='window.location=\"/admin/personnel/personnelview.html?personnelID=" + ID + "\"'>";
                 ret = ret + inData
                 ret = ret + "</a>";
             }
@@ -1827,7 +1827,7 @@ function buildStationWrapper(inData) {
 
         if (ID.length > 0) {
             if (isNaN(ID) == false) {
-                ret = "<a href='#' onclick='window.location=\"/admin/station/station.html?stationId=" + ID + "\"'>";
+                ret = "<a href='#' onclick='window.location=\"/admin/station/stationview.html?stationId=" + ID + "\"'>";
                 ret = ret + inData
                 ret = ret + "</a>";
             }
@@ -2644,4 +2644,20 @@ function setThisQueryToRunLongNoAutoUnBlock()
 {
     $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
     clearTimeout(unblockHandle);
+}
+
+function extractParens(inString) {
+
+    var regExp = /\(([^)]+)\)/;
+    var matches = regExp.exec(inString);
+
+    if (matches.length == 2)
+    {
+        return matches[1];
+    }
+    else
+    {
+        return inString;
+    }
+
 }
