@@ -1121,15 +1121,30 @@ function buildXRYMenu(selectedItem) {
 
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/admin/advertiser/advertiserlist.html?MenuItem=true" role="button" aria-expanded="false">Market Advertiser</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/stationadvertiser/stationadvertiserlist.html?MenuItem=true">Station Advertiser</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/mediaadvertiser/mediaadvertiserlist.html?MenuItem=true">Media Advertiser</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html?MenuItem=true">Parent Advertiser</a></li>';
+    menuItems += '                  <li class="dropdown" style="display:block"><a' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="true">Advertiser <span style="margin-right:10px;" class="caret"></span></a>'
+    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
+    menuItems += '                          <li style="display:block;"><a href="/admin/advertiser/advertiserlist.html?MenuItem=true" role="button" aria-expanded="false">Market Advertiser</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/admin/stationadvertiser/stationadvertiserlist.html?MenuItem=true">Station Advertiser</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/admin/mediaadvertiser/mediaadvertiserlist.html?MenuItem=true">Media Advertiser</a></li>';
+    menuItems += '                      </ul>';
+    menuItems += '                  </li>';
 
-    menuItems += '                  <li style="display:block;"><a href="/admin/agency/agencylist.html?MenuItem=true" role="button" aria-expanded="false">Market Agency</a></li>';
+ 
+    menuItems += '                  <li class="dropdown" style="display:block"><a' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="true">Agency <span style="margin-right:10px;" class="caret"></span></a>'
+    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
+    menuItems += '                          <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html?MenuItem=true">Parent Advertiser</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/admin/agency/agencylist.html?MenuItem=true" role="button" aria-expanded="false">Market Agency</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/admin/stationagency/stationagencylist.html?MenuItem=true">Station Agency</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/admin/parentagency/parentagencylist.html?MenuItem=true">Parent Agency</a></li>';
+    menuItems += '                      </ul>';
+    menuItems += '                  </li>';
 
-    menuItems += '                  <li style="display:block;"><a href="/admin/stationagency/stationagencylist.html?MenuItem=true">Station Agency</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/parentagency/parentagencylist.html?MenuItem=true">Parent Agency</a></li>';
+    menuItems += '                  <li class="dropdown" style="display:block"><a' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="true">Imports <span style="margin-right:10px;" class="caret"></span></a>'
+    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
+    menuItems += '                          <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html?MenuItem=true">Data Mapping</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/admin/agency/agencylist.html?MenuItem=true" role="button" aria-expanded="false">Column Mapping</a></li>';
+    menuItems += '                      </ul>';
+    menuItems += '                  </li>';
 
 
 
