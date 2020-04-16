@@ -1452,7 +1452,7 @@ function populateDataTable(tableName, data) {
     table.rows.add(tableJson).draw();
      
     table.columns.adjust().draw();
-
+    $.unblockUI();
 }
 
 //ajax error function
