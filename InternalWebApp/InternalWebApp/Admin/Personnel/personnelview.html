@@ -77,6 +77,14 @@
         .changeProductStation {
             width: 200px;
         }
+        .colWidth20
+        {
+            width:20% !important;
+        }
+        .colWidth60
+        {
+            width:60% !important;
+        }
     </style>
 </head>
 <body>
@@ -267,6 +275,23 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- start datatable-->
+                            <div id="divResults" class="dataTable-top-margin borderSection">
+                                <h4 class="text-center sectionHeader">Customer Communication Touches</h4>
+
+                                <table id="dtCustomerSupportList" class="dataTable-border dataTable-headers dataTable-cell-border" style="width: 100%">
+                                    <thead>
+                                        <tr>
+                                            <th class="exportColumnn">Date</th>
+                                            <th class="exportColumn">Communication</th>
+                                            <th class="exportColumn">&nbsp;</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <!-- end datatable -->
+
                             <!-- Ownership -->
                             <div class="borderSection">
                                 <h4 class="text-center sectionHeader">Ownership</h4>
@@ -310,14 +335,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <hr />
+ 
 
-                            <!--<div class="row">
-                                <div class="col-md-12 text-align-left">
-                                    <input type="button" value="Customer support" onclick="showCustomerSupport();" />
-                                    <input type="button" value="Training" onclick="showTraining();" />
-                                </div>
-                            </div>-->
                             
                             <!--
                                 Things not yet covered in Personnel View:
@@ -644,6 +663,8 @@
         setDataTable_RolesTVB();
         setDataTable_RolesMSS();
         setDataTable_RolesDMA();
+        setDataTableCustomerSupport();
+        clearSearchButtonSetupCustomerSupport();
 
         setDataTable_PersonnelChangeHistoryPersonnelField();
         setDataTable_PersonnelChangeHistoryPersonnelOwners();
@@ -657,6 +678,7 @@
         getPersonnelWebSetupStatus();
         getPersonnelOwners();
         getPersonnelProducts();
+        getCustomerSupportList();
 
         cleanupBackButton();
 
@@ -2684,5 +2706,111 @@
 
     function genericAjaxError(jQxhr, textStatus, errorThrown) {
         MKAErrorMessageRtn(errorThrown);
+    }
+
+    function setDataTableCustomerSupport()
+    {
+        var exportColumns = returnTableColumnsByClass("dtCustomerSupportList", "exportColumn");
+
+        $("#dtCustomerSupportList").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": 10,
+            "data": [],
+            "ordering": false, // SP pre-sorts by actual (not stringified) date/time
+            "columns": [
+                {
+                    mRender: function (data, type, row) {
+                        //return row["ContactDateTime"];
+                        return row["ContactDateTime"];
+                    },
+                    "className": "smallCol colWidth20"
+                },
+                {
+                    mRender: function (data, type, row) {
+
+                        return row["Type"] + " / " + row["Description"].toString().replace("<p>", "").replace("</p>", "");
+                    },
+                    "orderable": false,
+                    "className": "text-align-left colWidth60"
+                },
+                {
+                    mRender: function (data, type, row) {
+                        var customerSupportContactId = row["CustomerSupportContactID"];
+                        if (customerSupportContactId != null) {
+                            return '<a href="#" onclick="editCustomerSupportContact(' + customerSupportContactId + ')">View Customer Support</a>';
+                        }
+                        else {
+                            var trainingEventId = row["TrainingEventID"];
+                            if (trainingEventId != null) {
+                                return '<a href="#" onclick="editTrainingEvent(' + trainingEventId + ')">View Training</a>';
+                            }
+                            else {
+                                return "";
+                            }
+                        }
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": " text-align-center colWidth20"
+                }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [],
+            initComplete: function () {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter:"
+            }
+        });
+
+    }
+
+    function clearSearchButtonSetupCustomerSupport() {
+        $("body").on("click", "#clear_search_button", function () {
+            var table = $("#dtCustomerSupportList").DataTable();
+            table.search('').draw();
+        });
+
+    }
+    function getCustomerSupportList() {
+
+        $("#dtCustomerSupportList_length").hide();
+
+        $.ajax({
+            url: ServicePrefix + '/api/CustomerSupport/GetCustomerSupportContacts',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    populateDataTable("dtCustomerSupportList", data);
+                    $("#divResults").show();
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+    function editCustomerSupportContact(customerSupportContactId) {
+        window.location = "/admin/customersupport/customersupport.html?customerSupportContactId=" + customerSupportContactId;
+    }
+    function editTraining(trainingEventId) {
+        window.location = "/admin/training/training.html?trainingEventId=" + trainingEventId;
     }
 </script>
