@@ -110,13 +110,13 @@
             <div class="container">
 
                 <div class="addButtonDiv">
-                    <input type="button" value="Show" onclick="getRelationshipLists();" /><br />
+  
                     <input type="button" value="+" class="addNewButton addNewButton-list-pages" style="margin-top:10px" onclick="addRelationshipList();" />
                 </div>
                 <div style="margin: 0px auto 0 auto">
                     <div class="row">
                         <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                            <h2 id="pageTitle">Relationship Lists</h2>
+                            <h2 id="pageTitle">Personnel Groups</h2>
                         </div>
                     </div>
                     <div id="divQuickReport" style="margin-right:65px">
@@ -127,12 +127,15 @@
                     <div class="search-section">
                         <div class="row ">
                             <div class="col-md-6">
-                                <label for="ddlCreator" class="filterLabel">Creator</label>
+                                <label for="ddlCreator" class="filterLabel">Author</label>
                                 <select id="ddlCreator" class="filterControl report-filter"></select>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-3" style="display:none">
                                 <label for="chkIncludeInactive" class="filterLabel">Include inactive creators</label>
                                 <input type="checkbox" id="chkIncludeInactive" class="filterControl report-filter" onclick="getCreatorList();" />
+                            </div>
+                            <div class="col-md-3 text-align-right">
+                                <input type="button" value="Show" onclick="getRelationshipLists();" />
                             </div>
                         </div>
                     </div>
@@ -142,9 +145,9 @@
                     <table id="dtRelationshipLists" class="dataTable-border dataTable-headers dataTable-cell-border" style="width: 100%">
                         <thead>
                             <tr>
-                                <th class="exportColumn">Creator</th>
                                 <th class="exportColumn">Name</th>
-                                <th class="exportColumn"># Members</th>
+                                <th class="exportColumn">Members</th>
+                                <th class="exportColumn">Author</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -166,7 +169,7 @@
     <div id="listDialog" style="display:none">
         <div class="row">
             <div class="col-md-3 text-align-left">
-                Creator
+                Author
             </div>
             <div class="col-md-9 text-align-left">
                 <select id="ddlListDialogCreator" class="listDialogInput listDialogNew"></select>
@@ -329,7 +332,7 @@
             width: 1200,
             height: 800,
             modal: true,
-            title: 'Relationship List',
+            title: 'Group Maintenance',
             create: function (event, ui) {
                 $(event.target).parent().css('position', 'fixed');
             }
@@ -366,7 +369,7 @@
         var previousSelection = $("#ddlCreator").val();
         var previousSelectionFound = false;
 
-        var str = '<option value="">-- All creators --</option>';
+        var str = '<option value="">-- All --</option>';
         $.each(data.report.rows, function (index) {
             str = str + '<option value="' + data.report.rows[index].PersonnelID + '">' + data.report.rows[index].Name + '</option>';
             if (data.report.rows[index].PersonnelID == previousSelection) {
@@ -458,12 +461,12 @@
                 [1, 'asc'] // List Name
             ],
             "columns": [
-                { "data": 'ListCreator' },
                 { "data": 'RelationshipListName' },
                 { "data": 'MemberCount' },
+                { "data": 'ListCreator' },
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="#" onclick="viewList(' + row.RelationshipListID + ')">View/Edit</a>';
+                        return '<a href="#" onclick="viewList(' + row.RelationshipListID + ')">Edit</a>';
                     },
                     "orderable": false,
                     "searchable": false,

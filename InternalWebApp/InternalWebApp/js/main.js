@@ -1027,7 +1027,7 @@ function buildMainMenu(selectedItem) {
     menuItems += productDashboard('mrr');
     menuItems += productDashboard('xry');
     menuItems += productDashboard('tvb');
-    menuItems += productDashboard('mss');
+    //menuItems += productDashboard('mss');
     menuItems += productDashboard('dma');
 
     menuItems += '              </ul>';
@@ -1036,6 +1036,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block"><a href="/admin/personnel/personnellist.html?MenuItem=true">Personnel</a></li>';
     menuItems += '                  <li style="display:block"><a href="/admin/webnotification/webnotification.html?MenuItem=true">Web Notifications</a></li>';
+    menuItems += '                  <li style="display:block"><a href="/admin/relationship/relationshiplists.html?MenuItem=true">Group Maintenace</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Stations") + ' role="button" aria-expended="false">Stations<span style="margin-right:10px;" class="caret"></span></a>';
@@ -1092,7 +1093,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += productDashboard('mrr');
     menuItems += productDashboard('xry');
     menuItems += productDashboard('tvb');
-    menuItems += productDashboard('mss');
+    //menuItems += productDashboard('mss');
     menuItems += productDashboard('dma');
     menuItems += '              </ul>';
     menuItems += '        </li>';
@@ -1261,7 +1262,7 @@ function buildTVBMenu(selectedItem) {
     menuItems += productDashboard('mrr');
     menuItems += productDashboard('xry');
     menuItems += productDashboard('tvb');
-    menuItems += productDashboard('mss');
+ //   menuItems += productDashboard('mss');
     menuItems += productDashboard('dma');
     menuItems += '              </ul>';
     menuItems += '        </li>';
@@ -1304,7 +1305,7 @@ function buildMSSMenu(selectedItem) {
     menuItems += productDashboard('mrr');
     menuItems += productDashboard('xry');
     menuItems += productDashboard('tvb');
-    menuItems += productDashboard('mss');
+    //menuItems += productDashboard('mss');
     menuItems += productDashboard('dma');
     menuItems += '              </ul>';
     menuItems += '        </li>';
@@ -1333,7 +1334,7 @@ function buildDMAMenu(selectedItem) {
     menuItems += productDashboard('mrr');
     menuItems += productDashboard('xry');
     menuItems += productDashboard('tvb');
-    menuItems += productDashboard('mss');
+    //menuItems += productDashboard('mss');
     menuItems += productDashboard('dma');
     menuItems += '              </ul>';
     menuItems += '        </li>';
@@ -1499,7 +1500,7 @@ function buildTechMenu(selectedItem) {
     menuItems += productDashboard('mrr');
     menuItems += productDashboard('xry');
     menuItems += productDashboard('tvb');
-    menuItems += productDashboard('mss');
+    //menuItems += productDashboard('mss');
     menuItems += productDashboard('dma');
     menuItems += '              </ul>';
     menuItems += '        </li>';
