@@ -15,9 +15,9 @@ var gShowHeader = true;
 var release =
 {
     "DEV": "N/A",
-    "STAGING": "3/16/2020",
-    "PRODUCTION": "3/16/2020",
-    "DEMO": "3/16/2020"
+    "STAGING": "4/15/2020",
+    "PRODUCTION": "4/15/2020",
+    "DEMO": "4/15/2020"
 }
 var dateOfCode = new Date();
 release["DEV"] = (dateOfCode.getMonth() + 1) + '-' + dateOfCode.getDate() + '-' + dateOfCode.getFullYear();
@@ -1104,9 +1104,16 @@ function buildXRYMenu(selectedItem) {
     menuItems += '        <li style="display:block"><a href="/products/xry/xryreminders.html?MenuItem=true">Reminders</a></li>';
     menuItems += '        <li style="display:block;"><a href="/products/xry/xryownershipmappinglist.html?MenuItem=true">Ownership Mapping</a></li>';
     menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrydatacollection.html?MenuItem=true">Data Collection</a></li>';
-    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=adv&MenuItem=true">Advertiser Matching</a></li>';
-    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=agy&MenuItem=true">Agency Matching</a></li>';
-    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=media&MenuItem=true">Media Matching</a></li>';
+
+    menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">Matching <span style="margin-right:10px;" class="caret"></span></a>'
+    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
+    menuItems += '                          <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=adv&MenuItem=true">Advertiser Matching</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=agy&MenuItem=true">Agency Matching</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=media&MenuItem=true">Media Matching</a></li>';
+    menuItems += '                      </ul>';
+    menuItems += '                  </li>';
+
+
     menuItems += '</ul>';
     menuItems += '</li>';
 
@@ -1121,15 +1128,32 @@ function buildXRYMenu(selectedItem) {
 
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/admin/advertiser/advertiserlist.html?MenuItem=true" role="button" aria-expanded="false">Market Advertiser</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/stationadvertiser/stationadvertiserlist.html?MenuItem=true">Station Advertiser</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/mediaadvertiser/mediaadvertiserlist.html?MenuItem=true">Media Advertiser</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html?MenuItem=true">Parent Advertiser</a></li>';
+    menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">Advertiser <span style="margin-right:10px;" class="caret"></span></a>'
+    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
+    menuItems += '                          <li style="display:block;"><a href="/admin/advertiser/advertiserlist.html?MenuItem=true" role="button" aria-expanded="false">Market Advertiser</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/admin/stationadvertiser/stationadvertiserlist.html?MenuItem=true">Station Advertiser</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/admin/mediaadvertiser/mediaadvertiserlist.html?MenuItem=true">Media Advertiser</a></li>';
+    menuItems += '                      </ul>';
+    menuItems += '                  </li>';
 
-    menuItems += '                  <li style="display:block;"><a href="/admin/agency/agencylist.html?MenuItem=true" role="button" aria-expanded="false">Market Agency</a></li>';
+ 
+    menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">Agency <span style="margin-right:10px;" class="caret"></span></a>'
+    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
+    menuItems += '                          <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html?MenuItem=true">Parent Advertiser</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/admin/agency/agencylist.html?MenuItem=true" role="button" aria-expanded="false">Market Agency</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/admin/stationagency/stationagencylist.html?MenuItem=true">Station Agency</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/admin/parentagency/parentagencylist.html?MenuItem=true">Parent Agency</a></li>';
+    menuItems += '                      </ul>';
+    menuItems += '                  </li>';
 
-    menuItems += '                  <li style="display:block;"><a href="/admin/stationagency/stationagencylist.html?MenuItem=true">Station Agency</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/parentagency/parentagencylist.html?MenuItem=true">Parent Agency</a></li>';
+    menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">Imports <span style="margin-right:10px;" class="caret"></span></a>'
+    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
+    menuItems += '                          <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html?MenuItem=true">Data Scripts</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html?MenuItem=true">Import Setup</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/products/xry/import/xryimportdatacolumnmappingrulelist.html?MenuItem=true">Data Mapping</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/products/xry/import/xryimportcomlumnmappingrulelist.html?MenuItem=true" role="button" aria-expanded="false">Column Mapping</a></li>';
+    menuItems += '                      </ul>';
+    menuItems += '                  </li>';
 
 
 
@@ -1141,12 +1165,24 @@ function buildXRYMenu(selectedItem) {
 
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Audit") + ' href="" role="button" aria-expanded="false">Audit <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/products/xry/bulkupdates/xrymarketadvertiserbulkupdate.html?MenuItem=true">Market Advertiser Audit</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/xry/bulkupdates/xrystationadvertiserbulkupdate.html?MenuItem=true">Station Advertiser Audit</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/xry/bulkupdates/xrymediaadvertiserbulkupdate.html?MenuItem=true">Media Advertiser Audit</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/xry/bulkupdates/xrymarketagencybulkupdate.html?MenuItem=true">Market Agency Audit</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/xry/bulkupdates/xrystationagencybulkupdate.html?MenuItem=true">Station Agency Audit</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/xry/bulkupdates/xryadvertiserrevenuebulkupdate.html?MenuItem=true">Advertiser Revenue Research Audit</a></li>';
+
+    menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">Advertiser <span style="margin-right:10px;" class="caret"></span></a>'
+    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
+
+    menuItems += '                          <li style="display:block;"><a href="/products/xry/bulkupdates/xrymarketadvertiserbulkupdate.html?MenuItem=true">Market Advertiser Audit</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/products/xry/bulkupdates/xrystationadvertiserbulkupdate.html?MenuItem=true">Station Advertiser Audit</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/products/xry/bulkupdates/xrymediaadvertiserbulkupdate.html?MenuItem=true">Media Advertiser Audit</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/products/xry/bulkupdates/xryadvertiserrevenuebulkupdate.html?MenuItem=true">Advertiser Revenue Research Audit</a></li>';
+    menuItems += '                      </ul>';
+    menuItems += '                  </li>';
+
+    menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">Agency <span style="margin-right:10px;" class="caret"></span></a>'
+    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
+    menuItems += '                          <li style="display:block;"><a href="/products/xry/bulkupdates/xrymarketagencybulkupdate.html?MenuItem=true">Market Agency Audit</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/products/xry/bulkupdates/xrystationagencybulkupdate.html?MenuItem=true">Station Agency Audit</a></li>';
+    menuItems += '                      </ul>';
+    menuItems += '                  </li>';
+
     menuItems += '                  <li style="display:block;"><a href="/products/xry/bulkupdates/xrymediarevenuebulkupdate.html?MenuItem=true">Media Revenue Research Audit</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
@@ -1175,7 +1211,7 @@ function buildMRRMenu(selectedItem) {
     menuItems += productDashboard('mrr');
     menuItems += productDashboard('xry');
     menuItems += productDashboard('tvb');
-    menuItems += productDashboard('mss');
+    //menuItems += productDashboard('mss');
     menuItems += productDashboard('dma');
     menuItems += '</ul>';
     menuItems += '</li>';
@@ -1435,7 +1471,7 @@ function populateDataTable(tableName, data) {
     table.rows.add(tableJson).draw();
      
     table.columns.adjust().draw();
-
+    $.unblockUI();
 }
 
 //ajax error function
@@ -1761,7 +1797,7 @@ function buildMarketWrapper(inData) {
 
         if (ID.length > 0) {
             if (isNaN(ID) == false) {
-                ret = "<a href='#' onclick='window.location=\"/admin/market/market.html?marketId=" + ID + "\"'>";
+                ret = "<a href='#' onclick='window.location=\"/admin/market/marketview.html?marketId=" + ID + "\"'>";
                 ret = ret + inData
                 ret = ret + "</a>";
             }
@@ -1795,7 +1831,7 @@ function buildUserWrapper(inData) {
 
         if (ID.length > 0) {
             if (isNaN(ID) == false) {
-                ret = "<a href='#' onclick='window.location=\"/admin/personnel/personnel.html?personnelID=" + ID + "\"'>";
+                ret = "<a href='#' onclick='window.location=\"/admin/personnel/personnelview.html?personnelID=" + ID + "\"'>";
                 ret = ret + inData
                 ret = ret + "</a>";
             }
@@ -1827,7 +1863,7 @@ function buildStationWrapper(inData) {
 
         if (ID.length > 0) {
             if (isNaN(ID) == false) {
-                ret = "<a href='#' onclick='window.location=\"/admin/station/station.html?stationId=" + ID + "\"'>";
+                ret = "<a href='#' onclick='window.location=\"/admin/station/stationview.html?stationId=" + ID + "\"'>";
                 ret = ret + inData
                 ret = ret + "</a>";
             }
@@ -2644,4 +2680,20 @@ function setThisQueryToRunLongNoAutoUnBlock()
 {
     $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
     clearTimeout(unblockHandle);
+}
+
+function extractParens(inString) {
+
+    var regExp = /\(([^)]+)\)/;
+    var matches = regExp.exec(inString);
+
+    if (matches.length == 2)
+    {
+        return matches[1];
+    }
+    else
+    {
+        return inString;
+    }
+
 }
