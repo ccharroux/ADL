@@ -78,10 +78,125 @@
             </div>
             <div class="text-center" style="margin-top: 0">
 
+                <!--
+                load data fields
+                update button
+                -->
+                <div class="row input-row">
+                    <div class="col-md-3 text-align-left">
+                        <label for="ddlScript" class="">Script</label>
+                    </div>
+                    <div class="col-md-9 text-align-left">
+                        <select id="ddlScript" class="mkaRequired field-width-325" style="" errorMessage="You must select a Script."></select>
+                    </div>
+                </div>
+                
+                <div class="row input-row">
+                    <input type="hidden" id="txtColumnRuleId" /> <!-- not sure if worth showing identity field -->
+                    <div class="col-md-3 text-align-left">
+                        <label for="txtColumnRuleDescription">Rule Description</label>
+                    </div>
+                    <div class="col-md-9 text-align-left">
+                        <input type="text" class="mkaRequired field-width-325" maxlength="100" id="txtColumnRuleDescription" errorMessage="You must enter a Column Rule Description." value="" />
+                    </div>
+                </div>
+                
+                <div class="row input-row">
+                    <div class="col-md-3 text-align-left">
+                        <label for="txtColumnRuleToken">Rule Token</label>
+                    </div>
+                    <div class="col-md-9 text-align-left">
+                        <input type="text" class="mkaRequired field-width-325" maxlength="50" id="txtColumnRuleToken" errorMessage="You must enter a Column Rule Token." value="" />
+                    </div>
+                </div>
+
+                <div class="row input-row">
+                    <div class="col-md-3 text-align-left">
+                        <label for="chkRuleRequired">Required</label>
+                    </div>
+                    <div class="col-md-9 text-align-left">
+                        <input type="checkbox" id="chkRuleRequired"/>
+                    </div>
+                </div>
+                
+                <div class="row input-row">
+                    <div class="col-md-3 text-align-left">
+                        <label for="chkRejectRow">Reject Row</label>
+                    </div>
+                    <div class="col-md-9 text-align-left">
+                        <input type="checkbox" id="chkRejectRow"/>
+                    </div>
+                </div>
+                
+                <div class="row input-row">
+                    <div class="col-md-3 text-align-left">
+                        <label for="chkPassMeansFail">Pass Means Fail</label>
+                    </div>
+                    <div class="col-md-9 text-align-left">
+                        <input type="checkbox" id="chkPassMeansFail"/>
+                    </div>
+                </div>
+                
+                <div class="row input-row">
+                    <div class="col-md-3 text-align-left">
+                        <label for="ddlOwner" class="">Owner</label>
+                    </div>
+                    <div class="col-md-9 text-align-left">
+                        <select id="ddlOwner" class="field-width-325" style="" ></select>
+                    </div>
+                </div>
+                
+                <div class="row input-row">
+                    <div class="col-md-3 text-align-left">
+                        <label for="ddlMarket" class="">Market</label>
+                    </div>
+                    <div class="col-md-9 text-align-left">
+                        <select id="ddlMarket" class="field-width-325" style=""></select>
+                    </div>
+                </div>
+                
+                <div class="row input-row">
+                    <div class="col-md-3 text-align-left">
+                        <label for="txtActiveDate">Active Date</label>
+                    </div>
+                    <div class="col-md-9 text-align-left">
+                        <input type="text" id="txtActiveDate" value="" maxlength="50" placeholder="MM/DD/YYYY" readonly />
+                    </div>
+                </div>
+                
+                <div class="row disable-date input-row" style="display: none;">
+                    <div class="col-md-3 text-align-left">
+                        <label for="txtDisableDate">Disable Date</label>
+                    </div>
+                    <div class="col-md-9 text-align-left">
+                        <input type="text" id="txtDisableDate" value="" maxlength="50" placeholder="MM/DD/YYYY" readonly />
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="default-button-section">
+                    <div class="row input-row">
+                        <div class="col-md-3">
+
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <div>
+                                <input value="Update" onclick="excludeFromBackButton(); " class="default-button" type="button">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <hr/>
+                    </div>
+                </div>
                 
                 
-                
-                
+                <!--
+                datatable with items    
+                -->
                 
 
             </div>
@@ -124,11 +239,173 @@
 </body>
 </html>
 <script>
+    var columnRuleId = 0;
+    var bIsNew = false;
+
     $(document).ready(function () {
 
         buildXRYMenu("Utility");
         buildQuickReports(['xry']);
 
-       
+        columnRuleId = (getParameterByName("ColumnRuleId") == null ? 0 : getParameterByName("ColumnRuleId"));
+
+        $("#txtColumnRuleId").val(columnRuleId);
+        bIsNew = columnRuleId <= 0;
+
+        //get scripts list
+        getScriptsList();
     });
+
+    function getScriptsList()
+    {
+        var control = "ddlScript";
+
+        $.ajax({
+            url: ServicePrefix + '/api/DataInput/GetDataInputList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="-1">-- Select a Script --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].dataInputId + '">' + data.report.rows[index].inputSystem + ' (' + data.report.rows[index].dataInputId + ')' + '</option>';
+
+                    });
+
+                    $("#" + control).html(str);
+                    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                }
+
+                getOwnerList();
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+        //get owner list
+    }
+
+    function getOwnerList()
+    {
+        // /api/Owner/GetOwnerListByProduct
+        var control = "ddlOwner";
+
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerListByProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": "xry"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="-1">-- Select an Owner --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].ownerid + '">' + data.report.rows[index].ownername + ' (' + data.report.rows[index].ownerid + ')' + '</option>';
+
+                    });
+
+                    $("#" + control).html(str);
+                    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                }
+
+                getMarketList();
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+
+        //get market list
+
+    }
+
+    function getMarketList()
+    {
+        var control = "ddlMarket";
+
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketListByProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": "xry"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="-1">-- Select a Market --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + ' (' + data.report.rows[index].marketId + ')' + '</option>';
+
+                    });
+
+                    $("#" + control).html(str);
+                    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                }
+
+                getMappingColumnRule();
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getMappingColumnRule()
+    {
+        if (columnRuleId <= 0)
+        {
+            initializeActiveDate();
+            return;
+        }
+
+        //get the rule
+
+
+    }
+
+    function initializeActiveDate() {
+        var activeDate = new Date();
+
+        $("#txtActiveDate").val(addZero(activeDate.getMonth() + 1) + '/' + addZero(activeDate.getDate()) + '/' + activeDate.getFullYear());
+
+        //$("#chkActive").prop('checked', true);
+    }
 </script>
