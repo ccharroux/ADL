@@ -289,6 +289,7 @@ reportName.push("rptStandardInputNotIncludedList");
 
 reportName.push("rptMRRUserListing");
 
+reportName.push("rptMRRUploadTemplateByOwnerWithRevenueExtended");
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -5096,6 +5097,81 @@ function getReportObject_MRRUploadTemplateByOwnerWithRevenue() {
 
     return tempObject;
 }
+
+function getReportFilterArray_MRRUploadTemplateByOwnerWithRevenueExtended() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        objectName: "ddlOwner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['MRR'],
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MRRUploadTemplateByOwnerWithRevenueExtended() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    columnsToDisplay.push("Period");
+    columnsToDisplay.push("Station Id");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Affiliation");
+
+    columnsToDisplay.push("Category");
+    columnsToDisplay.push("Category Description");
+    columnsToDisplay.push("Market Id");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Market Size");
+
+    columnsToDisplay.push("Prior Year");
+    columnsToDisplay.push("Revenue");
+    columnsToDisplay.push("Prior Year Revenue");
+    columnsToDisplay.push("Prior Period");
+    columnsToDisplay.push("Prior Period Revenue");
+
+    bLongQuery = true;
+
+    tempObject =
+    {
+        reportTitle: "MRR Upload Category Template (Revenue) Extended",
+        apiControllerAction: "/api/MRRReport/GetMRRUploadTemplateByOwnerWithRevenue",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['mrr', 'MRR Data Review'],
+        autoUpdate: false,
+        approved: true
+    }
+
+    return tempObject;
+}
+
+
 
 function getReportFilterArray_MRRMarketRevisionHistory() {
 
