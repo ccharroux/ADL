@@ -1135,7 +1135,7 @@ function buildXRYMenu(selectedItem) {
 
     menuItems += '                  <li style="display:block;"><a href="/admin/industry/industrylist.html?MenuItem=true">Industry</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/subindustry/subindustrylist.html?MenuItem=true">Sub Industry</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/nielsenmarketname/nielsenmarketnamelist.html?MenuItem=true">Nielson Market</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/nielsenmarketname/nielsenmarketnamelist.html?MenuItem=true">Nielsen Market</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
 

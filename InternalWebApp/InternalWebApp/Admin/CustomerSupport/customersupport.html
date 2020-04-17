@@ -81,7 +81,7 @@
                             <label for="dtCustomerSupportContactDate">Customer Support Contact Date</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="dtCustomerSupportContactDate" class="customerSupportDateTime mkaRequired" />
+                            <input type="text" id="dtCustomerSupportContactDate" class="customerSupportDateTime mkaRequired viewOnlyIfNotYours" />
                         </div>
                     </div>
 
@@ -91,7 +91,7 @@
                             <label for="tmCustomerSupportContactTime">Customer Support Contact Time</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="tmCustomerSupportContactTime" class="customerSupportDateTime" />
+                            <input type="text" id="tmCustomerSupportContactTime" class="customerSupportDateTime viewOnlyIfNotYours" />
                         </div>
                     </div>
 
@@ -135,7 +135,7 @@
                             <label for="ddlExternalPersonnel">Outside User</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlExternalPersonnel" class="mkaRequired viewOnlyOnEdit" errorMessage="You must select an external personnel."></select>
+                            <select id="ddlExternalPersonnel" class="mkaRequired viewOnlyOnEdit externalPersonnel" errorMessage="You must select an external personnel."></select>
                             <span style="display: none"> <!-- class="hideIfPersonnelFromQueryString" -->
                                 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
                                 <input type="checkbox" id="chkIncludeInternal" checked="checked" onchange="getExternalPersonnel();" />
@@ -149,7 +149,7 @@
                             <label for="ddlInternalPersonnel">MKA User</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlInternalPersonnel" class="mkaRequired viewOnlyOnEdit" errorMessage="You must select an internal personnel."></select>
+                            <select id="ddlInternalPersonnel" class="mkaRequired viewOnly" errorMessage="You must select an internal personnel."></select>
                         </div>
                     </div>
 
@@ -159,8 +159,7 @@
                             <label for="ddlCustomerSupportType">Customer Support Type</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlCustomerSupportType" class="mkaRequired" errorMessage="You must select a customer support type."></select>
-                            
+                            <select id="ddlCustomerSupportType" class="mkaRequired viewOnlyIfNotYours" errorMessage="You must select a customer support type."></select>
                         </div>
                     </div>
 
@@ -171,6 +170,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <textarea id="txtNotes" class="viewOnlyIfNotYours" style="width: 900px"></textarea>
+                            <span id="spanFootnote"></span>
                         </div>
                     </div>
 
@@ -183,9 +183,17 @@
                             </div>
                             <div class="col-md-9 text-align-left">
                                 <div>
-                                    <input value="Update" onclick="excludeFromBackButton(); updateCustomerSupportContactDetail();" class="default-button" type="button">
-                                     <br />
-                                    <input value="Add Training" style="margin-top:10px" onclick="window.location='/admin/training/training.html'" class="default-button" type="button">
+                                    <input value="Update" onclick="excludeFromBackButton(); updateCustomerSupportContactDetail();" class="default-button hideIfNotYours" type="button" />
+                                    <br />
+                                    <input value="Add Training" onclick="window.location='/admin/training/training.html'" class="default-button margin-top-10" type="button" />
+                                    <span class="hiddenOnNew">
+                                        <br />
+                                        <input value="Add Entry" onclick="addEntry();" class="default-button margin-top-10" type="button" />
+                                        (same user)
+                                        <br />
+                                        <input value="Create New Entry" onclick="createNewEntry();" class="default-button margin-top-10" type="button" />
+                                        (same or different user)
+                                    </span>
                                 </div>
                                 <!--<div class="back-button-div">
                                     <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button">
@@ -226,6 +234,9 @@
 <script>
 
     var customerSupportContactId;
+
+    var mode;
+    var fromCustomerSupportContactId;
 
     var gotMarkets = false;
     var gotOwners = false;
@@ -283,6 +294,8 @@
     }
 
     function checkForInsertOrUpdate() {
+        $(".viewOnly").prop("disabled", true);
+
         if (customerSupportContactId == null) {
             // insert
             $("#spanTitle").text("Add Customer Support Contact");
@@ -665,11 +678,6 @@
     }
 
     function getCustomerSupportContactDetail() {
-        // new entry
-        if (customerSupportContactId == null) {
-            return;
-        }
-
         // each get-X calls this function on success, but only proceed once all of them have succeeded
         if (
                gotMarkets == false
@@ -683,6 +691,12 @@
 
         // already got detail (avoid infinite loop due to indirect effects)
         if (gotCustomerSupportContactDetail) {
+            return;
+        }
+
+        // new entry
+        if (customerSupportContactId == null) {
+            checkMode();
             return;
         }
 
@@ -744,8 +758,91 @@
 
         $("#txtNotes").val(obj["Description"].replace("<p>", "").replace("</p>", ""));
 
+        // apply lockdowns to Chosen controls as well
+        checkForInsertOrUpdate();
+
         if (obj["Internal Personnel ID"] != personnelIdCurrentlyLoggedIn) {
-            $(".viewOnlyIfNotYours").prop("disabled", true);
+            $(".hideIfNotYours").hide();
+            $(".viewOnlyIfNotYours").prop("disabled", true).trigger("chosen:updated"); // trigger is for Chosen controls; as of 4/15/2020, latest version of Chosen prefers "liszt:updated" but current version doesn't support that
+            $("#spanTitle").text($("#spanTitle").text().replace("Edit", "View"));
+        }
+    }
+
+    function checkMode() {
+        mode = getParameterByName("mode");
+
+        if (mode == null) {
+            return;
+        }
+
+        fromCustomerSupportContactId = getParameterByName("fromCustomerSupportContactId");
+        if (fromCustomerSupportContactId == null) {
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/CustomerSupport/GetCustomerSupportContactDetail',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inCustomerSupportContactId": fromCustomerSupportContactId
+            }),
+            success: function (data, textStatus, jQxhr) {
+                getFromCustomerSupportContactDetailSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getFromCustomerSupportContactDetailSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get customer support contact detail");
+            return;
+        }
+
+        gotCustomerSupportContactDetail = true;
+
+        var obj = data.report.rows[0];
+
+        // getParameterByName() outputs lowercase anyway, just making it explicit for clarity
+        switch (mode.toLowerCase()) {
+
+            case "addentry":
+
+                setExternalPersonnelFromDetail(
+                    obj["External Personnel ID"],
+                    obj["External Personnel"]
+                );
+                setOwnerFromExternalPersonnel();
+                $(".externalPersonnel").prop("disabled", true);
+
+                var footnote = "Re: " + obj["Internal Personnel"]
+                    + " / " + obj["External Personnel"]
+                    + " / " + obj["Customer Support Contact Date"]
+                    + " " + obj["Customer Support Contact Time"];
+                $("#spanFootnote").text(footnote);
+
+                break;
+
+            case "createnewentry":
+
+                setExternalPersonnelFromDetail(
+                    obj["External Personnel ID"],
+                    obj["External Personnel"]
+                );
+                setOwnerFromExternalPersonnel();
+
+                break;
+
         }
     }
 
@@ -905,7 +1002,7 @@
             }
 
             if ($(eID).prop('tagName').toLowerCase() == "select") {
-                if ($(eID).val() == "-1") {
+                if ($(eID).val() == "") {
                     bootbox.alert(errorMessage, function () { });
                     loopBreak = false;
                     return false;
@@ -928,6 +1025,12 @@
     }
 
     function insertCustomerSupportContact() {
+        var notes = $("#txtNotes").val();
+        var footnote = $("#spanFootnote").text();
+        if (footnote != "") {
+            notes += "<br />&nbsp;<br />" + footnote;
+        }
+
         $.ajax({
             url: ServicePrefix + '/api/CustomerSupport/InsertCustomerSupportContact',
             dataType: 'json',
@@ -939,7 +1042,7 @@
                 "inPersonnelId": $("#ddlExternalPersonnel").val(),
                 "inInternalPersonnelId": $("#ddlInternalPersonnel").val(),
                 "inCustomerSupportTypeId": $("#ddlCustomerSupportType").val(),
-                "inNotes": $("#txtNotes").val()
+                "inNotes": notes
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -1007,5 +1110,17 @@
 
     function genericAjaxError(jQxhr, textStatus, errorThrown) {
         MKAErrorMessageRtn(errorThrown);
+    }
+
+    function addEntry() {
+        window.location = "/admin/customersupport/customersupport.html"
+            + "?mode=addEntry"
+            + "&fromCustomerSupportContactId=" + customerSupportContactId;
+    }
+
+    function createNewEntry() {
+        window.location = "/admin/customersupport/customersupport.html"
+            + "?mode=createNewEntry"
+            + "&fromCustomerSupportContactId=" + customerSupportContactId;
     }
 </script>
