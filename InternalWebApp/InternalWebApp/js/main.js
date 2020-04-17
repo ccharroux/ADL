@@ -1151,7 +1151,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += '                          <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html?MenuItem=true">Data Scripts</a></li>';
     menuItems += '                          <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html?MenuItem=true">Import Setup</a></li>';
     menuItems += '                          <li style="display:block;"><a href="/products/xry/import/xryimportdatacolumnmappingrulelist.html?MenuItem=true">Data Mapping</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="/products/xry/import/xryimportcomlumnmappingrulelist.html?MenuItem=true" role="button" aria-expanded="false">Column Mapping</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/products/xry/import/xryimportmappingcolumnrulelist.html?MenuItem=true" role="button" aria-expanded="false">Column Mapping</a></li>';
     menuItems += '                      </ul>';
     menuItems += '                  </li>';
 

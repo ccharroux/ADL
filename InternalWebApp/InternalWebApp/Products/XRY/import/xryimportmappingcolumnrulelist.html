@@ -120,7 +120,7 @@
                         <div class="col-md-4">
                             <div style="display:table-cell; float: right;">
                                 <label class="dropdown-label">&nbsp;</label><br />
-                                <input type="button" value="+" class="addNewButton addNewButton-list-pages vertical-center" onclick="editMatchedNotification(0)" />
+                                <input type="button" value="+" class="addNewButton addNewButton-list-pages vertical-center" onclick="editRule(0)" />
                             </div>
                         </div>
                     </div>
@@ -201,7 +201,7 @@
                 else {
 
                     var str = '';
-                    str = '<option value="">-- Select a Script --</option>';
+                    str = '<option value="-1">-- Select a Script --</option>';
                     $.each(data.report.rows, function (index) {
 
                         str = str + '<option value="' + data.report.rows[index].dataInputId + '">' + data.report.rows[index].inputSystem + ' (' + data.report.rows[index].dataInputId + ')' + '</option>';
@@ -225,6 +225,10 @@
     function getColumnMappingRules() {
 
         //add validation to make sure required fields are completed
+        if (searchValidationPassed() == false)
+        {
+            return;
+        }
 
         var sUrl = ServicePrefix + "/api/XrayImport/GetImportMappingColumnRulesList?";
         sUrl += "inApiToken=" + getLocalStorage("APIToken");
@@ -250,7 +254,7 @@
             }
         });
     }
-
+    
     function loadResultsData(data) {
         //get columns
         var columns = getResultsColumns();
@@ -290,7 +294,7 @@
             "visible": true,
             "mData": "Required",
             "orderable": true,
-            "className": "exportColumn"
+            "className": "text-align-center exportColumn"
         });
 
         columnsToDisplay.push({
@@ -298,7 +302,7 @@
             "visible": true,
             "mData": "Owner",
             "orderable": true,
-            "className": "exportColumn"
+            "className": "text-align-center exportColumn"
         });
 
         columnsToDisplay.push({
@@ -306,7 +310,7 @@
             "visible": true,
             "mData": "Market",
             "orderable": true,
-            "className": "exportColumn"
+            "className": "text-align-center exportColumn"
         });
 
         columnsToDisplay.push({
@@ -314,14 +318,23 @@
             "visible": true,
             "mData": "Delete Date",
             "orderable": true,
-            "className": "exportColumn"
+            "className": "text-align-center exportColumn"
         });
 
         // add action column here
 
         columnsToDisplay.push({
             "mRender": function (data, type, row) {
-                return ' ';
+                if (row["Delete Date"] != null)
+                {
+                    return '';
+                } else
+                {
+                    var strActions = "";
+                    strActions += '<a href="#" onclick="editRule(' + row.columnRuleId + ');">Edit</a>';
+                    strActions += '&nbsp;&nbsp;<a href="#" onclick="deleteRule(' + row.columnRuleId + ');">Delete</a>'
+                    return strActions;
+                }
             },
             "orderable": false,
             "searchable": false,
@@ -367,4 +380,43 @@
         });
     }
 
+    function searchValidationPassed() {
+        var loopBreak = true;
+        $(".mkaRequired").each(function (index, el) {
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            // Text
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+            // Select
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == "-1") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+        });
+
+        return loopBreak;
+    }
+
+
+    function editRule(columnRuleId)
+    {
+        //xryimportmappingcolumnrule.html
+        window.location = "/products/xry/import/xryimportmappingcolumnrule.html?ColumnRuleId=" + columnRuleId;
+    }
+
+    function deleteRule(columnRuleId)
+    {
+
+    }
 </script>
