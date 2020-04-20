@@ -500,6 +500,7 @@ function addDialogComponents() {
     // JAVASCRIPT FIRST
     var imported = document.createElement('script');
     imported.src = 'https://code.jquery.com/ui/1.12.1/jquery-ui.js';
+    imported.async = false; // optionally
     document.head.appendChild(imported);
 
     // NOW THE CSS

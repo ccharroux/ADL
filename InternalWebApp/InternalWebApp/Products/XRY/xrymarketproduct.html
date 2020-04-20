@@ -262,6 +262,35 @@
                             <label style="font-weight:400" id="lblMarketNielsenSetup"></label><span><input style="width:60px; margin-left:20px" value="Edit" onclick="goToNielsenSetup();" class="default-button" type="button"></span>
                         </div>
                     </div>
+                    <!--Market Nielsen Date -->
+                    <div class="row input-row divNielsenDate" style="display:none">
+                        <div class="col-md-3 text-align-left">
+                            <label>As of Date for Nielsen</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <span>Period</span>
+                            <select id="ddlNielsenDatePeriod" errorMessage="You must enter a Period.">
+                                <option value="-1">-- Select a Period --</option>
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                            <span>Year</span>
+                            <span><input style="width:60px; text-align:center" maxlength="4" type="text" id="txtNielsenDateYear" value="" placeholder="YYYY" errorMessage="You must enter a Year." /></span>
+                            <div style="margin-top:10px">
+                                <input type="button" onclick="updateXRYProductNielsenDateAllMarkets()"  class="default-button"  value="Update All Markets with Date"/>
+                            </div>
+                        </div>
+                    </div>
 
 
                     <div class="default-button-section">
@@ -468,7 +497,7 @@
 
         } else {
             var str = '';
-            str = '<option value="-1">-- Select a Processor</option>';
+            str = '<option value="-1" selected>-- Select a Processor</option>';
 
             $.each(data.report.rows, function (index) {
                 str = str + '<option value="' + data.report.rows[index].operatorID + '">' + data.report.rows[index].operator + '</option>';
@@ -714,6 +743,26 @@
                 $("#chkRevTypeAvail").prop("checked", (obj["revenueTypeAvailableInProduction"] == true ? true : false));
               
                 $("#lblMarketNielsenSetup").html(obj["Nielsen Market"]);
+
+
+
+                if (obj["Nielsen Market"].toLowerCase().trim() == "yes")
+                {
+                    var nielsenDate = obj["Nielsen Period"];
+
+                    if (nielsenDate.length == 6)
+                    {
+                        $("#txtNielsenDateYear").val(nielsenDate.substring(0, 4));
+                        $("#ddlNielsenDatePeriod").val(nielsenDate.substr(4, 2));
+                    }
+
+                    $(".divNielsenDate").show();
+                }
+                else
+                {
+                    $(".divNielsenDate").hide();
+                }
+
                 if (obj["onHoldDate"] != "" && obj["onHoldDate"] != null) {
                     $("#txtMarketOnHoldDate").text(extractDateOnly(obj["onHoldDate"]));
                     $("#divMarketOnHoldDate").removeClass("hidden");
@@ -722,6 +771,31 @@
 
 
         }
+    }
+
+    function validateNielsenDate()
+    {
+        if ($("#ddlNielsenDatePeriod").val() == "-1") {
+            bootbox.alert("A Nielsen Period must be selected.", function () { });
+            return false;
+        }
+
+        if ($("#txtNielsenDateYear").val().trim().length != 4) {
+            bootbox.alert("A Nielsen Year must be entered.", function () { });
+            return false;
+        }
+
+        if (isNaN($("#txtNielsenDateYear").val().trim()) == true) {
+            bootbox.alert("The Nielsen Year must be numeric.", function () { });
+            return false;
+        }
+
+        if ($("#txtNielsenDateYear").val() < "2000") {
+            bootbox.alert("The Nielsen Year must be > 1999.", function () { });
+            return false;
+        }
+
+        return true;
     }
 
     function updateXRYProduct() {
@@ -734,30 +808,52 @@
         var queryCutOff = null;
         var numberPriorYears = null;
         var newsMinRev = 0;
-        if ($("#rdAll").prop("checked")) {
-        }
-        if ($("#rdNone").prop("checked")) {
+
+        if ($("#rdAll").prop("checked")) {}
+
+        if ($("#rdNone").prop("checked"))
+        {
             marketIdList.push($("#rdNone").val());
         }
-        if ($("#rdLimited").prop("checked")) {
 
+        if ($("#rdLimited").prop("checked"))
+        {
             $(".associatedMarkets").each(function () {
-                if ($(this).prop("checked")) {
+                if ($(this).prop("checked"))
+                {
                     marketIdList.push($(this).data("marketid"));
                 }
             });
-            if (!marketIdList.length) {
+
+            if (!marketIdList.length)
+            {
                 bootbox.alert("If 'limited' is selected, you must select at least one other market. ", function () {
                 });
                 return;
             }
         }
         
-        if ($("#hdnQueryCutOff").val().trim() != "") {
+        if ($("#hdnQueryCutOff").val().trim() != "")
+        {
             queryCutOff = $("#hdnQueryCutOff").val().trim();
         }
-        if ($("#hdnNumberPriorYears").val().trim() != "" && $("#hdnNumberPriorYears").val().trim() != 0) {
+
+        if ($("#hdnNumberPriorYears").val().trim() != "" && $("#hdnNumberPriorYears").val().trim() != 0)
+        {
             numberPriorYears = $("#hdnNumberPriorYears").val().trim();
+        }
+
+ 
+        var nielsenDate = "";
+        if ($(".divNielsenDate").is(":visible"))
+        {
+            if (validateNielsenDate() == false) {
+                return;
+            }
+            else {
+                nielsenDate = $("#txtNielsenDateYear").val() + $("#ddlNielsenDatePeriod").val();
+            }
+
         }
 
         var url = ServicePrefix + '/api/market/UpdateMarketProductProperties';
@@ -785,7 +881,8 @@
                 "inExclusivityMethod": $("input[name=clusterExclusivity]:checked").val().trim(),
                 "inNumberPriorYears": numberPriorYears,
                 "inAccountTypeBreakdownAvailable": $("#chkAccTypeAvail").prop("checked"),
-                "inRevenueTypeBreakdownAvailable": $("#chkRevTypeAvail").prop("checked")
+                "inRevenueTypeBreakdownAvailable": $("#chkRevTypeAvail").prop("checked"),
+                "inNielsenDate" : nielsenDate
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -807,6 +904,57 @@
             bootbox.alert('XRY Product has successfully been updated.');
         }
     }
+
+
+    function updateXRYProductNielsenDateAllMarkets() {
+
+        if (validateNielsenDate() == false) {
+            return;
+        }
+
+        var nielsenDate = "";
+
+        if ($(".divNielsenDate").is(":visible")) {
+            if (validateNielsenDate() == false) {
+                return;
+            }
+            else {
+                nielsenDate = $("#txtNielsenDateYear").val() + $("#ddlNielsenDatePeriod").val();
+            }
+        }
+
+        var url = ServicePrefix + '/api/market/UpdateXRYNielsenDateAllMarkets';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inNielsenDate": nielsenDate
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                updateXRYProductNielsenDateAllMarketsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function updateXRYProductNielsenDateAllMarketsSuccess(data, textStatus, jQxhr)
+    {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+        } else {
+            bootbox.alert('All XRY Market Nielsen Dates have successfully been updated.');
+        }
+    }
+
 
     function hideShowMarketHoldDate() {
 
@@ -850,7 +998,6 @@
                     loopBreak = false;
                     return false;
                 }
-
             }
 
             if ($(eID).prop('tagName').toLowerCase() == "select") {
