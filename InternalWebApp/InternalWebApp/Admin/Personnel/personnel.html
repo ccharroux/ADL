@@ -1174,15 +1174,20 @@
             return;
         }
 
+        //user is new
+        //no need for email change check
+        //continue to create personnel
         if (personnelID <= 0) {
             $("#hdnPersonnelId").val(personnelID);
-        }
+            updatePersonnel();
 
+        } else {
+
+            //User exists
             //Email change check
             if (emailAddress.toUpperCase().trim() !== $("#txtEmailAddress").val().toUpperCase().trim()) {
                 //Email change has been detected
-                //first step
-                //SAML check
+                //first step is SAML check
                 checkSAMLStatus();
             } else {
                 //email was not changed, continue with update
@@ -1190,6 +1195,56 @@
             }
 
         }
+    }
+
+    function checkSAMLStatus() {
+        var url = ServicePrefix + '/api/Personnel/GetPersonnelSAMLStatus';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelID
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                checkSAMLStatusSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function checkSAMLStatusSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+
+            switch (data.report.rows[0].passwordOrSAML) {
+                case 1:
+                    //SAML ONLY - These users do not get a notification if username is changed continue with update.
+                    updatePersonnel();
+                    break;
+                case 2:
+                    //SAML or Regular - user can use both saml or regular login
+                    checkWebStatusForUsernameChange();
+                    break;
+                case 0:
+                    //Regular Only - non saml user
+                    checkWebStatusForUsernameChange();
+                    break;
+                default:
+                    bootbox.alert("There was an issue when checking the SAML status of this user.");
+                    break;
+            }
+
+        }
+    }
 
 
     function checkWebStatusForUsernameChange() {
@@ -1212,8 +1267,10 @@
                 showUsernameChangeDialogForPending();
                 break;
             case "NOTIFIED":
-                //User has been sent a web setup email
-                //User needs a new web setup email with new username
+                //User is in the status of 'Notified'
+                //That means they have been sent an initial setup
+                //email and haven't set up their web account yet.
+                //Ask internal user if they are sure they want to change email.
                 showUsernameChangeDialogForNotified();
                 break;
             case "WEB USER":
@@ -1226,6 +1283,12 @@
                 break;
 
         }
+    }
+
+    function showUsernameChangeDialogForPending() {
+        var strMessage = "This personnel has a PENDING notification. You must clear PENDING notification before you can alter the user's Email. Update has been canceled.";
+
+        bootbox.alert(strMessage, function () { });
     }
 
     function showUsernameChangeDialogForNotified() {
@@ -1280,6 +1343,10 @@
                 btnNo: {
                     label: "No",
                     callback: function () {
+                        //email will not be sent        
+                        //but pending notification will be
+                        //created for internal user to send
+                        //when they are ready.
                         insertPendingNotification();
                     }
                 }
@@ -1356,67 +1423,13 @@
             bootbox.alert("Pending record has been created for this user.", function () {
                 //Pending record for username change has been created
                 //Continue with personnel update
+                //Internal user will be able to send
+                //Pending notification from webnotification page
                 updatePersonnel();
             });
 
         }
     }
-
-    function showUsernameChangeDialogForPending() {
-        var strMessage = "This personnel has a PENDING notification. You must clear PENDING notification before you can alter the user's Email. Update has been canceled.";
-
-        bootbox.alert(strMessage, function () {});
-    }
-
-    function checkSAMLStatus() {
-        var url = ServicePrefix + '/api/Personnel/GetPersonnelSAMLStatus';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inPersonnelId": personnelID
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                checkSAMLStatusSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
-    }
-
-    function checkSAMLStatusSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-        } else {
-
-            switch (data.report.rows[0].passwordOrSAML) {
-                case 1:
-                    //SAML ONLY - These users do not get a notification if username is chanced continue with update.
-                    updatePersonnel();
-                    break;
-                case 2:
-                    //SAML or Regular - user can use both saml or regular login
-                    checkWebStatusForUsernameChange();
-                    break;
-                case 0:
-                    //Regular Only - non saml user
-                    checkWebStatusForUsernameChange();
-                    break;
-                default: 
-                    bootbox.alert("There was an issue when checking the SAML status of this user.");
-                    break;
-            }
-
-        }
-    }
-
 
     function updatePersonnel() {
 
