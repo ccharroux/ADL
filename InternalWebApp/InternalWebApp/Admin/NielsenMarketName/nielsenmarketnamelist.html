@@ -131,9 +131,22 @@
 <script>
     $(document).ready(function() {
 
+        buildList();
+
+
+        buildXRYMenu("Utility");
+        setLocalStorage("search", '');
+        setLocalStorage("searchPage", window.location);
+
+        loadReportParameters();
+        
+    });
+
+    function buildList()
+    {
         var reportTitle = 'Nielsen Market Names List';
         var exportColumns = returnTableColumnsByClass("dtNielsenMarketNamesList", "exportColumn");
-        var dataTableURL = ServicePrefix + '/api/NielsenMarket/GetNielsenMarketList';
+        var dataTableURL = ServicePrefix + '/api/NielsenMarket/GetNielsenMarketList?inApiToken=' + getLocalStorage("APIToken");
 
         $("#dtNielsenMarketNamesList").DataTable({
             "dom": "Blfrtip",
@@ -142,12 +155,7 @@
                 "url": dataTableURL,
                 "dataType": "json",
                 "contentType": "application/json",
-                "type": "POST",
-                "data": function (d) {
-                    return JSON.stringify({
-                        "inApiToken": getLocalStorage("APIToken")
-                    });
-                },
+                "type": "GET",
                 "dataSrc": function (json) {
                     if (json.response.status.toUpperCase() === "SUCCESS") {
 
@@ -245,15 +253,7 @@
                 var table = $("#dtNielsenMarketNamesList").DataTable();
                 table.search('').draw();
             });
-
-        buildXRYMenu("Utility");
-        setLocalStorage("search", '');
-        setLocalStorage("searchPage", window.location);
-
-        loadReportParameters();
-        
-    });
-
+    }
     function editNielsenMarket(nielsenMarketId) {
         window.location = "/admin/nielsenmarketname/nielsenmarketname.html?marketID=" + nielsenMarketId;
     }
