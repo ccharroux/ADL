@@ -311,7 +311,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div>
-                                    <input value="Update" onclick="excludeFromBackButton(); updatePersonnel();" class="default-button" type="button" />
+                                    <input value="Update" onclick="excludeFromBackButton(); initiatePersonnelUpdate();" class="default-button" type="button" />
                                 </div>
                                 <!--<div class="back-button-div">
                                     <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button" />
@@ -424,6 +424,7 @@
     var personnelID = 0;
     var personnelName = "";
     var emailAddress = "";
+    var bSendUsernameChangeEmail = false;
 
     $(document).ready(function ()
     {
@@ -1167,7 +1168,7 @@
     }
 
 
-    function updatePersonnel() {
+    function initiatePersonnelUpdate() {
 
         if (validationPassed() == false) {
             return;
@@ -1176,6 +1177,248 @@
         if (personnelID <= 0) {
             $("#hdnPersonnelId").val(personnelID);
         }
+
+            //Email change check
+            if (emailAddress.toUpperCase().trim() !== $("#txtEmailAddress").val().toUpperCase().trim()) {
+                //Email change has been detected
+                //first step
+                //SAML check
+                checkSAMLStatus();
+            } else {
+                //email was not changed, continue with update
+                updatePersonnel();
+            }
+
+        }
+
+
+    function checkWebStatusForUsernameChange() {
+
+        //User does not have a Web Setup,
+        //mka team doesn't need to notify user
+        //when username/email is altered
+        if ($("#spnWebStatus").text() == "") {
+            //continue with user update
+            updatePersonnel();
+            return;
+        }
+
+        //Check Web Status
+        switch ($("#spnWebStatus").text().toUpperCase().trim()) {
+            case "PENDING":
+                //User has pending notification, 
+                //you cannot change their username if they have a pending notification
+                //Changes canceled.
+                showUsernameChangeDialogForPending();
+                break;
+            case "NOTIFIED":
+                //User has been sent a web setup email
+                //User needs a new web setup email with new username
+                showUsernameChangeDialogForNotified();
+                break;
+            case "WEB USER":
+                //Ask to send email
+                showUsernameChangeDialogForWebUser();
+                break;
+            default:
+                //Issue happened cancel 
+                bootbox.alert("There was an issue when checking the Web Status for this user. Update has been canceled.");
+                break;
+
+        }
+    }
+
+    function showUsernameChangeDialogForNotified() {
+        var strMessage = "This user has not completed their web setup yet. Are you sure you want to change their username/email?";
+
+        bootbox.dialog({
+            message: strMessage,
+            buttons: {
+                btnCancel: {
+                    label: "Cancel",
+                    callback: function () {
+                        bootbox.alert("Process has been canceled. No emails have been sent and Update has been canceled.", function () {
+                            return;
+                        });
+                    }
+                },
+                btnYes: {
+                    label: "Yes",
+                    callback: function () {
+                        showUsernameChangeDialogForWebUser();
+                    }
+                }
+            }
+
+
+        });
+    }
+
+    function showUsernameChangeDialogForWebUser() {
+        var strMessage = "The email for this personnel has been changed. Send Username Change notification to this user?";
+
+        bootbox.dialog({
+            message: strMessage,
+            buttons: {
+                btnCancel: {
+                    label: "Cancel",
+                    callback: function () {
+                        bootbox.alert("Process has been canceled. No emails have been sent and Update has been canceled.", function () {
+                            return;
+                        });
+                        
+                    }
+                },
+                btnYes: {
+                    label: "Yes",
+                    callback: function () {
+                        //Set flag to send username email after personnel gets successfully updated.
+                        bSendUsernameChangeEmail = true;
+                        updatePersonnel();
+                    }
+                },
+                btnNo: {
+                    label: "No",
+                    callback: function () {
+                        insertPendingNotification();
+                    }
+                }
+            }
+        });
+    }
+
+    function sendUsernameChangeEmail() {
+        var url = ServicePrefix  + '/api/Notification/InitiateWebNotification';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelID": personnelID,
+                "inNotificationToken": "UserNameChange"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                sendUsernameChangeEmailSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+        $.ajax(url, settings);
+    }
+
+    function sendUsernameChangeEmailSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            $.each(data.report.rows, function (index) {
+
+                bootbox.alert("Username Change email has been sent.", function () {
+                    window.location = "/admin/personnel/personnel.html?personnelID=" + personnelID;
+                });
+
+            });
+        }
+    }
+
+    function insertPendingNotification() {
+        var url = ServicePrefix + '/api/Personnel/InsertPersonnelNotification';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelID,
+                "inActionToken": "UserNameChange"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                insertPendingNotificationSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function insertPendingNotificationSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+
+            bootbox.alert("Pending record has been created for this user.", function () {
+                //Pending record for username change has been created
+                //Continue with personnel update
+                updatePersonnel();
+            });
+
+        }
+    }
+
+    function showUsernameChangeDialogForPending() {
+        var strMessage = "This personnel has a PENDING notification. You must clear PENDING notification before you can alter the user's Email. Update has been canceled.";
+
+        bootbox.alert(strMessage, function () {});
+    }
+
+    function checkSAMLStatus() {
+        var url = ServicePrefix + '/api/Personnel/GetPersonnelSAMLStatus';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelID
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                checkSAMLStatusSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function checkSAMLStatusSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+
+            switch (data.report.rows[0].passwordOrSAML) {
+                case 1:
+                    //SAML ONLY - These users do not get a notification if username is chanced continue with update.
+                    updatePersonnel();
+                    break;
+                case 2:
+                    //SAML or Regular - user can use both saml or regular login
+                    checkWebStatusForUsernameChange();
+                    break;
+                case 0:
+                    //Regular Only - non saml user
+                    checkWebStatusForUsernameChange();
+                    break;
+                default: 
+                    bootbox.alert("There was an issue when checking the SAML status of this user.");
+                    break;
+            }
+
+        }
+    }
+
+
+    function updatePersonnel() {
 
         var url = ServicePrefix + '/api/Personnel/UpdatePersonnel';
 
@@ -1242,9 +1485,18 @@
                 }
 
                 bootbox.alert('Personnel update successful.', function () {
+
+                    if (bSendUsernameChangeEmail) {
+                        //Username has been changed and
+                        //update has been successful, send username change email
+                        sendUsernameChangeEmail();
+                        return;
+                    }
+
                     if (bReloadPage) {
                         window.location = "/admin/personnel/personnel.html?personnelID=" + $("#hdnPersonnelId").val();
                     }
+            
                 });
 
             });
