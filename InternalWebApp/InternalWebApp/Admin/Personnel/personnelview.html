@@ -233,22 +233,19 @@
                             </div>
 
                             <!-- Global History-->
-                            <div class="row initiallyHidden historySection borderSection" id="divPersonnelChangeHistoryPersonnelField">
+                            <div class="row noMarginsLeftRight initiallyHidden historySection borderSection" id="divPersonnelChangeHistoryPersonnelField">
                                 <!-- dataTable-top-margin makes it too wide -->
+                                <h4 class="text-center sectionHeader">History</h4>
 
-                                <div class="col-md-12">
-                                    <div class="row noMarginsLeftRight">
-                                        <div class="col-md-9 subHeaderStyle">
-                                            <div id="headerPersonnelChangeHistoryPersonnelField"></div>
-                                        </div>
-                                        <div class="col-md-3 text-align-center subHeaderStyle">
-                                            <input style="margin-left: 30px;"value="Hide" onclick="hidePersonnelChangeHistoryPersonnelField();"  type="button">
-                                        </div>
-                                    </div>
-
+                                <div class="col-md-9 subHeaderStyle">
+                                    <div id="headerPersonnelChangeHistoryPersonnelField"></div>
                                 </div>
+                                <div class="col-md-3 text-align-center subHeaderStyle">
+                                    <input style="margin-left: 30px;" value="Hide" onclick="hidePersonnelChangeHistoryPersonnelField();" type="button">
+                                </div>  
 
-                                <div class="col-md-12 text-align-left">
+
+ 
                                     <table id="dtPersonnelChangeHistoryPersonnelField" class="dataTable-border dataTable-headers dataTable-cell-border fullWidth">
                                         <thead>
                                             <tr>
@@ -257,10 +254,9 @@
                                             </tr>
                                         </thead>
                                     </table>
-                                </div>
+ 
                             </div>
 
-                            <hr />
                             <!-- Web Status -->
                             <div class="borderSection">
                                 <h4 class="text-center sectionHeader">Web Setup Status</h4>
@@ -277,8 +273,8 @@
                             </div>
 
                             <!-- start datatable-->
-                            <div id="divResults" class="dataTable-top-margin borderSection">
-                                <h4 class="text-center sectionHeader">Customer Communication Touches</h4>
+                            <div id="divResults" class="borderSection">
+                                <h4 class="text-center sectionHeader">Customer Communication Touch Points</h4>
 
                                 <table id="dtCustomerSupportList" class="dataTable-border dataTable-headers dataTable-cell-border" style="width: 100%">
                                     <thead>
@@ -286,6 +282,20 @@
                                             <th class="exportColumnn">Date</th>
                                             <th class="exportColumn">Communication</th>
                                             <th class="exportColumn">&nbsp;</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <!-- end datatable -->
+
+                            <!-- start datatable-->
+                            <div id="divResultsRelationshipList" class="borderSection">
+                                <h4 class="text-center sectionHeader">Personnel Groups</h4>
+                                <table id="dtRelationshipLists" class="dataTable-border dataTable-headers dataTable-cell-border" style="width: 100%">
+                                    <thead>
+                                        <tr>
+                                            <th class="exportColumn">Name</th>
+                                            <th class="exportColumn">Author</th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -491,7 +501,7 @@
                                                 <option value="Contact">Contact</option>
                                                 <option value="Recipient">Recipient</option>
                                             </select>
-                                            <input id="btnShowOrHidePersonnelChangeHistoryXRYPersonnelRoles" value="Show history" onclick="showOrHidePersonnelChangeHistoryXRYPersonnelRoles();" class="history-button" type="button">
+                                            <input id="btnShowOrHidePersonnelChangeHistoryXRYPersonnelRoles" value="Show" onclick="showOrHidePersonnelChangeHistoryXRYPersonnelRoles();" class="history-button" type="button">
                                         </div>
                                     </div>
                                 </div>
@@ -664,7 +674,10 @@
         setDataTable_RolesMSS();
         setDataTable_RolesDMA();
         setDataTableCustomerSupport();
+        setDataTable_RelationshipList();
+
         clearSearchButtonSetupCustomerSupport();
+        clearSearchButtonSetupRelationshipLists();
 
         setDataTable_PersonnelChangeHistoryPersonnelField();
         setDataTable_PersonnelChangeHistoryPersonnelOwners();
@@ -679,7 +692,7 @@
         getPersonnelOwners();
         getPersonnelProducts();
         getCustomerSupportList();
-
+        getRelationshipLists();
         cleanupBackButton();
 
     });
@@ -2708,9 +2721,6 @@
             ],
             "pagingType": "full_numbers",
             "buttons": [],
-            initComplete: function () {
-                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
-            },
             createdRow: function (row, data, index) {
                 //this adds the class to every row
                 $(row).addClass('single-line-height');
@@ -2765,4 +2775,80 @@
     function editTrainingEvent(trainingEventId) {
         window.location = "/admin/training/training.html?trainingEventId=" + trainingEventId;
     }
+
+
+    function setDataTable_RelationshipList() {
+        var reportTitle = "Relationship Lists";
+        var exportColumns = returnTableColumnsByClass("dtRelationshipLists", "exportColumn");
+
+        $("#dtRelationshipLists").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": 10,
+            "data": [],
+            "order": [
+                [0, 'asc']
+            ],
+            "columns": [
+                { "data": 'RelationshipListName' },
+                { "data": 'ListCreator' }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [],
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+    }
+
+    function clearSearchButtonSetupRelationshipLists() {
+        $("body").on("click", "#clear_search_button", function () {
+            var table = $("#dtRelationshipLists").DataTable();
+            table.search('').draw();
+        });
+    }
+
+    function getRelationshipLists() {
+ 
+        var includeInactive = false;
+
+        var url = ServicePrefix + '/api/Relationship/GetRelationshipLists'
+            + '?inApiToken=' + getLocalStorage("APIToken");
+
+        if (personnelId != "") {
+            url += '&inPersonnelId=' + personnelId;
+        }
+
+        if (includeInactive) {
+            url += '&inincludeInactive=true';
+        }
+
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            success: function (data, textStatus, jQxhr) {
+                getRelationshipListsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getRelationshipListsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        populateDataTable("dtRelationshipLists", data);
+        $("#divResultsRelationshipList").show();
+    }
+
 </script>
