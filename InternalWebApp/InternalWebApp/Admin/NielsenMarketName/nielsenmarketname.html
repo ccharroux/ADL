@@ -41,6 +41,8 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
     <!--Chosen Dropdown-->
     <link rel="stylesheet" href="/css/chosen.min.css" />
 
@@ -69,14 +71,14 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Market - Nielsen Name</h2>
+                        <h2>Nielsen Market</h2>
                     </div>
                 </div>
                 <div class="text-center">
 
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtMarketId">MKA Market ID</label>
+                            <label for="txtMarketId">Market ID</label>
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input type="text" class="field-width-325" id="txtMarketId" disabled />
@@ -85,7 +87,7 @@
 
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="ddlMarket">MKA Market Name</label>
+                            <label for="ddlMarket">Market Name</label>
                         </div>
                         <div class="col-md-9 text-align-left">
                             <select id="ddlMarket" onchange="excludeFromBackButton(); marketChange();" class="mkaRequired field-width-325" errorMessage="You must select a Market"></select>
@@ -94,10 +96,10 @@
 
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtNielsenMarketName">Nielsen Market Name</label>
+                            <label for="txtNielsenMarketName">Nielsen Market</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="txtNielsenMarketName" maxlength="50" class="mkaRequired field-width-325" errorMessage="You must enter a Nielsen Market Name" value="" maxlength="50" />
+                            <input type="text" id="txtNielsenMarketName" maxlength="50" class="mkaRequired field-width-325" errorMessage="You must enter a Nielsen Market Name" value=""  />
                         </div>
                     </div>
 
@@ -118,7 +120,12 @@
 
                     </div>
                     <center>
-                        <div class="dataTable-top-margin">
+                        <div class="row ">
+                            <div class="col-md-12 text-align-right existingEntry" style="display:none">
+                                <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editNielsenMarketParticipant('', '')" />
+                            </div>
+                        </div>
+                        <div class="dataTable-top-margin existingEntry" style="display:none">
                             <table id="dtNielsenMarketParticipantList" class="dataTable-border dataTable-headers dataTable-cell-border">
                                 <thead>
                                     <tr>
@@ -134,10 +141,31 @@
                 </div>
             </div>
         </div>
+        <div id="editDialog" title="" style="display:none; width: 100%;">
+            <div style="width:55%; display:inline-block; vertical-align:top;">
+                <input id="hidOldParticipantName" value="" type="hidden" />
+                <label for="ddlMediaType">Media Type</label><br />
+                <select style="width: 360px;" id="ddlMediaType" class="search-ddl-select">
+                    <option value="-1" selected="selected">-- Select Media Type --</option>
+                    <option value="2">Television</option>
+                    <option value="3">Newspapers</option>
+                </select>
+                <br />
+                <label for="txtName">Participant Name</label><br />
+                <div><input style="width: 360px;" type="text" id="txtParticipantName"/></div>
+            </div>
+            <div style="margin-top:20px; text-align:center;">
+                <input type="button" id="btnSave" value="Save" class="default-button" onclick="saveParticipant();" />
+            </div>
+            <div style="margin-top:4px; text-align:center">
+                <input type="button" id="btnCancel" value="Close" class="default-button" onclick="closeEditDialog()" />
+            </div>
+        </div>
     </div>
 
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <!-- jQuery Easing -->
     <script src="/js/jquery.easing.1.3.js"></script>
     <!-- Bootstrap -->
@@ -177,20 +205,44 @@
         setupMarketId = (getParameterByName("setupMarketID") == null ? 0 : getParameterByName("setupMarketID"));
 
         buildXRYMenu("Utility");
+        buildUIDialogs();
 
         if (marketId === "0") {
             //load unlinked markets
             loadMarkets(false);
+            $(".existingEntry").hide();
 
         } else {
             //load linked markets
-            //load the nielsen market with that ID          
+            //load the nielsen market with that ID   
+            $(".existingEntry").show();
             loadMarkets(true);
             buildList();
 
         }
      
     });
+
+    function buildUIDialogs() {
+        $(function () {
+            $("#editDialog").dialog({
+                autoOpen: false,
+                resizable: false,
+                width: 420,
+                height: 300,
+                modal: true,
+                title: 'Nielsen Participant Maintenance',
+                create: function (event, ui) {
+                    $(event.target).parent().css('position', 'fixed');
+                }
+            });
+        });
+
+    }
+    function breakDownDataTable(inTable)
+    {
+        $('#' + inTable).DataTable().ajax.reload();
+    }
 
     function buildList() {
         var reportTitle = 'Nielsen Market Participants List';
@@ -224,7 +276,7 @@
                 { "data": 'mediaTypeName' },
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="#" onclick="editNielsenMarketParticipant(' + "'" + row.participantName + "'," + "'" + row.mediaTypeName + "'" + ')">Edit</a>&nbsp;<a href="#" onclick="deleteNielsenMarketParticipant(' + "'" + row.participantName + "'," + "'" + row.mediaTypeName + "'" + ')">Delete</a>';
+                        return '<a href="#" onclick="editNielsenMarketParticipant(' + "'" + row.participantName + "'," + row.mediaTypeId + ')">Edit</a>&nbsp;<a href="#" onclick="deleteNielsenMarketParticipant(' + "'" + row.participantName + "'," + row.mediaTypeId + ')">Delete</a>';
                     },
                     "orderable": false,
                     "searchable": false,
@@ -476,7 +528,7 @@
                 bReloadPage = true;
             }
 
-            bootbox.alert('Market - Nielsen Name has successfully been updated.');
+            bootbox.alert('Nielsen Market has successfully been updated.');
 
             if (bReloadPage) {
                 window.location = "/admin/nielsenmarketname/nielsenmarketname.html?marketID=" + $("#txtMarketId").val();
@@ -487,11 +539,163 @@
 
     function editNielsenMarketParticipant(inName, inMediaType)
     {
-
+        loadDialog(inName, inMediaType);
     }
 
-    function deleteNielsenMarketParticipant(inName, inMediaType) {
+    function deleteNielsenMarketParticipant(inName, inMediaType)
+    {
 
+        var Message = "Are you sure you want to delete " + inName + "?";
+
+        bootbox.confirm(Message,
+            function (result) 
+            {
+                if (result) 
+                {
+                    $.ajax({
+                        url: ServicePrefix + '/api/NielsenMarket/DeleteNielsenMarketParticipant',
+                        dataType: 'json',
+                        type: 'post',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            "inApiToken": getLocalStorage("APIToken"),
+                            "inMarketId": marketId,
+                            "inMediaTypeId" : inMediaType,
+                            "inParticipantName" : inName
+                        }),
+                        processData: false,
+                        success: function (data, textStatus, jQxhr) {
+
+                            if (data.response.status != "SUCCESS") {
+                                MKAErrorMessageRtn(data.response.errorMessage[0]);
+                            } else {
+                                breakDownDataTable("dtNielsenMarketParticipantList");
+                            }
+
+                        },
+                        error: function (jqXhr, textStatus, errorThrown) {
+                            MKAErrorMessageRtn(errorThrown);
+
+                        }
+                    });
+
+                } 
+                {
+                    return;
+                }
+            });
+    }
+
+    function loadDialog(inName, inMediaType)
+    {
+        $("#hidOldParticipantName").val(inName);
+        $("#txtParticipantName").val(inName);
+        $("#ddlMediaType").val(inMediaType);
+
+        if (inName == '')
+        {
+
+            $("#ddlMediaType").prop("disabled", false);
+            $("#ddlMediaType").val("-1");
+        }
+        else
+        {
+            $("#ddlMediaType").prop("disabled", true);
+        }
+
+
+        openEditDialog();
+    }
+
+    function closeEditDialog() {
+
+        $("#editDialog").dialog("close");
+    }
+
+    function openEditDialog() {
+
+        $(".ui-dialog-titlebar-close").hide();
+        $("#editDialog").dialog("open");
+    }
+
+    function saveParticipant()
+    {
+
+        var inParticipantName = $("#txtParticipantName").val();
+        var inOldParticipantName = $("#hidOldParticipantName").val();
+        var inMediaType = $("#ddlMediaType").val();
+
+
+        if (inMediaType == "-1" || inMediaType == "")
+        {
+            closeEditDialog();
+            bootbox.alert('Media Type must be selected.', function () { openEditDialog(); });
+            return;
+        }
+
+        if (inParticipantName.trim() == "")
+        {
+            closeEditDialog();
+            bootbox.alert('Participant name must be entered.', function () { openEditDialog(); });
+            return;
+        }
+
+        var obj = new Object();
+        var url = '';
+
+        // new
+        if (inOldParticipantName == '')
+        {
+            url = ServicePrefix + '/api/NielsenMarket/InsertNielsenMarketParticipant'
+            obj = 
+            {
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId,
+                "inMediaTypeId": inMediaType,
+                "inParticipantName": inParticipantName
+            }
+        }
+        else
+        {
+            url = ServicePrefix + '/api/NielsenMarket/UpdateNielsenMarketParticipant'
+            obj =
+            {
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId,
+                "inMediaTypeId": inMediaType,
+                "inOldParticipantName": inOldParticipantName,
+                "inNewParticipantName": inParticipantName
+            }
+        }
+
+        if (inOldParticipantName.toLowerCase() == inParticipantName.toLowerCase())
+        {
+            closeEditDialog();
+            return;
+        }
+
+
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify(obj),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+ 
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0], closeEditDialog, openEditDialog);
+                } else {
+                    closeEditDialog();
+                    breakDownDataTable("dtNielsenMarketParticipantList");
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown, closeEditDialog, openEditDialog);
+            }
+        });
     }
 </script>
 

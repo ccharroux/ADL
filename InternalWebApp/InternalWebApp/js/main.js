@@ -11,6 +11,7 @@ const gChosenParams = {
     allowSplitWordSearch: false
 }
 var gShowHeader = true;
+var gAJAXError = false;
 
 var release =
 {
@@ -289,7 +290,12 @@ var navTool = {
 
 $(document).ready(function ()
 {
- 
+    $(document).ajaxSuccess(function () {
+        gAJAXError = false;
+    });
+    $(document).ajaxError(function () {
+        gAJAXError = false;
+    });
 
     setTimeout(resetHeaderBackButton, 1500);
 
@@ -988,7 +994,7 @@ function goBackToDashboard() {
     window.location = "/admin/login/dashboard.html";
 }
 
-function MKAErrorMessageRtn(message, url) {
+function MKAErrorMessageRtn(message, preCallback, postCallback) {
 
     var newMessage = "";
 
@@ -997,21 +1003,57 @@ function MKAErrorMessageRtn(message, url) {
         message = "";
     }
 
+    if (!preCallback == false)
+    {
+        const promise = new Promise((resolve, reject) => {
+
+            preCallback();
+            resolve("OK");
+        });
+
+        promise.then
+        (
+                    (data) => {
+                        MKAErrorMessageDeliveryRtn(message, postCallback);
+                    },
+                    (error) => {
+                        bootbox.alert(error, function () { return; });
+                    }
+        );
+    }
+    else
+    {
+        MKAErrorMessageDeliveryRtn(message, postCallback);
+    }
+
+}
+
+function MKAErrorMessageDeliveryRtn(message, postCallback) {
+
     if (message.toString().toLowerCase().indexOf('token is invalid') > -1) {
         newMessage = "Your Token has expired - Please login again";
         bootbox.alert(newMessage, function () {
-
+ 
         });
         window.location = "/admin/login/login.html";
     }
     else if (message.toString().toLowerCase().indexOf('authentication failed') > -1) {
         newMessage = "Authentication Failed";
         $("#password").val('');
-        bootbox.alert(newMessage, function () { });
+        bootbox.alert(newMessage, function () {
+ 
+        });
     }
     else {
-        bootbox.alert('Process Failed.\n\r\n\r' + message + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () { });
+        bootbox.alert('Process Failed.\n\r\n\r' + message + '.' +
+            (gAJAXError == true ? '\n\r\n\rDevelopment has been notified and is looking into this issue.' : ''), function () {
+
+                if (!postCallback == false) {
+                    postCallback();
+                }
+            });
     }
+
 }
 
 function buildMainMenu(selectedItem) {
