@@ -239,7 +239,7 @@
 </body>
 </html>
 <script>
-    var columnRuleId = 0;
+    var mappingColumnRuleId = 0;
     var bIsNew = false;
 
     $(document).ready(function () {
@@ -247,10 +247,10 @@
         buildXRYMenu("Utility");
         buildQuickReports(['xry']);
 
-        columnRuleId = (getParameterByName("ColumnRuleId") == null ? 0 : getParameterByName("ColumnRuleId"));
+        mappingColumnRuleId = (getParameterByName("MappingColumnRuleId") == null ? 0 : getParameterByName("MappingColumnRuleId"));
 
-        $("#txtColumnRuleId").val(columnRuleId);
-        bIsNew = columnRuleId <= 0;
+        $("#txtColumnRuleId").val(mappingColumnRuleId);
+        bIsNew = mappingColumnRuleId <= 0;
 
         //get scripts list
         getScriptsList();
@@ -325,7 +325,7 @@
                     str = '<option value="-1">-- Select an Owner --</option>';
                     $.each(data.report.rows, function (index) {
 
-                        str = str + '<option value="' + data.report.rows[index].ownerid + '">' + data.report.rows[index].ownername + ' (' + data.report.rows[index].ownerid + ')' + '</option>';
+                        str = str + '<option value="' + data.report.rows[index].ownerid + '">' + data.report.rows[index].ownername + '</option>';
 
                     });
 
@@ -390,14 +390,65 @@
 
     function getMappingColumnRule()
     {
-        if (columnRuleId <= 0)
+        if (mappingColumnRuleId <= 0)
         {
             initializeActiveDate();
             return;
         }
 
         //get the rule
+        var sUrl = ServicePrefix + "/api/XrayImport/GetImportMappingColumnRule?";
+        sUrl += "inApiToken=" + getLocalStorage("APIToken");
+        sUrl += "&inMappingColumnRuleId=" + mappingColumnRuleId;
 
+        $.ajax({
+            url: sUrl,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else
+                {
+                    $.each(data.report.rows, function(index)
+                    {
+                        var obj = data.report.rows[index];
+
+                        $("#ddlScript").val(obj.scriptId);
+                        $("#txtColumnRuleDescription").val(obj["Rule Description"]);
+                        $("#txtColumnRuleToken").val(obj.Token);
+                        $("#chkRuleRequired").prop("checked", obj.Required);
+                        $("#chkRejectRow").prop("checked", obj["Reject Row"]);
+                        $("#chkPassMeansFail").prop("checked", obj["Pass Means Fail"]);
+                        $("#ddlOwner").val(obj.ownerId || -1);
+                        $("#ddlMarket").val(obj.marketId || -1);
+
+                        var activeDate = new Date(obj["Active Date"]);
+                        $("#txtActiveDate").val(addZero(activeDate.getMonth() + 1) + '/' + addZero(activeDate.getDate()) + '/' + activeDate.getFullYear());
+
+                        if (obj["Delete Date"] != null) {
+                            var disableDate = new Date(obj["Delete Date"]);
+                            $("#txtDisableDate").val(addZero(disableDate.getMonth() + 1) +
+                                '/' +
+                                addZero(disableDate.getDate()) +
+                                '/' +
+                                disableDate.getFullYear());
+                            $(".disable-date").show();
+                        } else {
+                            $(".disable-date").hide();
+                        }
+
+                    });
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
 
     }
 
