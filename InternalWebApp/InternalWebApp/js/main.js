@@ -1492,6 +1492,34 @@ function returnProductListLinks(row) {
     return productList;
 }
 
+function returnProductMarketLinks(row) {
+    
+    var productList = "";
+
+    if (row.MRR.trim().length > 0)
+    {
+        productList = productList + '<a href="#" onclick="goTo(';
+        productList = productList + "'/products/mrr/mrrmarketproduct.html?marketId=" + row.marketId;
+        productList = productList + "')";
+        productList = productList + ';">' + row.MRR.toUpperCase() + "</a>&nbsp;";
+    }
+    if (row.XRY.trim().length > 0) {
+        productList = productList + '<a href="#" onclick="goTo(';
+        productList = productList + "'/products/xry/xrymarketproduct.html?marketId=" + row.marketId;
+        productList = productList + "')";
+        productList = productList + ';">' + row.XRY.toUpperCase() + "</a>&nbsp;";
+    }
+    if (row.TVB.trim().length > 0) {
+        productList = productList + '<a href="#" onclick="goTo(';
+        productList = productList + "'/products/tvb/tvbmarketproduct.html?marketId=" + row.marketId;
+        productList = productList + "')";
+        productList = productList + ';">' + row.TVB.toUpperCase() + "</a>&nbsp;";
+    }
+    productList += row.MSS.trim().length > 0 ? row.MSS.toUpperCase() + '&nbsp;' : '';
+    productList += row.DMA.trim().length > 0 ? row.DMA.toUpperCase() + '&nbsp;' : '';
+
+    return productList;
+}
 
 
 function populateDataTable(tableName, data) {
