@@ -389,22 +389,39 @@
                                 </div>
 
                                 <div id="divMRR" class="initiallyHidden borderSection">
+                                    <h4 class="text-center sectionHeader">Details</h4>
+
                                     <div class="row">
-                                        <div class="col-md-4 text-align-left">
+                                        <div class="col-md-5 text-align-left">
                                             <label for="spanMRREstimated">Estimated?</label>
                                         </div>
-                                        <div class="col-md-8 text-align-left">
+                                        <div class="col-md-7 text-align-left">
                                             <span id="spanMRREstimated"></span>
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-4 text-align-left">
+                                        <div class="col-md-5 text-align-left">
                                             <label for="spanMRRAboveBelowNonParticipant">Above/Below Non-Participant?</label>
                                         </div>
-                                        <div class="col-md-8 text-align-left">
+                                        <div class="col-md-7 text-align-left">
                                             <span id="spanMRRAboveBelowNonParticipant"></span>
                                         </div>
                                     </div>
+                                </div>
+
+                                <!-- XRY options -->
+                                <div class="row productXRY sectionProduct margin-top-10">
+                                    <div class="col-md-9">
+                                        <h3 style="margin-bottom: 5px;" class="productXRY">XRY</h3>
+                                    </div>
+                                    <div class="col-md-3 text-align-center">
+                                        <input id="btnShowHideXRY" value="Show" onclick="showOrHideXRY();" class="default-button" type="button">
+                                    </div>
+                                </div>
+
+                                <div id="divXRY" class="initiallyHidden borderSection">
+                                    <h4 class="text-center sectionHeader">Submissions</h4>
+                                    <div id="submissionList"></div>
                                 </div>
 
                                 <!-- TVB options -->
@@ -419,6 +436,8 @@
                                 </div>
  
                                 <div id="divTVB" class="initiallyHidden borderSection">
+                                    <h4 class="text-center sectionHeader">Details</h4>
+
                                     <div class="row">
                                         <div class="col-md-4 text-align-left">
                                             <label for="spanTVBTimeSalesStation">Time Sales Station</label>
@@ -461,17 +480,7 @@
                                     </div>
                                 </div>
                             </div>
-                                    <!--
-                Possible additions:
 
-                * TVB - Is affiliation reported individually or rolled up into Misc/Other?
-
-                Change history:
-                * Station markets
-                * Station owner groups
-                * (MRR options)
-                * (TVB stuff)
-            -->
                                 </div>
                             </div>
 
@@ -1564,6 +1573,11 @@
                         changeValueFromShowToHide("btnShowHide" + productId);
                         getMRRStationOptions();
                         break;
+                    case "XRY":
+                        $("#div" + productId).show();
+                        changeValueFromShowToHide("btnShowHide" + productId);
+                        getSubmissionList();
+                        break;
                     case "TVB":
                         $("#div" + productId).show();
                         changeValueFromShowToHide("btnShowHide" + productId);
@@ -1754,32 +1768,40 @@
     }
 
     function changeValueFromShowToHide(controlId) {
-        console.log(controlId);
+ 
         $("#" + controlId).val($("#" + controlId).val().replace("Show", "Hide"));
     }
 
     function showOrHideMRR() {
         if ($("#divMRR").is(":visible")) {
             $("#divMRR").hide();
-            changeValueFromHideToShow("btnShowOrHideMRR");
+            changeValueFromHideToShow("btnShowHideMRR");
         } else {
             $("#divMRR").show();
-            changeValueFromShowToHide("btnShowOrHideMRR");
+            changeValueFromShowToHide("btnShowHideMRR");
         }
     }
-
+    function showOrHideXRY() {
+        if ($("#divXRY").is(":visible")) {
+            $("#divXRY").hide();
+            changeValueFromHideToShow("btnShowHideXRY");
+        } else {
+            $("#divXRY").show();
+            changeValueFromShowToHide("btnShowHideXRY");
+        }
+    }
     function showOrHideTVBOptions()
     {
 
         if ($("#divTVB").is(":visible"))
         {
             $("#divTVB").hide();
-            changeValueFromHideToShow("btnShowOrHideTVB");
+            changeValueFromHideToShow("btnShowHideTVB");
         }
         else
         {
             $("#divTVB").show();
-            changeValueFromShowToHide("btnShowOrHideTVB");
+            changeValueFromShowToHide("btnShowHideTVB");
         }
     }
 
@@ -1841,5 +1863,83 @@
 
     function genericAjaxError(jQxhr, textStatus, errorThrown) {
         MKAErrorMessageRtn(errorThrown);
+    }
+
+    function getSubmissionList() {
+
+        var url = ServicePrefix + '/api/ReInput/GetReInputList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getSubmissionListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getSubmissionListSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            var str = '';
+
+            $("#submissionList").html("");
+            str = str + '<div class="row noMarginsLeftRight" style="padding-top:3px;">';
+
+            str = str + '   <div class="col-md-6 text-align-left" style="background-color: rgb(86, 101, 115);color:white">';
+            str = str + "Submission";
+            str = str + '</div>';
+
+            str = str + '   <div class="col-md-4 text-align-center" style="background-color: rgb(86, 101, 115);color:white">';
+            str = str + "Alt Call Letters";
+            str = str + '</div>';
+
+            str = str + '   <div class="col-md-2 text-align-center" style="background-color: rgb(86, 101, 115);color:white">';
+            str = str + "Seasonal";
+            str = str + '</div>';
+
+            str = str + '</div>';
+
+            $.each(data.report.rows, function (index) {
+
+                var obj = data.report.rows[index];
+
+                str = str + '<div class="row noMarginsLeftRight"" style="padding-top:3px;">';
+
+                str = str + '   <div class="col-md-6 text-align-left" >';
+                str = str + obj.description.toUpperCase() + ' (' + obj.submissionId + ')';
+                str = str +     '</div>';
+
+                str = str + '   <div class="col-md-4 text-align-center" >';
+                str = str + (obj.altCallLetters == null ? '' : obj.altCallLetters.toUpperCase());
+                str = str + '</div>';
+
+                str = str + '   <div class="col-md-2 text-align-center">';
+                str = str + obj.seasonal;
+                str = str + '</div>';
+
+                str = str + '</div>';
+
+
+            });
+
+            $("#submissionList").append(str);
+
+        }
+
     }
 </script>
