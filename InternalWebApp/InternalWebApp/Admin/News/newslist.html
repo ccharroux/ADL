@@ -75,9 +75,13 @@
 
                 <!-- search / filter area -->
                 <div class="row search-section">
-                    <div class="col-md-10 ">
+                    <div class="col-md-5">
                         <label for="ddlProduct" class="dropdown-label">Product</label>
                         <select id="ddlProduct" class="search-ddl-select dropdown-select report-filter" onchange="getNewsList();"></select>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="chkIncludeDeleted" class="dropdown-label">Include Deleted</label>
+                        <input type="checkbox" id="chkIncludeDeleted" class="report-filter" onchange="getNewsList();" />
                     </div>
                     <div class="col-md-2">
                         <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="addNews();" />
@@ -89,14 +93,15 @@
                     <table id="dtNews" class="dataTable-border dataTable-headers dataTable-cell-border">
                         <thead>
                             <tr>
-                                <th class="exportColumn">Title</th>
-                                <th class="exportColumn">Short Text</th>
-                                <th class="exportColumn">Text</th>
-                                <th class="exportColumn">Image</th>
-                                <th class="exportColumn">Date</th>
-                                <th class="exportColumn">View More</th>
-                                <th class="exportColumn">Product</th>
                                 <th class="exportColumn">Public</th>
+                                <th class="exportColumn">Product</th>
+                                <th class="exportColumn">Title</th>
+                                <th class="exportColumn">Date</th>
+                                <th class="exportColumn">Image</th>
+                                <th class="exportColumn">Short Text</th>
+                                <th class="exportColumn">View More</th>
+                                <th class="exportColumn">Text</th>
+                                <th class="exportColumn">Creator</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -196,14 +201,15 @@
             "pageLength": gDataTableDefaultRows,
             "data": [],
             "columns": [
-                { "data": 'NewsTitle' },
-                { "data": 'NewsShortText', "render": $.fn.dataTable.render.ellipsis(200, true, false) },
-                { "data": 'NewsText', "render": $.fn.dataTable.render.ellipsis(200, true, false) },
-                { "data": 'NewsImage' },
-                { "data": 'NewsDateTime' },
-                { "data": 'ViewMore' },
-                { "data": 'ProductID' },
                 { "data": 'IsPublic' },
+                { "data": 'ProductID' },
+                { "data": 'NewsTitle' },
+                { "data": 'NewsDateTime' },
+                { "data": 'NewsImage' },
+                { "data": 'NewsShortText', "render": $.fn.dataTable.render.ellipsis(200, true, false) },
+                { "data": 'ViewMore' },
+                { "data": 'NewsText', "render": $.fn.dataTable.render.ellipsis(200, true, false) },
+                { "data": 'Creator' },
                 {
                     mRender: function (data, type, row) {
                         return "<a href='#' onclick='editNews(" + row.NewsKey + ");'>Edit</a>"
@@ -336,6 +342,9 @@
         if (productId != "") {
             url += '&inProductId=' + productId;
         }
+        if ($("#chkIncludeDeleted").prop("checked") || productId == "DEL" || productId == "UPD") {
+            url += '&inIncludeDeleted=true';
+        }
 
         $.ajax({
             url: url,
@@ -361,11 +370,79 @@
     }
 
     function approveNews(NewsKey) {
-        bootbox.alert('This functionality is still under development.');
+        bootbox.confirm("Are you sure you want to approve this news article?", function (result) {
+            if (result == true) {
+                approveNewsConfirmed(NewsKey);
+            }
+        });
+    }
+
+    function approveNewsConfirmed(NewsKey) {
+        $.ajax({
+            url: ServicePrefix + '/api/News/UpdateNewsApprove',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inNewsKey": NewsKey
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                approveNewsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function approveNewsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert('News article approved.');
+        getNewsList();
     }
 
     function unapproveNews(NewsKey) {
-        bootbox.alert('This functionality is still under development.');
+        bootbox.confirm("Are you sure you want to unapprove this news article?", function (result) {
+            if (result == true) {
+                unapproveNewsConfirmed(NewsKey);
+            }
+        });
+    }
+
+    function unapproveNewsConfirmed(NewsKey) {
+        $.ajax({
+            url: ServicePrefix + '/api/News/UpdateNewsUnapprove',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inNewsKey": NewsKey
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                unapproveNewsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function unapproveNewsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert('News article unapproved.');
+        getNewsList();
     }
 
     function deleteNews(NewsKey) {
@@ -378,7 +455,7 @@
 
     function deleteNewsConfirmed(NewsKey) {
         $.ajax({
-            url: ServicePrefix + '/api/News/GetNewsList',
+            url: ServicePrefix + '/api/News/UpdateNewsSoftDelete',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
