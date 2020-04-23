@@ -290,6 +290,9 @@ reportName.push("rptStandardInputNotIncludedList");
 reportName.push("rptMRRUserListing");
 
 reportName.push("rptMRRUploadTemplateByOwnerWithRevenueExtended");
+
+reportName.push("rptCategoryGrowthByMarket");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -11434,4 +11437,65 @@ function getReportObject_MRRUserListing() {
 
     return tempObject;
 
+}
+//
+function getReportFilterArray_CategoryGrowthByMarket() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+
+
+    return arrayFilters;
+}
+
+function getReportObject_CategoryGrowthByMarket() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Industry");
+    columnsToDisplay.push("Sub Industry");
+    columnsToDisplay.push("This Period");
+    columnsToDisplay.push("Last Period");
+    columnsToDisplay.push("Growth");
+
+
+    tempObject =
+    {
+        reportTitle: "Category Growth by Market",
+        apiControllerAction: "/api/XrayReport/GetCategoryGrowthByMarket",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry', 'XRY Data Review']
+    }
+
+    return tempObject;
 }
