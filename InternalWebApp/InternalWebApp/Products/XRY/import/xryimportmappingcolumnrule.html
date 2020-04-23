@@ -55,7 +55,7 @@
     <!--[if lt IE 9]>
         <script src="js/respond.min.js"></script>
     <![endif]-->
-    
+
     <style>
         .requiredText {
             color: red !important;
@@ -220,7 +220,7 @@
                             <hr />
                         </div>
                     </div>
-                   
+
                 </div>
 
                 <!--
@@ -439,7 +439,10 @@
                     $.each(data.report.rows, function (index) {
                         var obj = data.report.rows[index];
 
+                        //not sure if they can change after created
                         $("#ddlScript").val(obj.scriptId);
+                        $("#ddlScript").prop('disabled', true).trigger('chosen:updated');
+
                         $("#txtColumnRuleDescription").val(obj["Rule Description"]);
                         $("#txtColumnRuleToken").val(obj.Token);
                         $("#chkRuleRequired").prop("checked", obj.Required);
@@ -479,8 +482,6 @@
         var activeDate = new Date();
 
         $("#txtActiveDate").val(addZero(activeDate.getMonth() + 1) + '/' + addZero(activeDate.getDate()) + '/' + activeDate.getFullYear());
-
-        //$("#chkActive").prop('checked', true);
     }
 
     function getMappingColumnRuleItemsList() {
@@ -574,13 +575,11 @@
         columnsToDisplay.push({
             "visible": true,
             "mRender": function (data, type, row) {
-                if (row["Delete Date"] != null)
-                {
+                if (row["Delete Date"] != null) {
                     return '';
-                } else
-                {
+                } else {
                     var strActions = "";
-                    strActions += '<a href="#" onclick="editRuleItem(0);">Add</a>';
+                    //strActions += '<a href="#" onclick="editRuleItem(0);">Add</a>';
                     strActions += '&nbsp;&nbsp;<a href="#" onclick="editRuleItem(' + row.mappingColumnRuleItemId + ');">Edit</a>';
                     strActions += '&nbsp;&nbsp;<a href="#" onclick="deleteRuleItem(' + row.mappingColumnRuleItemId + ');">Delete</a>';
                     strActions += '&nbsp;&nbsp;<a href="#" onclick="reorderRuleItem(' + row.mappingColumnRuleItemId + ');">Reorder</a>';
@@ -598,7 +597,6 @@
     function loadResultsDataTable(data, columns) {
         var results = data["report"]["rows"];
 
-        //creating a variable that will used for datatable functions later
         var searchTable;
 
         if ($.fn.DataTable.isDataTable('#dtResults')) {
@@ -626,28 +624,116 @@
         });
     }
 
-    function editRuleItem(columnRuleItemId)
-    {
+    function editRuleItem(columnRuleItemId) {
         bootbox.alert('This functionality is still under development.', function () {
         });
     }
 
-    function deleteRuleItem(columnRuleItemId)
-    {
+    function deleteRuleItem(columnRuleItemId) {
         bootbox.alert('This functionality is still under development.', function () {
         });
     }
 
-    function reorderRuleItem(columnRuleItemId)
-    {
+    function reorderRuleItem(columnRuleItemId) {
         bootbox.alert('This functionality is still under development.', function () {
         });
     }
 
-    function updateMappingColumnRule()
-    {
-        bootbox.alert('This functionality is still under development.', function () {
+    function updateMappingColumnRule() {
+
+        if (validationPassed() == false) {
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/XrayImport/UpdateImportMappingColumnRule',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMappingColumnRuleId": mappingColumnRuleId,
+                "inScriptId": $("#ddlScript").val(),
+                "inDescription": $("#txtColumnRuleDescription").val(),
+                "inToken": $("#txtColumnRuleToken").val(),
+                "inRequired": $("#chkRuleRequired").is(':checked'),
+                "inRejectRow": $("#chkRejectRow").is(':checked'),
+                "inPassMeansFail": $("#chkPassMeansFail").is(':checked'),
+                "inOwnerId": $("#ddlOwner").val() > 0 ? $("#ddlOwner").val() : null,
+                "inMarketId": $("#ddlMarket").val() > 0 ? $("#ddlMarket").val() : null,
+                "inIsNew": bIsNew
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var bReloadPage = false;
+                    var obj = data.report.rows[0];
+
+                    if ($("#txtColumnRuleId").val() == "0") {
+                        bReloadPage = true;
+                        $("#txtColumnRuleId").val(obj._updateStatus);
+                    }
+
+                    bootbox.alert('Import Mapping Column Rule Updated', function () {
+
+                        if (bReloadPage) {
+                            window.location = "/products/xry/import/xryimportmappingcolumnrule.html?MappingColumnRuleId=" + $("#txtColumnRuleId").val();
+                        }
+                    });
+                }
+
+                //get list of import mapping column rule items
+                getMappingColumnRuleItemsList();
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
         });
+    }
+
+    function validationPassed() {
+
+        //-----------------------------
+        // Basic Validation requires
+        // the following on each
+        // element
+        //-----------------------------
+        // class: mkaRequired
+        // custom attribute: errorMessage
+        //-----------------------------
+        var loopBreak = true;
+
+        $(".mkaRequired").each(function (index, el) {
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            // Text
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+            // Select
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == "-1") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false
+                    return false;
+                }
+            }
+
+        });
+ 
+        return loopBreak;
+
     }
 
 </script>
