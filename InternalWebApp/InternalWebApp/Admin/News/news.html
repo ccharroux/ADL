@@ -414,7 +414,15 @@
     }
 
     function insertOrUpdateNews() {
-        $("#txtTitle").val(tinymce.get("txtTitle").getContent({ format: 'html' }));
+        var title = tinymce.get("txtTitle").getContent({ format: 'html' });
+        title = title.replace(/^<p>/g, "");
+        title = title.replace(/<\/p>$/g, "");
+        if (title.includes("<p>")) {
+            bootbox.alert("Title is limited to one line");
+            return;
+        }
+        $("#txtTitle").val(title);
+
         $("#txtShortText").val(tinymce.get("txtShortText").getContent({ format: 'html' }));
 
         if ($("#chkViewMore").prop("checked")) {
