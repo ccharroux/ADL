@@ -1080,7 +1080,7 @@ function sendErrorEmail(message)
         contentType: 'application/json',
         data: JSON.stringify({
             "inApiToken": getLocalStorage("APIToken"),
-            "inBody": "ERROR: " + message + "<br>" + "URL: " + gAJAXErrorURL + (gAJAXErrorData == null ? "" : "<br>DATA: " + gAJAXErrorData)
+            "inBody": "ERROR: " + message + "<br>" + "URL: " + gAJAXErrorURL.replace("{}", "") + (gAJAXErrorData == null ? "" : "<br>DATA: " + gAJAXErrorData)
         }),
         processData: false,
         success: function (data, textStatus, jQxhr) {
