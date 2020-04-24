@@ -178,11 +178,11 @@
                         </div>
                     </div>
                     <div class="col-md-6" style="text-align:center">
-                        <div style="padding-top:5px" id="rankSection">
-                            <input type="button" style="width:200px" class="marketHistoryButton" onclick="rankYearPeriod();" value="Rank All Markets" /> for <span id="spanQuarterEndMonthName"></span>
+                        <div style="padding-top:5px" id="rankSection" class="marketHistoryButton">
+                            <input type="button" style="width:200px" onclick="rankYearPeriod();" value="Rank All Markets" /> for <span id="spanQuarterEndMonthName"></span>
                         </div>
                         <div style="display:none;padding-top:5px" id="unrankSection">
-                            <input type="button" style="width:200px" class="marketHistoryButton" onclick="unrankYearPeriod();" value="Un-rank market (revision)" />
+                            <input type="button" style="width:200px" onclick="unrankYearPeriod();" value="Un-rank market (revision)" />
                         </div>
                     </div>
                 </div>
@@ -328,6 +328,7 @@
     var revenueDetailChanged = false;
     var revenueAmountsAllValid = true;
     var postSaveCallback = null;
+    var minimumPercentSubmittedBeforeRank_TimeSales = 80; // also appears in tvbrevenuedetailrepbilling.html, , but plan is to eventually rank and release rep billing data separately from / after time sales data anyway
     var minimumPercentSubmittedBeforeRank = 0;
     var timeoutObject = null;
 
@@ -1378,9 +1379,7 @@
         var newText = submittedPercent + "% (" + submittedCount + " of " + totalCount + ")";
 
         if (submittedPercent >= minimumPercentSubmittedBeforeRank) {
-            // disabling this so that ranking can only be triggered from Edit Time Sales Revenue
-            // if we allow triggering ranking from here, then we should also check whether a minimum percentage of time sales stations have submitted data
-            // $(".marketHistoryButton").show();
+            checkTimeSalesStationsSubmitted();
         } else {
             $(".marketHistoryButton").hide();
             newText += " - need at least " + minimumPercentSubmittedBeforeRank + "% before ranking";
@@ -1389,6 +1388,54 @@
         $("#RepBillingStationsSubmitted").text(newText);
     }
 
+    function checkTimeSalesStationsSubmitted() {
+        var url = ServicePrefix + '/api/TVB/GetTimeSalesStationsSubmitted';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                checkTimeSalesStationsSubmittedSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function checkTimeSalesStationsSubmittedSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get time sales stations submitted");
+            return;
+        }
+
+        var submittedCount = data.report.rows[0].submittedCount;
+        var totalCount = data.report.rows[0].totalCount;
+        var submittedPercent = Math.round(1000 * submittedCount / totalCount) / 10; // one decimal place, .toFixed() apparently has occasional float weirdness
+
+        if (submittedPercent >= minimumPercentSubmittedBeforeRank_TimeSales) {
+            $(".marketHistoryButton").show();
+        } else {
+            $(".marketHistoryButton").hide();
+            var newText = " - time sales at " + submittedPercent + "%, need time sales at least " + minimumPercentSubmittedBeforeRank_TimeSales + "% before ranking";
+            $("#RepBillingStationsSubmitted").text($("#RepBillingStationsSubmitted").text() + newText);
+        }
+    }
 
     function validRevenueAmount(revenueAmount)
     {
