@@ -80,26 +80,16 @@
                     <table id="dt" class="dataTable-border dataTable-headers dataTable-cell-border">
                         <thead>
                             <tr>
-                                <th class="exportColumn">Market</th>
-                                <th class="exportColumn">Active<br />Period</th>
-                                <th class="exportColumn">Released<br />Period</th>
-                                <th class="exportColumn">Reviewed<br />Period</th>
-                                <th class="exportColumn">Revenue<br />Entered</th>
+                                <th class="exportColumn text-align-center">Market</th>
+                                <th class="exportColumn text-align-center">Active<br />Period</th>
+                                <th class="exportColumn text-align-center">Released<br />Period</th>
+                                <th class="exportColumn text-align-center">Reviewed<br />Period</th>
+                                <th class="exportColumn text-align-center">Revenue<br />Entered</th>
                                 <th></th>
                                 <th></th>
                             </tr>
                         </thead>
-                        <tfoot>
-                            <tr>
-                                <th>Market</th>
-                                <th>Active<br />Period</th>
-                                <th>Released<br />Period</th>
-                                <th>Reviewed<br />Period</th>
-                                <th>Revenue<br />Entered</th>
-                                <th></th>
-                                <th></th>
-                            </tr>
-                        </tfoot>
+ 
                     </table>
                 </div>
 
@@ -166,11 +156,21 @@
             "pageLength": gDataTableDefaultRows,
             "data": [],
             "columns": [
-                { "data": 'market' },
-                { "data": 'Active Period' },
-                { "data": 'Released Period' },
-                { "data": 'Reviewed Period' },
-                { "data": 'Revenue Entered' },
+                {
+                    mRender: function (data, type, row) {
+
+                        var dataToParse = row["market"] + ' (' + row["marketId"] + ')';
+
+                        return buildMarketWrapper(dataToParse);
+                    },
+                    "orderable": true,
+                    "searchable": true,
+                    "className": "text-align-left"
+                },
+                { "data": 'Active Period', "className": "text-align-center" },
+                { "data": 'Released Period', "className": "text-align-center" },
+                { "data": 'Reviewed Period', "className": "text-align-center" },
+                { "data": 'Revenue Entered', "className": "text-align-center" },
                 {
                     mRender: function (data, type, row) {
                         var yearToStart = '2001';
@@ -184,7 +184,7 @@
                     },
                     "orderable": false,
                     "searchable": false,
-                    "className": "text-align-right"
+                    "className": "text-align-center"
                 },                
                 {
                 mRender: function (data, type, row) {
@@ -194,7 +194,7 @@
                     },
                     "orderable": false,
                     "searchable": false,
-                    "className": "text-align-right"
+                    "className": "text-align-center"
                 }
             ],
             "pagingType": "full_numbers",
@@ -271,7 +271,7 @@
 
     function getData() {
  
-  
+        setThisQueryToRunLongNoAutoUnBlock();
 
         //filling out url for ajax
         var url = ServicePrefix + '/api/MRRReport/GetMRRMarketHistoryDataMatrixList?inApiToken=' + getLocalStorage("APIToken");
@@ -324,7 +324,7 @@
         //filling out url for ajax call
         var url = ServicePrefix + '/api/MRR/OpenMRRCurrentMarketForSubmission';
         var message = "Open for Submission for " + market;
-        clearTimeout(unblockHandle);
+        setThisQueryToRunLongNoAutoUnBlock();
 
         //filling out settings for ajax call
         var settings = {
@@ -370,7 +370,7 @@
         //filling out url for ajax call
         var url = ServicePrefix + '/api/MRR/BulkUpdateMRRRevenueMarket';
         var message = "Data Updated for " + market;
-        clearTimeout(unblockHandle);
+        setThisQueryToRunLongNoAutoUnBlock();
  
 
         //filling out settings for ajax call
