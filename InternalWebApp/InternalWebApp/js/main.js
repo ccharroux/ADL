@@ -12,6 +12,8 @@ const gChosenParams = {
 }
 var gShowHeader = true;
 var gAJAXError = false;
+var gAJAXErrorURL = "";
+var gAJAXErrorData = null;
 
 var release =
 {
@@ -293,8 +295,15 @@ $(document).ready(function ()
     $(document).ajaxSuccess(function () {
         gAJAXError = false;
     });
-    $(document).ajaxError(function () {
-        gAJAXError = false;
+    $(document).ajaxError(function (event, jqxhr, settings, thrownError) {
+        gAJAXErrorURL = settings.url;
+        if (!settings.data == false)
+        {
+            gAJAXErrorData = settings.data;
+        }
+        console.log(settings.url);
+        console.log(settings.data)
+        gAJAXError = true;
     });
 
     setTimeout(resetHeaderBackButton, 1500);
@@ -1014,7 +1023,9 @@ function MKAErrorMessageRtn(message, preCallback, postCallback) {
         promise.then
         (
                     (data) => {
+
                         MKAErrorMessageDeliveryRtn(message, postCallback);
+                        setTimeout(function () { sendErrorEmail(message) }, 1000);
                     },
                     (error) => {
                         bootbox.alert(error, function () { return; });
@@ -1045,6 +1056,7 @@ function MKAErrorMessageDeliveryRtn(message, postCallback) {
         });
     }
     else {
+
         bootbox.alert('Process Failed.\n\r\n\r' + message + '.' +
             (gAJAXError == true ? '\n\r\n\rDevelopment has been notified and is looking into this issue.' : ''), function () {
 
@@ -1052,8 +1064,38 @@ function MKAErrorMessageDeliveryRtn(message, postCallback) {
                     postCallback();
                 }
             });
+
+        setTimeout(function () { sendErrorEmail(message) }, 1000);
+
     }
 
+}
+
+function sendErrorEmail(message)
+{
+    $.ajax({
+        url: ServicePrefix + '/api/Email/EmailAPIError',
+        dataType: 'json',
+        type: 'post',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inBody": "ERROR: " + message + "<br>" + "URL: " + gAJAXErrorURL + (gAJAXErrorData == null ? "" : "<br>DATA: " + gAJAXErrorData)
+        }),
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+
+            //if (data.response.status != "SUCCESS") {
+            //    alert(errorThrown);
+            //}
+            //else {
+                return;
+            //}
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            //alert(errorThrown);
+        }
+    });
 }
 
 function buildMainMenu(selectedItem) {

@@ -10651,7 +10651,8 @@ function getReportObject_MRRImportMarketCategoryWarningToleranceList() {
         apiControllerAction: "/api/RevenueCategory/GetMRRImportMarketCategoryWarningToleranceList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr']
+        product: ['mrr'],
+        approved: true
     }
 
     return tempObject;
