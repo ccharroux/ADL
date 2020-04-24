@@ -88,16 +88,7 @@
                                 <th></th>
                             </tr>
                         </thead>
-                        <tfoot>
-                            <tr>
-                                <th>Market</th>
-                                <th>Active<br />Period</th>
-                                <th>Released<br />Period</th>
-                                <th>Revenue<br />Entered</th>
-                                <th></th>
-                                <th></th>
-                            </tr>
-                        </tfoot>
+
                     </table>
                 </div>
 
@@ -166,10 +157,20 @@
             "pageLength": gDataTableDefaultRows,
             "data": [],
             "columns": [
-                { "data": 'market' },
-                { "data": 'Active Period' },
-                { "data": 'Released Period' },
-                { "data": 'Revenue Entered' },
+                {
+                    mRender: function (data, type, row) {
+
+                        var dataToParse = row["market"] + ' (' + row["marketId"] + ')';
+
+                        return buildMarketWrapper(dataToParse);
+                    },
+                    "orderable": true,
+                    "searchable": true,
+                    "className": "text-align-left"
+                },
+                { "data": 'Active Period', "className": "text-align-center" },
+                { "data": 'Released Period', "className": "text-align-center" },
+                { "data": 'Revenue Entered', "className": "text-align-center" },
                 {
                     mRender: function (data, type, row) {
                         var yearToStart = '2001';
@@ -182,8 +183,7 @@
                         return '<a href="#" onclick="excludeFromBackButton(); addData(' + row.marketId + ',\'' + row.market + '\',' + yearToStart + ');">Data Update</a>';
                     },
                     "orderable": false,
-                    "searchable": false,
-                    "className": "text-align-right"
+                    "searchable": false, "className": "text-align-center"
                 },                
                 {
                 mRender: function (data, type, row) {
@@ -192,8 +192,7 @@
                     return '<a href="#" onclick="excludeFromBackButton(); openData(' + row.marketId + ',\'' + row.market + '\',' + ');">Open for Submission</a>';
                     },
                     "orderable": false,
-                    "searchable": false,
-                    "className": "text-align-right"
+                    "searchable": false, "className": "text-align-center"
                 }
             ],
             "pagingType": "full_numbers",
@@ -271,6 +270,9 @@
     function getData() {
  
   
+        
+        setThisQueryToRunLongNoAutoUnBlock();
+
 
         //filling out url for ajax
         var url = ServicePrefix + '/api/XRAYReport/GetXRAYMarketHistoryDataMatrixList?inApiToken=' + getLocalStorage("APIToken");
@@ -322,7 +324,7 @@
         //filling out url for ajax call
         var url = ServicePrefix + '/api/XRAY/OpenXRAYCurrentMarketForSubmission';
         var message = "Open for Submission for " + market;
-        clearTimeout(unblockHandle);
+        setThisQueryToRunLongNoAutoUnBlock();
 
         //filling out settings for ajax call
         var settings = {
@@ -364,7 +366,7 @@
     }
     function doaddData(marketId, yearToStart, market)
     {
-
+        setThisQueryToRunLongNoAutoUnBlock();
         //filling out url for ajax call
         var url = ServicePrefix + '/api/XRAY/BulkUpdateXRAYRevenueMarket';
         var message = "Data Update request is partially complete for " + market + '. The Ranking process has been added to the queue. You will receive and email when it completes. '

@@ -2792,8 +2792,9 @@ function formatNumber(num) {
 
 function setThisQueryToRunLongNoAutoUnBlock()
 {
-    $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
     clearTimeout(unblockHandle);
+    $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
+    console.log(unblockHandle);
 }
 
 function extractParens(inString) {
