@@ -292,6 +292,7 @@ reportName.push("rptMRRUserListing");
 reportName.push("rptMRRUploadTemplateByOwnerWithRevenueExtended");
 
 reportName.push("rptCategoryGrowthByMarket");
+reportName.push("rptTimeSalesVsAllRepBillingStations");
 
 function buildReportArray()
 {
@@ -11496,6 +11497,70 @@ function getReportObject_CategoryGrowthByMarket() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['xry', 'XRY Data Review']
+    }
+
+    return tempObject;
+}
+function getReportFilterArray_TimeSalesVsAllRepBillingStations() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'quarter'],
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_TimeSalesVsAllRepBillingStations() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "Time Sales vs ALL Rep Billing Stations",
+        apiControllerAction: "/api/TVBReport/GetTimeSalesVersusRepBillingAllRepBillingStations",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb', 'TVB Data Review', 'old admin'],
+        sortable: true
+
     }
 
     return tempObject;
