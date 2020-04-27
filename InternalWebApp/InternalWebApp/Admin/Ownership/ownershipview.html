@@ -581,6 +581,50 @@
 
                             </div>
 
+                            <!-- Owner personnel -->
+                            <div class="borderSection">
+                                <h4 class="text-center sectionHeader">Owner Personnel</h4>
+                                <div class="row">
+                                    <!-- dataTable-top-margin makes it too wide -->
+                                    <div class="col-md-12 text-align-left">
+                                        <table id="dtOwnerPersonnel" class="dataTable-border dataTable-headers dataTable-cell-border fullWidth">
+                                            <thead>
+                                                <tr>
+                                                    <th class="exportColumn">Name</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- history -->
+                                <div class="margin-top-10">
+                                    <div class="row noMarginsLeftRight">
+                                        <div class="col-md-9 subHeaderStyle">
+                                            Owner Personnel - History
+                                        </div>
+                                        <div class="col-md-3 text-align-center subHeaderStyle">
+                                            <input style="margin-left: 30px;" id="btnShowOrHideOwnerChangeHistoryOwnerPersonnel" value="Show" onclick="showOrHideOwnerChangeHistoryOwnerPersonnel();" class="history-button" type="button">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row initiallyHidden" id="divOwnerChangeHistoryOwnerPersonnel">
+                                    <!-- dataTable-top-margin makes it too wide -->
+                                    <div class="col-md-12 text-align-left">
+                                        <table id="dtOwnerChangeHistoryOwnerPersonnel" class="dataTable-border dataTable-headers dataTable-cell-border fullWidth">
+                                            <thead>
+                                                <tr>
+                                                    <th class="exportColumn">Change Date</th>
+                                                    <th class="exportColumn">Personnel</th>
+                                                    <th class="exportColumn">Change Value</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+
                             <!--
                                 possible additions:
                                 * owner groups - which products are active, similar to stations
@@ -651,6 +695,7 @@
         setDataTable_OwnerXRYMarketExceptions();
         setDataTable_OwnerProductList();
         setDataTable_StationProductList();
+        setDataTable_OwnerPersonnel();
 
         setDataTable_OwnerChangeHistoryOwnerField();
 
@@ -661,6 +706,7 @@
         getSubsidiaryOwners();
         getOwnerGroups();
         getOwnerProducts(); // success -> getStationProducts()
+        getOwnerPersonnel();
 
         cleanupBackButton();
 
@@ -1190,7 +1236,7 @@
                 { "data": 'DMA', "className": 'initiallyHidden initiallyHiddenStationProduct text-align-center stationProductDMA' }
             ],
             "pagingType": "full_numbers",
-            "paging": false,
+            "paging": true,
             "searching": false,
             "bInfo": false,
             "buttons": [
@@ -1249,6 +1295,98 @@
             //initComplete: function () {
             //    // handled earlier for entire page, don't repeat
             //    // $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            //},
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            //language: {
+            //    //this changes search box label from Search: to Filter Results:
+            //    search: "Filter Results:"
+            //}
+        });
+
+    }
+
+    function setDataTable_OwnerPersonnel() {
+        var reportTitle = "Owner Personnel";
+        var exportColumns = returnTableColumnsByClass("dtOwnerPersonnel", "exportColumn");
+
+        $("#dtOwnerPersonnel").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                {
+                    "data": 'name',
+                    "render": function (data, type, row, meta) {
+                        if (type === 'display') {
+                            data = '<a href="/admin/personnel/personnelview.html?PersonnelID=' + row["personnelId"] + '">' + data + '</a>';
+                        }
+                        return data;
+                    }
+                },
+            ],
+            "pagingType": "full_numbers",
+            "paging": true,
+            "searching": false,
+            "bInfo": false,
+            "ordering": false,
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'excel',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'print',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //}
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            //initComplete: function () {
+            //    $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
             //},
             createdRow: function (row, data, index) {
                 //this adds the class to every row
@@ -1685,64 +1823,6 @@
         populateDataTable("dtSubsidiaryOwnerList", data);
     }
 
-    function getOwnerProducts() {
-        var url = ServicePrefix + '/api/Owner/GetMarketStationCountByOwnerProduct'
-            + '?inApiToken=' + getLocalStorage("APIToken")
-            + '&inOwnerId=' + ownerId;
-
-        var settings = {
-            dataType: 'json',
-            type: 'get',
-            contentType: 'application/json',
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getOwnerProductsSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
-
-    }
-
-    function getOwnerProductsSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        populateDataTable("dtOwnerProductList", data);
-
-        $.each(data.report.rows, function (index) {
-            var obj = data.report.rows[index];
-
-            if (obj["disableDate"] == null || obj["disableDate"] == "") {
-                $(".product" + obj["product"]).show();
-                //$("#div" + obj["product"]).hide();
-                changeValueFromShowToHide("btnShowHide" + obj["product"]);
-
-                switch (obj["product"]) {
-                    case "MRR":
-                        getOwnerMRRMarketExceptions();
-                        break;
-
-                    case "XRY":
-                        getOwnerXRYMarketExceptions();
-                        break;
-
-                    case "TVB":
-                        getOwnerTVBOptions();
-                        break;
-                }
-            }
-        });
-
-        getStationProducts();
-    }
-
     function getOwnerMRRMarketExceptions() {
         var url = ServicePrefix + '/api/MRRReport/GetOwnerMRRMarketExceptions'
             + '?inApiToken=' + getLocalStorage("APIToken")
@@ -1838,6 +1918,64 @@
         $("#spanTVBRepBillingStatus").text(data.report.rows[0].repBillingStatus);
     }
 
+    function getOwnerProducts() {
+        var url = ServicePrefix + '/api/Owner/GetMarketStationCountByOwnerProduct'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inOwnerId=' + ownerId;
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOwnerProductsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getOwnerProductsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        populateDataTable("dtOwnerProductList", data);
+
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+
+            if (obj["disableDate"] == null || obj["disableDate"] == "") {
+                $(".product" + obj["product"]).show();
+                //$("#div" + obj["product"]).hide();
+                changeValueFromShowToHide("btnShowHide" + obj["product"]);
+
+                switch (obj["product"]) {
+                    case "MRR":
+                        getOwnerMRRMarketExceptions();
+                        break;
+
+                    case "XRY":
+                        getOwnerXRYMarketExceptions();
+                        break;
+
+                    case "TVB":
+                        getOwnerTVBOptions();
+                        break;
+                }
+            }
+        });
+
+        getStationProducts();
+    }
+
     function getStationProducts() {
         var url = ServicePrefix + '/api/Owner/GetMarketStationListByOwnerProduct'
             + '?inApiToken=' + getLocalStorage("APIToken")
@@ -1874,6 +2012,40 @@
         activeProductList.forEach(function (e) {
             $(".stationProduct" + e).show();
         });
+    }
+
+    function getOwnerPersonnel() {
+        var url = ServicePrefix + '/api/Personnel/GetPersonnelListByMarketOwner';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerId": ownerId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOwnerPersonnelSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getOwnerPersonnelSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        populateDataTable("dtOwnerPersonnel", data);
     }
 
     function changeValueFromHideToShow(controlId) {
