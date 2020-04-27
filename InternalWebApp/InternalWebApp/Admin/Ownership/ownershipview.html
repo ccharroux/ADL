@@ -321,7 +321,7 @@
                                 <div class="row initiallyHidden" id="divOwnerChangeHistoryOwnerGroups">
                                     <!-- dataTable-top-margin makes it too wide -->
                                     <div class="col-md-12 text-align-left">
-                                        <table id="dtOwnerChangeHistoryOwnerProducts" class="dataTable-border dataTable-headers dataTable-cell-border fullWidth">
+                                        <table id="dtOwnerChangeHistoryOwnerGroups" class="dataTable-border dataTable-headers dataTable-cell-border fullWidth">
                                             <thead>
                                                 <tr>
                                                     <th class="exportColumn">Change Date</th>
@@ -672,6 +672,8 @@
     var ownerId;
     var activeProductList = []; // store for later use by market/station grid
 
+    var gotOwnerChangeHistoryOwnerProducts = false;
+
     $(document).ready(function ()
     {
 
@@ -699,6 +701,7 @@
         setDataTable_OwnerPersonnel();
 
         setDataTable_OwnerChangeHistoryOwnerField();
+        setDataTable_OwnerChangeHistoryOwnerProducts();
 
         $(".initiallyHidden").hide();
 
@@ -1494,7 +1497,95 @@
 
     }
 
-    // TODO add setDataTable_* functions related to change history
+    function setDataTable_OwnerChangeHistoryOwnerProducts() {
+        var reportTitle = "Owner Change History - Owner Products";
+        var exportColumns = returnTableColumnsByClass("dtOwnerChangeHistoryOwnerProducts", "exportColumn");
+
+        $("#dtOwnerChangeHistoryOwnerProducts").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                { "data": 'Change Date', "className": "changeDate" },
+                { "data": 'Product', "className": "changeOwnerProduct" },
+                { "data": 'Change Value', "className": "changeOwnerProductValue" }
+            ],
+            "order": [
+                [0, "asc"] // Change Date
+            ],
+            "pagingType": "full_numbers",
+            "paging": false,
+            "searching": false,
+            "bInfo": false,
+            "ordering": false,
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'excel',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'print',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtMarketList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //}
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            //initComplete: function () {
+            //    // handled earlier for entire page, don't repeat
+            //    // $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            //},
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            //language: {
+            //    //this changes search box label from Search: to Filter Results:
+            //    search: "Filter Results:"
+            //}
+        });
+
+    }
 
     function isNullOrEmpty(s) {
         return s == null || s.toString().trim() == "";
@@ -2087,17 +2178,15 @@
     function getOwnerChangeHistoryOwnerField(ownerFieldName, ownerFieldDescription) {
         $("#headerOwnerChangeHistoryOwnerField").text(ownerFieldDescription + ' - History');
 
-        var url = ServicePrefix + '/api/Owner/GetOwnerChangeHistoryOwnerField';
+        var url = ServicePrefix + '/api/Owner/GetOwnerChangeHistoryOwnerField'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inOwnerId=' + ownerId
+            + '&inOwnerFieldName=' + ownerFieldName;
 
         var settings = {
             dataType: 'json',
-            type: 'post',
+            type: 'get',
             contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inOwnerId": ownerId,
-                "inOwnerFieldName": ownerFieldName
-            }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 getOwnerChangeHistoryOwnerFieldSuccess(data, textStatus, jQxhr, ownerFieldDescription);
@@ -2131,6 +2220,60 @@
 
     function hideOwnerChangeHistoryOwnerField() {
         $("#divOwnerChangeHistoryOwnerField").hide();
+    }
+
+    function showOrHideOwnerChangeHistoryOwnerProducts() {
+        if ($("#divOwnerChangeHistoryOwnerProducts").is(":visible")) {
+            $("#divOwnerChangeHistoryOwnerProducts").hide();
+            changeValueFromHideToShow("btnShowOrHideOwnerChangeHistoryOwnerProducts");
+        } else {
+            if (gotOwnerChangeHistoryOwnerProducts) {
+                $("#divOwnerChangeHistoryOwnerProducts").show();
+            } else {
+                getOwnerChangeHistoryOwnerProducts();
+            }
+            changeValueFromShowToHide("btnShowOrHideOwnerChangeHistoryOwnerProducts");
+        }
+    }
+
+    function getOwnerChangeHistoryOwnerProducts() {
+        var url = ServicePrefix + '/api/Owner/GetOwnerChangeHistoryOwnerProducts'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inOwnerId=' + ownerId;
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOwnerChangeHistoryOwnerProductsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getOwnerChangeHistoryOwnerProductsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            bootbox.alert("No changes found");
+            return;
+        }
+
+        populateDataTable("dtOwnerChangeHistoryOwnerProducts", data);
+        $("#divOwnerChangeHistoryOwnerProducts").show();
+        gotOwnerChangeHistoryOwnerProducts = true;
+
     }
 
     function genericAjaxError(jQxhr, textStatus, errorThrown) {
