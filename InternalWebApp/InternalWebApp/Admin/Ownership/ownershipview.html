@@ -259,6 +259,15 @@
                                         <input type="button" onclick="getOwnerChangeHistoryOwnerField('ClientID', 'Client ID');" value="History" />
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-md-4 text-align-left">
+                                        <label for="spanClientID">SAML Status</label>
+                                    </div>
+                                    <div class="col-md-5 text-align-left">
+                                        <span id="spanSAMLStatus"></span>
+                                    </div>
+                                    <!-- no change history for this table -->
+                                </div>
                             </div>
 
                             <div class="row noMarginsLeftRight initiallyHidden borderSection" id="divOwnerChangeHistoryOwnerField">
@@ -561,6 +570,7 @@
         $(".initiallyHidden").hide();
 
         getOwner(); // success -> getParentOwner()
+        getOwnerSAML();
         getSubsidiaryOwners();
         getOwnerGroups();
         getOwnerProducts(); // success -> getStationProducts()
@@ -1236,6 +1246,42 @@
             phoneText += " ext " + extension;
         }
         $("#" + phoneBlock).text(phoneText);
+    }
+
+    function getOwnerSAML() {
+        var url = ServicePrefix + '/api/Owner/GetOwnerSAML'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inOwnerId=' + ownerId;
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOwnerSAMLSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getOwnerSAMLSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            bootbox.alert('Faled to get owner SAML data.');
+            return;
+        }
+
+        $("#spanSAMLStatus").text(data.report.rows[0].SAMLStatus);
     }
 
     function getParentOwner(parentOwnerId) {
