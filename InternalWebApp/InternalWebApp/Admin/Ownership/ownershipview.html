@@ -628,6 +628,7 @@
                             <!--
                                 possible additions:
                                 * owner groups - which products are active, similar to stations
+                                * owner personnel - market name or count (once new control table implemented)
                             -->
 
                         </div>
@@ -737,7 +738,7 @@
             "paging": false,
             "searching": false,
             "bInfo": false,
-            "ordering": false,
+            "ordering": true,
             "buttons": [
                //{
                //    extend: 'csv',
@@ -1239,6 +1240,7 @@
             "paging": true,
             "searching": false,
             "bInfo": false,
+            "ordering": true,
             "buttons": [
                //{
                //    extend: 'csv',
@@ -1304,6 +1306,9 @@
             //    //this changes search box label from Search: to Filter Results:
             //    search: "Filter Results:"
             //}
+            "fnDrawCallback": function () {
+                showOrHideStationProducts();
+            },
         });
 
     }
@@ -1735,7 +1740,9 @@
 
                 var obj = data.report.rows[index];
 
-                $("#spanParentOwner").text(obj["parentOwnerName"]);
+                $("#spanParentOwner").html(
+                    '<a href="/admin/parentownership/parentownership.html?ParentOwnershipID=' + obj["parentOwnerId"] + '">'
+                    + obj["parentOwnerName"] + '</a>');
                 setAddress(
                     "spanParentAddress",
                     obj["parentOwnerAddress"],
@@ -2007,6 +2014,10 @@
 
         populateDataTable("dtStationProductList", data);
 
+        showOrHideStationProducts();
+    }
+
+    function showOrHideStationProducts() {
         $(".initiallyHiddenStationProduct").hide();
         // activeProductList is populated as side effect of market/product grid
         activeProductList.forEach(function (e) {
