@@ -168,6 +168,7 @@
                 <div class="text-center margin-top-0">
                     <div class="row">
                         <div class="col-md-6 text-align-left">
+
                             <!-- Owner basic data -->
                             <div class="borderSection">
                                 <div class="row">
@@ -259,6 +260,7 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div class="row noMarginsLeftRight initiallyHidden borderSection" id="divOwnerChangeHistoryOwnerField">
                                 <!-- dataTable-top-margin makes it too wide -->
                                 <h4 class="text-center sectionHeader">History</h4>
@@ -277,9 +279,76 @@
                                     </thead>
                                 </table>
                             </div>
+
+                            <!-- Owner group list with market/station counts -->
+                            <div class="borderSection">
+                                <h4 class="text-center sectionHeader">Owner Groups</h4>
+                                <div class="row">
+                                    <!-- dataTable-top-margin makes it too wide -->
+                                    <div class="col-md-12 text-align-left">
+                                        <table id="dtOwnerGroupList" class="dataTable-border dataTable-headers dataTable-cell-border fullWidth">
+                                            <thead>
+                                                <tr>
+                                                    <th class="exportColumn">Group</th>
+                                                    <th class="exportColumn numericColumn">Markets</th>
+                                                    <th class="exportColumn numericColumn">Stations</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- history -->
+                                <div class="margin-top-10">
+                                    <div class="row noMarginsLeftRight">
+                                        <div class="col-md-9 subHeaderStyle">
+                                            Owner Groups - History
+                                        </div>
+                                        <div class="col-md-3 text-align-center subHeaderStyle">
+                                            <input style="margin-left: 30px;" id="btnShowOrHideOwnerChangeHistoryOwnerGroups" value="Show" onclick="showOrHideOwnerChangeHistoryOwnerGroups();" class="history-button" type="button">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row initiallyHidden" id="divOwnerChangeHistoryOwnerGroups">
+                                    <!-- dataTable-top-margin makes it too wide -->
+                                    <div class="col-md-12 text-align-left">
+                                        <table id="dtOwnerChangeHistoryOwnerProducts" class="dataTable-border dataTable-headers dataTable-cell-border fullWidth">
+                                            <thead>
+                                                <tr>
+                                                    <th class="exportColumn">Change Date</th>
+                                                    <th class="exportColumn">Group</th>
+                                                    <th class="exportColumn">Change Value</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- Subsidiary owners -->
+                            <div class="borderSection">
+                                <h4 class="text-center sectionHeader">Subsidiary Owners</h4>
+                                <div class="row">
+                                    <!-- dataTable-top-margin makes it too wide -->
+                                    <div class="col-md-12 text-align-left">
+                                        <table id="dtSubsidiaryOwnerList" class="dataTable-border dataTable-headers dataTable-cell-border fullWidth">
+                                            <thead>
+                                                <tr>
+                                                    <th class="exportColumn">Main Owner</th>
+                                                    <th class="exportColumn">Subsidiary Owner</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- TODO add more left-side stuff here -->
+
                         </div>
                         <div class="col-md-6 text-align-left">
+
                             <!-- Parent owner data -->
                             <div class="borderSection">
                                 <h4 class="text-center sectionHeader">Parent Owner</h4>
@@ -317,6 +386,7 @@
                                 </div>
                             </div>
                             <hr />
+
                             <!-- Owner product list with market/station product counts -->
                             <div class="borderSection">
                                 <h4 class="text-center sectionHeader">Owner Products</h4>
@@ -367,6 +437,7 @@
                                 </div>
 
                             </div>
+
                             <!-- Owner Stations -->
                             <div class="borderSection">
 
@@ -390,6 +461,7 @@
                                         </table>
                                     </div>
                                 </div>
+
                                 <!-- history -->
                                 <div class="margin-top-10">
                                     <div class="row noMarginsLeftRight">
@@ -415,7 +487,11 @@
                                         </table>
                                     </div>
                                 </div>
+
                             </div>
+
+                            <!-- TODO maybe add more right-side stuff here -->
+
                         </div>
                     </div>
                 </div>
@@ -475,6 +551,8 @@
 
         buildQuickReports(['owner']);
 
+        setDataTable_OwnerGroupList();
+        setDataTable_SubsidiaryOwners();
         setDataTable_OwnerProductList();
         setDataTable_StationProductList();
 
@@ -482,11 +560,209 @@
 
         $(".initiallyHidden").hide();
 
-        getOwner();
+        getOwner(); // success -> getParentOwner()
+        getSubsidiaryOwners();
+        getOwnerGroups();
+        getOwnerProducts(); // success -> getStationProducts()
 
         cleanupBackButton();
 
     });
+
+    function setDataTable_OwnerGroupList() {
+        var reportTitle = "Owner Group List";
+        var exportColumns = returnTableColumnsByClass("dtOwnerGroupList", "exportColumn");
+
+        $("#dtOwnerGroupList").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                {
+                    "data": 'ownerGroupName',
+                    "render": function (data, type, row, meta) {
+                        if (type === 'display') {
+                            data = '<a href="/admin/ownershipgroup/ownershipgroup.html?OwnerGroupID=' + row["ownerGroupId"] + '">' + data + '</a>';
+                        }
+                        return data;
+                    }
+                },
+                { "data": 'marketCount', "className": "numericColumn" },
+                { "data": 'stationCount', "className": "numericColumn" },
+            ],
+            "pagingType": "full_numbers",
+            "paging": false,
+            "searching": false,
+            "bInfo": false,
+            "ordering": false,
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'excel',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'print',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //}
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            //initComplete: function () {
+            //    $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            //},
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            //language: {
+            //    //this changes search box label from Search: to Filter Results:
+            //    search: "Filter Results:"
+            //}
+        });
+
+    }
+
+    function setDataTable_SubsidiaryOwners() {
+        var reportTitle = "Subsidiary Owners";
+        var exportColumns = returnTableColumnsByClass("dtSubsidiaryOwnerList", "exportColumn");
+
+        $("#dtSubsidiaryOwnerList").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                {
+                    "data": 'mainOwnerName',
+                    "render": function (data, type, row, meta) {
+                        if (type === 'display' && row["mainOwnerId"] != ownerId) {
+                            data = '<a href="/admin/ownership/ownershipview.html?OwnerID=' + row["mainOwnerId"] + '">' + data + '</a>';
+                        }
+                        return data;
+                    }
+                },
+                {
+                    "data": 'subsidiaryOwnerName',
+                    "render": function (data, type, row, meta) {
+                        if (type === 'display' && row["subsidiaryOwnerId"] != ownerId) {
+                            data = '<a href="/admin/ownership/ownershipview.html?OwnerID=' + row["subsidiaryOwnerId"] + '">' + data + '</a>';
+                        }
+                        return data;
+                    }
+                },
+            ],
+            "pagingType": "full_numbers",
+            "paging": false,
+            "searching": false,
+            "bInfo": false,
+            "ordering": false,
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'excel',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'print',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //}
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            //initComplete: function () {
+            //    $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            //},
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            //language: {
+            //    //this changes search box label from Search: to Filter Results:
+            //    search: "Filter Results:"
+            //}
+        });
+
+    }
 
     function setDataTable_OwnerProductList() {
         var reportTitle = "Owner Product List";
@@ -871,9 +1147,8 @@
                 );
                 $("#spanEmail").html(obj["Email Address"]);
                 $("#spanClientID").html(obj["MKA Client Number"]);
-                
+
                 getParentOwner(obj["Parent Owner ID"]);
-                getOwnerProducts();
 
             });
 
@@ -1030,6 +1305,66 @@
 
         }
 
+    }
+
+    function getOwnerGroups() {
+        var url = ServicePrefix + '/api/Owner/GetMarketStationCountByOwnerGroup'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inOwnerId=' + ownerId;
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOwnerGroupsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function getOwnerGroupsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        populateDataTable("dtOwnerGroupList", data);
+    }
+
+    function getSubsidiaryOwners() {
+        var url = ServicePrefix + '/api/Owner/GetSubsidiaryOwners'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inOwnerId=' + ownerId;
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getSubsidiaryOwnersSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function getSubsidiaryOwnersSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        populateDataTable("dtSubsidiaryOwnerList", data);
     }
 
     function getOwnerProducts() {
