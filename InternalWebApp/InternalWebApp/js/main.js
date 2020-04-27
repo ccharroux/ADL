@@ -2829,3 +2829,63 @@ function extractParens(inString) {
     }
 
 }
+
+function doesUserHaveAccessToFeature(inToken)
+{
+ 
+        var url = ServicePrefix + '/api/Feature/GetPersonnelHasFeature';
+        url += '?inApiToken=' + getLocalStorage("APIToken");
+        url += '&inFeatureToken=' + inToken
+
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var bIssue = true;
+
+                    if ((!data.report.rows == true) ||  (data.report.rows.length == 0))
+                    {
+                        bIssue = true;
+                    }
+
+                    $.each(data.report.rows, function (index) {
+                        if (data.report.rows[index].personnelHasFeature.toLowerCase() == "yes")
+                        {
+                            bIssue = false;
+                        }
+                        else
+                        {
+                            bIssue = true;
+                        }
+                    });
+
+                    if (bIssue == true)
+                    {
+                        bootbox.alert('You do not have access to this area.', function () {
+                            window.location = "/admin/login/dashboard.html";
+                        });
+
+                    }
+                    else
+                    {
+                        return true;
+                    }
+
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+ 
+}
