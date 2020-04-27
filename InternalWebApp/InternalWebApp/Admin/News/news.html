@@ -104,16 +104,19 @@
                         </div>
                     </div>
                     <!-- Date -->
-                    <div class="row input-row">
+                    <div class="row input-row" id="dateRow">
                         <div class="col-md-3 text-align-left">
                             <label for="txtDate">Date</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="txtDate" class="mkaEditable" value="" />
+
+                            <label id="txtDate"></label>
+
+                           <!-- <input type="text" id="txtDate" class="mkaEditable" value="" /> -->
                         </div>
                     </div>
                     <!-- Image -->
-                    <div class="row input-row">
+                    <div class="row input-row" style="display:none">
                         <div class="col-md-3 text-align-left">
                             <label for="txtImage">Image</label>
                         </div>
@@ -124,14 +127,14 @@
                     <!-- Short Text -->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtShortText">Short Text</label>
+                            <label for="txtShortText">Text</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <textarea cols="20" rows="50" style="height:200px; width:600px" class="mkaRequired  mkaEditable" id="txtShortText" errorMessage="You must enter Short Text."></textarea>
+                            <textarea cols="20" rows="50" style="height:200px; width:600px" class="mkaRequired  mkaEditable" id="txtShortText" errorMessage="You must enter Text."></textarea>
                         </div>
                     </div>
                     <!-- View More -->
-                    <div class="row input-row">
+                    <div class="row input-row" style="display:none">
                         <div class="col-md-3 text-align-left">
                             <label for="chkViewMore">View More</label>
                         </div>
@@ -140,7 +143,7 @@
                         </div>
                     </div>
                     <!-- Text -->
-                    <div class="row input-row">
+                    <div class="row input-row" style="display:none"> 
                         <div class="col-md-3 text-align-left">
                             <label for="txtText">Text</label>
                         </div>
@@ -160,9 +163,11 @@
                             <div class="col-md-3">
                             </div>
                             <div class="col-md-6 text-align-center">
+                                <div style="margin-bottom:10px">
+                                    <input style="display:none" value="Update" onclick="excludeFromBackButton(); insertOrUpdateNews();" class="updateButton default-button" type="button">
+                                </div>
                                 <div>
-                                    <input style="display:none" value="Update" onclick="excludeFromBackButton(); insertOrUpdateNews();" class="updateButton" type="button">
-                                    <input style="display:none" value="Delete" onclick="excludeFromBackButton(); deleteNews();" class="updateButton" type="button">
+                                    <input style="display:none" value="Delete" onclick="excludeFromBackButton(); deleteNews();" class="updateButton default-button" type="button">
                                 </div>
                                 <!--<div class="back-button-div">
                                     <input value="Back" onclick="goBackToList();" class="default-button" type="button">
@@ -256,9 +261,9 @@
     }
 
     function setupDatePicker() {
-        $(function () {
-            $("#txtDate").datepicker();
-        });
+        //$(function () {
+        //    $("#txtDate").datepicker();
+        //});
     }
 
     function getProductList() {
@@ -299,24 +304,43 @@
         addOrEditNews();
     }
 
-    function addOrEditNews() {
-        if (newsKey == null) { // add
+    function addOrEditNews()
+    {
+        if (newsKey == null)
+        { // add
             MakePageReadOnly(false);
-            $("#txtDate").datepicker('setDate', new Date());
+//            $("#txtDate").datepicker('setDate', new Date());
+            $("#txtDate").html(new Date());
+            $("#chkViewMore").prop("checked", false);
+            $("#dateRow").hide();
+
             showOrHideFullText();
-        } else { // edit
+        }
+        else
+        { // edit
             MakePageReadOnly(false);
+            $("#dateRow").show();
             getNews(newsKey);
         }
     }
 
-    function MakePageReadOnly(bReadOnly) {
-        if (bReadOnly) {
+    function MakePageReadOnly(bReadOnly)
+    {
+        if (bReadOnly)
+        {
             $(".updateButton").hide();
             $(".mkaEditable").prop("readonly", "readonly");
             $(".mkaEditable").prop("disabled", "disabled");
+
+            $(".mce-menubar").hide();
+            $(".mce-toolbar").hide();
+
+            tinyMCE.get('txtTitle').getBody().setAttribute('editable', false);
+            tinyMCE.get('txtShortText').getBody().setAttribute('editable', false);
+            tinyMCE.get('txtText').getBody().setAttribute('editable', false);
         }
-        else {
+        else
+        {
             $(".updateButton").show();
         }
     }
@@ -341,7 +365,8 @@
         });
     }
 
-    function getNewsSuccess(data, textStatus, jQxhr) {
+    function getNewsSuccess(data, textStatus, jQxhr)
+    {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -358,32 +383,45 @@
         $("#ddlProduct").val(obj.ProductID);
         $("#txtTitle").val(obj.NewsTitle);
         tinymce.get("txtTitle").setContent(obj.NewsTitle);
-        $("#txtDate").val(obj.NewsDate);
+        $("#txtDate").html(obj.NewsDate);
         // add NewsTime? break ties by NewsKey? add NewsSequence and break ties by that?
         $("#txtImage").val(obj.NewsImage);
         $("#txtShortText").val(obj.NewsShortText);
         tinymce.get("txtShortText").setContent(obj.NewsShortText);
         $("#chkViewMore").prop("checked", obj.ViewMore);
+        $("#chkViewMore").prop("checked", false);
+
         $("#txtText").val(obj.NewsText);
         tinymce.get("txtText").setContent(obj.NewsText);
+
+        if (obj.Editable == false)
+        {
+            gReadOnly = true;
+            MakePageReadOnly(true);
+
+        }
 
         showOrHideFullText();
     }
 
     function showOrHideFullText() {
-        if ($("#chkViewMore").prop("checked")) {
-            $("#divFullText").show();
-            $("#divNoFullText").hide();
 
-            var text = tinymce.get("txtText").getContent({ format: 'html' });
-            if (text == "") {
-                var shortText = tinymce.get("txtShortText").getContent({ format: 'html' });
-                tinymce.get("txtText").setContent(shortText);
-            }
-        } else {
+       //if ($("#chkViewMore").prop("checked"))
+       // {
+       //     $("#divFullText").show();
+       //     $("#divNoFullText").hide();
+
+       //     var text = tinymce.get("txtText").getContent({ format: 'html' });
+       //     if (text == "") {
+       //         var shortText = tinymce.get("txtShortText").getContent({ format: 'html' });
+       //         tinymce.get("txtText").setContent(shortText);
+       //     }
+       //}
+       // else
+       // {
             $("#divFullText").hide();
             $("#divNoFullText").show();
-        }
+       // } 
     }
 
     function validationPassed() {
@@ -413,10 +451,12 @@
         return loopBreak;
     }
 
-    function insertOrUpdateNews() {
+    function insertOrUpdateNews()
+    {
         var title = tinymce.get("txtTitle").getContent({ format: 'html' });
         title = title.replace(/^<p>/g, "");
         title = title.replace(/<\/p>$/g, "");
+
         if (title.includes("<p>")) {
             bootbox.alert("Title is limited to one line");
             return;
@@ -425,9 +465,12 @@
 
         $("#txtShortText").val(tinymce.get("txtShortText").getContent({ format: 'html' }));
 
-        if ($("#chkViewMore").prop("checked")) {
+        if ($("#chkViewMore").prop("checked"))
+        {
             $("#txtText").val(tinymce.get("txtText").getContent({ format: 'html' }));
-        } else {
+        }
+        else
+        {
             $("#txtText").val($("#txtShortText").val());
         }
 

@@ -80,7 +80,7 @@
                         <select id="ddlProduct" class="search-ddl-select dropdown-select report-filter" onchange="getNewsList();"></select>
                     </div>
                     <div class="col-md-5">
-                        <label for="chkIncludeDeleted" class="dropdown-label">Include Deleted</label>
+                        <label for="chkIncludeDeleted" class="dropdown-label">Include Deleted&nbsp;</label>
                         <input type="checkbox" id="chkIncludeDeleted" class="report-filter" onchange="getNewsList();" />
                     </div>
                     <div class="col-md-2">
@@ -97,9 +97,6 @@
                                 <th class="exportColumn">Product</th>
                                 <th class="exportColumn">Title</th>
                                 <th class="exportColumn">Date</th>
-                                <th class="exportColumn">Image</th>
-                                <th class="exportColumn">Short Text</th>
-                                <th class="exportColumn">View More</th>
                                 <th class="exportColumn">Text</th>
                                 <th class="exportColumn">Creator</th>
                                 <th></th>
@@ -200,22 +197,72 @@
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
             "data": [],
+            "order": [[ 3, "desc" ]],
             "columns": [
-                { "data": 'IsPublic' },
-                { "data": 'ProductID' },
-                { "data": 'NewsTitle' },
-                { "data": 'NewsDateTime' },
-                { "data": 'NewsImage' },
-                { "data": 'NewsShortText', "render": $.fn.dataTable.render.ellipsis(200, true, false) },
-                { "data": 'ViewMore' },
-                { "data": 'NewsText', "render": $.fn.dataTable.render.ellipsis(200, true, false) },
-                { "data": 'Creator' },
+                {
+                    "data": 'IsPublic',
+                    "className": "text-align-center"
+                },
                 {
                     mRender: function (data, type, row) {
-                        return "<a href='#' onclick='editNews(" + row.NewsKey + ");'>Edit</a>"
-                            + " <a href='#' onclick='approveNews(" + row.NewsKey + ");'>Approve</a>"
-                            + " <a href='#' onclick='unapproveNews(" + row.NewsKey + ");'>Unapprove</a>"
-                            + " <a href='#' onclick='deleteNews(" + row.NewsKey + ");'>Delete</a>";
+
+                        var action = '';
+                        
+                        if (row["ProductID"] == 'DEL')
+                        {
+                            action = action + '<font color="red">';
+
+                        }
+                        
+                        action = action + row["ProductID"];
+
+                        if (row["ProductID"] == 'DEL')
+                        {
+                            action = action + '</font>';
+                        }
+
+                        return action;
+                    },
+                    "orderable": true,
+                    "searchable": true,
+                    "className": "text-align-center"
+                },
+                { "data": 'NewsTitle' },
+                {
+                    "data": 'NewsDateTime',
+                    "className": "text-align-center"
+                },
+                { "data": 'NewsText', "render": $.fn.dataTable.render.ellipsis(200, true, false) },
+                {
+                    "data": 'Creator',
+                    "className": "text-align-center"
+                },
+                {
+                    mRender: function (data, type, row) {
+
+                        var action = '';
+
+                        if (row["Editable"] == true)
+                        {
+                            action = action + "<a href='#' onclick='editNews(" + row.NewsKey + ");'>Edit</a><br>";
+                        
+                            if (row["IsPublic"].toUpperCase() == "YES")
+                            {
+                                action = action + " <a href='#' onclick='unapproveNews(" + row.NewsKey + ");'>Unapprove</a><br>";
+                            }
+                            else
+                            {
+                                action = action + " <a href='#' onclick='approveNews(" + row.NewsKey + ");'>Approve</a><br>";
+                            }
+                        
+                            action = action + " <a href='#' onclick='deleteNews(" + row.NewsKey + ");'>Delete</a><br>";
+                        }
+                        else
+                        {
+                            action = action + " <a href='#' onclick='editNews(" + row.NewsKey + ");'>View</a>";
+
+                        }
+                        return action;
                     },
                     "orderable": false,
                     "searchable": false,
@@ -224,17 +271,7 @@
             ],
             "pagingType": "full_numbers",
             "buttons": [
-               //{
-               //    extend: 'csv',
-               //    exportOptions: {
-               //        columns: exportColumns,
-               //        format: {
-               //            header: function (data, columnIdx) {
-               //                return returnExportColumnHeadingTitle("dtNews", data, columnIdx);
-               //            }
-               //        }
-               //    }
-               //},
+ 
                {
                    extend: 'excel',
                    title: reportTitle,
@@ -247,18 +284,7 @@
                        }
                    }
                },
-               //{
-               //    extend: 'pdf',
-               //    title: reportTitle,
-               //    exportOptions: {
-               //        columns: exportColumns,
-               //        format: {
-               //            header: function (data, columnIdx) {
-               //                return returnExportColumnHeadingTitle("dtNews", data, columnIdx);
-               //            }
-               //        }
-               //    }
-               //},
+ 
                {
                    extend: 'print',
                    title: reportTitle,

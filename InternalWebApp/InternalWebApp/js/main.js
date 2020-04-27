@@ -1620,15 +1620,32 @@ function buildTechMenu(selectedItem) {
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "TechTools") + ' role="button" aria-expanded="false">Tools <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html?MenuItem=true">Tech Tools</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/news/newslist.html?MenuItem=true">News Tool</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/techtools/matchednotification/matchednotificationlist.html?MenuItem=true">Matched Notification Tool</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/encryptdecrypt.html?MenuItem=true">Encryption/Decryption Tool</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrarchiverollover.html?MenuItem=true">MRR Rollover</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrmarkethistorydatamatrix.html?MenuItem=true">MRR Market History Maintenance</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/mrr/mrrstationownerchanged.html?MenuItem=true">MRR Station Ownership Change</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/xry/xrymarkethistorydatamatrix.html?MenuItem=true">XRY Market History Maintenance</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/xry/xrystationownerchanged.html?MenuItem=true">XRY Station Ownership Change</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/products/tvb/tvbMarketHistoryDataMatrix.html?MenuItem=true">TVB Market History Maintenance</a></li>';
+
+    menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">MRR <span style="margin-right:10px;" class="caret"></span></a>'
+    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
+    menuItems += '                          <li style="display:block;"><a href="/products/mrr/mrrarchiverollover.html?MenuItem=true">MRR Rollover</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/products/mrr/mrrmarkethistorydatamatrix.html?MenuItem=true">MRR Market History Maintenance</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/products/mrr/mrrstationownerchanged.html?MenuItem=true">MRR Station Ownership Change</a></li>';
+    menuItems += '                      </ul>';
+    menuItems += '                  </li>';
+
+    menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">XRY <span style="margin-right:10px;" class="caret"></span></a>'
+    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
+    menuItems += '                          <li style="display:block;"><a href="/products/xry/xrymarkethistorydatamatrix.html?MenuItem=true">XRY Market History Maintenance</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/products/xry/xrystationownerchanged.html?MenuItem=true">XRY Station Ownership Change</a></li>';
+    menuItems += '                      </ul>';
+    menuItems += '                  </li>';
+
+    menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">TVB <span style="margin-right:10px;" class="caret"></span></a>'
+    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
+    menuItems += '                          <li style="display:block;"><a href="/products/tvb/tvbMarketHistoryDataMatrix.html?MenuItem=true">TVB Market History Maintenance</a></li>';
+    menuItems += '                      </ul>';
+    menuItems += '                  </li>';
+
     menuItems += '                  <li style="display:block;"><a href="/Admin/TechTools/passedQAList.html?MenuItem=true">Passed QA List</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/encryptdecrypt.html?MenuItem=true">Encryption/Decryption Tool</a></li>';
 
     menuItems += '              </ul>';
     menuItems += '        </li>';
