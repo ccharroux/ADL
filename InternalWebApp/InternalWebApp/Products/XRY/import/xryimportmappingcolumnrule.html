@@ -209,14 +209,14 @@
                 <!--
                 datatable with items
                 -->
-                <div class="row">
+                <div class="row new-item" style="display: none;">
                     <div class="col-md-8">
 
                     </div>
                     <div class="col-md-4">
                         <div style="display:table-cell; float: right;">
                             <label class="dropdown-label">&nbsp;</label><br />
-                            <input type="button" value="+" class="addNewButton addNewButton-list-pages vertical-center" onclick="editRuleItem(0)" />
+                            <input type="button" value="+" class="addNewButton addNewButton-list-pages vertical-center" onclick="editRuleItem(0);" />
                         </div>
                     </div>
                 </div>
@@ -410,6 +410,8 @@
     function getMappingColumnRule() {
         if (mappingColumnRuleId <= 0) {
             initializeActiveDate();
+            $(".new-item").hide();
+            cleanupBackButton(window.location.pathname);
             return;
         }
 
@@ -460,8 +462,12 @@
                             $(".disable-date").hide();
                         }
 
+                        $(".new-item").show();
+
                         //get list of import mapping column rule items
                         getMappingColumnRuleItemsList();
+
+                        cleanupBackButton(window.location.pathname);
                     });
                 }
             },
@@ -678,14 +684,20 @@
 
                     bootbox.alert('Import Mapping Column Rule Updated', function () {
 
-                        if (bReloadPage) {
-                            window.location = "/products/xry/import/xryimportmappingcolumnrule.html?MappingColumnRuleId=" + $("#txtColumnRuleId").val();
+                        if (bReloadPage)
+                        {
+                            window.location =
+                                "/products/xry/import/xryimportmappingcolumnrule.html?MappingColumnRuleId=" + $("#txtColumnRuleId").val();
                         }
                     });
+
+                    //get list of import mapping column rule items
+                    if (bReloadPage == false) {
+                        getMappingColumnRuleItemsList();
+                    }
                 }
 
-                //get list of import mapping column rule items
-                getMappingColumnRuleItemsList();
+               
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -722,7 +734,7 @@
             if ($(eID).prop('tagName').toLowerCase() == "select") {
                 if ($(eID).val() == "-1") {
                     bootbox.alert(errorMessage, function () { });
-                    loopBreak = false
+                    loopBreak = false;
                     return false;
                 }
             }
