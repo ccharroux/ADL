@@ -673,6 +673,7 @@
     var ownerId;
     var activeProductList = []; // store for later use by market/station grid
 
+    var gotOwnerChangeHistoryOwnerGroups = false;
     var gotOwnerChangeHistoryOwnerProducts = false;
     var gotOwnerChangeHistoryOwnerStations = false;
     var gotOwnerChangeHistoryOwnerPersonnel = false;
@@ -704,6 +705,7 @@
         setDataTable_OwnerPersonnel();
 
         setDataTable_OwnerChangeHistoryOwnerField();
+        setDataTable_OwnerChangeHistoryOwnerGroups();
         setDataTable_OwnerChangeHistoryOwnerProducts();
         setDataTable_OwnerChangeHistoryOwnerStations();
         setDataTable_OwnerChangeHistoryOwnerPersonnel();
@@ -1424,6 +1426,96 @@
             "columns": [
                 { "data": 'Change Date', "className": "changeDate" },
                 { "data": 'Change Value', "className": "changeValue" }
+            ],
+            "order": [
+                [0, "asc"] // Change Date
+            ],
+            "pagingType": "full_numbers",
+            "paging": false,
+            "searching": false,
+            "bInfo": false,
+            "ordering": false,
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'excel',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'print',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOwnerList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //}
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            //initComplete: function () {
+            //    // handled earlier for entire page, don't repeat
+            //    // $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            //},
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            //language: {
+            //    //this changes search box label from Search: to Filter Results:
+            //    search: "Filter Results:"
+            //}
+        });
+
+    }
+
+    function setDataTable_OwnerChangeHistoryOwnerGroups() {
+        var reportTitle = "Owner Change History - Owner Groups";
+        var exportColumns = returnTableColumnsByClass("dtOwnerChangeHistoryOwnerGroups", "exportColumn");
+
+        $("#dtOwnerChangeHistoryOwnerGroups").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                { "data": 'Change Date', "className": "changeDate" },
+                { "data": 'Owner Group ID' },
+                { "data": 'Change Value', "className": "changeValue" },
             ],
             "order": [
                 [0, "asc"] // Change Date
@@ -2406,6 +2498,60 @@
 
     function hideOwnerChangeHistoryOwnerField() {
         $("#divOwnerChangeHistoryOwnerField").hide();
+    }
+
+    function showOrHideOwnerChangeHistoryOwnerGroups() {
+        if ($("#divOwnerChangeHistoryOwnerGroups").is(":visible")) {
+            $("#divOwnerChangeHistoryOwnerGroups").hide();
+            changeValueFromHideToShow("btnShowOrHideOwnerChangeHistoryOwnerGroups");
+        } else {
+            if (gotOwnerChangeHistoryOwnerGroups) {
+                $("#divOwnerChangeHistoryOwnerGroups").show();
+            } else {
+                getOwnerChangeHistoryOwnerGroups();
+            }
+            changeValueFromShowToHide("btnShowOrHideOwnerChangeHistoryOwnerGroups");
+        }
+    }
+
+    function getOwnerChangeHistoryOwnerGroups() {
+        var url = ServicePrefix + '/api/Owner/GetOwnerChangeHistoryOwnerGroups'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inOwnerId=' + ownerId;
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOwnerChangeHistoryOwnerGroupsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getOwnerChangeHistoryOwnerGroupsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            bootbox.alert("No changes found");
+            return;
+        }
+
+        populateDataTable("dtOwnerChangeHistoryOwnerGroups", data);
+        $("#divOwnerChangeHistoryOwnerGroups").show();
+        gotOwnerChangeHistoryOwnerGroups = true;
+
     }
 
     function showOrHideOwnerChangeHistoryOwnerProducts() {
