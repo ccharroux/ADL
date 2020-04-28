@@ -97,6 +97,10 @@
             min-width: 100px !important;
             max-width: 100px !important;
         }
+        .linkColor
+        {
+            color: #1FB57B !important;
+        }
     </style>
 </head>
 <body>
@@ -178,10 +182,10 @@
         </div>
         <div class="row margin-top-10">
             <div class="col-md-12 text-align-center">
-                <input type="button" id="btnListDialogSave" onclick="listDialogSave();" value="Save" />
-                <input type="button" id="btnListDialogReset" onclick="listDialogReset();" value="Reset" />
-                <input type="button" id="btnListDialogDelete" class="listDialogEdit" onclick="listDialogDelete();" value="Delete" />
-                <input type="button" id="btnListDialogClose" onclick="listDialogClose();" value="Close" />
+                <input style="display:none" type="button" id="btnListDialogSave" onclick="listDialogSave();" value="Save" />
+                <input style="display:none" type="button" id="btnListDialogReset" onclick="listDialogReset();" value="Reset" />
+                <!--<input type="button" id="btnListDialogDelete" class="listDialogEdit" onclick="listDialogDelete();" value="Delete" />
+                <input type="button" id="btnListDialogClose" onclick="listDialogClose();" value="Close" />-->
                 <span class="listDialogNew" style="margin-left: 50px">
                     Once list is saved, you will be able to add members
                 </span>
@@ -272,6 +276,7 @@
 
     var currentRelationshipListId = null;
     var newListMode = false;
+    var gEditableItem = false;
 
     $(document).ready(function () {
         $("#divResults").hide();
@@ -296,6 +301,9 @@
 
         setLocalStorage("search", $("#ddlCreator").val());
         setLocalStorage("searchPage", window.location);
+
+        setTimeout(getRelationshipLists, 1000);
+        
     });
 
     function buildUIDialogs() {
@@ -434,15 +442,27 @@
             ],
             "columns": [
                 { "data": 'RelationshipListName' },
-                { "data": 'MemberCount' },
+                {
+                    "data": 'MemberCount',
+                    "className": "text-align-center"
+                },
                 { "data": 'ListCreator' },
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="#" onclick="viewList(' + row.RelationshipListID + ')">Edit</a>';
+                        var action = '';
+                        if (row.Editable == false) {
+                            action = action + '<a href="#" onclick="viewList(' + row.RelationshipListID + ')">View</a><br>';
+                            action = action + '<a href="#" onclick="cloneList(' + row.RelationshipListID + ')">Clone</a>';
+                        }
+                        else {
+                            action = action + '<a href="#" onclick="viewList(' + row.RelationshipListID + ')">Edit</a><br>';
+                            action = action + '<a href="#" onclick="listDialogDelete(' + row.RelationshipListID + ')">Delete</a>';
+                        }
+                        return action;
                     },
                     "orderable": false,
                     "searchable": false,
-                    "className": "text-align-left"
+                    "className": "text-align-center"
                 }
             ],
             "pagingType": "full_numbers",
@@ -532,14 +552,16 @@
                 { "data": 'Phone' },
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="/admin/personnel/personnelview.html?PersonnelID=' + row.PersonnelID + '">View</a>'
-                            + ' | <a href="/admin/personnel/personnel.html?PersonnelID=' + row.PersonnelID + '">Edit</a>'
-                            + ' | <a href="/admin/customersupport/customersupport.html?PersonnelID=' + row.PersonnelID + '&CustomerSupportType=Sales">Record Sales Contact</a>'
-                            + ' | <a href="#" onclick="removeMember(' + row.PersonnelID + ',\'' + encodeURI(row.Name) + '\');">Remove</a>'; // pass name so we don't have to look it up again for the confirmation prompt
+                        var action = '';
+                        action = action + '<a class="linkColor" href="#" onclick="goTo(' + "/admin/personnel/personnelview.html?PersonnelID=" + row.PersonnelID + ');">View</a><br>'
+                        action = action + '<a class="linkColor" href="/admin/personnel/personnel.html?PersonnelID=' + row.PersonnelID + '">Edit</a><br>'
+                        action = action + '<a class="linkColor" href="/admin/customersupport/customersupport.html?PersonnelID=' + row.PersonnelID + '&CustomerSupportType=Sales">Customer Service</a><br>'
+                        //action = action + '<a class="linkColor" href="#" onclick="removeMember(' + row.PersonnelID + ',\'' + encodeURI(row.Name) + '\');">Remove</a>'; // pass name so we don't have to look it up again for the confirmation prompt
+                        return action;
                     },
                     "orderable": false,
                     "searchable": false,
-                    "className": "text-align-left"
+                    "className": "text-align-center"
                 }
             ],
             "columnDefs": [
@@ -791,11 +813,13 @@
         reHideChosenDDLs();
     }
 
-    function viewList(relationshipListId) {
+    function viewList(relationshipListId)
+    {
         currentRelationshipListId = relationshipListId;
 
         viewListBasicInfo();
-        viewListMembers();
+
+
         $("#divNewMembersSearch").show();
         $("#divNewMembersResults").hide();
 
@@ -831,9 +855,24 @@
         }
 
         var obj = data.report.rows[0];
+        if (obj.Editable == false)
+        {
+            $("#btnListDialogSave").hide();
+            $("#btnListDialogReset").hide();
+            $("#divNewMembersSearch").hide();
+            $("#txtListDialogName").prop("disabled", true);
+        }
+        else
+        {
+            $("#btnListDialogSave").show();
+            $("#btnListDialogReset").show();
+            $("#divNewMembersSearch").show();
+            $("#txtListDialogName").prop("disabled", false);
+        }
 
         $("#spanListDialogCreator").text(obj.ListCreator);
         $("#txtListDialogName").val(obj.RelationshipListName);
+        viewListMembers(obj.Editable);
     }
 
     function addRelationshipList() {
@@ -951,7 +990,8 @@
         $("#listDialog").dialog("close");
     }
 
-    function listDialogDelete() {
+    function listDialogDelete(id) {
+
         bootbox.confirm('Delete this list?', function (result) {
             if (result) {
                 $.ajax({
@@ -961,7 +1001,7 @@
                     contentType: 'application/json',
                     data: JSON.stringify({
                         "inApiToken": getLocalStorage("APIToken"),
-                        "inRelationshipListId": currentRelationshipListId
+                        "inRelationshipListId": id
                     }),
                     processData: false,
                     success: function (data, textStatus, jQxhr) {
@@ -970,7 +1010,7 @@
                         }
                         else {
                             getRelationshipLists();
-                            listDialogClose();
+                            //listDialogClose();
                         }
                     },
                     error: function (jqXhr, textStatus, errorThrown) {
@@ -1082,4 +1122,14 @@
         });
     }
 
+    function goTo(url)
+    {
+        window.location = url;
+    }
+
+    function cloneList(id)
+    {
+        bootbox.alert("Not implemented yet");
+        return;
+    }
 </script>
