@@ -162,6 +162,7 @@
         getScriptsList();
 
         //load last search eventually
+        setTimeout('loadLastSearch()', 1000);
     });
 
     function getScriptsList() {
@@ -205,10 +206,21 @@
 
     }
 
-    function getColumnMappingRules() {
+    function loadLastSearch() {
+
+        loadReportParameters();
+
+        setTimeout('getColumnMappingRules(true)', 500);
+    }
+
+    function getColumnMappingRules(bSilent) {
+
+        if (!bSilent) {
+            bSilent = false;
+        }
 
         //add validation to make sure required fields are completed
-        if (searchValidationPassed() == false)
+        if (searchValidationPassed(bSilent) == false)
         {
             return;
         }
@@ -363,7 +375,8 @@
         });
     }
 
-    function searchValidationPassed() {
+    function searchValidationPassed(bSilent) {
+
         var loopBreak = true;
         $(".mkaRequired").each(function (index, el) {
             var eID = "#" + $(el).attr("id");
@@ -372,7 +385,10 @@
             // Text
             if ($(eID).prop('tagName').toLowerCase() == "input") {
                 if ($(eID).val().trim() == "") {
-                    bootbox.alert(errorMessage, function () { });
+                    if (bSilent == false)
+                    {
+                        bootbox.alert(errorMessage, function() {});
+                    }
                     loopBreak = false;
                     return false;
                 }
@@ -381,7 +397,10 @@
             // Select
             if ($(eID).prop('tagName').toLowerCase() == "select") {
                 if ($(eID).val() == "-1") {
-                    bootbox.alert(errorMessage, function () { });
+                    if (bSilent == false)
+                    {
+                        bootbox.alert(errorMessage, function() {});
+                    }
                     loopBreak = false;
                     return false;
                 }
