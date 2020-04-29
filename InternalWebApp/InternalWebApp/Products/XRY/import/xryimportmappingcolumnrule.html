@@ -64,7 +64,6 @@
         .vertical-center {
             vertical-align: middle;
         }
-
     </style>
 
 </head>
@@ -209,23 +208,32 @@
                 <!--
                 datatable with items
                 -->
-                <div class="row new-item" style="display: none;">
-                    <div class="col-md-8">
-
-                    </div>
-                    <div class="col-md-4">
-                        <div style="display:table-cell; float: right;">
-                            <label class="dropdown-label">&nbsp;</label><br />
-                            <input type="button" value="+" class="addNewButton addNewButton-list-pages vertical-center" onclick="editRuleItem(0);" />
+                <div class="item-list-area" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
+                            <h3>Import Mapping Column Rule Items</h3>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div id="dtResultsHolder" class="col-md-12 dataTable-top-margin">
-                        <table id="dtResults" class="dataTable-border dataTable-headers dataTable-cell-border"></table>
-                    </div>
-                </div>
 
+                    <div class="row" >
+                        <div class="col-md-8">
+
+                        </div>
+                        <div class="col-md-4">
+                            <div style="display:table-cell; float: right;">
+                                <label class="dropdown-label">&nbsp;</label><br />
+                                <input type="button" value="+" class="addNewButton addNewButton-list-pages vertical-center" onclick="editRuleItem(0);" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div id="dtResultsHolder" class="col-md-12 dataTable-top-margin">
+                            <table id="dtResults" class="dataTable-border dataTable-headers dataTable-cell-border"></table>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
@@ -410,7 +418,7 @@
     function getMappingColumnRule() {
         if (mappingColumnRuleId <= 0) {
             initializeActiveDate();
-            $(".new-item").hide();
+            $(".item-list-area").hide();
             cleanupBackButton(window.location.pathname);
             return;
         }
@@ -462,7 +470,7 @@
                             $(".disable-date").hide();
                         }
 
-                        $(".new-item").show();
+                        $(".item-list-area").show();
 
                         //get list of import mapping column rule items
                         getMappingColumnRuleItemsList();
@@ -572,22 +580,10 @@
             "orderable": true
         });
 
+        // NOTE: This is a place holder for the Action column
+        // The actions will be built during the rowCallback instead of mRender.
         columnsToDisplay.push({
             "visible": true,
-            "mRender": function (data, type, row) {
-                if (row["Delete Date"] != null) {
-                    return '';
-                } else {
-                    var strActions = "";
-                    //strActions += '<a href="#" onclick="editRuleItem(0);">Add</a>';
-                    strActions += '&nbsp;&nbsp;<a href="#" onclick="editRuleItem(' + row.mappingColumnRuleItemId + ');">Edit</a>';
-                    strActions += '&nbsp;&nbsp;<a href="#" onclick="deleteRuleItem(' + row.mappingColumnRuleItemId + ');">Delete</a>';
-                    strActions += '&nbsp;&nbsp;<a href="#" onclick="reorderRuleItem(' + row.mappingColumnRuleItemId + ');">Reorder</a>';
-
-                    return strActions;
-                }
-            },
-            "orderable": false,
             "className": "text-align-right"
         });
 
@@ -596,6 +592,9 @@
 
     function loadResultsDataTable(data, columns) {
         var results = data["report"]["rows"];
+        var bHasMultipleRows = results.length > 1;
+        var iFirstRowIndex = 0;
+        var iLastRowIndex = results.length - 1;
 
         var searchTable;
 
@@ -612,6 +611,15 @@
             "order": [],
             "data": results,
             "columns": columns,
+            "columnDefs": [
+                {
+                    // This targets the Action column
+                    // and assigns default content.
+                    targets: 7,
+                    defaultContent: '',
+                    orderable: false
+                }
+            ],
             "createdRow": function (row, data, index) {
                 //this adds the class to every row
                 $(row).addClass('single-line-height');
@@ -620,15 +628,43 @@
                 search: "Filter Results:"
             },
             "buttons": [
-            ]
+            ],
+            "rowCallback": function (row, data, displayNum, displayIndex, dataIndex) {
+
+                // NOTE: This coding build the fields for the action column.
+                // Wanted the Move UP/Move DOWN to be dynamic based on what the data was.
+                // rowCallback was the best option since it is called before the dataTable is displayed.
+                // This gave me access to indexes, etc.
+
+                if (data["Delete Date"] != null) {
+                    // The td is the visible column in the table.
+                    // In this case, it is the action column.
+                    $('td:eq(4)', row).html('');
+                } else {
+                    var strActions = "";
+                    strActions += '<a href="#" onclick="editRuleItem(' + data.mappingColumnRuleItemId + ');">Edit</a>';
+                    strActions += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="deleteRuleItem(' + data.mappingColumnRuleItemId + ');">Delete</a>';
+
+                    if (bHasMultipleRows) {
+                        if (dataIndex == iFirstRowIndex) {
+                            strActions += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="reorderRuleItem(' + data.mappingColumnRuleItemId + ',' + mappingColumnRuleId + ',' + data["Order By"] + ',\'DOWN\');">Move Item Down</a>';
+                        } else if (dataIndex == iLastRowIndex) {
+                            strActions += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="reorderRuleItem(' + data.mappingColumnRuleItemId + ',' + mappingColumnRuleId + ',' + data["Order By"] + ',\'UP\');">Move Item Up</a>';
+                        } else {
+                            strActions += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="reorderRuleItem(' + data.mappingColumnRuleItemId + ',' + mappingColumnRuleId + ',' + data["Order By"] + ',\'DOWN\');">Move Item Down</a>';
+                            strActions += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="reorderRuleItem(' + data.mappingColumnRuleItemId + ',' + mappingColumnRuleId + ',' + data["Order By"] + ',\'UP\');">Move Item Up</a>';
+                        }
+                    }
+
+                    // The td is the visible column in the table.
+                    // In this case, it is the action column.
+                    $('td:eq(4)', row).html(strActions);
+                }
+            }
         });
     }
 
     function editRuleItem(columnRuleItemId) {
-        bootbox.alert('This functionality is still under development.', function () {
-        });
-        //will also need to pass the mappingColumnRuleId
-        //columnRuleItemId of 0 equals new
         window.location = "/products/xry/import/xryimportmappingcolumnruleitem.html?MappingColumnRuleItemId=" + columnRuleItemId + "&MappingColumnRuleId=" + mappingColumnRuleId;
     }
 
@@ -637,8 +673,31 @@
         });
     }
 
-    function reorderRuleItem(columnRuleItemId) {
-        bootbox.alert('This functionality is still under development.', function () {
+    function reorderRuleItem(columnRuleItemId, columnRuleId, columnRuleItemOrderBy, reorderDirection) {
+
+        $.ajax({
+            url: ServicePrefix + '/api/XrayImport/ReorderImportMappingColumnRuleItem',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inColumnRuleItemId": columnRuleItemId,
+                "inColumnRuleId": columnRuleId,
+                "inColumnRuleItemOrderBy": columnRuleItemOrderBy,
+                "inReorderDirection": reorderDirection
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    getMappingColumnRuleItemsList();
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
         });
     }
 
@@ -684,8 +743,7 @@
 
                     bootbox.alert('Import Mapping Column Rule Updated', function () {
 
-                        if (bReloadPage)
-                        {
+                        if (bReloadPage) {
                             window.location =
                                 "/products/xry/import/xryimportmappingcolumnrule.html?MappingColumnRuleId=" + $("#txtColumnRuleId").val();
                         }
@@ -697,7 +755,7 @@
                     }
                 }
 
-               
+
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -740,7 +798,7 @@
             }
 
         });
- 
+
         return loopBreak;
 
     }
