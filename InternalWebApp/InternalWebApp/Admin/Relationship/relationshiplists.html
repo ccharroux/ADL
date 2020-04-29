@@ -565,12 +565,12 @@
                 }
             ],
             "columnDefs": [
-                { "targets": 0, "className": "memberName" },
-                { "targets": 1, "className": "memberMarket" },
-                { "targets": 2, "className": "memberOwner" },
-                { "targets": 3, "className": "memberTitle" },
-                { "targets": 4, "className": "memberPhone" },
-                { "targets": 5, "className": "memberAction" }
+                { "targets": 0, "className": "memberName text-align-left" },
+                { "targets": 1, "className": "memberMarket text-align-left" },
+                { "targets": 2, "className": "memberOwner text-align-left" },
+                { "targets": 3, "className": "memberTitle text-align-left" },
+                { "targets": 4, "className": "memberPhone text-align-left" },
+                { "targets": 5, "className": "memberAction text-align-center" }
             ],
             "pagingType": "full_numbers",
             "buttons": [
@@ -660,22 +660,25 @@
                 { "data": 'Phone' },
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="/admin/personnel/personnelview.html?PersonnelID=' + row.PersonnelID + '">View</a>'
-                            + ' | <a href="/admin/personnel/personnel.html?PersonnelID=' + row.PersonnelID + '">Edit</a>'
-                            + ' | <a href="#" onclick="addMember(' + row.PersonnelID + ',\'' + encodeURI(row.Name) + '\');">Add</a>'; // pass name so we don't have to look it up again for the confirmation prompt
+                        var action = '<a class="linkColor" href="#" onclick="addMember(' + row.PersonnelID + ',\'' + encodeURI(row.Name) + '\');">Add To Group</a><br>'; // pass name so we don't have to look it up again for the confirmation prompt
+
+                        action = action + '<a class="linkColor" href="/admin/personnel/personnelview.html?PersonnelID=' + row.PersonnelID + '">View</a>&nbsp;&nbsp;&nbsp;'
+                              + '<a  class="linkColor" href="/admin/personnel/personnel.html?PersonnelID=' + row.PersonnelID + '">Edit</a><br>';
+
+                        return action;
                     },
                     "orderable": false,
                     "searchable": false,
-                    "className": "text-align-left"
+                    "className": "text-align-center"
                 }
             ],
             "columnDefs": [
-                { "targets": 0, "className": "memberName" },
-                { "targets": 1, "className": "memberMarket" },
-                { "targets": 2, "className": "memberOwner" },
-                { "targets": 3, "className": "memberTitle" },
-                { "targets": 4, "className": "memberPhone" },
-                { "targets": 5, "className": "memberAction" }
+                { "targets": 0, "className": "memberName text-align-left" },
+                { "targets": 1, "className": "memberMarket text-align-left" },
+                { "targets": 2, "className": "memberOwner text-align-left" },
+                { "targets": 3, "className": "memberTitle text-align-left" },
+                { "targets": 4, "className": "memberPhone text-align-left" },
+                { "targets": 5, "className": "memberAction text-align-center" }
             ],
             "pagingType": "full_numbers",
             "buttons": [
@@ -825,6 +828,7 @@
 
         newListMode = false;
         updateUIForNewOrEditMode();
+        $("#txtPartialText").val("");
 
         $("#listDialog").dialog("open");
     }
@@ -1054,10 +1058,17 @@
         });
     }
 
-    function searchNewMembers() {
+    function searchNewMembers()
+    {
         var partialText = $("#txtPartialText").val().toString().trim();
-        if (partialText == "") {
-            bootbox.alert("No partial text entered");
+
+ 
+        if (partialText.length < 2)
+        {
+            $("#listDialog").dialog("close");
+            bootbox.alert("Partial text needs to be 2 or more characters.",
+                function () { $("#listDialog").dialog("open"); }
+                );
             return;
         }
 

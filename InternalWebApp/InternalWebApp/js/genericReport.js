@@ -294,6 +294,8 @@ reportName.push("rptMRRUploadTemplateByOwnerWithRevenueExtended");
 reportName.push("rptCategoryGrowthByMarket");
 reportName.push("rptTimeSalesVsAllRepBillingStations");
 
+reportName.push("rptPersonnelGroupList");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -331,7 +333,6 @@ function buildReportObjectArray()
     for (var x = 0; x < reportName.length; x++)
     {
         var module = reportName[x].replace("rpt", "");
- 
         arrayObject = window[("getReportObject_" + module)]();
         arrayObject.filters = window[("getReportFilterArray_" + module)]();
         reportObjectArray.push(arrayObject);
@@ -11559,6 +11560,57 @@ function getReportObject_TimeSalesVsAllRepBillingStations() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb', 'TVB Data Review', 'old admin'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_PersonnelGroupList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "RelationshipOwners",
+        jsCall: "getCreatorList",
+        objectName: "ddlRelationshipOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "PersonnelGroups",
+        objectName: "ddlPersonnelGroups",
+        jsCall: "getPersonnelGroups",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_PersonnelGroupList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("User");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Owner");
+    columnsToDisplay.push("Phone");
+    columnsToDisplay.push("Title");
+
+    tempObject =
+    {
+        reportTitle: "Personnel Group Member List",
+        apiControllerAction: "/api/Relationship/GetRelationshipListMembers",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['personnel'],
         sortable: true
 
     }

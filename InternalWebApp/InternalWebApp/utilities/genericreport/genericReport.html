@@ -147,6 +147,17 @@
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-12 ">
+
+                        <div class="form-group rptView rptRelationshipOwners">
+                            <label for="ddlRelationshipOwners" class="dropdown-label rptView rptRelationshipOwners">Creators</label>
+                            <select id="ddlRelationshipOwners" apiInput="inRelationshipOwnerId" onchange="getPersonnelGroups(this.val);" class="dropdown-select rptView rptRelationshipOwners report-filter"></select>
+                        </div>
+
+                        <div class="form-group rptView rptPersonnelGroups">
+                            <label for="ddlPersonnelGroups" class="dropdown-label rptView rptPersonnelGroups">List</label>
+                            <select id="ddlPersonnelGroups" apiInput="inRelationshipListId" class="dropdown-select rptView rptPersonnelGroups report-filter"></select>
+                        </div>
+
                         <div class="form-group rptView rptErrorDates">
                             <label for="ddlErrorDates" class="dropdown-label rptView rptErrorDates">Date</label>
                             <select id="ddlErrorDates" apiInput="inErrorDate" onchange="getErrorIPAddresses(this.val);" class="dropdown-select rptView rptErrorDates report-filter"></select>
@@ -845,8 +856,6 @@
 
     function activateFilter(filterObject) {
 
- 
-
         var classToShow = "rpt" + filterObject.token;
         $("." + classToShow).show();
 
@@ -855,13 +864,11 @@
             $("#" + filterObject.objectName).hide();
         }
 
-
         if (filterObject.jsCall == null)
         {
             return;
         }
  
-
         var jsCallParams = (filterObject.jsCallParameters == undefined ? new Array() : filterObject.jsCallParameters);
         
         var fn = window[filterObject.jsCall];
@@ -2630,7 +2637,15 @@
             else {
                 if (isRequired)
                 {
-                    var msg = "Please select a " + nameOfParm.toLowerCase().replace("in", "").replace("id", "");
+
+                    var parmWithIssue = nameOfParm.toLowerCase().replace("in", "").replace("id", "");
+
+                    // overrides here for business reasons                   
+                    // relationshiplist --> personnelGroup
+
+                    paramWithIssue = paramWithIssue.toLowerCase().replace("relationshiplist", "personnel group");
+
+                    var msg = "Please select a " + parmWithIssue
                     if (bSilent == false) {
                         bootbox.alert(msg, function () { });
                     }
@@ -3399,4 +3414,95 @@
 
         //});
     }
+
+
+    function getCreatorList() {
+        var url = ServicePrefix + '/api/Relationship/GetRelationshipListOwners' + '?inApiToken=' + getLocalStorage("APIToken");
+             url += '&inIncludeInactive=true';
+
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            success: function (data, textStatus, jQxhr) {
+                getCreatorListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getCreatorListSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS")
+        {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '<option value="">-- All --</option>';
+        $.each(data.report.rows, function (index) {
+            str = str + '<option value="' + data.report.rows[index].PersonnelID + '">' + data.report.rows[index].Name + '</option>';
+ 
+        });
+
+        $("#ddlRelationshipOwners").html(str);
+
+        convertToChosenSelect("ddlRelationshipOwners", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+ 
+    }
+
+
+    function getPersonnelGroups() {
+
+        var personnelId = $("#ddlRelationshipOwners").val();
+        var includeInactive = true;
+
+        var url = ServicePrefix + '/api/Relationship/GetRelationshipLists'
+            + '?inApiToken=' + getLocalStorage("APIToken");
+
+        if (personnelId != "" && personnelId != null)
+        {
+            url += '&inPersonnelId=' + personnelId;
+        }
+
+        url += '&inincludeInactive=true';
+
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            success: function (data, textStatus, jQxhr) {
+                getPersonnelGroupsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getPersonnelGroupsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '<option value="">-- All --</option>';
+        $.each(data.report.rows, function (index) {
+            str = str + '<option value="' + data.report.rows[index].RelationshipListID + '">' + data.report.rows[index].RelationshipListName + '</option>';
+
+        });
+
+        $("#ddlPersonnelGroups").html(str);
+
+        convertToChosenSelect("ddlPersonnelGroups", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+
+    }
+
 </script>
