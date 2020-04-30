@@ -88,10 +88,6 @@
                 </div>
                 <div class="text-center" style="margin-top: 0">
 
-                    <!--
-                    load data fields
-                    update button
-                    -->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="ddlScript" class="">Script</label>
@@ -270,6 +266,7 @@
 
     <!--Chosen Dropdown-->
     <script src="/js/chosen.jquery.min.js"></script>
+
 </body>
 </html>
 <script>
@@ -423,7 +420,6 @@
             return;
         }
 
-        //get the rule
         var sUrl = ServicePrefix + "/api/XrayImport/GetImportMappingColumnRule?";
         sUrl += "inApiToken=" + getLocalStorage("APIToken");
         sUrl += "&inMappingColumnRuleId=" + mappingColumnRuleId;
@@ -493,7 +489,7 @@
     }
 
     function getMappingColumnRuleItemsList() {
-        //get the rule
+   
         var sUrl = ServicePrefix + "/api/XrayImport/GetImportMappingColumnRuleItemsList?";
         sUrl += "inApiToken=" + getLocalStorage("APIToken");
         sUrl += "&inMappingColumnRuleId=" + mappingColumnRuleId;
@@ -584,7 +580,7 @@
             "className": "text-align-center"
         });
 
-        // NOTE: This is a place holder for the Action column
+        // NOTE: This is a place holder for the Action column (edit, delete, etc)
         // The actions will be built during the rowCallback instead of mRender.
         columnsToDisplay.push({
             "visible": true,
@@ -675,8 +671,42 @@
     }
 
     function deleteRuleItem(columnRuleItemId) {
-        bootbox.alert('This functionality is still under development.', function () {
+   
+        $.ajax({
+            url: ServicePrefix + '/api/XrayImport/DeleteImportMappingColumnRuleItem',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMappingColumnRuleItemId": columnRuleItemId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var bReloadPage = false;
+                    var obj = data.report.rows[0];
+
+                    if ($("#txtColumnRuleId").val() == "0") {
+                        bReloadPage = true;
+                        $("#txtColumnRuleId").val(obj._updateStatus);
+                    }
+
+                    bootbox.alert('Import Mapping Column Rule Item was deleted.', function () {
+                    });
+
+                    getMappingColumnRuleItemsList();
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
         });
+
     }
 
     function reorderRuleItem(columnRuleItemId, columnRuleId, columnRuleItemOrderBy, reorderDirection) {
