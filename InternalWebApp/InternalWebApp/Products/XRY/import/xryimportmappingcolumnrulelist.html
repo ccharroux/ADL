@@ -162,7 +162,8 @@
         getScriptsList();
 
         //load last search eventually
-        setTimeout('loadLastSearch()', 1000);
+        //setTimeout('loadLastSearch()', 1000);
+        cleanupBackButton();
     });
 
     function getScriptsList() {
@@ -276,10 +277,9 @@
         });
 
         columnsToDisplay.push({
-            "title": "Description",
+            "title": "Rule",
             "visible": true,
             "mData": "Rule Description",
-            "orderable": true,
             "className": "exportColumn"
         });
 
@@ -287,7 +287,6 @@
             "title": "Required",
             "visible": true,
             "mData": "Required",
-            "orderable": true,
             "className": "text-align-center exportColumn"
         });
 
@@ -295,23 +294,29 @@
             "title": "Owner",
             "visible": true,
             "mData": "Owner",
-            "orderable": true,
-            "className": "text-align-center exportColumn"
+            "className": "exportColumn"
         });
 
         columnsToDisplay.push({
             "title": "Market",
             "visible": true,
             "mData": "Market",
-            "orderable": true,
-            "className": "text-align-center exportColumn"
+            "className": "exportColumn"
         });
 
         columnsToDisplay.push({
-            "title": "Delete Date",
+            "title": "Active",
             "visible": true,
-            "mData": "Delete Date",
-            "orderable": true,
+            "mRender": function(data, type, row)
+            {
+                if (row["Delete Date"] == null)
+                {
+                    return 'Yes';
+                } else
+                {
+                    return 'No';
+                }
+            },
             "className": "text-align-center exportColumn"
         });
 
@@ -319,7 +324,7 @@
             "mRender": function (data, type, row) {
                 if (row["Delete Date"] != null)
                 {
-                    return '';
+                    return 'Reactivate';
                 } else
                 {
                     var strActions = "";
@@ -328,7 +333,6 @@
                     return strActions;
                 }
             },
-            "orderable": false,
             "searchable": false,
             "className": "text-align-right"
         });
@@ -355,6 +359,12 @@
             "order": [],
             "data": results,
             "columns": columns,
+            "columnDefs": [
+                {
+                    orderable: false,
+                    targets: '_all'
+                }
+            ],
             "pagingType": "full_numbers",
             "buttons": [
             ],
