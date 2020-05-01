@@ -2537,12 +2537,18 @@ function getReportIdByToken(inValue) {
 
 }
 
-function getFeatureButtons(featureToken, featureValue) {
+function getFeatureButtons(featureToken, featureValue, bIsInternalUser) {
     //loop through results to build the buttons
     //active will be remove
     //  will pass featureid and value
     //non-active will be add
     //  will pass featureid, conditionid, value
+
+   
+    if (!bIsInternalUser)
+    {
+        bIsInternalUser = false;
+    }
 
     $.ajax({
         url: ServicePrefix + '/api/Feature/GetFeatureListByTokenValue',
@@ -2579,11 +2585,36 @@ function getFeatureButtons(featureToken, featureValue) {
                         sStyle = 'background-color:green;margin-bottom:5px;';
                     }
 
-                    str += '<' + 'input type="button" data-feature-active="' + obj.Active + '" data-feature-token="' + featureToken +
-                        '" data-feature-id="' + obj.FeatureId + '" data-feature-value="' + featureValue +
-                        '" data-feature-canbechanged="' + obj.CanBeChanged + '" data-feature-conditionid="' + obj.ConditionId +
-                        '" data-feature-description="' + obj.Description + '" class="feature-button" style="' + sStyle + '" value="' +
-                        btnValue + '" onclick="processFeature(this)"/><br/>';
+                    var sButton = '<' +
+                        'input type="button" data-feature-active="' +
+                        obj.Active +
+                        '" data-feature-token="' +
+                        featureToken +
+                        '" data-feature-id="' +
+                        obj.FeatureId +
+                        '" data-feature-value="' +
+                        featureValue +
+                        '" data-feature-canbechanged="' +
+                        obj.CanBeChanged +
+                        '" data-feature-conditionid="' +
+                        obj.ConditionId +
+                        '" data-feature-description="' +
+                        obj.Description +
+                        '" class="feature-button" style="' +
+                        sStyle +
+                        '" value="' +
+                        btnValue +
+                        '" onclick="processFeature(this)"/><br/>';
+
+                    //DEV-
+                    if (obj["Internal Only"] == true && bIsInternalUser)
+                    {
+                        str += sButton;
+                    } else if (obj["Internal Only"] == false)
+                    {
+                        str += sButton;
+                    }
+
                 });
 
 
