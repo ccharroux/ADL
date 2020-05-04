@@ -317,10 +317,10 @@
             {
                 if (row["Delete Date"] == null)
                 {
-                    return 'Yes';
+                    return 'True';
                 } else
                 {
-                    return 'No';
+                    return 'False';
                 }
             },
             "className": "text-align-center exportColumn"
@@ -328,17 +328,22 @@
 
         columnsToDisplay.push({
             "mRender": function (data, type, row) {
-                if (row["Delete Date"] != null)
+ 
+                var strActions = "";
+
+                //if the delete date is null, the rule is considered active.
+                //edit and delete options will show.
+                //otherwise, only the reactivate item will show.
+                if (row["Delete Date"] == null)
                 {
-                    //build api, etc to reactivate
-                    return '<a href="#" onclick="reactivateRule(' + row.columnRuleId + ');">Reactivate</a>';
-                } else
-                {
-                    var strActions = "";
                     strActions += '<a href="#" onclick="editRule(' + row.columnRuleId + ');">Edit</a>';
                     strActions += '&nbsp;&nbsp;<a href="#" onclick="deleteRule(' + row.columnRuleId + ');">Delete</a>';
-                    return strActions;
+                } else
+                {
+                    strActions += '<a href="#" onclick="reactivateRule(' + row.columnRuleId + ');">Reactivate</a>';
                 }
+
+                return strActions;
             },
             "searchable": false,
             "className": "text-align-right"
