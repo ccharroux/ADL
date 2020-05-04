@@ -572,7 +572,8 @@
                 } else {
                     return 'No';
                 }
-            }
+            },
+            "className": "text-align-center"
         });
 
         // NOTE: This is a place holder for the Action column (edit, delete, etc)
@@ -637,7 +638,7 @@
                 if (data["Delete Date"] != null) {
                     // The td is the visible column in the table.
                     // In this case, it is the action column.
-                    $('td:eq(4)', row).html('Reactivate');
+                    $('td:eq(4)', row).html('<a href="#" onclick="reactivateRuleItem(' + data.mappingColumnRuleItemId + ');">Reactivate</a>');
                 } else {
                     var strActions = "";
                     strActions += '<a href="#" onclick="editRuleItem(' + data.mappingColumnRuleItemId + ');">Edit</a>';
@@ -684,14 +685,6 @@
                 }
                 else {
 
-                    var bReloadPage = false;
-                    var obj = data.report.rows[0];
-
-                    if ($("#txtColumnRuleId").val() == "0") {
-                        bReloadPage = true;
-                        $("#txtColumnRuleId").val(obj._updateStatus);
-                    }
-
                     bootbox.alert('Import Mapping Column Rule Item was deleted.', function () {
                     });
 
@@ -731,6 +724,37 @@
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+    }
+
+    function reactivateRuleItem(columnRuleItemId)
+    {
+        $.ajax({
+            url: ServicePrefix + '/api/XrayImport/ReactivateImportMappingColumnRuleItem',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMappingColumnRuleItemId": columnRuleItemId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    bootbox.alert('Import Mapping Column Rule Item was reactivated.', function () {
+                    });
+
+                    getMappingColumnRuleItemsList();
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
     }
 
     function updateMappingColumnRule() {
