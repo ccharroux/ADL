@@ -588,10 +588,40 @@
 
     function loadResultsDataTable(data, columns) {
         var results = data["report"]["rows"];
-        var bHasMultipleRows = results.length > 1;
-        var iFirstRowIndex = 0;
-        var iLastRowIndex = results.length - 1;
+       
+        //determine the number of deleted rule items
+        var deleteItemCount = results.filter(function (item)
+        {
+            return item["Delete Date"] != null;
+        }).length;
 
+        //This will be true if there is more than 1 non-deleted item
+        var bHasMultipleRows = (results.length - deleteItemCount) > 1 ? true : false;
+
+        //find the index of the first non-deleted item
+        var firstNonDeletedIndex = 0;
+        if (bHasMultipleRows)
+        {
+            firstNonDeletedIndex = results.findIndex(function(item, i)
+            {
+                return item["Delete Date"] === null;
+            });
+        }
+
+        var lastNonDeletedIndex = 0;
+        //get last index that isn't deleted
+        if (bHasMultipleRows)
+        {
+            for (var i = results.length - 1; i >= 0; i--)
+            {
+                if (results[i]["Delete Date"] == null)
+                {
+                    lastNonDeletedIndex = i;
+                    break;
+                }
+            }
+        }
+       
         var searchTable;
 
         if ($.fn.DataTable.isDataTable('#dtResults')) {
@@ -645,9 +675,9 @@
                     strActions += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="deleteRuleItem(' + data.mappingColumnRuleItemId + ');">Delete</a>';
 
                     if (bHasMultipleRows) {
-                        if (dataIndex == iFirstRowIndex) {
+                        if (dataIndex == firstNonDeletedIndex) {
                             strActions += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="reorderRuleItem(' + data.mappingColumnRuleItemId + ',' + mappingColumnRuleId + ',' + data["Order By"] + ',\'DOWN\');">Down</a>';
-                        } else if (dataIndex == iLastRowIndex) {
+                        } else if (dataIndex == lastNonDeletedIndex) {
                             strActions += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="reorderRuleItem(' + data.mappingColumnRuleItemId + ',' + mappingColumnRuleId + ',' + data["Order By"] + ',\'UP\');">Up</a>';
                         } else {
                             strActions += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="reorderRuleItem(' + data.mappingColumnRuleItemId + ',' + mappingColumnRuleId + ',' + data["Order By"] + ',\'DOWN\');">Down</a>';
@@ -709,7 +739,6 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inColumnRuleItemId": columnRuleItemId,
                 "inColumnRuleId": columnRuleId,
-                "inColumnRuleItemOrderBy": columnRuleItemOrderBy,
                 "inReorderDirection": reorderDirection
             }),
             processData: false,
