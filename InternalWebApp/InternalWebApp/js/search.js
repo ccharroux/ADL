@@ -98,7 +98,7 @@ function loadSearchResults(data, columns) {
         searchTable = $('#dtSearchResults').DataTable();
         searchTable.destroy();
     }
- 
+
 
     //this code rebuilds the datatable with the updated data from the search 
     //or initial load.
@@ -127,12 +127,10 @@ function cancelSearch() {
 
     setLocalStorage("gSearchResults", JSON.stringify(searchResults));
 
-    if (!searchCriteria)
-    {
+    if (!searchCriteria) {
         window.location = "/admin/login/dashboard.html";
     }
-    else
-    {
+    else {
         //sends user back to page that called the search page
         var searchPage = searchCriteria["searchPage"]["href"];
         window.location = searchPage;
@@ -197,8 +195,7 @@ function fixAdvertiser() {
 
 function linkAgencyByLink(agencyId, marketId) {
 
-    if (marketId != searchCriteria["marketID"])
-    {
+    if (marketId != searchCriteria["marketID"]) {
         var errorMessage = "You cannot link to an agency from another market.";
         bootbox.alert(errorMessage, function () { });
         return;
@@ -377,8 +374,7 @@ function assignParentAgencyAudit() {
 
 function linkNewAdvertiserByLink(advertiserId, marketId) {
 
-    if (marketId != searchCriteria["marketID"])
-    {
+    if (marketId != searchCriteria["marketID"]) {
         var errorMessage = "You cannot link to an advertiser from another market.";
         bootbox.alert(errorMessage, function () { });
         return;
@@ -410,6 +406,8 @@ function linkPersonnel() {
 
     searchResults["hidPersonnelId"] = rowData[0].personnelId;
     searchResults["txtPersonnel"] = rowData[0].name;
+
+    console.log(searchResults);
 
     setLocalStorage("gSearchResults", JSON.stringify(searchResults));
 
@@ -465,7 +463,7 @@ function linkParentAgency() {
 
     var rowData = searchTable.rows('.selected').data();
 
- 
+
 
     var searchResults = {};
 
@@ -483,19 +481,16 @@ function linkParentAgency() {
     window.location = searchPage;
 }
 
-function buildAdvertiserSearch(searchCriteria)
-{
+function buildAdvertiserSearch(searchCriteria) {
     //if ($('.search-all-markets:visible').is(':checked')) {
     //    bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
     //    });
     //}
 
-    if ($('.search-text:visible').val().length > 0)
-    {
+    if ($('.search-text:visible').val().length > 0) {
         searchText = $('.search-text:visible').val();
     }
-    else
-    {
+    else {
         searchText = searchCriteria["marketAdvertiserName"].length > 0 ? searchCriteria["marketAdvertiserName"] : searchCriteria["advertiserName"];
     }
 
@@ -622,7 +617,7 @@ function buildAgencySearch(searchCriteria) {
     columns.push({
         "mRender": function (data, type, row) {
             var str = '<a href="#" onclick="EditMarketAgency(' + row.agencyId + ')">Edit</a>&nbsp;&nbsp;';
-                str = str + '<a href="#" onclick="linkAgencyByLink(' + row.agencyId + ',' + row.marketId + ')">Link Agency</a>';
+            str = str + '<a href="#" onclick="linkAgencyByLink(' + row.agencyId + ',' + row.marketId + ')">Link Agency</a>';
             return str;
         },
         "bSortable": false,
@@ -637,7 +632,7 @@ function buildAgencySearch(searchCriteria) {
 }
 
 function buildParentAdvertiserSearch(searchCriteria) {
-    
+
     $(".search-check-box").hide();
 
     if ($('.search-text:visible').val().length > 0) {
@@ -720,7 +715,7 @@ function buildParentAdvertiserAuditSearch(searchCriteria) {
 
     columns = [];
 
-   
+
     columns.push({
         "title": "Parent Advertiser Name",
         "mData": "parentAdvertiserName",
@@ -866,21 +861,38 @@ function buildPersonnelSearch(searchCriteria) {
     //}
 
 
-
-    if ($('.search-text:visible').val().length > 0)
-    {
+    if ($('.search-text:visible').val().length > 0) {
         searchText = $('.search-text:visible').val();
     }
-    else
+    else {
+        if (searchCriteria["hidPersonnel"] !== undefined) {
+            searchText = searchCriteria["hidPersonnel"].length > 0 ? searchCriteria["hidPersonnel"] : "";
+        } else if (searchCriteria["txtPersonnel"] !== undefined) {
+            searchText = searchCriteria["txtPersonnel"].length > 0 ? searchCriteria["txtPersonnel"] : "";
+        } else {
+            searchText = "";
+        }
+
+    }
+
+    var ownerId = -1;
+
+    if ($('#ddlOwner').val() !== null && $('#ddlOwner').val().length > 0)
     {
-        searchText = searchCriteria["hidPersonnel"].length > 0 ? searchCriteria["hidPersonnel"] : "";
+        ownerId = $('#ddlOwner').val();
+    } else {
+        if (searchCriteria["ddlOwner"] !== undefined)
+        {
+            ownerId = searchCriteria["ddlOwner"] == "" || searchCriteria["ddlOwner"] == "-1" ? -1 : searchCriteria["ddlOwner"];
+        }
     }
 
     //setup the parameters for the API
 
     apiParameters = {
         "inApiToken": apiToken,
-        "inLastName": searchText
+        "inLastName": searchText,
+        "inOwnerId": ownerId > 0 ? ownerId : null
     }
     api = "/api/Personnel/GetPersonnelListLastName";
 
@@ -1023,8 +1035,7 @@ function MatchingAgencies() {
     window.location = '/products/xry/revenue/xrymatch.html?MatchPage=agy&MenuItem=false';
 }
 
-function buildAdvertiserAuditSearch(searchCriteria)
-{
+function buildAdvertiserAuditSearch(searchCriteria) {
     $(".search-check-box").hide();
 
     //this should be the update advertiser name
@@ -1103,8 +1114,7 @@ function buildAdvertiserAuditSearch(searchCriteria)
 
 }
 
-function linkBulkAdvertiserByLink(advertiserId, marketId)
-{
+function linkBulkAdvertiserByLink(advertiserId, marketId) {
     if (marketId != searchCriteria["ddlMarket"]) {
         var errorMessage = "You cannot link to an advertiser from another market.";
         bootbox.alert(errorMessage, function () { });
@@ -1145,8 +1155,7 @@ function linkBulkAdvertiser() {
     window.location = searchPage;
 }
 
-function buildAgencyAuditSearch(searchCriteria)
-{
+function buildAgencyAuditSearch(searchCriteria) {
     $(".search-check-box").hide();
 
     //this should be the update agency name
@@ -1210,8 +1219,7 @@ function buildAgencyAuditSearch(searchCriteria)
 
 }
 
-function linkBulkAgencyByLink(agencyId, marketId)
-{
+function linkBulkAgencyByLink(agencyId, marketId) {
     if (marketId != searchCriteria["ddlMarket"]) {
         var errorMessage = "You cannot link to an agency from another market.";
         bootbox.alert(errorMessage, function () { });
@@ -1227,8 +1235,7 @@ function linkBulkAgencyByLink(agencyId, marketId)
     linkBulkAgency();
 }
 
-function linkBulkAgency()
-{
+function linkBulkAgency() {
     //leaving this code here in case need to add the link button back in
     var searchTable = $('#dtSearchResults').DataTable();
     if (searchTable.rows('.selected').any() === false) {
@@ -1256,4 +1263,53 @@ function linkBulkAgency()
     //sends user back to page that called the search page
     var searchPage = searchCriteria["searchPage"]["href"];
     window.location = searchPage;
+}
+
+function getOwnerList() {
+    var url = ServicePrefix + '/api/Owner/GetOwnerListUnfiltered';
+
+    var settings = {
+        dataType: 'json',
+        type: 'post',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inOwnerName": "",
+            "inActiveOnly": "1",
+            "inAddDetails": "0"
+        }),
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+            getOwnerListSuccess(data, textStatus, jQxhr);
+        },
+        error: function (jQxhr, textStatus, errorThrown) {
+            genericAjaxError(jQxhr, textStatus, errorThrown);
+        }
+    };
+
+    $.ajax(url, settings);
+}
+
+function getOwnerListSuccess(data, textStauts, jQxhr) {
+
+    if (data.response.status != "SUCCESS") {
+        MKAErrorMessageRtn(data.response.errorMessage[0]);
+    }
+
+    else {
+
+        var str = '';
+
+        str = "<option value='-1'> -- Select an Owner </option>";
+
+        $.each(data.report.rows, function (index) {
+            str = str + "<option value='" + data.report.rows[index].OwnerID + "'>" + data.report.rows[index].OwnerName + "</option>";
+        });
+
+        $("#ddlOwner").append(str);
+
+        convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+    }
+
 }
