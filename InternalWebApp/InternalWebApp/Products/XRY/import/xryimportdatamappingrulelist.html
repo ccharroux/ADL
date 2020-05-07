@@ -56,7 +56,15 @@
         <script src="js/respond.min.js"></script>
     <![endif]-->
 
+    <style>
+        .requiredText {
+            color: red !important;
+        }
 
+        .vertical-center {
+            vertical-align: middle;
+        }
+    </style>
 
 </head>
 <body>
@@ -77,6 +85,34 @@
                 <div id="divQuickReport">
                     <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
                     <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>
+                
+                <div class="row search-section">
+                    <div>
+                        <div class="col-md-4">
+                            <label for="ddlScript" class="requiredText dropdown-label rptView"> * Script</label><br />
+                            <select id="ddlScript" apiInput="inScriptId" onchange="" class="mkaRequired dropdown-select rptView report-filter" errorMessage="Please select a Script to search."></select>
+                        </div>
+                        <div class="col-md-4">
+                            <div style="display:table-cell; text-align: right;">
+                                <label class="dropdown-label">&nbsp;</label><br />
+                                <input type="button" class="search-button" value="Search" onclick="getDataMappingRules();" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div style="display:table-cell; float: right;">
+                                <label class="dropdown-label">&nbsp;</label><br />
+                                <input type="button" value="+" class="addNewButton addNewButton-list-pages vertical-center" onclick="editRule(0)" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div id="dtResultsHolder" class="col-md-12 dataTable-top-margin">
+                            <table id="dtResults" class="dataTable-border dataTable-headers dataTable-cell-border"></table>
+                        </div>
+                    </div>
+
                 </div>
 
 
@@ -118,6 +154,7 @@
 
 </body>
 </html>
+
 <script>
     $(document).ready(function () {
         if (doesUserHaveAccessToFeature("XRAYIMPORTRULEADMIN") == false)
@@ -127,6 +164,51 @@
         {
             buildXRYMenu("Utility");
             buildQuickReports(['xry']);
+
+            //get list of scripts
+            getScriptsList();
+
+            cleanupBackButton();
         }
     });
+
+    function getScriptsList() {
+        var control = "ddlScript";
+
+        $.ajax({
+            url: ServicePrefix + '/api/DataInput/GetDataInputList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="-1">-- Select a Script --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].dataInputId + '">' + data.report.rows[index].inputSystem + ' (' + data.report.rows[index].dataInputId + ')' + '</option>';
+
+                    });
+
+                    $("#" + control).html(str);
+                    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
 </script>
