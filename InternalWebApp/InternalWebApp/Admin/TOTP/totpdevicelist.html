@@ -95,6 +95,10 @@
             right: 80px;
             z-index: 0;
         }
+
+        #viewDeviceDialog {
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
@@ -162,7 +166,79 @@
                 Device Description
             </div>
             <div class="col-md-9 text-align-left">
-                TODO text input
+                <input type="text" maxlength="100" class="mkaRequired" id="txtDeviceDescription" errorMessage="You must enter a Device Description." />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <hr />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-align-center">
+                <input type="button" id="btnAddDialogSave" onclick="addDialogSave();" value="Save" />
+                <input type="button" id="btnAddDialogClose" onclick="addDialogClose();" value="Close" />
+            </div>
+        </div>
+    </div>
+    <div id="viewDeviceDialog" style="display:none">
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Personnel
+            </div>
+            <div class="col-md-8 text-align-left">
+                <span id="spanPersonnel"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Device Description
+            </div>
+            <div class="col-md-8 text-align-left">
+                <span id="spanDeviceDescription"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                QR Code
+            </div>
+            <div class="col-md-8 text-align-left">
+                <image id="imgQRCode"></image>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                One-Time Passwords
+            </div>
+            <div class="col-md-8 text-align-left">
+                <!-- start datatable-->
+                <div id="divOneTimePasswords" class="searchResults dataTable-top-margin">
+                    <table id="dtOneTimePasswords" class="dataTable-border dataTable-headers dataTable-cell-border" style="width: 90%">
+                        <thead>
+                            <tr>
+                                <th class="exportColumn">Time</th>
+                                <th class="exportColumn">Password</th>
+                            </tr>
+                        </thead>
+                        <!--<tfoot>
+                            <tr>
+                                <th>Time</th>
+                                <th>Password</th>
+                            </tr>
+                        </tfoot>-->
+                    </table>
+                </div>
+                <!-- end datatable -->
+            </div>
+            <div class="row">
+                <div class="col-md-11">
+                    <hr />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-11 text-align-center">
+                    <input type="button" id="btnViewDialogClose" onclick="viewDialogClose();" value="Close" />
+                </div>
             </div>
         </div>
     </div>
@@ -208,7 +284,8 @@
 
         setEventListeners();
 
-        setDataTable();
+        setDataTable_Devices();
+        setDataTable_DeviceOneTimePasswords();
 
         clearSearchButtonSetup();
 
@@ -229,6 +306,18 @@
             resizable: false,
             width: 600,
             height: 450,
+            modal: true,
+            title: 'Event',
+            create: function (event, ui) {
+                $(event.target).parent().css('position', 'fixed');
+            }
+        });
+
+        $("#viewDeviceDialog").dialog({
+            autoOpen: false,
+            resizable: false,
+            width: 750,
+            height: 800,
             modal: true,
             title: 'Event',
             create: function (event, ui) {
@@ -298,7 +387,7 @@
         //});
     }
 
-    function setDataTable() {
+    function setDataTable_Devices() {
         var reportTitle = "TOTP Device List";
         var exportColumns = returnTableColumnsByClass("dtDeviceList", "exportColumn");
 
@@ -315,9 +404,11 @@
                 { "data": 'DeviceDescription' },
                 {
                     mRender: function (data, type, row) {
-                        var personnelId = row["Personnel ID"];
-                        var deviceDescription = row["Device Description"];
-                        return '<a href="#" onclick="TODO_deleteTOTPDevice(' + personnelId + ',TODO encoded desc' + ')">Delete</a>';
+                        var personnelId = row["PersonnelID"];
+                        var personnel = row["Personnel"];
+                        var deviceDescription = row["DeviceDescription"];
+                        return '<a href="#" onclick="viewTOTPDevice(' + personnelId + ',\'' + encodeURIComponent(deviceDescription) + '\')">View</a>'
+                            + ' <a href="#" onclick="deleteTOTPDevice(' + personnelId + ',\'' + encodeURIComponent(personnel) + '\',\'' + encodeURIComponent(deviceDescription) + '\')">Delete</a>';
                     },
                     "orderable": false,
                     "searchable": false,
@@ -392,6 +483,94 @@
         });
     }
 
+    function setDataTable_DeviceOneTimePasswords() {
+        var reportTitle = "TOTP Device One-Time Passwords";
+        var exportColumns = returnTableColumnsByClass("dtOneTimePasswords", "exportColumn");
+
+        $("#dtOneTimePasswords").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "paging": false,
+            "searching": false,
+            "info": false,
+            "data": [],
+            "order": [
+                [0, 'asc'] // Time
+            ],
+            "ordering": false,
+            "columns": [
+                { "data": 'Time' },
+                { "data": 'Password' }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOneTimePasswords", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'excel',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOneTimePasswords", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOneTimePasswords", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               //{
+               //    extend: 'print',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtOneTimePasswords", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //}
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            initComplete: function () {
+                // only once per page, affects all datatables on the page
+                //$(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+    }
+
     function clearSearchButtonSetup() {
         $("body").on("click", "#clear_search_button", function () {
             var table = $("#dtDeviceList").DataTable();
@@ -449,6 +628,126 @@
                 }
                 populateDataTable("dtDeviceList", data);
                 $(".searchResults").show();
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function addTOTPDevice() {
+        $("#txtDeviceDescription").val("");
+        $("#addDeviceDialog").dialog("open");
+    }
+
+    function addDialogSave() {
+        bootbox.alert("Not yet implemented");
+        // TODO check for duplicate
+        // TODO call /api/TOTP/InsertTOTPDevice (API generates TOTPSecret, should default to PersonnelID from APIToken)
+        // TODO viewTOTPDevice(TODO PersonnelID, $("#txtDeviceDescription").val());
+    }
+
+    function addDialogClose() {
+        $("#addDeviceDialog").dialog("close");
+    }
+
+    function viewTOTPDevice(personnelId, deviceDescription) {
+        deviceDescriptionDecoded = decodeURIComponent(deviceDescription);
+
+        $("#spanDeviceDescription").text(deviceDescriptionDecoded);
+
+        url = ServicePrefix + '/api/TOTP/GetTOTPDevice'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inPersonnelId=' + personnelId
+            + '&inDeviceDescription=' + encodeURIComponent(deviceDescriptionDecoded);
+
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                viewTOTPDeviceSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function viewTOTPDeviceSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get data from /api/TOTP/GetTOTPDevice");
+            return;
+        }
+
+        var obj = data.report.rows[0];
+        $("#spanPersonnel").text(obj.Personnel);
+
+        // extra data added by the API layer
+
+        $("#spanManualEntry").text(data.report.secretManualEntry);
+        $("#imgQRCode").attr("src", "data:image/gif;base64," + data.report.secretQRCode);
+
+        var oneTimePasswordList = [];
+        var oneTimePasswordCurrentTime = data.report.oneTimePasswordCurrentTime;
+        var numberOffsets = data.report.oneTimePasswordNumberOffsets;
+        var oneTimePassword;
+        for (var offset = -numberOffsets; offset <= numberOffsets; ++offset) {
+            oneTimePassword = data.report["oneTimePasswordOffset" + offset];
+            oneTimePasswordList = oneTimePasswordList.concat([{
+                "Time": offset, // TODO compute human-readable timestamp from oneTimePasswordCurrentTime and offset
+                "Password": oneTimePassword
+            }]);
+        }
+        var oneTimePasswordObject = {
+            "response": data.response,
+            "report": {
+                "rows": oneTimePasswordList
+            }
+        };
+        populateDataTable("dtOneTimePasswords", oneTimePasswordObject);
+
+        $("#viewDeviceDialog").dialog("open");
+    }
+
+    function viewDialogClose() {
+        $("#viewDeviceDialog").dialog("close");
+    }
+
+    function deleteTOTPDevice(personnelId, personnel, deviceDescription) {
+        bootbox.confirm("Delete this device? (" + personnel + " / " + deviceDescription + ")", function (result) {
+            if (result) {
+                deleteTOTPDeviceConfirmed(personnelId, deviceDescription);
+            }
+        });
+    }
+
+    function deleteTOTPDeviceConfirmed(personnelId, deviceDescription) {
+        $.ajax({
+            url: ServicePrefix + '/api/TOTP/DeleteTOTPDevice',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelId,
+                "inDeviceDescription": deviceDescription
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                    return;
+                }
+                bootbox.alert("Device deleted.");
+                getDevices();
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
