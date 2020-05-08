@@ -123,7 +123,7 @@
                             <div class="row" style="height:70px;">
                                 <div class="col-md-3">
                                     <label for="ddlPersonnel" class="filterLabel">Personnel</label><br />
-                                    <select id="ddlPersonnel" class="filterControlRight report-filter"></select>
+                                    <select id="ddlPersonnel" class="filterControlRight report-filter" onchange="getDeviceList();"></select>
                                 </div>
                                 <div class="col-md-9" style="text-align:right">
                                     <input type="button" value="+" class="addNewButton addNewButton-list-pages" style="margin-top:10px" onclick="addTOTPDevice();" />
@@ -204,7 +204,7 @@
         $(".searchResults").hide();
         buildUIDialogs();
 
-        getPersonnelList();
+        getPersonnelList(); // success -> getDeviceList()
 
         setEventListeners();
 
@@ -221,8 +221,6 @@
 
         //setLocalStorage("search", $("#ddlMediaType").val()  );
         //setLocalStorage("searchPage", window.location);
-
-        getDeviceList();
     });
 
     function buildUIDialogs() {
@@ -240,16 +238,14 @@
     }
 
     function getPersonnelList() {
-        return; // TODO temporary - need to add SP and API first
+        var url = ServicePrefix + '/api/TOTP/GetTOTPDevicePersonnel'
+            + '?inApiToken=' + getLocalStorage("APIToken");
 
         $.ajax({
-            url: ServicePrefix + '/api/TOTP/GetTOTPExistingPersonnel',
+            url: url,
             dataType: 'json',
-            type: 'post',
+            type: 'get',
             contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 getPersonnelListSuccess(data, textStatus, jQxhr);
@@ -269,11 +265,13 @@
         var str = '<option value="">-- All Personnel --</option>';
         $.each(data.report.rows, function (index) {
             var obj = data.report.rows[index];
-            str = str + '<option value="' + obj["Personnel ID"] + '">' + obj["Personnel"] + '</option>';
+            str = str + '<option value="' + obj["PersonnelID"] + '">' + obj["Personnel"] + '</option>';
         });
         $("#ddlPersonnel").html(str);
 
         convertToChosenSelect("ddlPersonnel", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        getDeviceList();
     }
 
     function setEventListeners() {
@@ -429,11 +427,10 @@
         url = ServicePrefix + '/api/TOTP/GetTOTPDevices'
             + '?inApiToken=' + getLocalStorage("APIToken");
 
-        //TODO temporary - need to populate ddlPersonnel first
-        //var personnelId = $("#ddlPersonnel").val();
-        //if (personnelId != "") {
-        //    url += '&inPersonnelId=' + personnelId;
-        //}
+        var personnelId = $("#ddlPersonnel").val();
+        if (personnelId != "") {
+            url += '&inPersonnelId=' + personnelId;
+        }
 
         $.ajax({
             url: url,
