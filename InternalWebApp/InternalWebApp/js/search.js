@@ -29,9 +29,6 @@ function getSearchData(searchCriteria) {
         case "PARENTAGENCY":
             buildParentAgencySearch(searchCriteria);
             break;
-            //case "LINKAGENCY":
-            //    buildLinkAgencySearch(searchCriteria);
-            //    break;
         case "LINKADV":
             //should allow cross market search
             buildLinkAdvertiserSearch(searchCriteria);
@@ -54,10 +51,21 @@ function getSearchData(searchCriteria) {
         default:
     }
 
+    //DEV-7085 
+    //added validation to make sure there is search text
+    //regardless of the type of search
+    if (searchText.length == 0)
+    {
+        bootbox.alert('Please enter search text.', function () {
+                });
+        return;
+    }
+   
+
     //make api call and return data
     //this occurs regardless of the token
     //the url is based on what was assigned in the previous switch statement
-    //data is assigned the apiparameters also created in the switch statement
+    //data is assigned the api parameters also created in the switch statement
     //when call is successful it will call loadSearchResults
     gResults = $.ajax({
         url: ServicePrefix + api,
@@ -252,9 +260,6 @@ function linkParentAdvertiserByLink(parentAdvertiserId) {
 
     var rowId = $('#dtSearchResults').dataTable().fnFindCellRowIndexes(parentAdvertiserId, 0);
 
-    //console.log(parentAdvertiserId);
-    //console.log(rowId);
-
     var table = $('#dtSearchResults').DataTable();
     table.row(rowId).select();
 
@@ -442,7 +447,6 @@ function linkNewAdvertiser() {
 }
 
 function linkParentAgencyByLink(parentAgencyId) {
-    //console.log(parentAgencyId);
 
     var rowId = $('#dtSearchResults').dataTable().fnFindCellRowIndexes(parentAgencyId, 0);
 
@@ -482,10 +486,6 @@ function linkParentAgency() {
 }
 
 function buildAdvertiserSearch(searchCriteria) {
-    //if ($('.search-all-markets:visible').is(':checked')) {
-    //    bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
-    //    });
-    //}
 
     if ($('.search-text:visible').val().length > 0) {
         searchText = $('.search-text:visible').val();
@@ -566,10 +566,6 @@ function buildAdvertiserSearch(searchCriteria) {
 }
 
 function buildAgencySearch(searchCriteria) {
-    //if ($('.search-all-markets:visible').is(':checked')) {
-    //    bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
-    //    });
-    //}
 
     //figure out change for station agency page
     if ($('.search-text:visible').val().length > 0) {
@@ -855,11 +851,6 @@ function buildParentAgencyAuditSearch(searchCriteria) {
 }
 
 function buildPersonnelSearch(searchCriteria) {
-    //if ($('.search-all-markets:visible').is(':checked')) {
-    //    bootbox.alert('Searching all markets functionality is under development but will still search the current market.', function () {
-    //    });
-    //}
-
 
     if ($('.search-text:visible').val().length > 0) {
         searchText = $('.search-text:visible').val();
