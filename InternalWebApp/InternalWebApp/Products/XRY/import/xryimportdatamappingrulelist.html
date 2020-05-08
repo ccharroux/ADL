@@ -86,7 +86,7 @@
                     <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
                     <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
                 </div>
-                
+
                 <div class="row search-section">
                     <div>
                         <div class="col-md-4">
@@ -157,11 +157,9 @@
 
 <script>
     $(document).ready(function () {
-        if (doesUserHaveAccessToFeature("XRAYIMPORTRULEADMIN") == false)
-        {
+        if (doesUserHaveAccessToFeature("XRAYIMPORTRULEADMIN") == false) {
             return;
-        } else
-        {
+        } else {
             buildXRYMenu("Utility");
             buildQuickReports(['xry']);
 
@@ -211,4 +209,255 @@
         });
 
     }
+
+    function getDataMappingRules() {
+        //add validation to make sure required fields are completed
+        if (searchValidationPassed() == false) {
+            return;
+        }
+
+        var sUrl = ServicePrefix + "/api/XrayImport/GetImportDataMappingRulesList?";
+        sUrl += "inApiToken=" + getLocalStorage("APIToken");
+        sUrl += "&inScriptId=" + $("#ddlScript").val();
+
+        $.ajax({
+            url: sUrl,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    loadResultsData(data);
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
+    }
+
+    function loadResultsData(data) {
+        //get columns
+        var columns = getResultsColumns();
+        //load the data
+        loadResultsDataTable(data, columns);
+    }
+
+    function getResultsColumns() {
+        var columnsToDisplay = new Array();
+
+        columnsToDisplay.push({
+            "title": "dataRuleId",
+            "visible": false,
+            "mData": "dataRuleId",
+            "orderable": false,
+            "searchable": false
+        });
+
+        columnsToDisplay.push({
+            "title": "scriptId",
+            "visible": false,
+            "mData": "scriptId",
+            "orderable": false,
+            "searchable": false
+        });
+
+        columnsToDisplay.push({
+            "title": "Column",
+            "visible": true,
+            "mData": "Column",
+            "className": "exportColumn"
+        });
+
+        columnsToDisplay.push({
+            "title": "Compare Value",
+            "visible": true,
+            "mData": "Compare Value",
+            "className": "exportColumn"
+        });
+
+        columnsToDisplay.push({
+            "title": "Required",
+            "visible": true,
+            "mData": "Required",
+            "className": "text-align-center exportColumn"
+        });
+
+        columnsToDisplay.push({
+            "title": "Active",
+            "visible": true,
+            "mData": "Active",
+            "className": "text-align-center exportColumn"
+        });
+
+        columnsToDisplay.push({
+            "mRender": function (data, type, row) {
+
+                var strActions = "";
+
+                //if the delete date is null, the rule is considered active.
+                //edit and delete options will show.
+                //otherwise, only the reactivate item will show.
+                if (row["Delete Date"] == null) {
+                    strActions += '<a href="#" onclick="editRule(' + row.dataRuleId + ');">Edit</a>';
+                    strActions += '&nbsp;&nbsp;<a href="#" onclick="deleteRule(' + row.dataRuleId + ');">Delete</a>';
+                } else {
+                    strActions += '<a href="#" onclick="reactivateRule(' + row.dataRuleId + ');">Reactivate</a>';
+                }
+
+                return strActions;
+            },
+            "searchable": false,
+            "className": "text-align-right"
+        });
+
+        return columnsToDisplay;
+    }
+
+    function loadResultsDataTable(data, columns) {
+
+        var results = data["report"]["rows"];
+
+        var searchTable;
+
+        if ($.fn.DataTable.isDataTable('#dtResults')) {
+            searchTable = $('#dtResults').DataTable();
+            searchTable.destroy();
+        }
+
+        resetDataTableDOM("dtResults", "dtResultsHolder", "dataTable-border dataTable-headers dataTable-cell-border");
+
+        searchTable = $("#dtResults").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "order": [],
+            "data": results,
+            "columns": columns,
+            "columnDefs": [
+                {
+                    orderable: false,
+                    targets: '_all'
+                }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [
+            ],
+            initComplete: function () {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            "language": {
+                search: "Filter Results:"
+            }
+        });
+    }
+
+    function searchValidationPassed() {
+
+        var loopBreak = true;
+        $(".mkaRequired").each(function (index, el) {
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            // Text
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+
+                    bootbox.alert(errorMessage, function () { });
+
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+            // Select
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == null || $(eID).val() == "-1") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+        });
+
+        return loopBreak;
+    }
+
+    function editRule(dataRuleId) {
+        window.location = "/products/xry/import/xryimportdatamappingrule.html?DataMappingRuleId=" + dataRuleId;
+    }
+
+    function deleteRule(dataRuleId) {
+
+        bootbox.alert("Functionality to be built", function () { });
+        return;
+
+        //$.ajax({
+        //    url: ServicePrefix + '/api/XrayImport/DeleteImportMappingColumnRule',
+        //    dataType: 'json',
+        //    type: 'post',
+        //    contentType: 'application/json',
+        //    data: JSON.stringify({
+        //        "inApiToken": getLocalStorage("APIToken"),
+        //        "inMappingColumnRuleId": columnRuleId
+        //    }),
+        //    processData: false,
+        //    success: function (data, textStatus, jQxhr) {
+        //        if (data.response.status != "SUCCESS") {
+        //            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        //        }
+        //        else {
+
+        //            bootbox.alert('Import Mapping Column Rule was deleted.', function () {
+        //            });
+
+        //            getColumnMappingRules();
+        //        }
+        //    },
+        //    error: function (jqXhr, textStatus, errorThrown) {
+        //        genericAjaxError(jqXhr, textStatus, errorThrown);
+        //    }
+        //});
+    }
+
+    function reactivateRule(dataRuleId) {
+        bootbox.alert("Functionality to be built", function () { });
+        return;
+
+        //$.ajax({
+        //    url: ServicePrefix + '/api/XrayImport/ReactivateImportMappingColumnRule',
+        //    dataType: 'json',
+        //    type: 'post',
+        //    contentType: 'application/json',
+        //    data: JSON.stringify({
+        //        "inApiToken": getLocalStorage("APIToken"),
+        //        "inMappingColumnRuleId": columnRuleId
+        //    }),
+        //    processData: false,
+        //    success: function (data, textStatus, jQxhr) {
+        //        if (data.response.status != "SUCCESS") {
+        //            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        //        }
+        //        else {
+
+        //            bootbox.alert('Import Mapping Column Rule was reactivated.', function () {
+        //            });
+
+        //            getColumnMappingRules();
+        //        }
+        //    },
+        //    error: function (jqXhr, textStatus, errorThrown) {
+        //        genericAjaxError(jqXhr, textStatus, errorThrown);
+        //    }
+        //});
+    }
+
 </script>
