@@ -1146,10 +1146,11 @@ function buildMainMenu(selectedItem) {
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="/admin/login/dashboard.html?MenuItem=true">Virtual Groups</a></li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Settings") + ' role="button" aria-expanded="false">Settings <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="/admin/news/newslist.html?MenuItem=true">News</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/training/traininglist.html?MenuItem=true">Training</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/customersupport/customersupportlist.html?MenuItem=true">Customer Support</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html?MenuItem=true">Tech Tools</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/relationship/relationshiplists.html?MenuItem=true">Personnel Groups</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html?MenuItem=true">Tech Tools</a></li>';
     menuItems += '                  <li style="display:block;text-align:center;">----------------------</li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/format/formatlist.html?MenuItem=true">Formats</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/marketsize/marketsizelist.html?MenuItem=true">Market Sizes</a></li>';
@@ -1237,7 +1238,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
     menuItems += '                          <li style="display:block;"><a href="/products/xry/import/xryimportdatainputlist.html?MenuItem=true">Data Import Scripts</a></li>';
     menuItems += '                          <li style="display:block;"><a href="/admin/parentadvertiser/parentadvertiserlist.html?MenuItem=true">Import Setup</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="/products/xry/import/xryimportdatacolumnmappingrulelist.html?MenuItem=true">Data Mapping</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/products/xry/import/xryimportdatamappingrulelist.html?MenuItem=true">Data Mapping</a></li>';
     menuItems += '                          <li style="display:block;"><a href="/products/xry/import/xryimportmappingcolumnrulelist.html?MenuItem=true" role="button" aria-expanded="false">Column Mapping</a></li>';
     menuItems += '                      </ul>';
     menuItems += '                  </li>';
@@ -2536,12 +2537,18 @@ function getReportIdByToken(inValue) {
 
 }
 
-function getFeatureButtons(featureToken, featureValue) {
+function getFeatureButtons(featureToken, featureValue, bIsInternalUser) {
     //loop through results to build the buttons
     //active will be remove
     //  will pass featureid and value
     //non-active will be add
     //  will pass featureid, conditionid, value
+
+   
+    if (!bIsInternalUser)
+    {
+        bIsInternalUser = false;
+    }
 
     $.ajax({
         url: ServicePrefix + '/api/Feature/GetFeatureListByTokenValue',
@@ -2578,11 +2585,36 @@ function getFeatureButtons(featureToken, featureValue) {
                         sStyle = 'background-color:green;margin-bottom:5px;';
                     }
 
-                    str += '<' + 'input type="button" data-feature-active="' + obj.Active + '" data-feature-token="' + featureToken +
-                        '" data-feature-id="' + obj.FeatureId + '" data-feature-value="' + featureValue +
-                        '" data-feature-canbechanged="' + obj.CanBeChanged + '" data-feature-conditionid="' + obj.ConditionId +
-                        '" data-feature-description="' + obj.Description + '" class="feature-button" style="' + sStyle + '" value="' +
-                        btnValue + '" onclick="processFeature(this)"/><br/>';
+                    var sButton = '<' +
+                        'input type="button" data-feature-active="' +
+                        obj.Active +
+                        '" data-feature-token="' +
+                        featureToken +
+                        '" data-feature-id="' +
+                        obj.FeatureId +
+                        '" data-feature-value="' +
+                        featureValue +
+                        '" data-feature-canbechanged="' +
+                        obj.CanBeChanged +
+                        '" data-feature-conditionid="' +
+                        obj.ConditionId +
+                        '" data-feature-description="' +
+                        obj.Description +
+                        '" class="feature-button" style="' +
+                        sStyle +
+                        '" value="' +
+                        btnValue +
+                        '" onclick="processFeature(this)"/><br/>';
+
+                    //DEV-
+                    if (obj["Internal Only"] == true && bIsInternalUser)
+                    {
+                        str += sButton;
+                    } else if (obj["Internal Only"] == false)
+                    {
+                        str += sButton;
+                    }
+
                 });
 
 

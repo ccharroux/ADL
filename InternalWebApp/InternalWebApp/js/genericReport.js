@@ -836,7 +836,8 @@ function getReportObject_MarketRevenueHourlyActivity() {
         apiControllerAction:  "/api/MRRReport/GetHourlyActivity",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product: ['mrr']
+        product: ['mrr'],
+        approved: true
     }
 
     return tempObject;
@@ -961,7 +962,8 @@ function getReportObject_UserActivityDetail() {
         apiControllerAction:  "/api/XRAYReport/GetUserActivityDetail",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product: ['xry']
+        product: ['xry'],
+        approved: true
     }
 
     return tempObject;
@@ -1410,7 +1412,8 @@ function getReportObject_NewUserListing() {
         apiControllerAction:  "/api/PersonnelReport/GetNewUserListing",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product: ['personnel']
+        product: ['personnel'],
+        approved: true
     }
 
     return tempObject;
@@ -2168,7 +2171,8 @@ function getReportObject_MRRStationManagerList() {
         apiControllerAction: "/api/MRRReport/GetMRRStationManagerList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr', 'mrr pre-release']
+        product: ['mrr', 'mrr pre-release'],
+        approved: true
     }
 
     return tempObject;
@@ -2393,7 +2397,8 @@ function getReportObject_MarketSetupMarket() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'mrr setup info'],
-        sortable: true
+        sortable: true,
+        approved: true
     }
 
     return tempObject;
@@ -2431,7 +2436,8 @@ function getReportObject_MarketSetupMarketMRRCategories() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'mrr setup info'],
-        sortable: true
+        sortable: true,
+        approved: true
     }
 
     return tempObject;
@@ -2467,7 +2473,8 @@ function getReportObject_MarketSetupMarketMRRReports() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'mrr setup info'],
-        sortable: true
+        sortable: true,
+        approved: true
     }
 
     return tempObject;
@@ -2539,7 +2546,8 @@ function getReportObject_MarketSetupMarketProducts() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'mrr setup info'],
-        sortable: true
+        sortable: true,
+        approved: true
     }
 
     return tempObject;
@@ -2575,7 +2583,8 @@ function getReportObject_MarketSetupMarketStations() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'mrr setup info'],
-        sortable: true
+        sortable: true,
+        approved: true
     }
 
     return tempObject;
@@ -2647,7 +2656,8 @@ function getReportObject_MarketSetupMarketVirtualGroups() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'mrr setup info'],
-        sortable: true
+        sortable: true,
+        approved: true
     }
 
     return tempObject;
@@ -3400,7 +3410,8 @@ function getReportObject_TVBMarketStationRelease() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb'],
-        sortable: true
+        sortable: true,
+        approved: true
     }
 
     return tempObject;
@@ -3541,7 +3552,8 @@ function getReportObject_MRRReportList() {
         apiControllerAction: "/api/MRRReport/GetMRRReports",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr']
+        product: ['mrr'],
+        approved: true
     }
 
     return tempObject;
@@ -3569,7 +3581,8 @@ function getReportObject_MRRMarketReportList() {
         apiControllerAction: "/api/MRRReport/GetMRRReportsByMarket",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr', 'mrr pre-release']
+        product: ['mrr', 'mrr pre-release'],
+        approved: true
     }
 
     return tempObject;
@@ -3598,7 +3611,8 @@ function getReportObject_MRROwnerReportList() {
         apiControllerAction: "/api/MRRReport/GetMRROwnerGroupReport",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr']
+        product: ['mrr'],
+        approved: true
     }
 
     return tempObject;
@@ -4515,7 +4529,8 @@ function getReportObject_MRRReportMatrix() {
         apiControllerAction: "/api/MRRReport/GetMRRReportMatrixList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr']
+        product: ['mrr'],
+        approved: true
     }
 
     return tempObject;
@@ -4765,7 +4780,7 @@ function getReportObject_MRRRevenueEntryMissingList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Data Review'],
-        autoUpdate: false
+        autoUpdate: true
     }
 
     return tempObject;
