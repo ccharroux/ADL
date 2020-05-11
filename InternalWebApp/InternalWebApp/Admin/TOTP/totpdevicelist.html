@@ -188,6 +188,7 @@
             </div>
             <div class="col-md-8 text-align-left">
                 <span id="spanPersonnel"></span>
+                <span id="spanPersonnelId" class="hidden"></span>
             </div>
         </div>
         <div class="row">
@@ -275,6 +276,8 @@
 </body>
 </html>
 <script>
+
+    var timeoutObject = null;
 
     $(document).ready(function () {
         $(".searchResults").hide();
@@ -654,8 +657,6 @@
     function viewTOTPDevice(personnelId, deviceDescription) {
         deviceDescriptionDecoded = decodeURIComponent(deviceDescription);
 
-        $("#spanDeviceDescription").text(deviceDescriptionDecoded);
-
         url = ServicePrefix + '/api/TOTP/GetTOTPDevice'
             + '?inApiToken=' + getLocalStorage("APIToken")
             + '&inPersonnelId=' + personnelId
@@ -687,6 +688,9 @@
             return;
         }
 
+        $("#spanPersonnelId").val(personnelId);
+        $("#spanDeviceDescription").val(deviceDescriptionDecoded);
+
         var obj = data.report.rows[0];
         $("#spanPersonnel").text(obj.Personnel);
 
@@ -697,10 +701,13 @@
 
         $("#viewDeviceDialog").dialog("open");
 
-        getTOTPDeviceOneTimePasswords(personnelId, deviceDescriptionDecoded);
+        getTOTPDeviceOneTimePasswords();
     }
 
     function getTOTPDeviceOneTimePasswords(personnelId, deviceDescriptionDecoded) {
+        var personnelId = $("#spanPersonnelId").val();
+        var deviceDescriptionDecoded = $("#spanDeviceDescription").val();
+
         url = ServicePrefix + '/api/TOTP/GetTOTPDeviceOneTimePasswords'
             + '?inApiToken=' + getLocalStorage("APIToken")
             + '&inPersonnelId=' + personnelId
@@ -733,10 +740,13 @@
         }
 
         populateDataTable("dtOneTimePasswords", data);
+
+        timeoutObject = setTimeout(getTOTPDeviceOneTimePasswords, 30000); // refresh every 30 seconds
     }
 
     function viewDialogClose() {
         $("#viewDeviceDialog").dialog("close");
+        clearTimeoutIfAny();
     }
 
     function deleteTOTPDevice(personnelId, personnel, deviceDescription) {
