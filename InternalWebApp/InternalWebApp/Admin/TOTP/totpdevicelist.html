@@ -162,10 +162,10 @@
     </div>
     <div id="addDeviceDialog" style="display:none">
         <div class="row">
-            <div class="col-md-3 text-align-left">
+            <div class="col-md-4 text-align-left">
                 Device Description
             </div>
-            <div class="col-md-9 text-align-left">
+            <div class="col-md-8 text-align-left">
                 <input type="text" maxlength="100" class="mkaRequired" id="txtDeviceDescription" errorMessage="You must enter a Device Description." />
             </div>
         </div>
@@ -183,61 +183,75 @@
     </div>
     <div id="viewDeviceDialog" style="display:none">
         <div class="row">
-            <div class="col-md-3 text-align-left">
-                Personnel
-            </div>
-            <div class="col-md-8 text-align-left">
-                <span id="spanPersonnel"></span>
-                <span id="spanPersonnelId" class="hidden"></span>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-3 text-align-left">
-                Device Description
-            </div>
-            <div class="col-md-8 text-align-left">
-                <span id="spanDeviceDescription"></span>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-3 text-align-left">
-                QR Code
-            </div>
-            <div class="col-md-8 text-align-left">
-                <image id="imgQRCode"></image>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-3 text-align-left">
-                One-Time Passwords
-            </div>
-            <div class="col-md-8 text-align-left">
-                <!-- start datatable-->
-                <div id="divOneTimePasswords" class="searchResults dataTable-top-margin">
-                    <table id="dtOneTimePasswords" class="dataTable-border dataTable-headers dataTable-cell-border" style="width: 90%">
-                        <thead>
-                            <tr>
-                                <th class="exportColumn">Time</th>
-                                <th class="exportColumn">Password</th>
-                            </tr>
-                        </thead>
-                        <!--<tfoot>
-                            <tr>
-                                <th>Time</th>
-                                <th>Password</th>
-                            </tr>
-                        </tfoot>-->
-                    </table>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4 text-align-left">
+                        Personnel
+                    </div>
+                    <div class="col-md-8 text-align-left">
+                        <span id="spanPersonnel"></span>
+                        <span id="spanPersonnelId" class="hidden"></span>
+                    </div>
                 </div>
-                <!-- end datatable -->
+                <div class="row">
+                    <div class="col-md-4 text-align-left">
+                        Device Description
+                    </div>
+                    <div class="col-md-8 text-align-left">
+                        <span id="spanDeviceDescription"></span>
+                    </div>
+                </div>
+                <div class="row margin-top-50">
+                    <div class="col-md-4 text-align-left">
+                        QR Code
+                    </div>
+                    <div class="col-md-8 text-align-left">
+                        <image id="imgQRCode"></image>
+                    </div>
+                </div>
+                <div class="row margin-top-50">
+                    <div class="col-md-4 text-align-left">
+                        Manual Entry <br /> <span style="font-size: 0.75em"> &nbsp; (if QR code doesn't work)</span>
+                    </div>
+                    <div class="col-md-8 text-align-left">
+                        <span id="spanManualEntry"></span>
+                    </div>
+                </div>
             </div>
+            <div class="col-md-6">
+                <div class="col-md-4 text-align-left">
+                    One-Time Passwords
+                </div>
+                <div class="col-md-8 text-align-left">
+                    <!-- start datatable-->
+                    <div id="divOneTimePasswords" class="searchResults dataTable-top-margin">
+                        <table id="dtOneTimePasswords" class="dataTable-border dataTable-headers dataTable-cell-border" style="width: 90%">
+                            <thead>
+                                <tr>
+                                    <th class="exportColumn">Time</th>
+                                    <th class="exportColumn">Password</th>
+                                </tr>
+                            </thead>
+                            <!--<tfoot>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Password</th>
+                                </tr>
+                            </tfoot>-->
+                        </table>
+                    </div>
+                    <!-- end datatable -->
+                </div>
+            </div>
+        </div>
+        <div class="row">
             <div class="row">
-                <div class="col-md-11">
+                <div class="col-md-12">
                     <hr />
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-11 text-align-center">
+                <div class="col-md-12 text-align-center">
                     <input type="button" id="btnViewDialogClose" onclick="viewDialogClose();" value="Close" />
                 </div>
             </div>
@@ -307,7 +321,7 @@
         $("#addDeviceDialog").dialog({
             autoOpen: false,
             resizable: false,
-            width: 600,
+            width: 700,
             height: 450,
             modal: true,
             title: 'Event',
@@ -319,7 +333,7 @@
         $("#viewDeviceDialog").dialog({
             autoOpen: false,
             resizable: false,
-            width: 750,
+            width: 1200,
             height: 800,
             modal: true,
             title: 'Event',
@@ -644,10 +658,43 @@
     }
 
     function addDialogSave() {
-        bootbox.alert("Not yet implemented");
-        // TODO check for duplicate
-        // TODO call /api/TOTP/InsertTOTPDevice (API generates TOTPSecret, should default to PersonnelID from APIToken)
-        // TODO viewTOTPDevice(TODO PersonnelID, $("#txtDeviceDescription").val());
+        $.ajax({
+            url: ServicePrefix + '/api/TOTP/InsertTOTPDevice',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inDeviceDescription": $("#txtDeviceDescription").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                insertTOTPDeviceSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function insertTOTPDeviceSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            bootbox.alert("Failed to get result");
+            return;
+        }
+
+        addDialogClose();
+
+        getDeviceList();
+
+        var personnelId = data.report.rows[0].personnelId;
+        var deviceDescription = $("#txtDeviceDescription").val();
+        viewTOTPDevice(personnelId, encodeURIComponent(deviceDescription));
     }
 
     function addDialogClose() {
@@ -689,7 +736,7 @@
         }
 
         $("#spanPersonnelId").val(personnelId);
-        $("#spanDeviceDescription").val(deviceDescriptionDecoded);
+        $("#spanDeviceDescription").text(deviceDescriptionDecoded);
 
         var obj = data.report.rows[0];
         $("#spanPersonnel").text(obj.Personnel);
@@ -704,9 +751,13 @@
         getTOTPDeviceOneTimePasswords();
     }
 
-    function getTOTPDeviceOneTimePasswords(personnelId, deviceDescriptionDecoded) {
+    function getTOTPDeviceOneTimePasswords() {
+        if ($("#viewDeviceDialog").dialog("isOpen") == false) {
+            return;
+        }
+
         var personnelId = $("#spanPersonnelId").val();
-        var deviceDescriptionDecoded = $("#spanDeviceDescription").val();
+        var deviceDescriptionDecoded = $("#spanDeviceDescription").text();
 
         url = ServicePrefix + '/api/TOTP/GetTOTPDeviceOneTimePasswords'
             + '?inApiToken=' + getLocalStorage("APIToken")
@@ -750,14 +801,16 @@
     }
 
     function deleteTOTPDevice(personnelId, personnel, deviceDescription) {
-        bootbox.confirm("Delete this device? (" + personnel + " / " + deviceDescription + ")", function (result) {
+        var personnelDecoded = decodeURIComponent(personnel);
+        var deviceDescriptionDecoded = decodeURIComponent(deviceDescription);
+        bootbox.confirm("Delete this device? (" + personnelDecoded + " / " + deviceDescriptionDecoded + ")", function (result) {
             if (result) {
-                deleteTOTPDeviceConfirmed(personnelId, deviceDescription);
+                deleteTOTPDeviceConfirmed(personnelId, deviceDescriptionDecoded);
             }
         });
     }
 
-    function deleteTOTPDeviceConfirmed(personnelId, deviceDescription) {
+    function deleteTOTPDeviceConfirmed(personnelId, deviceDescriptionDecoded) {
         $.ajax({
             url: ServicePrefix + '/api/TOTP/DeleteTOTPDevice',
             dataType: 'json',
@@ -766,7 +819,7 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inPersonnelId": personnelId,
-                "inDeviceDescription": deviceDescription
+                "inDeviceDescription": deviceDescriptionDecoded
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -775,7 +828,7 @@
                     return;
                 }
                 bootbox.alert("Device deleted.");
-                getDevices();
+                getDeviceList();
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
