@@ -10,7 +10,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>MKA Internal Media Site</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=RepFirmStationMapping-width, initial-scale=1">
     <!-- Facebook and Twitter integration -->
     <meta property="og:title" content="" />
     <meta property="og:image" content="" />
@@ -93,10 +93,6 @@
             right: 80px;
             z-index: 0;
         }
-
-        #viewDeviceDialog {
-            overflow: hidden;
-        }
     </style>
 </head>
 <body>
@@ -112,7 +108,7 @@
                 <div style="margin: 0px auto 0 auto">
                     <div class="row">
                         <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                            <h2 id="pageTitle">TOTP Devices</h2>
+                            <h2 id="pageTitle">Rep Firm Station Mapping</h2>
                         </div>
                     </div>
                     <div id="divQuickReport">
@@ -124,11 +120,11 @@
                         <div>
                             <div class="row" style="height:70px;">
                                 <div class="col-md-3">
-                                    <label for="ddlPersonnel" class="filterLabel">Personnel</label><br />
-                                    <select id="ddlPersonnel" class="filterControlRight report-filter" onchange="getDeviceList();"></select>
+                                    <label for="ddlRepFirm" class="filterLabel">Rep Firm</label><br />
+                                    <select id="ddlRepFirm" class="filterControlRight report-filter" onchange="getRepFirmStationMappingList();"></select>
                                 </div>
                                 <div class="col-md-9" style="text-align:right">
-                                    <input type="button" value="+" class="addNewButton addNewButton-list-pages" style="margin-top:10px" onclick="addTOTPDevice();" />
+                                    <input type="button" value="+" class="addNewButton addNewButton-list-pages" style="margin-top:10px" onclick="addRepFirmStationMapping();" />
                                 </div>
                             </div>
                         </div>
@@ -136,18 +132,24 @@
                 </div>
                 <!-- start datatable-->
                 <div id="divResults" class="searchResults dataTable-top-margin">
-                    <table id="dtDeviceList" class="dataTable-border dataTable-headers dataTable-cell-border" style="width: 100%">
+                    <table id="dtRepFirmStationMapping" class="dataTable-border dataTable-headers dataTable-cell-border" style="width: 100%">
                         <thead>
                             <tr>
-                                <th class="exportColumn">Personnel</th>
-                                <th class="exportColumn">Device</th>
+                                <th class="exportColumn">Rep Firm</th>
+                                <th class="exportColumn">Our Name</th>
+                                <th class="exportColumn">Their Call Letters</th>
+                                <th class="exportColumn">Market</th>
+                                <th class="exportColumn">Owner</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <!--<tfoot>
                             <tr>
-                                <th>Personnel</th>
-                                <th>Device</th>
+                                <th>Rep Firm</th>
+                                <th>Our Name</th>
+                                <th>Their Call Letters</th>
+                                <th>Market</th>
+                                <th>Owner</th>
                                 <th></th>
                             </tr>
                         </tfoot>-->
@@ -158,13 +160,13 @@
         </div>
         <!--<div id="map" data-animate-effect="fadeIn"></div>-->
     </div>
-    <div id="addDeviceDialog" style="display:none">
+    <div id="addRepFirmStationMappingDialog" style="display:none">
         <div class="row">
             <div class="col-md-4 text-align-left">
-                Device Description
+                Their Call Letters
             </div>
             <div class="col-md-8 text-align-left">
-                <input type="text" maxlength="100" class="mkaRequired" id="txtDeviceDescription" errorMessage="You must enter a Device Description." />
+                <input type="text" maxlength="100" class="mkaRequired" id="txtRepFirmStationMappingDescription" errorMessage="You must enter a RepFirmStationMapping Description." />
             </div>
         </div>
         <div class="row">
@@ -176,82 +178,6 @@
             <div class="col-md-12 text-align-center">
                 <input type="button" id="btnAddDialogSave" onclick="addDialogSave();" value="Save" />
                 <input type="button" id="btnAddDialogClose" onclick="addDialogClose();" value="Close" />
-            </div>
-        </div>
-    </div>
-    <div id="viewDeviceDialog" style="display:none">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="row">
-                    <div class="col-md-4 text-align-left">
-                        Personnel
-                    </div>
-                    <div class="col-md-8 text-align-left">
-                        <span id="spanPersonnel"></span>
-                        <span id="spanPersonnelId" class="hidden"></span>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4 text-align-left">
-                        Device Description
-                    </div>
-                    <div class="col-md-8 text-align-left">
-                        <span id="spanDeviceDescription"></span>
-                    </div>
-                </div>
-                <div class="row margin-top-50">
-                    <div class="col-md-4 text-align-left">
-                        QR Code
-                    </div>
-                    <div class="col-md-8 text-align-left">
-                        <image id="imgQRCode"></image>
-                    </div>
-                </div>
-                <div class="row margin-top-50">
-                    <div class="col-md-4 text-align-left">
-                        Manual Entry <br /> <span style="font-size: 0.75em"> &nbsp; (if QR code doesn't work)</span>
-                    </div>
-                    <div class="col-md-8 text-align-left">
-                        <span id="spanManualEntry"></span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="col-md-4 text-align-left">
-                    One-Time Passwords
-                </div>
-                <div class="col-md-8 text-align-left">
-                    <!-- start datatable-->
-                    <div id="divOneTimePasswords" class="searchResults dataTable-top-margin">
-                        <table id="dtOneTimePasswords" class="dataTable-border dataTable-headers dataTable-cell-border" style="width: 90%">
-                            <thead>
-                                <tr>
-                                    <th class="exportColumn">Time</th>
-                                    <th class="exportColumn">Password</th>
-                                </tr>
-                            </thead>
-                            <!--<tfoot>
-                                <tr>
-                                    <th>Time</th>
-                                    <th>Password</th>
-                                </tr>
-                            </tfoot>-->
-                        </table>
-                    </div>
-                    <!-- end datatable -->
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="row">
-                <div class="col-md-12">
-                    <hr />
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12 text-align-center">
-                    <input type="button" id="btnViewDialogClose" onclick="viewDialogClose();" value="Close" />
-                </div>
             </div>
         </div>
     </div>
@@ -289,24 +215,24 @@
 </html>
 <script>
 
-    var timeoutObject = null;
+    var gotRepFirms = false;
 
     $(document).ready(function () {
         $(".searchResults").hide();
         buildUIDialogs();
 
-        getPersonnelList(); // success -> getDeviceList()
+        getRepFirms();
+        // success on all of these -> getRepFirmStationMappingList()
 
         setEventListeners();
 
-        setDataTable_Devices();
-        setDataTable_DeviceOneTimePasswords();
+        setDataTable();
 
         clearSearchButtonSetup();
 
-        buildMainMenu("TOTP");
+        buildMainMenu("RepFirmStationMapping");
 
-        buildQuickReports(['totp']);
+        buildQuickReports(['repfirmstationmapping']);
 
         // Reset this variable
         //setLocalStorage("quickReportQS", null);
@@ -316,7 +242,7 @@
     });
 
     function buildUIDialogs() {
-        $("#addDeviceDialog").dialog({
+        $("#addRepFirmStationMappingDialog").dialog({
             autoOpen: false,
             resizable: false,
             width: 700,
@@ -327,23 +253,64 @@
                 $(event.target).parent().css('position', 'fixed');
             }
         });
-
-        $("#viewDeviceDialog").dialog({
-            autoOpen: false,
-            resizable: false,
-            width: 1200,
-            height: 800,
-            modal: true,
-            title: 'Event',
-            create: function (event, ui) {
-                $(event.target).parent().css('position', 'fixed');
-            }
-        });
     }
 
-    function getPersonnelList() {
-        var url = ServicePrefix + '/api/TOTP/GetTOTPDevicePersonnel'
+    function getRepFirms() {
+        var url = ServicePrefix + '/api/RepFirm/GetRepFirmList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inActiveOnly": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getRepFirmsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function getRepFirmsSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        str = '<option value="">-- Select a Rep Firm --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str = str + '<option value="' + obj.repFirmId + '">' + obj.repFirmName + '</option>';
+        });
+        $("#ddlRepFirm").html(str);
+        convertToChosenSelect("ddlRepFirm", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotRepFirms = true;
+        getRepFirmStationMappingList();
+    }
+
+    function getRepFirmStationMappingList() {
+        if (gotRepFirms == false) {
+            return;
+        }
+
+        //setLocalStorage("search", $("#ddlMediaType").val());
+        //setLocalStorage("searchPage", window.location);
+
+        var url = ServicePrefix + '/api/RepFirmStationMapping/GetRepFirmStationMappingList'
             + '?inApiToken=' + getLocalStorage("APIToken");
+        if ($("#ddlRepFirm").val() != "") {
+            url += '&inRepFirmId=' + $("#ddlRepFirm").val();
+        }
 
         $.ajax({
             url: url,
@@ -352,7 +319,7 @@
             contentType: 'application/json',
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getPersonnelListSuccess(data, textStatus, jQxhr);
+                getRepFirmStationMappingListSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -360,22 +327,19 @@
         });
     }
 
-    function getPersonnelListSuccess(data, textStatus, jQxhr) {
+    function getRepFirmStationMappingListSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
-        var str = '<option value="">-- All Personnel --</option>';
-        $.each(data.report.rows, function (index) {
-            var obj = data.report.rows[index];
-            str = str + '<option value="' + obj["PersonnelID"] + '">' + obj["Personnel"] + '</option>';
-        });
-        $("#ddlPersonnel").html(str);
+        //if (data.report.rows.length == 0) {
+        //    bootbox.alert("No rep firm station mappings found");
+        //    return;
+        //}
 
-        convertToChosenSelect("ddlPersonnel", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-        getDeviceList();
+        populateDataTable("dtRepFirmStationMapping", data);
+        $(".searchResults").show();
     }
 
     function setEventListeners() {
@@ -402,28 +366,31 @@
         //});
     }
 
-    function setDataTable_Devices() {
-        var reportTitle = "TOTP Device List";
-        var exportColumns = returnTableColumnsByClass("dtDeviceList", "exportColumn");
+    function setDataTable() {
+        var reportTitle = "Rep Firm Station Mapping List";
+        var exportColumns = returnTableColumnsByClass("dtRepFirmStationMapping", "exportColumn");
 
-        $("#dtDeviceList").DataTable({
+        $("#dtRepFirmStationMapping").DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
             "data": [],
             "order": [
-                [0, 'asc'], // Personnel
-                [1, 'asc'] // Device Description
+                [0, 'asc'], // Rep Firm
+                [1, 'asc'] // Our Name
             ],
             "columns": [
-                { "data": 'Personnel' },
-                { "data": 'DeviceDescription' },
+                { "data": 'RepFirmName' },
+                { "data": 'StationName' },
+                { "data": 'RepFirmCallLetters' },
+                { "data": 'MarketName' },
+                { "data": 'OwnerName' },
                 {
                     mRender: function (data, type, row) {
                         var personnelId = row["PersonnelID"];
                         var personnel = row["Personnel"];
-                        var deviceDescription = row["DeviceDescription"];
-                        return '<a href="#" onclick="viewTOTPDevice(' + personnelId + ',\'' + encodeURIComponent(deviceDescription) + '\')">View</a>'
-                            + ' <a href="#" onclick="deleteTOTPDevice(' + personnelId + ',\'' + encodeURIComponent(personnel) + '\',\'' + encodeURIComponent(deviceDescription) + '\')">Delete</a>';
+                        var RepFirmStationMappingDescription = row["RepFirmStationMappingDescription"];
+                        return '<a href="#" onclick="viewTOTPRepFirmStationMapping(' + personnelId + ',\'' + encodeURIComponent(RepFirmStationMappingDescription) + '\')">View</a>'
+                            + ' <a href="#" onclick="deleteTOTPRepFirmStationMapping(' + personnelId + ',\'' + encodeURIComponent(personnel) + '\',\'' + encodeURIComponent(RepFirmStationMappingDescription) + '\')">Delete</a>';
                     },
                     "orderable": false,
                     "searchable": false,
@@ -438,7 +405,7 @@
                //        columns: exportColumns,
                //        format: {
                //            header: function (data, columnIdx) {
-               //                return returnExportColumnHeadingTitle("dtDeviceList", data, columnIdx);
+               //                return returnExportColumnHeadingTitle("dtRepFirmStationMapping", data, columnIdx);
                //            }
                //        }
                //    }
@@ -450,7 +417,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtDeviceList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtRepFirmStationMapping", data, columnIdx);
                            }
                        }
                    }
@@ -462,7 +429,7 @@
                //        columns: exportColumns,
                //        format: {
                //            header: function (data, columnIdx) {
-               //                return returnExportColumnHeadingTitle("dtDeviceList", data, columnIdx);
+               //                return returnExportColumnHeadingTitle("dtRepFirmStationMapping", data, columnIdx);
                //            }
                //        }
                //    }
@@ -474,7 +441,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtDeviceList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtRepFirmStationMapping", data, columnIdx);
                            }
                        }
                    }
@@ -498,97 +465,9 @@
         });
     }
 
-    function setDataTable_DeviceOneTimePasswords() {
-        var reportTitle = "TOTP Device One-Time Passwords";
-        var exportColumns = returnTableColumnsByClass("dtOneTimePasswords", "exportColumn");
-
-        $("#dtOneTimePasswords").DataTable({
-            "dom": "Blfrtip",
-            "pageLength": gDataTableDefaultRows,
-            "paging": false,
-            "searching": false,
-            "info": false,
-            "data": [],
-            "order": [
-                [0, 'asc'] // Time
-            ],
-            "ordering": false,
-            "columns": [
-                { "data": 'startDateTime' },
-                { "data": 'oneTimePassword' }
-            ],
-            "pagingType": "full_numbers",
-            "buttons": [
-               //{
-               //    extend: 'csv',
-               //    exportOptions: {
-               //        columns: exportColumns,
-               //        format: {
-               //            header: function (data, columnIdx) {
-               //                return returnExportColumnHeadingTitle("dtOneTimePasswords", data, columnIdx);
-               //            }
-               //        }
-               //    }
-               //},
-               //{
-               //    extend: 'excel',
-               //    title: reportTitle,
-               //    exportOptions: {
-               //        columns: exportColumns,
-               //        format: {
-               //            header: function (data, columnIdx) {
-               //                return returnExportColumnHeadingTitle("dtOneTimePasswords", data, columnIdx);
-               //            }
-               //        }
-               //    }
-               //},
-               //{
-               //    extend: 'pdf',
-               //    title: reportTitle,
-               //    exportOptions: {
-               //        columns: exportColumns,
-               //        format: {
-               //            header: function (data, columnIdx) {
-               //                return returnExportColumnHeadingTitle("dtOneTimePasswords", data, columnIdx);
-               //            }
-               //        }
-               //    }
-               //},
-               //{
-               //    extend: 'print',
-               //    title: reportTitle,
-               //    exportOptions: {
-               //        columns: exportColumns,
-               //        format: {
-               //            header: function (data, columnIdx) {
-               //                return returnExportColumnHeadingTitle("dtOneTimePasswords", data, columnIdx);
-               //            }
-               //        }
-               //    }
-               //}
-               //,
-               //this button is supposed to handle column visibility
-               //however it isn't working on our site
-               //'colvis'
-            ],
-            initComplete: function () {
-                // only once per page, affects all datatables on the page
-                //$(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
-            },
-            createdRow: function (row, data, index) {
-                //this adds the class to every row
-                $(row).addClass('single-line-height');
-            },
-            language: {
-                //this changes search box label from Search: to Filter Results:
-                search: "Filter Results:"
-            }
-        });
-    }
-
     function clearSearchButtonSetup() {
         $("body").on("click", "#clear_search_button", function () {
-            var table = $("#dtDeviceList").DataTable();
+            var table = $("#dtRepFirmStationMapping").DataTable();
             table.search('').draw();
         });
     }
@@ -614,60 +493,24 @@
     }
 
 
-    function getDeviceList() {
-        //setLocalStorage("search", $("#ddlMediaType").val());
-        //setLocalStorage("searchPage", window.location);
-
-        url = ServicePrefix + '/api/TOTP/GetTOTPDevices'
-            + '?inApiToken=' + getLocalStorage("APIToken");
-
-        var personnelId = $("#ddlPersonnel").val();
-        if (personnelId != "") {
-            url += '&inPersonnelId=' + personnelId;
-        }
-
-        $.ajax({
-            url: url,
-            dataType: 'json',
-            type: 'get',
-            contentType: 'application/json',
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                    return;
-                }
-                if (data.report.rows.length == 0) {
-                    bootbox.alert("No devices found");
-                    return;
-                }
-                populateDataTable("dtDeviceList", data);
-                $(".searchResults").show();
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function addTOTPDevice() {
-        $("#txtDeviceDescription").val("");
-        $("#addDeviceDialog").dialog("open");
+    function addTOTPRepFirmStationMapping() {
+        $("#txtRepFirmStationMappingDescription").val("");
+        $("#addRepFirmStationMappingDialog").dialog("open");
     }
 
     function addDialogSave() {
         $.ajax({
-            url: ServicePrefix + '/api/TOTP/InsertTOTPDevice',
+            url: ServicePrefix + '/api/TOTP/InsertTOTPRepFirmStationMapping',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inDeviceDescription": $("#txtDeviceDescription").val()
+                "inRepFirmStationMappingDescription": $("#txtRepFirmStationMappingDescription").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                insertTOTPDeviceSuccess(data, textStatus, jQxhr);
+                insertTOTPRepFirmStationMappingSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -675,7 +518,7 @@
         });
     }
 
-    function insertTOTPDeviceSuccess(data, textStatus, jQxhr) {
+    function insertTOTPRepFirmStationMappingSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -688,24 +531,24 @@
 
         addDialogClose();
 
-        getDeviceList();
+        getRepFirmStationMappingList();
 
         var personnelId = data.report.rows[0].personnelId;
-        var deviceDescription = $("#txtDeviceDescription").val();
-        viewTOTPDevice(personnelId, encodeURIComponent(deviceDescription));
+        var RepFirmStationMappingDescription = $("#txtRepFirmStationMappingDescription").val();
+        viewTOTPRepFirmStationMapping(personnelId, encodeURIComponent(RepFirmStationMappingDescription));
     }
 
     function addDialogClose() {
-        $("#addDeviceDialog").dialog("close");
+        $("#addRepFirmStationMappingDialog").dialog("close");
     }
 
-    function viewTOTPDevice(personnelId, deviceDescription) {
-        deviceDescriptionDecoded = decodeURIComponent(deviceDescription);
+    function viewTOTPRepFirmStationMapping(personnelId, RepFirmStationMappingDescription) {
+        RepFirmStationMappingDescriptionDecoded = decodeURIComponent(RepFirmStationMappingDescription);
 
-        url = ServicePrefix + '/api/TOTP/GetTOTPDevice'
+        url = ServicePrefix + '/api/TOTP/GetTOTPRepFirmStationMapping'
             + '?inApiToken=' + getLocalStorage("APIToken")
             + '&inPersonnelId=' + personnelId
-            + '&inDeviceDescription=' + encodeURIComponent(deviceDescriptionDecoded);
+            + '&inRepFirmStationMappingDescription=' + encodeURIComponent(RepFirmStationMappingDescriptionDecoded);
 
         $.ajax({
             url: url,
@@ -714,7 +557,7 @@
             contentType: 'application/json',
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                viewTOTPDeviceSuccess(data, textStatus, jQxhr, personnelId, deviceDescriptionDecoded);
+                viewTOTPRepFirmStationMappingSuccess(data, textStatus, jQxhr, personnelId, RepFirmStationMappingDescriptionDecoded);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -722,19 +565,19 @@
         });
     }
 
-    function viewTOTPDeviceSuccess(data, textStatus, jQxhr, personnelId, deviceDescriptionDecoded) {
+    function viewTOTPRepFirmStationMappingSuccess(data, textStatus, jQxhr, personnelId, RepFirmStationMappingDescriptionDecoded) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
         if (data.report.rows.length == 0) {
-            MKAErrorMessageRtn("Failed to get data from /api/TOTP/GetTOTPDevice");
+            MKAErrorMessageRtn("Failed to get data from /api/TOTP/GetTOTPRepFirmStationMapping");
             return;
         }
 
         $("#spanPersonnelId").val(personnelId);
-        $("#spanDeviceDescription").text(deviceDescriptionDecoded);
+        $("#spanRepFirmStationMappingDescription").text(RepFirmStationMappingDescriptionDecoded);
 
         var obj = data.report.rows[0];
         $("#spanPersonnel").text(obj.Personnel);
@@ -744,23 +587,23 @@
         $("#spanManualEntry").text(data.report.secretManualEntry);
         $("#imgQRCode").attr("src", "data:image/gif;base64," + data.report.secretQRCode);
 
-        $("#viewDeviceDialog").dialog("open");
+        $("#viewRepFirmStationMappingDialog").dialog("open");
 
-        getTOTPDeviceOneTimePasswords();
+        getTOTPRepFirmStationMappingOneTimePasswords();
     }
 
-    function getTOTPDeviceOneTimePasswords() {
-        if ($("#viewDeviceDialog").dialog("isOpen") == false) {
+    function getTOTPRepFirmStationMappingOneTimePasswords() {
+        if ($("#viewRepFirmStationMappingDialog").dialog("isOpen") == false) {
             return;
         }
 
         var personnelId = $("#spanPersonnelId").val();
-        var deviceDescriptionDecoded = $("#spanDeviceDescription").text();
+        var RepFirmStationMappingDescriptionDecoded = $("#spanRepFirmStationMappingDescription").text();
 
-        url = ServicePrefix + '/api/TOTP/GetTOTPDeviceOneTimePasswords'
+        url = ServicePrefix + '/api/TOTP/GetTOTPRepFirmStationMappingOneTimePasswords'
             + '?inApiToken=' + getLocalStorage("APIToken")
             + '&inPersonnelId=' + personnelId
-            + '&inDeviceDescription=' + encodeURIComponent(deviceDescriptionDecoded);
+            + '&inRepFirmStationMappingDescription=' + encodeURIComponent(RepFirmStationMappingDescriptionDecoded);
 
         $.ajax({
             url: url,
@@ -769,7 +612,7 @@
             contentType: 'application/json',
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getTOTPDeviceOneTimePasswordsSuccess(data, textStatus, jQxhr);
+                getTOTPRepFirmStationMappingOneTimePasswordsSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -777,47 +620,47 @@
         });
     }
 
-    function getTOTPDeviceOneTimePasswordsSuccess(data, textStatus, jQxhr) {
+    function getTOTPRepFirmStationMappingOneTimePasswordsSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
         if (data.report.rows.length == 0) {
-            MKAErrorMessageRtn("Failed to get data from /api/TOTP/GetTOTPDeviceOneTimePasswords");
+            MKAErrorMessageRtn("Failed to get data from /api/TOTP/GetTOTPRepFirmStationMappingOneTimePasswords");
             return;
         }
 
         populateDataTable("dtOneTimePasswords", data);
 
-        timeoutObject = setTimeout(getTOTPDeviceOneTimePasswords, 30000); // refresh every 30 seconds
+        timeoutObject = setTimeout(getTOTPRepFirmStationMappingOneTimePasswords, 30000); // refresh every 30 seconds
     }
 
     function viewDialogClose() {
-        $("#viewDeviceDialog").dialog("close");
+        $("#viewRepFirmStationMappingDialog").dialog("close");
         clearTimeoutIfAny();
     }
 
-    function deleteTOTPDevice(personnelId, personnel, deviceDescription) {
+    function deleteTOTPRepFirmStationMapping(personnelId, personnel, RepFirmStationMappingDescription) {
         var personnelDecoded = decodeURIComponent(personnel);
-        var deviceDescriptionDecoded = decodeURIComponent(deviceDescription);
-        bootbox.confirm("Delete this device? (" + personnelDecoded + " / " + deviceDescriptionDecoded + ")", function (result) {
+        var RepFirmStationMappingDescriptionDecoded = decodeURIComponent(RepFirmStationMappingDescription);
+        bootbox.confirm("Delete this RepFirmStationMapping? (" + personnelDecoded + " / " + RepFirmStationMappingDescriptionDecoded + ")", function (result) {
             if (result) {
-                deleteTOTPDeviceConfirmed(personnelId, deviceDescriptionDecoded);
+                deleteTOTPRepFirmStationMappingConfirmed(personnelId, RepFirmStationMappingDescriptionDecoded);
             }
         });
     }
 
-    function deleteTOTPDeviceConfirmed(personnelId, deviceDescriptionDecoded) {
+    function deleteTOTPRepFirmStationMappingConfirmed(personnelId, RepFirmStationMappingDescriptionDecoded) {
         $.ajax({
-            url: ServicePrefix + '/api/TOTP/DeleteTOTPDevice',
+            url: ServicePrefix + '/api/TOTP/DeleteTOTPRepFirmStationMapping',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inPersonnelId": personnelId,
-                "inDeviceDescription": deviceDescriptionDecoded
+                "inRepFirmStationMappingDescription": RepFirmStationMappingDescriptionDecoded
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -825,8 +668,8 @@
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                     return;
                 }
-                bootbox.alert("Device deleted.");
-                getDeviceList();
+                bootbox.alert("RepFirmStationMapping deleted.");
+                getRepFirmStationMappingList();
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
