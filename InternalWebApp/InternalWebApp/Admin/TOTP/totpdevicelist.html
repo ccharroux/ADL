@@ -499,8 +499,8 @@
             ],
             "ordering": false,
             "columns": [
-                { "data": 'Time' },
-                { "data": 'Password' }
+                { "data": 'startDateTime' },
+                { "data": 'oneTimePassword' }
             ],
             "pagingType": "full_numbers",
             "buttons": [
@@ -668,7 +668,7 @@
             contentType: 'application/json',
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                viewTOTPDeviceSuccess(data, textStatus, jQxhr);
+                viewTOTPDeviceSuccess(data, textStatus, jQxhr, personnelId, deviceDescriptionDecoded);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -676,7 +676,7 @@
         });
     }
 
-    function viewTOTPDeviceSuccess(data, textStatus, jQxhr) {
+    function viewTOTPDeviceSuccess(data, textStatus, jQxhr, personnelId, deviceDescriptionDecoded) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -695,26 +695,44 @@
         $("#spanManualEntry").text(data.report.secretManualEntry);
         $("#imgQRCode").attr("src", "data:image/gif;base64," + data.report.secretQRCode);
 
-        var oneTimePasswordList = [];
-        var oneTimePasswordCurrentTime = data.report.oneTimePasswordCurrentTime;
-        var numberOffsets = data.report.oneTimePasswordNumberOffsets;
-        var oneTimePassword;
-        for (var offset = -numberOffsets; offset <= numberOffsets; ++offset) {
-            oneTimePassword = data.report["oneTimePasswordOffset" + offset];
-            oneTimePasswordList = oneTimePasswordList.concat([{
-                "Time": offset, // TODO compute human-readable timestamp from oneTimePasswordCurrentTime and offset
-                "Password": oneTimePassword
-            }]);
-        }
-        var oneTimePasswordObject = {
-            "response": data.response,
-            "report": {
-                "rows": oneTimePasswordList
-            }
-        };
-        populateDataTable("dtOneTimePasswords", oneTimePasswordObject);
-
         $("#viewDeviceDialog").dialog("open");
+
+        getTOTPDeviceOneTimePasswords(personnelId, deviceDescriptionDecoded);
+    }
+
+    function getTOTPDeviceOneTimePasswords(personnelId, deviceDescriptionDecoded) {
+        url = ServicePrefix + '/api/TOTP/GetTOTPDeviceOneTimePasswords'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inPersonnelId=' + personnelId
+            + '&inDeviceDescription=' + encodeURIComponent(deviceDescriptionDecoded);
+
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getTOTPDeviceOneTimePasswordsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getTOTPDeviceOneTimePasswordsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get data from /api/TOTP/GetTOTPDeviceOneTimePasswords");
+            return;
+        }
+
+        populateDataTable("dtOneTimePasswords", data);
     }
 
     function viewDialogClose() {
