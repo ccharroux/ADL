@@ -119,11 +119,23 @@
                     <div>
                         <div>
                             <div class="row" style="height:70px;">
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label for="ddlRepFirm" class="filterLabel">Rep Firm</label><br />
                                     <select id="ddlRepFirm" class="filterControlRight report-filter" onchange="getRepFirmStationMappingList();"></select>
                                 </div>
-                                <div class="col-md-9" style="text-align:right">
+                                <div class="col-md-2">
+                                    <label for="ddlMarket" class="filterLabel">Market</label><br />
+                                    <select id="ddlMarket" class="filterControlRight report-filter" onchange="getRepFirmStationMappingList();"></select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="ddlOwner" class="filterLabel">Owner</label><br />
+                                    <select id="ddlOwner" class="filterControlRight report-filter" onchange="getRepFirmStationMappingList();"></select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="ddlStation" class="filterLabel">Station</label><br />
+                                    <select id="ddlStation" class="filterControlRight report-filter" onchange="getRepFirmStationMappingList();"></select>
+                                </div>
+                                <div class="col-md-4" style="text-align:right">
                                     <input type="button" value="+" class="addNewButton addNewButton-list-pages" style="margin-top:10px" onclick="addRepFirmStationMapping();" />
                                 </div>
                             </div>
@@ -136,8 +148,8 @@
                         <thead>
                             <tr>
                                 <th class="exportColumn">Rep Firm</th>
-                                <th class="exportColumn">Our Name</th>
-                                <th class="exportColumn">Their Call Letters</th>
+                                <th class="exportColumn">Station</th>
+                                <th class="exportColumn">Rep Firm Call Letters</th>
                                 <th class="exportColumn">Market</th>
                                 <th class="exportColumn">Owner</th>
                                 <th></th>
@@ -146,8 +158,8 @@
                         <!--<tfoot>
                             <tr>
                                 <th>Rep Firm</th>
-                                <th>Our Name</th>
-                                <th>Their Call Letters</th>
+                                <th>Station</th>
+                                <th>Rep Firm Call Letters</th>
                                 <th>Market</th>
                                 <th>Owner</th>
                                 <th></th>
@@ -163,10 +175,42 @@
     <div id="addRepFirmStationMappingDialog" style="display:none">
         <div class="row">
             <div class="col-md-4 text-align-left">
-                Their Call Letters
+                Rep Firm
             </div>
             <div class="col-md-8 text-align-left">
-                <input type="text" maxlength="100" class="mkaRequired" id="txtRepFirmStationMappingDescription" errorMessage="You must enter a RepFirmStationMapping Description." />
+                <select id="ddlEditRepFirm" class="report-filter disableForEdit" onchange="getEditStationList();"></select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 text-align-left">
+                Station
+            </div>
+            <div class="col-md-8 text-align-left">
+                <select id="ddlEditStation" class="report-filter disableForEdit" onchange="getStation();"></select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 text-align-left">
+                Rep Firm's Call Letters
+            </div>
+            <div class="col-md-8 text-align-left">
+                <input type="text" maxlength="100" class="mkaRequired" id="txtRepFirmCallLetters" errorMessage="You must enter the rep firm's call letters'." />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 text-align-left">
+                Market
+            </div>
+            <div class="col-md-8 text-align-left">
+                <span id="spanMarket"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 text-align-left">
+                Owner
+            </div>
+            <div class="col-md-8 text-align-left">
+                <span id="spanOwner"></span>
             </div>
         </div>
         <div class="row">
@@ -216,12 +260,18 @@
 <script>
 
     var gotRepFirms = false;
+    var gotMarkets = false;
+    var gotOwners = false;
+    var gotStations = false;
 
     $(document).ready(function () {
         $(".searchResults").hide();
         buildUIDialogs();
 
         getRepFirms();
+        getMarkets();
+        getOwners();
+        getStations();
         // success on all of these -> getRepFirmStationMappingList()
 
         setEventListeners();
@@ -256,9 +306,8 @@
     }
 
     function getRepFirms() {
-        var url = ServicePrefix + '/api/RepFirm/GetRepFirmList';
-
-        var settings = {
+        $.ajax({
+            url: ServicePrefix + '/api/RepFirm/GetRepFirmList',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
@@ -273,14 +322,10 @@
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
-        };
-
-        $.ajax(url, settings);
-
+        });
     }
 
     function getRepFirmsSuccess(data, textStatus, jQxhr) {
-
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -289,7 +334,7 @@
         str = '<option value="">-- Select a Rep Firm --</option>';
         $.each(data.report.rows, function (index) {
             var obj = data.report.rows[index];
-            str = str + '<option value="' + obj.repFirmId + '">' + obj.repFirmName + '</option>';
+            str += '<option value="' + obj.repFirmId + '">' + obj.repFirmName + '</option>';
         });
         $("#ddlRepFirm").html(str);
         convertToChosenSelect("ddlRepFirm", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
@@ -298,8 +343,128 @@
         getRepFirmStationMappingList();
     }
 
+    function getMarkets() {
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketListByProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": 'TVB'
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
+    }
+
+    function getMarketsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = "<option value=''>-- Select a Market --</option>";
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str += "<option value='" + obj.marketId + "'>" + obj.marketName + " (" + obj.marketId + ")" + "</option>";
+        });
+        $("#ddlMarket").html(str);
+        convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotMarkets = true;
+        getRepFirmStationMappingList();
+    }
+
+    function getOwners() {
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerListByProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": "TVB"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOwnersSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getOwnersSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = "<option value=''>-- Select an Owner --</option>";
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str += '<option value="' + obj.ownerid + '">' + obj.ownername + '</option>';
+        });
+        $("#ddlOwner").html(str);
+        convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotOwners = true;
+        getRepFirmStationMappingList();
+    }
+
+    function getStations() {
+        var url = ServicePrefix + '/api/TVBReport/GetRepBillingStationList'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inSource=RepFirm'
+            + '&inMode=Station';
+
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getStationsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getStationsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = "<option value=''>-- Select a Station --</option>";
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str += '<option value="' + obj["Station ID"] + '">' + obj["Station"] + '</option>';
+        });
+        $("#ddlStation").html(str);
+        convertToChosenSelect("ddlStation", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotStations = true;
+        getRepFirmStationMappingList();
+    }
+
     function getRepFirmStationMappingList() {
-        if (gotRepFirms == false) {
+        if (
+               gotRepFirms == false
+            || gotMarkets == false
+            || gotOwners == false
+            || gotStations == false
+        ) {
             return;
         }
 
@@ -310,6 +475,15 @@
             + '?inApiToken=' + getLocalStorage("APIToken");
         if ($("#ddlRepFirm").val() != "") {
             url += '&inRepFirmId=' + $("#ddlRepFirm").val();
+        }
+        if ($("#ddlMarket").val() != "") {
+            url += '&inMarketId=' + $("#ddlMarket").val();
+        }
+        if ($("#ddlOwner").val() != "") {
+            url += '&inOwnerId=' + $("#ddlOwner").val();
+        }
+        if ($("#ddlStation").val() != "") {
+            url += '&inStationId=' + $("#ddlStation").val();
         }
 
         $.ajax({
@@ -386,11 +560,14 @@
                 { "data": 'OwnerName' },
                 {
                     mRender: function (data, type, row) {
-                        var personnelId = row["PersonnelID"];
-                        var personnel = row["Personnel"];
+                        var repFirmId = row["RepFirmID"];
+                        var stationId = row["StationID"];
+                        var repFirmName = encodeURIComponent(row["RepFirmName"]);
+                        var stationName = encodeURIComponent(row["StationName"]);
+                        var repFirmCallLetters = encodeURIComponent(row["RepFirmCallLetters"]);
                         var RepFirmStationMappingDescription = row["RepFirmStationMappingDescription"];
-                        return '<a href="#" onclick="viewTOTPRepFirmStationMapping(' + personnelId + ',\'' + encodeURIComponent(RepFirmStationMappingDescription) + '\')">View</a>'
-                            + ' <a href="#" onclick="deleteTOTPRepFirmStationMapping(' + personnelId + ',\'' + encodeURIComponent(personnel) + '\',\'' + encodeURIComponent(RepFirmStationMappingDescription) + '\')">Delete</a>';
+                        return '<a href="#" onclick="addRepFirmStationMapping(' + repFirmId + ',' + stationId + ',\'' + repFirmCallLetters + '\')">Edit</a>'
+                            + ' <a href="#" onclick="deleteRepFirmStationMapping(' + repFirmId + ',' + stationId + ',\'' + repFirmName + '\',\'' + stationName +  '\')">Delete</a>';
                     },
                     "orderable": false,
                     "searchable": false,
@@ -492,25 +669,50 @@
         //setTimeout(getTrainingList, 1000);
     }
 
-
-    function addTOTPRepFirmStationMapping() {
-        $("#txtRepFirmStationMappingDescription").val("");
-        $("#addRepFirmStationMappingDialog").dialog("open");
+    function inEditMode() {
+        return $("#ddlEditRepFirm").prop("disabled");
     }
 
-    function addDialogSave() {
+    function addRepFirmStationMapping(repFirmId, stationId, repFirmCallLetters) { // Add doesn't pass params, Edit does
+        var repFirmCallLettersDecoded = "";
+
+        if (repFirmId == null) {
+            repFirmId = "";
+            stationId = "";
+            $(".disableForEdit").prop("disabled", false);
+        } else {
+            repFirmCallLettersDecoded = decodeURIComponent(repFirmCallLetters);
+            $(".disableForEdit").prop("disabled", true);
+        }
+     
+        $("#addRepFirmStationMappingDialog").dialog("open");
+
+        $("#ddlEditRepFirm").html($("#ddlRepFirm").html());
+        convertToChosenSelect("ddlEditRepFirm", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+        $("#ddlEditRepFirm").val(repFirmId);
+
+        $("#ddlEditStation").html($("#ddlStation").html());
+        $("#ddlEditStation").val(stationId);
+        getStation();
+
+        $("#txtRepFirmCallLetters").val(repFirmCallLettersDecoded);
+    }
+
+    function getEditStationList() {
+        var url = ServicePrefix + '/api/TVBReport/GetRepBillingStationList'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inSource=RepFirm'
+            + '&inRepFirmId=' + $("#ddlEditRepFirm").val()
+            + '&inMode=Station';
+
         $.ajax({
-            url: ServicePrefix + '/api/TOTP/InsertTOTPRepFirmStationMapping',
+            url: url,
             dataType: 'json',
-            type: 'post',
+            type: 'get',
             contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inRepFirmStationMappingDescription": $("#txtRepFirmStationMappingDescription").val()
-            }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                insertTOTPRepFirmStationMappingSuccess(data, textStatus, jQxhr);
+                getEditStationsSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -518,162 +720,235 @@
         });
     }
 
-    function insertTOTPRepFirmStationMappingSuccess(data, textStatus, jQxhr) {
+    function getEditStationsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = "<option value=''>-- Select a Station --</option>";
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str += '<option value="' + obj["Station ID"] + '">' + obj["Station"] + '</option>';
+        });
+        $("#ddlEditStation").html(str);
+        $("#ddlEditStation").trigger("chosen:updated");
+    }
+
+    function getStation() {
+        var stationId = $("#ddlEditStation").val();
+        if (stationId == "") {
+            $("#spanMarket").text("");
+            $("#spanOwner").text("");
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Station/GetStation',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getStationSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getStationSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
         if (data.report.rows.length == 0) {
-            bootbox.alert("Failed to get result");
+            MKAErrorMessageRtn('Failed to get station data');
+            return;
+        }
+
+        var obj = data.report.rows[0];
+        getMarket(obj.marketId);
+        getOwner(obj.ownerId);
+    }
+
+    function getMarket(marketId) {
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarket',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getMarketSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn('Failed to get market data');
+            return;
+        }
+
+        var obj = data.report.rows[0];
+        $("#spanMarket").text(obj.marketName);
+    }
+
+    function getOwner(ownerId) {
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwner',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerId": ownerId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOwnerSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getOwnerSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn('Failed to get owner data');
+            return;
+        }
+
+        var obj = data.report.rows[0];
+        $("#spanOwner").text(obj["Owner Name"]);
+    }
+
+    function addDialogSave() {
+        var repFirmId = $("#ddlEditRepFirm").val();
+        if (repFirmId == "") {
+            bootbox.alert("Must select rep firm");
+            return;
+        }
+
+        var stationId = $("#ddlEditStation").val();
+        if (stationId == "") {
+            bootbox.alert("Must select station");
+            return;
+        }
+
+        var repFirmCallLetters = $("#txtRepFirmCallLetters").val();
+        if (repFirmCallLetters.trim() == "") {
+            bootbox.alert("Must enter rep firm's call letters");
+            return;
+        }
+
+        var verb = inEditMode() ? "Update" : "Insert";
+        var url = ServicePrefix + '/api/RepFirmStationMapping/' + verb + 'RepFirmStationMapping';
+
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inRepFirmId": repFirmId,
+                "inStationId": stationId,
+                "inRepFirmCallLetters": repFirmCallLetters
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                insertRepFirmStationMappingSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function insertRepFirmStationMappingSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
         addDialogClose();
 
-        getRepFirmStationMappingList();
+        var action = inEditMode() ? "updated" : "added";
+        bootbox.alert("Rep firm station mapping " + action + ".");
 
-        var personnelId = data.report.rows[0].personnelId;
-        var RepFirmStationMappingDescription = $("#txtRepFirmStationMappingDescription").val();
-        viewTOTPRepFirmStationMapping(personnelId, encodeURIComponent(RepFirmStationMappingDescription));
+        getRepFirmStationMappingList();
     }
 
     function addDialogClose() {
         $("#addRepFirmStationMappingDialog").dialog("close");
     }
 
-    function viewTOTPRepFirmStationMapping(personnelId, RepFirmStationMappingDescription) {
-        RepFirmStationMappingDescriptionDecoded = decodeURIComponent(RepFirmStationMappingDescription);
+    function deleteRepFirmStationMapping(repFirmId, stationId, repFirmName, stationName) {
+        var repFirmNameDecoded = decodeURIComponent(repFirmName);
+        var stationNameDecoded = decodeURIComponent(stationName);
 
-        url = ServicePrefix + '/api/TOTP/GetTOTPRepFirmStationMapping'
-            + '?inApiToken=' + getLocalStorage("APIToken")
-            + '&inPersonnelId=' + personnelId
-            + '&inRepFirmStationMappingDescription=' + encodeURIComponent(RepFirmStationMappingDescriptionDecoded);
-
-        $.ajax({
-            url: url,
-            dataType: 'json',
-            type: 'get',
-            contentType: 'application/json',
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                viewTOTPRepFirmStationMappingSuccess(data, textStatus, jQxhr, personnelId, RepFirmStationMappingDescriptionDecoded);
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function viewTOTPRepFirmStationMappingSuccess(data, textStatus, jQxhr, personnelId, RepFirmStationMappingDescriptionDecoded) {
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        if (data.report.rows.length == 0) {
-            MKAErrorMessageRtn("Failed to get data from /api/TOTP/GetTOTPRepFirmStationMapping");
-            return;
-        }
-
-        $("#spanPersonnelId").val(personnelId);
-        $("#spanRepFirmStationMappingDescription").text(RepFirmStationMappingDescriptionDecoded);
-
-        var obj = data.report.rows[0];
-        $("#spanPersonnel").text(obj.Personnel);
-
-        // extra data added by the API layer
-
-        $("#spanManualEntry").text(data.report.secretManualEntry);
-        $("#imgQRCode").attr("src", "data:image/gif;base64," + data.report.secretQRCode);
-
-        $("#viewRepFirmStationMappingDialog").dialog("open");
-
-        getTOTPRepFirmStationMappingOneTimePasswords();
-    }
-
-    function getTOTPRepFirmStationMappingOneTimePasswords() {
-        if ($("#viewRepFirmStationMappingDialog").dialog("isOpen") == false) {
-            return;
-        }
-
-        var personnelId = $("#spanPersonnelId").val();
-        var RepFirmStationMappingDescriptionDecoded = $("#spanRepFirmStationMappingDescription").text();
-
-        url = ServicePrefix + '/api/TOTP/GetTOTPRepFirmStationMappingOneTimePasswords'
-            + '?inApiToken=' + getLocalStorage("APIToken")
-            + '&inPersonnelId=' + personnelId
-            + '&inRepFirmStationMappingDescription=' + encodeURIComponent(RepFirmStationMappingDescriptionDecoded);
-
-        $.ajax({
-            url: url,
-            dataType: 'json',
-            type: 'get',
-            contentType: 'application/json',
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getTOTPRepFirmStationMappingOneTimePasswordsSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function getTOTPRepFirmStationMappingOneTimePasswordsSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        if (data.report.rows.length == 0) {
-            MKAErrorMessageRtn("Failed to get data from /api/TOTP/GetTOTPRepFirmStationMappingOneTimePasswords");
-            return;
-        }
-
-        populateDataTable("dtOneTimePasswords", data);
-
-        timeoutObject = setTimeout(getTOTPRepFirmStationMappingOneTimePasswords, 30000); // refresh every 30 seconds
-    }
-
-    function viewDialogClose() {
-        $("#viewRepFirmStationMappingDialog").dialog("close");
-        clearTimeoutIfAny();
-    }
-
-    function deleteTOTPRepFirmStationMapping(personnelId, personnel, RepFirmStationMappingDescription) {
-        var personnelDecoded = decodeURIComponent(personnel);
-        var RepFirmStationMappingDescriptionDecoded = decodeURIComponent(RepFirmStationMappingDescription);
-        bootbox.confirm("Delete this RepFirmStationMapping? (" + personnelDecoded + " / " + RepFirmStationMappingDescriptionDecoded + ")", function (result) {
+        bootbox.confirm("Delete this rep firm station mapping? (" + repFirmNameDecoded + " / " + stationNameDecoded + ")", function (result) {
             if (result) {
-                deleteTOTPRepFirmStationMappingConfirmed(personnelId, RepFirmStationMappingDescriptionDecoded);
+                deleteRepFirmStationMappingConfirmed(repFirmId, stationId);
             }
         });
     }
 
-    function deleteTOTPRepFirmStationMappingConfirmed(personnelId, RepFirmStationMappingDescriptionDecoded) {
+    function deleteRepFirmStationMappingConfirmed(repFirmId, stationId) {
         $.ajax({
-            url: ServicePrefix + '/api/TOTP/DeleteTOTPRepFirmStationMapping',
+            url: ServicePrefix + '/api/RepFirmStationMapping/DeleteRepFirmStationMapping',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inPersonnelId": personnelId,
-                "inRepFirmStationMappingDescription": RepFirmStationMappingDescriptionDecoded
+                "inRepFirmId": repFirmId,
+                "inStationId": stationId
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
-                    return;
-                }
-                bootbox.alert("RepFirmStationMapping deleted.");
-                getRepFirmStationMappingList();
+                deleteRepFirmStationMappingSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+    }
+
+    function deleteRepFirmStationMappingSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert("Rep firm station mapping deleted.");
+
+        getRepFirmStationMappingList();
     }
 </script>

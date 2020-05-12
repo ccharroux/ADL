@@ -420,10 +420,10 @@
                 {
                     mRender: function (data, type, row) {
                         var personnelId = row["PersonnelID"];
-                        var personnel = row["Personnel"];
-                        var deviceDescription = row["DeviceDescription"];
-                        return '<a href="#" onclick="viewTOTPDevice(' + personnelId + ',\'' + encodeURIComponent(deviceDescription) + '\')">View</a>'
-                            + ' <a href="#" onclick="deleteTOTPDevice(' + personnelId + ',\'' + encodeURIComponent(personnel) + '\',\'' + encodeURIComponent(deviceDescription) + '\')">Delete</a>';
+                        var personnel = encodeURIComponent(row["Personnel"]);
+                        var deviceDescription = encodeURIComponent(row["DeviceDescription"]);
+                        return '<a href="#" onclick="viewTOTPDevice(' + personnelId + ',\'' + deviceDescription + '\')">View</a>'
+                            + ' <a href="#" onclick="deleteTOTPDevice(' + personnelId + ',\'' + personnel + '\',\'' + deviceDescription + '\')">Delete</a>';
                     },
                     "orderable": false,
                     "searchable": false,
@@ -656,6 +656,12 @@
     }
 
     function addDialogSave() {
+        var deviceDescription = $("#txtDeviceDescription").val();
+        if (deviceDescription.trim() == "") {
+            bootbox.alert("Must enter device description");
+            return;
+        }
+
         $.ajax({
             url: ServicePrefix + '/api/TOTP/InsertTOTPDevice',
             dataType: 'json',
@@ -663,7 +669,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inDeviceDescription": $("#txtDeviceDescription").val()
+                "inDeviceDescription": deviceDescription
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
