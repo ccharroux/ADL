@@ -123,11 +123,7 @@
                     <div>
                         <div>
                             <div class="row" style="height:70px;">
-                                <div class="col-md-3">
-                                    <label for="ddlPersonnel" class="filterLabel">Personnel</label><br />
-                                    <select id="ddlPersonnel" class="filterControlRight report-filter" onchange="getDeviceList();"></select>
-                                </div>
-                                <div class="col-md-9" style="text-align:right">
+                                <div class="col-md-12" style="text-align:right">
                                     <input type="button" value="+" class="addNewButton addNewButton-list-pages" style="margin-top:10px" onclick="addTOTPDevice();" />
                                 </div>
                             </div>
@@ -139,14 +135,12 @@
                     <table id="dtDeviceList" class="dataTable-border dataTable-headers dataTable-cell-border" style="width: 100%">
                         <thead>
                             <tr>
-                                <th class="exportColumn">Personnel</th>
                                 <th class="exportColumn">Device</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <!--<tfoot>
                             <tr>
-                                <th>Personnel</th>
                                 <th>Device</th>
                                 <th></th>
                             </tr>
@@ -182,15 +176,6 @@
     <div id="viewDeviceDialog" style="display:none">
         <div class="row">
             <div class="col-md-6">
-                <div class="row">
-                    <div class="col-md-4 text-align-left">
-                        Personnel
-                    </div>
-                    <div class="col-md-8 text-align-left">
-                        <span id="spanPersonnel"></span>
-                        <span id="spanPersonnelId" class="hidden"></span>
-                    </div>
-                </div>
                 <div class="row">
                     <div class="col-md-4 text-align-left">
                         Device Description
@@ -295,7 +280,7 @@
         $(".searchResults").hide();
         buildUIDialogs();
 
-        getPersonnelList(); // success -> getDeviceList()
+        getDeviceList();;
 
         setEventListeners();
 
@@ -341,43 +326,6 @@
         });
     }
 
-    function getPersonnelList() {
-        var url = ServicePrefix + '/api/TOTP/GetTOTPDevicePersonnel'
-            + '?inApiToken=' + getLocalStorage("APIToken");
-
-        $.ajax({
-            url: url,
-            dataType: 'json',
-            type: 'get',
-            contentType: 'application/json',
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getPersonnelListSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function getPersonnelListSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        var str = '<option value="">-- All Personnel --</option>';
-        $.each(data.report.rows, function (index) {
-            var obj = data.report.rows[index];
-            str = str + '<option value="' + obj["PersonnelID"] + '">' + obj["Personnel"] + '</option>';
-        });
-        $("#ddlPersonnel").html(str);
-
-        convertToChosenSelect("ddlPersonnel", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-        getDeviceList();
-    }
-
     function setEventListeners() {
         //var input = document.getElementById("searchTextNumber");
         //input.addEventListener("keyup", function (event) {
@@ -411,19 +359,15 @@
             "pageLength": gDataTableDefaultRows,
             "data": [],
             "order": [
-                [0, 'asc'], // Personnel
-                [1, 'asc'] // Device Description
+                [0, 'asc'] // Device Description
             ],
             "columns": [
-                { "data": 'Personnel' },
                 { "data": 'DeviceDescription' },
                 {
                     mRender: function (data, type, row) {
-                        var personnelId = row["PersonnelID"];
-                        var personnel = encodeURIComponent(row["Personnel"]);
                         var deviceDescription = encodeURIComponent(row["DeviceDescription"]);
-                        return '<a href="#" onclick="viewTOTPDevice(' + personnelId + ',\'' + deviceDescription + '\')">View</a>'
-                            + ' <a href="#" onclick="deleteTOTPDevice(' + personnelId + ',\'' + personnel + '\',\'' + deviceDescription + '\')">Delete</a>';
+                        return '<a href="#" onclick="viewTOTPDevice(\'' + deviceDescription + '\')">View</a>'
+                            + ' <a href="#" onclick="deleteTOTPDevice(\'' + deviceDescription + '\')">Delete</a>';
                     },
                     "orderable": false,
                     "searchable": false,
@@ -621,11 +565,6 @@
         url = ServicePrefix + '/api/TOTP/GetTOTPDevices'
             + '?inApiToken=' + getLocalStorage("APIToken");
 
-        var personnelId = $("#ddlPersonnel").val();
-        if (personnelId != "") {
-            url += '&inPersonnelId=' + personnelId;
-        }
-
         $.ajax({
             url: url,
             dataType: 'json',
@@ -696,21 +635,19 @@
 
         getDeviceList();
 
-        var personnelId = data.report.rows[0].personnelId;
         var deviceDescription = $("#txtDeviceDescription").val();
-        viewTOTPDevice(personnelId, encodeURIComponent(deviceDescription));
+        viewTOTPDevice(encodeURIComponent(deviceDescription));
     }
 
     function addDialogClose() {
         $("#addDeviceDialog").dialog("close");
     }
 
-    function viewTOTPDevice(personnelId, deviceDescription) {
+    function viewTOTPDevice(deviceDescription) {
         deviceDescriptionDecoded = decodeURIComponent(deviceDescription);
 
         url = ServicePrefix + '/api/TOTP/GetTOTPDevice'
             + '?inApiToken=' + getLocalStorage("APIToken")
-            + '&inPersonnelId=' + personnelId
             + '&inDeviceDescription=' + encodeURIComponent(deviceDescriptionDecoded);
 
         $.ajax({
@@ -720,7 +657,7 @@
             contentType: 'application/json',
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                viewTOTPDeviceSuccess(data, textStatus, jQxhr, personnelId, deviceDescriptionDecoded);
+                viewTOTPDeviceSuccess(data, textStatus, jQxhr, deviceDescriptionDecoded);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -728,7 +665,7 @@
         });
     }
 
-    function viewTOTPDeviceSuccess(data, textStatus, jQxhr, personnelId, deviceDescriptionDecoded) {
+    function viewTOTPDeviceSuccess(data, textStatus, jQxhr, deviceDescriptionDecoded) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -739,11 +676,7 @@
             return;
         }
 
-        $("#spanPersonnelId").val(personnelId);
         $("#spanDeviceDescription").text(deviceDescriptionDecoded);
-
-        var obj = data.report.rows[0];
-        $("#spanPersonnel").text(obj.Personnel);
 
         // extra data added by the API layer
 
@@ -760,12 +693,10 @@
             return;
         }
 
-        var personnelId = $("#spanPersonnelId").val();
         var deviceDescriptionDecoded = $("#spanDeviceDescription").text();
 
         url = ServicePrefix + '/api/TOTP/GetTOTPDeviceOneTimePasswords'
             + '?inApiToken=' + getLocalStorage("APIToken")
-            + '&inPersonnelId=' + personnelId
             + '&inDeviceDescription=' + encodeURIComponent(deviceDescriptionDecoded);
 
         $.ajax({
@@ -804,17 +735,16 @@
         clearTimeoutIfAny();
     }
 
-    function deleteTOTPDevice(personnelId, personnel, deviceDescription) {
-        var personnelDecoded = decodeURIComponent(personnel);
+    function deleteTOTPDevice(deviceDescription) {
         var deviceDescriptionDecoded = decodeURIComponent(deviceDescription);
-        bootbox.confirm("Delete this device? (" + personnelDecoded + " / " + deviceDescriptionDecoded + ")", function (result) {
+        bootbox.confirm("Delete this device? (" + deviceDescriptionDecoded + ")", function (result) {
             if (result) {
-                deleteTOTPDeviceConfirmed(personnelId, deviceDescriptionDecoded);
+                deleteTOTPDeviceConfirmed(deviceDescriptionDecoded);
             }
         });
     }
 
-    function deleteTOTPDeviceConfirmed(personnelId, deviceDescriptionDecoded) {
+    function deleteTOTPDeviceConfirmed(deviceDescriptionDecoded) {
         $.ajax({
             url: ServicePrefix + '/api/TOTP/DeleteTOTPDevice',
             dataType: 'json',
@@ -822,7 +752,6 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inPersonnelId": personnelId,
                 "inDeviceDescription": deviceDescriptionDecoded
             }),
             processData: false,
