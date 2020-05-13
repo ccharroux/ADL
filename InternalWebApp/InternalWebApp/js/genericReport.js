@@ -10904,6 +10904,14 @@ function getReportFilterArray_UsersNotLoggedInAfterDateList() {
     }
     arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
     return arrayFilters;
 }
 
