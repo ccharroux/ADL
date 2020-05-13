@@ -1,3 +1,4 @@
+ 
 
 const gMediaTypeRadio = "RADIO";
 const gMediaTypeTelevision = "TELEVISION";
@@ -290,8 +291,11 @@ var navTool = {
 // Internal Admin Section
 //---------------------------------
 
+
 $(document).ready(function ()
 {
+
+
     $(document).ajaxSuccess(function () {
         gAJAXError = false;
     });
