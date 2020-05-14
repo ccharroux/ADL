@@ -93,7 +93,7 @@
                             <label for="ddlScript" class="">Script</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlScript" class="mkaRequired field-width-325" style="" errorMessage="You must select a Script."></select>
+                            <select id="ddlScript" class="mkaRequired field-width-325" onchange="getRuleTokenList(this.value);" errorMessage="You must select a Script."></select>
                         </div>
                     </div>
 
@@ -109,10 +109,11 @@
 
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtColumnRuleToken">Rule Token</label>
+                            <label for="ddlToken">Rule Token</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" class="mkaRequired field-width-325" maxlength="50" id="txtColumnRuleToken" errorMessage="You must enter a Column Rule Token." value="" />
+                            <!--<input type="text" class="mkaRequired field-width-325" maxlength="50" id="txtColumnRuleToken" errorMessage="You must enter a Column Rule Token." value="" />-->
+                            <select id="ddlToken" class="mkaRequired field-width-325" errorMessage="You must select a Column Rule Token."></select>
                         </div>
                     </div>
 
@@ -289,6 +290,8 @@
             $("#txtColumnRuleId").val(mappingColumnRuleId);
             bIsNew = mappingColumnRuleId <= 0;
 
+            getRuleTokenList(-1, "");
+
             getScriptsList();
         }
     });
@@ -450,7 +453,9 @@
                         $("#ddlScript").prop('disabled', true).trigger('chosen:updated');
 
                         $("#txtColumnRuleDescription").val(obj["Rule Description"]);
-                        $("#txtColumnRuleToken").val(obj.Token);
+
+                        getRuleTokenList(obj.scriptId, obj.Token);
+
                         $("#chkRuleRequired").prop("checked", obj.Required);
                         $("#chkRejectRow").prop("checked", obj["Reject Row"]);
                         $("#chkPassMeansFail").prop("checked", obj["Pass Means Fail"]);
@@ -808,7 +813,7 @@
                 "inMappingColumnRuleId": mappingColumnRuleId,
                 "inScriptId": $("#ddlScript").val(),
                 "inDescription": $("#txtColumnRuleDescription").val(),
-                "inToken": $("#txtColumnRuleToken").val(),
+                "inToken": $("#ddlToken").val(),
                 "inRequired": $("#chkRuleRequired").is(':checked'),
                 "inRejectRow": $("#chkRejectRow").is(':checked'),
                 "inPassMeansFail": $("#chkPassMeansFail").is(':checked'),
@@ -887,7 +892,7 @@
 
             // Select
             if ($(eID).prop('tagName').toLowerCase() == "select") {
-                if ($(eID).val() == "-1") {
+                if ($(eID).val() == null || $(eID).val() == "-1") {
                     bootbox.alert(errorMessage, function () { });
                     loopBreak = false;
                     return false;
@@ -897,6 +902,77 @@
         });
 
         return loopBreak;
+
+    }
+
+    function getRuleTokenList(scriptId, tokenValue)
+    {
+
+        if (scriptId == -1)
+        {
+            //create ddl with just select value (-1) with no items
+            $("#ddlToken").html('');
+
+            var str = '';
+            str = '<option value="-1">-- Select a Token --</option>';
+            $("#ddlToken").html(str);
+            convertToChosenSelect('ddlToken', gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+            return;
+        }
+
+        if (!tokenValue)
+        {
+            tokenValue = "";
+        }
+
+        var control = "ddlToken";
+
+        var str = '';
+        
+        var sUrl = ServicePrefix + "/api/XrayImport/GetImportMappingColumnRuleTokenList?";
+        sUrl += "inApiToken=" + getLocalStorage("APIToken");
+        sUrl += "&inScriptId=" + scriptId;
+
+        $.ajax({
+            url: sUrl,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    $.each(data.report.rows, function (index) {
+
+                        str = '<option value="-1">-- Select a Token --</option>';
+                        $.each(data.report.rows, function (index) {
+
+                            str = str + '<option value="' + data.report.rows[index].Token + '">' + data.report.rows[index].Token + '</option>';
+
+                        });
+
+                    });
+
+                    $("#" + control).html(str);
+                    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    if (tokenValue.length > 0)
+                    {
+                        $("#" + control).val(tokenValue);
+                    } else
+                    {
+                        $("#" + control).val("-1");
+                    }
+                  
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
 
     }
 
