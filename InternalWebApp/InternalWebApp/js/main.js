@@ -1652,6 +1652,7 @@ function buildTechMenu(selectedItem) {
     menuItems += '                      </ul>';
     menuItems += '                  </li>';
 
+    menuItems += '                  <li style="display:block;"><a href="/Admin/TOTP/totpdevicelist.html?MenuItem=true">Admin Device Managment</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/Admin/TechTools/passedQAList.html?MenuItem=true">Passed QA List</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/techtools/encryptdecrypt.html?MenuItem=true">Encryption/Decryption Tool</a></li>';
 
