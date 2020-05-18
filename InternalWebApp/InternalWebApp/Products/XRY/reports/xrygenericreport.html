@@ -268,6 +268,17 @@
                             <label for="dtEndDate" class="dropdown-label auditEndDate rptView">End Date</label>
                             <input type="text" id="dtEndDate" class="auditEndDate rptView report-filter" style="max-width: 100px;" apiInput="inEndDate">
                         </div>
+
+                        <div class="form-group rptView auditFromYearPeriod">
+                            <label for="ddlFromYYYYMM" class="dropdown-label rptView auditFromYearPeriod">From Period</label>
+                            <select id="ddlFromYYYYMM" apiInput="inFromPeriodYYYYMM" class="dropdown-select rptView auditFromYearPeriod report-filter"></select>
+                        </div>
+
+                        <div class="form-group rptView auditToYearPeriod">
+                            <label for="ddlToYYYYMM" class="dropdown-label rptView auditToYearPeriod">To Period</label>
+                            <select id="ddlToYYYYMM" apiInput="inToPeriodYYYYMM" class="dropdown-select rptView auditToYearPeriod report-filter"></select>
+                        </div>
+
                         <div class="form-group col-md-3 rptButton" style="text-align: right">
                             <label for="btnReport" class="dropdown-label">&nbsp;</label>
                             <input type="button" id="btnReport" class="search-button" value="Show" onclick="getReport()" />
@@ -361,8 +372,11 @@
     var gHideHeader = null;
     var gMessageSubTitle = '';
 
+    var param_stationId = null;
+
     $(document).ready(function ()
     {
+        param_stationId = getParameterByName("stationId");
 
         gHideHeader = getParameterByName("hideHeader");
         $("#header-summary-section").hide();
@@ -692,6 +706,35 @@
 
     }
 
+    function getPeriodList_YYYYMM() {
+
+        var control = this.objectName;
+
+        var str = '';
+        str = '<option value="">-- Select a Period --</option>';
+
+        var thisYear = (new Date()).getFullYear();
+
+        for (var i = thisYear; i > (thisYear - 10) ; i--) {
+
+            for (var i2 = 12; i2 > 0; i2--) {
+
+                var period = i + '/' + addZero(i2);
+
+
+                str = str + '<option value="' + period + '">' + period + '</option>';
+            }
+        }
+
+        $("#" + control).html(str);
+
+        convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        saveLoadedControlSelection(control);
+
+
+    }
+
     //--------------------------------
     // Filters get loaded here
     //--------------------------------
@@ -841,7 +884,7 @@
                 else {
 
                     var str = '';
-                    str = '<option value="-1">-- Select an Industry --</option>';
+                    str = '<option value="">-- Select an Industry --</option>';
 
                     $.each(data.report.rows, function (index) {
 
@@ -918,7 +961,7 @@
         $("#ddlOwner").html('');
 
         var str = '';
-        str = '<option value="-1">-- Select an Owner --</option>';
+        str = '<option value="">-- Select an Owner --</option>';
         $("#ddlOwner").html(str);
         convertToChosenSelect('ddlOwner', gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
     }
@@ -1155,7 +1198,6 @@
                     if (bSilent == false) {
                         bootbox.alert(msg, function () { });
                     }
-                    //bootbox.alert(msg, function () { });
                     return false;
                 }
 
@@ -1543,7 +1585,7 @@
     {
         //console.log(industryId);
 
-        if (industryId == undefined || industryId === "-1") {
+        if (industryId == undefined || industryId === "-1" || industryId === "") {
             $("#ddlSubIndustry").html('');
             getDefaultSubIndustry();
             return;
@@ -1606,7 +1648,7 @@
 
     function getOwnerList(marketId)
     {
-        console.log("ownerlist market: " + marketId);
+        //console.log("ownerlist market: " + marketId);
 
         if (marketId == undefined || marketId == "") {
 
@@ -1636,7 +1678,7 @@
 
                     var str = '';
 
-                    $("#ddlOwner").html("<option value='-1'> -- Select an Owner --</option>");
+                    $("#ddlOwner").html("<option value=''> -- Select an Owner --</option>");
 
                     var holdOwnerID = "0";
 
@@ -1823,6 +1865,60 @@
                 activateFilter(objectValue);
             }
             
+        });
+
+    }
+
+    function getStationListByGeneralFilters(marketId, ownerId)
+    {
+
+        var control = this.objectName;
+
+        var str = '';
+        str = '<option value="">-- Select a Station --</option>';
+        $("#" + control).html(str);
+
+        $.ajax({
+            url: ServicePrefix + '/api/Station/GetStationListByGeneralFilters',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProduct": null,
+                "inMarketId": marketId,
+                "inOwnerId": ownerId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    $.each(data.report.rows, function (index) {
+                        str = str + '<option value="' + data.report.rows[index]["Station Id"] + '">' + data.report.rows[index].Station + '</option>';
+                    });
+
+                    $("#" + control).append(str);
+
+                    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    saveLoadedControlSelection(control);
+
+                    if (!param_stationId == false && param_stationId.length > 0) {
+                        $("#" + control).val(param_stationId);
+                    }
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
         });
 
     }
