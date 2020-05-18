@@ -49,7 +49,12 @@
     <!--[if lt IE 9]>
     <script src="js/respond.min.js"></script>
     <![endif]-->
-
+    <style>
+        select
+        {
+            width: 240px!important;
+        }
+    </style>
 
 </head>
 <body>
@@ -64,7 +69,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 text-center col-md-offset-3 fh5co-heading">
-                        <h2>Import Acct Rev Validation Type</h2>
+                        <h2>Import Script Setup</h2>
                     </div>
                 </div>
                 <div id="divQuickReport">
@@ -75,18 +80,24 @@
                 <!-- search / filter area -->
                 <div class="search-section">
                     <div class="row ">
-                        <div class="col-md-9">
-                            <label for="ddlOwner" class="filterLabel">Owner</label>
+                        <div class="col-md-3">
+                            <label for="ddlOwner" class="filterLabel">Owner</label><br />
                             <select id="ddlOwner" class="filterControl report-filter"></select>
-                            <label for="ddlScript" class="filterLabel">Script</label>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="ddlScript" class="filterLabel">Script</label><br />
                             <select id="ddlScript" class="filterControl report-filter"></select>
-                            <label for="ddlStation" class="filterLabel">Station</label>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="ddlStation" class="filterLabel">Station</label><br />
                             <select id="ddlStation" class="filterControl report-filter"></select>
                         </div>
                         <div class="col-md-2 text-align-right">
+                            <label>&nbsp;</label><br />
                             <input type="button" value="Show" onclick="getAcctRevValidationTypeList();" />
                         </div>
                         <div class="col-md-1">
+     
                             <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="" />
                         </div>
                     </div>
@@ -99,7 +110,7 @@
                                 <th class="exportColumn">Owner</th>
                                 <th class="exportColumn">Import Script</th>
                                 <th class="exportColumn">Station</th>
-                                <th class="exportColumn">Status</th>
+                                <th class="exportColumn text-align-center">Status</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -306,7 +317,7 @@
     }
 
     function setDataTable() {
-        var reportTitle = "Import Acct Rev Validation Type";
+        var reportTitle = "Import Script Setup";
         var exportColumns = returnTableColumnsByClass("dtAcctRevValidationTypeList", "exportColumn");
 
         $("#dtAcctRevValidationTypeList").DataTable({
@@ -317,8 +328,13 @@
                 { "data": 'Owner' },
                 { "data": 'Import Script' },
                 { "data": 'Station' },
-                { "data": 'Status'},
-                { "data": '' }
+                { "data": 'Status',
+                    "className": "text-align-center"
+                },
+                {
+                    "data": '',
+                    "className": "text-align-center"
+                }
             ],
             "select": true,
             language: {
@@ -412,19 +428,32 @@
         columns = new Array();
 
         columns.push(
-                { "data": 'Owner' },
+                {
+                    mRender: function (data, type, row) {
+                        var str = buildOwnerWrapper(row["Owner"]);
+                        return str;
+                    },
+                },
                 { "data": 'Import Script' },
-                { "data": 'Station' },
-                { "data": 'Status' },
+                {
+                    mRender: function (data, type, row) {
+                        var str = buildStationWrapper(row["Station"]) ;
+                        return str;
+                    },
+                },
+                {
+                    "data": 'Status',
+                    "className": "text-align-center"
+                },
             {
                 mRender: function (data, type, row) {
                     var str = '';
-                    str = str + '<a href="#" onclick="viewAcctRevValidationType(\'' + row["OwnerId"] + '\', ' + '\'' + row["StationId"] + '\'' + ')">View</a>&nbsp;<a href="#" onclick="deleteAcctRevValidationType(' + row["ID"] + ')">Delete</a>';
+                    str = str + '<a href="#" onclick="viewAcctRevValidationType(\'' + row["OwnerId"] + '\', ' + '\'' + row["StationId"] + '\'' + ')">View</a><br><a href="#" onclick="deleteAcctRevValidationType(' + row["ID"] + ')">Delete</a>';
                     return str;
                 },
                 "orderable": false,
                 "searchable": false,
-                "className": "text-align-right"
+                "className": "text-align-center"
             });
 
         loadResults(dataObj, columns, dataTable);
