@@ -296,6 +296,8 @@ reportName.push("rptTimeSalesVsAllRepBillingStations");
 
 reportName.push("rptPersonnelGroupList");
 
+reportName.push("rptAdvertiserByCategory");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -11635,6 +11637,118 @@ function getReportObject_PersonnelGroupList() {
         columnsToDisplay: columnsToDisplay,
         product: ['personnel'],
         sortable: true
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_AdvertiserByCategory()
+{
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    //market required
+    arrayObject = {
+        token: "Market",
+        jsCall: "getXRYMarketList",
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    //station
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationListByGeneralFilters",
+        objectName: "ddlStation",
+        reloadBasedMarket: true,
+        reloadBasedOwner: false,
+        reloadBasedProduct: false,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    //arrayObject = {
+    //    token: "Station",
+    //    jsCall: "getXrayStationList",
+    //    objectName: "ddlStation",
+    //    required: false
+    //}
+    //arrayFilters.push(arrayObject);
+   
+
+    //market advertiser name
+    arrayObject = {
+        token: "MarketAdvertiserName",
+        jsCall: null,
+        objectName: "txtMarketAdvertiserName",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    //industry/category required
+    arrayObject = {
+        token: "Industry",
+        jsCall: "getIndustryList",
+        objectName: "ddlIndustry",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    //sub industry/sub category
+    arrayObject = {
+        token: "SubIndustry",
+        jsCall: "getSubIndustryList",
+        objectName: "ddlSubIndustry",
+        reloadBasedIndustry: true,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    //owner update based on market
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerList",
+        objectName: "ddlOwner",
+        reloadBasedMarket: true,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    //yyyymm from period required
+    arrayObject = {
+        token: "FromYearPeriod",
+        jsCall: "getPeriodList_YYYYMM",
+        objectName: "ddlFromYYYYMM",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_AdvertiserByCategory() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Advertiser");
+    columnsToDisplay.push("Agency");
+    columnsToDisplay.push("Industry");
+    columnsToDisplay.push("Revenue");
+
+    tempObject =
+    {
+        reportTitle: "Advertisers By Category Summary",
+        apiControllerAction: "/api/XRAYRevenue/GetAdvertiserByCategorySummary",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry', 'advertiser', 'XRY Data Review'],
+        sortable: true,
+        reportPath: "/Products/XRY/reports/xrygenericreport.html"
 
     }
 
