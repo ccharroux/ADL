@@ -294,9 +294,6 @@ var navTool = {
 
 $(document).ready(function ()
 {
-    // resolve conflict between Bootstrap and jQuery UI, see https://thedesignspace.net/jquery-dialog-missing-x-from-close-button/?cn-reloaded=1
-    var bootstrapButton = $.fn.button.noConflict()
-    $.fn.bootstrapBtn = bootstrapButton;
 
     $(document).ajaxSuccess(function () {
         gAJAXError = false;
