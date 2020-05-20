@@ -1373,6 +1373,7 @@ function buildTVBMenu(selectedItem) {
     menuItems += '<ul class="dropdown-menu" role="menu">';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirm.html?MenuItem=true">Time Sales</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirmrepfirm.html?MenuItem=true">Rep Firm</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirmrepbillingestimate.html?MenuItem=true">Estimate (Kantar)</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += productDashboard('');
