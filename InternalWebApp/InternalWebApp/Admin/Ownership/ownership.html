@@ -95,6 +95,8 @@
 
                     </div>
                     <!-- Media Type -->
+                    <input type="hidden" id="hdnMediaType" value="" />
+
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="ddlMediaType">Media Type</label>
@@ -503,6 +505,18 @@
 
     function enableOwnerProduct(productId) {
 
+        //check for TVB
+        if (productId.toUpperCase() == 'TVB') {
+
+            var mediaType = $("#hdnMediaType").val();
+
+            if (mediaType.toUpperCase() != gMediaTypeTelevision.toUpperCase()) {
+                bootbox.alert("You cannot activate TVB for this ownership. An ownership's media type must be Television to be compatible for TVB.");
+                return;
+            }
+
+        }
+
         enablingProduct = productId.toUpperCase();
 
         var url = ServicePrefix + '/api/Owner/UpdateOwnerProduct';
@@ -716,6 +730,10 @@
                         $("#txtEmailAddress").val(obj["Email Address"]);
 
                     });
+
+                    //setting hidden media type for tvb guard against non tv ownerships
+                    $("#hdnMediaType").val($("#ddlMediaType option:selected").text());
+
 
                 }
             },
