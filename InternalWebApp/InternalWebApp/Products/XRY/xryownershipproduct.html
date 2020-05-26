@@ -190,7 +190,7 @@
 
             $("#ddlDataInput").html(str);
             convertToChosenSelect("ddlDataInput", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
+            getOwnerDataInput();
         }
 
     }
@@ -227,6 +227,48 @@
             bootbox.alert("Xray has been enabled successfully.", function () {
                 
             });
+        }
+    }
+
+    function getOwnerDataInput() {
+
+        if (ownerId <= 0) {
+            return;
+        }
+
+        var url = ServicePrefix + '/api/DataInput/GetOwnerDataInput'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inOwnerId=' + ownerId
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOwnerDataInputSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function getOwnerDataInputSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+
+            $.each(data.report.rows, function (index) {
+                var obj = data.report.rows[index];
+
+                $("#ddlDataInput").val(obj["DataInputID"]);
+
+            });
+
+
         }
     }
 
