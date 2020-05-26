@@ -67,6 +67,10 @@
         <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
 
+                <!--Hidden Inputs-->
+                <input type="hidden" id="hdnOwner" value="" />
+                <input type="hidden" id="hdnMediaType" value="" />
+
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
                         <h2>Ownership</h2>
@@ -334,6 +338,8 @@
         $("#hidOwnerId").val(ownerID == '0' ? 'NEW' : ownerID);
         $("#txtOwnerID").val(ownerID);
 
+        removeProductLocalStorage()
+
         getStateList();
         //getMediaTypes();
 
@@ -344,6 +350,7 @@
         //=>getOwnerProducts();
         //=>getOwner();
 
+        cleanupBackButton();
         loadFeatureButtons();
     });
 
@@ -480,6 +487,10 @@
                     var bReloadPage = false;
                     var obj = data.report.rows[0];
 
+                    //reset hidden values on success of update
+                    $("#hdnMediaType").val($("#ddlMediaType option:selected").text());
+                    $("#hdnOwner").val($("#txtOwnerName").val());
+
                     if ($("#txtOwnerID").val() === "0") {
                         bReloadPage = true;
                         $("#txtOwnerID").val(obj._updateStatus);
@@ -502,6 +513,30 @@
     }
 
     function enableOwnerProduct(productId) {
+
+        //check for TVB
+        if (productId.toUpperCase() == 'TVB') {
+
+            var mediaType = $("#hdnMediaType").val();
+
+            if (mediaType.toUpperCase() != gMediaTypeTelevision.toUpperCase()) {
+                bootbox.alert("You cannot activate TVB for this ownership. An ownership's media type must be Television to be compatible for TVB.");
+                return;
+            }
+
+        }
+
+        if (productId.toUpperCase() == 'XRY') {
+            goToXRYProductPage();
+            return;
+        }
+
+        updateOwnerProduct(productId);
+
+    }
+
+    function updateOwnerProduct(productId) {
+        excludeFromBackButton();
 
         enablingProduct = productId.toUpperCase();
 
@@ -581,7 +616,8 @@
                         str = str + '<div id="date' + productId + '" />';
                         str = str + '</div>';
                         str = str + '<div id="productButtons' + productId + '" class="col-md-6" style="text-align:left;">';
-                        str = str + '<input type="button" id="productAdd' + productId + '" style="margin-right:3px;margin-left:3px;" class="" onClick="excludeFromBackButton(); enableOwnerProduct(' + '\'' + productId + '\');" Value="Enable" />';
+                        str = str + '<input type="button" id="productAdd' + productId + '" style="margin-right:3px;margin-left:3px;" class="" onClick="enableOwnerProduct(' + '\'' + productId + '\');" Value="Enable" />';
+                        str = str + '<input type="button" id="productEdit' + productId + '" stye="margin-right:3px;margin-left:3px;" class="hidden" onClick="editProduct(\'' + productId + '\')" Value="Edit" />';
                         str = str + '<input type="button" id="productDisable' + productId + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="excludeFromBackButton(); disableOwnerProduct(' + '\'' + productId + '\');" Value="Disable" />';
                         str = str + '</div>';
                         str = str + '</div>';
@@ -633,6 +669,12 @@
                         var productId = obj.OP_ProductID.toUpperCase();
 
                         if (obj.OP_DisableDate == null) {
+
+                            //Edit button is currently only for XRY
+                            if (productId.toUpperCase() == 'XRY') {
+                                $("#productEdit" + productId).removeClass("hidden");
+                            }
+
                             $("#productAdd" + productId).addClass("hidden");
                             $("#productDisable" + productId).removeClass("hidden");
                             $("#date" + productId).html(extractDateOnly(obj.OP_ActiveDate));
@@ -643,6 +685,7 @@
                             $("#productAdd" + productId).removeClass("hidden");
                             $("#date" + productId).html(extractDateOnly(obj.OP_DisableDate));
                             $("#date" + productId).css("color", "red");
+
                         }
 
                     });
@@ -716,6 +759,11 @@
                         $("#txtEmailAddress").val(obj["Email Address"]);
 
                     });
+
+                    //setting hidden media type for tvb guard against non tv ownerships
+                    $("#hdnMediaType").val($("#ddlMediaType option:selected").text());
+                    
+                    $("#hdnOwner").val($("#txtOwnerName").val());
 
                 }
             },
@@ -854,5 +902,30 @@
             getFeatureButtons("ownerid", ownerID);
         }
     }
+
+    function setProductLocalStorage() {
+        setLocalStorage("tempOwnerName", $("#hdnOwner").val());
+        setLocalStorage("tempOwnerMediaType", $("#hdnMediaType").val());
+
+    }
+
+    function removeProductLocalStorage() {
+        removeLocalStorage("tempOwnerName");
+        removeLocalStorage("tempOwnerMediaType");
+    }
+
+    function editProduct(productId) {
+        //product should only be XRY at the moment
+        if (productId.toUpperCase() == 'XRY') {
+            goToXRYProductPage();
+        }
+    }
+
+    function goToXRYProductPage() {
+        setProductLocalStorage();
+        window.location = '/products/xry/xryownershipproduct.html?OwnerId=' + ownerID;
+    }
+
+
 </script>
 

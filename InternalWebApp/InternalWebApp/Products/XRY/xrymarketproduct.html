@@ -129,20 +129,24 @@
                             <label>Cluster Exclusivity</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="radio" id="rdCluster" value="Cluster" name="clusterExclusivity" />
+                            <input type="radio" id="rdCluster" onclick="setMinEntities(this);" value="Cluster" name="clusterExclusivity" />
                             <label for="rdCluster">Cluster</label>
-                            <input type="radio" id="rdStation" value="Station" name="clusterExclusivity" checked />
+                            <input type="radio" id="rdStation" onclick="setMinEntities(this);" value="Station" name="clusterExclusivity" checked />
                             <label for="rdStation">Station</label>
                         </div>
                     </div>
-
+                    <!-- 
+                    if station show check box for exclusivity and dropdown with 2 and 3
+                    also, how do we show no exclusivity in the database for a market??
+                     -->
                     <!--Miminum Entities YTD-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtMinEntities">Min. Entities YTD</label>
+                            <label for="ddlMinEntities">Min. Entities YTD</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" id="txtMinEntities" value="0" class="mkaRequired field-width-325" errorMessage="You must enter a Minimum Entities YTD."/>
+                            <!--<input type="text" id="txtMinEntities" value="0" class="mkaRequired field-width-325" errorMessage="You must enter a Minimum Entities YTD."/>-->
+                            <select id="ddlMinEntities" class="mkaRequired field-width-325" errorMessage="You must enter a Minimum Entities YTD."></select>
                         </div>
                     </div>
 
@@ -187,8 +191,8 @@
                             <input type="checkbox" id="chkAccTypeAvail" />
                         </div>
                     </div>                    
-
-                    <!--Revenue Type Availability-->
+            
+                <!--Revenue Type Availability-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="chkRevTypeAvail">Revenue Type In Prod</label>
@@ -197,8 +201,20 @@
                             <input type="checkbox" id="chkRevTypeAvail" disabled />
                         </div>
                     </div>
-                  
-                    <!--Parnter List-->
+                
+                <!--
+                    Add dropdown list with years/periods    
+                -->
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="ddlFirstYearPeriod">First Year/Period Available</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <select id="ddlFirstYearPeriod" class="mkaRequired field-width-325" errorMessage="You must select a First Year/Period Available."></select>
+                        </div>
+                    </div>    
+
+                <!--Parnter List-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="ddlPartnerList">Partner</label>
@@ -352,6 +368,8 @@
             $("#chkMarketOnHold").prop("checked", true);
         }
 
+        getPeriodList_YYYYMM();
+        getMinimumEntityList();
 
         getMarket();
 
@@ -603,8 +621,9 @@
                 str = str + '<input type="checkbox" class="associatedMarkets" id="chk' + data.report.rows[index].marketId + '" data-marketid="' + data.report.rows[index].marketId + '">'
                 str = str + '<label for="chk' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName.trim() + '</label></div>'
             });
-            if (cntr == 0) {
-                str = str + "No other markets available."
+            if (cntr == 0)
+            {
+                str = str + "No other markets available.";
             }
             $("#selectLimited").html(str);
 
@@ -728,10 +747,13 @@
 
                 if (obj["exclusivityMethod"].toLowerCase() == "cluster") {
                     $("#rdCluster").prop("checked", true);
+                    $("#ddlMinEntities").prop("disabled", true).trigger("chosen:updated");
                 } else {
                     $("#rdStation").prop("checked", true);
                 }
-                $("#txtMinEntities").val(obj["minimumStationsYTD"]);
+                //$("#txtMinEntities").val(obj["minimumStationsYTD"]);
+                $("#ddlMinEntities").val(obj["minimumStationsYTD"]);
+
                 $("#txtMinMarketShare").val(obj["minimumShareYTD"]);
                 $("#txtMaxMarketShare").val(obj["maximumShareYTD"]);
                 $("#txtNewsRevMinimum").val(obj["minimumNewspaperRevenue"]);
@@ -740,8 +762,9 @@
                 $("#hdnQueryCutOff").val(obj["queryCutOff"]);
                 $("#hdnNumberPriorYears").val(obj["numberPriorYears"]);
                 $("#chkAccTypeAvail").prop("checked", (obj["accountTypeAvailableInProduction"] == true ? true : false));
+                $("#ddlFirstYearPeriod").val(obj["accountTypeFirstYearAvailable"]);
                 $("#chkRevTypeAvail").prop("checked", (obj["revenueTypeAvailableInProduction"] == true ? true : false));
-              
+
                 $("#lblMarketNielsenSetup").html(obj["Nielsen Market"]);
 
 
@@ -806,7 +829,7 @@
 
         var marketIdList = [];
         var queryCutOff = null;
-        var numberPriorYears = null;
+        var numberPriorYears = 5;
         var newsMinRev = 0;
 
         if ($("#rdAll").prop("checked")) {}
@@ -871,7 +894,9 @@
                 "inSubmittingPeriodId": $("#ddlSubmittingFrequency").val().trim(),
                 "inMarketOnHold": $("#chkMarketOnHold").prop("checked"),
                 "inOtherMarketIdList": marketIdList,
-                "inMinimumStationsYTD": $("#txtMinEntities").val().trim(),
+                //change this to use the ddl value
+                "inMinimumStationsYTD": $("#ddlMinEntities").val(),
+                //"inMinimumStationsYTD": $("#txtMinEntities").val().trim(),
                 "inMinimumShareYTD": $("#txtMinMarketShare").val().trim(),
                 "inMaximumShareYTD": $("#txtMaxMarketShare").val().trim(),
                 "inMinimumNewspaperRevenue": $("#txtNewsRevMinimum").val().trim(),
@@ -879,10 +904,13 @@
                 "inVersion": 5,
                 "inQueryCutOff": queryCutOff,
                 "inExclusivityMethod": $("input[name=clusterExclusivity]:checked").val().trim(),
-                "inNumberPriorYears": numberPriorYears,
+                //dev--7053 default to 5 if less than 5
+                "inNumberPriorYears": numberPriorYears < 5 ? 5 : numberPriorYears, 
                 "inAccountTypeBreakdownAvailable": $("#chkAccTypeAvail").prop("checked"),
                 "inRevenueTypeBreakdownAvailable": $("#chkRevTypeAvail").prop("checked"),
-                "inNielsenDate" : nielsenDate
+                "inNielsenDate": nielsenDate,
+                //need to pass in first period available date to api and procs
+                "inFirstYearAvailable": $("#ddlFirstYearPeriod").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -1001,7 +1029,7 @@
             }
 
             if ($(eID).prop('tagName').toLowerCase() == "select") {
-                if ($(eID).val() == "-1") {
+                if ($(eID).val() == null || $(eID).val() == "-1") {
                     bootbox.alert(errorMessage, function () { });
                     loopBreak = false;
                     return false;
@@ -1023,6 +1051,55 @@
         else {
 
             window.location = "/admin/nielsenmarketname/nielsenmarketname.html?marketID=" + marketId;
+        }
+    }
+
+    function getPeriodList_YYYYMM() {
+
+        var control = "ddlFirstYearPeriod";
+
+        var str = '';
+        str = '<option value="-1">-- Select a Period --</option>';
+
+        var thisYear = (new Date()).getFullYear();
+
+        for (var i = thisYear; i > (thisYear - 10) ; i--) {
+
+            for (var i2 = 12; i2 > 0; i2--) {
+
+                var period = i + '/' + addZero(i2);
+                var value = i + addZero(i2);
+
+                str = str + '<option value="' + value + '">' + period + '</option>';
+            }
+        }
+
+        $("#" + control).html(str);
+
+        convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+    }
+
+    function getMinimumEntityList()
+    {
+        var str = '';
+        str += '<option value="-1">-- Select Number of Entities --</option>';
+        str += '<option value="2">2</option>';
+        str += '<option value="3">3</option>';
+
+        $("#ddlMinEntities").html(str);
+        convertToChosenSelect("ddlMinEntities", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+    }
+
+    function setMinEntities(option)
+    {
+        if (option.value.toLowerCase() == "cluster")
+        {
+            $("#ddlMinEntities").val(2);
+            $("#ddlMinEntities").prop("disabled", true).trigger("chosen:updated");
+        } else
+        {
+            $("#ddlMinEntities").prop("disabled", false).trigger("chosen:updated");
         }
     }
 
