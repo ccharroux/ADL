@@ -1366,7 +1366,8 @@ function buildTVBMenu(selectedItem) {
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbmarketdelivery.html?MenuItem=true">Report Delivery</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetailrepbilling.html?MenuItem=true">Edit Rep Billing</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetail.html?MenuItem=true">Edit Time Sales</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbestimates.html?MenuItem=true">Estimates</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbestimates.html?MenuItem=true">TS Estimates</a></li>';
+ 
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrepfirmstationmappinglist.html?MenuItem=true">Rep Station Mapping</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
@@ -1375,6 +1376,7 @@ function buildTVBMenu(selectedItem) {
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirm.html?MenuItem=true">Time Sales</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirmrepfirm.html?MenuItem=true">Rep Firm</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirmrepbillingestimate.html?MenuItem=true">Estimate (Kantar)</a></li>';
+ 
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += productDashboard('');
