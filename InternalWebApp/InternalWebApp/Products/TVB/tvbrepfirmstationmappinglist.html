@@ -48,6 +48,7 @@
     <script src="js/respond.min.js"></script>
     <![endif]-->
     <style>
+
         .filterLabel {
             margin-left: 10px;
             /*margin-right: 5px;*/
@@ -92,6 +93,11 @@
             top: 265px;
             right: 80px;
             z-index: 0;
+        }
+
+          #dtRepFirmStationMapping_length select
+        {
+            min-width: 0!important;
         }
     </style>
 </head>
@@ -152,19 +158,10 @@
                                 <th class="exportColumn">Rep Firm Call Letters</th>
                                 <th class="exportColumn">Market</th>
                                 <th class="exportColumn">Owner</th>
-                                <th></th>
+                                <th class="text-align-center"></th>
                             </tr>
                         </thead>
-                        <!--<tfoot>
-                            <tr>
-                                <th>Rep Firm</th>
-                                <th>Station</th>
-                                <th>Rep Firm Call Letters</th>
-                                <th>Market</th>
-                                <th>Owner</th>
-                                <th></th>
-                            </tr>
-                        </tfoot>-->
+
                     </table>
                 </div>
                 <!-- end datatable -->
@@ -173,7 +170,7 @@
         <!--<div id="map" data-animate-effect="fadeIn"></div>-->
     </div>
     <div id="addRepFirmStationMappingDialog" style="display:none">
-        <div class="row">
+        <div class="row" style="margin-top:3px">
             <div class="col-md-4 text-align-left">
                 Rep Firm
             </div>
@@ -181,7 +178,7 @@
                 <select id="ddlEditRepFirm" class="report-filter disableForEdit" onchange="getEditStationList();"></select>
             </div>
         </div>
-        <div class="row">
+        <div class="row" style="margin-top:3px">
             <div class="col-md-4 text-align-left">
                 Station
             </div>
@@ -189,15 +186,15 @@
                 <select id="ddlEditStation" class="report-filter disableForEdit" onchange="getStation();"></select>
             </div>
         </div>
-        <div class="row">
+        <div class="row" style="margin-top:3px">
             <div class="col-md-4 text-align-left">
                 Rep Firm's Call Letters
             </div>
             <div class="col-md-8 text-align-left">
-                <input type="text" maxlength="100" class="mkaRequired" id="txtRepFirmCallLetters" errorMessage="You must enter the rep firm's call letters'." />
+                <input type="text" style="width:225px;" maxlength="100" class="mkaRequired" id="txtRepFirmCallLetters" errorMessage="You must enter the rep firm's call letters'." />
             </div>
         </div>
-        <div class="row">
+        <div class="row" style="margin-top:3px">
             <div class="col-md-4 text-align-left">
                 Market
             </div>
@@ -205,7 +202,7 @@
                 <span id="spanMarket"></span>
             </div>
         </div>
-        <div class="row">
+        <div class="row" style="margin-top:3px">
             <div class="col-md-4 text-align-left">
                 Owner
             </div>
@@ -213,14 +210,14 @@
                 <span id="spanOwner"></span>
             </div>
         </div>
-        <div class="row">
+        <div class="row" style="margin-top:3px">
             <div class="col-md-12">
                 <hr />
             </div>
         </div>
         <div class="row">
             <div class="col-md-12 text-align-center">
-                <input type="button" id="btnAddDialogSave" onclick="addDialogSave();" value="Save" />
+                <input type="button" id="btnAddDialogSave" onclick="addDialogSave();" value="Save" />&nbsp;&nbsp;
                 <input type="button" id="btnAddDialogClose" onclick="addDialogClose();" value="Close" />
             </div>
         </div>
@@ -280,9 +277,9 @@
 
         clearSearchButtonSetup();
 
-        buildMainMenu("RepFirmStationMapping");
+        buildTVBMenu("Revenue");
 
-        buildQuickReports(['repfirmstationmapping']);
+        buildQuickReports(['tvb']);
 
         // Reset this variable
         //setLocalStorage("quickReportQS", null);
@@ -296,9 +293,9 @@
             autoOpen: false,
             resizable: false,
             width: 700,
-            height: 450,
+            height: 350,
             modal: true,
-            title: 'Event',
+            title: '',
             create: function (event, ui) {
                 $(event.target).parent().css('position', 'fixed');
             }
@@ -554,10 +551,25 @@
             ],
             "columns": [
                 { "data": 'RepFirmName' },
-                { "data": 'StationName' },
+                {
+                    mRender: function (data, type, row) {
+
+                        return buildStationWrapper(row["StationName"]);
+                    }
+                },
                 { "data": 'RepFirmCallLetters' },
-                { "data": 'MarketName' },
-                { "data": 'OwnerName' },
+                {
+                    mRender: function (data, type, row) {
+
+                        return buildMarketWrapper(row["MarketName"]);
+                    }
+                },
+                {
+                    mRender: function (data, type, row) {
+ 
+                        return buildOwnerWrapper(row["OwnerName"]);
+                    }
+                },
                 {
                     mRender: function (data, type, row) {
                         var repFirmId = row["RepFirmID"];
@@ -567,11 +579,11 @@
                         var repFirmCallLetters = encodeURIComponent(row["RepFirmCallLetters"]);
                         var RepFirmStationMappingDescription = row["RepFirmStationMappingDescription"];
                         return '<a href="#" onclick="addRepFirmStationMapping(' + repFirmId + ',' + stationId + ',\'' + repFirmCallLetters + '\')">Edit</a>'
-                            + ' <a href="#" onclick="deleteRepFirmStationMapping(' + repFirmId + ',' + stationId + ',\'' + repFirmName + '\',\'' + stationName +  '\')">Delete</a>';
+                            + '&nbsp;&nbsp;&nbsp;<a href="#" onclick="deleteRepFirmStationMapping(' + repFirmId + ',' + stationId + ',\'' + repFirmName + '\',\'' + stationName + '\')">Delete</a>';
                     },
                     "orderable": false,
                     "searchable": false,
-                    "className": "text-align-left"
+                    "className": "text-align-center"
                 }
             ],
             "pagingType": "full_numbers",
@@ -913,7 +925,7 @@
         var repFirmNameDecoded = decodeURIComponent(repFirmName);
         var stationNameDecoded = decodeURIComponent(stationName);
 
-        bootbox.confirm("Delete this rep firm station mapping? (" + repFirmNameDecoded + " / " + stationNameDecoded + ")", function (result) {
+        bootbox.confirm("Are you sure you want to Delete this rep firm station mapping? (" + repFirmNameDecoded + " / " + stationNameDecoded + ")", function (result) {
             if (result) {
                 deleteRepFirmStationMappingConfirmed(repFirmId, stationId);
             }

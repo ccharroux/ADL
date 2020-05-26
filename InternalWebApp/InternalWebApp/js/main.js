@@ -1367,6 +1367,7 @@ function buildTVBMenu(selectedItem) {
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetailrepbilling.html?MenuItem=true">Edit Rep Billing</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetail.html?MenuItem=true">Edit Time Sales</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbestimates.html?MenuItem=true">Estimates</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrepfirmstationmappinglist.html?MenuItem=true">Rep Station Mapping</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Confirm") + ' href="" role="button" aria-expanded="false">Confirm <span style="margin-right:10px;" class="caret"></span></a>';
