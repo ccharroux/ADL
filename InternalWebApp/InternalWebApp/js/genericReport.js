@@ -4782,7 +4782,8 @@ function getReportObject_MRRRevenueEntryMissingList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Data Review'],
-        autoUpdate: true
+        autoUpdate: true,
+        approved: true
     }
 
     return tempObject;
