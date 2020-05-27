@@ -1203,7 +1203,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += '                          <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=media&MenuItem=true">Media Matching</a></li>';
     menuItems += '                      </ul>';
     menuItems += '                  </li>';
-    menuItems += '        <li style="display:block;"><a href="/products/xry/xryreportstatus.html?MenuItem=true">Report Status</a></li>';
+    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xryreportstatus.html?MenuItem=true">Report Status</a></li>';
 
     menuItems += '</ul>';
     menuItems += '</li>';
