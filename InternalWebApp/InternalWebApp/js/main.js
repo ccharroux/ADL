@@ -1203,7 +1203,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += '                          <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=media&MenuItem=true">Media Matching</a></li>';
     menuItems += '                      </ul>';
     menuItems += '                  </li>';
-
+    menuItems += '        <li style="display:block;"><a href="/products/xry/xryreportstatus.html?MenuItem=true">Report Status</a></li>';
 
     menuItems += '</ul>';
     menuItems += '</li>';
@@ -1918,6 +1918,11 @@ function resetDataTableDOM(tableToDestroyId, divOfTableId, classOfTable) {
 
 function buildMarketWrapper(inData) {
 
+    if (!inData)
+    {
+        return "";
+    }
+
     var ret = inData;
 
     // find parens
@@ -1951,6 +1956,10 @@ function buildMarketWrapper(inData) {
     return ret;
 }
 function buildUserWrapper(inData) {
+
+    if (!inData) {
+        return "";
+    }
 
     var bIDIncluded = false;
 
@@ -1986,6 +1995,11 @@ function buildUserWrapper(inData) {
 }
 function buildStationWrapper(inData) {
 
+    if (!inData)
+    {
+        return "";
+    }
+
     var ret = inData;
 
     // find parens
@@ -2018,6 +2032,11 @@ function buildStationWrapper(inData) {
 }
 function buildOwnerWrapper(inData) {
 
+    if (!inData)
+    {
+        return "";
+    }
+
     var ret = inData;
 
     // find parens
@@ -2039,7 +2058,7 @@ function buildOwnerWrapper(inData) {
         if (ID.length > 0) {
             if (isNaN(ID) == false) {
                 ret = "<a href='#' onclick='window.location=\"/admin/ownership/ownership.html?ownerId=" + ID + "\"'>";
-                ret = ret + inData
+                ret = ret + inData;
                 ret = ret + "</a>";
             }
         }
@@ -2049,6 +2068,11 @@ function buildOwnerWrapper(inData) {
     return ret;
 }
 function buildAgencyWrapper(inData) {
+
+    if (!inData)
+    {
+        return "";
+    }
 
     var ret = inData;
 
@@ -2081,6 +2105,10 @@ function buildAgencyWrapper(inData) {
     return ret;
 }
 function buildAdvertiserWrapper(inData) {
+
+    if (!inData) {
+        return "";
+    }
 
     var ret = inData;
 
