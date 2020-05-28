@@ -1191,6 +1191,7 @@ function buildXRYMenu(selectedItem) {
 
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
+    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xryreportstatus.html?MenuItem=true">Report Status</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/xry/xryrelease.html?MenuItem=true">Release</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/xry/xryreminders.html?MenuItem=true">Reminders</a></li>';
     menuItems += '        <li style="display:block;"><a href="/products/xry/xryownershipmappinglist.html?MenuItem=true">Ownership Mapping</a></li>';
@@ -1203,7 +1204,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += '                          <li style="display:block;"><a href="/products/xry/revenue/xrymatch.html?MatchPage=media&MenuItem=true">Media Matching</a></li>';
     menuItems += '                      </ul>';
     menuItems += '                  </li>';
-    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xryreportstatus.html?MenuItem=true">Report Status</a></li>';
+
 
     menuItems += '</ul>';
     menuItems += '</li>';
@@ -2958,5 +2959,13 @@ function doesUserHaveAccessToFeature(inToken)
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+ 
+}
+function widerReport()
+{
+
+ 
+    $('th').attr('style', 'font-size:12px !important');
+ 
  
 }
