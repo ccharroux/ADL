@@ -3171,7 +3171,8 @@ function getReportObject_MRRMarketStationRelease() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Data Review', 'mrr delivery'],
-        sortable: true
+        sortable: true,
+        approved: true
     }
 
     return tempObject;
@@ -3342,7 +3343,8 @@ function getReportObject_TVBMarketRelease() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb'],
-        sortable: true
+        sortable: true,
+        approved: true
     }
 
     return tempObject;
@@ -4274,7 +4276,8 @@ function getReportObject_MultipleOwnersPerUser() {
         apiControllerAction: "/api/PersonnelReport/GetMultipleOwnersPerUserList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['personnel']
+        product: ['personnel'],
+        approved: true
     }
 
     return tempObject;
@@ -8124,7 +8127,8 @@ function getReportObject_MRRModeUsageSummary()
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr'],
-        sortable: false
+        sortable: false,
+        approved: true
 
     }
 
@@ -8523,7 +8527,8 @@ function getReportObject_ImpersonationLogList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['misc', 'personnel','tech', 'qa'],
-        sortable: false
+        sortable: false,
+        approved: true
 
     }
 
@@ -9689,7 +9694,8 @@ function getReportObject_MRRStationSubmissionStatusByMarket() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['market', 'station', 'mrr'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 
@@ -10411,7 +10417,8 @@ function getReportObject_InactiveStationAssignmentList() {
         apiControllerAction: "/api/PersonnelReport/GetInactiveStationAssignmentList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['personnel']
+        product: ['personnel'],
+        approved: true
     }
 
     return tempObject;
@@ -10932,7 +10939,8 @@ function getReportObject_UsersNotLoggedInAfterDateList()
         apiControllerAction: "/api/PersonnelReport/GetUsersNotLoggedInSinceList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['personnel']
+        product: ['personnel'],
+        approved: true
     }
 
     return tempObject;
