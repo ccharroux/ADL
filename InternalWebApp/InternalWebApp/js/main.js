@@ -1196,6 +1196,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += '        <li style="display:block"><a href="/products/xry/xryreminders.html?MenuItem=true">Reminders</a></li>';
     menuItems += '        <li style="display:block;"><a href="/products/xry/xryownershipmappinglist.html?MenuItem=true">Ownership Mapping</a></li>';
     menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrydatacollection.html?MenuItem=true">Data Collection</a></li>';
+    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrydelivery.html?MenuItem=true">Delivery</a></li>';
 
     menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">Matching <span style="margin-right:10px;" class="caret"></span></a>'
     menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
