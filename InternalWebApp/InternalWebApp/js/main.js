@@ -7,6 +7,10 @@ const gMediaTypeOutOfHome = "OUT OF HOME";
 const gMediaTypeNetwork = "NETWORK";
 const gMediaTypeSurvey = "SURVEY";
 
+const gEmailTokenUsernameChange = "USERNAMECHANGE";
+const gEmailTokenPassAndUsernameChange = "PASSWORDANDUSERNAMECHANGE";
+const gEmailTokenPasswordChange = "PASSWORDCHANGE";
+
 const gChosenParams = {
     allowSearchContains: true,
     allowSplitWordSearch: false
