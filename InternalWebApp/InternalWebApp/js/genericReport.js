@@ -297,6 +297,7 @@ reportName.push("rptTimeSalesVsAllRepBillingStations");
 reportName.push("rptPersonnelGroupList");
 
 reportName.push("rptAdvertiserByCategory");
+reportName.push("rptTVBInvalidStationList");
 
 function buildReportArray()
 {
@@ -11759,6 +11760,35 @@ function getReportObject_AdvertiserByCategory() {
         product: ['xry', 'advertiser', 'XRY Data Review'],
         sortable: true,
         reportPath: "/Products/XRY/reports/xrygenericreport.html"
+
+    }
+
+    return tempObject;
+}
+ 
+function getReportFilterArray_TVBInvalidStationList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    return arrayFilters;
+}
+
+function getReportObject_TVBInvalidStationList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+ 
+
+    tempObject =
+    {
+        reportTitle: "TVB Invalid Station List",
+        apiControllerAction: "/api/TVBReport/GetInvalidStationList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true 
 
     }
 
