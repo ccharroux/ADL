@@ -19,9 +19,9 @@ var gAJAXErrorData = null;
 var release =
 {
     "DEV": "N/A",
-    "STAGING": "4/15/2020",
-    "PRODUCTION": "4/15/2020",
-    "DEMO": "4/15/2020"
+    "STAGING": "6/1/2020",
+    "PRODUCTION": "6/1/2020",
+    "DEMO": "6/1/2020"
 }
 var dateOfCode = new Date();
 release["DEV"] = (dateOfCode.getMonth() + 1) + '-' + dateOfCode.getDate() + '-' + dateOfCode.getFullYear();
