@@ -3872,7 +3872,8 @@ function getReportObject_CorporateGroupUserList() {
         apiControllerAction: "/api/Report/GetCorporateAndGroupUserList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['personnel']
+        product: ['personnel'],
+        approved: true
     }
 
     return tempObject;
