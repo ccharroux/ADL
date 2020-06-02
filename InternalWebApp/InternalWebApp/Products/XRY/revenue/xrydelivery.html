@@ -234,8 +234,8 @@
                         </div>
 
                         <div class="form-group rptView collection-owner vertical-center del-owner">
-                            <label for="ddlOwner" class="requiredText dropdown-label rptView"> * Owner</label>
-                            <select id="ddlOwner" apiInput="inOwnerId" onchange="" class="mkaRequired dropdown-select rptView report-filter"></select>
+                            <label for="ddlOwner" class="dropdown-label rptView">Owner</label>
+                            <select id="ddlOwner" apiInput="inOwnerId" onchange="" class="dropdown-select rptView report-filter"></select>
                         </div>
 
                         <div class="form-group rptView vertical-center">
@@ -250,7 +250,7 @@
 
                         <div class="form-group rptView vertical-center del-media-type">
                             <label for="ddlMediaType" class="dropdown-label rptView">Media Type</label>
-                            <select id="ddlMediaType" apiInput="inMediaType" class="mkaRequired dropdown-select rptView report-filter"></select>
+                            <select id="ddlMediaType" apiInput="inMediaType" class="dropdown-select rptView report-filter"></select>
                         </div>
 
                         <!-- show delivered checkbox -->
@@ -262,7 +262,7 @@
 
                         <div class="form-group rptButton vertical-center" style="float:none;text-align:left">
                             <label for="btnReport" class="dropdown-label">&nbsp;</label>
-                            <input type="button" id="btnReport" class="search-button" value="Show" onclick="" />
+                            <input type="button" id="btnReport" class="search-button" value="Show" onclick="getReport();" />
                         </div>
 
                     </div>
@@ -363,12 +363,16 @@
                 $(".del-owner").hide();
                 $(".del-media-type").show();
 
-            } else if (this.value == 'market') {
+            } else if (this.value == 'market')
+            {
+                $("#ddlMarket").val("");
                 $(".del-market").show();
                 $(".del-owner").hide();
                 $(".del-media-type").hide();
 
-            } else if (this.value == 'nationwide') {
+            } else if (this.value == 'nationwide')
+            {
+                $("#ddlOwner").val("");
                 $(".del-market").hide();
                 $(".del-owner").show();
                 $(".del-media-type").show();
@@ -378,19 +382,20 @@
                 $(".del-nationwide").hide();
                 $(".del-media-type").show();
             }
-        });
 
-        if ($.fn.DataTable.isDataTable('#dtResults')) {
-            var searchTable = $('#dtResults').DataTable();
-            searchTable.clear().draw();
-            searchTable.destroy();
-            $('#dtResults').hide();
-        }
+
+            if ($.fn.DataTable.isDataTable('#dtResults')) {
+                var searchTable = $('#dtResults').DataTable();
+                searchTable.clear().draw();
+                searchTable.destroy();
+                $('#dtResults').hide();
+            }
+
+        });
 
         $(".del-market").hide();
         $(".del-owner").hide();
         $(".del-media-type").show();
-
 
     }
 
@@ -435,7 +440,6 @@
 
                 }
 
-
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -466,7 +470,7 @@
 
                     var str = '';
 
-                    $("#" + control).html("<option value=''> -- Select an Owner --</option>");
+                    $("#" + control).html("<option value=''>All</option>");
 
                     $.each(data.report.rows, function (index) {
                         var obj = data.report.rows[index];
@@ -492,7 +496,7 @@
         var control = "ddlMediaType";
 
         var str = "";
-        str += '<option value="-1">All</option>';
+        str += '<option value="">All</option>';
         str += '<option value="1" selected>Radio</option>';
         str += '<option value="2">Television</option>';
         str += '<option value="5">Networks</option>';
@@ -502,74 +506,391 @@
 
     }
 
-    function getReport()
-    {
+    function getReport() {
 
-        if (validateFilters() == false)
-        {
+        if (validateFilters() == false) {
             return;
         }
 
-
-        if ($("#rdoAllMarkets").is(':checked'))
-        {
+        if ($("#rdoAllMarkets").is(':checked')) {
             //get all markets report
             getAllMarketsReport();
-        } else if ($("#rdoMarket").is(':checked'))
-        {
+        } else if ($("#rdoMarket").is(':checked')) {
             //get market report
             getMarketReport();
-        } else if ($("#rdoNationwide").is(':checked'))
-        {
+        } else if ($("#rdoNationwide").is(':checked')) {
             //get nationwide report
+            getNationwideReport();
         }
 
 
     }
 
-    function getAllMarketsReport()
-    {
+    function getAllMarketsReport() {
+
         var columns = getAllMarketsReportColumns();
         //call api and pass to loadResults
+
+        var queryString = "?";
+
+        queryString += "inApiToken=" + getLocalStorage("APIToken");
+        queryString += "&inPeriod=" + $("#ddlPeriod").val();
+        queryString += "&inYear=" + $("#ddlYear").val();
+        queryString += "&inMediaType=" + $("#ddlMediaType").val();
+        queryString += "&inShowDelivered=" + $("#chkShowDelivered").is(":checked");
+
+        var allMarketsReportApi = "/api/XRAY/GetMarketDeliveryList" + queryString;
+
+        $.ajax({
+            url: ServicePrefix + allMarketsReportApi,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    loadResults(data, columns);
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+
     }
 
-    function getAllMarketsReportColumns()
-    {
+    function getAllMarketsReportColumns() {
         var columnsToDisplay = new Array();
 
+        columnsToDisplay.push(
+            {
+                "title": "Market",
+                "mRender": function (data, type, row) {
+                    return buildMarketWrapper(row.Market);
+                },
+                "visible": true
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "Media Type",
+                "mData": "Media Type",
+                "visible": true
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "Ranked",
+                "mData": "Ranked",
+                "visible": true,
+                "className": "text-align-center"
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "Ranked Date",
+                "mData": "Ranked Date",
+                "visible": true
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "Delivered On",
+                "mData": "Delivered On",
+                "visible": true
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "Revision",
+                "mData": "Revision",
+                "visible": true,
+                "className": "text-align-right"
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "Revision Date",
+                "mData": "Revision Date",
+                "visible": true
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "Redelivery Date",
+                "mData": "Redelivery Date",
+                "visible": true
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "Internal Revision Message",
+                "mData": "Internal Revision Message",
+                "visible": true
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "Client Revision Message",
+                "mData": "Client Revision Message",
+                "visible": true
+            }
+        );
+
+
+        columnsToDisplay.push(
+            {
+                "title": "Actions",
+                "mRender": function (data, type, row)
+                {
+                    var sActions = '';
+
+                    if (row.Ranked.toLowerCase() == "yes" && row["Delivered On"] == null)
+                    {
+                        sActions += "Delivery&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Release without e-mail";
+                    }
+
+                    if (row["Delivered On"] != null)
+                    {
+                        sActions += "&nbsp;&nbsp;Re-deliver";
+                    }
+
+                    return sActions;
+                },
+                "orderable": false,
+                "searchable": false,
+                "visible": true,
+                "className": "text-align-center"
+            }
+        );
 
         return columnsToDisplay;
     }
 
-    function getMarketReport()
-    {
+    function getMarketReport() {
         var columns = getMarketReportColumns();
         //call api and pass to loadResults
+        var queryString = "?";
+
+        queryString += "inApiToken=" + getLocalStorage("APIToken");
+        queryString += "&inPeriod=" + $("#ddlPeriod").val();
+        queryString += "&inYear=" + $("#ddlYear").val();
+        queryString += "&inMarketId=" + $("#ddlMarket").val();
+        queryString += "&inShowDelivered=" + $("#chkShowDelivered").is(":checked");
+
+        var allMarketsReportApi = "/api/XRAY/GetMarketDeliveryRecipientList" + queryString;
+
+        $.ajax({
+            url: ServicePrefix + allMarketsReportApi,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    loadResults(data, columns);
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
     }
 
     function getMarketReportColumns() {
         var columnsToDisplay = new Array();
 
+        columnsToDisplay.push(
+            {
+                "title": "Recipient",
+                "mData": "Recipient",
+                "visible": true
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "E-Mail",
+                "mData": "E-Mail",
+                "visible": true
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "Station",
+                "mRender": function (data, type, row) {
+                    return buildStationWrapper(row.Station);
+                },
+                "visible": true
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "Ownership",
+                "mRender": function (data, type, row) {
+                    return buildOwnerWrapper(row.Ownership);
+                },
+                "visible": true
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "Delivered On",
+                "mData": "Delivered On",
+                "visible": true
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "Revision",
+                "mData": "Revision",
+                "visible": true,
+                "className": "text-align-right"
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "Actions",
+                "mRender": function (data, type, row)
+                {
+                    var sActions = "";
+
+                    if (row["Delivered On"] != null)
+                    {
+                        sActions += "&nbsp;&nbsp;Re-deliver";
+                    }
+
+                    return sActions;
+                },
+                "orderable": false,
+                "searchable": false,
+                "visible": true,
+                "className": "text-align-center"
+            }
+        );
 
         return columnsToDisplay;
     }
 
-    function getNationwideReport()
-    {
+    function getNationwideReport() {
         var columns = getNationwideColumns();
         //call api and pass to loadResults
+        var queryString = "?";
+
+        queryString += "inApiToken=" + getLocalStorage("APIToken");
+        queryString += "&inPeriod=" + $("#ddlPeriod").val();
+        queryString += "&inYear=" + $("#ddlYear").val();
+        queryString += "&inOwnerId=" + $("#ddlOwner").val();
+        queryString += "&inMediaType=" + $("#ddlMediaType").val();
+        queryString += "&inShowDelivered=" + $("#chkShowDelivered").is(":checked");
+
+        var allMarketsReportApi = "/api/XRAY/GetOwnerDeliveryList" + queryString;
+
+        $.ajax({
+            url: ServicePrefix + allMarketsReportApi,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    loadResults(data, columns);
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
     }
 
-    function getNationwideColumns()
-    {
+    function getNationwideColumns() {
         var columnsToDisplay = new Array();
 
+        columnsToDisplay.push(
+            {
+                "title": "Ownership",
+                "mRender": function (data, type, row) {
+                    return buildOwnerWrapper(row.Ownership);
+                },
+                "visible": true
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "Rank Date",
+                "mData": "Rank Date",
+                "visible": true
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "Release Date",
+                "mData": "Release Date",
+                "visible": true
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "Redeliver Date",
+                "mData": "Redeliver Date",
+                "visible": true
+            }
+        );
+
+        columnsToDisplay.push(
+            {
+                "title": "Actions",
+                "mRender": function (data, type, row)
+                {
+                    var sActions = "";
+
+                    if (row["Rank Date"] != null && row["Release Date"] == null)
+                    {
+                        sActions += "&nbsp;&nbsp;Deliver&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Release without email";
+                    }
+
+                    if (row["Rank Date"] != null && row["Release Date"] != null)
+                    {
+                        sActions += "&nbsp;&nbsp;Re-deliver";
+                    }
+
+                    return sActions;
+                },
+                "orderable": false,
+                "searchable": false,
+                "visible": true,
+                "className": "text-align-center"
+            }
+        );
 
         return columnsToDisplay;
     }
 
-    function loadResults(data, columns, reportTitle)
-    {
+    function loadResults(data, columns, reportTitle) {
         if (!data["report"]["rows"]) {
             destroyDataTable();
             $("#noDataFound").show();
@@ -648,21 +969,55 @@
         });
     }
 
-    function validateFilters(bSilent)
-    {
+    function validateFilters(bSilent) {
+        //fix if going to run silently
+        if (!bSilent) {
+            bSilent = false;
+        }
+
         var loopBreak = true;
         var msg = "";
         //add coding based on what is checked
         //check other fields
-        if ($("#rdoMarket").is(':checked'))
-        {
-            //check market
-        } else if ($("#rdoNationwide").is(':checked')) {
-            //check ownership
+        //all markets have no checks
+
+        //nationwide has no checks
+        //no owners selected means all owners for the reports
+
+        //market must submit a value
+        if ($("#rdoMarket").is(':checked')) {
+            if ($("#ddlMarket").val().trim() == "") {
+                msg = "Please select a market.";
+                if (bSilent == false) {
+                    bootbox.alert(msg, function () { });
+                }
+                loopBreak = false;
+                return false;
+            }
         }
 
-        //check year
-        //check period
+
+        console.log("year: " + $("#ddlYear").val());
+
+        if ($("#ddlYear").val().trim() == "") {
+            msg = "Please select a year.";
+            if (bSilent == false) {
+                bootbox.alert(msg, function () { });
+            }
+            loopBreak = false;
+            return false;
+        }
+
+        if ($("#ddlPeriod").val().trim() == "") {
+            msg = "Please select a period.";
+            if (bSilent == false) {
+                bootbox.alert(msg, function () { });
+            }
+            loopBreak = false;
+            return false;
+        }
+
+        return loopBreak;
     }
 
     function destroyDataTable() {
@@ -673,6 +1028,6 @@
         }
 
     }
-        
+
 </script>
 
