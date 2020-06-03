@@ -7,6 +7,10 @@ const gMediaTypeOutOfHome = "OUT OF HOME";
 const gMediaTypeNetwork = "NETWORK";
 const gMediaTypeSurvey = "SURVEY";
 
+const gEmailTokenUsernameChange = "USERNAMECHANGE";
+const gEmailTokenPassAndUsernameChange = "PASSWORDANDUSERNAMECHANGE";
+const gEmailTokenPasswordChange = "PASSWORDCHANGE";
+
 const gChosenParams = {
     allowSearchContains: true,
     allowSplitWordSearch: false
@@ -19,9 +23,9 @@ var gAJAXErrorData = null;
 var release =
 {
     "DEV": "N/A",
-    "STAGING": "4/15/2020",
-    "PRODUCTION": "4/15/2020",
-    "DEMO": "4/15/2020"
+    "STAGING": "6/1/2020",
+    "PRODUCTION": "6/1/2020",
+    "DEMO": "6/1/2020"
 }
 var dateOfCode = new Date();
 release["DEV"] = (dateOfCode.getMonth() + 1) + '-' + dateOfCode.getDate() + '-' + dateOfCode.getFullYear();
@@ -1191,10 +1195,12 @@ function buildXRYMenu(selectedItem) {
 
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
+    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xryreportstatus.html?MenuItem=true">Report Status</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/xry/xryrelease.html?MenuItem=true">Release</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/xry/xryreminders.html?MenuItem=true">Reminders</a></li>';
     menuItems += '        <li style="display:block;"><a href="/products/xry/xryownershipmappinglist.html?MenuItem=true">Ownership Mapping</a></li>';
     menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrydatacollection.html?MenuItem=true">Data Collection</a></li>';
+    menuItems += '        <li style="display:block;"><a href="/products/xry/revenue/xrydelivery.html?MenuItem=true">Delivery</a></li>';
 
     menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">Matching <span style="margin-right:10px;" class="caret"></span></a>'
     menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
@@ -1366,7 +1372,9 @@ function buildTVBMenu(selectedItem) {
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbmarketdelivery.html?MenuItem=true">Report Delivery</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetailrepbilling.html?MenuItem=true">Edit Rep Billing</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetail.html?MenuItem=true">Edit Time Sales</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbestimates.html?MenuItem=true">Estimates</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbestimates.html?MenuItem=true">TS Estimates</a></li>';
+ 
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrepfirmstationmappinglist.html?MenuItem=true">Rep Station Mapping</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Confirm") + ' href="" role="button" aria-expanded="false">Confirm <span style="margin-right:10px;" class="caret"></span></a>';
@@ -1374,6 +1382,7 @@ function buildTVBMenu(selectedItem) {
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirm.html?MenuItem=true">Time Sales</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirmrepfirm.html?MenuItem=true">Rep Firm</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirmrepbillingestimate.html?MenuItem=true">Estimate (Kantar)</a></li>';
+ 
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += productDashboard('');
@@ -1915,6 +1924,11 @@ function resetDataTableDOM(tableToDestroyId, divOfTableId, classOfTable) {
 
 function buildMarketWrapper(inData) {
 
+    if (!inData)
+    {
+        return "";
+    }
+
     var ret = inData;
 
     // find parens
@@ -1948,6 +1962,10 @@ function buildMarketWrapper(inData) {
     return ret;
 }
 function buildUserWrapper(inData) {
+
+    if (!inData) {
+        return "";
+    }
 
     var bIDIncluded = false;
 
@@ -1983,6 +2001,11 @@ function buildUserWrapper(inData) {
 }
 function buildStationWrapper(inData) {
 
+    if (!inData)
+    {
+        return "";
+    }
+
     var ret = inData;
 
     // find parens
@@ -2015,6 +2038,11 @@ function buildStationWrapper(inData) {
 }
 function buildOwnerWrapper(inData) {
 
+    if (!inData)
+    {
+        return "";
+    }
+
     var ret = inData;
 
     // find parens
@@ -2036,7 +2064,7 @@ function buildOwnerWrapper(inData) {
         if (ID.length > 0) {
             if (isNaN(ID) == false) {
                 ret = "<a href='#' onclick='window.location=\"/admin/ownership/ownership.html?ownerId=" + ID + "\"'>";
-                ret = ret + inData
+                ret = ret + inData;
                 ret = ret + "</a>";
             }
         }
@@ -2046,6 +2074,11 @@ function buildOwnerWrapper(inData) {
     return ret;
 }
 function buildAgencyWrapper(inData) {
+
+    if (!inData)
+    {
+        return "";
+    }
 
     var ret = inData;
 
@@ -2078,6 +2111,10 @@ function buildAgencyWrapper(inData) {
     return ret;
 }
 function buildAdvertiserWrapper(inData) {
+
+    if (!inData) {
+        return "";
+    }
 
     var ret = inData;
 
@@ -2927,5 +2964,13 @@ function doesUserHaveAccessToFeature(inToken)
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+ 
+}
+function widerReport()
+{
+
+ 
+    $('th').attr('style', 'font-size:12px !important');
+ 
  
 }

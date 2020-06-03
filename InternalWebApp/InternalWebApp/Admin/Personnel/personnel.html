@@ -66,27 +66,27 @@
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
                         <h2 class="inline-block">Personnel</h2><br />
-                        <div class="hidden dropdown inline-block linkdropdown"  id="ddlAssignments">
+                        <div class="hidden dropdown inline-block linkdropdown" id="ddlAssignments">
                             <a role="button" aria-expanded="false">Assignments <span style="margin-right:10px;" class="caret"></span></a>
-                           <ul class="dropdown-menu linkdropdown-menu" role="menu">                              
-                               <li class="display-block"><a href="#" onclick="goToAssignments();">Assignments</a></li>
-                               <li class="display-block"><a href="#" onclick="goToCopyAssignments();">Copy Assignments</a></li>
-                               <li class="display-block"><a href="#" onclick="goToGroupAssignments();">Group Assignments</a></li>
-                           </ul>
-                            
+                            <ul class="dropdown-menu linkdropdown-menu" role="menu">
+                                <li class="display-block"><a href="#" onclick="goToAssignments();">Assignments</a></li>
+                                <li class="display-block"><a href="#" onclick="goToCopyAssignments();">Copy Assignments</a></li>
+                                <li class="display-block"><a href="#" onclick="goToGroupAssignments();">Group Assignments</a></li>
+                            </ul>
+
                         </div>
                         <!--<a class="hidden" id="aAssignments" href="#" onclick="goToAssignment()">Assignments</a> &nbsp;-->
                         <a class="hidden" id="aTProductList" href="#ancProducts">Product List</a> &nbsp;
                         <a class="hidden" id="aTOwnershipList" href="#ancOwnerships">Ownerships</a>&nbsp;
-                        <a   href="#" onclick="goToPersonnelSnapshot();">Dashboard</a>
+                        <a href="#" onclick="goToPersonnelSnapshot();">Dashboard</a>
                     </div>
                 </div>
                 <div id="divQuickReport">
                     <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
                     <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
-            </div>  
-            <div class="featureButtons"></div>
-            <div class="text-center margin-top-0">
+                </div>
+                <div class="featureButtons"></div>
+                <div class="text-center margin-top-0">
 
                     <!--Hidden Inputs-->
                     <input type="hidden" id="hdnEmail" value="" />
@@ -103,7 +103,7 @@
                         </div>
                     </div>
 
-               
+
 
                     <!--First Name-->
                     <div class="row input-row">
@@ -282,7 +282,7 @@
                             <input type="text" id="txtEmailAddress" maxlength="50" class="mkaRequired field-width-325" errorMessage="You must enter an Email Address" />
                         </div>
                         <div id="divResetPassword" class="col-md-4 text-align-center hidden">
-                            <input onclick="excludeFromBackButton(); resetPassword();" value="Reset Password" class="default-button" type="button" />
+                            <input onclick="excludeFromBackButton(); checkIfPasswordResetIsAllowed(gEmailTokenPasswordChange);" value="Reset Password" class="default-button" type="button" />
                         </div>
                     </div>
 
@@ -326,7 +326,7 @@
                         <div class="row input-row">
                             <a id="ancOwnerships"></a>
                             <div class="col-md-6 text-align-left">
-                                <div  >
+                                <div>
                                     <label for="ddlAssignedOwnerships">Current Assigned Ownerships</label>
                                 </div>
                                 <div>
@@ -425,11 +425,11 @@
     var personnelName = "";
     var emailAddress = "";
     var bSendUsernameChangeEmail = false;
+    var bSendUsernameAndPasswordChangeEmail = false;
 
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         buildMainMenu("Personnel");
-        buildQuickReports(['personnel',  'owner', 'market', 'station' ]);
+        buildQuickReports(['personnel', 'owner', 'market', 'station']);
 
         personnelID = (getParameterByName("personnelid") == null ? 0 : getParameterByName("personnelid"));
         setLocalStorage("gPageParameters", "");
@@ -438,8 +438,7 @@
 
     });
 
-    function getStateList()
-    {
+    function getStateList() {
         var url = ServicePrefix + '/api/State/GetStateList';
 
         var settings = {
@@ -708,11 +707,9 @@
 
     }
 
-    function getOwnershipList(bAlsoLoadPersonnel)
-    {
+    function getOwnershipList(bAlsoLoadPersonnel) {
 
-        if (!bAlsoLoadPersonnel)
-        {
+        if (!bAlsoLoadPersonnel) {
             bAlsoLoadPersonnel = true;
         }
 
@@ -724,7 +721,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
- 
+
                 "inProductId": $("#ddlOwnershipProducts").val()
             }),
             processData: false,
@@ -751,20 +748,16 @@
                 var isAssigned = false;
                 var obj = data.report.rows[index];
 
-                $("#ddlAssignedOwnerships > option").each(function()
-                {
-                    if (this.value == obj.ownerid)
-                    {
+                $("#ddlAssignedOwnerships > option").each(function () {
+                    if (this.value == obj.ownerid) {
                         isAssigned = true;
                     }
                 });
 
-                if (isAssigned != true)
-                {
+                if (isAssigned != true) {
                     str = str + '<option value="' + obj.ownerid + '">' + obj.ownername + '</option>';
                 }
-                else
-                {
+                else {
 
                 }
             });
@@ -814,17 +807,15 @@
             bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
 
             });
-        } else
-        {
+        } else {
             $.each(data.report.rows,
-                function(index)
-                {
+                function (index) {
                     var obj = data.report.rows[index];
 
                     $("#txtFirstName").val(obj["firstName"].trim());
                     $("#txtLastName").val(obj["lastName"].trim());
                     $("#txtMiddleInitial").val(obj["middleInitial"].trim());
-                    $("#txtSalutation").val(obj["salutation"].trim() );
+                    $("#txtSalutation").val(obj["salutation"].trim());
                     $("#txtSuffix").val(obj["suffix"].trim());
                     $("#txtTitle").val(obj["title"].trim());
                     $("#ddlPosition").val(obj["positionCode"]);
@@ -832,11 +823,9 @@
                     $("#txtAddress2").val(obj["address2"].trim());
                     $("#txtAddress3").val(obj["address3"].trim());
                     $("#txtCity").val(obj["city"].trim());
-                    if (obj["stateAbbreviation"] == null)
-                    {
+                    if (obj["stateAbbreviation"] == null) {
                         $("#ddlState").val(-1);
-                    } else
-                    {
+                    } else {
                         $("#ddlState").val(obj["stateAbbreviation"].trim());
                     }
                     $("#txtZipCode").val(obj["zipCode"].trim());
@@ -901,7 +890,7 @@
             $.each(data.report.rows, function (index) {
                 var obj = data.report.rows[index];
                 var status = -1;
- 
+
 
                 if (obj.status != null) {
                     if (obj.status == 0) {
@@ -968,10 +957,8 @@
 
             bootbox.alert("Ownership has been added successfully.");
 
-            $('#ddlOwnership > option:selected').each(function()
-            {
-                if ($('#ddlAssignedOwnerships [value="' + $(this).val() + '"]').length == 0)
-                {
+            $('#ddlOwnership > option:selected').each(function () {
+                if ($('#ddlAssignedOwnerships [value="' + $(this).val() + '"]').length == 0) {
                     $('#ddlAssignedOwnerships').html('<option value="' +
                         $(this).val() +
                         '">' +
@@ -1030,8 +1017,7 @@
 
                 if (obj['_updateStatus'] == -1) {
                     bootbox.alert("Ownership has been removed but ContactId: " + personnelID + " has active/submitted surveys and hence can not be deleted from ContactMSS table. In order to delete this contact, first delete all survey assignments.");
-                } else
-                {
+                } else {
                     bootbox.alert("Ownership has been removed successfully.");
                 }
             });
@@ -1262,7 +1248,7 @@
         //Check Web Status
         switch ($("#spnWebStatus").text().toUpperCase().trim()) {
             case "PENDING":
-                //User has pending notification, 
+                //User has pending notification,
                 //you cannot change their username if they have a pending notification
                 //Changes canceled.
                 showUsernameChangeDialogForPending();
@@ -1276,10 +1262,10 @@
                 break;
             case "WEB USER":
                 //Ask to send email
-                showUsernameChangeDialogForWebUser();
+                showUsernameChangeAskDialog();
                 break;
             default:
-                //Issue happened cancel 
+                //Issue happened cancel
                 bootbox.alert("There was an issue when checking the Web Status for this user. Update has been canceled.");
                 break;
 
@@ -1301,15 +1287,14 @@
                 btnCancel: {
                     label: "Cancel",
                     callback: function () {
-                        bootbox.alert("Process has been canceled. No emails have been sent and Update has been canceled.", function () {
-                            return;
-                        });
+                        usernamePasswordChangeCancelDialog();
+                        return;
                     }
                 },
                 btnYes: {
                     label: "Yes",
                     callback: function () {
-                        showUsernameChangeDialogForWebUser();
+                        showUsernameChangeAskDialog();
                     }
                 }
             }
@@ -1318,8 +1303,8 @@
         });
     }
 
-    function showUsernameChangeDialogForWebUser() {
-        var strMessage = "The email for this personnel has been changed. Send Username Change notification to this user?";
+    function showUsernameChangeAskDialog() {
+        var strMessage = "The email for this personnel will be changed. Reset their password as well?";
 
         bootbox.dialog({
             message: strMessage,
@@ -1327,16 +1312,45 @@
                 btnCancel: {
                     label: "Cancel",
                     callback: function () {
-                        bootbox.alert("Process has been canceled. No emails have been sent and Update has been canceled.", function () {
-                            return;
-                        });
-                        
+                        usernamePasswordChangeCancelDialog();
+                        return;
                     }
                 },
                 btnYes: {
                     label: "Yes",
                     callback: function () {
-                        //Set flag to send username email after personnel gets successfully updated.
+                        //Email will be updated
+                        //and password will be reset
+                        showUsernameAndPasswordChangeDialog();
+                    }
+                },
+                btnNo: {
+                    label: "No",
+                    callback: function () {
+                        //only email will be updated
+                        showUsernameChangeDialog();
+                    }
+                }
+            }
+        });
+    }
+
+    function showUsernameChangeDialog() {
+        var strMessage = "The email for this personnel will be changed. Password will not be reset. Send email now?";
+
+        bootbox.dialog({
+            message: strMessage,
+            buttons: {
+                btnCancel: {
+                    label: "Cancel",
+                    callback: function () {
+                        usernamePasswordChangeCancelDialog();
+                        return;
+                    }
+                },
+                btnYes: {
+                    label: "Send Email",
+                    callback: function () {
                         bSendUsernameChangeEmail = true;
                         updatePersonnel();
                     }
@@ -1344,19 +1358,70 @@
                 btnNo: {
                     label: "No",
                     callback: function () {
-                        //email will not be sent        
+                        //email will not be sent
                         //but pending notification will be
                         //created for internal user to send
                         //when they are ready.
-                        insertPendingNotification();
+                        insertPendingNotification(gEmailTokenUsernameChange);
                     }
                 }
             }
         });
     }
 
-    function sendUsernameChangeEmail() {
-        var url = ServicePrefix  + '/api/Notification/InitiateWebNotification';
+    function usernamePasswordChangeCancelDialog() {
+        bootbox.alert("Process has been canceled. No emails have been sent and Update has been canceled.", function () {
+            return;
+        });
+    }
+
+    function showUsernameAndPasswordChangeDialog() {
+        var strMessage = "Email for this user will be updated and password will be reset. Send email now?";
+
+        bootbox.dialog({
+            message: strMessage,
+            buttons: {
+                btnCancel: {
+                    label: "Cancel",
+                    callback: function () {
+                        usernamePasswordChangeCancelDialog();
+                        return;
+                    }
+                },
+                btnYes: {
+                    label: "Send Email",
+                    callback: function () {
+                        bSendUsernameAndPasswordChangeEmail = true;
+                        updatePersonnel();
+                    }
+                },
+                btnNo: {
+                    label: "No",
+                    callback: function () {
+                        //email will not be sent
+                        //but pending notification will be
+                        //created for internal user to send
+                        //when they are ready.
+                        insertPendingNotification(gEmailTokenPassAndUsernameChange);
+                    }
+                }
+
+            }
+        });
+
+
+    }
+
+    function initiateWebNotification(emailToken) {
+
+        if (emailToken == "" || emailToken == null) {
+            //throw error
+            bootbox.alert("There was an issue checking for an email token. Email could not be sent.", function () {
+                return;
+            });
+        }
+
+        var url = ServicePrefix + '/api/Notification/InitiateWebNotification';
 
         var settings = {
             dataType: 'json',
@@ -1365,11 +1430,12 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inPersonnelID": personnelID,
-                "inNotificationToken": "UserNameChange"
+                "inNotificationToken": emailToken,
+                "inEmail": $("#txtEmailAddress").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                sendUsernameChangeEmailSuccess(data, textStatus, jQxhr);
+                initiateWebNotificationSuccess(data, textStatus, jQxhr);
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
@@ -1378,13 +1444,13 @@
         $.ajax(url, settings);
     }
 
-    function sendUsernameChangeEmailSuccess(data, textStatus, jQxhr) {
+    function initiateWebNotificationSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
         } else {
             $.each(data.report.rows, function (index) {
 
-                bootbox.alert("Username Change email has been sent.", function () {
+                bootbox.alert("Email has been sent.", function () {
                     window.location = "/admin/personnel/personnel.html?personnelID=" + personnelID;
                 });
 
@@ -1392,7 +1458,7 @@
         }
     }
 
-    function insertPendingNotification() {
+    function insertPendingNotification(emailToken) {
         var url = ServicePrefix + '/api/Personnel/InsertPersonnelNotification';
 
         var settings = {
@@ -1402,7 +1468,7 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inPersonnelId": personnelID,
-                "inActionToken": "UserNameChange"
+                "inActionToken": emailToken
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -1505,19 +1571,27 @@
                     if (bSendUsernameChangeEmail) {
                         //Username has been changed and
                         //update has been successful, send username change email
-                        sendUsernameChangeEmail();
+                        initiateWebNotification(gEmailTokenUsernameChange);
+                        return;
+                    }
+
+                    if (bSendUsernameAndPasswordChangeEmail) {
+                        //Username has been changed and
+                        //password has been reset, send username and password change email
+                        checkIfPasswordResetIsAllowed(gEmailTokenPassAndUsernameChange);
                         return;
                     }
 
                     if (bReloadPage) {
                         window.location = "/admin/personnel/personnel.html?personnelID=" + $("#hdnPersonnelId").val();
                     }
-            
+
                 });
 
             });
         }
     }
+
 
     function isEmail() {
 
@@ -1562,7 +1636,7 @@
         return loopBreak;
     }
 
-    function resetPassword() {
+    function checkIfPasswordResetIsAllowed(emailToken) {
         var url = ServicePrefix + '/api/Personnel/GetPersonnelOkayToResetPasswordFromInternal'
             + '?inApiToken=' + getLocalStorage("APIToken")
             + '&inPersonnelId=' + personnelID;
@@ -1573,7 +1647,7 @@
             contentType: 'application/json',
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                resetPasswordCheckOkaySuccess(data, textStatus, jQxhr);
+                checkIfPasswordResetIsAllowedSuccess(data, textStatus, jQxhr, emailToken);
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
@@ -1582,7 +1656,7 @@
         $.ajax(url, settings);
     }
 
-    function resetPasswordCheckOkaySuccess(data, textStatus, jQxhr) {
+    function checkIfPasswordResetIsAllowedSuccess(data, textStatus, jQxhr, emailToken) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -1602,6 +1676,21 @@
             return;
         }
 
+        switch (emailToken.toUpperCase()) {
+            case gEmailTokenPassAndUsernameChange.toUpperCase():
+                initiateWebNotification(gEmailTokenPassAndUsernameChange);
+                break;
+            case gEmailTokenPasswordChange.toUpperCase():
+                resetPassword();
+                break;
+            default:
+                bootbox.alert("There was an issue when finding an email token. Invalid email token: " + emailToken);
+                break;
+        }
+
+    }
+
+    function resetPassword() {
         var url = ServicePrefix + '/api/Personnel/ResetPasswordFromInternal';
 
         var settings = {
@@ -1631,8 +1720,7 @@
 
         bootbox.alert("Password reset initiated successfully.");
     }
-    function goToPersonnelSnapshot()
-    {
+    function goToPersonnelSnapshot() {
         setPageParameters();
         window.location = "/admin/personnel/personnelview.html?PersonnelId=" + personnelID;
 
@@ -1660,14 +1748,11 @@
 
     }
 
-    function loadFeatureButtons()
-    {
-        if (personnelID > 0)
-        {
+    function loadFeatureButtons() {
+        if (personnelID > 0) {
             var bIsInternalUser = false;
             if ($("#txtEmailAddress").val().toLowerCase().indexOf("millerkaplan.com") != -1 ||
-                $("#txtEmailAddress").val().toLowerCase().indexOf("mkasystems.com") != -1)
-            {
+                $("#txtEmailAddress").val().toLowerCase().indexOf("mkasystems.com") != -1) {
                 bIsInternalUser = true;
             }
 

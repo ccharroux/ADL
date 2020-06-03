@@ -297,6 +297,7 @@ reportName.push("rptTimeSalesVsAllRepBillingStations");
 reportName.push("rptPersonnelGroupList");
 
 reportName.push("rptAdvertiserByCategory");
+reportName.push("rptTVBInvalidStationList");
 
 function buildReportArray()
 {
@@ -3171,7 +3172,8 @@ function getReportObject_MRRMarketStationRelease() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Data Review', 'mrr delivery'],
-        sortable: true
+        sortable: true,
+        approved: true
     }
 
     return tempObject;
@@ -3342,7 +3344,8 @@ function getReportObject_TVBMarketRelease() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb'],
-        sortable: true
+        sortable: true,
+        approved: true
     }
 
     return tempObject;
@@ -3869,7 +3872,8 @@ function getReportObject_CorporateGroupUserList() {
         apiControllerAction: "/api/Report/GetCorporateAndGroupUserList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['personnel']
+        product: ['personnel'],
+        approved: true
     }
 
     return tempObject;
@@ -4274,7 +4278,8 @@ function getReportObject_MultipleOwnersPerUser() {
         apiControllerAction: "/api/PersonnelReport/GetMultipleOwnersPerUserList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['personnel']
+        product: ['personnel'],
+        approved: true
     }
 
     return tempObject;
@@ -8124,7 +8129,8 @@ function getReportObject_MRRModeUsageSummary()
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr'],
-        sortable: false
+        sortable: false,
+        approved: true
 
     }
 
@@ -8523,7 +8529,8 @@ function getReportObject_ImpersonationLogList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['misc', 'personnel','tech', 'qa'],
-        sortable: false
+        sortable: false,
+        approved: true
 
     }
 
@@ -8930,7 +8937,8 @@ function getReportObject_TimeSalesVsRepBilling() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb', 'TVB Data Review', 'old admin'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 
@@ -9688,7 +9696,8 @@ function getReportObject_MRRStationSubmissionStatusByMarket() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['market', 'station', 'mrr'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 
@@ -10410,7 +10419,8 @@ function getReportObject_InactiveStationAssignmentList() {
         apiControllerAction: "/api/PersonnelReport/GetInactiveStationAssignmentList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['personnel']
+        product: ['personnel'],
+        approved: true
     }
 
     return tempObject;
@@ -10931,7 +10941,8 @@ function getReportObject_UsersNotLoggedInAfterDateList()
         apiControllerAction: "/api/PersonnelReport/GetUsersNotLoggedInSinceList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['personnel']
+        product: ['personnel'],
+        approved: true
     }
 
     return tempObject;
@@ -11750,6 +11761,35 @@ function getReportObject_AdvertiserByCategory() {
         product: ['xry', 'advertiser', 'XRY Data Review'],
         sortable: true,
         reportPath: "/Products/XRY/reports/xrygenericreport.html"
+
+    }
+
+    return tempObject;
+}
+ 
+function getReportFilterArray_TVBInvalidStationList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    return arrayFilters;
+}
+
+function getReportObject_TVBInvalidStationList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+ 
+
+    tempObject =
+    {
+        reportTitle: "TVB Invalid Station List",
+        apiControllerAction: "/api/TVBReport/GetInvalidStationList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true 
 
     }
 
