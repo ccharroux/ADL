@@ -274,11 +274,11 @@
                 <div class="row del-market-buttons" style="margin-top: 10px; display: none;">
                     <div class="col-md-1">
                         <label for="btnDeliverMarket" class="dropdown-label">&nbsp;</label>
-                        <input type="button" id="btnDeliverMarket" class="search-button" value="Deliver" onclick="" />
+                        <input type="button" id="btnDeliverMarket" class="search-button" value="Deliver" onclick="marketDeliverAllRecipients();" />
                     </div>
                     <div class="col-md-1">
                         <label for="btnRedeliverMarket" class="dropdown-label">&nbsp;</label>
-                        <input type="button" id="btnRedeliverMarket" class="search-button" value="Re-deliver" onclick="" />
+                        <input type="button" id="btnRedeliverMarket" class="search-button" value="Re-deliver" onclick="marketRedeliverAllRecipients();" />
                     </div>
                 </div>
 
@@ -354,6 +354,9 @@
         loadOwnershipsByProduct();
 
         //set timer to get report
+        //it is defaulted to the all markets reports
+        //current month and year
+        setTimeout(getReport, 500);
 
         $("body").on("click",
             "#clear_search_button",
@@ -373,15 +376,13 @@
                 $(".del-owner").hide();
                 $(".del-media-type").show();
                 $(".del-market-buttons").hide();
-            } else if (this.value == 'market')
-            {
+            } else if (this.value == 'market') {
                 $("#ddlMarket").val("");
                 $(".del-market").show();
                 $(".del-owner").hide();
                 $(".del-media-type").hide();
 
-            } else if (this.value == 'nationwide')
-            {
+            } else if (this.value == 'nationwide') {
                 $("#ddlOwner").val("");
                 $(".del-market").hide();
                 $(".del-owner").show();
@@ -535,7 +536,6 @@
             getNationwideReport();
         }
 
-
     }
 
     function getAllMarketsReport() {
@@ -563,7 +563,7 @@
                 if (data.response.status != "SUCCESS") {
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 } else {
-                    loadResults(data, columns);
+                    loadResults(data, columns, "All Markets Delivery Report");
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -665,18 +665,15 @@
         columnsToDisplay.push(
             {
                 "title": "Actions",
-                "mRender": function (data, type, row)
-                {
+                "mRender": function (data, type, row) {
                     var sActions = '';
 
-                    if (row.Ranked.toLowerCase() == "yes" && row["Delivered On"] == null)
-                    {
-                        sActions += "Delivery&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Release without e-mail";
+                    if (row.Ranked.toLowerCase() == "yes" && row["Delivered On"] == null) {
+                        sActions += '<a href="#" onclick="deliverMarket();">Deliver</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="deliverMarketNoEmail();">Release without e-mail</a>';
                     }
 
-                    if (row["Delivered On"] != null)
-                    {
-                        sActions += "&nbsp;&nbsp;Re-deliver";
+                    if (row["Delivered On"] != null) {
+                        sActions += '&nbsp;&nbsp;<a href="#" onclick="redeliverMarket();">Re-deliver</a>';
                     }
 
                     return sActions;
@@ -692,6 +689,7 @@
     }
 
     function getMarketReport() {
+
         var columns = getMarketReportColumns();
         //call api and pass to loadResults
         var queryString = "?";
@@ -714,7 +712,7 @@
                 if (data.response.status != "SUCCESS") {
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 } else {
-                    loadResults(data, columns);
+                    loadResults(data, columns, "Market Delivery Report");
                     $(".del-market-buttons").show();
                 }
             },
@@ -783,13 +781,17 @@
         columnsToDisplay.push(
             {
                 "title": "Actions",
-                "mRender": function (data, type, row)
-                {
-                    var sActions = "";
+                "mRender": function (data, type, row) {
+                    var sActions = '';
 
-                    if (row["Delivered On"] != null)
-                    {
-                        sActions += "&nbsp;&nbsp;Re-deliver";
+
+                    if (row["Delivered On"] == null) {
+                        sActions += '&nbsp;&nbsp;<a href="#" onclick="deliverRecipient();">Deliver</a>';
+                    }
+
+
+                    if (row["Delivered On"] != null) {
+                        sActions += '&nbsp;&nbsp;<a href="#" onclick="redeliverRecipient();">Re-deliver</a>';
                     }
 
                     return sActions;
@@ -828,7 +830,7 @@
                 if (data.response.status != "SUCCESS") {
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 } else {
-                    loadResults(data, columns);
+                    loadResults(data, columns, "Nationwide Delivery Report");
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -877,18 +879,15 @@
         columnsToDisplay.push(
             {
                 "title": "Actions",
-                "mRender": function (data, type, row)
-                {
-                    var sActions = "";
+                "mRender": function (data, type, row) {
+                    var sActions = '';
 
-                    if (row["Rank Date"] != null && row["Release Date"] == null)
-                    {
-                        sActions += "&nbsp;&nbsp;Deliver&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Release without email";
+                    if (row["Rank Date"] != null && row["Release Date"] == null) {
+                        sActions += '&nbsp;&nbsp;<a href="#" onclick="deliverOwnership();">Deliver</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="deliverOwnershipNoEmail();">Release without email</a>';
                     }
 
-                    if (row["Rank Date"] != null && row["Release Date"] != null)
-                    {
-                        sActions += "&nbsp;&nbsp;Re-deliver";
+                    if (row["Rank Date"] != null && row["Release Date"] != null) {
+                        sActions += '&nbsp;&nbsp;<a href="#" onclick="redeliverOwnership();">Re-deliver</a>';
                     }
 
                     return sActions;
@@ -982,18 +981,16 @@
         });
     }
 
-    function validateFilters(bSilent) {
-        //fix if going to run silently
-        if (!bSilent) {
-            bSilent = false;
-        }
+    function validateFilters() {
+
 
         var loopBreak = true;
         var msg = "";
+
         //add coding based on what is checked
         //check other fields
-        //all markets have no checks
 
+        //all markets have no checks
         //nationwide has no checks
         //no owners selected means all owners for the reports
 
@@ -1001,31 +998,22 @@
         if ($("#rdoMarket").is(':checked')) {
             if ($("#ddlMarket").val().trim() == "") {
                 msg = "Please select a market.";
-                if (bSilent == false) {
-                    bootbox.alert(msg, function () { });
-                }
+                bootbox.alert(msg, function () { });
                 loopBreak = false;
                 return false;
             }
         }
 
-
-        console.log("year: " + $("#ddlYear").val());
-
         if ($("#ddlYear").val().trim() == "") {
             msg = "Please select a year.";
-            if (bSilent == false) {
-                bootbox.alert(msg, function () { });
-            }
+            bootbox.alert(msg, function () { });
             loopBreak = false;
             return false;
         }
 
         if ($("#ddlPeriod").val().trim() == "") {
             msg = "Please select a period.";
-            if (bSilent == false) {
-                bootbox.alert(msg, function () { });
-            }
+            bootbox.alert(msg, function () { });
             loopBreak = false;
             return false;
         }
@@ -1040,6 +1028,49 @@
             $('#dtResults').hide();
         }
 
+    }
+
+    //All markets
+    function deliverMarket() {
+        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+    }
+
+    function deliverMarketNoEmail() {
+        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+    }
+
+    function redeliverMarket() {
+        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+    }
+
+    //market
+    function marketDeliverAllRecipients() {
+        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+    }
+
+    function marketRedeliverAllRecipients() {
+        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+    }
+
+    function deliverRecipient() {
+        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+    }
+
+    function redeliverRecipient() {
+        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+    }
+
+    //nationwide
+    function deliverOwnership() {
+        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+    }
+
+    function deliverOwnershipNoEmail() {
+        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+    }
+
+    function redeliverOwnership() {
+        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
     }
 
 </script>
