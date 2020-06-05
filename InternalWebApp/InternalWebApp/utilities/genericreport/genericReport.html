@@ -320,10 +320,16 @@
                             <label for="ddlFromYear" class="dropdown-label rptView rptFromYear">From Year</label>
                             <select id="ddlFromYear" apiInput="inFromYear" class="dropdown-select rptView rptFromYear report-filter"></select>
                         </div>
+                        <div class="form-group rptView rptToPeriod">
+                            <label for="ddlToPeriod" class="dropdown-label rptView rptToPeriod">End Period</label>
+                            <select id="ddlToPeriod" apiInput="inToPeriod" class="dropdown-select rptView rptToPeriod report-filter"></select>
+                        </div>
                         <div class="form-group rptView rptToYear">
                             <label for="ddlToYear" class="dropdown-label rptView rptToYear">To Year</label>
                             <select id="ddlToYear" apiInput="inToYear" class="dropdown-select rptView rptToYear report-filter"></select>
                         </div>
+
+
                         <div class="form-group rptView rptPeriod" >
                             <label for="ddlPeriod" class="dropdown-label rptView rptPeriod">Period</label>
                             <select id="ddlPeriod" apiInput="inPeriod" class="dropdown-select rptView rptPeriod report-filter"></select>
@@ -1130,7 +1136,12 @@
 
     }
 
-    function getMediaTypeList() {
+    function getMediaTypeList(bSpecialRules)
+    {
+        if (!bSpecialRules)
+        {
+            bSpecialRules = false;
+        }
 
         $.ajax({
             url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
@@ -1143,18 +1154,36 @@
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
+                var str = '';
                 if (data.response.status != "SUCCESS") {
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
                 else {
 
-                    var str = '';
                     str = '<option value="">-- Select a Media Type --</option>';
                     $.each(data.report.rows, function (index) {
 
-                        str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+                        if (bSpecialRules == false)
+                        {
+                            str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+                        }
+                        else
+                        {
+                            if (data.report.rows[index].MediaTypeID == "1" ||
+                                data.report.rows[index].MediaTypeID == "2" ||
+                                data.report.rows[index].MediaTypeID == "5") {
+                                str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+                            }
+                        }
+
 
                     });
+
+
+                    if (bSpecialRules)
+                    {
+                        str = str + '<option value="15">Radio + Network</option>';
+                    }
 
                     $("#ddlMediaType").html(str);
 
@@ -1336,7 +1365,7 @@
     }
     function getPeriodList(typesToLoad, inDefaultSelect)
     {
- 
+
         if (!typesToLoad)
         {
             typesToLoad = "all";
@@ -1413,8 +1442,11 @@
         $("#ddlPriorPeriod").html(str);
 
         convertToChosenSelect("ddlPriorPeriod", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
         saveLoadedControlSelection("ddlPriorPeriod");
+        $("#ddlToPeriod").html(str);
+
+        convertToChosenSelect("ddlToPeriod", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+        saveLoadedControlSelection("ddlToPeriod");
 
         if (!paramRevenuePeriod == false && paramRevenuePeriod.length > 0) {
             $("#ddlPeriod").val(paramRevenuePeriod);
@@ -2645,7 +2677,7 @@
 
                     paramWithIssue = paramWithIssue.toLowerCase().replace("relationshiplist", "personnel group");
 
-                    var msg = "Please select a " + parmWithIssue
+                    var msg = "Please select a " + paramWithIssue
                     if (bSilent == false) {
                         bootbox.alert(msg, function () { });
                     }

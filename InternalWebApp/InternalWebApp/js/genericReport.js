@@ -298,6 +298,7 @@ reportName.push("rptPersonnelGroupList");
 
 reportName.push("rptAdvertiserByCategory");
 reportName.push("rptTVBInvalidStationList");
+reportName.push("rptMRRCategoryYTDList");
 
 function buildReportArray()
 {
@@ -4340,7 +4341,8 @@ function getReportObject_UsersAssignedReportsInvalidOwner() {
         apiControllerAction: "/api/PersonnelReport/GetUsersAssignedReportsInvalidOwnerList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['personnel']
+        product: ['personnel'],
+        approved: true
     }
 
     return tempObject;
@@ -4373,7 +4375,8 @@ function getReportObject_UsersAssignedInvalidMarket() {
         apiControllerAction: "/api/PersonnelReport/GetUsersAssignedInvalidMarketReportList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['personnel']
+        product: ['personnel'],
+        approved: true
     }
 
     return tempObject;
@@ -8036,7 +8039,8 @@ function getReportObject_XRAYDataRetentionList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['xry'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 
@@ -11790,6 +11794,66 @@ function getReportObject_TVBInvalidStationList() {
         columnsToDisplay: columnsToDisplay,
         product: ['tvb'],
         sortable: true 
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRCategoryYTDList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+ 
+
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        jsCallParameters: ['true'],
+        objectName: "ddlMediaType",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "ToYear",
+        jsCall: "getYearList",
+        objectName: "ddlToYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "ToPeriod",
+        jsCall: "getPeriodList",
+        jsCallParameters: ['all'],
+        objectName: "ddlToPeriod",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+
+    return arrayFilters;
+}
+
+function getReportObject_MRRCategoryYTDList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "MRR Category YTD Report",
+        apiControllerAction: "/api/MRRReport/GetMarketTotalsByCategoryAllMarkets",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['MRR'],
+        sortable: false
 
     }
 
