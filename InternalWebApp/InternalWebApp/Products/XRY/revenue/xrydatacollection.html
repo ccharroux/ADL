@@ -2129,7 +2129,43 @@
                             '","' +
                             row["Media Type"] +
                             '",' + row["submissionId"];
-                        actions += '<a href="#" onclick=changeAvailability(' + parameters + ');>Change&nbsp;Availability</a>';
+                        actions += '<a href="#" onclick=changeAvailability(' + parameters + ');>Change&nbsp;Availability</a><br/>';
+                    }
+
+                    if ($("#rdoThirdParty").is(':checked'))
+                    {
+                        //nothing to do here since it is at the market level
+                    } else
+                    {
+                        //need to determine what other criteria to use to include the delete revenue link
+                        //if hasn't been posted, etc., there are no records to delete.
+                        //could leave as is since an error message will appear if nothing is deleted
+
+                        //if row.Revenue > 0
+                        //show the link
+                        //pass status, amount, station, period, year
+                        //figure out how to strip the $ and ,
+                        var sRevenue = row.Revenue;
+                        sRevenue = sRevenue.replace(/\$/g, "").replace(/,/g, "");
+                        var iRevenue = parseInt(sRevenue, 10);
+                        if (iRevenue > 0)
+                        {
+                            parameters = "";
+                            parameters = row["stationId"] +
+                                ',"' +
+                                row["Station"].replace(/[\s]/g, "&nbsp;") +
+                                '","' +
+                                row["Revenue"] +
+                                '",' +
+                                $("#ddlYear").val() +
+                                ',' +
+                                $("#ddlPeriod").val() +
+                                ',"' +
+                                row["Status"] +
+                                '"';
+                            
+                            actions += '<a href="#" onclick=deleteRevenue(' + parameters + ');>Delete&nbsp;Revenue</a><br/>';
+                        }
                     }
                 }
 
@@ -3707,8 +3743,7 @@
                         //bootbox.alert("You must enter a Client Comment for a revision", function () { return; });
                         reject("You must enter a Client Comment for a revision");
                     }
-                    importProcessCommentArray.push(objText)
-
+                    importProcessCommentArray.push(objText);
                 }
 
                 importProcessArray.push(obj);
@@ -3936,5 +3971,83 @@
 
         });
         resetImportButtons();
+    }
+
+    function deleteRevenue(stationId, stationName, revenue, year, period, status)
+    {
+        var msg = "";
+        msg += "Are you sure that you want to delete the revenue for station: " +
+            stationName +
+            "? The station is in a status of " +
+            status +
+            ".<br/> You will be deleting " + revenue + " for " + period + "/" + year + ".";
+
+        var dialog = bootbox.dialog({
+            title: "Delete Station Revenue for " + stationName,
+            message: msg,
+            size: 'large',
+            buttons: {
+                yes: {
+                    label: "Yes",
+                    className: 'btn-primary',
+                    callback: function () {
+                        
+                        //delete the revenue
+                        processDeleteRevenue(stationId, year, period, stationName);
+                    }
+                },
+                cancel: {
+                    label: "Cancel",
+                    className: '',
+                    callback: function ()
+                    {
+                        return;
+                    }
+                }
+            },
+            onEscape: function ()
+            {
+                dialog.modal("hide");
+                return;
+            }
+        });
+    }
+
+    function processDeleteRevenue(stationId, year, period, stationName)
+    {
+        //this will call the api to delete the revenue
+        $.ajax({
+            url: ServicePrefix + '/api/XRAYRevenue/DeleteRevenueByStationYearPeriod',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStationId": stationId,
+                "inYear": year,
+                "inPeriod": addZero(period)
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    bootbox.alert("The revenue for station: " + stationName + " for period/year, " + period +"/" + year + ", has been deleted.",
+                        function () {
+
+                        });
+
+                    getDataCollectionList();
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
     }
 </script>

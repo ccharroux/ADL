@@ -300,6 +300,8 @@ reportName.push("rptAdvertiserByCategory");
 reportName.push("rptTVBInvalidStationList");
 reportName.push("rptMRRCategoryYTDList");
 
+reportName.push("rptXrayDeleteStationRevenueLogList");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -11854,6 +11856,77 @@ function getReportObject_MRRCategoryYTDList() {
         columnsToDisplay: columnsToDisplay,
         product: ['MRR'],
         sortable: false
+
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_XrayDeleteStationRevenueLogList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        jsCall: "getPeriodList",
+        jsCallParameters: ['all'],
+        objectName: "ddlPeriod",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+
+    return arrayFilters;
+}
+
+function getReportObject_XrayDeleteStationRevenueLogList() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+        reportTitle: "XRay Deleted Station Revenue Log",
+        apiControllerAction: "/api/XRAYReport/GetXrayDeleteStationRevenueLogList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry', 'XRY Data Review'],
+        sortable: true
 
     }
 
