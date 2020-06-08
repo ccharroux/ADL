@@ -1681,7 +1681,7 @@
                 initiateWebNotification(gEmailTokenPassAndUsernameChange);
                 break;
             case gEmailTokenPasswordChange.toUpperCase():
-                resetPassword();
+                showResetPasswordDialog();
                 break;
             default:
                 bootbox.alert("There was an issue when finding an email token. Invalid email token: " + emailToken);
@@ -1690,7 +1690,48 @@
 
     }
 
+    function showResetPasswordDialog() {
+        var strMessage = "User's password will be reset. Send email now?";
+
+        bootbox.dialog({
+            message: strMessage,
+            buttons: {
+                btnCancel: {
+                    label: "Cancel",
+                    callback: function () {
+                        usernamePasswordChangeCancelDialog();
+                        return;
+                    }
+                },
+                btnYes: {
+                    label: "Send Email",
+                    callback: function () {
+                        resetPassword();
+                    }
+                },
+                btnNo: {
+                    label: "No",
+                    callback: function () {
+                        //email will not be sent
+                        //but pending notification will be
+                        //created for internal user to send
+                        //when they are ready.
+                        insertPendingNotification(gEmailTokenPasswordChange);
+                    }
+                }
+
+            }
+        });
+
+
+
+    }
+
+
+
+
     function resetPassword() {
+
         var url = ServicePrefix + '/api/Personnel/ResetPasswordFromInternal';
 
         var settings = {
@@ -1699,7 +1740,8 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inPersonnelId": personnelID
+                "inPersonnelId": personnelID,
+                "inEmail": $("#txtEmailAddress").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -1718,7 +1760,9 @@
             return;
         }
 
-        bootbox.alert("Password reset initiated successfully.");
+        bootbox.alert("Password reset initiated successfully.", function () {
+            getPersonnelWebSetup();
+        });
     }
     function goToPersonnelSnapshot() {
         setPageParameters();
