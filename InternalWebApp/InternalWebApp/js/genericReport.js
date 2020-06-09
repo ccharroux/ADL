@@ -9642,6 +9642,14 @@ function getReportFilterArray_MRRStationSubmissionStatus() {
     }
     arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
     arrayObject = new Object();
     arrayObject = {
         token: "StationStatus",
