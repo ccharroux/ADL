@@ -301,6 +301,7 @@ reportName.push("rptTVBInvalidStationList");
 reportName.push("rptMRRCategoryYTDList");
 
 reportName.push("rptXrayDeleteStationRevenueLogList");
+reportName.push("rptExclusiveAccountChanges");
 
 function buildReportArray()
 {
@@ -9755,6 +9756,51 @@ function getReportFilterArray_ExclusiveAdvertiserChanges() {
 
     return arrayFilters;
 }
+function getReportFilterArray_ExclusiveAccountChanges() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwner",
+        required: false
+    }
+
+    arrayFilters.push(arrayObject);
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
 function getReportObject_ExclusiveAdvertiserChanges() {
 
     var tempObject = new Object();
@@ -9768,6 +9814,25 @@ function getReportObject_ExclusiveAdvertiserChanges() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['market', 'advertiser', 'xry', 'qa'],
+        sortable: true
+
+    }
+
+    return tempObject;
+}
+function getReportObject_ExclusiveAccountChanges() {
+
+    var tempObject = new Object();
+
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "XRay Exclusive Account Changes",
+        apiControllerAction: "/api/XRAYReport/GetExclusiveAccountChanges",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['market', 'agency', 'xry', 'qa'],
         sortable: true
 
     }
