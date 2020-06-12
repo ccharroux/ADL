@@ -114,8 +114,8 @@
                         -->
                         <div class="col-md-2 text-align-left">
                             Select by:<br />
-                            <input type="radio" id="rdoMarket" name="profileOptions" /><label for="rdoMarket">Market</label><br />
-                            <input type="radio" id="rdoOwner" name="profileOptions" /><label for="rdoOwner">Owner</label>
+                            <input type="radio" id="rdoMarket" name="profileOptions" value="market" /><label for="rdoMarket">Market</label><br />
+                            <input type="radio" id="rdoOwner" name="profileOptions" value="owner" /><label for="rdoOwner">Owner</label>
                         </div>
 
                         <!-- cluster api
@@ -126,9 +126,7 @@
                         <div class="col-md-3 market-choice">
                             <div>
                                 <label>Market</label>
-                                <select>
-                                    <option>Individual Market</option>
-                                </select>
+                                <select id="ddlMarket" onchange="getOwnersByMarket();"></select>
                             </div>
                             <div style="margin-top: 20px;">
                                 <label>Owners</label>
@@ -144,31 +142,29 @@
                         -->
                         <div class="col-md-3 owner-choice" style="display: none;">
                             <div>
-                                <label>owner</label>
-                                <select>
-                                    <option>Individual Owner</option>
-                                </select>
+                                <label>Owner</label>
+                                <select id="ddlOwner" onchange="getMarketsByOwner(); getOwnerGroupsByOwner();"></select>
                             </div>
-                            <div style="margin-top: 20px;" >
-                                <label>market</label>
+                            <div style="margin-top: 20px;">
+                                <label>Market</label>
                                 <div id="market-by-owner">
                                     <input type="checkbox" style="text-align: left;" /> <!-- markets -->
                                 </div>
                             </div>
                             <div style="margin-top: 20px;">
-                                <label>owner groups</label>
-                                <div id="id="ownergroup-by-owner"">
+                                <label>Owner Groups</label>
+                                <div id="ownergroup-by-owner">
                                     <input type="checkbox" style="text-align: left;" /> <!-- ownergroups -->
-                                    </div>
+                                </div>
                             </div>
 
                         </div>
 
                         <div class="col-md-3 text-align-right">
-                            <input type="button" id="btnReport" class="search-button" value="Assign" onclick="" /><br/>
+                            <input type="button" id="btnReport" class="search-button" value="Assign" onclick="" /><br />
                             <input type="checkbox" id="chkKeepAssignments" /><label for="chkKeepAssignments">Retain current assignments</label>
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
@@ -217,51 +213,316 @@
         buildQuickReports(['tech']);
 
         setupUI();
+
+        //load functionality based on market
+        getMarketList(true);
     });
 
     function setupUI() {
+
+        $("#rdoMarket").prop("checked", true);
+
         //setup radio button click
         //if market clicked
         //select first market and load owners for that market
         //if owner clicked
         //select first owner and load markets and owner groups for that owner
 
-        //load everything based on market being selected and the first market selected
-        //follow logic above for market
+        $('input[type=radio][name=profileOptions]').change(function () {
+
+            if (this.value == 'market') {
+                
+                $(".market-choice").show();
+                //hide owner sections
+                $(".owner-choice").hide();
+
+                getMarketList(false);
+
+            } else if (this.value == 'owner') {
+                
+                //hide market section
+                $(".market-choice").hide();
+                //hide owner sections
+                $(".owner-choice").show();
+                //get list of markets for owner
+                //get list of owner groups for owner
+                getOwnersList();
+
+            } else {
+                
+                //defaulting to market value if the radio button value is lost
+                $(".market-choice").show();
+                //hide owner sections
+                $(".owner-choice").hide();
+                
+                getMarketList(false);
+            }
+        });
+
+       
     }
 
-    function getOwnersByMarket()
-    {
+    function getMarketList(pageLoad) {
+
+        if (!pageLoad)
+        {
+            pageLoad = false;
+        }
+
+        var control = "ddlMarket";
+
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    
+                    $.each(data.report.rows, function (index) {
+                        
+                        if (index == 0) {
+                            str = str + '<option value="' + data.report.rows[index].marketId + '" selected="selected">' + data.report.rows[index].marketName + '</option>';
+                        } else {
+                            str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
+                        }
+                    });
+
+                    $("#" + control).html(str);
+                    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    //now get the list of owners
+                    getOwnersByMarket();
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getOwnersByMarket() {
         //api /Owner/GetOwnerListByMarket
         //post
         //param marketid
+
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerListByMarket',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": $("#ddlMarket").val(),
+                "inIncludeBA": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else
+                {
+                    $("#owner-by-market").html('');
+                    var str = "";
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+                        //build the checkboxes here
+                        str = str +
+                            '<input type="checkbox" id="o_' +
+                            obj.ownerid +
+                            '" value="' +
+                            obj.ownerid +
+                            '" name="checkOwners" /><label for="o_' +
+                            obj.ownerid +
+                            '">' +
+                            obj.ownername +
+                            '</label><br/>';
+                    });
+
+                    $("#owner-by-market").html(str);
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
     }
 
-    function getMarketsByOwner()
+    function getOwnersList()
     {
-        //api /Owner/GetMarketListByOwner
+        //api /Market/GetMarketList
         //post
-        //parameters
-        //ownerid
-        //@inIncludeBA = 1
-        //create the market checkboxes
+        var control = "ddlOwner";
+
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inActiveOnly": true,
+                "inAddDetails": false
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+
+                    $.each(data.report.rows, function (index) {
+
+                        if (index == 0) {
+                            str = str + '<option value="' + data.report.rows[index].OwnerID + '" selected="selected">' + data.report.rows[index].OwnerName + '&nbsp;(' + data.report.rows[index].OwnerID + ')</option>';
+                        } else {
+                            str = str + '<option value="' + data.report.rows[index].OwnerID + '">' + data.report.rows[index].OwnerName + '&nbsp;(' + data.report.rows[index].OwnerID + ')</option>';
+                        }
+                    });
+
+                    $("#" + control).html(str);
+                    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    //get markets
+                    getMarketsByOwner();
+                    //get ownergroups
+                    getOwnerGroupsByOwner();
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
     }
 
-    function getOwnerGroupsByOwner()
-    {
-        //look at how this loaded
-        //api /OwnerGroup/GetOwnerGroupListByOwner
-        //post
-        //parameters
-        //@inOwnerId = 5,
-        //@inActiveOnly = 1,
-        //@inIncludeNationwide = 1
+    function getMarketsByOwner() {
+        
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetMarketListByOwner',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerId": $("#ddlOwner").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
 
-        //create the owner group checkboxes
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    $("#market-by-owner").html('');
+                    var str = "";
+                    $.each(data.report.rows, function (index) {
+                        
+                        var obj = data.report.rows[index];
+                        //build the checkboxes here
+                        str = str +
+                            '<input type="checkbox" id="m_' +
+                            obj.M_MarketID +
+                            '" value="' +
+                            obj.M_MarketID +
+                            '" name="checkMarkets" /><label for="m_' +
+                            obj.M_MarketID +
+                            '">' +
+                            obj.M_MarketName +
+                            '&nbsp;(' +
+                            obj.M_MarketID +
+                            ')</label><br/>';
+                    });
+
+                    $("#market-by-owner").html(str);
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
     }
 
-    function assignItems()
-    {
+    function getOwnerGroupsByOwner() {
+        
+        $.ajax({
+            url: ServicePrefix + '/api/OwnerGroup/GetOwnerGroupListByOwner',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerId": $("#ddlOwner").val(),
+                "inActiveOnly": true,
+                "inIncludeNationwide": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    $("#ownergroup-by-owner").html('');
+
+                    var str = "";
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+                        //build the checkboxes here
+                        str = str +
+                            '<input type="checkbox" id="og_' +
+                            obj.ownerGroupId +
+                            '" value="' +
+                            obj.ownerGroupId +
+                            '" name="checkOwnerGroups" /><label for="og_' +
+                            obj.ownerGroupId +
+                            '">' +
+                            obj.ownerGroupName +
+                            '&nbsp;(' +
+                            obj.ownerGroupId +
+                            ')</label><br/>';
+                    });
+
+                    $("#ownergroup-by-owner").html(str);
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function assignItems() {
         //if retain current unchecked
         //call delete api
 
@@ -279,8 +540,7 @@
 
     }
 
-    function validateSelections()
-    {
+    function validateSelections() {
         //should have at least one to assign
         //if market checked at least 1 owner
 
