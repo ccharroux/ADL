@@ -302,6 +302,7 @@ reportName.push("rptMRRCategoryYTDList");
 
 reportName.push("rptXrayDeleteStationRevenueLogList");
 reportName.push("rptExclusiveAccountChanges");
+reportName.push("rptMarketInfo");
 
 function buildReportArray()
 {
@@ -12005,3 +12006,36 @@ function getReportObject_XrayDeleteStationRevenueLogList() {
 
     return tempObject;
 }
+
+function getReportFilterArray_MarketInfo() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_MarketInfo() {
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject = {
+        reportTitle: "Market Information",
+        apiControllerAction: '/api/Market/GetMarketInfo',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['market'],
+        sortable: true
+    }
+
+    return tempObject;
+}
+
+
