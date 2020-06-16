@@ -11614,7 +11614,8 @@ function getReportObject_CategoryGrowthByMarket() {
         apiControllerAction: "/api/XrayReport/GetCategoryGrowthByMarket",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry', 'XRY Data Review']
+        product: ['xry', 'XRY Data Review'],
+        approved: true
     }
 
     return tempObject;
@@ -11840,7 +11841,8 @@ function getReportObject_AdvertiserByCategory() {
         columnsToDisplay: columnsToDisplay,
         product: ['xry', 'advertiser', 'XRY Data Review'],
         sortable: true,
-        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        approved: true
 
     }
 
