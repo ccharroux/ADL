@@ -12021,6 +12021,16 @@ function getReportFilterArray_MarketInfo() {
     }
     arrayFilters.push(arrayObject);
 
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        objectName: "ddlMarket",
+        required: false,
+        reloadBasedProduct: true
+    }
+    arrayFilters.push(arrayObject);
+
     return arrayFilters;
 }
 
