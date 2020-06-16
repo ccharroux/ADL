@@ -12014,20 +12014,10 @@ function getReportFilterArray_MarketInfo() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token: "Product",
-        jsCall: "getProductList",
-        objectName: "ddlProduct",
-        required: true
-    }
-    arrayFilters.push(arrayObject);
-
-    arrayObject = new Object();
-    arrayObject = {
         token: "Market",
-        jsCall: "getMarketListByProduct",
+        jsCall: "getMarketListAll",
         objectName: "ddlMarket",
-        required: false,
-        reloadBasedProduct: true
+        required: false
     }
     arrayFilters.push(arrayObject);
 
