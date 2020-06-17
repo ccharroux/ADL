@@ -60,6 +60,16 @@
 
 
     <style>
+        .rdo-label {
+            padding-left: 5px;
+        }
+
+        .rtpViewRight {
+            margin-right: 5px;
+            vertical-align: top;
+            display: inline-block;
+        }
+
         .rptView {
             margin-left: 5px;
             vertical-align: top;
@@ -112,10 +122,10 @@
                         select by radio buttons market/owner
                         ddl of owner or market
                         -->
-                        <div class="col-md-2 text-align-left">
+                        <div class="col-md-12 text-align-left">
                             Select by:<br />
-                            <input type="radio" id="rdoMarket" name="profileOptions" value="market" /><label for="rdoMarket">Market</label><br />
-                            <input type="radio" id="rdoOwner" name="profileOptions" value="owner" /><label for="rdoOwner">Owner</label>
+                            <input type="radio" id="rdoMarket" name="profileOptions" value="market" class="report-filter" /><label for="rdoMarket" class="rdo-label rtpViewRight">Market</label>
+                            <input type="radio" id="rdoOwner" name="profileOptions" value="owner" class="report-filter" /><label for="rdoOwner" class="rdo-label rtpViewRight">Owner</label>
                         </div>
 
                         <!-- cluster api
@@ -123,15 +133,25 @@
                         display ddl of markets
                         checkboxes of owners
                         -->
-                        <div class="col-md-3 market-choice">
-                            <div>
-                                <label>Market</label>
-                                <select id="ddlMarket" onchange="getOwnersByMarket();"></select>
+                    </div>
+                    
+                    <div class="row text-align-left" style="margin-top: 20px;">
+                        <div class="col-md-9 market-choice">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label class="dropdown-label rptView">Market</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <select id="ddlMarket" class="dropdown-select rptView report-filter" onchange="getOwnersByMarket();"></select>
+                                </div>
                             </div>
-                            <div style="margin-top: 20px;">
-                                <label>Owners</label>
-                                <div id="owner-by-market">
-                                    <input type="checkbox" style="text-align: left;" /> <!-- owner -->
+                            <div class="row" style="margin-top: 20px;">
+                                <div class="col-md-2">
+                                    <label class="dropdown-label rptView">Owners</label>
+                                </div>
+                                <div class="col-md-9 text-align-left">
+                                    <div id="owner-by-market">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -140,36 +160,49 @@
                         if owner selected
                         checkboxes of markets
                         -->
-                        <div class="col-md-3 owner-choice" style="display: none;">
-                            <div>
-                                <label>Owner</label>
-                                <select id="ddlOwner" onchange="getMarketsByOwner(); getOwnerGroupsByOwner();"></select>
-                            </div>
-                            <div style="margin-top: 20px;">
-                                <label>Market</label>
-                                <div id="market-by-owner">
-                                    <input type="checkbox" style="text-align: left;" /> <!-- markets -->
+                        <div class="col-md-9 owner-choice" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label class="dropdown-label rptView">Owner</label>
                                 </div>
-                            </div>
-                            <div style="margin-top: 20px;">
-                                <label>Owner Groups</label>
-                                <div id="ownergroup-by-owner">
-                                    <input type="checkbox" style="text-align: left;" /> <!-- ownergroups -->
+                                <div class="col-md-9">
+                                    <select id="ddlOwner" class="dropdown-select rptView report-filter text-align-left" onchange="getMarketsByOwner(); getOwnerGroupsByOwner();"></select>
                                 </div>
                             </div>
 
+                            <div class="row" style="margin-top: 20px;">
+                                <div class="col-md-2">
+                                    <label class="dropdown-label rptView">Markets</label>
+                                </div>
+                                <div class="col-md-9 text-align-left">
+                                    <div id="market-by-owner">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 20px;">
+                                <div class="col-md-2">
+                                    <label class="dropdown-label rptView">Owner&nbsp;Groups</label>
+                                </div>
+                                <div class="col-md-9 text-align-left">
+                                    <div id="ownergroup-by-owner">
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
 
-                        <div class="col-md-3 text-align-right">
+                        <div class="col-md-3 text-align-left">
                             <input type="button" id="btnReport" class="search-button" value="Assign" onclick="assignItems();" /><br />
-                            <input type="checkbox" id="chkKeepAssignments" /><label for="chkKeepAssignments">Retain current assignments</label>
+                            <input type="checkbox" id="chkKeepAssignments" /><label for="chkKeepAssignments" class="dropdown-select report-filter rdo-label rtpViewRight">Retain current assignments</label>
                         </div>
+
 
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
@@ -231,7 +264,7 @@
         $('input[type=radio][name=profileOptions]').change(function () {
 
             if (this.value == 'market') {
-                
+
                 $(".market-choice").show();
                 //hide owner sections
                 $(".owner-choice").hide();
@@ -239,7 +272,7 @@
                 getMarketList(false);
 
             } else if (this.value == 'owner') {
-                
+
                 //hide market section
                 $(".market-choice").hide();
                 //hide owner sections
@@ -249,23 +282,22 @@
                 getOwnersList();
 
             } else {
-                
+
                 //defaulting to market value if the radio button value is lost
                 $(".market-choice").show();
                 //hide owner sections
                 $(".owner-choice").hide();
-                
+
                 getMarketList(false);
             }
         });
 
-       
+
     }
 
     function getMarketList(pageLoad) {
 
-        if (!pageLoad)
-        {
+        if (!pageLoad) {
             pageLoad = false;
         }
 
@@ -288,9 +320,9 @@
                 else {
 
                     var str = '';
-                    
+
                     $.each(data.report.rows, function (index) {
-                        
+
                         if (index == 0) {
                             str = str + '<option value="' + data.report.rows[index].marketId + '" selected="selected">' + data.report.rows[index].marketName + '</option>';
                         } else {
@@ -314,9 +346,6 @@
     }
 
     function getOwnersByMarket() {
-        //api /Owner/GetOwnerListByMarket
-        //post
-        //param marketid
 
         $.ajax({
             url: ServicePrefix + '/api/Owner/GetOwnerListByMarket',
@@ -334,22 +363,21 @@
                 if (data.response.status != "SUCCESS") {
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
-                else
-                {
+                else {
                     $("#owner-by-market").html('');
                     var str = "";
                     $.each(data.report.rows, function (index) {
 
                         var obj = data.report.rows[index];
-                        //build the checkboxes here
+                      
                         str = str +
                             '<input type="checkbox" id="o_' +
                             obj.ownerid +
                             '" value="' +
                             obj.ownerid +
-                            '" name="checkOwners" /><label for="o_' +
+                            '" name="checkOwners" class="report-filter"/><label for="o_' +
                             obj.ownerid +
-                            '">' +
+                            '" class="rdo-label">' +
                             obj.ownername +
                             '</label><br/>';
                     });
@@ -366,10 +394,8 @@
 
     }
 
-    function getOwnersList()
-    {
-        //api /Market/GetMarketList
-        //post
+    function getOwnersList() {
+        
         var control = "ddlOwner";
 
         $.ajax({
@@ -419,7 +445,7 @@
     }
 
     function getMarketsByOwner() {
-        
+
         $.ajax({
             url: ServicePrefix + '/api/Owner/GetMarketListByOwner',
             dataType: 'json',
@@ -440,17 +466,17 @@
                     $("#market-by-owner").html('');
                     var str = "";
                     $.each(data.report.rows, function (index) {
-                        
+
                         var obj = data.report.rows[index];
-                        //build the checkboxes here
+                        
                         str = str +
                             '<input type="checkbox" id="m_' +
                             obj.M_MarketID +
                             '" value="' +
                             obj.M_MarketID +
-                            '" name="checkMarkets" /><label for="m_' +
+                            '" name="checkMarkets" class="report-filter" /><label for="m_' +
                             obj.M_MarketID +
-                            '">' +
+                            '" class="rdo-label rtpViewRight" >' +
                             obj.M_MarketName +
                             '&nbsp;(' +
                             obj.M_MarketID +
@@ -469,7 +495,7 @@
     }
 
     function getOwnerGroupsByOwner() {
-        
+
         $.ajax({
             url: ServicePrefix + '/api/OwnerGroup/GetOwnerGroupListByOwner',
             dataType: 'json',
@@ -495,15 +521,15 @@
                     $.each(data.report.rows, function (index) {
 
                         var obj = data.report.rows[index];
-                        //build the checkboxes here
+                        
                         str = str +
                             '<input type="checkbox" id="og_' +
                             obj.ownerGroupId +
                             '" value="' +
                             obj.ownerGroupId +
-                            '" name="checkOwnerGroups" /><label for="og_' +
+                            '" name="checkOwnerGroups" class="report-filter" /><label for="og_' +
                             obj.ownerGroupId +
-                            '">' +
+                            '" class="rdo-label rtpViewRight" >' +
                             obj.ownerGroupName +
                             '&nbsp;(' +
                             obj.ownerGroupId +
@@ -530,9 +556,8 @@
         var aMarkets = new Array();
         var aOwnerGroups = new Array();
 
-        if ($("#rdoMarket").is(':checked'))
-        {
-           
+        if ($("#rdoMarket").is(':checked')) {
+
             aMarkets.push($("#ddlMarket").val());
 
             $('input[name=checkOwners]:checked').each(function () {
@@ -540,15 +565,18 @@
                 aOwners.push($(this).attr('value'));
             });
 
-            if (aOwners.length == 0)
-            {
-                alert("no owners");
+            if (aOwners.length == 0) {
+                bootbox.alert(
+                    "You haven't selected any owners to assign.",
+                    function () {
+
+                    }
+                );
                 return;
             }
         }
 
-        if ($("#rdoOwner").is(':checked'))
-        {
+        if ($("#rdoOwner").is(':checked')) {
             aOwners.push($("#ddlOwner").val());
 
             $('input[name=checkMarkets]:checked').each(function () {
@@ -558,12 +586,17 @@
 
             $('input[name=checkOwnerGroups]:checked').each(function () {
                 //code
-               aOwnerGroups.push($(this).attr('value'));
+                aOwnerGroups.push($(this).attr('value'));
             });
 
-            if (aMarkets.length == 0 && aOwnerGroups.length == 0)
-            {
-                alert("nothing selected");
+            if (aMarkets.length == 0 && aOwnerGroups.length == 0) {
+                bootbox.alert(
+                    "You haven't selected any markets or owner groups to assign.",
+                    function () {
+
+                    }
+                );
+                return;
             }
 
         }
@@ -572,21 +605,17 @@
         //if retain current unchecked
         //call delete api
 
-        if($("#chkKeepAssignments").is(':checked'))
-        {
-            
+        if ($("#chkKeepAssignments").is(':checked')) {
+
             //keep assignments
             //handle the other calls
-            if (aOwners.length > 0)
-            {
+            if (aOwners.length > 0 && aMarkets.length > 0) {
                 assignClusters(aOwners, aMarkets, aOwnerGroups);
-            } else if (aOwnerGroups.length > 0)
-            {
+            } else if (aOwnerGroups.length > 0) {
                 assignOwnerGroups(aOwnerGroups);
             }
 
-        } else
-        {
+        } else {
             //add message asking if you want to delete your assignments??
             //call delete assignments
             deleteAssignments(aOwners, aMarkets, aOwnerGroups);
@@ -605,8 +634,7 @@
         //build list of ownerships
     }
 
-    function deleteAssignments(aOwners, aMarkets, aOwnerGroups)
-    {
+    function deleteAssignments(aOwners, aMarkets, aOwnerGroups) {
         setThisQueryToRunLongNoAutoUnBlock();
 
         $.ajax({
@@ -625,15 +653,13 @@
                 }
                 else {
 
-                    if (aOwners.length > 0 && aMarkets.length > 0)
-                    {
+                    if (aOwners.length > 0 && aMarkets.length > 0) {
                         assignClusters(aOwners, aMarkets, aOwnerGroups);
 
-                    }else if (aOwnerGroups.length > 0)
-                    {
+                    } else if (aOwnerGroups.length > 0) {
                         assignOwnerGroups(aOwnerGroups);
                     }
-                  
+
                 }
 
             },
@@ -643,11 +669,9 @@
         });
     }
 
-    function assignClusters(aOwners, aMarkets, aOwnerGroups)
-    {
-    
-        if (aOwners.length == 0 && aMarkets.length == 0)
-        {
+    function assignClusters(aOwners, aMarkets, aOwnerGroups) {
+
+        if (aOwners.length == 0 && aMarkets.length == 0) {
             assignOwnerGroups(aOwnerGroups);
         }
 
@@ -671,11 +695,9 @@
                 }
                 else {
 
-                    if (aOwnerGroups.length > 0)
-                    {
+                    if (aOwnerGroups.length > 0) {
                         assignOwnerGroups(aOwnerGroups);
-                    } else
-                    {
+                    } else {
                         //message that assignments are done
                         bootbox.alert(
                             "Your assignments have been updated.",
@@ -695,11 +717,9 @@
 
     }
 
-    function assignOwnerGroups(aOwnerGroups)
-    {
-       
-        if (aOwnerGroups.length == 0)
-        {
+    function assignOwnerGroups(aOwnerGroups) {
+
+        if (aOwnerGroups.length == 0) {
             bootbox.alert(
                 "Your assignments have been updated.",
                 function () {
