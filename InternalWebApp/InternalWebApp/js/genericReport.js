@@ -577,7 +577,8 @@ function getReportObject_MRRMarketSummary()
         apiControllerAction:  "/api/MRRReport/GetMarketSummary",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product: ['mrr', 'MRR Data Review', 'mrr delivery', 'mrr pre-release']
+        product: ['mrr', 'MRR Data Review', 'mrr delivery', 'mrr pre-release'],
+        approved : true
     }
 
     return tempObject;
@@ -2518,7 +2519,8 @@ function getReportObject_MarketSetupMarketOwnerGroups() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'mrr setup info'],
-        sortable: true
+        sortable: true,
+        approved: true
     }
 
     return tempObject;
@@ -3055,7 +3057,8 @@ function getReportObject_MarketReleaseList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Data Review', 'mrr delivery', 'mrr delivery'],
-        sortable: true
+        sortable: true,
+        approved: true
     }
 
     return tempObject;
@@ -4749,7 +4752,8 @@ function getReportObject_MRRRevenueOutOfBalanceList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'MRR Security and Analysis'],
-        autoUpdate: false
+        autoUpdate: false,
+        approved: true
     }
 
     return tempObject;
@@ -9880,7 +9884,8 @@ function getReportObject_MRRMarketTotalsForNAB() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['mrr', 'NAB', 'survey'],
-        sortable: true
+        sortable: true,
+        approved : true
 
     }
 
