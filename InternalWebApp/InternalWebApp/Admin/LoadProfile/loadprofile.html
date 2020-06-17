@@ -123,7 +123,7 @@
                         ddl of owner or market
                         -->
                         <div class="col-md-12 text-align-left">
-                            Select by:<br />
+                            <b>Select by:</b>&nbsp;&nbsp;
                             <input type="radio" id="rdoMarket" name="profileOptions" value="market" class="report-filter" /><label for="rdoMarket" class="rdo-label rtpViewRight">Market</label>
                             <input type="radio" id="rdoOwner" name="profileOptions" value="owner" class="report-filter" /><label for="rdoOwner" class="rdo-label rtpViewRight">Owner</label>
                         </div>
@@ -192,7 +192,7 @@
                         </div>
 
                         <div class="col-md-3 text-align-left">
-                            <input type="button" id="btnReport" class="search-button" value="Assign" onclick="assignItems();" /><br />
+                            <input type="button" id="btnReport" class="search-button" value="Assign" onclick="assignItems();" /><br /><br/>
                             <input type="checkbox" id="chkKeepAssignments" /><label for="chkKeepAssignments" class="dropdown-select report-filter rdo-label rtpViewRight">Retain current assignments</label>
                         </div>
 
@@ -249,6 +249,7 @@
 
         //load functionality based on market
         getMarketList(true);
+        getOwnersList(true);
     });
 
     function setupUI() {
@@ -279,7 +280,7 @@
                 $(".owner-choice").show();
                 //get list of markets for owner
                 //get list of owner groups for owner
-                getOwnersList();
+                getOwnersList(false);
 
             } else {
 
@@ -299,6 +300,11 @@
 
         if (!pageLoad) {
             pageLoad = false;
+        }
+
+        if (pageLoad == false)
+        {
+            return;
         }
 
         var control = "ddlMarket";
@@ -394,8 +400,18 @@
 
     }
 
-    function getOwnersList() {
+    function getOwnersList(pageLoad) {
         
+        if (!pageLoad)
+        {
+            pageLoad = false;
+        }
+
+        if (pageLoad == false)
+        {
+            return;
+        }
+
         var control = "ddlOwner";
 
         $.ajax({
@@ -577,6 +593,7 @@
         }
 
         if ($("#rdoOwner").is(':checked')) {
+
             aOwners.push($("#ddlOwner").val());
 
             $('input[name=checkMarkets]:checked').each(function () {
@@ -601,7 +618,6 @@
 
         }
 
-
         //if retain current unchecked
         //call delete api
 
@@ -618,20 +634,37 @@
         } else {
             //add message asking if you want to delete your assignments??
             //call delete assignments
-            deleteAssignments(aOwners, aMarkets, aOwnerGroups);
+            var msg = "Are you sure you want to delete your current assignments?";
+
+            var dialog = bootbox.dialog({
+                title: "Delete Current Assignments",
+                message: msg,
+                size: 'large',
+                buttons: {
+                    yes: {
+                        label: "Yes",
+                        className: 'btn-primary',
+                        callback: function () {
+                            deleteAssignments(aOwners, aMarkets, aOwnerGroups);
+                        }
+                    },
+                    cancel: {
+                        label: "Cancel",
+                        className: '',
+                        callback: function () {
+                            return;
+                        }
+                    }
+                },
+                onEscape: function () {
+                    dialog.modal("hide");
+                    return;
+                }
+            });
+           
             //handle the other calls
         }
 
-        //if successful or no delete determine which apis to call cluster, ownership or both
-
-        //if market checked, just do cluster
-        //build list of owners
-        //build list of markets
-
-
-        //if owner checked do cluster and ownerships
-        //build list of markets and owners
-        //build list of ownerships
     }
 
     function deleteAssignments(aOwners, aMarkets, aOwnerGroups) {
@@ -766,37 +799,5 @@
         });
 
     }
-
-    //function validateSelections()
-    //{
-    //    var loopback = true;
-    //    //should have at least one to assign
-    //    //if market checked at least 1 owner
-
-    //    //if owner checked
-    //    //market and ownership together can't equal 0 selected
-    //    if ($("#rdoMarket").is(':checked'))
-    //    {
-    //        $('input[name=checkOwners]:checked').each(function () {
-    //            //code
-    //            console.log($(this).attr('value'));
-    //        });
-    //    }
-
-    //    if ($("#rdoOwner").is(':checked')) {
-    //        $('input[name=checkMarkets]:checked').each(function () {
-    //            //code
-    //            console.log($(this).attr('value'));
-    //        });
-
-    //        $('input[name=checkOwnerGroups]:checked').each(function () {
-    //            //code
-    //            console.log($(this).attr('value'));
-    //        });
-
-    //    }
-
-    //    return loopback;
-    //}
 
 </script>
