@@ -12021,6 +12021,15 @@ function getReportFilterArray_MarketInfo() {
     }
     arrayFilters.push(arrayObject);
 
+    arrayObject = new Object();
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
     return arrayFilters;
 }
 
