@@ -302,14 +302,16 @@ $(document).ready(function ()
     $(document).ajaxSuccess(function () {
         gAJAXError = false;
     });
-    $(document).ajaxError(function (event, jqxhr, settings, thrownError) {
-        gAJAXErrorURL = settings.url;
-        if (!settings.data == false)
+
+    $(document).ajaxError(function (event, jqxhr, inSettings, thrownError)
+    {
+        gAJAXErrorURL = inSettings.url;
+
+        if (!inSettings.data == false)
         {
-            gAJAXErrorData = settings.data;
+            gAJAXErrorData = inSettings.data;
         }
-        console.log(settings.url);
-        console.log(settings.data)
+
         gAJAXError = true;
     });
 
