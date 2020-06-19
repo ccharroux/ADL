@@ -1174,7 +1174,8 @@ function getReportObject_UserListing() {
         apiControllerAction:  "/api/XRAYReport/GetXRAYUserListing",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product: ['personnel', 'xry']
+        product: ['personnel', 'xry'],
+        approved: true
     }
 
     return tempObject;
@@ -4320,7 +4321,8 @@ function getReportObject_UserMissingGroup()
         apiControllerAction: "/api/PersonnelReport/GetUserMissingGroupReportList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['personnel']
+        product: ['personnel'],
+        approved: true
     }
 
     return tempObject;
@@ -11557,7 +11559,8 @@ function getReportObject_MRRUserListing() {
         apiControllerAction: "/api/MRRReport/GetMRRUserListing",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['personnel', 'mrr']
+        product: ['personnel', 'mrr'],
+        approved : true
     }
 
     return tempObject;
