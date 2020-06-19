@@ -8490,7 +8490,8 @@ function getReportObject_APILogList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['misc', 'personnel', 'tech'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 

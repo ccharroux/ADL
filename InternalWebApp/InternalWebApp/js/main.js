@@ -1740,11 +1740,23 @@ function getPeriodList(inType, inDefaultSelect) {
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     var thisMonth = (new Date()).getMonth();
 
+    if (inDefaultSelect.toLowerCase() == "priorperiod")
+    {
+        thisMonth = thisMonth - 1;
+        if (thisMonth == -1)
+        {
+            thisMonth = 11;
+            var newYear = $("#ddlYear option:selected").index() + 1;
+            $("#ddlYear")[0].selectedIndex = newYear;
+        }
+    }
+
     var str = '';
     str = '<option value="">-- Select a Period</option>';
 
     if (inType == 'months' || inType == 'all') {
-        for (var i = 1; i <= 12; i++) {
+        for (var i = 1; i <= 12; i++)
+        {
 
             str = str + '<option ';
 
