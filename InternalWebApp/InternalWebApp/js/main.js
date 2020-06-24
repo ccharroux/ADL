@@ -2310,7 +2310,7 @@ function buildCustomLink(objectName, data, bSortable, className) {
 
             if (row[objectName] != null &&
                 row[objectName] != "" &&
-                isNaN(row[objectName].toString().replace("$", "").replace(new RegExp('\,'), '')
+                isNaN(row[objectName].toString().replace("<b>", "").replace("</b>", "").replace("$", "").replace(new RegExp('\,'), '')
                 ) == false) {
                 if (row[objectName].toString().indexOf("-") > -1) {
                     textClassName = "redText";
@@ -2319,7 +2319,7 @@ function buildCustomLink(objectName, data, bSortable, className) {
             // negative %
             if (row[objectName] != null &&
                 row[objectName] != "" &&
-                isNaN(row[objectName].toString().replace("%", "").replace(new RegExp('\,'), '')) == false) {
+                isNaN(row[objectName].toString().replace("<b>", "").replace("</b>", "").replace("%", "").replace(new RegExp('\,'), '')) == false) {
                 if (row[objectName].toString().indexOf("%") > -1) {
                     if (row[objectName].toString().indexOf("-") > -1) {
                         textClassName = "redText";
