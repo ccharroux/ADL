@@ -11942,7 +11942,8 @@ function getReportObject_MRRCategoryYTDList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['MRR'],
-        sortable: false
+        sortable: false,
+        approved: true
 
     }
 
