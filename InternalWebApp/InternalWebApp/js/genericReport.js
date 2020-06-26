@@ -2052,7 +2052,8 @@ function getReportObject_MRREstimatedStationList() {
         apiControllerAction: "/api/MRRReport/GetMRREstimatedStationList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['mrr', 'MRR Data Review', 'mrr pre-release']
+        product: ['mrr', 'MRR Data Review', 'mrr pre-release'],
+        approved : true
     }
 
     return tempObject;
@@ -9682,7 +9683,8 @@ function getReportObject_MRRStationSubmissionStatus() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['market', 'station', 'mrr', 'MRR Data Review', 'mrr delivery'],
-        sortable: true
+        sortable: true,
+        approved: true
 
     }
 
@@ -12052,7 +12054,8 @@ function getReportObject_MarketInfo() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['market'],
-        sortable: true
+        sortable: true,
+        approved: true
     }
 
     return tempObject;
