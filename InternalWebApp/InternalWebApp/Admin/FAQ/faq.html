@@ -35,7 +35,6 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
-
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <!--Chosen Dropdown-->
     <link rel="stylesheet" href="/css/chosen.min.css" />
@@ -71,89 +70,53 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>News</h2>
+                        <h2>FAQ</h2>
                     </div>
                 </div>
-
                 <div class="text-center margin-top-0">
-                    <!-- Is Public -->
-                    <div class="row input-row">
-                        <div class="col-md-3 text-align-left">
-                            <label for="chkIsPublic">Public</label>
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <input type="checkbox" id="chkIsPublic" class="mkaEditable" />
-                        </div>
-                    </div>
                     <!-- Product -->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
                             <label for="ddlProduct">Product</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <select id="ddlProduct" class="mkaEditable"></select>
+                            <select id="ddlProduct" class="mkaEditable" onchange="getFAQCategoryList();"></select>
                         </div>
                     </div>
-                    <!-- Title -->
+                    <!-- FAQ Category -->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtTitle">Title</label>
+                            <label for="ddlFAQCategory">FAQ Category</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" maxlength="100" id="txtTitle" class="mkaRequired mkaEditable" errorMessage="You must enter a Title." value="" />
+                            <select id="ddlFAQCategory" class="mkaEditable"></select>
                         </div>
                     </div>
-                    <!-- Date -->
-                    <div class="row input-row" id="dateRow">
-                        <div class="col-md-3 text-align-left">
-                            <label for="txtDate">Date</label>
-                        </div>
-                        <div class="col-md-9 text-align-left">
-
-                            <label id="txtDate"></label>
-
-                           <!-- <input type="text" id="txtDate" class="mkaEditable" value="" /> -->
-                        </div>
-                    </div>
-                    <!-- Image -->
-                    <div class="row input-row" style="display:none">
-                        <div class="col-md-3 text-align-left">
-                            <label for="txtImage">Image</label>
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <input type="text" maxlength="300" id="txtImage" class="mkaEditable" value="" />
-                        </div>
-                    </div>
-                    <!-- Short Text -->
+                    <!-- Question -->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtShortText">Short Text</label>
+                            <label for="txtQuestion">Question</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <textarea cols="20" rows="50" style="height:200px; width:600px" class="mkaRequired  mkaEditable" id="txtShortText" errorMessage="You must enter Short Text."></textarea>
+                            <textarea cols="20" rows="50" style="height:200px; width:600px" class="mkaRequired  mkaEditable" id="txtQuestion" errorMessage="You must enter a question."></textarea>
                         </div>
                     </div>
-                    <!-- View More -->
-                    <div class="row input-row" style="display:none">
+                    <!-- Answer -->
+                    <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="chkViewMore">View More</label>
+                            <label for="txtAnswer">Answer</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="checkbox" id="chkViewMore" class="mkaEditable" onclick="showOrHideFullText();" />
+                            <textarea cols="20" rows="50" style="height:200px; width:600px" class="mkaRequired  mkaEditable" id="txtAnswer" errorMessage="You must enter an answer."></textarea>
                         </div>
                     </div>
-                    <!-- Text -->
-                    <div class="row input-row" style="display:none"> 
+                    <!-- Requires Login -->
+                    <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtText">Text</label>
+                            <label for="chkRequiresLogin">Requires Login</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <div id="divFullText">
-                                <textarea cols="20" rows="50" style="height:200px; width:600px" class="mkaRequired  mkaEditable" id="txtText" errorMessage="You must enter Text."></textarea>
-                            </div>
-                            <div id="divNoFullText">
-                                (same as Short Text)
-                            </div>
+                            <input type="checkbox" id="chkRequiresLogin" class="mkaEditable" />
                         </div>
                     </div>
                     <hr />
@@ -164,10 +127,10 @@
                             </div>
                             <div class="col-md-6 text-align-center">
                                 <div style="margin-bottom:10px">
-                                    <input style="display:none" value="Update" onclick="excludeFromBackButton(); insertOrUpdateNews();" class="updateButton default-button" type="button">
+                                    <input style="display:none" value="Update" onclick="excludeFromBackButton(); insertOrUpdateFAQ();" class="updateButton default-button" type="button">
                                 </div>
                                 <div>
-                                    <input style="display:none" value="Delete" onclick="excludeFromBackButton(); deleteNews();" class="updateButton default-button" type="button">
+                                    <input style="display:none" value="Delete" onclick="excludeFromBackButton(); deleteFAQ();" class="updateButton default-button" type="button">
                                 </div>
                                 <!--<div class="back-button-div">
                                     <input value="Back" onclick="goBackToList();" class="default-button" type="button">
@@ -213,26 +176,28 @@
 </html>
 <script>
 
-    var newsKey;
+    var faqKey;
+
+    var gotProducts = false;
+    var gotFAQCategories = false;
 
     var gReadOnly = false;
-    initTiny("txtTitle", 100);
-    initTiny("txtShortText");
-    initTiny("txtText");
+    initTiny("txtQuestion");
+    initTiny("txtAnswer");
 
     $(document).ready(function () {
 
-        buildMainMenu("News");
+        buildMainMenu("FAQ");
 
-        if (doesUserHaveAccessToFeature("updatenews") == false) {
-            return;
-        }
-        else
-        {
-            newsKey = getParameterByName("NewsKey");
-            getProductList(); // success -> getNews()
-            setupDatePicker();
-        }
+        // TODO re-enable this once updateFAQ feature is set up
+        //if (doesUserHaveAccessToFeature("updateFAQ") == false) {
+        //    return;
+        //}
+        //else
+        //{
+            faqKey = getParameterByName("faqKey");
+            getProductList(); // success -> getFAQCategoryList()
+        //}
 
     });
 
@@ -267,12 +232,6 @@
         });
     }
 
-    function setupDatePicker() {
-        //$(function () {
-        //    $("#txtDate").datepicker();
-        //});
-    }
-
     function getProductList() {
         $.ajax({
             url: ServicePrefix + '/api/Product/GetProductList',
@@ -304,30 +263,90 @@
             var productId = obj.P_ProductID.toUpperCase();
             str += '<option value="' + productId + '">' + obj.P_ProductName + '</option>';
         });
-        str += '<option value="DEL">DEL (hidden on public web site)</option>';
-        str += '<option value="UPD">UPD (hidden on public web site)</option>';
         $("#ddlProduct").html(str);
 
-        addOrEditNews();
+        gotProducts = true;
+        getFAQCategoryList();
     }
 
-    function addOrEditNews()
-    {
-        if (newsKey == null)
-        { // add
-            MakePageReadOnly(false);
-//            $("#txtDate").datepicker('setDate', new Date());
-            $("#txtDate").html(new Date());
-            $("#chkViewMore").prop("checked", false);
-            $("#dateRow").hide();
+    function getFAQCategoryList(nonRecursive) {
+        if (gotProducts == false) {
+            return;
+        }
 
-            showOrHideFullText();
+        var url = ServicePrefix + '/api/FAQ/GetFAQCategoryList'
+            + '?inApiToken=' + getLocalStorage("APIToken");
+        var productId = $("#ddlProduct").val();
+        if (productId != "") {
+            url += '&inProductId=' + productId;
+        }
+
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getFAQCategoryListSuccess(data, textStatus, jQxhr, nonRecursive);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getFAQCategoryListSuccess(data, textStatus, jQxhr, nonRecursive) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var oldValue = $("#ddlFAQCategory").val();
+        var oldValueFound = false;
+
+        var str = '<option value="">-- Select a FAQ Category --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str += '<option value="' + obj.faqCategoryKey + '">' + obj.productId.toUpperCase() + " - " + obj.name;
+            if (obj.requiresRole != "") {
+                str += ' (requires role ' + obj.requiresRole + ')';
+            }
+            str += '</option>';
+            if (obj.faqCategoryKey == oldValue) {
+                oldValueFound = true;
+            }
+        });
+        $("#ddlFAQCategory").html(str);
+
+        if (oldValueFound) {
+            $("#ddlFAQCategory").val(oldValue);
+        }
+
+        gotFAQCategories = true;
+
+        if (nonRecursive) {
+            return;
+        }
+
+        addOrEditFAQ();
+    }
+
+    function addOrEditFAQ()
+    {
+        if (gotProducts == false || gotFAQCategories == false) {
+            return;
+        }
+
+        MakePageReadOnly(false);
+
+        if (faqKey == null)
+        { // add
+            // no further action needed
         }
         else
         { // edit
-            MakePageReadOnly(false);
-            $("#dateRow").show();
-            getNews(newsKey);
+            getFAQ(faqKey);
         }
     }
 
@@ -342,9 +361,8 @@
             $(".mce-menubar").hide();
             $(".mce-toolbar").hide();
 
-            tinyMCE.get('txtTitle').getBody().setAttribute('editable', false);
-            tinyMCE.get('txtShortText').getBody().setAttribute('editable', false);
-            tinyMCE.get('txtText').getBody().setAttribute('editable', false);
+            tinyMCE.get('txtQuestion').getBody().setAttribute('editable', false);
+            tinyMCE.get('txtAnswer').getBody().setAttribute('editable', false);
         }
         else
         {
@@ -352,10 +370,10 @@
         }
     }
 
-    function getNews(newsKey) {
-        var url = ServicePrefix + '/api/News/GetNews'
+    function getFAQ(faqKey) {
+        var url = ServicePrefix + '/api/FAQ/GetFAQ'
             + "?inApiToken=" + getLocalStorage("APIToken")
-            + "&inNewsKey=" + newsKey;
+            + "&inFAQKey=" + faqKey;
 
         $.ajax({
             url: url,
@@ -364,7 +382,7 @@
             contentType: 'application/json',
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getNewsSuccess(data, textStatus, jQxhr);
+                getFAQSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -372,7 +390,7 @@
         });
     }
 
-    function getNewsSuccess(data, textStatus, jQxhr)
+    function getFAQSuccess(data, textStatus, jQxhr)
     {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
@@ -380,55 +398,58 @@
         }
 
         if (data.report.rows == null || data.report.rows.length == 0) {
-            MKAErrorMessageRtn("Failed to get news data");
+            MKAErrorMessageRtn("Failed to get FAQ data");
             return;
         }
 
         var obj = data.report.rows[0];
 
-        $("#chkIsPublic").prop("checked", obj.IsPublic);
-        $("#ddlProduct").val(obj.ProductID);
-        $("#txtTitle").val(obj.NewsTitle);
-        tinymce.get("txtTitle").setContent(obj.NewsTitle);
-        $("#txtDate").html(obj.NewsDate);
-        // add NewsTime? break ties by NewsKey? add NewsSequence and break ties by that?
-        $("#txtImage").val(obj.NewsImage);
-        $("#txtShortText").val(obj.NewsShortText);
-        tinymce.get("txtShortText").setContent(obj.NewsShortText);
-        $("#chkViewMore").prop("checked", obj.ViewMore);
-        $("#chkViewMore").prop("checked", false);
-
-        $("#txtText").val(obj.NewsText);
-        tinymce.get("txtText").setContent(obj.NewsText);
+        getProductFromFAQCategory(obj.faqCategoryKey);
+        $("#ddlFAQCategory").val(obj.faqCategoryKey);
+        $("#txtQuestion").val(obj.question);
+        tinymce.get("txtQuestion").setContent(obj.question);
+        $("#txtAnswer").val(obj.answer);
+        tinymce.get("txtAnswer").setContent(obj.answer);
+        $("#chkRequiresLogin").prop("checked", obj.requiresLogin);
 
         if (obj.Editable == false)
         {
             gReadOnly = true;
             MakePageReadOnly(true);
-
         }
-
-        showOrHideFullText();
     }
 
-    function showOrHideFullText() {
+    function getProductFromFAQCategory(faqCategoryKey) {
+        var url = ServicePrefix + '/api/FAQ/GetFAQCategory'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inFAQCategoryKey=' + faqCategoryKey;
 
-       //if ($("#chkViewMore").prop("checked"))
-       // {
-       //     $("#divFullText").show();
-       //     $("#divNoFullText").hide();
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getProductFromFAQCategorySuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        });
+    }
 
-       //     var text = tinymce.get("txtText").getContent({ format: 'html' });
-       //     if (text == "") {
-       //         var shortText = tinymce.get("txtShortText").getContent({ format: 'html' });
-       //         tinymce.get("txtText").setContent(shortText);
-       //     }
-       //}
-       // else
-       // {
-            $("#divFullText").hide();
-            $("#divNoFullText").show();
-       // } 
+    function getProductFromFAQCategorySuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var obj = data.report.rows[0];
+
+        $("#ddlProduct").val(obj.productId);
+
+        getFAQCategoryList(true);
     }
 
     function validationPassed() {
@@ -458,7 +479,9 @@
         return loopBreak;
     }
 
-    function insertOrUpdateNews()
+    // TODO resume cleanup here
+
+    function insertOrUpdateFAQ()
     {
         var title = tinymce.get("txtTitle").getContent({ format: 'html' });
         title = title.replace(/^<p>/g, "");
@@ -485,16 +508,16 @@
             return;
         }
 
-        if (newsKey == null) {
-            insertNews();
+        if (faqKey == null) {
+            insertFAQ();
         } else {
-            updateNews();
+            updateFAQ();
         }
     }
 
-    function insertNews() {
+    function insertFAQ() {
         $.ajax({
-            url: ServicePrefix + "/api/News/InsertNews",
+            url: ServicePrefix + "/api/FAQ/InsertFAQ",
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
@@ -502,16 +525,16 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inIsPublic": $("#chkIsPublic").prop("checked"),
                 "inProductId": $("#ddlProduct").val(),
-                "inNewsTitle": $("#txtTitle").val(),
-                "inNewsDateTime": $("#txtDate").val(),
-                "inNewsImage": $("#txtImage").val(),
-                "inNewsShortText": $("#txtShortText").val(),
+                "inFAQTitle": $("#txtTitle").val(),
+                "inFAQDateTime": $("#txtDate").val(),
+                "inFAQImage": $("#txtImage").val(),
+                "inFAQShortText": $("#txtShortText").val(),
                 "inViewMore": $("#chkViewMore").prop("checked"),
-                "inNewsText": $("#txtText").val()
+                "inFAQText": $("#txtText").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                insertOrUpdateNewsSuccess(data, textStatus, jQxhr);
+                insertOrUpdateFAQSuccess(data, textStatus, jQxhr);
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
@@ -519,27 +542,27 @@
         });
     }
 
-    function updateNews() {
+    function updateFAQ() {
         $.ajax({
-            url: ServicePrefix + "/api/News/UpdateNews",
+            url: ServicePrefix + "/api/FAQ/UpdateFAQ",
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inNewsKey": newsKey,
+                "inFAQKey": faqKey,
                 "inIsPublic": $("#chkIsPublic").prop("checked"),
                 "inProductId": $("#ddlProduct").val(),
-                "inNewsTitle": $("#txtTitle").val(),
-                "inNewsDateTime": $("#txtDate").val(),
-                "inNewsImage": $("#txtImage").val(),
-                "inNewsShortText": $("#txtShortText").val(),
+                "inFAQTitle": $("#txtTitle").val(),
+                "inFAQDateTime": $("#txtDate").val(),
+                "inFAQImage": $("#txtImage").val(),
+                "inFAQShortText": $("#txtShortText").val(),
                 "inViewMore": $("#chkViewMore").prop("checked"),
-                "inNewsText": $("#txtText").val()
+                "inFAQText": $("#txtText").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                insertOrUpdateNewsSuccess(data, textStatus, jQxhr);
+                insertOrUpdateFAQSuccess(data, textStatus, jQxhr);
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
@@ -547,7 +570,7 @@
         });
     }
 
-    function insertOrUpdateNewsSuccess(data, textStatus, jQxhr) {
+    function insertOrUpdateFAQSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -556,31 +579,31 @@
         backToList();
     }
 
-    function deleteNews() {
-        if (newsKey == null) {
+    function deleteFAQ() {
+        if (faqKey == null) {
             backToList();
         } else {
-            bootbox.confirm("Are you sure you want to delete this news article?", function (result) {
+            bootbox.confirm("Are you sure you want to delete this FAQ entry?", function (result) {
                 if (result) {
-                    deleteNewsConfirmed();
+                    deleteFAQConfirmed();
                 }
             });
         }
     }
 
-    function deleteNewsConfirmed() {
+    function deleteFAQConfirmed() {
         $.ajax({
-            url: ServicePrefix + "/api/News/UpdateNewsSoftDelete",
+            url: ServicePrefix + "/api/FAQ/DeleteFAQ",
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inNewsKey": newsKey
+                "inFAQKey": faqKey
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                deleteNewsSuccess(data, textStatus, jQxhr);
+                deleteFAQSuccess(data, textStatus, jQxhr);
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
@@ -588,7 +611,7 @@
         });
     }
 
-    function deleteNewsSuccess(data, textStatus, jQxhr) {
+    function deleteFAQSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -598,6 +621,6 @@
     }
 
     function backToList() {
-        window.location = '/admin/news/newslist.html';
+        window.location = '/admin/faq/faqlist.html';
     }
 </script>
