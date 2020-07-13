@@ -1148,7 +1148,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Ownerships") + '">Ownerships<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="/admin/ownership/ownershiplist.html?MenuItem=true" role="button" aria-expanded="false">Ownerships </a>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/ownership/ownershiplist.html?MenuItem=true" role="button" aria-expanded="false" class="approved">Ownerships </a>';
     menuItems += '                  <li style="display:block;"><a href="/admin/ownershipgroup/ownershipgrouplist.html?MenuItem=true">Groups</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/parentownership/parentownershiplist.html?MenuItem=true">Parents</a></li>';
     menuItems += '              </ul>';
