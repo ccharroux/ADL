@@ -511,11 +511,23 @@ function instantiatePopupComponent() {
 
 function showFavoriteDialog() {
 
-    $("#favId").val("0");
-    $("#favURL").val(window.location.toString());
-    $("#favTitle").val($("h2:first").html());
-    $("#favoritesDialog").dialog("open");
+    //$("#favId").val("0");
+    //$("#favURL").val(window.location.toString());
+    //$("#favTitle").val($("h2:first").html());
+    //$("#favoritesDialog").dialog("open");
 
+    setLocalStorage("gFavoritesInformation", "");
+
+    var favoriteCriteriaObj = {
+        "favoriteId": "0",
+        "favoriteTitle": $("h2:first").html(),
+        "favoriteUrl": window.location.toString(),
+        "favoritePreviousPage": window.location.toString()
+    }
+
+    setLocalStorage("gFavoritesInformation", JSON.stringify(favoriteCriteriaObj));
+
+    window.location = "/utilities/addFavorite.html";
 }
 function addDialogComponents() {
     //    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -689,10 +701,23 @@ function updateFavorite(id) {
 }
 function editFavorite(title, url, id) {
 
-    $("#favId").val(id);
-    $("#favURL").val(url);
-    $("#favTitle").val(title);
-    $("#favoritesDialog").dialog("open");
+    //$("#favId").val(id);
+    //$("#favURL").val(url);
+    //$("#favTitle").val(title);
+    //$("#favoritesDialog").dialog("open");
+
+    setLocalStorage("gFavoritesInformation", "");
+
+    var favoriteCriteriaObj = {
+        "favoriteId": id,
+        "favoriteTitle": title,
+        "favoriteUrl": url,
+        "favoritePreviousPage": window.location.toString()
+    }
+
+    setLocalStorage("gFavoritesInformation", JSON.stringify(favoriteCriteriaObj));
+
+    window.location = "/utilities/addFavorite.html";
 
 }
 function deleteFavorite(id) {
