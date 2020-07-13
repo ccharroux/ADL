@@ -649,7 +649,8 @@ function getReportObject_XRAYUsage() {
         apiControllerAction:  "/api/XRAYReport/GetXRayUsage",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product: ['xry']
+        product: ['xry'],
+        approved: true
     }
 
     return tempObject;
@@ -1219,7 +1220,8 @@ function getReportObject_AEStatus() {
         apiControllerAction:  "/api/AccountExecutiveReport/GetAEStatus",
         apiType:  "get",
         columnsToDisplay:  columnsToDisplay,
-        product: ['xry', 'account executive']
+        product: ['xry', 'account executive'],
+        approved: true
     }
 
     return tempObject;
@@ -3911,7 +3913,8 @@ function getReportObject_KeywordIndustryList() {
         apiControllerAction: "/api/XRAYReport/GetKeywordList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry']
+        product: ['xry'],
+        approved: true
     }
 
     return tempObject;
@@ -4128,7 +4131,8 @@ function getReportObject_DisabledUserAccountExecutive() {
         apiControllerAction: "/api/XRAYReport/GetDisabledUserAccountExecutiveList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry', 'account executive']
+        product: ['xry', 'account executive'],
+        approved: true
     }
 
     return tempObject;
@@ -4443,7 +4447,8 @@ function getReportObject_XRAYImportScript() {
         apiControllerAction: "/api/XRAYReport/GetXRAYImportScriptList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry', 'xry imports']
+        product: ['xry', 'xry imports'],
+        approved: true
     }
 
     return tempObject;
@@ -4856,7 +4861,8 @@ function getReportObject_AdvertiserAgencyRevenueList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['xry'],
-        autoUpdate: false
+        autoUpdate: false,
+        approved: true
     }
 
     return tempObject;
@@ -6245,7 +6251,8 @@ function getReportObject_Advertisers() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['advertiser', 'xry'],
-        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        approved: true
     }
 
     return tempObject;
@@ -6354,7 +6361,8 @@ function getReportObject_MediaAdvertisers() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['advertiser', 'xry'],
-        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        approved: true
     }
 
     return tempObject;
@@ -6569,7 +6577,8 @@ function getReportObject_NewAdvertisers() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['xry', 'advertiser', 'XRY Data Review'],
-        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        approved: true
     }
 
     return tempObject;
@@ -6804,7 +6813,8 @@ function getReportObject_NewAgencies() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['xry', 'agency', 'XRY Data Review'],
-        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        approved: true
     }
 
     return tempObject;
@@ -6907,7 +6917,8 @@ function getReportObject_AdvertisersRevenueResearch() {
                     minimumFractionDigits: 0
                 }) + ' total)'
             );
-        }
+        },
+        approved: true
     }
 
     return tempObject;
@@ -7046,7 +7057,8 @@ function getReportObject_MediaRevenueResearch() {
                     minimumFractionDigits: 0
                 }) + ' total)'
             );
-        }
+        },
+        approved: true
     }
 
     return tempObject;
@@ -7230,7 +7242,8 @@ function getReportObject_AdvertisersList() {
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: ['advertiser', 'xry'],
-        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        approved: true
     }
 
     return tempObject;
@@ -7275,7 +7288,8 @@ function getReportObject_AdvertisersAgenciesList() {
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: ['advertiser', 'xry'],
-        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        approved: true
     }
 
     return tempObject;
@@ -7306,7 +7320,8 @@ function getReportObject_DisabledAdvertisersList() {
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: ['advertiser', 'xry'],
-        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        approved: true
     }
 
     return tempObject;
@@ -7424,7 +7439,8 @@ function getReportObject_ParentAdvertiserList() {
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: ['advertiser', 'xry'],
-        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        approved: true
     }
 
     return tempObject;
@@ -7460,7 +7476,8 @@ function getReportObject_ParentAdvertiserAdvertiserList() {
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: ['advertiser', 'xry'],
-        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        approved: true
     }
 
     return tempObject;
@@ -7526,7 +7543,8 @@ function getReportObject_StationAdvertisersList() {
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: ['advertiser', 'xry'],
-        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        approved: true
     }
 
     return tempObject;
@@ -7573,7 +7591,8 @@ function getReportObject_AgencyList() {
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: ['agency', 'xry'],
-        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        approved: true
     }
 
     return tempObject;
@@ -7618,7 +7637,8 @@ function getReportObject_AgencyAdvertiserAccountsList() {
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: ['agency', 'xry'],
-        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        approved: true
     }
 
     return tempObject;
@@ -7649,7 +7669,8 @@ function getReportObject_DisabledAgencyList() {
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: ['agency', 'xry'],
-        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        approved: true
     }
 
     return tempObject;
@@ -7685,7 +7706,8 @@ function getReportObject_ParentAgencyList() {
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: ['agency', 'xry'],
-        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        approved: true
     }
 
     return tempObject;
@@ -7721,7 +7743,8 @@ function getReportObject_ParentAgencyAgencyList() {
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: ['agency', 'xry'],
-        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        approved: true
     }
 
     return tempObject;
@@ -7786,7 +7809,8 @@ function getReportObject_StationAgencyList() {
         apiType: "post",
         columnsToDisplay: columnsToDisplay,
         product: ['agency', 'xry'],
-        reportPath: "/Products/XRY/reports/xrygenericreport.html"
+        reportPath: "/Products/XRY/reports/xrygenericreport.html",
+        approved: true
     }
 
     return tempObject;
@@ -7868,7 +7892,8 @@ function getReportObject_PostedData() {
         apiControllerAction: "/api/XRayReport/GetPostedData",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry']        
+        product: ['xry'],
+        approved: true
     }
 
     return tempObject;
@@ -7932,7 +7957,8 @@ function getReportObject_ActiveMarketLog() {
         apiControllerAction: "/api/XRayReport/GetActiveMarketLog",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry']
+        product: ['xry'],
+        approved: true
     }
 
     return tempObject;
@@ -10008,7 +10034,8 @@ function getReportObject_XRYMarketExclusivitySettings() {
         apiControllerAction: "/api/XRAYReport/GetMarketExclusionSettings",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry', 'advertiser', 'agency']
+        product: ['xry', 'advertiser', 'agency'],
+        approved: true
     }
 
     return tempObject;
@@ -10279,7 +10306,8 @@ function getReportObject_MarketStationSummary() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['xry', 'XRY Data Review'],
-        sortable: false
+        sortable: false,
+        approved: true
     }
 
     return tempObject;
@@ -10396,7 +10424,8 @@ function getReportObject_XRYContactListByMarketOwner() {
         apiControllerAction: "/api/XRAYReport/GetContactListByMarketOwner",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry', 'XRY Data Review']
+        product: ['xry', 'XRY Data Review'],
+        approved: true
     }
 
     return tempObject;
@@ -10916,7 +10945,8 @@ function getReportObject_AdvertiserListByOwner() {
         apiControllerAction: "/api/Agency/GetAgencyListByOwner",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['agency', 'xry'] 
+        product: ['agency', 'xry'],
+        approved: true
     }
 
     return tempObject;
@@ -10972,7 +11002,8 @@ function getReportObject_AgencyListByOwner() {
         apiControllerAction: "/api/Advertiser/GetAdvertiserListByOwner",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['advertiser', 'xry']
+        product: ['advertiser', 'xry'],
+        approved: true
     }
 
     return tempObject;
@@ -11405,7 +11436,8 @@ function getReportObject_ImportScriptListByOwner() {
 
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['xry', 'xry imports']
+        product: ['xry', 'xry imports'],
+        approved: true
     }
 
     return tempObject;
