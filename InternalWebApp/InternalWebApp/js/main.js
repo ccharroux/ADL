@@ -17,8 +17,6 @@ const gChosenParams = {
 }
 var gShowHeader = true;
 var gAJAXError = false;
-var gAJAXErrorURL = "";
-var gAJAXErrorData = null;
 
 var release =
 {
@@ -305,11 +303,12 @@ $(document).ready(function ()
 
     $(document).ajaxError(function (event, jqxhr, inSettings, thrownError)
     {
-        gAJAXErrorURL = inSettings.url;
+ 
+        window.localStorage.setItem("AJAXErrorURL", inSettings.url);
 
         if (!inSettings.data == false)
         {
-            gAJAXErrorData = inSettings.data;
+            window.localStorage.setItem("AJAXErrorData", inSettings.data);
         }
 
         gAJAXError = true;
@@ -1082,6 +1081,9 @@ function MKAErrorMessageDeliveryRtn(message, postCallback) {
 
 function sendErrorEmail(message)
 {
+    var AJAXErrorURL = window.localStorage.getItem("AJAXErrorURL");
+    var AJAXErrorData = window.localStorage.getItem("AJAXErrorData");
+
     $.ajax({
         url: ServicePrefix + '/api/Email/EmailAPIError',
         dataType: 'json',
@@ -1089,7 +1091,7 @@ function sendErrorEmail(message)
         contentType: 'application/json',
         data: JSON.stringify({
             "inApiToken": getLocalStorage("APIToken"),
-            "inBody": "ERROR: " + message + "<br>" + "URL: " + gAJAXErrorURL.replace("{}", "") + (gAJAXErrorData == null ? "" : "<br>DATA: " + gAJAXErrorData)
+            "inBody": "ERROR: " + message + "<br>" + "URL: " + AJAXErrorURL.replace("{}", "") + (AJAXErrorData == null ? "" : "<br>DATA: " + AJAXErrorData)
         }),
         processData: false,
         success: function (data, textStatus, jQxhr) {
