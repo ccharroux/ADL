@@ -479,30 +479,10 @@
         return loopBreak;
     }
 
-    // TODO resume cleanup here
-
     function insertOrUpdateFAQ()
     {
-        var title = tinymce.get("txtTitle").getContent({ format: 'html' });
-        title = title.replace(/^<p>/g, "");
-        title = title.replace(/<\/p>$/g, "");
-
-        if (title.includes("<p>")) {
-            bootbox.alert("Title is limited to one line");
-            return;
-        }
-        $("#txtTitle").val(title);
-
-        $("#txtShortText").val(tinymce.get("txtShortText").getContent({ format: 'html' }));
-
-        if ($("#chkViewMore").prop("checked"))
-        {
-            $("#txtText").val(tinymce.get("txtText").getContent({ format: 'html' }));
-        }
-        else
-        {
-            $("#txtText").val($("#txtShortText").val());
-        }
+        $("#txtQuestion").val(tinymce.get("txtQuestion").getContent({ format: 'html' }));
+        $("#txtAnswer").val(tinymce.get("txtAnswer").getContent({ format: 'html' }));
 
         if (validationPassed() == false) {
             return;
@@ -523,14 +503,10 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inIsPublic": $("#chkIsPublic").prop("checked"),
-                "inProductId": $("#ddlProduct").val(),
-                "inFAQTitle": $("#txtTitle").val(),
-                "inFAQDateTime": $("#txtDate").val(),
-                "inFAQImage": $("#txtImage").val(),
-                "inFAQShortText": $("#txtShortText").val(),
-                "inViewMore": $("#chkViewMore").prop("checked"),
-                "inFAQText": $("#txtText").val()
+                "inQuestion": $("#txtQuestion").val(),
+                "inAnswer": $("#txtAnswer").val(),
+                "inFAQCategoryKey": $("#ddlFAQCategory").val(),
+                "inRequiresLogin": $("#chkRequiresLogin").prop("checked")
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -551,14 +527,10 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inFAQKey": faqKey,
-                "inIsPublic": $("#chkIsPublic").prop("checked"),
-                "inProductId": $("#ddlProduct").val(),
-                "inFAQTitle": $("#txtTitle").val(),
-                "inFAQDateTime": $("#txtDate").val(),
-                "inFAQImage": $("#txtImage").val(),
-                "inFAQShortText": $("#txtShortText").val(),
-                "inViewMore": $("#chkViewMore").prop("checked"),
-                "inFAQText": $("#txtText").val()
+                "inQuestion": $("#txtQuestion").val(),
+                "inAnswer": $("#txtAnswer").val(),
+                "inFAQCategoryKey": $("#ddlFAQCategory").val(),
+                "inRequiresLogin": $("#chkRequiresLogin").prop("checked")
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
