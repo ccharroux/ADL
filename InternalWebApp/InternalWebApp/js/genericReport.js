@@ -304,6 +304,8 @@ reportName.push("rptXrayDeleteStationRevenueLogList");
 reportName.push("rptExclusiveAccountChanges");
 reportName.push("rptMarketInfo");
 
+reportName.push("rptInternalUserFavorites");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -12094,4 +12096,54 @@ function getReportObject_MarketInfo() {
     return tempObject;
 }
 
+function getReportFilterArray_InternalUserFavorites() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
 
+    arrayObject = {
+        token: "Personnel",
+        jsCall: null,
+        objectName: "hidPersonnel",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+
+}
+
+function getReportObject_InternalUserFavorites() {
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Title");
+
+    columnsToDisplay.push({
+        "action": "edit",
+        "title": "URL",
+        "mRender": function(data, type, row)
+        {
+            var action = "<div><a href='" +
+                row.URL +
+                "'><i>" +
+                row.URL +
+                "</i></a></div>";
+            return action;
+        },
+        "orderable": true,
+        "searchable": true,
+        "className": "textAlignLeft moreWidthReportColumn"
+    });
+
+
+    tempObject = {
+        reportTitle: "Internal User Favorites",
+        apiControllerAction: '/api/InternalFavorite/GetInternalFavoriteList',
+        apiType: "post",
+        columnsToDisplay: columnsToDisplay,
+        product: ['personnel'],
+        sortable: true,
+        approved: true
+    }
+
+    return tempObject;
+}
