@@ -12115,6 +12115,7 @@ function getReportObject_InternalUserFavorites() {
     var tempObject = new Object();
     var columnsToDisplay = new Array();
 
+    columnsToDisplay.push("User");
     columnsToDisplay.push("Title");
 
     columnsToDisplay.push({
@@ -12131,18 +12132,17 @@ function getReportObject_InternalUserFavorites() {
         },
         "orderable": true,
         "searchable": true,
-        "className": "textAlignLeft moreWidthReportColumn"
+        "className": "textAlignLeft"
     });
 
 
     tempObject = {
         reportTitle: "Internal User Favorites",
-        apiControllerAction: '/api/InternalFavorite/GetInternalFavoriteList',
-        apiType: "post",
+        apiControllerAction: '/api/InternalFavorite/GetInternalFavoriteListByUser',
+        apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['personnel'],
-        sortable: true,
-        approved: true
+        sortable: true
     }
 
     return tempObject;
