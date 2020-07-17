@@ -296,6 +296,12 @@
                                 <input type="hidden" id="hidPersonnel" apiInput="inPersonnelId" class="dropdown-select rptView rptPersonnel report-filter" />
                             </div>
                         </div>
+                    
+                        <div class="form-group rptView rptPersonnelList">
+                            <label for="ddlPersonnelList" class="dropdown-label rptView rptPersonnelList">Personnel</label>
+                            <select id="ddlPersonnelList" apiInput="inPersonnelId" class="dropdown-select rptView rptPersonnelList report-filter"></select>
+                        </div>
+
                         <div class="form-group rptView rptAffiliation">
                             <label for="ddlAffiliation" class="dropdown-label rptView rptAffiliation">Affiliation</label>
                             <select id="ddlAffiliation" apiInput="inAffiliationId" class="dropdown-select rptView rptAffiliation report-filter"></select>
@@ -2555,6 +2561,48 @@
             },
             error: function (jqXhr, textType, errorThrown) {
                 genericAjaxError(jqXhr, textType, errorThrown);
+            }
+        });
+    }
+
+    function getInternalPersonnelList()
+    {
+        $.ajax({
+            url: ServicePrefix + '/api/Personnel/GetPersonnelInternalUserList?inApiToken=' + getLocalStorage("APIToken"),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    var str = '';
+
+                    $("#ddlPersonnelList").html("<option value=''> -- Select a User --</option>");
+
+
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = str + "<option value='" + obj.personnelId + "'>" + obj.Name + "</option>";
+
+                    });
+
+                    $("#ddlPersonnelList").append(str);
+
+                    convertToChosenSelect("ddlPersonnelList", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    saveLoadedControlSelection("ddlPersonnelList");
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
     }
