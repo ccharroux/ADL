@@ -12101,9 +12101,9 @@ function getReportFilterArray_InternalUserFavorites() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token: "Personnel",
-        jsCall: null,
-        objectName: "hidPersonnel",
+        token: "PersonnelList",
+        jsCall: "getInternalPersonnelList",
+        objectName: "ddlPersonnelList",
         required: true
     }
     arrayFilters.push(arrayObject);
