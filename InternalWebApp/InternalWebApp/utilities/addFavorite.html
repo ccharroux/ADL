@@ -378,12 +378,9 @@
     function saveFavorite()
     {
         //complete validation
-
-        //filling out url for ajax call
-        var url = ServicePrefix + '/api/InternalFavorite/InsertInternalFavorite';
-
-        if (iFavoriteId > 0) {
-            url = ServicePrefix + '/api/InternalFavorite/UpdateInternalFavorite';
+        if (validateFavorite() == false)
+        {
+            return;
         }
 
         //create list of those selected
@@ -396,6 +393,64 @@
             assignedPersonnelList.push(d.personnelId);
         });
 
+        if (assignedPersonnelList.length > 0)
+        {
+            //display message whether to include
+            var modal = bootbox.dialog({
+                message: "You have selected additional people to add this item to their favorite list. <br/><br/> Do you want to include yourself?",
+                title: "Include Yourself on the Favorite",
+                buttons: [
+                    {
+                        label: "Yes",
+                        className: "btn btn-primary",
+                        callback: function()
+                        {
+                            processFavorite(true, assignedPersonnelList);
+                        }
+                    },
+                    {
+                        label: "No",
+                        className: "btn btn-default",
+                        callback: function()
+                        {
+                            processFavorite(false, assignedPersonnelList);
+                        }
+                    },
+                    {
+                        label: "Cancel",
+                        className: "btn btn-default",
+                        callback: function()
+                        {
+                            return;
+                        }
+                    }
+                ],
+                show: false,
+                onEscape: function()
+                {
+                    modal.modal("hide");
+                }
+
+            });
+
+            modal.modal("show");
+
+        } else
+        {
+            processFavorite(true, assignedPersonnelList);
+        }
+
+    }
+
+    function processFavorite(bIncludeCurrentUser, assignedPersonnelList)
+    {
+        //filling out url for ajax call
+        var url = ServicePrefix + '/api/InternalFavorite/InsertInternalFavorite';
+
+        if (iFavoriteId > 0) {
+            url = ServicePrefix + '/api/InternalFavorite/UpdateInternalFavorite';
+        }
+
         //filling out settings for ajax call
         var settings = {
             dataType: 'json',
@@ -406,7 +461,8 @@
                 "inInternalFavoriteId": iFavoriteId, //$("#favId").val().trim(),
                 "inTitle": $("#favTitle").val().trim(),
                 "inURL": $("#favURL").val().trim().replace("localhost:51116", "devmediainternal.millerkaplan.com"),
-                "inAssignedPersonnelList": assignedPersonnelList
+                "inAssignedPersonnelList": assignedPersonnelList,
+                "inIncludeCurrentUser": bIncludeCurrentUser
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -415,8 +471,7 @@
                 if (data.response.status != "SUCCESS") {
                     //MKAErrorMessageRtn(data.response.errorMessage[0]);
                     //display message data.response.errorMessage[0]
-                    bootbox.alert(data.response.errorMessage[0], function()
-                    {
+                    bootbox.alert(data.response.errorMessage[0], function () {
                         window.location = sPreviousPage;
                     });
                 } else {
@@ -434,6 +489,26 @@
 
         //ajax call
         $.ajax(url, settings);
+    }
+
+    function validateFavorite()
+    {
+        var bPassed = true;
+
+        if ($("#favURL").val().trim() == "") {
+            bPassed = false;
+            bootbox.alert('You must enter a url for your Favorite', function () { });
+            return bPassed;
+        }
+
+        if ($("#favTitle").val().trim() == "") {
+            bPassed = false;
+            bootbox.alert('You must enter a title for your Favorite', function () { });
+            return bPassed;
+        }
+
+
+        return bPassed;
     }
 
 </script>
