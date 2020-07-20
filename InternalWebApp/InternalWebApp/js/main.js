@@ -1490,6 +1490,22 @@ function buildDMAMenu(selectedItem) {
 
 }
 
+function buildCancelMenu(selectedItem)
+{
+    var menuItems = '';
+
+    menuItems += '<h1><a href="/admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
+    menuItems += '<nav role="navigation" style="margin-top:20px">';
+    menuItems += '<ul>';
+
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Cancel") + 'href="#" onclick="updatedGoBack()">Cancel</a></li>';
+
+    menuItems += '</ul>';
+    menuItems += '</nav>';
+
+    $("#menu").html(menuItems);
+}
+
 function productDashboard(productId) {
     var strOut = '';
     var style = '';
