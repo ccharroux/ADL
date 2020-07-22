@@ -395,7 +395,7 @@
 
         if (assignedPersonnelList.length > 0)
         {
-            //display message whether to include
+            
             var modal = bootbox.dialog({
                 message: "You have selected additional people to add this item to their favorite list. <br/><br/> Do you want to include yourself?",
                 title: "Include Yourself on the Favorite",
@@ -444,21 +444,20 @@
 
     function processFavorite(bIncludeCurrentUser, assignedPersonnelList)
     {
-        //filling out url for ajax call
+        
         var url = ServicePrefix + '/api/InternalFavorite/InsertInternalFavorite';
 
         if (iFavoriteId > 0) {
             url = ServicePrefix + '/api/InternalFavorite/UpdateInternalFavorite';
         }
 
-        //filling out settings for ajax call
         var settings = {
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inInternalFavoriteId": iFavoriteId, //$("#favId").val().trim(),
+                "inInternalFavoriteId": iFavoriteId,
                 "inTitle": $("#favTitle").val().trim(),
                 "inURL": $("#favURL").val().trim().replace("localhost:51116", "devmediainternal.millerkaplan.com"),
                 "inAssignedPersonnelList": assignedPersonnelList,
@@ -469,11 +468,13 @@
                 $("#favoritesDialog").dialog("close");
 
                 if (data.response.status != "SUCCESS") {
+                    //not using the standard message process
+                    //the process worked but their were duplicate favorites.
                     //MKAErrorMessageRtn(data.response.errorMessage[0]);
                     //display message data.response.errorMessage[0]
                     bootbox.alert(data.response.errorMessage[0], function () {
-                        window.location = sPreviousPage;
                     });
+                    return;
                 } else {
                     bootbox.alert('Favorite has been ' + (iFavoriteId == 0 ? 'saved' : 'updated') + '.',
                         function () {
@@ -487,7 +488,6 @@
             }
         };
 
-        //ajax call
         $.ajax(url, settings);
     }
 
