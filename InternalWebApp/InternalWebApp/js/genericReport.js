@@ -305,6 +305,7 @@ reportName.push("rptExclusiveAccountChanges");
 reportName.push("rptMarketInfo");
 
 reportName.push("rptInternalUserFavorites");
+reportName.push("rptAsyncStatusIncompleteList");
 
 function buildReportArray()
 {
@@ -12143,6 +12144,31 @@ function getReportObject_InternalUserFavorites() {
         columnsToDisplay: columnsToDisplay,
         product: ['personnel'],
         sortable: true
+    }
+
+    return tempObject;
+}
+ 
+function getReportFilterArray_AsyncStatusIncompleteList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+ 
+    return arrayFilters;
+
+}
+
+function getReportObject_AsyncStatusIncompleteList() {
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject = {
+        reportTitle: "Async Incomplete Status List",
+        apiControllerAction: '/api/Async/GetAsyncJobIncompleteStatusList',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tech'],
+        sortable: true,
+        autoUpdate: true
     }
 
     return tempObject;
