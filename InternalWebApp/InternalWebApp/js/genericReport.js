@@ -304,6 +304,9 @@ reportName.push("rptXrayDeleteStationRevenueLogList");
 reportName.push("rptExclusiveAccountChanges");
 reportName.push("rptMarketInfo");
 
+reportName.push("rptInternalUserFavorites");
+reportName.push("rptAsyncStatusIncompleteList");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -12094,4 +12097,79 @@ function getReportObject_MarketInfo() {
     return tempObject;
 }
 
+function getReportFilterArray_InternalUserFavorites() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
 
+    arrayObject = {
+        token: "PersonnelList",
+        jsCall: "getInternalPersonnelList",
+        objectName: "ddlPersonnelList",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+
+}
+
+function getReportObject_InternalUserFavorites() {
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("User");
+    columnsToDisplay.push("Title");
+
+    columnsToDisplay.push({
+        "action": "edit",
+        "title": "URL",
+        "mRender": function(data, type, row)
+        {
+            var action = "<div><a href='" +
+                row.URL +
+                "'><i>" +
+                row.URL +
+                "</i></a></div>";
+            return action;
+        },
+        "orderable": true,
+        "searchable": true,
+        "className": "textAlignLeft"
+    });
+
+
+    tempObject = {
+        reportTitle: "Internal User Favorites",
+        apiControllerAction: '/api/InternalFavorite/GetInternalFavoriteListByUser',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['personnel'],
+        sortable: true
+    }
+
+    return tempObject;
+}
+ 
+function getReportFilterArray_AsyncStatusIncompleteList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+ 
+    return arrayFilters;
+
+}
+
+function getReportObject_AsyncStatusIncompleteList() {
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject = {
+        reportTitle: "Async Incomplete Status List",
+        apiControllerAction: '/api/Async/GetAsyncJobIncompleteStatusList',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tech'],
+        sortable: true,
+        autoUpdate: true
+    }
+
+    return tempObject;
+}

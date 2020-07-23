@@ -17,15 +17,13 @@ const gChosenParams = {
 }
 var gShowHeader = true;
 var gAJAXError = false;
-var gAJAXErrorURL = "";
-var gAJAXErrorData = null;
 
 var release =
 {
     "DEV": "N/A",
-    "STAGING": "6/24/2020",
-    "PRODUCTION": "6/24/2020",
-    "DEMO": "6/24/2020"
+    "STAGING": "7/17/2020",
+    "PRODUCTION": "7/17/2020",
+    "DEMO": "7/17/2020"
 }
 var dateOfCode = new Date();
 release["DEV"] = (dateOfCode.getMonth() + 1) + '-' + dateOfCode.getDate() + '-' + dateOfCode.getFullYear();
@@ -305,11 +303,12 @@ $(document).ready(function ()
 
     $(document).ajaxError(function (event, jqxhr, inSettings, thrownError)
     {
-        gAJAXErrorURL = inSettings.url;
+ 
+        window.localStorage.setItem("AJAXErrorURL", inSettings.url);
 
         if (!inSettings.data == false)
         {
-            gAJAXErrorData = inSettings.data;
+            window.localStorage.setItem("AJAXErrorData", inSettings.data);
         }
 
         gAJAXError = true;
@@ -511,11 +510,6 @@ function instantiatePopupComponent() {
 
 function showFavoriteDialog() {
 
-    //$("#favId").val("0");
-    //$("#favURL").val(window.location.toString());
-    //$("#favTitle").val($("h2:first").html());
-    //$("#favoritesDialog").dialog("open");
-
     setLocalStorage("gFavoritesInformation", "");
 
     var favoriteCriteriaObj = {
@@ -557,21 +551,7 @@ function addDialogComponents() {
  
     head.appendChild(link);
 
-    var d = '<div id="favoritesDialog" style="display:none" title="Favorite">';
-    d = d + '<div style="margin-top:5px;margin-bottom:5px">Add this page as one of your favorites</div>';
-    d = d + '<input type="hidden" id="favId" value="">';
-
-    d = d + '   <label>Title</label> <input type="text" class="favText" id="favTitle" placeholder="Enter Name..." /><br>';
-    d = d + '   <label>URL</label> <input type="text" class="favText" readonly="readonly" id="favURL" /><hr />';
-    d = d + '<center>';
-    d = d + '   <div style="margin-top:5px;margin-bottom:5px">';
-    d = d + '       <input type="button" id="btnProcess" value="Save" onclick="saveFavorite()" \>';
-    d = d + '   </div>';
-    d = d + '<div style="margin-top:5px;margin-bottom:5px">';
-    d = d + '    <input type="button" id="btnCancel" value="Cancel" onclick="cancelFavorite()" \>';
-    d = d + '        </div>';
-    d = d + '</center>';
-    d = d + '</div>';
+    var d = '';
 
     d = d + '<div class="favoriteButtonClass" style="position:absolute;top:5px; right:10px;z-index:1000">';
     d = d + '<div class="dropdown inline-block linkdropdown">';
@@ -634,77 +614,8 @@ function getFavoritesForQuickList() {
 
 
 }
-function cancelFavorite() {
-    $("#favoritesDialog").dialog("close");
-}
-function saveFavorite() {
 
-    var bPassedTest = true;
-
-    if ($("#favURL").val().trim() == "") {
-        bPassedTest = false;
-        bootbox.alert('You must enter a url for your Favorite', function () { });
-        return;
-    }
-
-    if ($("#favTitle").val().trim() == "") {
-        bPassedTest = false;
-        bootbox.alert('You must enter a title for your Favorite', function () { });
-        return;
-    }
-
-
-    if (bPassedTest == true) {
-        updateFavorite($("#favId").val());
-    }
-
-}
-function updateFavorite(id) {
-    //filling out url for ajax call
-    var url = ServicePrefix + '/api/InternalFavorite/InsertInternalFavorite';
-
-    if (id > 0) {
-        url = ServicePrefix + '/api/InternalFavorite/UpdateInternalFavorite';
-    }
-
-    //filling out settings for ajax call
-    var settings = {
-        dataType: 'json',
-        type: 'post',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            "inApiToken": getLocalStorage("APIToken"),
-            "inInternalFavoriteId": id,
-            "inTitle": $("#favTitle").val().trim(),
-            "inURL": $("#favURL").val().trim().replace("localhost:51116", "devmediainternal.millerkaplan.com")
-        }),
-        processData: false,
-        success: function (data, textStatus, jQxhr) {
-            $("#favoritesDialog").dialog("close");
-            bootbox.alert('Favorite has been ' + (id == 0 ? 'saved' : 'updated') + '.', function () {
-                if ((id > 0) || ($("#favURL").val().trim().toLowerCase().indexOf('/admin/login/dashboard.html') > -1)) {
-                    window.location = "/admin/login/dashboard.html";
-                }
-            });
-
-
-
-        },
-        error: function (jqXhr, textStatus, errorThrown) {
-            genericAjaxError(jqXhr, textStatus, errorThrown);
-        }
-    };
-
-
-    //ajax call
-    $.ajax(url, settings);
-}
 function editFavorite(title, url, id) {
-
-    //$("#favId").val(id);
-    //$("#favURL").val(url);
-    //$("#favTitle").val(title);
-    //$("#favoritesDialog").dialog("open");
 
     setLocalStorage("gFavoritesInformation", "");
 
@@ -1107,6 +1018,9 @@ function MKAErrorMessageDeliveryRtn(message, postCallback) {
 
 function sendErrorEmail(message)
 {
+    var AJAXErrorURL = window.localStorage.getItem("AJAXErrorURL");
+    var AJAXErrorData = window.localStorage.getItem("AJAXErrorData");
+
     $.ajax({
         url: ServicePrefix + '/api/Email/EmailAPIError',
         dataType: 'json',
@@ -1114,7 +1028,7 @@ function sendErrorEmail(message)
         contentType: 'application/json',
         data: JSON.stringify({
             "inApiToken": getLocalStorage("APIToken"),
-            "inBody": "ERROR: " + message + "<br>" + "URL: " + gAJAXErrorURL.replace("{}", "") + (gAJAXErrorData == null ? "" : "<br>DATA: " + gAJAXErrorData)
+            "inBody": "ERROR: " + message + "<br>" + "URL: " + AJAXErrorURL.replace("{}", "") + (AJAXErrorData == null ? "" : "<br>DATA: " + AJAXErrorData)
         }),
         processData: false,
         success: function (data, textStatus, jQxhr) {
@@ -1395,19 +1309,19 @@ function buildTVBMenu(selectedItem) {
     menuItems += '<ul class="dropdown-menu" role="menu">';
 
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbreminders.html?MenuItem=true">Reminders</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbreportstatus.html?MenuItem=true">Report Status</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbreportstatus.html?MenuItem=true" class="approved">Report Status</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbmarketdelivery.html?MenuItem=true">Report Delivery</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetailrepbilling.html?MenuItem=true">Edit Rep Billing</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetail.html?MenuItem=true">Edit Time Sales</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbestimates.html?MenuItem=true">TS Estimates</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrevenuedetail.html?MenuItem=true" class="approved">Edit Time Sales</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbestimates.html?MenuItem=true" class="approved">TS Estimates</a></li>';
  
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbrepfirmstationmappinglist.html?MenuItem=true">Rep Station Mapping</a></li>';
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Confirm") + ' href="" role="button" aria-expanded="false">Confirm <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '<ul class="dropdown-menu" role="menu">';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirm.html?MenuItem=true">Time Sales</a></li>';
-    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirmrepfirm.html?MenuItem=true">Rep Firm</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirm.html?MenuItem=true" class="approved">Time Sales</a></li>';
+    menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirmrepfirm.html?MenuItem=true" class="approved">Rep Firm</a></li>';
     menuItems += '        <li style="display:block"><a href="/products/tvb/tvbconfirmrepbillingestimate.html?MenuItem=true">Estimate (Kantar)</a></li>';
  
     menuItems += '</ul>';
@@ -1486,6 +1400,22 @@ function buildDMAMenu(selectedItem) {
     $("#menu").html(menuItems);
 
 
+}
+
+function buildCancelMenu(selectedItem)
+{
+    var menuItems = '';
+
+    menuItems += '<h1><a href="/admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
+    menuItems += '<nav role="navigation" style="margin-top:20px">';
+    menuItems += '<ul>';
+
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Cancel") + 'href="#" onclick="updatedGoBack()">Cancel</a></li>';
+
+    menuItems += '</ul>';
+    menuItems += '</nav>';
+
+    $("#menu").html(menuItems);
 }
 
 function productDashboard(productId) {
@@ -1687,6 +1617,8 @@ function buildTechMenu(selectedItem) {
     menuItems += '                          <li style="display:block;"><a href="/products/tvb/tvbMarketHistoryDataMatrix.html?MenuItem=true">TVB Market History Maintenance</a></li>';
     menuItems += '                      </ul>';
     menuItems += '                  </li>';
+
+    //menuItems += '                  <li style="display:block;"><a href="/Admin/FAQ/faqlist.html?MenuItem=true">Media FAQ</a></li>';
 
     menuItems += '                  <li style="display:block;"><a href="/Admin/TOTP/totpdevicelist.html?MenuItem=true">Admin Device Management</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/Admin/LoadProfile/loadprofile.html?MenuItem=true">Admin Load Profile</a></li>';

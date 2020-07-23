@@ -53,18 +53,38 @@
             color: white !important;
         }
 
-        .standardText, select {
-            width: 300px !important;
-        }
-
-        input[type=Text] {
-            width: 300px;
-        }
-
         .productButtonClass {
             margin-right: 3px;
             margin-left: 3px;
         }
+
+        table.dataTable tbody td.select-checkbox:before,
+        table.dataTable tbody td.select-checkbox:after,
+        table.dataTable thead th.select-checkbox:before,
+        table.dataTable thead th.select-checkbox:after {
+            display: block;
+            position: absolute;
+            top: auto !important;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            box-sizing: border-box;
+        }
+
+        table.dataTable tbody td.select-checkbox:before {
+            content: ' ';
+            margin-top: -6px;
+            margin-left: -8px;
+            border: 1px solid black;
+            border-radius: 3px;
+        }
+
+        table.dataTable tr.selected td.select-checkbox::after, 
+        table.dataTable tr.selected th.select-checkbox::after {
+            margin-top: -9px;
+            margin-left: -7px;
+        }
+
     </style>
     <!-- FOR IE9 below -->
     <!--[if lt IE 9]>
@@ -97,7 +117,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <input type="hidden" id="favId" value="">
-                            <input type="text" class="favText" id="favTitle" placeholder="Enter Name..." />
+                            <input type="text" class="field-width-500" maxlength="100" id="favTitle" placeholder="Enter Name..." />
                         </div>
                     </div>
                     
@@ -106,7 +126,7 @@
                             <label for="favURL">URL</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" class="favText" readonly="readonly" id="favURL" />
+                            <input type="text" class="field-width-500" maxlength="1000" readonly="readonly" id="favURL" />
                         </div>
                     </div>
                     
@@ -187,13 +207,16 @@
 
     $(document).ready(function()
     {
-        //buildMainMenu("");
+        buildCancelMenu("");
 
         $("#btnAddAsFavorite").hide();
         $(".favoriteButtonClass").hide();
 
         //load what is in local storage
         loadFavoriteParameters();
+
+        setupUI();
+
         loadInternalPersonnelList();
 
     });
@@ -217,6 +240,16 @@
 
         sPreviousPage = favoriteParameters["favoritePreviousPage"];
 
+    }
+
+    function setupUI()
+    {
+        $("body").on("click",
+            "#clear_search_button",
+            function () {
+                var table = $("#dtPersonnelResults").DataTable();
+                table.search('').draw();
+            });
     }
 
     function loadInternalPersonnelList() {
@@ -288,7 +321,10 @@
                 search: "Filter Results:"
             },
             "buttons": [
-            ]
+            ],
+            initComplete: function () {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
+            }
 
         });
 
@@ -318,8 +354,7 @@
             "title": "Name",
             "visible": true,
             "mData": "Name",
-            "orderable": true,
-            "className": "moreWidthReportColumn"
+            "orderable": true
         });
 
         //email
@@ -327,8 +362,7 @@
             "title": "Email Address",
             "visible": true,
             "mData": "Email Address",
-            "orderable": true,
-            "className": "moreWidthReportColumn"
+            "orderable": true
         });
 
         return columnsToDisplay;
@@ -344,12 +378,9 @@
     function saveFavorite()
     {
         //complete validation
-
-        //filling out url for ajax call
-        var url = ServicePrefix + '/api/InternalFavorite/InsertInternalFavorite';
-
-        if (iFavoriteId > 0) {
-            url = ServicePrefix + '/api/InternalFavorite/UpdateInternalFavorite';
+        if (validateFavorite() == false)
+        {
+            return;
         }
 
         //create list of those selected
@@ -362,29 +393,88 @@
             assignedPersonnelList.push(d.personnelId);
         });
 
-        //filling out settings for ajax call
+        if (assignedPersonnelList.length > 0)
+        {
+            
+            var modal = bootbox.dialog({
+                message: "You have selected additional people to add this item to their favorite list. <br/><br/> Do you want to include yourself?",
+                title: "Include Yourself on the Favorite",
+                buttons: [
+                    {
+                        label: "Yes",
+                        className: "btn btn-primary",
+                        callback: function()
+                        {
+                            processFavorite(true, assignedPersonnelList);
+                        }
+                    },
+                    {
+                        label: "No",
+                        className: "btn btn-default",
+                        callback: function()
+                        {
+                            processFavorite(false, assignedPersonnelList);
+                        }
+                    },
+                    {
+                        label: "Cancel",
+                        className: "btn btn-default",
+                        callback: function()
+                        {
+                            return;
+                        }
+                    }
+                ],
+                show: false,
+                onEscape: function()
+                {
+                    modal.modal("hide");
+                }
+
+            });
+
+            modal.modal("show");
+
+        } else
+        {
+            processFavorite(true, assignedPersonnelList);
+        }
+
+    }
+
+    function processFavorite(bIncludeCurrentUser, assignedPersonnelList)
+    {
+        
+        var url = ServicePrefix + '/api/InternalFavorite/InsertInternalFavorite';
+
+        if (iFavoriteId > 0) {
+            url = ServicePrefix + '/api/InternalFavorite/UpdateInternalFavorite';
+        }
+
         var settings = {
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inInternalFavoriteId": iFavoriteId, //$("#favId").val().trim(),
+                "inInternalFavoriteId": iFavoriteId,
                 "inTitle": $("#favTitle").val().trim(),
                 "inURL": $("#favURL").val().trim().replace("localhost:51116", "devmediainternal.millerkaplan.com"),
-                "inAssignedPersonnelList": assignedPersonnelList
+                "inAssignedPersonnelList": assignedPersonnelList,
+                "inIncludeCurrentUser": bIncludeCurrentUser
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 $("#favoritesDialog").dialog("close");
 
                 if (data.response.status != "SUCCESS") {
+                    //not using the standard message process
+                    //the process worked but their were duplicate favorites.
                     //MKAErrorMessageRtn(data.response.errorMessage[0]);
                     //display message data.response.errorMessage[0]
-                    bootbox.alert(data.response.errorMessage[0], function()
-                    {
-                        window.location = sPreviousPage;
+                    bootbox.alert(data.response.errorMessage[0], function () {
                     });
+                    return;
                 } else {
                     bootbox.alert('Favorite has been ' + (iFavoriteId == 0 ? 'saved' : 'updated') + '.',
                         function () {
@@ -398,8 +488,27 @@
             }
         };
 
-        //ajax call
         $.ajax(url, settings);
+    }
+
+    function validateFavorite()
+    {
+        var bPassed = true;
+
+        if ($("#favURL").val().trim() == "") {
+            bPassed = false;
+            bootbox.alert('You must enter a url for your Favorite', function () { });
+            return bPassed;
+        }
+
+        if ($("#favTitle").val().trim() == "") {
+            bPassed = false;
+            bootbox.alert('You must enter a title for your Favorite', function () { });
+            return bPassed;
+        }
+
+
+        return bPassed;
     }
 
 </script>
