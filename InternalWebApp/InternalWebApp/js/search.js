@@ -4,15 +4,22 @@ var apiToken = getLocalStorage("APIToken");
 var searchText = "";
 var columns = [];
 var gResults = null;
+var gSilentSearch;
 
-function getSearchData(searchCriteria) {
+function getSearchData(searchCriteria, bSilentSearch) {
     //get session object
     //switch statement on token
     //make api call can return the data
     //turn into json that the datatable can understand
     //console.log(searchCriteria);
 
-
+    if (bSilentSearch == undefined)
+    {
+        gSilentSearch = true;
+    } else
+    {
+        gSilentSearch = bSilentSearch;
+    }
 
     switch (searchCriteria["searchToken"].toUpperCase()) {
         case "STATIONMARKET":
@@ -54,10 +61,13 @@ function getSearchData(searchCriteria) {
     //DEV-7085 
     //added validation to make sure there is search text
     //regardless of the type of search
-    if (searchText.length == 0)
+    if (searchText.length == 0 && gSilentSearch == false)
     {
         bootbox.alert('Please enter search text.', function () {
                 });
+        return;
+    } else if (searchText.length == 0 && gSilentSearch == true)
+    {
         return;
     }
    

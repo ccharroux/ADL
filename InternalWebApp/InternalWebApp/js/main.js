@@ -2473,6 +2473,11 @@ function excludeFromBackButton() {
     gExcludeFromBackButton = true;
 }
 
+function includeInBackButton()
+{
+    gExcludeFromBackButton = false;
+}
+
 function cleanupBackButton(pageName) {
 
     if (!pageName) {
