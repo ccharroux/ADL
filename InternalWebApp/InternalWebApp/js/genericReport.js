@@ -11770,7 +11770,7 @@ function getReportObject_PersonnelGroupList() {
 
     tempObject =
     {
-        reportTitle: "Personnel Group Member List",
+        reportTitle: "MKA User Group Member List",
         apiControllerAction: "/api/Relationship/GetRelationshipListMembers",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
