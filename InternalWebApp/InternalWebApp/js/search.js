@@ -61,7 +61,7 @@ function getSearchData(searchCriteria, bSilentSearch) {
     //DEV-7085 
     //added validation to make sure there is search text
     //regardless of the type of search
-    if (searchText.length == 0 && gSilentSearch == false)
+    if ($('.search-text:visible').val().length == 0 && gSilentSearch == false)
     {
         bootbox.alert('Please enter search text.', function () {
                 });
