@@ -168,7 +168,7 @@
                 Author
             </div>
             <div class="col-md-9 text-align-left">
-                <select id="ddlListDialogCreator" class="listDialogInput listDialogNew"></select>
+                <select disabled="disabled" id="ddlListDialogCreator" class="listDialogInput listDialogNew"></select>
                 <span id="spanListDialogCreator" class="listDialogEdit"></span>
             </div>
         </div>
@@ -278,8 +278,10 @@
     var newListMode = false;
     var gEditableItem = false;
 
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         $("#divResults").hide();
+
         buildUIDialogs();
 
         getCreatorList();
@@ -805,6 +807,8 @@
     }
 
     function updateUIForNewOrEditMode() {
+
+
         if (newListMode) {
             $(".listDialogNew").show();
             $(".listDialogEdit").hide();
@@ -870,6 +874,9 @@
         {
             $("#btnListDialogSave").show();
             $("#btnListDialogReset").show();
+            // overridding - no need for this...
+            $("#btnListDialogReset").hide();
+
             $("#divNewMembersSearch").show();
             $("#txtListDialogName").prop("disabled", false);
         }
@@ -879,17 +886,24 @@
         viewListMembers(obj.Editable);
     }
 
-    function addRelationshipList() {
+    function addRelationshipList()
+    {
+
         getPotentialCreatorList();
+
         $("#txtListDialogName").val("");
         $("#divMembersResults").hide();
         $("#divNewMembersSearch").hide();
         $("#divNewMembersResults").hide();
-
+ 
         newListMode = true;
+
         updateUIForNewOrEditMode();
 
         $("#listDialog").dialog("open");
+        $("#btnListDialogSave").show();
+        $("#btnListDialogReset").hide();
+ 
     }
 
     function viewListMembers() {
@@ -922,10 +936,20 @@
         $("#divMembersResults").show();
     }
 
-    function listDialogSave() {
-        if (newListMode) {
+    function listDialogSave()
+    {
+        if ($("#txtListDialogName").val().trim() == "")
+        {
+            bootbox.alert("Please enter a Group Name");
+            return;
+        }
+
+        if (newListMode)
+        {
             listDialogSaveNew();
-        } else {
+        }
+        else
+        {
             listDialogSaveEdit();
         }
     }
@@ -991,7 +1015,10 @@
     }
 
     function listDialogClose() {
+
         $("#listDialog").dialog("close");
+
+
     }
 
     function listDialogDelete(id) {
@@ -1026,8 +1053,8 @@
     }
 
     function removeMember(personnelId, personnelNameEncoded) {
-        bootbox.confirm('Remove ' + decodeURI(personnelNameEncoded) + ' from this list?', function (result) {
-            if (result) {
+        //bootbox.confirm('Remove ' + decodeURI(personnelNameEncoded) + ' from this list?', function (result) {
+        //    if (result) {
                 $.ajax({
                     url: ServicePrefix + '/api/Relationship/DeleteRelationshipListMember',
                     dataType: 'json',
@@ -1047,6 +1074,7 @@
                             viewListMembers();
                             if ($("#divNewMembersResults").is(":visible")) {
                                 searchNewMembers();
+                                getRelationshipLists();
                             }
                         }
                     },
@@ -1054,8 +1082,8 @@
                         genericAjaxError(jqXhr, textStatus, errorThrown);
                     }
                 });
-            }
-        });
+        //    }
+        //});
     }
 
     function searchNewMembers()
@@ -1103,8 +1131,8 @@
     }
 
     function addMember(personnelId, personnelNameEncoded) {
-        bootbox.confirm('Add ' + decodeURI(personnelNameEncoded) + ' to this list?', function (result) {
-            if (result) {
+        //bootbox.confirm('Add ' + decodeURI(personnelNameEncoded) + ' to this list?', function (result) {
+        //    if (result) {
                 $.ajax({
                     url: ServicePrefix + '/api/Relationship/InsertRelationshipListMember',
                     dataType: 'json',
@@ -1123,14 +1151,15 @@
                         else {
                             viewListMembers();
                             searchNewMembers();
+                            getRelationshipLists();
                         }
                     },
                     error: function (jqXhr, textStatus, errorThrown) {
                         genericAjaxError(jqXhr, textStatus, errorThrown);
                     }
                 });
-            }
-        });
+            //}
+        //});
     }
 
     function goTo(url)
