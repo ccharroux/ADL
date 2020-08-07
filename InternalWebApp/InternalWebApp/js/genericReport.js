@@ -5325,6 +5325,27 @@ function getReportFilterArray_MRRNationwideTVByAffiliation() {
     }
     arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "MRRNationwideTVByRegion",
+        objectName: "btnMRRNationwideTVByRegion",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideTVByMarketSize",
+        objectName: "btnMRRNationwideTVByMarketSize",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideTVByAffiliation",
+        objectName: "btnMRRNationwideTVByAffiliation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
     return arrayFilters;
 }
 
@@ -5408,6 +5429,28 @@ function getReportFilterArray_MRRNationwideTVByRegion() {
     }
     arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "MRRNationwideTVByRegion",
+        objectName: "btnMRRNationwideTVByRegion",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideTVByMarketSize",
+        objectName: "btnMRRNationwideTVByMarketSize",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideTVByAffiliation",
+        objectName: "btnMRRNationwideTVByAffiliation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
     return arrayFilters;
 }
 
@@ -5489,6 +5532,28 @@ function getReportFilterArray_MRRNationwideTVBySize() {
     }
     arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "MRRNationwideTVByRegion",
+        objectName: "btnMRRNationwideTVByRegion",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideTVByMarketSize",
+        objectName: "btnMRRNationwideTVByMarketSize",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideTVByAffiliation",
+        objectName: "btnMRRNationwideTVByAffiliation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
     return arrayFilters;
 }
 
@@ -5567,6 +5632,27 @@ function getReportFilterArray_MRRNationwideRadioByFormat() {
         token: "Filter",
         objectName: "chkFilter",
         filterValue: "Nationwide",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideRadioByRegion",
+        objectName: "btnMRRNationwideRadioByRegion",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideRadioByMarketSize",
+        objectName: "btnMRRNationwideRadioByMarketSize",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideRadioByFormat",
+        objectName: "btnMRRNationwideRadioByFormat",
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -5653,6 +5739,28 @@ function getReportFilterArray_MRRNationwideRadioByRegion() {
     }
     arrayFilters.push(arrayObject);
 
+    arrayObject = {
+        token: "MRRNationwideRadioByRegion",
+        objectName: "btnMRRNationwideRadioByRegion",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideRadioByMarketSize",
+        objectName: "btnMRRNationwideRadioByMarketSize",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideRadioByFormat",
+        objectName: "btnMRRNationwideRadioByFormat",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
     return arrayFilters;
 }
 
@@ -5733,6 +5841,28 @@ function getReportFilterArray_MRRNationwideRadioBySize() {
         required: false
     }
     arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideRadioByRegion",
+        objectName: "btnMRRNationwideRadioByRegion",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideRadioByMarketSize",
+        objectName: "btnMRRNationwideRadioByMarketSize",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideRadioByFormat",
+        objectName: "btnMRRNationwideRadioByFormat",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
 
     return arrayFilters;
 }
