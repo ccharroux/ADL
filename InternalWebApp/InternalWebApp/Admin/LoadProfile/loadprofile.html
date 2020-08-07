@@ -599,8 +599,8 @@
         var aMarkets = new Array();
         var aOwnerGroups = new Array();
 
-        if ($("#rdoMarket").is(':checked')) {
-
+        if ($("#rdoMarket").is(':checked'))
+        {
             aMarkets.push($("#ddlMarket").val());
 
             $('input[name=checkOwners]:checked').each(function () {
@@ -619,8 +619,8 @@
             }
         }
 
-        if ($("#rdoOwner").is(':checked')) {
-
+        if ($("#rdoOwner").is(':checked'))
+        {
             aOwners.push($("#ddlOwner").val());
 
             $('input[name=checkMarkets]:checked').each(function () {
@@ -642,23 +642,26 @@
                 );
                 return;
             }
-
         }
 
         //if retain current unchecked
         //call delete api
 
-        if ($("#chkKeepAssignments").is(':checked')) {
-
+        if ($("#chkKeepAssignments").is(':checked'))
+        {
             //keep assignments
             //handle the other calls
-            if (aOwners.length > 0 && aMarkets.length > 0) {
+            if (aOwners.length > 0 && aMarkets.length > 0)
+            {
                 assignClusters(aOwners, aMarkets, aOwnerGroups);
-            } else if (aOwnerGroups.length > 0) {
+            }
+            else if (aOwnerGroups.length > 0)
+            {
                 assignOwnerGroups(aOwnerGroups);
             }
-
-        } else {
+        }
+        else
+        {
             //add message asking if you want to delete your assignments??
             //call delete assignments
             var msg = "You did not check <b>Retain Current Assignments</b>. This action will <font color='red'>DELETE</font> all of them. <br><br>Are you sure you want to <font color='red'>DELETE</font> your current assignments?";
@@ -728,11 +731,61 @@
         });
     }
 
-    function assignClusters(aOwners, aMarkets, aOwnerGroups) {
+    function assignClusters(aOwners, aMarkets, aOwnerGroups)
+    {
+        var maxItems = 3;
+        var bLastRun = false;
 
-        if (aOwners.length == 0 && aMarkets.length == 0) {
+        if (aOwners.length == 0 && aMarkets.length == 0)
+        {
             assignOwnerGroups(aOwnerGroups);
+            return;
         }
+
+
+        var aLeftOverMarkets = new Array();
+        var aLeftOverOwners = new Array();
+        var aProcessMarkets = new Array();
+        var aProcessOwners = new Array();
+
+        // do we need to split the arrays?
+        if (aOwners.length <= maxItems && aMarkets.length <= maxItems)
+        {
+            bLastRun = true;
+            aProcessOwners = JSON.parse(JSON.stringify(aOwners));
+            aProcessMarkets = JSON.parse(JSON.stringify(aMarkets));
+        }
+        else
+        {
+            // this is an owner selection
+            if (aOwners.length == 1)
+            {
+                aLeftOverMarkets = aMarkets.slice(maxItems, aMarkets.length);
+                aProcessMarkets = aMarkets.slice(0, maxItems);
+                aProcessOwners = JSON.parse(JSON.stringify(aOwners));
+                aLeftOverOwners = JSON.parse(JSON.stringify(aOwners));
+            }
+            // this is a market selection
+            else
+            {
+                aLeftOverOwners = aOwners.slice(maxItems, aOwners.length);
+                aProcessOwners = aOwners.slice(0, maxItems);
+                aProcessMarkets = JSON.parse(JSON.stringify(aMarkets));
+                aLeftOverMarkets = JSON.parse(JSON.stringify(aMarkets));
+            }
+        }
+
+        //console.log('------------------');
+        //console.log('Last Run');
+        //console.log(bLastRun);
+        //console.log("markets");
+        //console.log(aMarkets);
+        //console.log(aProcessMarkets);
+        //console.log(aLeftOverMarkets);
+        //console.log("owners");
+        //console.log(aOwners);
+        //console.log(aProcessOwners);
+        //console.log(aLeftOverOwners);
 
         setThisQueryToRunLongNoAutoUnBlock();
 
@@ -743,33 +796,40 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inOwnerId": aOwners,
-                "inMarketId": aMarkets
+                "inOwnerId": aProcessOwners,
+                "inMarketId": aProcessMarkets
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
-                if (data.response.status != "SUCCESS") {
+                if (data.response.status != "SUCCESS")
+                {
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
-                else {
-
-                    if (aOwnerGroups.length > 0) {
-                        assignOwnerGroups(aOwnerGroups);
-                    } else {
-                        //message that assignments are done
-                        bootbox.alert(
-                            "Your assignments have been updated.",
-                            function () {
-
-                            }
-                        );
+                else
+                {
+                    if (bLastRun == true)
+                    {
+                        if (aOwnerGroups.length > 0)
+                        {
+                            assignOwnerGroups(aOwnerGroups);
+                        }
+                        else
+                        {
+                            //message that assignments are done
+                            bootbox.alert("Your assignments have been updated.", function () {});
+                        }
                     }
-
+                    else
+                    {
+                        assignClusters(aLeftOverOwners, aLeftOverMarkets, aOwnerGroups);
+                        return;
+                    }
                 }
 
             },
-            error: function (jqXhr, textStatus, errorThrown) {
+            error: function (jqXhr, textStatus, errorThrown)
+            {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });

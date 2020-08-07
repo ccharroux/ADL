@@ -2866,7 +2866,7 @@ function setThisQueryToRunLongNoAutoUnBlock()
 {
     clearTimeout(unblockHandle);
     $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
-    console.log(unblockHandle);
+    //console.log(unblockHandle);
 }
 
 function extractParens(inString) {
