@@ -296,6 +296,10 @@ var navTool = {
 
 $(document).ready(function ()
 {
+    //$(document).ajaxStart(function ( ) {
+
+
+    //});
 
     $(document).ajaxSuccess(function () {
         gAJAXError = false;
@@ -303,11 +307,9 @@ $(document).ready(function ()
 
     $(document).ajaxError(function (event, jqxhr, inSettings, thrownError)
     {
- 
-        window.localStorage.setItem("AJAXErrorURL", inSettings.url);
+         window.localStorage.setItem("AJAXErrorURL", inSettings.url);
 
-        if (!inSettings.data == false)
-        {
+        if (!inSettings.data == false) {
             window.localStorage.setItem("AJAXErrorData", inSettings.data);
         }
 
@@ -951,6 +953,8 @@ function goBackToDashboard() {
 function MKAErrorMessageRtn(message, preCallback, postCallback) {
 
     var newMessage = "";
+    var AJAXErrorURL = window.localStorage.getItem("AJAXErrorURL");
+    var AJAXErrorData = window.localStorage.getItem("AJAXErrorData");
 
     if (!message)
     {
@@ -970,7 +974,7 @@ function MKAErrorMessageRtn(message, preCallback, postCallback) {
                     (data) => {
 
                         MKAErrorMessageDeliveryRtn(message, postCallback);
-                        setTimeout(function () { sendErrorEmail(message) }, 1000);
+                        setTimeout(function () { sendErrorEmail(message, AJAXErrorURL, AJAXErrorData) }, 1000);
                     },
                     (error) => {
                         bootbox.alert(error, function () { return; });
@@ -985,6 +989,9 @@ function MKAErrorMessageRtn(message, preCallback, postCallback) {
 }
 
 function MKAErrorMessageDeliveryRtn(message, postCallback) {
+
+    var AJAXErrorURL = window.localStorage.getItem("AJAXErrorURL");
+    var AJAXErrorData = window.localStorage.getItem("AJAXErrorData");
 
     if (message.toString().toLowerCase().indexOf('token is invalid') > -1) {
         newMessage = "Your Token has expired - Please login again";
@@ -1010,16 +1017,18 @@ function MKAErrorMessageDeliveryRtn(message, postCallback) {
                 }
             });
 
-        setTimeout(function () { sendErrorEmail(message) }, 1000);
+        setTimeout(function () { sendErrorEmail(message, AJAXErrorURL, AJAXErrorData) }, 1000);
 
     }
 
 }
 
-function sendErrorEmail(message)
+function sendErrorEmail(message, AJAXErrorURL, AJAXErrorData)
 {
-    var AJAXErrorURL = window.localStorage.getItem("AJAXErrorURL");
-    var AJAXErrorData = window.localStorage.getItem("AJAXErrorData");
+    console.log('ERROR');
+    console.log(message);
+    console.log(AJAXErrorURL);
+    console.log(AJAXErrorData);
 
     $.ajax({
         url: ServicePrefix + '/api/Email/EmailAPIError',
