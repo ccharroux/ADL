@@ -312,7 +312,7 @@ $(document).ready(function ()
         if (!inSettings.data == false) {
             window.localStorage.setItem("AJAXErrorData", inSettings.data);
         }
-
+        console.log(inSettings);
         gAJAXError = true;
     });
 
@@ -577,6 +577,7 @@ function addDialogComponents() {
 
 }
 function getFavoritesForQuickList() {
+
     $("#favoritesQuickList").append('<li class="display-block"><a href="/admin/login/dashboard.html">Favorites Page</a></li>');
 
     $.ajax({
@@ -953,6 +954,7 @@ function goBackToDashboard() {
 function MKAErrorMessageRtn(message, preCallback, postCallback) {
 
     var newMessage = "";
+
     var AJAXErrorURL = window.localStorage.getItem("AJAXErrorURL");
     var AJAXErrorData = window.localStorage.getItem("AJAXErrorData");
 
