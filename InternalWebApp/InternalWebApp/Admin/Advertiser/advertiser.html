@@ -365,6 +365,8 @@
     var bLinkParentAdvertiser = false;
     var bIsNew = false;
     var bIsFromReport = false;
+    var iNumericMediaTypeId = 0;
+    var iMarketId = 0;
 
     $(document).ready(function () {
 
@@ -375,8 +377,11 @@
         bIsFromReport = getParameterByName("FromReport") == null ? false : getParameterByName("FromReport");
 
         $("#txtAdvertiserId").val(advertiserId);
-
+        
         bIsNew = advertiserId <= 0;
+
+        iNumericMediaTypeId = getParameterByName("NumericMediaTypeId") == null ? 0 : getParameterByName("NumericMediaTypeId");
+        iMarketId = getParameterByName("MarketId") == null ? 0 : getParameterByName("MarketId");
 
         getMarketList();
 
@@ -596,6 +601,15 @@
             getSubIndustryList("-1", "");
 
             loadSearchResults();
+
+            //determine media code
+            if (iMarketId > 0)
+            {
+                $("#ddlMarket").val(iMarketId);
+            }
+
+            getMediaCode(0, iNumericMediaTypeId);
+
             return;
         }
 
@@ -753,6 +767,54 @@
                 MKAErrorMessageRtn(errorThrown);
             }
         });
+
+    }
+
+    function getMediaCode(currentMediaCode, newMediaType)
+    {
+        if (newMediaType <= 0)
+        {
+            return;
+        }
+
+        var mediaCodeApiUrl = ServicePrefix + '/api/MediaCode/GetMediaCodyByNewMediaType';
+        mediaCodeApiUrl = mediaCodeApiUrl + "?inApiToken=" + getLocalStorage("APIToken");
+        mediaCodeApiUrl = mediaCodeApiUrl + "&inOldMediaCodeId=" + currentMediaCode;
+        mediaCodeApiUrl = mediaCodeApiUrl + "&inNewMediaTypeId=" + newMediaType;
+
+        $.ajax({
+            url: mediaCodeApiUrl,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+
+                        if (obj.mediaCodeId != null && obj.mediaCodeId > 0)
+                        {
+                            $("#ddlMediaCode").val(obj.mediaCodeId);
+                        } else
+                        {
+                            $("#ddlMediaCode").val(-1);
+                        }
+
+                    });
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
+
 
     }
 

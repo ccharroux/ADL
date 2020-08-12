@@ -360,18 +360,31 @@
                 }
                 else {
 
-                    var str = '';
-                    //console.log(JSON.stringify(data));
-                    str = '<option value="">-- Select a Media Type --</option>';
-                    $.each(data.report.rows, function (index) {
+                    //var str = '';
+                    ////console.log(JSON.stringify(data));
+                    //str = '<option value="">-- Select a Media Type --</option>';
+                    //$.each(data.report.rows, function (index) {
 
-                        str = str + '<option value="' + data.report.rows[index].mediaTypeId + '">' + data.report.rows[index].mediaType + '</option>';
+                    //    str = str + '<option value="' + data.report.rows[index].mediaTypeId + '">' + data.report.rows[index].mediaType + '</option>';
 
-                    });
+                    //});
 
-                    $("#ddlMediaType").html(str);
+                    //$("#ddlMediaType").html(str);
 
-                    convertToChosenSelect("ddlMediaType");
+                    var $mediaTypeList = $("#ddlMediaType");
+
+                    $mediaTypeList.append("<option value='-1' data-media-type-id='-1'> -- Select a Media Type</option>");
+
+                    $.each(data.report.rows,
+                        function () {
+                            var element = $('<option></option>');
+                            element.val(this.mediaTypeId).html(this.mediaType);
+                            element.attr("data-media-type-id", this.mediaTypeNumericId);
+                            $mediaTypeList.append(element);
+                        });
+
+                    convertToChosenSelect("ddlMediaType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
 
                     //loadLastSearch();
                     getMediaAdvertiser();
@@ -398,6 +411,8 @@
             return;
         }
 
+        var mediaAdvertiserMediaTypeId = $("#ddlMediaType :selected").data('media-type-id');
+
         var searchCriteriaObj = {
             "searchToken": "MEDIAMARKET",
             "marketID": $("#ddlMarkets").val(),
@@ -410,8 +425,11 @@
             "searchPage": window.location,
             "advertiserCategory": $("#txtAdvertiserCategory").html(),
             "period": $("#txtPeriod").val(),
-            "year": $("#txtYear").val()
+            "year": $("#txtYear").val(),
+            "numericMediaTypeId": mediaAdvertiserMediaTypeId
         }
+
+        console.log(searchCriteriaObj);
 
         setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
        

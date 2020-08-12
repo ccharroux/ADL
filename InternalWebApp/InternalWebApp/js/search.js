@@ -5,6 +5,8 @@ var searchText = "";
 var columns = [];
 var gResults = null;
 var gSilentSearch;
+var gNumericMediaTypeId = 0;
+var gMarketId = 0;
 
 function getSearchData(searchCriteria, bSilentSearch) {
     //get session object
@@ -508,6 +510,9 @@ function buildAdvertiserSearch(searchCriteria) {
         searchText = searchCriteria["marketAdvertiserName"].length > 0 ? searchCriteria["marketAdvertiserName"] : searchCriteria["advertiserName"];
     }
 
+    gNumericMediaTypeId = searchCriteria["numericMediaTypeId"];
+    gMarketId = searchCriteria["marketID"];
+
     //setup the parameters for the API
 
     apiParameters = {
@@ -555,13 +560,13 @@ function buildAdvertiserSearch(searchCriteria) {
         "title": "Industry",
         "data": "industry",
         "orderable": true
-    })
+    });
 
     columns.push({
         "title": "Sub Industry",
         "data": "subIndustry",
         "orderable": true
-    })
+    });
 
 
     columns.push({
@@ -1028,7 +1033,20 @@ function buildLinkAdvertiserSearch(searchCriteria) {
 
 }
 function EditMarketAdvertiser(id) {
-    window.location = '/admin/advertiser/advertiser.html?AdvertiserID=' + id;
+
+    var marketUrl = '/admin/advertiser/advertiser.html?AdvertiserID=' + id;
+
+    if (gMarketId > 0)
+    {
+        marketUrl = marketUrl + '&MarketId=' + gMarketId;
+    }
+
+    if (id == 0 && gNumericMediaTypeId > 0)
+    {
+        marketUrl = marketUrl + '&NumericMediaTypeId=' + gNumericMediaTypeId;
+    }
+
+    window.location = marketUrl;
 }
 function MatchingAdvertisers() {
     window.location = '/products/xry/revenue/xrymatch.html?MatchPage=adv&MenuItem=false';
