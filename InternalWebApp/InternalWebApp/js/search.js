@@ -1036,12 +1036,12 @@ function EditMarketAdvertiser(id) {
 
     var marketUrl = '/admin/advertiser/advertiser.html?AdvertiserID=' + id;
 
-    if (gMarketId > 0)
+    if (gMarketId != null && gMarketId > 0)
     {
         marketUrl = marketUrl + '&MarketId=' + gMarketId;
     }
 
-    if (id == 0 && gNumericMediaTypeId > 0)
+    if (id == 0 && gNumericMediaTypeId != null && gNumericMediaTypeId > 0)
     {
         marketUrl = marketUrl + '&NumericMediaTypeId=' + gNumericMediaTypeId;
     }
