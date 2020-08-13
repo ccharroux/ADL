@@ -80,7 +80,7 @@
                 <div class="row">
                     <div class="col-md-10">
                         <label for="ddlOwner" class="search-ddl-label">Owner</label>
-                        <select id="ddlOwner" class="search-ddl-select mkaRequired report-filter" errorMessage="You must select an Owner." onchange="getMarketListByOwner()"></select>
+                        <select id="ddlOwner" class="search-ddl-select mkaRequired report-filter" errorMessage="You must select an Owner." onchange="getMarketListByOwner(this.value)"></select>
 
                         <label for="ddlMarket" class="search-ddl-label">Market</label>
                         <select id="ddlMarket" class="search-ddl-select mkaRequired report-filter" errorMessage="You must select a Market."></select>
@@ -226,17 +226,16 @@
             if (!param_ownerId == false && param_ownerId.length > 0)
             {
                 $("#ddlOwner").val(param_ownerId);
-                getMarketListByOwner();
+                getMarketListByOwner(param_ownerId);
             }
 
         }
 
     }
 
-    function getMarketListByOwner() {
+    function getMarketListByOwner(ownerId) {
 
-        if ($("#ddlOwner").val() == "-1") {
-            bootbox.alert("You must select an Ownership.");
+        if (ownerId <= 0) {
             return;
         }
 
@@ -248,7 +247,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inOwnerId": $("#ddlOwner").val()
+                "inOwnerId": ownerId
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
