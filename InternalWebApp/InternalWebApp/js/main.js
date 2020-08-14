@@ -1906,6 +1906,29 @@ function resetDataTableDOM(tableToDestroyId, divOfTableId, classOfTable) {
 
 }
 
+//added this function to add captions to a datatable
+//did not like the looks because the datatable put the caption under 
+//the search filter and # of items per page.
+//leaving the code here in case want to use in the future
+function resetDataTableDOMWithCaption(tableToDestroyId, divOfTableId, classOfTable, caption) {
+
+    if (!classOfTable) {
+        classOfTable = "stripe";
+    }
+
+    //If you want to repopulate the datatable with new columns and data,
+    //you need to remove the datatable from the DOM. 
+    //The .remove function will remove it.
+    $("#" + tableToDestroyId).remove();
+
+    //Once you remove the datatable from the DOM, you need add the HTML back to the page.
+    //I added a name to the DIV that has the table html. I used the datatable name plus added "Holder".
+    //The following coding adds the table back.
+    $("#" + divOfTableId).html('<table id="' + tableToDestroyId + '" class="' + classOfTable + '"><caption style="text-align: center; display: table-caption; caption-side: top; font-size: 1.5em;">'+caption+'</caption></table>');
+
+}
+
+
 function buildMarketWrapper(inData) {
 
     if (!inData)
