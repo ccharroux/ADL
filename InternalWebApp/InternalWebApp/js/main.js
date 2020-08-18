@@ -35,6 +35,9 @@ const gDefaultBackPage = "/admin/login/dashboard.html";
 var gExcludeFromBackButton = false;
 const gBackButtonArrayLimit = 5;
 
+const gMinimumSearchCharacters = 2;
+const gYearsToGoBack = 5;
+
 ; (function () {
 
     'use strict';
