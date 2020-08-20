@@ -659,7 +659,7 @@
             "mRender": function (data, type, row) {
                 return '<input type="radio" name="advertisers" id="rdo_' + row.advertiserId +
                     '" onclick="loadUpdateInformation(' + row.advertiserId + ',\'' + row.AdvertiserWithoutId + '\',' +
-                    row.industryId + ',' + row.subIndustryId + ',' + row.parentAdvertiserId + '); markAsNotSelectable(' + row.advertiserId + '); fixResultsSelect(' + row.advertiserId + ');">'; //advertiserid, advertiser name, industryid, subindustryid, parentadvertiserid
+                    row.industryId + ',' + row.subIndustryId + ',' + row.parentAdvertiserId + '); fixResultsSelect(' + row.advertiserId + ');">'; //advertiserid, advertiser name, industryid, subindustryid, parentadvertiserid
             },
             "orderable": false,
             "searchable": false
@@ -866,17 +866,6 @@
 
 
         matchTable.on('select', function (e, dt, type, indexes) {
-            if (type === 'row') {
-                var rows = matchTable.rows(indexes).nodes();
-                $.each($(rows),
-                    function () {
-                        if ($(this).hasClass('not-selectable')) {
-                            matchTable.row($(this)).deselect();
-                        }
-
-                    }
-                );
-            }
 
             var count = matchTable.rows({ selected: true }).count();
             if (count > 0) {
@@ -938,30 +927,7 @@
         enableUpdateArea(true);
     }
 
-    function markAsNotSelectable(advertiserId) {
-
-        $.blockUI();
-
-        var updateTable = $('#dtUpdates').DataTable();
-        var rows = updateTable.rows('.not-selectable').nodes();
-
-
-        $('#dtUpdates tr').removeClass('selected');
-        $('#dtUpdates tr').removeClass('not-selectable');
-        $("#dtUpdates tr").attr("background-color", "white");
-        updateTable.rows().deselect();
-
-        $("#btnUpdate").hide();
-
-        var updateRowId = $('#dtUpdates').dataTable().fnFindCellRowIndexes(advertiserId, 1);
-        $(updateTable.row(updateRowId).node()).addClass('not-selectable');
-        updateTable.row(updateRowId).deselect();
-
-        $.unblockUI();
-
-    }
-
-    function searchValidationPassed() {
+   function searchValidationPassed() {
         var loopBreak = true;
         $(".mkaRequired").each(function (index, el) {
             var eID = "#" + $(el).attr("id");
@@ -1108,10 +1074,10 @@
         enableUpdateArea(false);
     }
 
-    // NOTE: created this function to update the selected row
-    // on the results table. I made the radio button cell non-selectable
-    // because it was causing the click event to happen twice.
-    // This caused an issue with the wrong row being highlighted.
+    //// NOTE: created this function to update the selected row
+    //// on the results table. I made the radio button cell non-selectable
+    //// because it was causing the click event to happen twice.
+    //// This caused an issue with the wrong row being highlighted.
     function fixResultsSelect(advertiserId) {
         $.blockUI();
 
