@@ -593,6 +593,8 @@ function buildAgencySearch(searchCriteria) {
         searchText = searchCriteria["searchAgencyName"].length > 0 ? searchCriteria["searchAgencyName"] : searchCriteria["agencyName"];
     }
 
+    gMarketId = searchCriteria["marketID"];
+
     apiParameters = {
         "inApiToken": apiToken,
         "inMarketId": $('.search-all-markets:visible').is(':checked') ? "-1" : searchCriteria["marketID"],
@@ -1052,7 +1054,15 @@ function MatchingAdvertisers() {
     window.location = '/products/xry/revenue/xrymatch.html?MatchPage=adv&MenuItem=false';
 }
 function EditMarketAgency(id) {
-    window.location = '/admin/agency/agency.html?AgencyID=' + id;
+
+    var agencyUrl = '/admin/agency/agency.html?AgencyID=' + id;
+
+    if (gMarketId != null && gMarketId > 0)
+    {
+        agencyUrl = agencyUrl + '&MarketId=' + gMarketId;
+    }
+
+    window.location = agencyUrl;
 }
 function MatchingAgencies() {
     window.location = '/products/xry/revenue/xrymatch.html?MatchPage=agy&MenuItem=false';
