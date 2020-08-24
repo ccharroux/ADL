@@ -1717,7 +1717,7 @@ function getPeriodList(inType, inDefaultSelect) {
         thisMonth = thisMonth - 1;
         if (thisMonth == -1)
         {
-            thisMonth = 11;
+            thisMonth = 11; //priorperiod
             var newYear = $("#ddlYear option:selected").index() + 1;
             $("#ddlYear")[0].selectedIndex = newYear;
         }

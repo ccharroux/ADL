@@ -5313,6 +5313,7 @@ function getReportFilterArray_MRRNationwideTVByAffiliation() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -5417,6 +5418,7 @@ function getReportFilterArray_MRRNationwideTVByRegion() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -5520,6 +5522,7 @@ function getReportFilterArray_MRRNationwideTVBySize() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -5624,6 +5627,7 @@ function getReportFilterArray_MRRNationwideRadioByFormat() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -5727,6 +5731,7 @@ function getReportFilterArray_MRRNationwideRadioByRegion() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -5830,6 +5835,7 @@ function getReportFilterArray_MRRNationwideRadioBySize() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -9400,6 +9406,7 @@ function getReportFilterArray_TimeSalesCompareList() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -9418,6 +9425,7 @@ function getReportFilterArray_TimeSalesCompareList() {
         token: "PriorPeriod",
         objectName: "ddlPriorPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -9485,6 +9493,7 @@ function getReportFilterArray_TimeSalesCompleteRevenueList() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
