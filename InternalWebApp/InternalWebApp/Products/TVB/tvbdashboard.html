@@ -90,6 +90,13 @@
         .container{
             width:90%!important;
         }
+        .reportTotalLabel {
+            width: 410px;
+        }
+        .reportTotalDetail {
+            text-align: center;
+            width: 140px
+        }
     </style>
 
 
@@ -157,6 +164,32 @@
                 <div class="dataTable-top-margin" id="dtResultsWrapper">
                     <table id="dtResults" class="dataTable-border dataTable-headers dataTable-cell-border" ></table>
                     <div id="noDataFound" style="display:none; color: red">No data found</div>
+                </div>
+                <!-- grand totals -->
+                <div class="margin-top-10">
+                    <table id="dtResultsTotals" class="dataTable-border dataTable-headers dataTable-cell-border">
+                        <tr>
+                            <th rowspan="2" class="reportTotalLabel">Totals</th>
+                            <th class="reportTotalDetail">Total Stations</th>
+                            <th class="reportTotalDetail">Not Entered</th>
+                            <th class="reportTotalDetail">In</th>
+                            <th class="reportTotalDetail">Saved</th>
+                            <th class="reportTotalDetail">Submitted</th>
+                            <th class="reportTotalDetail">Estimated</th>
+                            <th class="reportTotalDetail">Processed</th>
+                            <th class="reportTotalDetail">Missing Stations</th>
+                        </tr>
+                        <tr>
+                            <td class="reportTotalDetail"><span id="spanReportTotal_TotalStations"></span></td>
+                            <td class="reportTotalDetail"><span id="spanReportTotal_NotEntered"></span></td>
+                            <td class="reportTotalDetail"><span id="spanReportTotal_In"></span></td>
+                            <td class="reportTotalDetail"><span id="spanReportTotal_Saved"></span></td>
+                            <td class="reportTotalDetail"><span id="spanReportTotal_Submitted"></span></td>
+                            <td class="reportTotalDetail"><span id="spanReportTotal_Estimated"></span></td>
+                            <td class="reportTotalDetail"><span id="spanReportTotal_Processed"></span></td>
+                            <td class="reportTotalDetail"><span id="spanReportTotal_MissingStations"></span></td>
+                        </tr>
+                    </table>
                 </div>
 
             </div>
@@ -476,6 +509,7 @@
             return;
         }
         $('#dtResults').show();
+        $('#dtResultsTotals').show();
 
 
 
@@ -627,6 +661,7 @@
             ],
         });
 
+        updateTotals(results);
     }
     function destroyDataTable() {
 
@@ -634,11 +669,52 @@
             var searchTable = $('#dtResults').DataTable();
             searchTable.destroy();
             $('#dtResults').hide();
+            $('#dtResultsTotals').hide();
         }
 
 
         resetDataTableDOM("dtResults", "dtResultsWrapper", "dataTable-border dataTable-headers dataTable-cell-border");
         $("#dtResultsWrapper").append('<div id="noDataFound" style="display:none; color: red">No data found</div>');
+    }
+
+    function updateTotals(results) {
+        var allOwners = ($("#ddlOwner").val() == "");
+
+        var reportTotal_TotalStations = 0;
+        var reportTotal_NotEntered = 0;
+        var reportTotal_In = 0;
+        var reportTotal_Saved = 0;
+        var reportTotal_Submitted = 0;
+        var reportTotal_Estimated = 0;
+        var reportTotal_Processed = 0;
+        var reportTotal_MissingStations = 0;
+
+        results.forEach(e => {
+            reportTotal_NotEntered += e["Not Entered"];
+            reportTotal_In += e["In"];
+            reportTotal_Saved += e["Saved"];
+            reportTotal_Submitted += e["Submitted"];
+            reportTotal_Estimated += e["Estimated"];
+            reportTotal_Processed += e["Processed"];
+            if (allOwners) {
+                reportTotal_TotalStations += e["Total Stations"];
+                reportTotal_MissingStations += e["Missing Stations"];
+            } else {
+                reportTotal_TotalStations += 1;
+                if (e["Missing Station"] == "true") {
+                    reportTotal_MissingStations += 1;
+                }
+            }
+        });
+
+        $("#spanReportTotal_TotalStations").text(reportTotal_TotalStations);
+        $("#spanReportTotal_NotEntered").text(reportTotal_NotEntered);
+        $("#spanReportTotal_In").text(reportTotal_In);
+        $("#spanReportTotal_Saved").text(reportTotal_Saved);
+        $("#spanReportTotal_Submitted").text(reportTotal_Submitted);
+        $("#spanReportTotal_Estimated").text(reportTotal_Estimated);
+        $("#spanReportTotal_Processed").text(reportTotal_Processed);
+        $("#spanReportTotal_MissingStations").text(reportTotal_MissingStations);
     }
 
     function reloadOwnersAndDates()
@@ -790,7 +866,7 @@
     function selectOwnerId(inOwnerId)
     {
 
-        if ($("#ddlOwner").val() == "-1") {
+        if ($("#ddlOwner").val() == "") {
 
             $("#ddlOwner").val(inOwnerId);
             getReport();
