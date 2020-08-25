@@ -510,7 +510,7 @@ function buildAdvertiserSearch(searchCriteria) {
         searchText = searchCriteria["marketAdvertiserName"].length > 0 ? searchCriteria["marketAdvertiserName"].substring(0,gMinimumSearchCharacters) : searchCriteria["advertiserName"].substring(0,gMinimumSearchCharacters);
     }
 
-    if ($('.search-text:visible').val().length == 0)
+    if ($('.search-text:visible').val().length == 0 && gSilentSearch == true)
     {
         $('.search-text:visible').val(searchText);
     }
