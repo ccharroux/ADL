@@ -507,7 +507,12 @@ function buildAdvertiserSearch(searchCriteria) {
         searchText = $('.search-text:visible').val();
     }
     else {
-        searchText = searchCriteria["marketAdvertiserName"].length > 0 ? searchCriteria["marketAdvertiserName"] : searchCriteria["advertiserName"];
+        searchText = searchCriteria["marketAdvertiserName"].length > 0 ? searchCriteria["marketAdvertiserName"].substring(0,gMinimumSearchCharacters) : searchCriteria["advertiserName"].substring(0,gMinimumSearchCharacters);
+    }
+
+    if ($('.search-text:visible').val().length == 0)
+    {
+        $('.search-text:visible').val(searchText);
     }
 
     gNumericMediaTypeId = searchCriteria["numericMediaTypeId"];
@@ -572,7 +577,20 @@ function buildAdvertiserSearch(searchCriteria) {
     columns.push({
         "mRender": function (data, type, row) {
             var str = '<a href="#" onclick="EditMarketAdvertiser(' + row.advertiserId + ')">Edit</a>&nbsp;&nbsp;';
-            str = str + '<a href="#" onclick="linkAdvertiserByLink(' + row.advertiserId + ',' + row.marketId + ')">Link Advertiser</a>';
+            if (row.marketId == gMarketId)
+            {
+                str = str +
+                    '<a href="#" onclick="linkAdvertiserByLink(' +
+                    row.advertiserId +
+                    ',' +
+                    row.marketId +
+                    ')">Link Advertiser</a>';
+            } else
+            {
+                //will need the stored procedure to return the industry and sub-industry ids.
+                //build the add link need to pass name, industry, subindustry and market to build in
+                str = str + '<a href="#" onclick="createNewMarketAdvertiserFromLink(0,\''+row.advertiser+'\',' + row.industryId + ',' + row.subIndustryId +')">Add</a>';
+            }
             return str;
         },
         "orderable": false,
@@ -1345,4 +1363,35 @@ function getOwnerListSuccess(data, textStauts, jQxhr) {
 
     }
 
+}
+
+function createNewMarketAdvertiserFromLink(id, advertiserName, industryId, subIndustryId)
+{
+    var marketUrl = '/admin/advertiser/advertiser.html?AdvertiserID=0' + id;
+
+    if (gMarketId != null && gMarketId > 0) {
+        marketUrl = marketUrl + '&MarketId=' + gMarketId;
+    }
+
+    if (id == 0 && gNumericMediaTypeId != null && gNumericMediaTypeId > 0) {
+        marketUrl = marketUrl + '&NumericMediaTypeId=' + gNumericMediaTypeId;
+    }
+
+    //add name
+    if (advertiserName != null && advertiserName.trim().length > 0)
+    {
+        marketUrl = marketUrl + '&MarketAdvertiserName=' + encodeURIComponent(advertiserName);
+    }
+    //add industry
+    if (industryId != null && industryId > 0)
+    {
+        marketUrl = marketUrl + '&IndustryId=' + industryId;
+    }
+    //add subindustry
+    if (subIndustryId != null && subIndustryId > -1)
+    {
+        marketUrl = marketUrl + '&SubIndustryId=' + subIndustryId;
+    }
+
+    window.location = marketUrl;
 }

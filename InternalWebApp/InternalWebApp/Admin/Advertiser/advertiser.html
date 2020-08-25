@@ -367,25 +367,18 @@
     var bIsFromReport = false;
     var iNumericMediaTypeId = 0;
     var iMarketId = 0;
+    var sAdvertiserName = "";
+    var iIndustryId = -1;
+    var iSubIndustryId = -1;
 
     $(document).ready(function () {
 
         buildXRYMenu("Utility");
         buildQuickReports(['advertiser']);
-        advertiserId = (getParameterByName("AdvertiserID") == null ? 0 : getParameterByName("AdvertiserID"));
-
-        bIsFromReport = getParameterByName("FromReport") == null ? false : getParameterByName("FromReport");
-
-        $("#txtAdvertiserId").val(advertiserId);
         
-        bIsNew = advertiserId <= 0;
-
-        iNumericMediaTypeId = getParameterByName("NumericMediaTypeId") == null ? 0 : getParameterByName("NumericMediaTypeId");
-        iMarketId = getParameterByName("MarketId") == null ? 0 : getParameterByName("MarketId");
+        setUIFields();
 
         getMarketList();
-
-        //set local setting for the back button
 
         $("#ddlIndustry").change(function () {
             getSubIndustryList($(this).val(), '');
@@ -400,6 +393,24 @@
             $(".standardInputArea").hide();
         }
     });
+
+    function setUIFields()
+    {
+        advertiserId = (getParameterByName("AdvertiserID") == null ? 0 : getParameterByName("AdvertiserID"));
+
+        bIsFromReport = getParameterByName("FromReport") == null ? false : getParameterByName("FromReport");
+
+        $("#txtAdvertiserId").val(advertiserId);
+
+        bIsNew = advertiserId <= 0;
+
+        iNumericMediaTypeId = getParameterByName("NumericMediaTypeId") == null ? 0 : getParameterByName("NumericMediaTypeId");
+        iMarketId = getParameterByName("MarketId") == null ? 0 : getParameterByName("MarketId");
+
+        sAdvertiserName = getParameterByName("MarketAdvertiserName") == null ? "" : getParameterByName("MarketAdvertiserName");
+        iIndustryId = getParameterByName("IndustryId") == null ? -1 : getParameterByName("IndustryId");
+        iSubIndustryId = getParameterByName("SubIndustryId") == null ? -1 : getParameterByName("SubIndustryId");
+    }
 
     function getMarketList() {
 
@@ -598,7 +609,21 @@
             $('.advertiser-link-advertiser').hide();
             $('.change-date').hide();
 
-            getSubIndustryList("-1", "");
+            //the name should've been supplied through the URL
+            //along with industry and sub-industry
+            if (sAdvertiserName.length > 0)
+            {
+                $("#txtAdvertiserName").val(sAdvertiserName);
+                if (iIndustryId > -1)
+                {
+                    $("#ddlIndustry").val(iIndustryId);
+                    getSubIndustryList(iIndustryId, iSubIndustryId);
+                }
+                
+            } else
+            {
+                getSubIndustryList("-1", "");
+            }
 
             loadSearchResults();
 
@@ -1250,8 +1275,10 @@
                             var matches = regExp.exec(data.report.rows[0].Market);
                             var marketId = matches[1];
                             $("#ddlMarket").val(marketId);
-                            $("#txtAdvertiserName").val(data.report.rows[0]['Advertiser Raw']);
-
+                            if ($("#txtAdvertiserName").val().length == 0)
+                            {
+                                $("#txtAdvertiserName").val(data.report.rows[0]['Advertiser Raw']);
+                            }
                         }
                         console.log(data);
                     }
