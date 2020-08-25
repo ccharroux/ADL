@@ -4,15 +4,24 @@ var apiToken = getLocalStorage("APIToken");
 var searchText = "";
 var columns = [];
 var gResults = null;
+var gSilentSearch;
+var gNumericMediaTypeId = 0;
+var gMarketId = 0;
 
-function getSearchData(searchCriteria) {
+function getSearchData(searchCriteria, bSilentSearch) {
     //get session object
     //switch statement on token
     //make api call can return the data
     //turn into json that the datatable can understand
     //console.log(searchCriteria);
 
-
+    if (bSilentSearch == undefined)
+    {
+        gSilentSearch = true;
+    } else
+    {
+        gSilentSearch = bSilentSearch;
+    }
 
     switch (searchCriteria["searchToken"].toUpperCase()) {
         case "STATIONMARKET":
@@ -54,10 +63,17 @@ function getSearchData(searchCriteria) {
     //DEV-7085 
     //added validation to make sure there is search text
     //regardless of the type of search
-    if (searchText.length == 0)
+    if ($('.search-text:visible').val().trim().length == 0 && gSilentSearch == false)
     {
         bootbox.alert('Please enter search text.', function () {
-                });
+        });
+
+        $('.search-text:visible').val("");
+
+        return;
+
+    } else if (searchText.length == 0 && gSilentSearch == true)
+    {
         return;
     }
    
@@ -491,8 +507,16 @@ function buildAdvertiserSearch(searchCriteria) {
         searchText = $('.search-text:visible').val();
     }
     else {
-        searchText = searchCriteria["marketAdvertiserName"].length > 0 ? searchCriteria["marketAdvertiserName"] : searchCriteria["advertiserName"];
+        searchText = searchCriteria["marketAdvertiserName"].length > 0 ? searchCriteria["marketAdvertiserName"].substring(0,gMinimumSearchCharacters) : searchCriteria["advertiserName"].substring(0,gMinimumSearchCharacters);
     }
+
+    if ($('.search-text:visible').val().length == 0 && gSilentSearch == true)
+    {
+        $('.search-text:visible').val(searchText);
+    }
+
+    gNumericMediaTypeId = searchCriteria["numericMediaTypeId"];
+    gMarketId = searchCriteria["marketID"];
 
     //setup the parameters for the API
 
@@ -541,19 +565,32 @@ function buildAdvertiserSearch(searchCriteria) {
         "title": "Industry",
         "data": "industry",
         "orderable": true
-    })
+    });
 
     columns.push({
         "title": "Sub Industry",
         "data": "subIndustry",
         "orderable": true
-    })
+    });
 
 
     columns.push({
         "mRender": function (data, type, row) {
             var str = '<a href="#" onclick="EditMarketAdvertiser(' + row.advertiserId + ')">Edit</a>&nbsp;&nbsp;';
-            str = str + '<a href="#" onclick="linkAdvertiserByLink(' + row.advertiserId + ',' + row.marketId + ')">Link Advertiser</a>';
+            if (row.marketId == gMarketId)
+            {
+                str = str +
+                    '<a href="#" onclick="linkAdvertiserByLink(' +
+                    row.advertiserId +
+                    ',' +
+                    row.marketId +
+                    ')">Link Advertiser</a>';
+            } else
+            {
+                //will need the stored procedure to return the industry and sub-industry ids.
+                //build the add link need to pass name, industry, subindustry and market to build in
+                str = str + '<a href="#" onclick="createNewMarketAdvertiserFromLink(0,\''+row.advertiser+'\',' + row.industryId + ',' + row.subIndustryId +')">Add</a>';
+            }
             return str;
         },
         "orderable": false,
@@ -573,6 +610,8 @@ function buildAgencySearch(searchCriteria) {
     } else {
         searchText = searchCriteria["searchAgencyName"].length > 0 ? searchCriteria["searchAgencyName"] : searchCriteria["agencyName"];
     }
+
+    gMarketId = searchCriteria["marketID"];
 
     apiParameters = {
         "inApiToken": apiToken,
@@ -1014,13 +1053,34 @@ function buildLinkAdvertiserSearch(searchCriteria) {
 
 }
 function EditMarketAdvertiser(id) {
-    window.location = '/admin/advertiser/advertiser.html?AdvertiserID=' + id;
+
+    var marketUrl = '/admin/advertiser/advertiser.html?AdvertiserID=' + id;
+
+    if (gMarketId != null && gMarketId > 0)
+    {
+        marketUrl = marketUrl + '&MarketId=' + gMarketId;
+    }
+
+    if (id == 0 && gNumericMediaTypeId != null && gNumericMediaTypeId > 0)
+    {
+        marketUrl = marketUrl + '&NumericMediaTypeId=' + gNumericMediaTypeId;
+    }
+
+    window.location = marketUrl;
 }
 function MatchingAdvertisers() {
     window.location = '/products/xry/revenue/xrymatch.html?MatchPage=adv&MenuItem=false';
 }
 function EditMarketAgency(id) {
-    window.location = '/admin/agency/agency.html?AgencyID=' + id;
+
+    var agencyUrl = '/admin/agency/agency.html?AgencyID=' + id;
+
+    if (gMarketId != null && gMarketId > 0)
+    {
+        agencyUrl = agencyUrl + '&MarketId=' + gMarketId;
+    }
+
+    window.location = agencyUrl;
 }
 function MatchingAgencies() {
     window.location = '/products/xry/revenue/xrymatch.html?MatchPage=agy&MenuItem=false';
@@ -1303,4 +1363,35 @@ function getOwnerListSuccess(data, textStauts, jQxhr) {
 
     }
 
+}
+
+function createNewMarketAdvertiserFromLink(id, advertiserName, industryId, subIndustryId)
+{
+    var marketUrl = '/admin/advertiser/advertiser.html?AdvertiserID=0' + id;
+
+    if (gMarketId != null && gMarketId > 0) {
+        marketUrl = marketUrl + '&MarketId=' + gMarketId;
+    }
+
+    if (id == 0 && gNumericMediaTypeId != null && gNumericMediaTypeId > 0) {
+        marketUrl = marketUrl + '&NumericMediaTypeId=' + gNumericMediaTypeId;
+    }
+
+    //add name
+    if (advertiserName != null && advertiserName.trim().length > 0)
+    {
+        marketUrl = marketUrl + '&MarketAdvertiserName=' + encodeURIComponent(advertiserName);
+    }
+    //add industry
+    if (industryId != null && industryId > 0)
+    {
+        marketUrl = marketUrl + '&IndustryId=' + industryId;
+    }
+    //add subindustry
+    if (subIndustryId != null && subIndustryId > -1)
+    {
+        marketUrl = marketUrl + '&SubIndustryId=' + subIndustryId;
+    }
+
+    window.location = marketUrl;
 }

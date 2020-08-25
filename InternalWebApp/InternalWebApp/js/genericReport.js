@@ -5313,6 +5313,7 @@ function getReportFilterArray_MRRNationwideTVByAffiliation() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -5321,6 +5322,27 @@ function getReportFilterArray_MRRNationwideTVByAffiliation() {
         token: "Filter",
         objectName: "chkFilter",
         filterValue: "Nationwide",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideTVByRegion",
+        objectName: "btnMRRNationwideTVByRegion",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideTVByMarketSize",
+        objectName: "btnMRRNationwideTVByMarketSize",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideTVByAffiliation",
+        objectName: "btnMRRNationwideTVByAffiliation",
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -5396,6 +5418,7 @@ function getReportFilterArray_MRRNationwideTVByRegion() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -5407,6 +5430,28 @@ function getReportFilterArray_MRRNationwideTVByRegion() {
         required: false
     }
     arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideTVByRegion",
+        objectName: "btnMRRNationwideTVByRegion",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideTVByMarketSize",
+        objectName: "btnMRRNationwideTVByMarketSize",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideTVByAffiliation",
+        objectName: "btnMRRNationwideTVByAffiliation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
 
     return arrayFilters;
 }
@@ -5477,6 +5522,7 @@ function getReportFilterArray_MRRNationwideTVBySize() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -5488,6 +5534,28 @@ function getReportFilterArray_MRRNationwideTVBySize() {
         required: false
     }
     arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideTVByRegion",
+        objectName: "btnMRRNationwideTVByRegion",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideTVByMarketSize",
+        objectName: "btnMRRNationwideTVByMarketSize",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideTVByAffiliation",
+        objectName: "btnMRRNationwideTVByAffiliation",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
 
     return arrayFilters;
 }
@@ -5559,6 +5627,7 @@ function getReportFilterArray_MRRNationwideRadioByFormat() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -5567,6 +5636,27 @@ function getReportFilterArray_MRRNationwideRadioByFormat() {
         token: "Filter",
         objectName: "chkFilter",
         filterValue: "Nationwide",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideRadioByRegion",
+        objectName: "btnMRRNationwideRadioByRegion",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideRadioByMarketSize",
+        objectName: "btnMRRNationwideRadioByMarketSize",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideRadioByFormat",
+        objectName: "btnMRRNationwideRadioByFormat",
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -5641,6 +5731,7 @@ function getReportFilterArray_MRRNationwideRadioByRegion() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -5652,6 +5743,28 @@ function getReportFilterArray_MRRNationwideRadioByRegion() {
         required: false
     }
     arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideRadioByRegion",
+        objectName: "btnMRRNationwideRadioByRegion",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideRadioByMarketSize",
+        objectName: "btnMRRNationwideRadioByMarketSize",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideRadioByFormat",
+        objectName: "btnMRRNationwideRadioByFormat",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
 
     return arrayFilters;
 }
@@ -5722,6 +5835,7 @@ function getReportFilterArray_MRRNationwideRadioBySize() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -5733,6 +5847,28 @@ function getReportFilterArray_MRRNationwideRadioBySize() {
         required: false
     }
     arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideRadioByRegion",
+        objectName: "btnMRRNationwideRadioByRegion",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideRadioByMarketSize",
+        objectName: "btnMRRNationwideRadioByMarketSize",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MRRNationwideRadioByFormat",
+        objectName: "btnMRRNationwideRadioByFormat",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
 
     return arrayFilters;
 }
@@ -9270,6 +9406,7 @@ function getReportFilterArray_TimeSalesCompareList() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -9288,6 +9425,7 @@ function getReportFilterArray_TimeSalesCompareList() {
         token: "PriorPeriod",
         objectName: "ddlPriorPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -9355,6 +9493,7 @@ function getReportFilterArray_TimeSalesCompleteRevenueList() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -11770,7 +11909,7 @@ function getReportObject_PersonnelGroupList() {
 
     tempObject =
     {
-        reportTitle: "Personnel Group Member List",
+        reportTitle: "MKA User Group Member List",
         apiControllerAction: "/api/Relationship/GetRelationshipListMembers",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,

@@ -24,7 +24,7 @@
     <meta name="twitter:card" content="" />
 
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="shortcut icon" href="/favicon.ico">
 
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
 
@@ -126,7 +126,7 @@
                             <br />
                             <input type="radio" name="matchType" id="rdoAgency" value="agency" class="report-filter"><label class="rdo-label rtpViewRight" for="rdoAgency">Agency</label>
                             <br />
-                            <input type="radio" name="matchType" id="rdoMedia" value="media" class="report-filter"><label class="rdo-label rtpViewRight" for="rdoMedia">Media</label>
+                            <input type="radio" name="matchType" id="rdoMedia" value="media" class="report-filter"><label class="rdo-label rtpViewRight" for="rdoMedia">Third Party</label>
                         </div>
                         <div class="form-group rptView vertical-center match-station match-media">
                             <label for="ddlPeriod" class="dropdown-label rptView">Period</label>
@@ -157,8 +157,6 @@
                             <select id="ddlOptions" apiInput="inOptionId" onchange="" class="dropdown-select rptView report-filter"></select>
                         </div><!-- adding comments here-->
                         <div class="form-group col-md-3 rptButton" style="text-align: right">
-                            <!--<label for="btnBack" class="dropdown-label">&nbsp;</label>
-                            <input type="button" id="btnBack" class="search-button" value="Back" onclick="updatedGoBack()" />-->
                             <label for="btnReport" class="dropdown-label">&nbsp;</label>
                             <input type="button" id="btnReport" class="search-button" value="Show" onclick="getMatchingReport()" />
                         </div>
@@ -360,7 +358,7 @@
             $("#pageTitle").html("Station Agency Match Page");
 
         } else if ($('#rdoMedia').is(':checked')) {
-            $("#pageTitle").html("Media Advertiser Match Page");
+            $("#pageTitle").html("Third Party Advertiser Match Page");
 
         } else {
             $("#pageTitle").html("Station Advertiser Match Page");
@@ -532,6 +530,18 @@
 
     }
 
+    function getAdvertiserExportColumns() {
+        var columnsToExport = new Array();
+
+        columnsToExport.push(0);
+        columnsToExport.push(1);
+        columnsToExport.push(2);
+        columnsToExport.push(3);
+        columnsToExport.push(4);
+
+        return columnsToExport;
+    }
+
     function getAgencyColumns() {
         /*
          * station
@@ -609,6 +619,19 @@
         return columnsToDisplay;
     }
 
+    function getAgencyExportColumns()
+    {
+        var columnsToExport = new Array();
+
+        columnsToExport.push(0);
+        columnsToExport.push(1);
+        columnsToExport.push(2);
+        columnsToExport.push(3);
+        columnsToExport.push(4);
+
+        return columnsToExport;
+    }
+
     function getMediaAdvertiserColumns() {
         var columnsToDisplay = new Array();
 
@@ -654,6 +677,22 @@
         });
 
         columnsToDisplay.push({
+            "title": "Market Category",
+            "visible": true,
+            "mData": "Market Category",
+            "orderable": true,
+            "searchable": true
+        });
+
+        columnsToDisplay.push({
+            "title": "Market Sub-Category",
+            "visible": true,
+            "mData": "Market Sub-Category",
+            "orderable": true,
+            "searchable": true
+        });
+
+        columnsToDisplay.push({
             "mRender": function (data, type, row) {
                 var action = "";
                 //pass the advertiser name, station category
@@ -677,6 +716,20 @@
         });
 
         return columnsToDisplay;
+    }
+
+    function getMediaAdvertiserExportColumns() {
+        var columnsToExport = new Array();
+
+        columnsToExport.push(0);
+        columnsToExport.push(1);
+        columnsToExport.push(2);
+        columnsToExport.push(3);
+        columnsToExport.push(4);
+        columnsToExport.push(5);
+        columnsToExport.push(6);
+
+        return columnsToExport;
     }
 
     function createStationAdvertiser(marketId, ownerId, stationId, advertiserName, category, stationAdvertiserCode, stationAgency, linkedAdvertiserId, standardInputId) {
@@ -1151,8 +1204,9 @@
 
     function loadMediaAdvertiserData(data) {
         var columns = getMediaAdvertiserColumns();
-        var title = "Unmatched Media Advertisers";
-        loadResults(data, columns, title);
+        var columnsToExport = getMediaAdvertiserExportColumns();
+        var title = "Third Party Advertisers Matching Report";
+        loadResults(data, columns, title, columnsToExport);
     }
 
     function getStationAgencyData() {
@@ -1275,19 +1329,21 @@
     function loadAdvertiserData(data) {
         //get columns
         var columns = getAdvertiserColumns();
-        var title = "Unmatched Advertisers";
-        loadResults(data, columns, title);
+        var columnsToExport = getAdvertiserExportColumns();
+        var title = "Advertisers Matching Report";
+        loadResults(data, columns, title, columnsToExport);
     }
 
     function loadAgencyData(data) {
         //get columns
         var columns = getAgencyColumns();
-        var title = "Unmatched Agencies";
-        loadResults(data, columns, title);
+        var columnsToExport = getAgencyExportColumns();
+        var title = "Agencies Matching Report";
+        loadResults(data, columns, title, columnsToExport);
 
     }
 
-    function loadResults(data, columns, reportTitle) {
+    function loadResults(data, columns, reportTitle, columnsToExport) {
         //data is the data from the ajax call
         //columns is the array that was built previously
 
@@ -1323,21 +1379,21 @@
                 search: "Filter Results:"
             },
             "buttons": [
-               //{
-               //    extend: 'excel',
-               //    title: reportTitle,
-               //    exportOptions: {
-               //        columns: columnsToExport
-               //    }
-               //},
-               //{
-               //    extend: 'print',
-               //    title: reportTitle,
-               //    exportOptions: {
-               //        columns: columnsToExport
+               {
+                   extend: 'excel',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: columnsToExport
+                   }
+               },
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: columnsToExport
 
-               //    }
-               //}
+                   }
+               }
             ]
         });
     }

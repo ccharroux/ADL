@@ -23,7 +23,7 @@
     <meta name="twitter:card" content="" />
 
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="shortcut icon" href="/favicon.ico">
 
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
 
@@ -388,6 +388,31 @@
 
                     </div>
                 </div>
+                <div class="form-group rptView rptMRRNationwideTVByRegion">
+                    <!--<label for="btnMRRNationwideTVByRegion" class="dropdown-label rptView rptFilter">Filter</label>-->
+                    <input id="btnMRRNationwideTVByRegion" type="button" value="TV by Region" onclick="getThisReport('MRR Nationwide TV Region')" apiInput="none" class="dropdown-select rptView rptMRRNationwideTVByRegion report-filter" />
+                </div>
+                <div class="form-group rptView rptMRRNationwideTVByMarketSize">
+                    <!--<label for="btnMRRNationwideTVByRegion" class="dropdown-label rptView rptFilter">Filter</label>-->
+                    <input id="rptMRRNationwideTVByMarketSize" type="button" value="TV by Market Size" onclick="getThisReport('MRR Nationwide TV Market Size')" apiInput="none" class="dropdown-select rptView rptMRRNationwideTVByMarketSize report-filter" />
+                </div>
+                <div class="form-group rptView rptMRRNationwideTVByAffiliation">
+                    <!--<label for="btnMRRNationwideTVByRegion" class="dropdown-label rptView rptFilter">Filter</label>-->
+                    <input id="rptMRRNationwideTVByAffiliation" type="button" value="TV by Affiliation" onclick="getThisReport('MRR Nationwide TV Affiliation')" apiInput="none" class="dropdown-select rptView rptMRRNationwideTVByAffiliation report-filter" />
+                </div>
+
+                <div class="form-group rptView rptMRRNationwideRadioByRegion">
+                    <!--<label for="btnMRRNationwideRadioByRegion" class="dropdown-label rpRadioiew rptFilter">Filter</label>-->
+                    <input id="btnMRRNationwideRadioByRegion" type="button" value="Radio by Region" onclick="getThisReport('MRR Nationwide Radio Region')" apiInput="none" class="dropdown-select rptView rptMRRNationwideRadioByRegion report-filter" />
+                </div>
+                <div class="form-group rptView rptMRRNationwideRadioByMarketSize">
+                    <!--<label for="btnMRRNationwideRadioByRegion" class="dropdown-label rpRadioiew rptFilter">Filter</label>-->
+                    <input id="rptMRRNationwideRadioByMarketSize" type="button" value="Radio by Market Size" onclick="getThisReport('MRR Nationwide Radio Market Size')" apiInput="none" class="dropdown-select rptView rptMRRNationwideRadioByMarketSize report-filter" />
+                </div>
+                <div class="form-group rptView rptMRRNationwideRadioByFormat">
+                    <!--<label for="btnMRRNationwideRadioByRegion" class="dropdown-label rpRadioiew rptFilter">Filter</label>-->
+                    <input id="rptMRRNationwideRadioByFormat" type="button" value="Radio by Format" onclick="getThisReport('MRR Nationwide Radio Format')" apiInput="none" class="dropdown-select rptView rptMRRNationwideRadioByFormat report-filter" />
+                </div>
                 <div class="row" style="display:none" id="autoRerun"></div>
                 <!-- start datatable coding-->
 
@@ -529,6 +554,21 @@
  
         // display filters
         displayFilters(reportFilterArray);
+
+        var passedYear = getParameterByName("passedYear");
+ 
+        if (!passedYear == false && passedYear != null)
+        {
+ 
+            $("#ddlYear").val(passedYear);
+        }
+
+        var passedPeriod = getParameterByName("passedPeriod");
+        if (!passedPeriod == false && passedPeriod != null) {
+            $("#ddlPeriod").val(passedPeriod);
+        }
+
+
 
         autoRun(reportFilterArray);
 
@@ -1371,6 +1411,8 @@
     }
     function getPeriodList(typesToLoad, inDefaultSelect)
     {
+ 
+
 
         if (!typesToLoad)
         {
@@ -1389,13 +1431,45 @@
         var d = new Date();
         var thisPeriod = d.getMonth() + 1;
         
-        if (typesToLoad.toLowerCase() == "all" || typesToLoad.toLowerCase() == "months") {
+        if (typesToLoad.toLowerCase() == "all" || typesToLoad.toLowerCase() == "months")
+        {
 
-            for (var i = 1; i <= 12; i++) {
+            if (inDefaultSelect.toLowerCase() == "priorperiod")
+            {
+                thisPeriod = thisPeriod - 1;
 
+                if (thisPeriod == 0)
+                {
+                    thisPeriod = 12; //priorperiod
+
+                    var yearObject = "ddlYear";
+                    var newYear = $("#" + yearObject + " option:selected").index() + 1;
+                    $("#" + yearObject)[0].selectedIndex = newYear;
+ 
+                    yearObject = "ddlPriorYear";
+                    newYear = $("#" + yearObject + " option:selected").index() + 1;
+                    $("#" + yearObject)[0].selectedIndex = newYear;
+
+                    yearObject = "ddlFromYear";
+                    newYear = $("#" + yearObject + " option:selected").index() + 1;
+                    $("#" + yearObject)[0].selectedIndex = newYear;
+
+                    yearObject = "ddlToYear";
+                    newYear = $("#" + yearObject + " option:selected").index() + 1;
+                    $("#" + yearObject)[0].selectedIndex = newYear;
+
+                }
+            }
+
+
+            for (var i = 1; i <= 12; i++)
+            {
                 str = str + '<option ' + (thisPeriod == i && inDefaultSelect != "quarter" ? "selected" : "");
                 str = str + ' value="' + (i < 10 ? '0' + i.toString() : i.toString()) + '">' + monthNames[i - 1] + '</option>';
             }
+
+ 
+
         }
 
         if (typesToLoad.toLowerCase() == "all") {
@@ -2725,7 +2799,7 @@
                     // overrides here for business reasons                   
                     // relationshiplist --> personnelGroup
 
-                    paramWithIssue = paramWithIssue.toLowerCase().replace("relationshiplist", "personnel group");
+                    paramWithIssue = paramWithIssue.toLowerCase().replace("relationshiplist", "mka user group");
 
                     var msg = "Please select a " + paramWithIssue
                     if (bSilent == false) {
@@ -3583,6 +3657,15 @@
         convertToChosenSelect("ddlPersonnelGroups", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
 
+    }
+
+    function getThisReport(rptTitle)
+    {
+        var urlString = '/utilities/genericreport/genericReport.html?reportId=' + getReportIdByToken(rptTitle);
+        urlString = urlString + '&passedYear=' + $("#ddlYear").val() + '&passedPeriod=' + $("#ddlPeriod").val();
+
+
+        window.location = urlString;
     }
 
 </script>

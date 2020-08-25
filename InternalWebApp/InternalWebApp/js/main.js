@@ -35,6 +35,9 @@ const gDefaultBackPage = "/admin/login/dashboard.html";
 var gExcludeFromBackButton = false;
 const gBackButtonArrayLimit = 5;
 
+const gMinimumSearchCharacters = 2;
+const gYearsToGoBack = 5;
+
 ; (function () {
 
     'use strict';
@@ -296,6 +299,10 @@ var navTool = {
 
 $(document).ready(function ()
 {
+    //$(document).ajaxStart(function ( ) {
+
+
+    //});
 
     $(document).ajaxSuccess(function () {
         gAJAXError = false;
@@ -303,14 +310,12 @@ $(document).ready(function ()
 
     $(document).ajaxError(function (event, jqxhr, inSettings, thrownError)
     {
- 
-        window.localStorage.setItem("AJAXErrorURL", inSettings.url);
+         window.localStorage.setItem("AJAXErrorURL", inSettings.url);
 
-        if (!inSettings.data == false)
-        {
+        if (!inSettings.data == false) {
             window.localStorage.setItem("AJAXErrorData", inSettings.data);
         }
-
+        console.log(inSettings);
         gAJAXError = true;
     });
 
@@ -575,6 +580,7 @@ function addDialogComponents() {
 
 }
 function getFavoritesForQuickList() {
+
     $("#favoritesQuickList").append('<li class="display-block"><a href="/admin/login/dashboard.html">Favorites Page</a></li>');
 
     $.ajax({
@@ -952,6 +958,9 @@ function MKAErrorMessageRtn(message, preCallback, postCallback) {
 
     var newMessage = "";
 
+    var AJAXErrorURL = window.localStorage.getItem("AJAXErrorURL");
+    var AJAXErrorData = window.localStorage.getItem("AJAXErrorData");
+
     if (!message)
     {
         message = "";
@@ -970,7 +979,7 @@ function MKAErrorMessageRtn(message, preCallback, postCallback) {
                     (data) => {
 
                         MKAErrorMessageDeliveryRtn(message, postCallback);
-                        setTimeout(function () { sendErrorEmail(message) }, 1000);
+                        setTimeout(function () { sendErrorEmail(message, AJAXErrorURL, AJAXErrorData) }, 1000);
                     },
                     (error) => {
                         bootbox.alert(error, function () { return; });
@@ -985,6 +994,9 @@ function MKAErrorMessageRtn(message, preCallback, postCallback) {
 }
 
 function MKAErrorMessageDeliveryRtn(message, postCallback) {
+
+    var AJAXErrorURL = window.localStorage.getItem("AJAXErrorURL");
+    var AJAXErrorData = window.localStorage.getItem("AJAXErrorData");
 
     if (message.toString().toLowerCase().indexOf('token is invalid') > -1) {
         newMessage = "Your Token has expired - Please login again";
@@ -1010,16 +1022,18 @@ function MKAErrorMessageDeliveryRtn(message, postCallback) {
                 }
             });
 
-        setTimeout(function () { sendErrorEmail(message) }, 1000);
+        setTimeout(function () { sendErrorEmail(message, AJAXErrorURL, AJAXErrorData) }, 1000);
 
     }
 
 }
 
-function sendErrorEmail(message)
+function sendErrorEmail(message, AJAXErrorURL, AJAXErrorData)
 {
-    var AJAXErrorURL = window.localStorage.getItem("AJAXErrorURL");
-    var AJAXErrorData = window.localStorage.getItem("AJAXErrorData");
+    console.log('ERROR');
+    console.log(message);
+    console.log(AJAXErrorURL);
+    console.log(AJAXErrorData);
 
     $.ajax({
         url: ServicePrefix + '/api/Email/EmailAPIError',
@@ -1069,7 +1083,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block"><a href="/admin/personnel/personnellist.html?MenuItem=true">Personnel</a></li>';
     menuItems += '                  <li style="display:block"><a href="/admin/webnotification/webnotification.html?MenuItem=true">Web Notifications</a></li>';
-    menuItems += '                  <li style="display:block"><a href="/admin/relationship/relationshiplists.html?MenuItem=true">Group Maintenace</a></li>';
+    //menuItems += '                  <li style="display:block"><a href="/admin/relationship/relationshiplists.html?MenuItem=true">Group Maintenacne</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Stations") + ' role="button" aria-expended="false">Stations<span style="margin-right:10px;" class="caret"></span></a>';
@@ -1097,7 +1111,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/admin/news/newslist.html?MenuItem=true">News</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/training/traininglist.html?MenuItem=true">Training</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/customersupport/customersupportlist.html?MenuItem=true">Customer Support</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/relationship/relationshiplists.html?MenuItem=true">Personnel Groups</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/relationship/relationshiplists.html?MenuItem=true">MKA User Groups</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html?MenuItem=true">Tech Tools</a></li>';
     menuItems += '                  <li style="display:block;text-align:center;">----------------------</li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/format/formatlist.html?MenuItem=true">Formats</a></li>';
@@ -1594,6 +1608,7 @@ function buildTechMenu(selectedItem) {
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "TechTools") + ' role="button" aria-expanded="false">Tools <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html?MenuItem=true">Tech Tools</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="/admin/email/emaillist.html?MenuItem=true">Email Tool</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/news/newslist.html?MenuItem=true">News Tool</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/techtools/matchednotification/matchednotificationlist.html?MenuItem=true">Matched Notification Tool</a></li>';
 
@@ -1702,7 +1717,7 @@ function getPeriodList(inType, inDefaultSelect) {
         thisMonth = thisMonth - 1;
         if (thisMonth == -1)
         {
-            thisMonth = 11;
+            thisMonth = 11; //priorperiod
             var newYear = $("#ddlYear option:selected").index() + 1;
             $("#ddlYear")[0].selectedIndex = newYear;
         }
@@ -1893,6 +1908,29 @@ function resetDataTableDOM(tableToDestroyId, divOfTableId, classOfTable) {
     $("#" + divOfTableId).html('<table id="' + tableToDestroyId + '" class="' + classOfTable + '"></table>');
 
 }
+
+//added this function to add captions to a datatable
+//did not like the looks because the datatable put the caption under 
+//the search filter and # of items per page.
+//leaving the code here in case want to use in the future
+function resetDataTableDOMWithCaption(tableToDestroyId, divOfTableId, classOfTable, caption) {
+
+    if (!classOfTable) {
+        classOfTable = "stripe";
+    }
+
+    //If you want to repopulate the datatable with new columns and data,
+    //you need to remove the datatable from the DOM. 
+    //The .remove function will remove it.
+    $("#" + tableToDestroyId).remove();
+
+    //Once you remove the datatable from the DOM, you need add the HTML back to the page.
+    //I added a name to the DIV that has the table html. I used the datatable name plus added "Holder".
+    //The following coding adds the table back.
+    $("#" + divOfTableId).html('<table id="' + tableToDestroyId + '" class="' + classOfTable + '"><caption style="text-align: center; display: table-caption; caption-side: top; font-size: 1.5em;">'+caption+'</caption></table>');
+
+}
+
 
 function buildMarketWrapper(inData) {
 
@@ -2472,6 +2510,11 @@ function excludeFromBackButton() {
     gExcludeFromBackButton = true;
 }
 
+function includeInBackButton()
+{
+    gExcludeFromBackButton = false;
+}
+
 function cleanupBackButton(pageName) {
 
     if (!pageName) {
@@ -2860,7 +2903,7 @@ function setThisQueryToRunLongNoAutoUnBlock()
 {
     clearTimeout(unblockHandle);
     $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
-    console.log(unblockHandle);
+    //console.log(unblockHandle);
 }
 
 function extractParens(inString) {

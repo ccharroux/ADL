@@ -25,7 +25,7 @@
     <meta name="twitter:card" content="" />
 
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="shortcut icon" href="/favicon.ico">
 
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
 
@@ -215,6 +215,15 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-md-6 table-titles" style="text-align: center">
+                            <h3>Search Results</h3>
+                        </div>
+                        <div class="col-md-6 table-titles" style="text-align: center">
+                            <h3>Items to be Updated</h3>
+                        </div>
+                    </div>
 
                     <div class="row">
                         <!--
@@ -273,9 +282,10 @@
 </html>
 <script>
     $(document).ready(function () {
-        enableUpdateArea(false);
-        //this menu will change
+
         buildXRYMenu("Audit");
+
+        setupUI();
 
         //load markets by product
         getMarketsByProduct();
@@ -288,6 +298,12 @@
 
         buildQuickReports(['xry']);
     });
+
+    function setupUI() {
+        enableUpdateArea(false);
+
+        $(".table-titles").hide();
+    }
 
     function getMarketsByProduct() {
         $.ajax({
@@ -478,6 +494,7 @@
                 } else {
                     loadResultsData(data);
                     loadMatchingData(data);
+                    $(".table-titles").show();
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -499,7 +516,7 @@
         columnsToDisplay.push({
             "mRender": function (data, type, row) {
                 return '<input type="radio" name="agencies" id="rdo_' + row.agencyId + '" onclick="loadUpdateInformation(' + row.agencyId + ',\'' + row.AgencyWithoutId + '\',' +
-                    row.accountTypeId + ',' + row.parentAgencyId + '); markAsNotSelectable(' + row.agencyId + '); fixResultsSelect(' + row.agencyId + ');">';
+                    row.accountTypeId + ',' + row.parentAgencyId + '); fixResultsSelect(' + row.agencyId + ');">';
             },
             "orderable": false,
             "searchable": false
@@ -694,17 +711,7 @@
 
 
         matchTable.on('select', function (e, dt, type, indexes) {
-            if (type === 'row') {
-                var rows = matchTable.rows(indexes).nodes();
-                $.each($(rows),
-                    function () {
-                        if ($(this).hasClass('not-selectable')) {
-                            matchTable.row($(this)).deselect();
-                        }
-                    }
-                );
-            }
-
+            
             var count = matchTable.rows({ selected: true }).count();
             if (count > 0) {
                 $("#dtUpdates_filter input").hide();
@@ -762,30 +769,6 @@
 
 
         $.unblockUI();
-    }
-
-    function markAsNotSelectable(agencyId) {
-
-
-        $.blockUI();
-
-        var updateTable = $('#dtUpdates').DataTable();
-        var rows = updateTable.rows('.not-selectable').nodes();
-
-
-        $('#dtUpdates tr').removeClass('selected');
-        $('#dtUpdates tr').removeClass('not-selectable');
-        $("#dtUpdates tr").attr("background-color", "white");
-        updateTable.rows().deselect();
-
-        $("#btnUpdate").hide();
-
-        var updateRowId = $('#dtUpdates').dataTable().fnFindCellRowIndexes(agencyId, 1);
-        $(updateTable.row(updateRowId).node()).addClass('not-selectable');
-        updateTable.row(updateRowId).deselect();
-
-        $.unblockUI();
-
     }
 
     function searchValidationPassed() {

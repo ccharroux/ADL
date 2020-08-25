@@ -25,7 +25,7 @@
     <meta name="twitter:card" content="" />
 
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="shortcut icon" href="/favicon.ico">
 
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
 
@@ -120,7 +120,7 @@
                             <input type="hidden" id="txtOldMarketAgencyName" value="" />
                             <input class="mkaRequired field-width-325 disabled" type="text" id="txtMarketAgency" disabled="disabled" errorMessage="Please use the Search Market Agency to link a Market Agency." />
                             <span>
-                                <input id="editMarketAgency" value="Edit" style="width:120px" onclick="editMarketAgency(); updateStationAgency();" class="default-button" type="button">
+                                <input id="editMarketAgency" value="Edit Market Agency" onclick="includeInBackButton(); editMarketAgency();" class="default-button" type="button">
                             </span>
                             <span id="marketAgencyMergeMessage" class="hidden to-be-linked-message">* Will be linked and revenues merged</span>
                             <span id="marketAgencyLinkMessage" class="hidden to-be-linked-message" style="display: inline-block; vertical-align: top;">* Will be linked but <br />revenues will not be merged</span>
@@ -155,6 +155,22 @@
                             <div>
                                 <input value="Link Market Agency" onclick="excludeFromBackButton(); linkMarketAgencyRevenueQuestion();" class="default-button" type="button">
                             </div>
+                        </div>
+                    </div>
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="ddlAccountType">Account Type</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <select class="field-width-325 disabled" id="ddlAccountType" disabled="disabled"></select>
+                        </div>
+                    </div>
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtParentAgencyName">Parent Agency</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <input class="field-width-325 disabled" maxlength="20" type="text" id="txtParentAgencyName" />
                         </div>
                     </div>
 
@@ -203,6 +219,12 @@
                             <div class="col-md-9 text-align-left">
                                 <div>
                                     <input value="Update" onclick="excludeFromBackButton(); updateStationAgency();" class="default-button" type="button">
+                                </div>
+                                <div style="padding-top: 10px">
+                                    <input id="btnGoBackToList" value="Go Back to List" onclick="updatedGoBack();" class="default-button" type="button">
+                                </div>
+                                <div style="padding-top: 10px">
+                                    <input id="btnGoBackToMatching" value="Go Back to Matching" onclick="updatedGoBack();" class="default-button" type="button">
                                 </div>
                             </div>
                         </div>
@@ -282,6 +304,7 @@
 
         setupUI();
 
+        cleanupBackButton(window.location.pathname);
     });
 
     function setupUIFields() {
@@ -302,6 +325,14 @@
                 var marketId = $(this).find(':selected').data('market-id');
                 $("#ddlMarkets").val(marketId);
             });
+
+        if (bIsAgyMatch) {
+            $("#btnGoBackToList").hide();
+            $("#btnGoBackToMatching").show();
+        } else {
+            $("#btnGoBackToList").show();
+            $("#btnGoBackToMatching").hide();
+        }
     }
 
     function getStationList() {
@@ -394,13 +425,60 @@
 
                 convertToChosenSelect("ddlMarkets");
 
-                getStationAgency();
-
+                //getStationAgency();
+                getAccountTypes();
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+    }
+
+    function getAccountTypes()
+    {
+        $.ajax({
+            url: ServicePrefix + '/api/AccountType/GetAccountTypeList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    //$.each(data.report.rows, function () {
+
+                        var str = '';
+
+                        str = str + "<option value='-1'> -- Select an Account Type</option>";
+
+                        //var holdOwnerID = "0";
+
+                        $.each(data.report.rows, function (index) {
+                            var obj = data.report.rows[index];
+                            str = str + "<option value='" + obj.accountTypeId + "'>" + obj.accountTypeName + " (" + obj.accountTypeId + ")" + "</option>";
+                           
+                        });
+
+                        $("#ddlAccountType").html(str);
+                    //});
+
+                    convertToChosenSelect("ddlAccountType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    getStationAgency();
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
+        
     }
 
     function setMarketValue() {
@@ -490,6 +568,8 @@
                     if (bIsAgyMatch) {
                         loadMatchData();
                     }
+
+                    loadMarketAgencyData();
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -500,6 +580,12 @@
     }
 
     function getMarketAgency(agencyId) {
+
+        if (agencyId <= 0)
+        {
+            return;
+        }
+
         $.ajax({
             url: ServicePrefix + '/api/Agency/GetAgency',
             dataType: 'json',
@@ -521,20 +607,35 @@
 
                         var obj = data.report.rows[index];
 
-                        $('#txtMarketAgency').val(obj["agencyName"]);
-                        $("#txtOldMarketAgencyName").val(obj["agencyName"]);
+                        if ($("#txtOldMarketAgencyName").val().length <= 0)
+                        {
+                            $("#txtOldMarketAgencyName").val(obj["agencyName"]);
+                        } else if ($("#txtOldMarketAgencyName").val().length > 0 && stationAgencyId == 0)
+                        {
+                            $("#txtOldMarketAgencyName").val(obj["agencyName"]);
+                        }
 
-                        $("#txtOldMarketAgencyId").val(obj["agencyId"]);
+                        if ($("#txtOldMarketAgencyId").val().length <= 0)
+                        {
+                            $("#txtOldMarketAgencyId").val(obj["agencyId"]);
+                        } else if ($("#txtOldMarketAgencyId").val().length > 0 && stationAgencyId == 0)
+                        {
+                            $("#txtOldMarketAgencyId").val(obj["agencyId"]);
+                        }
+
+                        $('#txtMarketAgency').val(obj["agencyName"]);
                         $('#txtMarketAgencyId').val(obj["agencyId"]);
                         marketAgencyId = obj["agencyId"];
 
-                        if (marketAgencyId == 0 || marketAgencyId == null) {
+                        if (stationAgencyId == 0 || marketAgencyId == null || marketAgencyId == 0) {
                             $("#editMarketAgency").hide();
                         }
                         else {
                             $("#editMarketAgency").show();
                         }
 
+                        $("#ddlAccountType").val(obj["accountTypeId"]);
+                        $("#txtParentAgencyName").val(obj["parentAgencyName"]);
                     });
 
                     loadMarketAgencySearchResults();
@@ -591,6 +692,11 @@
         }
 
         setLocalStorage("gSearchResults", "");
+
+        if ($("#txtMarketAgencyId").val() > 0)
+        {
+            getMarketAgency($("#txtMarketAgencyId").val());
+        }
 
         turnOnLinkMarketAgency();
     }
@@ -693,7 +799,6 @@
 
                         $("#txtStationAgencyId").val(obj["_updateStatus"]);
 
-                        //window.location = "/admin/stationagency/stationagency.html?StationAgencyID=" + $("#txtStationAgencyId").val();
                     }
 
                     if (bIsAgyMatch || bIsAgyMatch == "true") {
@@ -704,8 +809,9 @@
                     if (bLinkStationAgencyRevenues) {
                         linkStationAgencyRevenues();
                     }
-                    else {
-                        window.location = "/admin/stationagency/stationagency.html?StationAgencyID=" + $("#txtStationAgencyId").val();
+                    else
+                    {
+                        reloadPage();
                     }
                 }
             },
@@ -734,8 +840,9 @@
                 if (data.response.status != "SUCCESS") {
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
-                else {
-                    window.location = "/admin/stationagency/stationagency.html?StationAgencyID=" + $("#txtStationAgencyId").val();
+                else
+                {
+                    reloadPage();
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -803,6 +910,8 @@
                         bLinkStationAgencyRevenues = false;
 
                         turnOnLinkMarketAgency();
+
+                        getMarketAgency($("#txtMarketAgencyId").val());
                     }
                 }
             }
@@ -871,8 +980,9 @@
                 else {
 
                     //console.log($("#txtPreviousPageLocation").val());
-                    bootbox.alert("The station agency has been matched.", function () {
-                        window.location = $("#txtPreviousPageLocation").val();
+                    bootbox.alert("The station agency has been matched.", function ()
+                    {
+                        reloadPage();
                     });
                 }
 
@@ -884,31 +994,59 @@
 
     }
 
-    function determineGoBack() {
+    function reloadPage() {
+        var url = "";
+        url = url + "/admin/stationagency/stationagency.html?StationAgencyID=" + $("#txtStationAgencyId").val();
+        url = url + "&AgyMatch=" + bIsAgyMatch;
+        url = url + "&FromReport=" + bIsFromReport;
 
-        if (hasBackButtonData()) {
-            //var backButtonData = getBackButtonLastItem();
-
-            //window.location = backButtonData.previousPage;
-            window.location = getBackButtonPage();
-        }
-        else if (bIsFromReport || getLocalStorage("reportActionData").length > 0) {
-            var reportData = $.parseJSON(getLocalStorage("reportActionData"));
-
-            if (reportData["previousPage"].length > 0) {
-                window.location = reportData["previousPage"];
-            } else {
-                window.location = "/utilities/genericreport/genericReportList.html";
-            }
-
-        }
-        else {
-            goBackToDashboard();
-        }
-
+        window.location = url;
     }
+
     function editMarketAgency() {
+        //load fields as needed
+
+        setLocalStorage("gMarketAgencyInformation", "");
+
+        var marketAgencyCriteriaObj = new Object();
+
+        marketAgencyCriteriaObj = {
+            "marketAgencyId": $("#txtMarketAgencyId").val(),
+            "oldMarketAgencyId": $("#txtOldMarketAgencyId").val(),
+            "oldMarketAgencyName": $("#txtOldMarketAgencyName").val()
+        }
+
+        setLocalStorage("gMarketAgencyInformation", JSON.stringify(marketAgencyCriteriaObj));
 
         window.location = '/admin/agency/agency.html?AgencyID=' + marketAgencyId;
+    }
+
+    function loadMarketAgencyData()
+    {
+        if (getLocalStorage("gMarketAgencyInformation").length > 0 && jQuery.isEmptyObject(getLocalStorage("gMarketAgencyInformation")) == false)
+        {
+
+            //load the data 
+            var marketAgencyInfo = $.parseJSON(getLocalStorage("gMarketAgencyInformation"));
+
+            if (marketAgencyInfo["marketAgencyId"] != undefined) {
+                $("#txtMarketAgencyId").val(marketAgencyInfo["marketAgencyId"]);
+            }
+
+            if (marketAgencyInfo["oldMarketAgencyId"] != undefined) {
+                $("#txtOldMarketAgencyId").val(marketAgencyInfo["oldMarketAgencyId"]);
+            }
+
+            if (marketAgencyInfo["oldMarketAgencyName"] != undefined) {
+                $("#txtOldMarketAgencyName").val(marketAgencyInfo["oldMarketAgencyName"]);
+            }
+
+            setLocalStorage("gMarketAgencyInformation", "");
+
+            if ($("#txtMarketAgencyId").val() > 0)
+            {
+                getMarketAgency($("#txtMarketAgencyId").val());
+            }
+        }
     }
 </script>

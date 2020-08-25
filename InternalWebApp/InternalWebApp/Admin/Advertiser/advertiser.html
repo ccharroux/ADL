@@ -22,7 +22,7 @@
     <meta name="twitter:url" content="" />
     <meta name="twitter:card" content="" />
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="shortcut icon" href="/favicon.ico">
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
     <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700" rel="stylesheet">
     <!-- Animate.css -->
@@ -365,22 +365,20 @@
     var bLinkParentAdvertiser = false;
     var bIsNew = false;
     var bIsFromReport = false;
+    var iNumericMediaTypeId = 0;
+    var iMarketId = 0;
+    var sAdvertiserName = "";
+    var iIndustryId = -1;
+    var iSubIndustryId = -1;
 
     $(document).ready(function () {
 
         buildXRYMenu("Utility");
         buildQuickReports(['advertiser']);
-        advertiserId = (getParameterByName("AdvertiserID") == null ? 0 : getParameterByName("AdvertiserID"));
-
-        bIsFromReport = getParameterByName("FromReport") == null ? false : getParameterByName("FromReport");
-
-        $("#txtAdvertiserId").val(advertiserId);
-
-        bIsNew = advertiserId <= 0;
+        
+        setUIFields();
 
         getMarketList();
-
-        //set local setting for the back button
 
         $("#ddlIndustry").change(function () {
             getSubIndustryList($(this).val(), '');
@@ -395,6 +393,24 @@
             $(".standardInputArea").hide();
         }
     });
+
+    function setUIFields()
+    {
+        advertiserId = (getParameterByName("AdvertiserID") == null ? 0 : getParameterByName("AdvertiserID"));
+
+        bIsFromReport = getParameterByName("FromReport") == null ? false : getParameterByName("FromReport");
+
+        $("#txtAdvertiserId").val(advertiserId);
+
+        bIsNew = advertiserId <= 0;
+
+        iNumericMediaTypeId = getParameterByName("NumericMediaTypeId") == null ? 0 : getParameterByName("NumericMediaTypeId");
+        iMarketId = getParameterByName("MarketId") == null ? 0 : getParameterByName("MarketId");
+
+        sAdvertiserName = getParameterByName("MarketAdvertiserName") == null ? "" : getParameterByName("MarketAdvertiserName");
+        iIndustryId = getParameterByName("IndustryId") == null ? -1 : getParameterByName("IndustryId");
+        iSubIndustryId = getParameterByName("SubIndustryId") == null ? -1 : getParameterByName("SubIndustryId");
+    }
 
     function getMarketList() {
 
@@ -593,9 +609,32 @@
             $('.advertiser-link-advertiser').hide();
             $('.change-date').hide();
 
-            getSubIndustryList("-1", "");
+            //the name should've been supplied through the URL
+            //along with industry and sub-industry
+            if (sAdvertiserName.length > 0)
+            {
+                $("#txtAdvertiserName").val(sAdvertiserName.toUpperCase());
+                if (iIndustryId > -1)
+                {
+                    $("#ddlIndustry").val(iIndustryId);
+                    getSubIndustryList(iIndustryId, iSubIndustryId);
+                }
+                
+            } else
+            {
+                getSubIndustryList("-1", "");
+            }
 
             loadSearchResults();
+
+            //determine media code
+            if (iMarketId > 0)
+            {
+                $("#ddlMarket").val(iMarketId);
+            }
+
+            getMediaCode(0, iNumericMediaTypeId);
+
             return;
         }
 
@@ -756,6 +795,54 @@
 
     }
 
+    function getMediaCode(currentMediaCode, newMediaType)
+    {
+        if (newMediaType <= 0)
+        {
+            return;
+        }
+
+        var mediaCodeApiUrl = ServicePrefix + '/api/MediaCode/GetMediaCodyByNewMediaType';
+        mediaCodeApiUrl = mediaCodeApiUrl + "?inApiToken=" + getLocalStorage("APIToken");
+        mediaCodeApiUrl = mediaCodeApiUrl + "&inOldMediaCodeId=" + currentMediaCode;
+        mediaCodeApiUrl = mediaCodeApiUrl + "&inNewMediaTypeId=" + newMediaType;
+
+        $.ajax({
+            url: mediaCodeApiUrl,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+
+                        if (obj.mediaCodeId != null && obj.mediaCodeId > 0)
+                        {
+                            $("#ddlMediaCode").val(obj.mediaCodeId);
+                        } else
+                        {
+                            $("#ddlMediaCode").val(-1);
+                        }
+
+                    });
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
+
+
+    }
+
     function validationPassed() {
         var loopBreak = true;
         $(".mkaRequired").each(function (index, el) {
@@ -804,7 +891,11 @@
 
                     if (result) {
                         bLinkAdvertiser = true;
-                    } else {
+                    } else
+                    {
+                        bLinkAdvertiser = false;
+                        $("#txtLinkedAdvertiserId").val("");
+                        $("#txtLinkedAdvertiser").val("");
                         return;
                     }
 
@@ -1184,8 +1275,10 @@
                             var matches = regExp.exec(data.report.rows[0].Market);
                             var marketId = matches[1];
                             $("#ddlMarket").val(marketId);
-                            $("#txtAdvertiserName").val(data.report.rows[0]['Advertiser Raw']);
-
+                            if ($("#txtAdvertiserName").val().length == 0)
+                            {
+                                $("#txtAdvertiserName").val(data.report.rows[0]['Advertiser Raw']);
+                            }
                         }
                         console.log(data);
                     }

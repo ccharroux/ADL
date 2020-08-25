@@ -25,7 +25,7 @@
     <meta name="twitter:card" content="" />
 
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="shortcut icon" href="/favicon.ico">
 
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
 
@@ -420,7 +420,9 @@
         var currentYear = d.getFullYear();
         var lastDayOfTheMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0);
 
-        $("#dtStartDate").val(currentMonth + "/01/" + currentYear);
+        //DEV-7922 set the start date for the page to go back to January 1 and current year - 5
+        //created global variable gYearsToGoBack.
+        $("#dtStartDate").val("01/01/" + (currentYear - gYearsToGoBack));
         $("#dtEndDate").val(currentMonth + "/" + lastDayOfTheMonth.getDate() + "/" + currentYear);
 
     }
@@ -445,8 +447,8 @@
 
         var sUrl = ServicePrefix + "/api/AdvertiserAudit/GetAdvertiserRevenueResearchList?";
         sUrl += "inApiToken=" + getLocalStorage("APIToken");
-        sUrl += "&inAdvertiserName=" + $("#txtMarketAdvertiser").val();
-        sUrl += "&inAgencyName=" + $("#txtMarketAgency").val();
+        sUrl += "&inAdvertiserName=" + encodeURIComponent($("#txtMarketAdvertiser").val());
+        sUrl += "&inAgencyName=" + encodeURIComponent($("#txtMarketAgency").val());
         sUrl += "&inMarketId=" + $("#ddlMarket").val();
         sUrl += "&inStartDate=" + $("#dtStartDate").val();
         sUrl += "&inEndDate=" + $("#dtEndDate").val();
@@ -745,14 +747,14 @@
         $(".multi-field-search").each(function (index, el) {
             var eID = "#" + $(el).attr("id");
 
-            if ($(eID).val().length > 0) {
+            if ($(eID).val().length >= gMinimumSearchCharacters ) {
                 bMultiFieldCompleted = true;
             }
 
         });
 
         if (bMultiFieldCompleted == false) {
-            var errorMessage = "Please complete at least one of the fields notated with **.";
+            var errorMessage = "Please complete at least one of the fields notated with **. The search text must be at least " + gMinimumSearchCharacters + " characters.";
             bootbox.alert(errorMessage, function () { });
             loopBreak = false;
             return false;
