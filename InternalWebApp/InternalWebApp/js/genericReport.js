@@ -306,6 +306,7 @@ reportName.push("rptMarketInfo");
 
 reportName.push("rptInternalUserFavorites");
 reportName.push("rptAsyncStatusIncompleteList");
+reportName.push("rptMisMatchedParentAdvertiserIndustrySubIndustryList");
 
 function buildReportArray()
 {
@@ -8337,6 +8338,7 @@ function getReportFilterArray_MRROutstandingStationList()
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -8401,6 +8403,7 @@ function getReportFilterArray_TVBOutstandingStationList() {
         token: "Period",
         objectName: "ddlPeriod",
         jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required: true
     }
     arrayFilters.push(arrayObject);
@@ -12308,6 +12311,42 @@ function getReportObject_AsyncStatusIncompleteList() {
         product: ['tech'],
         sortable: true,
         autoUpdate: true
+    }
+
+    return tempObject;
+}
+
+rptMisMatchedParentAdvertiserIndustrySubIndustryList
+function getReportFilterArray_MisMatchedParentAdvertiserIndustrySubIndustryList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+ 
+
+    return arrayFilters;
+}
+
+function getReportObject_MisMatchedParentAdvertiserIndustrySubIndustryList() {
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject = {
+        reportTitle: "Mis-matched Parent Advertiser Industry / Sub List",
+        apiControllerAction: '/api/xrayreport/getmismatchedparentadvertiserindustrysubindustrylist',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['xry'],
+        sortable: true,
+        approved: false
     }
 
     return tempObject;
