@@ -608,7 +608,11 @@ function buildAgencySearch(searchCriteria) {
     if ($('.search-text:visible').val().length > 0) {
         searchText = $('.search-text:visible').val();
     } else {
-        searchText = searchCriteria["searchAgencyName"].length > 0 ? searchCriteria["searchAgencyName"] : searchCriteria["agencyName"];
+        searchText = searchCriteria["searchAgencyName"].length > 0 ? searchCriteria["searchAgencyName"].substring(0, gMinimumSearchCharacters) : searchCriteria["agencyName"].substring(0, gMinimumSearchCharacters);
+    }
+
+    if ($('.search-text:visible').val().length == 0 && gSilentSearch == true) {
+        $('.search-text:visible').val(searchText);
     }
 
     gMarketId = searchCriteria["marketID"];
@@ -652,7 +656,19 @@ function buildAgencySearch(searchCriteria) {
     columns.push({
         "mRender": function (data, type, row) {
             var str = '<a href="#" onclick="EditMarketAgency(' + row.agencyId + ')">Edit</a>&nbsp;&nbsp;';
-            str = str + '<a href="#" onclick="linkAgencyByLink(' + row.agencyId + ',' + row.marketId + ')">Link Agency</a>';
+            if (gMarketId == row.marketId)
+            {
+                str = str +
+                    '<a href="#" onclick="linkAgencyByLink(' +
+                    row.agencyId +
+                    ',' +
+                    row.marketId +
+                    ')">Link Agency</a>';
+            } else
+            {
+                str = str + '<a href="#" onclick="createNewMarketAgencyFromLink(0,\'' + row.agencyName + '\',' + row.accountTypeId + ')">Add</a>';
+            }
+            
             return str;
         },
         "bSortable": false,
@@ -1394,4 +1410,28 @@ function createNewMarketAdvertiserFromLink(id, advertiserName, industryId, subIn
     }
 
     window.location = marketUrl;
+}
+
+function createNewMarketAgencyFromLink(id, agencyName, accountTypeId)
+{
+    console.log(id + " " + agencyName + " " + accountTypeId);
+
+    var agencyUrl = '/admin/agency/agency.html?AgencyID=' + id;
+
+    if (gMarketId != null && gMarketId > 0) {
+        agencyUrl = agencyUrl + '&MarketId=' + gMarketId;
+    }
+
+    if (agencyName != null && agencyName.trim().length > 0)
+    {
+        agencyUrl = agencyUrl + '&MarketAgencyName=' + encodeURIComponent(agencyName);
+    }
+
+    if (accountTypeId != null && accountTypeId > 0)
+    {
+        agencyUrl = agencyUrl + '&AccountTypeId=' + accountTypeId;
+    }
+
+    window.location = agencyUrl;
+
 }

@@ -367,20 +367,15 @@
     var bLinkAgency = false;
     var bIsFromReport = false;
     var iMarketId = 0;
+    var sAgencyName = "";
+    var iAccountTypeId = 0;
 
     $(document).ready(function () {
 
         buildXRYMenu("Utility");
         buildQuickReports(['agency']);
 
-        agencyId = (getParameterByName("AgencyID") == null ? 0 : getParameterByName("AgencyID"));
-
-        $("#txtAgencyId").val(agencyId);
-        bIsNew = agencyId <= 0;
-
-        bIsFromReport = getParameterByName("FromReport") == null ? false : getParameterByName("FromReport");
-
-        iMarketId = getParameterByName("MarketId") == null ? 0 : getParameterByName("MarketId");
+        setUIFields();
 
         getMarketList();
 
@@ -393,6 +388,22 @@
         }
 
     });
+
+    function setUIFields()
+    {
+        agencyId = (getParameterByName("AgencyID") == null ? 0 : getParameterByName("AgencyID"));
+
+        $("#txtAgencyId").val(agencyId);
+        bIsNew = agencyId <= 0;
+
+        bIsFromReport = getParameterByName("FromReport") == null ? false : getParameterByName("FromReport");
+
+        iMarketId = getParameterByName("MarketId") == null ? 0 : getParameterByName("MarketId");
+
+        sAgencyName = getParameterByName("MarketAgencyName") == null ? "" : getParameterByName("MarketAgencyName");
+        iAccountTypeId = getParameterByName("AccountTypeId") == null ? 0 : getParameterByName("AccountTypeId");
+
+    }
 
     function getMarketList() {
 
@@ -506,6 +517,15 @@
 
             if (iMarketId > 0) {
                 $("#ddlMarket").val(iMarketId);
+            }
+
+            if (sAgencyName.length > 0)
+            {
+                $("#txtAgencyName").val(sAgencyName.toUpperCase());
+                if (iAccountTypeId > 0)
+                {
+                    $("#ddlAccountType").val(iAccountTypeId);
+                }
             }
 
             return;
@@ -1036,8 +1056,10 @@
                             var matches = regExp.exec(data.report.rows[0].Market);
                             var marketId = matches[1];
                             $("#ddlMarket").val(marketId);
-                            $("#txtAgencyName").val(data.report.rows[0]['Agency Raw']);
-
+                            if ($("#txtAgencyName").val().length == 0)
+                            {
+                                $("#txtAgencyName").val(data.report.rows[0]['Agency Raw']);
+                            }
                         }
  
                     }
