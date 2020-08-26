@@ -3045,7 +3045,8 @@ function getReportFilterArray_MarketReleaseList() {
     arrayObject = {
         token:  "Period",
         objectName:  "ddlPeriod",
-        jsCall:  "getPeriodList",
+        jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required:  true
     }
     arrayFilters.push(arrayObject);
