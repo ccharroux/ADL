@@ -12315,8 +12315,7 @@ function getReportObject_AsyncStatusIncompleteList() {
 
     return tempObject;
 }
-
-rptMisMatchedParentAdvertiserIndustrySubIndustryList
+ 
 function getReportFilterArray_MisMatchedParentAdvertiserIndustrySubIndustryList() {
     var arrayFilters = new Array();
     var arrayObject = new Object();
