@@ -3045,7 +3045,8 @@ function getReportFilterArray_MarketReleaseList() {
     arrayObject = {
         token:  "Period",
         objectName:  "ddlPeriod",
-        jsCall:  "getPeriodList",
+        jsCall: "getPeriodList",
+        jsCallParameters: ['all', 'priorperiod'],
         required:  true
     }
     arrayFilters.push(arrayObject);
@@ -6013,7 +6014,7 @@ function getReportObject_MRRMissingManagerSuggestedList() {
 
     tempObject =
     {
-        reportTitle: "MRR Missing Manager Suggestions",
+        reportTitle: "MRR Missing Manager / ADMIN Suggestions",
         apiControllerAction: "/api/MRRReport/GetMRRMissingManagerSuggestedList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
