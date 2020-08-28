@@ -10153,7 +10153,8 @@ function getReportObject_ProductMarketOwnerActivationList() {
         apiControllerAction: "/api/ProductReport/GetProductMarketOwnerActivationList",
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
-        product: ['product', 'owner', 'market']
+        product: ['product', 'owner', 'market'],
+        approved: true
     }
 
     return tempObject;

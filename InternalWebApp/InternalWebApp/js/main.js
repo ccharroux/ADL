@@ -1518,6 +1518,7 @@ function returnProductListLinks(row) {
     productList += row.MSS.trim().length > 0 ? '<a href="#" onclick="editProduct(\'' + row.MSS.toUpperCase() + '\')">' + row.MSS.toUpperCase() + '</a>&nbsp;' : '';
     productList += row.TVB.trim().length > 0 ? '<a href="#" onclick="editProduct(\'' + row.TVB.toUpperCase() + '\')">' + row.TVB.toUpperCase() + '</a>&nbsp;' : '';
     productList += row.DMA.trim().length > 0 ? '<a href="#" onclick="editProduct(\'' + row.DMA.toUpperCase() + '\')">' + row.DMA.toUpperCase() + '</a>&nbsp;' : '';
+    productList += row.DMX.trim().length > 0 ? '<a href="#" onclick="editProduct(\'' + row.DMX.toUpperCase() + '\')">' + row.DMX.toUpperCase() + '</a>&nbsp;' : '';
 
     return productList;
 }
@@ -1533,20 +1534,45 @@ function returnProductMarketLinks(row) {
         productList = productList + "')";
         productList = productList + ';">' + row.MRR.toUpperCase() + "</a>&nbsp;";
     }
+
     if (row.XRY.trim().length > 0) {
         productList = productList + '<a href="#" onclick="goTo(';
         productList = productList + "'/products/xry/xrymarketproduct.html?marketId=" + row.marketId;
         productList = productList + "')";
         productList = productList + ';">' + row.XRY.toUpperCase() + "</a>&nbsp;";
     }
+
     if (row.TVB.trim().length > 0) {
         productList = productList + '<a href="#" onclick="goTo(';
         productList = productList + "'/products/tvb/tvbmarketproduct.html?marketId=" + row.marketId;
         productList = productList + "')";
         productList = productList + ';">' + row.TVB.toUpperCase() + "</a>&nbsp;";
     }
-    productList += row.MSS.trim().length > 0 ? row.MSS.toUpperCase() + '&nbsp;' : '';
-    productList += row.DMA.trim().length > 0 ? row.DMA.toUpperCase() + '&nbsp;' : '';
+
+    if (row.DMA.trim().length > 0) {
+        productList = productList + '<a href="#" onclick="goTo(';
+        productList = productList + "'/products/DMA/DMAmarketproduct.html?marketId=" + row.marketId;
+        productList = productList + "')";
+        productList = productList + ';">' + row.DMA.toUpperCase() + "</a>&nbsp;";
+    }
+
+    if (row.DMX.trim().length > 0) {
+        productList = productList + '<a href="#" onclick="goTo(';
+        productList = productList + "'/products/DMX/DMXmarketproduct.html?marketId=" + row.marketId;
+        productList = productList + "')";
+        productList = productList + ';">' + row.DMX.toUpperCase() + "</a>&nbsp;";
+    }
+
+    if (row.MSS.trim().length > 0) {
+        productList = productList + '<a href="#" onclick="goTo(';
+        productList = productList + "'/products/mss/mssmarketproduct.html?marketId=" + row.marketId;
+        productList = productList + "')";
+        productList = productList + ';">' + row.MSS.toUpperCase() + "</a>&nbsp;";
+    }
+
+    //productList += row.MSS.trim().length > 0 ? row.MSS.toUpperCase() + '&nbsp;' : '';
+    //productList += row.DMA.trim().length > 0 ? row.DMA.toUpperCase() + '&nbsp;' : '';
+    //productList += row.DMX.trim().length > 0 ? row.DMX.toUpperCase() + '&nbsp;' : '';
 
     return productList;
 }
