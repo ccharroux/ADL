@@ -1182,25 +1182,33 @@
         });
     }
 
-    function insertTrainingEventSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
+    function insertTrainingEventSuccess(data, textStatus, jQxhr)
+    {
+
+        if (data.response.status != "SUCCESS")
+        {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
-        if (data.report.rows.length == 0) {
+        if (data.report.rows.length == 0)
+        {
             MKAErrorMessageRtn("Failed to get new training event ID");
             return;
         }
 
-        var failureReason = data.report.rows[0].failureReason;
-        if (failureReason != null && failureReason != "") {
-            bootbox.alert("Unable to add training event: " + failureReason);
+        // this did not have an error, but failed
+        if (data.response.errorMessage.length > 0)
+        {
+            bootbox.alert("Unable to add training event: " + data.response.errorMessage[0]);
             return;
         }
 
+        // grab new traingEventId
         trainingEventId = data.report.rows[0].trainingEventId;
+
         window.location = "/admin/training/training.html?TrainingEventID=" + trainingEventId;
+
     }
 
     function updateTrainingEvent() {
