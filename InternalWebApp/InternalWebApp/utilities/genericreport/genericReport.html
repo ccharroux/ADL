@@ -2145,6 +2145,48 @@
         });
 
     }
+    function getOwnerGroupListByProduct(inProduct) {
+
+        $.ajax({
+            url: ServicePrefix + '/api/OwnerGroup/GetOwnerGroupListByProduct?inApiToken=' + getLocalStorage("APIToken") + "&inProductId=" + inProduct,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    var str = '';
+
+                    $("#ddlOwnerGroup").html("<option value=''> -- Select an Owner Group --</option>");
+
+                    var holdOwnerID = "0";
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = str + "<option value='" + obj.OwnerGroupId + "'>" + obj.OwnerGroup  + "</option>";
+
+                    });
+
+                    $("#ddlOwnerGroup").append(str);
+
+                    convertToChosenSelect("ddlOwnerGroup", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    saveLoadedControlSelection("ddlOwnerGroup");
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
     function getOwnerGroupList() {
 
         $.ajax({

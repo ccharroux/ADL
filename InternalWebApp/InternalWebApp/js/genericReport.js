@@ -308,6 +308,9 @@ reportName.push("rptInternalUserFavorites");
 reportName.push("rptAsyncStatusIncompleteList");
 reportName.push("rptMisMatchedParentAdvertiserIndustrySubIndustryList");
 
+reportName.push("rptMRROwnerGroupMarketAnalysis");
+reportName.push("rptXRYOwnerGroupMarketAnalysis");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -12346,6 +12349,89 @@ function getReportObject_MisMatchedParentAdvertiserIndustrySubIndustryList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['xry'],
+        sortable: true,
+        approved: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRROwnerGroupMarketAnalysis() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "OwnerGroup",
+        jsCall: "getOwnerGroupListByProduct",
+        jsCallParameters: ['MRR'],
+        objectName: "ddlOwnerGroup",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        jsCallParameters: ['MRR'],
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_MRROwnerGroupMarketAnalysis() {
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject = {
+        reportTitle: "MRR Owner Group Market Analysis",
+        apiControllerAction: '/api/ownergroupreport/GetOwnerGroupAnalysis',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['mrr', 'owner group'],
+        sortable: true,
+        approved: false
+    }
+
+    return tempObject;
+}
+function getReportFilterArray_XRYOwnerGroupMarketAnalysis() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "OwnerGroup",
+        jsCall: "getOwnerGroupListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlOwnerGroup",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_XRYOwnerGroupMarketAnalysis() {
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject = {
+        reportTitle: "XRY Owner Group Market Analysis",
+        apiControllerAction: '/api/ownergroupreport/GetOwnerGroupAnalysis',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['XRY', 'owner group'],
         sortable: true,
         approved: false
     }
