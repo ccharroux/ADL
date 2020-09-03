@@ -663,7 +663,6 @@ function getReportObject_XRAYUsage() {
     return tempObject;
 }
 
-// MRR Usage
 function getReportFilterArray_MRRUsage() {
 
     var arrayFilters = new Array();
