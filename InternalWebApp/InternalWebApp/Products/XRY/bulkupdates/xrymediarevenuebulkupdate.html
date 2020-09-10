@@ -195,7 +195,7 @@
                         <div class="col-md-2">
                             <div style="display:table-cell; float:right">
                                 <label class="dropdown-label">&nbsp;</label><br />
-                                <input type="button" class="search-button" value="Search" onclick="clearUpdateFields();searchForMediaRevenue();" />
+                                <input type="button" class="search-button" value="Search" onclick="searchForMediaRevenue(false);" /> <!--clearUpdateFields();-->
                             </div>
                         </div>
                     </div>
@@ -206,7 +206,7 @@
                             <div class="col-md-3 match-info-row">
                                 <input type="hidden" id="txtUpdateMarketAdvertiserId" class="report-filter" value="" />
                                 <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label><br/>
-                                <input type="text" id="txtUpdateMarketAdvertiser" onclick="excludeFromBackButton(); searchMarketAdvertiser();" readonly="readonly" style="width: 450px !important;" maxlength="50" class="report-filter" />
+                                <input type="text" id="txtUpdateMarketAdvertiser" onclick="includeInBackButton(); searchMarketAdvertiser();" readonly="readonly" style="width: 450px !important;" maxlength="50" class="report-filter" />
                             </div>
                             <div class="col-md-9 match-info-row" style="text-align:right">
                                 <label class="dropdown-label">&nbsp;</label><br />
@@ -280,7 +280,13 @@
 
         buildQuickReports(['xry']);
 
-        setTimeout('loadLastSearch()', 1000);
+        if (getLocalStorage("gSearchResults").length > 0)
+        {
+            setTimeout('loadLastSearch()', 1000);
+        } else
+        {
+            setTimeout('loadLastSearchFromBackButton()', 1000);
+        }
     });
 
     function getMarketsByProduct() {
@@ -370,7 +376,7 @@
         var currentYear = d.getFullYear();
         var lastDayOfTheMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0);
 
-        $("#dtStartDate").val(currentMonth + "/01/" + currentYear);
+        $("#dtStartDate").val("01/01/" + (currentYear - gYearsToGoBack));
         $("#dtEndDate").val(currentMonth + "/" + lastDayOfTheMonth.getDate() + "/" + currentYear);
 
     }
@@ -384,9 +390,13 @@
 
     }
 
-    function searchForMediaRevenue() {
+    function searchForMediaRevenue(bIsSilent) {
         
-        if (searchValidationPassed() == false) {
+        if (!bIsSilent) {
+            bIsSilent = false;
+        }
+
+        if (searchValidationPassed(bIsSilent) == false) {
             return;
         }
 
@@ -445,7 +455,7 @@
 
         columnsToDisplay.push({
             "mRender": function (data, type, row) {
-                return '<a href="#" onclick="loadUpdateInformation(' + row.advertiserId + ',\'' + row.AdvertiserWithoutId + '\');">Link</a>';
+                return '<a href="#" onclick="loadUpdateInformation(' + row.advertiserId + ',\'' + row.AdvertiserWithoutId + '\');">Redirect</a>';
             },
             "orderable": false,
             "searchable": false,
@@ -554,7 +564,7 @@
                 orderable: false,
                 className: 'select-checkbox'
             }],
-            "select": "multi",
+            "select": "os",
             "language": {
                 search: "Filter Results:"
             },
@@ -578,7 +588,7 @@
 
             var count = searchTable.rows({ selected: true }).count();
             if (count == 0) {
-                clearUpdateFields();
+                //clearUpdateFields();
                 $("#dtResults_filter input").show();
                 $("#dtResults_filter label").show();
             }
@@ -621,7 +631,7 @@
         $.unblockUI();
     }
 
-    function searchValidationPassed() {
+    function searchValidationPassed(bIsSilent) {
      
         var loopBreak = true;
         $(".mkaRequired").each(function (index, el) {
@@ -631,7 +641,10 @@
             // Text
             if ($(eID).prop('tagName').toLowerCase() == "input") {
                 if ($(eID).val().trim() == "") {
-                    bootbox.alert(errorMessage, function () { });
+                    if (bIsSilent == false)
+                    {
+                        bootbox.alert(errorMessage, function() {});
+                    }
                     loopBreak = false;
                     return false;
                 }
@@ -640,7 +653,10 @@
             // Select
             if ($(eID).prop('tagName').toLowerCase() == "select") {
                 if ($(eID).val() == "-1") {
-                    bootbox.alert(errorMessage, function () { });
+                    if (bIsSilent == false)
+                    {
+                        bootbox.alert(errorMessage, function() {});
+                    }
                     loopBreak = false;
                     return false;
                 }
@@ -663,8 +679,11 @@
         });
 
         if (bMultiFieldCompleted == false) {
-            var errorMessage = "Please complete at least one of the fields notated with **.";
-            bootbox.alert(errorMessage, function () { });
+            if (bIsSilent == false)
+            {
+                var errorMessage = "Please complete at least one of the fields notated with **.";
+                bootbox.alert(errorMessage, function() {});
+            }
             loopBreak = false;
             return false;
         }
@@ -674,8 +693,11 @@
             //when trying to parse an invalid date, the function will throw an error to catch
             var startDate = $.datepicker.parseDate('mm/dd/yy', $('#dtStartDate').val());
         } catch (err) {
-            var errorMessage = "Please input a valid Start Date.";
-            bootbox.alert(errorMessage, function () { });
+            if (bIsSilent == false)
+            {
+                var errorMessage = "Please input a valid Start Date.";
+                bootbox.alert(errorMessage, function() {});
+            }
             loopBreak = false;
             return false;
         }
@@ -685,8 +707,11 @@
             //when trying to parse an invalid date, the function will throw an error to catch
             var endDate = $.datepicker.parseDate('mm/dd/yy', $('#dtEndDate').val());
         } catch (err) {
-            var errorMessage = "Please input a valid End Date.";
-            bootbox.alert(errorMessage, function () { });
+            if (bIsSilent == false)
+            {
+                var errorMessage = "Please input a valid End Date.";
+                bootbox.alert(errorMessage, function() {});
+            }
             loopBreak = false;
             return false;
         }
@@ -736,6 +761,7 @@
 
     function loadLastSearch() {
         if (getLocalStorage("gSearchResults").length <= 0) {
+            cleanupBackButton(window.location.pathname);
             return;
         }
 
@@ -751,6 +777,8 @@
 
         setTimeout('searchForMediaRevenue()', 1000);
 
+        cleanupBackButton(window.location.pathname);
+
     }
 
     function startMediaAdvertiserRevenueUpdate() {
@@ -760,12 +788,16 @@
         }
 
         var updateMediaAdvertiserRevenueIds = new Array();
+        selectedTableItems = new Array();
 
         var updatesTable = $("#dtResults").DataTable();
 
         updatesTable.rows({ selected: true }).every(function () {
             var d = this.data();
             updateMediaAdvertiserRevenueIds.push(d.revenueXrayId);
+            selectedTableItems.push({
+                "revenueXrayId": d.revenueXrayId
+            });
         });
 
 
@@ -836,7 +868,7 @@
                 } else {
                     bootbox.alert("All media revenue has been redirected.", function () { });
                     searchForMediaRevenue();
-                    clearUpdateFields();
+                    //clearUpdateFields();
                 }
             },
             error: function (jQxhr, textStatus, errorThrown) {
@@ -863,5 +895,11 @@
         $("#updateInformationInstuctions").hide();
         $("#dtResults_filter input").show();
         $("#dtResults_filter label").show();
+    }
+
+    function loadLastSearchFromBackButton() {
+
+        loadReportParameters();
+        searchForMediaRevenue(true);
     }
 </script>

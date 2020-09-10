@@ -1225,6 +1225,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += '                          <li style="display:block;"><a href="/products/xry/bulkupdates/xrystationadvertiserbulkupdate.html?MenuItem=true">Station Advertiser Audit</a></li>';
     menuItems += '                          <li style="display:block;"><a href="/products/xry/bulkupdates/xrymediaadvertiserbulkupdate.html?MenuItem=true">Media Advertiser Audit</a></li>';
     menuItems += '                          <li style="display:block;"><a href="/products/xry/bulkupdates/xryadvertiserrevenuebulkupdate.html?MenuItem=true">Advertiser Revenue Research Audit</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/products/xry/bulkupdates/xrymediarevenuebulkupdate.html?MenuItem=true">Media Revenue Research Audit</a></li>';
     menuItems += '                      </ul>';
     menuItems += '                  </li>';
 
@@ -1235,7 +1236,6 @@ function buildXRYMenu(selectedItem) {
     menuItems += '                      </ul>';
     menuItems += '                  </li>';
 
-    menuItems += '                  <li style="display:block;"><a href="/products/xry/bulkupdates/xrymediarevenuebulkupdate.html?MenuItem=true">Media Revenue Research Audit</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
 
