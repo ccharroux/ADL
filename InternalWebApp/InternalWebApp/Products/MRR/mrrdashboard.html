@@ -132,6 +132,11 @@
                 </div>
                 <!-- data table html -->
                 <div class="dataTable-top-margin">
+                    <div class="text-center">
+                        Total Stations Pending: <span id="spanTotalStationsPending"></span>
+                        <br />
+                        Total Contacts Pending: <span id="spanTotalContactsPending"></span>
+                    </div>
                     <table id="dtResults" class="dataTable-border dataTable-headers dataTable-cell-border"></table>
                     <div id="noDataFound" style="display:none; color: red">No data found</div>
                 </div>
@@ -467,6 +472,7 @@
         });
 
         loadResults(dataObj, columns);
+        getTotals();
     }
     function IsInArray(arrayToSearch, valToFind) {
         for (var i = 0; i < arrayToSearch.length; i++) {
@@ -542,6 +548,39 @@
         });
 
     }
+
+    function getTotals() {
+        // can't just sum detail because some contacts may be pending across multiple markets
+        $.ajax({
+            url: ServicePrefix + api.replace('/api/MRRReport/GetMarketRelease', '/api/MRRReport/GetMarketReleaseTotals'),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getTotalsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        })
+    }
+
+    function getTotalsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get totals");
+            return;
+        }
+
+        $("#spanTotalStationsPending").text(data.report.rows[0].totalStationsPending);
+        $("#spanTotalContactsPending").text(data.report.rows[0].totalContactsPending);
+    }
+
     function getMediaTypeList() {
 
 
