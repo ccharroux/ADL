@@ -157,7 +157,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <div>
-                                <input value="Search Market Advertiser" onclick="excludeFromBackButton(); searchMarketAdvertiser();" class="default-button-650" type="button">
+                                <input value="Search Market Advertiser" onclick="includeInBackButton(); searchMarketAdvertiser();" class="default-button-650" type="button">
                             </div>
                         </div>
                     </div>
@@ -346,8 +346,26 @@
 
         setupUI();
 
-        //make sure this is in the right place
-        cleanupBackButton(window.location.pathname);
+        //check for advertiser search data
+        //check for edit button data
+        //check for match data
+        //finally do load back button stuff
+        //need to add the back button cleanup into the correct spots
+
+        if (getLocalStorage("gSearchResults").length > 0)
+        {
+            setTimeout('loadMarketAdvertiserSearchResults()',1000);
+        } else if (getLocalStorage("gMarketAdvertiserInformation").length > 0 && jQuery.isEmptyObject(getLocalStorage("gMarketAdvertiserInformation")) == false)
+        {
+            setTimeout('loadMarketAdvertiserData()',1000);
+        } else if (bIsAdvMatch && getLocalStorage("newAdvertiserMatch").length > 0)
+        {
+            setTimeout('loadMatchData()',1000);
+        } else
+        {
+            //load back button data
+            setTimeout('loadLastSearchFromBackButton()',1000);
+        }
 
     });
 
@@ -693,6 +711,7 @@
 
         if (getLocalStorage("gSearchResults").length <= 0) {
             turnOnLinkMarketAdvertiser();
+            //cleanupBackButton(window.location.pathname);
             return;
         }
 
@@ -732,6 +751,8 @@
         }
 
         turnOnLinkMarketAdvertiser();
+
+        cleanupBackButton(window.location.pathname);
     }
 
     function turnOnLinkMarketAdvertiser() {
@@ -937,6 +958,7 @@
     function loadMatchData() {
 
         if (getLocalStorage("newAdvertiserMatch").length <= 0) {
+            //cleanupBackButton(window.location.pathname);
             return;
         }
 
@@ -946,20 +968,28 @@
         $('#ddlStations').prop("disabled", true);
 
         if (advertiserMatchData["station"] != undefined)
+        {
             $("#ddlStations").val(advertiserMatchData["station"]);
+        }
 
         if (advertiserMatchData["market"] != undefined)
+        {
             $("#ddlMarkets").val(advertiserMatchData["market"]);
+        }
 
         if (advertiserMatchData["advertiser"] != undefined)
+        {
             $("#txtStationAdvertiser").val(advertiserMatchData["advertiser"]);
+        }
 
         //can the user change the name??
         //it is required for the matching process
         $("#txtStationAdvertiser").prop("disabled", true);
 
         if (advertiserMatchData["stationAdvertiserCode"] != undefined)
+        {
             $("#txtStationAdvertiserCode").val(advertiserMatchData["stationAdvertiserCode"]);
+        }
 
         $(".advertiser-category").show();
         $("#txtAdvertiserCategory").html(advertiserMatchData["advertiserCategory"]);
@@ -968,6 +998,7 @@
         $("#txtYear").val(advertiserMatchData["year"]);
         $("#txtPreviousPageLocation").val(advertiserMatchData["previousPage"]);
 
+        cleanupBackButton(window.location.pathname);
     }
 
     function updateStationAdvertiserMatch() {
@@ -1087,5 +1118,15 @@
                 getMarketAdvertiser($("#txtMarketAdvertiserId").val());
             }
         }
+
+        cleanupBackButton(window.location.pathname);
+    }
+
+    function loadLastSearchFromBackButton()
+    {
+        console.log('loadLastSearchFromBackButton');
+        loadReportParameters();
+        //should not need to go get the market advertiser because everything should be listed
+        //this would include the parent advertiser, etc.
     }
 </script>
