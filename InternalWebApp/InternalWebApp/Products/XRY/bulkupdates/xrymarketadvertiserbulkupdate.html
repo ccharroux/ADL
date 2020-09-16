@@ -198,7 +198,7 @@
                         <div class="col-md-3">
                             <div style="display:table-cell; float:right">
                                 <label class="dropdown-label">&nbsp;</label><br />
-                                <input type="button" class="search-button" value="Search" onclick="clearUpdateFields(); searchForMarketAdvertiser();" />
+                                <input type="button" class="search-button" value="Search" onclick="searchForMarketAdvertiser();" /> <!--clearUpdateFields(); -->
                             </div>
                         </div>
                     </div>
@@ -291,11 +291,15 @@
     <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/api/fnFindCellRowIndexes.js"></script>
 
     <!--Chosen Dropdown-->
-    <script src="/js/chosen.jquery.min.js"></script>
+    <script src="/js/chosen.jquery.min.js">
+    </script>
 
 </body>
 </html>
 <script>
+
+    var selectedTableItems = new Array();
+
     $(document).ready(function () {
 
        
@@ -614,7 +618,7 @@
 
         var sUrl = ServicePrefix + "/api/AdvertiserAudit/GetAdvertiserAuditList?";
         sUrl += "inApiToken=" + getLocalStorage("APIToken");
-        sUrl += "&inAdvertiserName=" + $("#txtMarketAdvertiser").val();
+        sUrl += "&inAdvertiserName=" + encodeURIComponent($("#txtMarketAdvertiser").val());
         sUrl += "&inMarketId=" + $("#ddlMarket").val();
         sUrl += "&inMediaCodeId=" + $("#ddlMediaCode").val();
         sUrl += "&inMediaTypeId=" + $("#ddlMediaType").val();
@@ -766,6 +770,8 @@
         var columns = getMatchingColumns();
         //load the data
         loadMatchingDataTable(data, columns);
+
+        loadSelectedTableItems();
     }
 
     function getMatchingColumns() {
@@ -856,7 +862,7 @@
                 orderable: false,
                 className: 'select-checkbox'
             }],
-            "select": "multi",
+            "select": "os",
             "language": {
                 search: "Filter Results:"
             },
@@ -927,7 +933,7 @@
         enableUpdateArea(true);
     }
 
-   function searchValidationPassed() {
+    function searchValidationPassed() {
         var loopBreak = true;
         $(".mkaRequired").each(function (index, el) {
             var eID = "#" + $(el).attr("id");
@@ -968,6 +974,8 @@
 
         var updateAdvertisersList = new Array();
 
+        selectedTableItems = new Array();
+
         var updatesTable = $("#dtUpdates").DataTable();
 
         updatesTable.rows({ selected: true }).every(function () {
@@ -975,6 +983,10 @@
             updateAdvertisersList.push({
                 "inUpdateAdvertiserId": d.advertiserId,
                 "inUpdateMarketId": d.marketId
+            });
+
+            selectedTableItems.push({
+                "advertiserId": d.advertiserId
             });
         });
 
@@ -1038,7 +1050,7 @@
                 } else {
                     bootbox.alert("All advertisers have been updated.", function () { });
                     searchForMarketAdvertiser();
-                    clearUpdateFields();
+                    //clearUpdateFields();
                 }
             },
             error: function (jQxhr, textStatus, errorThrown) {
@@ -1088,5 +1100,24 @@
         $(resultTable.row(resultRowId).node()).addClass('selected');
 
         $.unblockUI();
+    }
+
+    function loadSelectedTableItems() {
+        if (selectedTableItems.length == 0) {
+            return;
+        }
+
+        var tbResults = $("#dtUpdates").DataTable();
+
+        for (var i = 0; i < selectedTableItems.length; i++) {
+            var selectedItem = selectedTableItems[i];
+            tbResults.rows(function (idx, data, node) {
+                if (data.advertiserId === selectedItem.advertiserId) {
+                    tbResults.row(idx).select();
+                }
+            });
+        }
+
+        selectedTableItems = new Array();
     }
 </script>
