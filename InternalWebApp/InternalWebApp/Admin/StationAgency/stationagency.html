@@ -151,7 +151,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <div>
-                                <input value="Search Market Agency" onclick="excludeFromBackButton(); searchMarketAgency();" class="default-button-650" type="button">
+                                <input value="Search Market Agency" onclick="includeInBackButton(); searchMarketAgency();" class="default-button-650" type="button">
                             </div>
                         </div>
                     </div>
@@ -313,7 +313,18 @@
 
         setupUI();
 
-        cleanupBackButton(window.location.pathname);
+        if (getLocalStorage("gSearchResults").length > 0) {
+            setTimeout('loadMarketAgencySearchResults()', 1000);
+        } else if (getLocalStorage("gMarketAgencyInformation").length > 0 && jQuery.isEmptyObject(getLocalStorage("gMarketAgencyInformation")) == false) {
+            setTimeout('loadMarketAgencyData()', 1000);
+        } else if (bIsAgyMatch && getLocalStorage("newAgencyMatch").length > 0) {
+            setTimeout('loadMatchData()', 1000);
+        } else {
+            //load back button data
+            setTimeout('loadLastSearchFromBackButton()', 1000);
+        }
+
+        //cleanupBackButton(window.location.pathname);
     });
 
     function setupUIFields() {
@@ -708,6 +719,8 @@
         }
 
         turnOnLinkMarketAgency();
+
+        cleanupBackButton(window.location.pathname);
     }
 
     function searchMarketAgency() {
@@ -937,21 +950,30 @@
 
         //should possibly disable this since required for match
         $("#ddlStations").prop("disabled", true);
+
         if (agencyMatchData["station"] != undefined)
+        {
             $("#ddlStations").val(agencyMatchData["station"]);
+        }
 
         if (agencyMatchData["market"])
+        {
             $("#ddlMarkets").val(agencyMatchData["market"]);
+        }
 
         if (agencyMatchData["agency"])
+        {
             $("#txtStationAgencyName").val(agencyMatchData["agency"]);
+        }
 
         //can the user change the name??
         //it is required for the matching process
         $("#txtStationAgencyName").prop("disabled", true);
 
         if (agencyMatchData["stationAgencyCode"] != undefined)
+        {
             $("#txtStationAgencyCode").val(agencyMatchData["stationAgencyCode"]);
+        }
 
         $(".agency-category").show();
         $("#txtAgencyCategory").html(agencyMatchData["agencyCategory"]);
@@ -960,6 +982,7 @@
         $("#txtYear").val(agencyMatchData["year"]);
         $("#txtPreviousPageLocation").val(agencyMatchData["previousPage"]);
 
+        cleanupBackButton(window.location.pathname);
     }
 
     function updateStationAgencyMatch() {
@@ -1056,6 +1079,12 @@
             {
                 getMarketAgency($("#txtMarketAgencyId").val());
             }
+
+            cleanupBackButton(window.location.pathname);
         }
+    }
+
+    function loadLastSearchFromBackButton() {
+        loadReportParameters();
     }
 </script>

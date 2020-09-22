@@ -2388,6 +2388,33 @@ function getReportParameters() {
         }
     });
 
+    if (jQuery.isEmptyObject(reportParams))
+    {
+        $(":input").each(function(index, value)
+        {
+            if (this.tagName.toLowerCase() == "select")
+            {
+                reportParams[this.id] = this.value;
+            } else if (this.tagName.toLowerCase() == "input")
+            {
+                switch (this.type.toLowerCase())
+                {
+                case "radio":
+                    reportParams[this.id] = this.checked;
+                    break;
+                case "button":
+                    break;
+                default:
+                    if (this.id.length > 0)
+                    {
+                        reportParams[this.id] = this.value;
+                    }
+                    break;
+                }
+            }
+        });
+    }
+
     reportParams["previousPage"] = window.location.href;
 
     return reportParams;

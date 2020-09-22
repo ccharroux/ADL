@@ -694,7 +694,41 @@
     }
 
     function enableProduct(productId) {
-        bootbox.alert("This functionality is currently in development.");
+        var activate = true;
+
+        var url = ServicePrefix + '/api/ParentOwnership/UpdateParentOwnerProduct';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inParentOwnerId": $("#txtParentOwnershipId").val(),
+                "inProductId": productId,
+                "inActivate": activate
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                enableProductSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function enableProductSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        } else {
+            bootbox.alert("Parent Ownership product updated.", function () {
+                window.location = "/admin/parentownership/parentownership.html?parentOwnershipID=" + parentOwnershipId;
+            });
+        }
     }
 
     function disableProduct(productId) {

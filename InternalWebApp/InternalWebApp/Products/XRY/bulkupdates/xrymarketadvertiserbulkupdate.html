@@ -178,7 +178,7 @@
                         </div>
 
                         <div class="col-md-3">
-                            <label for="ddlMediaType" class="dropdown-label"  style="color: red;"> * Media Type</label><br />
+                            <label for="ddlMediaType" class="dropdown-label" style="color: red;"> * Media Type</label><br />
                             <select id="ddlMediaType" class="dropdown-select report-filter mkaRequired" errorMessage="Please choose a media type."></select>
                         </div>
                     </div>
@@ -198,7 +198,7 @@
                         <div class="col-md-3">
                             <div style="display:table-cell; float:right">
                                 <label class="dropdown-label">&nbsp;</label><br />
-                                <input type="button" class="search-button" value="Search" onclick="clearUpdateFields(); searchForMarketAdvertiser();" />
+                                <input type="button" class="search-button" value="Search" onclick="searchForMarketAdvertiser();" /> <!--clearUpdateFields(); -->
                             </div>
                         </div>
                     </div>
@@ -206,30 +206,34 @@
                     <div id="matchInfo" class="match-info">
                         <h3 class="match-info-header">Update Information</h3>
                         <div class="row">
-                            <div class="col-md-3 match-info-row">
+                            <div class="col-md-6 match-info-row">
                                 <input type="hidden" id="txtUpdateOldMarketAdvertiserName" value="" />
                                 <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label><br />
                                 <input type="text" id="txtUpdateMarketAdvertiser" style="width: 450px !important;" maxlength="50" class="report-filter" />
                             </div>
-                            <div class="col-md-2 match-info-row">
-                                <label for="ddlUpdateIndustry" class="dropdown-label">Industry</label><br />
-                                <select id="ddlUpdateIndustry" onchange="getSubIndustries(['ddlUpdateSubIndustry'], this.options[this.selectedIndex].value);" class="dropdown-select report-filter"></select>
-                            </div>
-                            <div class="col-md-2 match-info-row">
-                                <label for="ddlUpdateSubIndustry" class="dropdown-label">Sub Industry</label><br />
-                                <select id="ddlUpdateSubIndustry" class="dropdown-select report-filter"></select>
-                            </div>
-                            <div class="col-md-2 match-info-row">
+                            <div class="col-md-6 match-info-row">
                                 <label for="ddlUpdateParentAdvertiser" class="dropdown-label">Parent Advertiser</label><br />
                                 <select id="ddlUpdateParentAdvertiser" class="dropdown-select report-filter"></select>
                             </div>
-                            <div class="col-md-3 match-info-row" style="text-align:right">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 match-info-row">
+                                <label for="ddlUpdateIndustry" class="dropdown-label">Industry</label><br />
+                                <select id="ddlUpdateIndustry" onchange="getSubIndustries(['ddlUpdateSubIndustry'], this.options[this.selectedIndex].value);" class="dropdown-select report-filter"></select>
+                            </div>
+                            <div class="col-md-3 match-info-row">
+                                <label for="ddlUpdateSubIndustry" class="dropdown-label">Sub Industry</label><br />
+                                <select id="ddlUpdateSubIndustry" class="dropdown-select report-filter"></select>
+                            </div>
+
+                            <div class="col-md-6 match-info-row" style="text-align:right">
                                 <label for="btnUpdate" class="dropdown-label">&nbsp;</label><br />
                                 <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startMarketAdvertiserUpdateProcess();" />
                             </div>
+
                         </div>
                     </div>
-                    
+
                     <div class="row" style="margin-top: 20px;">
                         <div class="col-md-6 table-titles" style="text-align: center">
                             <h3>Search Results</h3>
@@ -248,7 +252,7 @@
                         <div id="dtResultsHolder" class="col-md-6">
                             <table id="dtResults" class="cell-border"></table>
                         </div>
- 
+
                         <div id="dtUpdatesHolder" class="col-md-6">
                             <table id="dtUpdates" class="cell-border"></table>
                         </div>
@@ -291,14 +295,16 @@
     <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/api/fnFindCellRowIndexes.js"></script>
 
     <!--Chosen Dropdown-->
-    <script src="/js/chosen.jquery.min.js"></script>
+    <script src="/js/chosen.jquery.min.js">
+    </script>
 
 </body>
 </html>
 <script>
-    $(document).ready(function () {
 
-       
+    var selectedTableItems = new Array();
+
+    $(document).ready(function () {
 
         buildXRYMenu("Audit");
 
@@ -321,8 +327,7 @@
 
     });
 
-    function setupUI()
-    {
+    function setupUI() {
         enableUpdateArea(false);
 
         $(".table-titles").hide();
@@ -431,11 +436,9 @@
                     str = '<option value="-1">-- Select a Media Type</option>';
                     $.each(data.report.rows, function (index) {
                         var obj = data.report.rows[index];
-                        if (obj.MediaTypeID == 1)
-                        {
+                        if (obj.MediaTypeID == 1) {
                             str = str + '<option selected value="' + obj.MediaTypeID + '">' + obj.MediaTypeName + '</option>';
-                        } else
-                        {
+                        } else {
                             str = str + '<option value="' + obj.MediaTypeID + '">' + obj.MediaTypeName + '</option>';
                         }
                     });
@@ -614,7 +617,7 @@
 
         var sUrl = ServicePrefix + "/api/AdvertiserAudit/GetAdvertiserAuditList?";
         sUrl += "inApiToken=" + getLocalStorage("APIToken");
-        sUrl += "&inAdvertiserName=" + $("#txtMarketAdvertiser").val();
+        sUrl += "&inAdvertiserName=" + encodeURIComponent($("#txtMarketAdvertiser").val());
         sUrl += "&inMarketId=" + $("#ddlMarket").val();
         sUrl += "&inMediaCodeId=" + $("#ddlMediaCode").val();
         sUrl += "&inMediaTypeId=" + $("#ddlMediaType").val();
@@ -766,6 +769,8 @@
         var columns = getMatchingColumns();
         //load the data
         loadMatchingDataTable(data, columns);
+
+        loadSelectedTableItems();
     }
 
     function getMatchingColumns() {
@@ -856,7 +861,7 @@
                 orderable: false,
                 className: 'select-checkbox'
             }],
-            "select": "multi",
+            "select": "os",
             "language": {
                 search: "Filter Results:"
             },
@@ -913,7 +918,7 @@
     function loadUpdateInformation(marketAdvertiserId, marketAdvertiserName, industryId, subIndustryId, parentAdvertiserId) {
 
         $.blockUI();
-      
+
         $("#txtUpdateOldMarketAdvertiserName").val(marketAdvertiserName);
         $("#txtUpdateMarketAdvertiser").val(marketAdvertiserName);
         $("#ddlUpdateParentAdvertiser").val(parentAdvertiserId || "-1");
@@ -927,7 +932,7 @@
         enableUpdateArea(true);
     }
 
-   function searchValidationPassed() {
+    function searchValidationPassed() {
         var loopBreak = true;
         $(".mkaRequired").each(function (index, el) {
             var eID = "#" + $(el).attr("id");
@@ -968,6 +973,8 @@
 
         var updateAdvertisersList = new Array();
 
+        selectedTableItems = new Array();
+
         var updatesTable = $("#dtUpdates").DataTable();
 
         updatesTable.rows({ selected: true }).every(function () {
@@ -975,6 +982,10 @@
             updateAdvertisersList.push({
                 "inUpdateAdvertiserId": d.advertiserId,
                 "inUpdateMarketId": d.marketId
+            });
+
+            selectedTableItems.push({
+                "advertiserId": d.advertiserId
             });
         });
 
@@ -1038,7 +1049,7 @@
                 } else {
                     bootbox.alert("All advertisers have been updated.", function () { });
                     searchForMarketAdvertiser();
-                    clearUpdateFields();
+                    //clearUpdateFields();
                 }
             },
             error: function (jQxhr, textStatus, errorThrown) {
@@ -1088,5 +1099,24 @@
         $(resultTable.row(resultRowId).node()).addClass('selected');
 
         $.unblockUI();
+    }
+
+    function loadSelectedTableItems() {
+        if (selectedTableItems.length == 0) {
+            return;
+        }
+
+        var tbResults = $("#dtUpdates").DataTable();
+
+        for (var i = 0; i < selectedTableItems.length; i++) {
+            var selectedItem = selectedTableItems[i];
+            tbResults.rows(function (idx, data, node) {
+                if (data.advertiserId === selectedItem.advertiserId) {
+                    tbResults.row(idx).select();
+                }
+            });
+        }
+
+        selectedTableItems = new Array();
     }
 </script>
