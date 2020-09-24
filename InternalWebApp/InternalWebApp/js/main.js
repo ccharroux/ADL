@@ -2484,7 +2484,7 @@ function removeCurrentPageItem(pageName) {
         backButtonData = $.parseJSON(getLocalStorage("backButtonData"));
 
         for (var i = 0; i < backButtonData["drilldown"].length; i++) {
-            var index = backButtonData["drilldown"][i].previousPage.indexOf(pageName);
+            var index = backButtonData["drilldown"][i].previousPage.toLowerCase().indexOf(pageName.toLowerCase());
             if (index > -1) {
                 backButtonData["drilldown"].splice(i, 1);
                 break;

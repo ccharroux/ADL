@@ -218,8 +218,8 @@
                             <div class="col-md-2 match-info-row text-align-right">
                                 <label for="btnCreateParent" class="dropdown-label">&nbsp;</label><br />
                                 <input type="button" id="btnCreateParent" style="display: none;" class="search-button" value="Create Parent Advertiser" onclick="createNewParentAdvertiser();" /><br/>
-                                <!--<label for="btnLinkParent" class="dropdown-label">&nbsp;</label><br />
-                                <input type="button" id="btnLinkParent" class="search-button" value="Link Market Advertiser" onclick="linkMarketAdvertiser();" />-->
+                                <label for="btnLinkMarketAdvertiser" class="dropdown-label">&nbsp;</label><br />
+                                <input type="button" id="btnLinkMarketAdvertiser" style="display: none;" class="search-button" value="Link Market Advertiser" onclick="linkMarketAdvertiser();" />
                             </div>
                         </div>
                         <div class="row">
@@ -329,6 +329,8 @@
         getParentAdvertiserList(["ddlParentAdvertiser", "ddlUpdateParentAdvertiser"], "-1");
 
         buildQuickReports(['xry']);
+
+        setTimeout('loadLastSearchFromBackButton()', 1000);
 
     });
 
@@ -611,9 +613,23 @@
         });
     }
 
-    function searchForMarketAdvertiser() {
+    function searchForMarketAdvertiser(bIsSilent) {
+        //due to back button functionality from creating parent or linking
+        //make this a silent search
+
+        if (!bIsSilent)
+        {
+            bIsSilent = false;
+        }
+
+        if (bIsSilent == false)
+        {
+            setLocalStorage("gResultsRowSelected","");
+        }
+
         //add any validations needed for required fields
-        if (searchValidationPassed() == false) {
+        if (searchValidationPassed(bIsSilent) == false)
+        {
             return;
         }
 
@@ -645,6 +661,12 @@
                     loadResultsData(data);
                     loadMatchingData(data);
                     $(".table-titles").show();
+                    //call whatever functions in a delay to get the data table items checked.
+
+                    //reload table selections
+                    loadSelectedResultsRows();
+                    loadSelectedTableItems();
+                    loadSelectedUpdateRows();
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -667,7 +689,7 @@
             "mRender": function (data, type, row) {
                 return '<input type="radio" name="advertisers" id="rdo_' + row.advertiserId +
                     '" onclick="loadUpdateInformation(' + row.advertiserId + ',\'' + row.AdvertiserWithoutId + '\',' +
-                    row.industryId + ',' + row.subIndustryId + ',' + row.parentAdvertiserId + '); markAsNotSelectable(' + row.advertiserId + '); fixResultsSelect(' + row.advertiserId + ');">'; //advertiserid, advertiser name, industryid, subindustryid, parentadvertiserid
+                    row.industryId + ',' + row.subIndustryId + ',' + row.parentAdvertiserId + '); getSelectedResultsRows('+ row.advertiserId+ '); markAsNotSelectable(' + row.advertiserId + '); fixResultsSelect(' + row.advertiserId + ');">'; //advertiserid, advertiser name, industryid, subindustryid, parentadvertiserid
             },
             "orderable": false,
             "searchable": false
@@ -778,6 +800,7 @@
             }
         });
 
+       
     }
 
     function loadMatchingData(data) {
@@ -786,7 +809,7 @@
         //load the data
         loadMatchingDataTable(data, columns);
 
-        loadSelectedTableItems();
+        
     }
 
     function getMatchingColumns() {
@@ -898,11 +921,19 @@
         matchTable.on('select', function (e, dt, type, indexes) {
 
             var count = matchTable.rows({ selected: true }).count();
-            if (count > 0) {
+            if (count > 1) {
                 $("#dtUpdates_filter input").hide();
                 $("#dtUpdates_filter label").hide();
                 $("#btnCreateParent").show();
                 $("#btnUpdate").show();
+                $("#btnLinkMarketAdvertiser").hide();
+            } else if (count == 1)
+            {
+                $("#dtUpdates_filter input").hide();
+                $("#dtUpdates_filter label").hide();
+                $("#btnCreateParent").show();
+                $("#btnUpdate").show();
+                $("#btnLinkMarketAdvertiser").show();
             }
 
         });
@@ -916,6 +947,7 @@
                 $("#dtUpdates_filter label").show();
                 $("#btnCreateParent").hide();
                 $("#btnUpdate").hide();
+                $("#btnLinkMarketAdvertiser").hide();
             }
         });
 
@@ -973,6 +1005,7 @@
         updateTable.rows().deselect();
 
         $("#btnCreateParent").hide();
+        $("#btnLinkMarketAdvertiser").hide();
         $("#btnUpdate").hide();
 
         var updateRowId = $('#dtUpdates').dataTable().fnFindCellRowIndexes(advertiserId, 1);
@@ -984,7 +1017,7 @@
     }
 
 
-    function searchValidationPassed() {
+    function searchValidationPassed(bIsSilent) {
         var loopBreak = true;
         $(".mkaRequired").each(function (index, el) {
             var eID = "#" + $(el).attr("id");
@@ -993,7 +1026,10 @@
             // Text
             if ($(eID).prop('tagName').toLowerCase() == "input") {
                 if ($(eID).val().trim() == "") {
-                    bootbox.alert(errorMessage, function () { });
+                    if (bIsSilent == false)
+                    {
+                        bootbox.alert(errorMessage, function() {});
+                    }
                     loopBreak = false;
                     return false;
                 }
@@ -1002,7 +1038,10 @@
             // Select
             if ($(eID).prop('tagName').toLowerCase() == "select") {
                 if ($(eID).val() == "-1") {
-                    bootbox.alert(errorMessage, function () { });
+                    if (bIsSilent == false)
+                    {
+                        bootbox.alert(errorMessage, function() {});
+                    }
                     loopBreak = false;
                     return false;
                 }
@@ -1010,7 +1049,12 @@
         });
 
         if ($("#txtMarketAdvertiser").val().length < 3 && $("#ddlMarket").val() == "-1") {
-            bootbox.alert("Market Advertiser requires 3 or more characters when no Market is selected.", function () { });
+            if (bIsSilent == false)
+            {
+                bootbox.alert("Market Advertiser requires 3 or more characters when no Market is selected.",
+                    function() {});
+            }
+
             return false;
         }
 
@@ -1178,13 +1222,107 @@
         //direct the parent advertiser crud page
         //make sure the back button works
 
+        //get the item that was selected on the left
+        //create list of items selected on right
+
         //may need to expand what was checked, etc.
-        window.location = "/Admin/ParentAdvertiser/parentadvertiser.html?ParentAdvertiserID=0";
+        //pass in industry and sub-industry from update info section
+
+        getSelectedUpdateRows();
+        window.location = "/Admin/ParentAdvertiser/parentadvertiser.html?ParentAdvertiserID=0&IndustryID=" + $("#ddlUpdateIndustry").val() + "&SubIndustryID=" + $("#ddlUpdateSubIndustry").val();
     }
 
     function linkMarketAdvertiser()
     {
-        alert('to be built');
+        //need to figure out getting the market advertiser from the updates datatable that is selected.
+        //that will be the advertiser id that is passed in
+        //also hide/disable button if more than one is selected on the updates table
+        //also use whatever method is done to save the selected data table items
+        //this will be built as part of the create parent advertiser functionality
+
+        window.location = "/Admin/Advertiser/advertiser.html?AdvertiserID=0"; 
     }
 
+    function getSelectedResultsRows(advertiserId)
+    {
+        setLocalStorage("gResultsRowSelected", "");
+
+        var resultsSelectedItem = new Array();
+
+        resultsSelectedItem.push({
+            "advertiserId": advertiserId
+        });
+
+        setLocalStorage("gResultsRowSelected", JSON.stringify(resultsSelectedItem));
+    }
+
+    function loadSelectedResultsRows()
+    {
+        if (getLocalStorage("gResultsRowSelected").length <= 0)
+        {
+            return;
+        }
+
+        var resultsSelectedItems = $.parseJSON(getLocalStorage("gResultsRowSelected"));
+
+        var tbResults = $("#dtResults").DataTable();
+
+        for (var i = 0; i < resultsSelectedItems.length; i++)
+        {
+            var selectedItem = resultsSelectedItems[i];
+            var resultRowId = $('#dtResults').dataTable().fnFindCellRowIndexes(selectedItem.advertiserId, 1);
+            $(tbResults.row(resultRowId).node()).addClass('selected');
+            $("#rdo_" + selectedItem.advertiserId).click();
+        }
+
+    }
+
+    function getSelectedUpdateRows()
+    {
+        setLocalStorage("gUpdateRowsSelected", "");
+
+        var updatesTable = $("#dtUpdates").DataTable();
+
+        var updateSelectedItems = new Array();
+
+        updatesTable.rows({ selected: true }).every(function () {
+            var d = this.data();
+           
+            updateSelectedItems.push({
+                "advertiserId": d.advertiserId
+            });
+        });
+
+        setLocalStorage("gUpdateRowsSelected", JSON.stringify(updateSelectedItems));
+    }
+
+    function loadSelectedUpdateRows()
+    {
+
+        if (getLocalStorage("gUpdateRowsSelected").length <= 0)
+        {
+            return;
+        }
+
+        var updatesSelectedItems = $.parseJSON(getLocalStorage("gUpdateRowsSelected"));
+
+        var tbUpdates = $("#dtUpdates").DataTable();
+
+        for (var i = 0; i < updatesSelectedItems.length; i++) {
+            var selectedItem = updatesSelectedItems[i];
+            tbUpdates.rows(function (idx, data, node) {
+                if (data.advertiserId === selectedItem.advertiserId) {
+                    tbUpdates.row(idx).select();
+                }
+            });
+        }
+
+        setLocalStorage("gUpdateRowsSelected","");
+    }
+
+    function loadLastSearchFromBackButton() {
+
+        loadReportParameters();
+        searchForMarketAdvertiser(true);
+    }
 </script>

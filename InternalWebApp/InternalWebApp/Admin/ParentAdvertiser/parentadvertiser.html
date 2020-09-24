@@ -86,7 +86,7 @@
                             <label for="txtParentAdvertiserName">Parent Advertiser Name</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" class="mkaRequired field-width-450 font-14" maxlength="50" id="txtParentAdvertiserName" errorMessage="You must enter a Parent Advertiser Name." value="" />
+                            <input type="text" class="mkaRequired field-width-450 font-14" style="text-transform: uppercase;" maxlength="50" id="txtParentAdvertiserName" errorMessage="You must enter a Parent Advertiser Name." value="" />
                         </div>
                     </div>
 
@@ -113,7 +113,7 @@
                             <label for="txtLinkedParentAdvertiser">Linked Parent Advertiser</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input class="field-width-450 font-14 disabled" type="text" id="txtLinkedParentAdvertiser" disabled="disabled" errorMessage="Please use the Search Parent Advertiser to link a Parent Advertiser." /><span id="parentLinkedMessage" class="hidden to-be-linked-message">* Will be linked</span>
+                            <input class="field-width-450 font-14 disabled" style="text-transform: uppercase;" type="text" id="txtLinkedParentAdvertiser" disabled="disabled" errorMessage="Please use the Search Parent Advertiser to link a Parent Advertiser." /><span id="parentLinkedMessage" class="hidden to-be-linked-message">* Will be linked</span>
                         </div>
                     </div>
 
@@ -233,6 +233,8 @@
     var parentAdvertiserId = 0;
     var bLinkParentAdvertiser = false;
     var bIsNew = false;
+    var iIndustryId = -1;
+    var iSubIndustryId = -1;
 
     $(document).ready(function () {
 
@@ -244,6 +246,7 @@
 
         getIndustryList();
 
+        cleanupBackButton();
 
     });
 
@@ -255,6 +258,9 @@
         $("#txtParentAdvertiserId").val(parentAdvertiserId);
 
         bIsNew = parentAdvertiserId <= 0;
+
+        iIndustryId = getParameterByName("IndustryID") == null ? -1 : getParameterByName("IndustryID");
+        iSubIndustryId = getParameterByName("SubIndustryID") == null ? -1 : getParameterByName("SubIndustryID");
     }
 
     function setupUI()
@@ -330,6 +336,14 @@
             //$('.link-parent').hide();
             $('.link-parent-advertiser').hide();
             $('.change-date').hide();
+            if (iIndustryId > -1)
+            {
+                $("#ddlIndustry").val(iIndustryId);
+                if (iSubIndustryId > -1)
+                {
+                    getSubIndustryList(iIndustryId,iSubIndustryId);
+                }
+            }
             loadSearchResults();
             return;
         }
@@ -506,7 +520,7 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inParentAdvertiserId": $("#txtParentAdvertiserId").val(),
-                "inParentAdvertiserName": $("#txtParentAdvertiserName").val(),
+                "inParentAdvertiserName": $("#txtParentAdvertiserName").val().toUpperCase(),
                 "inIndustryId": $("#ddlIndustry").val(),
                 "inSubIndustryId": $("#ddlSubIndustry").val(),
                 "inIsNew": bIsNew
@@ -517,7 +531,8 @@
                 if (data.response.status != "SUCCESS") {
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 }
-                else {
+                else
+                {
 
                     if (bIsNew) {
 
@@ -527,7 +542,6 @@
 
                         window.location = "/admin/parentadvertiser/parentadvertiser.html?ParentAdvertiserID=" + $("#txtParentAdvertiserId").val();
                     }
-
 
                     if (bLinkParentAdvertiser) {
                         linkParentAdvertiser();
@@ -596,15 +610,13 @@
     }
 
     function loadSearchResults() {
-        if (getLocalStorage("gSearchResults").length <= 0) {
+        if (getLocalStorage("gSearchResults").length <= 0)
+        {
             turnOnLinkParentAdvertiser();
             return;
         }
 
         var searchResults = $.parseJSON(getLocalStorage("gSearchResults"));
-
-        //console.log("search results");
-        //console.log(searchResults);
 
         $("#txtParentAdvertiserId").val(searchResults["parentAdvertiserID"]);
         $("#txtParentAdvertiserName").val(searchResults["parentAdvertiserName"]);
