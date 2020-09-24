@@ -924,7 +924,7 @@ function getParameterByName(name, url) {
         return '';
     }
 
-    return decodeURIComponent(results[2].replace(/\+/g, " "));
+    return replaceAll(decodeURIComponent(results[2].replace(/\+/g, " ")), "script", "");
 }
 
 function extractDateOnly(inDate) {
