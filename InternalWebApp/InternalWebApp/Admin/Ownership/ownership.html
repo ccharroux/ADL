@@ -266,7 +266,7 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="row product-list-header width-100" id="productListHeader">
-                                        <div class="col-md-4 text-align-left">
+                                        <div class="col-md-3 text-align-left">
                                             <strong>
                                                 Product
                                             </strong>
@@ -276,7 +276,7 @@
                                                 Dates
                                             </strong>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-7">
 
                                         </div>
                                     </div>
@@ -608,18 +608,35 @@
 
                         var productId = obj.P_ProductID.toUpperCase();
 
-                        str = str + '<div class="row" style="padding-top:3px;">';
-                        str = str + '<div class="col-md-4" style="text-align:left">';
+                        // open master div
+                        str = str + '<div class="row row_' + productId + '" style="display:none;padding-top:3px;">';
+
+                        // product name
+                        str = str + '<div class="col-md-3" style="text-align:left">';
                         str = str + productId + " - " + obj.P_ProductName;
                         str = str + '</div>';
+
+                        // product date
                         str = str + '<div class="col-md-2" style="text-align:left">';
                         str = str + '<div id="date' + productId + '" />';
                         str = str + '</div>';
-                        str = str + '<div id="productButtons' + productId + '" class="col-md-6" style="text-align:left;">';
+
+                        // product button div
+                        str = str + '<div id="productButtons' + productId + '" class="col-md-7" style="text-align:left;">';
+
+                        // enable button
                         str = str + '<input type="button" id="productAdd' + productId + '" style="margin-right:3px;margin-left:3px;" class="" onClick="enableOwnerProduct(' + '\'' + productId + '\');" Value="Enable" />';
+
+                        // edit button
                         str = str + '<input type="button" id="productEdit' + productId + '" stye="margin-right:3px;margin-left:3px;" class="hidden" onClick="editProduct(\'' + productId + '\')" Value="Edit" />';
+
+                        // disable button
                         str = str + '<input type="button" id="productDisable' + productId + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="excludeFromBackButton(); disableOwnerProduct(' + '\'' + productId + '\');" Value="Disable" />';
+
+                        // close product button div
                         str = str + '</div>';
+
+                        // close master div
                         str = str + '</div>';
 
                     });
@@ -666,9 +683,14 @@
 
                         var obj = data.report.rows[index];
 
-                        var productId = obj.OP_ProductID.toUpperCase();
+                        // This code is added to restrict 
+                        // visibility of products that are NOT allowed
 
-                        if (obj.OP_DisableDate == null) {
+                        var productId = obj.productId.toUpperCase();
+
+                        $(".row_" + productId).show();
+
+                        if (obj.activeDate != null && obj.activeFlag == true) {
 
                             //Edit button is currently only for XRY
                             if (productId.toUpperCase() == 'XRY') {
@@ -677,15 +699,17 @@
 
                             $("#productAdd" + productId).addClass("hidden");
                             $("#productDisable" + productId).removeClass("hidden");
-                            $("#date" + productId).html(extractDateOnly(obj.OP_ActiveDate));
+                            $("#date" + productId).html(extractDateOnly(obj.activeDate));
                             $("#date" + productId).css("color", "green");
                         }
-                        else {
+                        else if (obj.disableDate != null && obj.activeFlag == false) {
                             $("#productDisable" + productId).addClass("hidden");
                             $("#productAdd" + productId).removeClass("hidden");
-                            $("#date" + productId).html(extractDateOnly(obj.OP_DisableDate));
+                            $("#date" + productId).html(extractDateOnly(obj.disableDate));
                             $("#date" + productId).css("color", "red");
 
+                        } else if (obj.disableDate == null && obj.activeDate == null) {
+                            $("#productAdd" + productId).removeClass('hidden');
                         }
 
                     });

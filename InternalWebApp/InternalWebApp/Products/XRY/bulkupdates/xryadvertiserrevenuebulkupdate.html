@@ -204,7 +204,7 @@
                         <div class="col-md-6">
                             <div style="display:table-cell; float:right">
                                 <label class="dropdown-label">&nbsp;</label><br />
-                                <input type="button" class="search-button" value="Search" onclick="clearUpdateFields(); searchForAdvertiserRevenue();" />
+                                <input type="button" class="search-button" value="Search" onclick="searchForAdvertiserRevenue(false);" /> <!--clearUpdateFields(); -->
                             </div>
                         </div>
                     </div>
@@ -219,26 +219,26 @@
                     <div id="matchInfo" class="match-info">
                         <h3 class="match-info-header">Update Information</h3>
                         <div class="row">
-                            <div class="col-md-3 match-info-row">
+                            <div class="col-md-5 match-info-row">
                                 <!--
                                 turn these into search boxes
                                 -->
                                 <input type="hidden" id="txtUpdateMarketAdvertiserId" class="report-filter" value="" />
                                 <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label><br />
-                                <input type="text" id="txtUpdateMarketAdvertiser" onclick="excludeFromBackButton(); searchMarketAdvertiser();" readonly="readonly" style="width: 450px !important;" maxlength="50" class="report-filter" />
+                                <input type="text" id="txtUpdateMarketAdvertiser" onclick="includeInBackButton(); searchMarketAdvertiser();" readonly="readonly" style="width: 450px !important;" maxlength="50" class="report-filter" />
                             </div>
-                            <div class="col-md-3 match-info-row">
+                            <div class="col-md-5 match-info-row">
                                 <input type="hidden" id="txtUpdateMarketAgencyId" class="report-filter" value="" />
                                 <label for="txtUpdateMarketAgency" class="dropdown-label">Market Agency</label><br />
-                                <input type="text" id="txtUpdateMarketAgency" onclick="excludeFromBackButton(); searchMarketAgency();" readonly="readonly" style="width: 450px !important;" maxlength="50" class="report-filter" />
+                                <input type="text" id="txtUpdateMarketAgency" onclick="includeInBackButton(); searchMarketAgency();" readonly="readonly" style="width: 450px !important;" maxlength="50" class="report-filter" />
                             </div>
-                            <div class="col-md-6 match-info-row" style="text-align:right">
+                            <div class="col-md-2 match-info-row" style="text-align:right">
                                 <label class="dropdown-label">&nbsp;</label><br />
                                 <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startAdvertiserRevenueUpdate();" />
                             </div>
                         </div>
                         <div class="row" id="updateInformationInstuctions" style="display:none">
-                            <div class="col-md-12">
+                            <div class="col-md-12 text-align-left">
                                 Click the Market Advertiser or Market Agency box to search for Update Information.
                             </div>
                         </div>
@@ -309,7 +309,16 @@
         buildQuickReports(['xry']);
 
         //loadLastSearch();
-        setTimeout('loadLastSearch()', 1000);
+        if (getLocalStorage("gSearchResults").length > 0)
+        {
+            setTimeout('loadLastSearch()', 1000);
+        } else
+        {
+            setTimeout('loadLastSearchFromBackButton()', 1000);
+        }
+
+        //keeping in just to make sure the back button stuff is cleaned up
+        //cleanupBackButton(window.location.pathname);
     });
 
     function getMarketsByProduct() {
@@ -436,9 +445,13 @@
 
     }
 
-    function searchForAdvertiserRevenue() {
+    function searchForAdvertiserRevenue(bIsSilent) {
 
-        if (searchValidationPassed() == false) {
+        if (!bIsSilent) {
+            bIsSilent = false;
+        }
+
+        if (searchValidationPassed(bIsSilent) == false) {
             return;
         }
 
@@ -499,7 +512,7 @@
         columnsToDisplay.push({
             "mRender": function (data, type, row) {
                 return '<a href="#" onclick="loadUpdateInformation(' + row.advertiserId + ',\'' + row.AdvertiserWithoutId + '\',' +
-                    row.agencyId + ',\'' + row.AgencyWithoutId + '\');">Link</a> ';
+                    row.agencyId + ',\'' + row.AgencyWithoutId + '\');">Redirect</a> ';
             },
             "orderable": false,
             "searchable": false,
@@ -642,7 +655,9 @@
                     className: 'select-checkbox'
                 }
             ],
-            "select": "multi",
+            //os makes the multi select work like the operating system
+            //shift/ctrl mouse click
+            "select": "os",
             "language": {
                 search: "Filter Results:"
             },
@@ -666,7 +681,7 @@
 
             var count = searchTable.rows({ selected: true }).count();
             if (count == 0) {
-                clearUpdateFields();
+                //clearUpdateFields();
                 $("#dtResults_filter input").show();
                 $("#dtResults_filter label").show();
             }
@@ -678,7 +693,8 @@
     // when coming back from searching for
     // a market advertiser or agency for the
     // bulk update.
-    function loadSelectedTableItems() {
+    function loadSelectedTableItems()
+    {
         if (selectedTableItems.length == 0) {
             return;
         }
@@ -712,7 +728,7 @@
     }
 
 
-    function searchValidationPassed() {
+    function searchValidationPassed(bIsSilent) {
 
         var loopBreak = true;
         $(".mkaRequired").each(function (index, el) {
@@ -722,7 +738,10 @@
             // Text
             if ($(eID).prop('tagName').toLowerCase() == "input") {
                 if ($(eID).val().trim() == "") {
-                    bootbox.alert(errorMessage, function () { });
+                    if (bIsSilent == false)
+                    {
+                        bootbox.alert(errorMessage, function() {});
+                    }
                     loopBreak = false;
                     return false;
                 }
@@ -731,7 +750,10 @@
             // Select
             if ($(eID).prop('tagName').toLowerCase() == "select") {
                 if ($(eID).val() == "-1") {
-                    bootbox.alert(errorMessage, function () { });
+                    if (bIsSilent == false)
+                    {
+                        bootbox.alert(errorMessage, function() {});
+                    }
                     loopBreak = false;
                     return false;
                 }
@@ -754,8 +776,14 @@
         });
 
         if (bMultiFieldCompleted == false) {
-            var errorMessage = "Please complete at least one of the fields notated with **. The search text must be at least " + gMinimumSearchCharacters + " characters.";
-            bootbox.alert(errorMessage, function () { });
+            if (bIsSilent == false)
+            {
+                var errorMessage =
+                    "Please complete at least one of the fields notated with **. The search text must be at least " +
+                        gMinimumSearchCharacters +
+                        " characters.";
+                bootbox.alert(errorMessage, function() {});
+            }
             loopBreak = false;
             return false;
         }
@@ -765,8 +793,11 @@
             //when trying to parse an invalid date, the function will throw an error to catch
             var startDate = $.datepicker.parseDate('mm/dd/yy', $('#dtStartDate').val());
         } catch (err) {
-            var errorMessage = "Please input a valid Start Date.";
-            bootbox.alert(errorMessage, function () { });
+            if (bIsSilent == false)
+            {
+                var errorMessage = "Please input a valid Start Date.";
+                bootbox.alert(errorMessage, function() {});
+            }
             loopBreak = false;
             return false;
         }
@@ -776,8 +807,11 @@
             //when trying to parse an invalid date, the function will throw an error to catch
             var endDate = $.datepicker.parseDate('mm/dd/yy', $('#dtEndDate').val());
         } catch (err) {
-            var errorMessage = "Please input a valid End Date.";
-            bootbox.alert(errorMessage, function () { });
+            if (bIsSilent == false)
+            {
+                var errorMessage = "Please input a valid End Date.";
+                bootbox.alert(errorMessage, function() {});
+            }
             loopBreak = false;
             return false;
         }
@@ -870,6 +904,7 @@
     {
 
         if (getLocalStorage("gSearchResults").length <= 0) {
+            cleanupBackButton(window.location.pathname);
             return;
         }
 
@@ -887,6 +922,7 @@
 
         setTimeout('searchForAdvertiserRevenue()', 1000);
 
+        cleanupBackButton(window.location.pathname);
     }
 
     function startAdvertiserRevenueUpdate() {
@@ -897,11 +933,16 @@
 
         var updateAdvertiserRevenueIds = new Array();
 
+        selectedTableItems = new Array();
+
         var updatesTable = $("#dtResults").DataTable();
 
         updatesTable.rows({ selected: true }).every(function () {
             var d = this.data();
             updateAdvertiserRevenueIds.push(d.revenueXrayId);
+            selectedTableItems.push({
+                "revenueXrayId": d.revenueXrayId
+            });
         });
 
 
@@ -977,7 +1018,7 @@
                 } else {
                     bootbox.alert("All advertiser revenue have been redirected.", function () { });
                     searchForAdvertiserRevenue();
-                    clearUpdateFields();
+                    //clearUpdateFields();
                 }
             },
             error: function (jQxhr, textStatus, errorThrown) {
@@ -1010,6 +1051,11 @@
 
     }
 
+    function loadLastSearchFromBackButton() {
+
+        loadReportParameters();
+        searchForAdvertiserRevenue(true);
+    }
 
 
 </script>

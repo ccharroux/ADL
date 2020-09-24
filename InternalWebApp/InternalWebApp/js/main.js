@@ -1225,6 +1225,7 @@ function buildXRYMenu(selectedItem) {
     menuItems += '                          <li style="display:block;"><a href="/products/xry/bulkupdates/xrystationadvertiserbulkupdate.html?MenuItem=true">Station Advertiser Audit</a></li>';
     menuItems += '                          <li style="display:block;"><a href="/products/xry/bulkupdates/xrymediaadvertiserbulkupdate.html?MenuItem=true">Media Advertiser Audit</a></li>';
     menuItems += '                          <li style="display:block;"><a href="/products/xry/bulkupdates/xryadvertiserrevenuebulkupdate.html?MenuItem=true">Advertiser Revenue Research Audit</a></li>';
+    menuItems += '                          <li style="display:block;"><a href="/products/xry/bulkupdates/xrymediarevenuebulkupdate.html?MenuItem=true">Media Revenue Research Audit</a></li>';
     menuItems += '                      </ul>';
     menuItems += '                  </li>';
 
@@ -1235,7 +1236,6 @@ function buildXRYMenu(selectedItem) {
     menuItems += '                      </ul>';
     menuItems += '                  </li>';
 
-    menuItems += '                  <li style="display:block;"><a href="/products/xry/bulkupdates/xrymediarevenuebulkupdate.html?MenuItem=true">Media Revenue Research Audit</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
 
@@ -2387,6 +2387,33 @@ function getReportParameters() {
 
         }
     });
+
+    if (jQuery.isEmptyObject(reportParams))
+    {
+        $(":input").each(function(index, value)
+        {
+            if (this.tagName.toLowerCase() == "select")
+            {
+                reportParams[this.id] = this.value;
+            } else if (this.tagName.toLowerCase() == "input")
+            {
+                switch (this.type.toLowerCase())
+                {
+                case "radio":
+                    reportParams[this.id] = this.checked;
+                    break;
+                case "button":
+                    break;
+                default:
+                    if (this.id.length > 0)
+                    {
+                        reportParams[this.id] = this.value;
+                    }
+                    break;
+                }
+            }
+        });
+    }
 
     reportParams["previousPage"] = window.location.href;
 

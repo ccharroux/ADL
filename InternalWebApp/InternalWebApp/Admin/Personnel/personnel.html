@@ -530,15 +530,14 @@
     }
 
     function getProductList() {
-        var url = ServicePrefix + '/api/Product/GetProductList';
+        var url = ServicePrefix + '/api/Personnel/GetPersonnelAvailableProductList'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inPersonnelId=' + personnelID;
 
         var settings = {
             dataType: 'json',
-            type: 'post',
+            type: 'get',
             contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 getProductListSuccess(data, textStatus, jQxhr);
@@ -968,6 +967,8 @@
                     $(this).remove();
                 }
             });
+
+            getProductList(); // in case a product is now available due to the new owner
         }
     }
 
@@ -1020,6 +1021,8 @@
                 } else {
                     bootbox.alert("Ownership has been removed successfully.");
                 }
+
+                getProductList(); // in case a product was only available due to the owner that was just removed
             });
         }
     }

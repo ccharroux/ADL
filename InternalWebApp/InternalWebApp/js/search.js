@@ -689,10 +689,22 @@ function buildParentAdvertiserSearch(searchCriteria) {
     if ($('.search-text:visible').val().length > 0) {
         searchText = $('.search-text:visible').val();
     } else {
-        searchText = searchCriteria["linkParentAdvertiserName"].length > 0 ? searchCriteria["linkParentAdvertiserName"] : searchCriteria["advertiserName"];
+        if (searchCriteria["linkParentAdvertiserName"].length > 0)
+        {
+            searchText = searchCriteria["linkParentAdvertiserName"].substring(0, gMinimumSearchCharacters);
+        } else if (searchCriteria["advertiserName"] != undefined)
+        {
+            searchText = searchCriteria["advertiserName"].substring(0, gMinimumSearchCharacters);
+        } else if (searchCriteria["parentAdvertiserName"] != undefined)
+        {
+            searchText = searchCriteria["parentAdvertiserName"].substring(0, gMinimumSearchCharacters);
+        }
     }
 
-
+    if ($('.search-text:visible').val().length == 0 && gSilentSearch == true) {
+        $('.search-text:visible').val(searchText);
+    }
+    
     apiParameters = {
         "inApiToken": apiToken,
         "inParentAdvertiserName": searchText,
@@ -813,7 +825,20 @@ function buildParentAgencySearch(searchCriteria) {
     if ($('.search-text:visible').val().length > 0) {
         searchText = $('.search-text:visible').val();
     } else {
-        searchText = searchCriteria["linkParentAgencyName"].length > 0 ? searchCriteria["linkParentAgencyName"] : searchCriteria["agencyName"];
+        if (searchCriteria["linkParentAgencyName"].length > 0)
+        {
+            searchText = searchCriteria["linkParentAgencyName"].substring(0, gMinimumSearchCharacters);
+        } else if (searchCriteria["agencyName"] != undefined)
+        {
+            searchText = searchCriteria["agencyName"].substring(0, gMinimumSearchCharacters);
+        } else if (searchCriteria["parentAgencyName"] != undefined) {
+            searchText = searchCriteria["parentAgencyName"].substring(0, gMinimumSearchCharacters);
+        }
+        //searchText = searchCriteria["linkParentAgencyName"].length > 0 ? searchCriteria["linkParentAgencyName"].substring(0, gMinimumSearchCharacters) : searchCriteria["agencyName"].substring(0, gMinimumSearchCharacters);
+    }
+
+    if ($('.search-text:visible').val().length == 0 && gSilentSearch == true) {
+        $('.search-text:visible').val(searchText);
     }
 
     apiParameters = {
@@ -995,7 +1020,11 @@ function buildLinkAdvertiserSearch(searchCriteria) {
     if ($('.search-text:visible').val().length > 0) {
         searchText = $('.search-text:visible').val();
     } else {
-        searchText = searchCriteria["linkedAdvertiserName"].length > 0 ? searchCriteria["linkedAdvertiserName"] : searchCriteria["advertiserName"];
+        searchText = searchCriteria["linkedAdvertiserName"].length > 0 ? searchCriteria["linkedAdvertiserName"].substring(0, gMinimumSearchCharacters) : searchCriteria["advertiserName"].substring(0, gMinimumSearchCharacters);
+    }
+
+    if ($('.search-text:visible').val().length == 0 && gSilentSearch == true) {
+        $('.search-text:visible').val(searchText);
     }
 
     //setup the parameters for the API
