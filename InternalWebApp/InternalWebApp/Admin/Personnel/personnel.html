@@ -699,7 +699,7 @@
 
             })
 
-            $("#ddlAssignedOwnerships").append(str);
+            $("#ddlAssignedOwnerships").html(str);
 
             getOwnershipList();
         }
@@ -956,18 +956,16 @@
 
             bootbox.alert("Ownership has been added successfully.");
 
-            $('#ddlOwnership > option:selected').each(function () {
-                if ($('#ddlAssignedOwnerships [value="' + $(this).val() + '"]').length == 0) {
-                    $('#ddlAssignedOwnerships').html('<option value="' +
-                        $(this).val() +
-                        '">' +
-                        $(this).text() +
-                        '</option>' +
-                        $('#ddlAssignedOwnerships').html());
+            $('#ddlOwnership > option:selected').each(function ()
+            {
+                if ($('#ddlAssignedOwnerships [value="' + $(this).val() + '"]').length == 0)
+                {
+                    $('#ddlAssignedOwnerships').html('<option value="' + $(this).val() + '">' + $(this).text() + '</option>' + $('#ddlAssignedOwnerships').html());
                     $(this).remove();
                 }
             });
-
+            getPersonnelAssignedOwnershipList();
+            getOwnershipList(true);
             getProductList(); // in case a product is now available due to the new owner
         }
     }
@@ -1009,12 +1007,6 @@
         } else {
             $.each(data.report.rows, function (index) {
                 var obj = data.report.rows[index];
-                $('#ddlAssignedOwnerships > option:selected').each(function () {
-                    if ($('#ddlOwnership [value="' + $(this).val() + '"]').length == 0) {
-                        $('#ddlOwnership').html('<option value="' + $(this).val() + '">' + $(this).text() + '</option>' + $('#ddlOwnership').html());
-                        $(this).remove();
-                    }
-                })
 
                 if (obj['_updateStatus'] == -1) {
                     bootbox.alert("Ownership has been removed but ContactId: " + personnelID + " has active/submitted surveys and hence can not be deleted from ContactMSS table. In order to delete this contact, first delete all survey assignments.");
@@ -1022,6 +1014,8 @@
                     bootbox.alert("Ownership has been removed successfully.");
                 }
 
+                getPersonnelAssignedOwnershipList();
+                getOwnershipList(true);
                 getProductList(); // in case a product was only available due to the owner that was just removed
             });
         }
