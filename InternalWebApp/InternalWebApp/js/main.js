@@ -2182,6 +2182,44 @@ function buildAdvertiserWrapper(inData) {
 
     return ret;
 }
+
+function buildParentAdvertiserWrapper(inData)
+{
+    if (!inData) {
+        return "";
+    }
+
+    var ret = inData;
+
+    // find parens
+    var bIDIncluded = false;
+
+    if ((inData.lastIndexOf("(") > -1) &&
+        (inData.lastIndexOf(")") > -1)) {
+        bIDIncluded = true;
+    }
+
+    if (bIDIncluded == true) {
+        var ID = '';
+
+        var init = inData.lastIndexOf('(');
+        var fin = inData.lastIndexOf(')');
+
+        ID = inData.substr(init + 1, fin - init - 1);
+
+        if (ID.length > 0) {
+            if (isNaN(ID) == false) {
+                ret = "<a href='#' onclick='window.location=\"/Admin/parentadvertiser/parentadvertiser.html?ParentAdvertiserID=" + ID + "\"'>";
+                ret = ret + inData;
+                ret = ret + "</a>";
+            }
+        }
+
+    }
+
+    return ret;
+}
+
 function buildCustomLink(objectName, data, bSortable, className) {
     var column = new Object();
 
@@ -2308,6 +2346,28 @@ function buildCustomLink(objectName, data, bSortable, className) {
                 if (row.Agency != null) {
                     return buildAgencyWrapper(row.Agency);
                 } else {
+                    return '';
+                }
+            },
+            "orderable": bSortable,
+            "className": className
+        };
+        return column;
+    }
+
+    //create same code for Parent Advertiser
+    if (objectName == "Parent Advertiser")
+    {
+        column = {
+            "title": objectName,
+            "visible": true,
+            "mRender": function(data, type, row)
+            {
+                if (row["Parent Advertiser"] != null)
+                {
+                    return buildParentAdvertiserWrapper(row["Parent Advertiser"]);
+                } else
+                {
                     return '';
                 }
             },
