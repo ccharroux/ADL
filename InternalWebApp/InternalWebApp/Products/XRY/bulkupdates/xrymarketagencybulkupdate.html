@@ -165,10 +165,6 @@
 
                 <div class="row search-section">
                     <div class="row" style="margin-bottom: 20px;">
-                        <div class="col-md-2">
-                            <label for="ddlMediaType" class="dropdown-label" style="color: red;"> * Media Type</label><br />
-                            <select id="ddlMediaType" class="dropdown-select report-filter mkaRequired" errorMessage="Please select a Media Type in order to search."></select>
-                        </div>
 
                         <div class="col-md-2">
                             <label for="txtMarketAgency" class="dropdown-label" style="color: red;"> * Market Agency</label><br />
@@ -185,10 +181,16 @@
                             <label for="ddlParentAgency" class="dropdown-label">Parent Agency</label><br />
                             <select id="ddlParentAgency" class="dropdown-select report-filter"></select>
                         </div>
+                        
+                        <div class="col-md-2">
+                            <label for="ddlMediaType" class="dropdown-label" style="color: red;"> * Media Type</label><br />
+                            <select id="ddlMediaType" class="dropdown-select report-filter mkaRequired" errorMessage="Please select a Media Type in order to search."></select>
+                        </div>
+
                         <div class="col-md-4">
                             <div style="display:table-cell; float:right">
                                 <label class="dropdown-label">&nbsp;</label><br />
-                                <input type="button" class="search-button" value="Search" onclick="clearUpdateFields(); searchForMarketAgency();" />
+                                <input type="button" class="search-button" value="Search" onclick="searchForMarketAgency(false);" /> <!--clearUpdateFields(); -->
                             </div>
                         </div>
                     </div>
@@ -210,8 +212,25 @@
                                 <select id="ddlUpdateParentAgency" class="dropdown-select report-filter"  ></select>
                             </div>
                             <div class="col-md-5 match-info-row" style="text-align:right">
+                                
+                                
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                &nbsp;
+                            </div>
+                            <div class="col-md-2">
+                                <label for="btnCreateParent" class="dropdown-label">&nbsp;</label><br />
+                                <input type="button" id="btnCreateParent" style="" class="search-button disabled-button" value="Create Parent Agency" onclick="createNewParentAgency();" />
+                            </div>
+                            <div class="col-md-2">
+                                <label for="btnLinkMarketAgency" class="dropdown-label">&nbsp;</label><br />
+                                <input type="button" id="btnLinkMarketAgency" style="" class="search-button disabled-button" value="Link Market Agency" onclick="linkMarketAgency();" />
+                            </div>
+                            <div class="col-md-2">
                                 <label for="btnUpdate" class="dropdown-label">&nbsp;</label><br />
-                                <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startMarketAgencyUpdateProcess();" />
+                                <input type="button" id="btnUpdate" style="" class="search-button disabled-button" value="Update" onclick="startMarketAgencyUpdateProcess();" />
                             </div>
                         </div>
                     </div>
@@ -281,6 +300,9 @@
 </body>
 </html>
 <script>
+
+    var selectedTableItems = new Array();
+
     $(document).ready(function () {
 
         buildXRYMenu("Audit");
@@ -297,6 +319,8 @@
         getAccountTypes(["ddlUpdateAccountType"], "-1");
 
         buildQuickReports(['xry']);
+
+        setTimeout('loadLastSearchFromBackButton()', 1000);
     });
 
     function setupUI() {
@@ -368,7 +392,11 @@
                     str = '<option value="-1">-- Select a Media Type</option>';
                     $.each(data.report.rows, function (index) {
                         var obj = data.report.rows[index];
-                        str = str + '<option value="' + obj.MediaTypeID + '">' + obj.MediaTypeName + '</option>';
+                        if (obj.MediaTypeID == 1) {
+                            str = str + '<option selected value="' + obj.MediaTypeID + '">' + obj.MediaTypeName + '</option>';
+                        } else {
+                            str = str + '<option value="' + obj.MediaTypeID + '">' + obj.MediaTypeName + '</option>';
+                        }
                     });
 
                     $("#ddlMediaType").html(str);
@@ -464,9 +492,18 @@
         });
     }
 
-    function searchForMarketAgency() {
+    function searchForMarketAgency(bIsSilent) {
+
+        if (!bIsSilent) {
+            bIsSilent = false;
+        }
+
+        if (bIsSilent == false) {
+            setLocalStorage("gResultsRowSelected", "");
+        }
+
         //add any validations needed for required fields
-        if (searchValidationPassed() == false) {
+        if (searchValidationPassed(bIsSilent) == false) {
             return;
         }
 
@@ -475,7 +512,7 @@
 
         var sUrl = ServicePrefix + "/api/AgencyAudit/GetAgencyAuditList?";
         sUrl += "inApiToken=" + getLocalStorage("APIToken");
-        sUrl += "&inAgencyName=" + $("#txtMarketAgency").val();
+        sUrl += "&inAgencyName=" + encodeURIComponent($("#txtMarketAgency").val());
         sUrl += "&inMarketId=" + $("#ddlMarket").val();
         sUrl += "&inMediaTypeId=" + $("#ddlMediaType").val();
         sUrl += "&inParentAgencyId=" + $("#ddlParentAgency").val();
@@ -494,6 +531,11 @@
                 } else {
                     loadResultsData(data);
                     loadMatchingData(data);
+
+                    loadSelectedResultsRows();
+                    loadSelectedTableItems();
+                    loadSelectedUpdateRows();
+
                     $(".table-titles").show();
                 }
             },
@@ -516,7 +558,9 @@
         columnsToDisplay.push({
             "mRender": function (data, type, row) {
                 return '<input type="radio" name="agencies" id="rdo_' + row.agencyId + '" onclick="loadUpdateInformation(' + row.agencyId + ',\'' + row.AgencyWithoutId + '\',' +
-                    row.accountTypeId + ',' + row.parentAgencyId + '); fixResultsSelect(' + row.agencyId + ');">';
+                    row.accountTypeId + ',' + row.parentAgencyId + '); getSelectedResultsRows(' + row.agencyId + ');' +
+                    ' markAsNotSelectable(' + row.agencyId + '); fixResultsSelect(' + row.agencyId + ');'+
+                    ' $(\'#btnCreateParent\').prop(\'disabled\', false).removeClass(\'disabled-button\');">';
             },
             "orderable": false,
             "searchable": false
@@ -701,7 +745,7 @@
                 orderable: false,
                 className: 'select-checkbox'
             }],
-            "select": "multi",
+            "select": "os",
             "language": {
                 search: "Filter Results:"
             },
@@ -713,10 +757,17 @@
         matchTable.on('select', function (e, dt, type, indexes) {
             
             var count = matchTable.rows({ selected: true }).count();
-            if (count > 0) {
+
+            if (count > 1) {
                 $("#dtUpdates_filter input").hide();
                 $("#dtUpdates_filter label").hide();
-                $("#btnUpdate").show();
+                $("#btnLinkMarketAgency").prop("disabled", true).addClass("disabled-button"); //disable
+            } else if (count == 1) {
+                $("#dtUpdates_filter input").hide();
+                $("#dtUpdates_filter label").hide();
+                //$("#btnCreateParent").prop("disabled", false).removeClass("disabled-button");
+                $("#btnUpdate").prop("disabled", false).removeClass("disabled-button");
+                $("#btnLinkMarketAgency").prop("disabled", false).removeClass("disabled-button");
             }
 
         });
@@ -724,10 +775,13 @@
         matchTable.on('deselect', function (e, dt, type, indexes) {
 
             var count = matchTable.rows({ selected: true }).count();
-            if (count == 0) {
+            if (count == 1) {
+                $("#btnLinkMarketAgency").prop("disabled", false).removeClass("disabled-button");//enable not going to hide
+            } else if (count == 0) {
                 $("#dtUpdates_filter input").show();
                 $("#dtUpdates_filter label").show();
-                $("#btnUpdate").hide();
+                $("#btnUpdate").prop("disabled", true).addClass("disabled-button");
+                $("#btnLinkMarketAgency").prop("disabled", true).addClass("disabled-button");
             }
         });
     }
@@ -771,7 +825,7 @@
         $.unblockUI();
     }
 
-    function searchValidationPassed() {
+    function searchValidationPassed(bIsSilent) {
         var loopBreak = true;
         $(".mkaRequired").each(function (index, el) {
             var eID = "#" + $(el).attr("id");
@@ -780,7 +834,10 @@
             // Text
             if ($(eID).prop('tagName').toLowerCase() == "input") {
                 if ($(eID).val().trim() == "") {
-                    bootbox.alert(errorMessage, function () { });
+                    if (bIsSilent == false)
+                    {
+                        bootbox.alert(errorMessage, function() {});
+                    }
                     loopBreak = false;
                     return false;
                 }
@@ -789,7 +846,10 @@
             // Select
             if ($(eID).prop('tagName').toLowerCase() == "select") {
                 if ($(eID).val() == "-1") {
-                    bootbox.alert(errorMessage, function () { });
+                    if (bIsSilent == false)
+                    {
+                        bootbox.alert(errorMessage, function() {});
+                    }
                     loopBreak = false;
                     return false;
                 }
@@ -797,7 +857,11 @@
         });
 
         if ($("#txtMarketAgency").val().length < 3 && $("#ddlMarket").val() == "-1") {
-            bootbox.alert("Market Agency requires 3 or more characters when no Market is selected.", function () { });
+            if (bIsSilent == false)
+            {
+                bootbox.alert("Market Agency requires 3 or more characters when no Market is selected.", function() {});
+            }
+            loopBreak = false;
             return false;
         }
 
@@ -811,6 +875,7 @@
         }
 
         var updateAgencyIds = new Array();
+        selectedTableItems = new Array();
 
         var updatesTable = $("#dtUpdates").DataTable();
 
@@ -819,6 +884,10 @@
             updateAgencyIds.push({
                 "inUpdateAgencyId": d.agencyId,
                 "inUpdateMarketId": d.marketId
+            });
+
+            selectedTableItems.push({
+                "agencyId": d.agencyId
             });
         });
 
@@ -876,8 +945,8 @@
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                 } else {
                     bootbox.alert("All agencies have been updated.", function () { });
-                    searchForMarketAgency();
-                    clearUpdateFields();
+                    searchForMarketAgency(true);
+                    //clearUpdateFields();
                 }
             },
             error: function (jQxhr, textStatus, errorThrown) {
@@ -929,4 +998,153 @@
 
         $.unblockUI();
     }
+
+    function markAsNotSelectable(agencyId) {
+
+
+        $.blockUI();
+
+        var updateTable = $('#dtUpdates').DataTable();
+        var rows = updateTable.rows('.not-selectable').nodes();
+
+
+        $('#dtUpdates tr').removeClass('selected');
+        $('#dtUpdates tr').removeClass('not-selectable');
+        $("#dtUpdates tr").attr("background-color", "white");
+        updateTable.rows().deselect();
+
+        //$("#btnUpdate").hide();
+
+        var updateRowId = $('#dtUpdates').dataTable().fnFindCellRowIndexes(agencyId, 1);
+        $(updateTable.row(updateRowId).node()).addClass('not-selectable');
+        //updateTable.row(updateRowId).deselect();
+
+        $.unblockUI();
+
+    }
+
+    function getSelectedResultsRows(agencyId) {
+        setLocalStorage("gResultsRowSelected", "");
+
+        var resultsSelectedItem = new Array();
+
+        resultsSelectedItem.push({
+            "agencyId": agencyId
+        });
+
+        setLocalStorage("gResultsRowSelected", JSON.stringify(resultsSelectedItem));
+    }
+
+    function loadSelectedResultsRows() {
+        if (getLocalStorage("gResultsRowSelected").length <= 0) {
+            return;
+        }
+
+        var resultsSelectedItems = $.parseJSON(getLocalStorage("gResultsRowSelected"));
+
+        var tbResults = $("#dtResults").DataTable();
+
+        for (var i = 0; i < resultsSelectedItems.length; i++) {
+            var selectedItem = resultsSelectedItems[i];
+            var resultRowId = $('#dtResults').dataTable().fnFindCellRowIndexes(selectedItem.agencyId, 1);
+            $(tbResults.row(resultRowId).node()).addClass('selected');
+            $("#rdo_" + selectedItem.agencyId).click();
+        }
+
+    }
+
+    function loadSelectedTableItems() {
+        if (selectedTableItems.length == 0) {
+            return;
+        }
+
+        var tbUpdates = $("#dtUpdates").DataTable();
+
+        for (var i = 0; i < selectedTableItems.length; i++) {
+            var selectedItem = selectedTableItems[i];
+            tbUpdates.rows(function (idx, data, node) {
+                if (data.agencyId === selectedItem.agencyId) {
+                    tbUpdates.row(idx).select();
+                }
+            });
+        }
+
+        selectedTableItems = new Array();
+    }
+
+    function getSelectedUpdateRows() {
+        setLocalStorage("gUpdateRowsSelected", "");
+
+        var updatesTable = $("#dtUpdates").DataTable();
+
+        var updateSelectedItems = new Array();
+
+        updatesTable.rows({ selected: true }).every(function () {
+            var d = this.data();
+
+            updateSelectedItems.push({
+                "agencyId": d.agencyId
+            });
+        });
+
+        setLocalStorage("gUpdateRowsSelected", JSON.stringify(updateSelectedItems));
+    }
+
+    function loadSelectedUpdateRows() {
+
+        if (getLocalStorage("gUpdateRowsSelected").length <= 0) {
+            return;
+        }
+
+        var updatesSelectedItems = $.parseJSON(getLocalStorage("gUpdateRowsSelected"));
+
+        var tbUpdates = $("#dtUpdates").DataTable();
+
+        for (var i = 0; i < updatesSelectedItems.length; i++) {
+            var selectedItem = updatesSelectedItems[i];
+            tbUpdates.rows(function (idx, data, node) {
+                if (data.agencyId === selectedItem.agencyId) {
+                    tbUpdates.row(idx).select();
+                }
+            });
+        }
+
+        setLocalStorage("gUpdateRowsSelected", "");
+    }
+
+    function loadLastSearchFromBackButton() {
+
+        loadReportParameters();
+        searchForMarketAgency(true);
+    }
+
+    function createNewParentAgency()
+    {
+        getSelectedUpdateRows();
+        var sMarketAgency = encodeURIComponent($("#txtUpdateMarketAgency").val());
+        window.location = "/Admin/ParentAgency/parentagency.html?ParentAgencyID=0&MarketAgencyName=" + sMarketAgency;
+    }
+
+    function linkMarketAgency()
+    {
+        getSelectedUpdateRows();
+
+        //need to get the value so the page can directed to the correct advertiser crud page.
+        //i could put this value in a page variable. but i feel more comfortable using a local variable here.
+        var updatesSelectedItems = $.parseJSON(getLocalStorage("gUpdateRowsSelected"));
+        var selectedItem = new Array();
+
+        //there should only be 1 item the array
+        for (var i = 0; i < updatesSelectedItems.length; i++) {
+            selectedItem.push(updatesSelectedItems[i]);
+        }
+
+        if (selectedItem.length == 0) {
+            bootbox.alert("Unable to find the Market Agency ID to send you to the page to do the Market Agency linking.", function () { });
+            return;
+        }
+
+        window.location = "/Admin/Agency/agency.html?AgencyID=" + selectedItem[0].agencyId;
+    }
+
 </script>
