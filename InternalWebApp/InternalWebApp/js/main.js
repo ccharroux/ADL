@@ -310,7 +310,7 @@ $(document).ready(function ()
 
     $(document).ajaxError(function (event, jqxhr, inSettings, thrownError)
     {
-         window.localStorage.setItem("AJAXErrorURL", inSettings.url);
+        window.localStorage.setItem("AJAXErrorURL", inSettings.url);
 
         if (!inSettings.data == false) {
             window.localStorage.setItem("AJAXErrorData", inSettings.data);
@@ -1030,10 +1030,10 @@ function MKAErrorMessageDeliveryRtn(message, postCallback) {
 
 function sendErrorEmail(message, AJAXErrorURL, AJAXErrorData)
 {
-    console.log('ERROR');
-    console.log(message);
-    console.log(AJAXErrorURL);
-    console.log(AJAXErrorData);
+    //console.log('ERROR');
+    //console.log(message);
+    //console.log(AJAXErrorURL);
+    //console.log(AJAXErrorData);
 
     $.ajax({
         url: ServicePrefix + '/api/Email/EmailAPIError',

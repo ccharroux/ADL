@@ -161,6 +161,17 @@
                                 <select id="ddlReport" class="search-ddl-select" style="width:400px" multiple size="10"></select>
                             </div>
                         </div>
+                        <div class="col-md-6 ProductChoices DMXChoices" style="display:none">
+                            <div class="assignmentBoxes" style="padding-top:0px;padding-left:0px;padding-right:0px">
+                                <h4 class="assignmentBoxHeader">Assignment Actions</h4>
+                                <div style="padding-left:10px; padding-right:10px">
+
+                                    <input type="checkbox" id="chkDMXRecipient" onclick="resetRelatedControl(this, 'ddlAccessDMX');" style="margin-right:5px" checked="checked" readonly="readonly" /><label for="chkDMXRecipient">Recipient</label> <br />
+                                    <label for="ddlAccessDMX" class="search-ddl-label" style="vertical-align: top; margin-left:10px">Access Levels</label>
+                                    <select id="ddlAccessDMX" class="search-ddl-select" style="height: 170px;width: 340px;" size="10"></select>
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-md-6 ProductChoices XRYChoices" style="display:none">
                             <div class="assignmentBoxes" style="padding-top:0px;padding-left:0px;padding-right:0px">
                                 <h4 class="assignmentBoxHeader">Assignment Actions</h4>
@@ -436,10 +447,12 @@
     function doAssignment() {
 
         // validation
-        if (areAssignmentsValid() == false) {
+        if (areAssignmentsValid() == false)
+        {
             return;
         }
-        else {
+        else
+        {
             beginAssignmentProcess();
         }
 
@@ -448,7 +461,8 @@
 
     function beginAssignmentProcess() {
 
-        switch ($("#ddlProduct").val().toString().toLowerCase()) {
+        switch ($("#ddlProduct").val().toString().toLowerCase())
+        {
 
             case "dma":
                 return assignDMA();
@@ -462,13 +476,19 @@
             case "tvb":
                 return assignTVB();
 
+            case "dmx":
+                return assignDMX();
+
             default:
                 return false;
 
         }
 
     }
-    function assignDMA() {
+
+    function assignDMA()
+    {
+
         var stationArray = new Array();
         var reportArray = new Array();
 
@@ -558,7 +578,45 @@
         assignAJAX(inputObject, $("#ddlProduct").val(), $("#ddlProduct").val() + " Assignments Complete");
 
     }
-    function assignXRY() {
+
+    function assignDMX()
+    {
+
+        var stationArray = new Array();
+
+        var radioValue = $("input[name='radContactDMX']:checked").val();
+
+        $("#ddlStation option:selected").each(function ()
+        {
+            // recipient only array
+            if ($("#chkDMXRecipient").is(':checked') == true)
+            {
+                var stationObject = {
+                    "stationId": $(this).val(),
+                    "selected": true
+                }
+                stationArray.push(stationObject);
+            }
+
+         });
+
+        var inputObject = JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inPersonnelId": personnelId,
+            "inMarketId": $("#ddlMarketAssign").val(),
+            "inMarketStationList": stationArray,
+            "inAccessLevelId": $("#ddlAccessDMX").val()
+        });
+
+ 
+        assignAJAX(inputObject, $("#ddlProduct").val(), $("#ddlProduct").val() + " Assignments Complete");
+
+    }
+
+
+    function assignXRY()
+    {
+
         var stationArray = new Array();
         var stationSubmissionArray = new Array();
 
@@ -568,18 +626,23 @@
         var isContact = false;
         var isPrimaryContact = false;
 
-        if (radioValue.toLowerCase() == "primary") {
+        if (radioValue.toLowerCase() == "primary")
+        {
             isContact = true;
             isPrimaryContact = true;
         }
-        if (radioValue.toLowerCase() == "secondary") {
+
+        if (radioValue.toLowerCase() == "secondary")
+        {
             isContact = true;
             isPrimaryContact = false;
         }
 
-        $("#ddlStation option:selected").each(function () {
+        $("#ddlStation option:selected").each(function ()
+        {
             // recipient only array
-            if ($("#chkXRYRecipient").is(':checked') == true) {
+            if ($("#chkXRYRecipient").is(':checked') == true)
+            {
                 var stationObject = {
                     "stationId": $(this).val(),
                     "selected": true
@@ -588,7 +651,8 @@
             }
 
             // contacts only array
-            if (isContact == true) {
+            if (isContact == true)
+            {
                 var stationObject = {
                     "stationId": $(this).val(),
                     "submissionId": '1',
@@ -614,6 +678,7 @@
         assignAJAX(inputObject, $("#ddlProduct").val(), $("#ddlProduct").val() + " Assignments Complete");
 
     }
+
     function assignMRR() {
         var stationArray = new Array();
         var reportArray = new Array();
@@ -665,7 +730,9 @@
         assignAJAX(inputObject, $("#ddlProduct").val(), $("#ddlProduct").val() + " Assignments Complete");
 
     }
-    function assignAJAX(inputObject, product, successMessage) {
+    function assignAJAX(inputObject, product, successMessage)
+
+    {
         // reset product for XRAY.. use XRAY instead of XRAY
         product = (product.toLowerCase() == 'xry' ? 'XRAY' : product.toUpperCase());
 
@@ -678,10 +745,10 @@
 
         var actionAlter = "";
 
-        if (product.toUpperCase() == "MRR" || product.toUpperCase() == "XRAY") {
+        if (product.toUpperCase() == "MRR" || product.toUpperCase() == "XRAY")
+        {
             actionAlter = "MarketStation";
         }
-
 
         var url = ServicePrefix + '/api/' + product + '/UpdatePersonnel' + actionAlter + 'Assignments';
 
@@ -692,28 +759,32 @@
             contentType: 'application/json',
             data: inputObject,
             processData: false,
-            success: function (data, textStatus, jQxhr) {
+            success: function (data, textStatus, jQxhr)
+            {
 
-                if (data.response.status != "SUCCESS") {
+                if (data.response.status != "SUCCESS")
+                {
                     MKAErrorMessageRtn(data.response.errorMessage[0]);
                     return;
                 }
                 //bootbox.alert(successMessage);
 
-                if ($("#spnWebStatus").text() == "") {
+                if ($("#spnWebStatus").text() == "")
+                {
                     //Ask user if they want to send setup email
                     showSetupEmailDialog(successMessage);
 
-                } else {
+                }
+                else
+                {
                     bootbox.alert(successMessage);
                     loadPersonnelAssignmentList("dtPersonnelAssignmentList");
-
                 }
 
             },
-            error: function (jqXhr, textStatus, errorThrown) {
+            error: function (jqXhr, textStatus, errorThrown)
+            {
                 MKAErrorMessageRtn(errorThrown);
-
             }
         });
 
@@ -747,7 +818,8 @@
 
     }
 
-    function areAssignmentsValid() {
+    function areAssignmentsValid()
+    {
 
 
         switch ($("#ddlProduct").val().toString().toLowerCase()) {
@@ -757,6 +829,9 @@
 
             case "mrr":
                 return areMRRAssignmentsValid();
+
+            case "dmx":
+                return areDMXAssignmentsValid();
 
             case "xry":
                 return areXRYAssignmentsValid();
@@ -769,7 +844,8 @@
 
         }
     }
-    function marketSelectionValid() {
+    function marketSelectionValid()
+    {
         // a market must be selected
         if ($("#ddlMarketAssign").val() == "") {
             bootbox.alert("You must select a market to perform the assignment operation.");
@@ -781,7 +857,8 @@
 
     }
 
-    function stationSelectionValid() {
+    function stationSelectionValid()
+    {
 
         // at least 1 station
         var count = $("#ddlStation :selected").length;
@@ -792,7 +869,8 @@
         }
     }
 
-    function areTVBAssignmentsValid() {
+    function areTVBAssignmentsValid()
+    {
 
         // at least 1 action
         if ($("#chkTVBRepDataContact").is(':checked') == false &&
@@ -805,7 +883,8 @@
         }
 
         // Time Sales Contact
-        if ($('input[name=radContactTVB]:checked').val() != "") {
+        if ($('input[name=radContactTVB]:checked').val() != "")
+        {
 
             if (marketSelectionValid() == false) {
                 return false;
@@ -819,13 +898,16 @@
         }
 
         // Recipients
-        if ($("#chkTVBRecipient").is(':checked')) {
+        if ($("#chkTVBRecipient").is(':checked'))
+        {
 
-            if (marketSelectionValid() == false) {
+            if (marketSelectionValid() == false)
+            {
                 return false;
             }
 
-            if (stationSelectionValid() == false) {
+            if (stationSelectionValid() == false)
+            {
                 return false;
             }
 
@@ -838,7 +920,8 @@
         }
 
         // Administrator
-        if ($("#chkTVBAdministrator").is(':checked')) {
+        if ($("#chkTVBAdministrator").is(':checked'))
+        {
 
             if (marketSelectionValid() == false) {
                 return false;
@@ -853,7 +936,8 @@
 
 
         // Rep Firm Contact
-        if ($("#chkTVBRepDataContact").is(':checked')) {
+        if ($("#chkTVBRepDataContact").is(':checked'))
+        {
             var count = $("#ddlRepFirms :selected").length;
 
             if (count <= 0) {
@@ -872,21 +956,25 @@
         // at least 1 action
         if ($("#chkMRRAdministrator").is(':checked') == false &&
             $("#chkMRRRecipient").is(':checked') == false &&
-            $('input[name=radContactMRR]:checked').val() == "") {
+            $('input[name=radContactMRR]:checked').val() == "")
+        {
             bootbox.alert("You must select at least 1 assignment action to perform the assignment operation.");
             return false;
         }
 
-        if (marketSelectionValid() == false) {
+        if (marketSelectionValid() == false)
+        {
             return false;
         }
 
-        if (stationSelectionValid() == false) {
+        if (stationSelectionValid() == false)
+        {
             return false;
         }
 
         // Recipients
-        if ($("#chkMRRRecipient").is(':checked')) {
+        if ($("#chkMRRRecipient").is(':checked'))
+        {
             var count = $("#ddlReport :selected").length;
 
             if (count <= 0) {
@@ -919,11 +1007,13 @@
 
         return true;
     }
-    function areXRYAssignmentsValid() {
+
+    function areXRYAssignmentsValid()
+    {
 
         // at least 1 action
-        if ($("#chkXRYRecipient").is(':checked') == false &&
-            $('input[name=radContactXRY]:checked').val() == "") {
+        if ($("#chkXRYRecipient").is(':checked') == false && $('input[name=radContactXRY]:checked').val() == "")
+        {
             bootbox.alert("You must select at least 1 assignment action to perform the assignment operation.");
             return false;
         }
@@ -941,6 +1031,42 @@
             var count = $("#ddlAccessXRY :selected").length;
 
             if (count <= 0) {
+                bootbox.alert("You must select an Access Level to perform the assignment operation.");
+                return false;
+            }
+        }
+
+        return true;
+
+    }
+
+    function areDMXAssignmentsValid()
+    {
+
+        // at least 1 action
+        if ($("#chkDMXRecipient").is(':checked') == false && $('input[name=radContactDMX]:checked').val() == "")
+        {
+            bootbox.alert("You must select at least 1 assignment action to perform the assignment operation.");
+            return false;
+        }
+
+        if (marketSelectionValid() == false)
+        {
+            return false;
+        }
+
+        if (stationSelectionValid() == false)
+        {
+            return false;
+        }
+
+        // Recipients
+        if ($("#chkDMXRecipient").is(':checked'))
+        {
+            var count = $("#ddlAccessDMX :selected").length;
+
+            if (count <= 0)
+            {
                 bootbox.alert("You must select an Access Level to perform the assignment operation.");
                 return false;
             }
@@ -1760,6 +1886,10 @@
 
         if ($("#ddlProduct").val().toString().toLowerCase() == 'xry') {
             loadXrayAccessLevelList("ddlAccessXRY");
+        }
+
+        if ($("#ddlProduct").val().toString().toLowerCase() == 'dmx') {
+            loadXrayAccessLevelList("ddlAccessDMX");
         }
 
         if ($("#ddlProduct").val().toString().toLowerCase() == 'dma') {
