@@ -147,6 +147,10 @@
                             <label for="chkForceUserView" class="checkboxView forceUserView">
                                 <input type="checkbox" id="chkForceUserView" value="" onclick="getReminders();" checked="checked" />&nbsp;Show Contacts
                             </label>
+
+                            <label for="chkOnlyPrimaryContacts" class="checkboxView OnlyPrimaryContacts">
+                                <input type="checkbox" id="chkOnlyPrimaryContacts" value="" onclick="getReminders();" checked="checked" />&nbsp;Only Primary Contacts
+                            </label>
                         </center>
                     </div>
                 </div>
@@ -949,6 +953,10 @@
 
         url += '&inForceUserView=' + $("#chkForceUserView").is(":checked");
 
+        if ($("#chkOnlyPrimaryContacts").prop('checked')) {
+            url += '&inOnlyPrimaryContacts=true';
+        }
+
         $.ajax({
             url: url,
             dataType: 'json',
@@ -1047,6 +1055,11 @@
 
         var url = ServicePrefix + '/api/MRR/InsertRemindersIntoQueue';
 
+        var onlyPrimaryContacts = $("#chkOnlyPrimaryContacts").prop('checked');
+        if (currentStationId != null && currentPersonnelId != null) {
+            onlyPrimaryContacts = false;
+        }
+
         var settings = {
             dataType: 'json',
             type: 'post',
@@ -1058,7 +1071,8 @@
                 "inYear": currentYear(),
                 "inPeriod": currentPeriod(),
                 "inEmailNote": $("#txtEmailNote").val(),
-                "inPersonnelId": currentPersonnelId
+                "inPersonnelId": currentPersonnelId,
+                "inOnlyPrimaryContacts": onlyPrimaryContacts
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -1154,6 +1168,7 @@
                 "inPeriod": currentPeriod(),
                 "inOnlyPendingMarkets": $("#chkOnlyPendingMarkets").is(':checked'),
                 "inEmailNote": $("#txtEmailNote").val(),
+                "inOnlyPrimaryContacts": $("#chkOnlyPrimaryContacts").prop('checked')
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
