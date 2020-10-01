@@ -311,6 +311,10 @@ reportName.push("rptMisMatchedParentAdvertiserIndustrySubIndustryList");
 reportName.push("rptMRROwnerGroupMarketAnalysis");
 reportName.push("rptXRYOwnerGroupMarketAnalysis");
 
+reportName.push("rptTVBReportingMarketStatus");
+
+reportName.push("rptTVBStationIssueList");
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -12431,6 +12435,56 @@ function getReportObject_XRYOwnerGroupMarketAnalysis() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['XRY', 'owner group'],
+        sortable: true,
+        approved: false
+    }
+
+    return tempObject;
+}
+ 
+function getReportFilterArray_TVBReportingMarketStatus()
+{
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    return arrayFilters;
+}
+
+function getReportObject_TVBReportingMarketStatus()
+{
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject = {
+        reportTitle: "TVB Reporting Market Status",
+        apiControllerAction: '/api/TvbReport/GetReportingMarketStatus',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
+        sortable: true,
+        approved: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_TVBStationIssueList() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    return arrayFilters;
+}
+
+function getReportObject_TVBStationIssueList() {
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject = {
+        reportTitle: "TVB Station Issue List",
+        apiControllerAction: '/api/TvbReport/GetTVBStationIssueList',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['tvb'],
         sortable: true,
         approved: false
     }
