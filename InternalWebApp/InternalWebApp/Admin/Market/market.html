@@ -683,11 +683,8 @@
             return;
         }
 
-        var str = '';
-
-        var holdMarketID = "0";
-        var productList = "";
-        var holdObject = new Object();
+        var dmaEligible = false;
+        var dmxEligible = false;
 
         $.each(data.report.rows, function (index) {
 
@@ -735,7 +732,7 @@
             // product specific buttons
             //-------------------------
             // revenue definition
-            if (productId == "MRR" && obj.activeFlag == true)
+            if (productId.toUpperCase() == "MRR" && obj.activeFlag == true)
             {
                 var btnStr = '<input id="mrrReportSetup" value="Report Setup" class="productButtonClass" onclick="goToMarketReportSetup()" type="button">';
                 btnStr = btnStr + '<input id="mrrRevenueDefinition" class="productButtonClass" value="Revenue Definition" onclick="goToRevenueDefinition(' + marketId + ');" type="button">';
@@ -743,11 +740,37 @@
                 $("#productButtons" + productId).append(btnStr);
             }
 
+            //product list returns only eligible products
+            //if dma or dmx is not returned then they are
+            //not eligible for this market
+            if (productId.toUpperCase() == "DMA") {
+                dmaEligible = true;
+            }
+
+            if (productId.toUpperCase() == "DMX") {
+                dmxEligible = true;
+            }
+
+
             addStationLookupButton(productId, obj);
 
 
         });
- 
+            
+        //add message if dma is not eligable
+        if (dmaEligible == false) {
+            $(".row_DMA").show();
+            var dmaMessage = "<div class='col-md-12' style='padding-left: 0px;'>Parent Market is not active for DMA.</div>";
+            $("#productButtonsDMA").append(dmaMessage);
+
+        }
+
+        //add message if dmx is not eligable
+        if (dmxEligible == false) {
+            $(".row_DMX").show();
+            var dmxMessage = "<div class='col-md-12' style='padding-left: 0px;'>Parent Market is not active for DMX.</div>";
+            $("#productButtonsDMX").append(dmxMessage);
+        }
 
 
         }
