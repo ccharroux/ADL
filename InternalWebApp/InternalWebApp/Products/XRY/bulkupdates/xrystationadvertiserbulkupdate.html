@@ -203,7 +203,7 @@
                         <div class="col-md-6">
                             <div style="display:table-cell; float:right">
                                 <label class="dropdown-label">&nbsp;</label><br />
-                                <input type="button" class="search-button" value="Search" onclick="clearUpdateFields(); searchForStationAdvertiser();" />
+                                <input type="button" class="search-button" value="Search" onclick="searchForStationAdvertiser();" /> <!-- clearUpdateFields();  -->
                             </div>
                         </div>
                     </div>
@@ -218,22 +218,32 @@
                             <div class="col-md-4 match-info-row">
                                 <input type="hidden" id="txtUpdateMarketAdvertiserId" value="" />
                                 <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label><br/>
-                                <input type="text" id="txtUpdateMarketAdvertiser" readonly="readonly" style="width: 450px !important;" maxlength="50" class="report-filter" />
+                                <input type="text" id="txtUpdateMarketAdvertiser" readonly="readonly" style="width: 450px !important;" maxlength="50" class="report-filter disabled" />
                             </div>
                             <div class="col-md-3 match-info-row">
                                 <label for="ddlUpdateIndustry" class="dropdown-label">Industry</label><br/>
-                                <select id="ddlUpdateIndustry" disabled="disabled" onchange="getSubIndustries(['ddlUpdateSubIndustry'], this.options[this.selectedIndex].value);" class="dropdown-select report-filter"></select>
+                                <select id="ddlUpdateIndustry" disabled="disabled" onchange="getSubIndustries(['ddlUpdateSubIndustry'], this.options[this.selectedIndex].value);" class="dropdown-select report-filter disabled"></select>
                             </div>
                             <div class="col-md-3 match-info-row">
                                 <label for="ddlUpdateSubIndustry" class="dropdown-label">Sub Industry</label><br/>
-                                <select id="ddlUpdateSubIndustry" disabled="disabled" class="dropdown-select report-filter"></select>
+                                <select id="ddlUpdateSubIndustry" disabled="disabled" class="dropdown-select report-filter disabled"></select>
                             </div>
                             <div class="col-md-2 match-info-row" style="text-align: right">
                                 <label for="btnUpdate" class="dropdown-label">&nbsp;</label><br />
-                                <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startStationAdvertiserUpdate();"/>
+                                <input type="button" id="btnUpdate" disabled="disabled" class="search-button disabled-button" value="Update" onclick="startStationAdvertiserUpdate();"/>
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-md-6 table-titles" style="text-align: center">
+                            <h3>Search Results</h3>
+                        </div>
+                        <div class="col-md-6 table-titles" style="text-align: center">
+                            <h3>Items to be Updated</h3>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <!--
                         2 datatables
@@ -289,6 +299,8 @@
 </html>
 <script>
 
+    var selectedTableItems = new Array();
+
     $(document).ready(function () {
         buildXRYMenu("Audit");
 
@@ -302,6 +314,8 @@
         getOwnerList(["ddlOwner"], "-1", "-1");
 
         buildQuickReports(['xry']);
+
+        $(".table-titles").hide();
 
         cleanupBackButton();
     });
@@ -554,6 +568,10 @@
                 } else {
                     loadResultsData(data);
                     loadMatchingData(data);
+                    $(".table-titles").show();
+
+                    loadSelectedResultsRows();
+                    loadSelectedTableItems();
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -575,7 +593,8 @@
         columnsToDisplay.push({
             "mRender": function (data, type, row) {
                 return '<input type="radio" id="rdo_' + row.stationAdvertiserId + '" name="advertisers" onclick="loadUpdateInformation(' + row.stationAdvertiserId + ',' + row.marketAdvertiserId +
-                    ',\'' + row.MarketAdvertiserWithoutId + '\',' + row.industryId + ',' + row.subIndustryId + '); markAsNotSelectable(' + row.stationAdvertiserId + '); fixResultsSelect(' + row.stationAdvertiserId + ');">';
+                    ',\'' + row.MarketAdvertiserWithoutId + '\',' + row.industryId + ',' + row.subIndustryId + '); getSelectedResultsRows(' + row.stationAdvertiserId +
+                    '); markAsNotSelectable(' + row.stationAdvertiserId + '); fixResultsSelect(' + row.stationAdvertiserId + ');">';
             },
             "orderable": false,
             "searchable": false
@@ -590,30 +609,18 @@
         });
 
         columnsToDisplay.push({
-            "title": "Market",
-            "visible": true,
-            "mData": "Market",
-            "orderable": true
-        });
-        columnsToDisplay.push({
             "title": "Station",
             "visible": true,
             "mData": "Station",
             "orderable": true
         });
+
         columnsToDisplay.push({
             "title": "Station Advertiser",
             "visible": true,
             "mData": "Station Advertiser",
             "orderable": true
         });
-
-        //columnsToDisplay.push({
-        //    "title": "Station Code",
-        //    "visible": true,
-        //    "mData": "Station Code",
-        //    "orderable": true
-        //});
 
         columnsToDisplay.push({
             "title": "Market Advertiser",
@@ -623,16 +630,12 @@
         });
 
         columnsToDisplay.push({
-            "title": "Industry",
+            "title": "Industry /<br/>Sub Industry",
             "visible": true,
-            "mData": "Industry",
-            "orderable": true
-        });
-        columnsToDisplay.push({
-            "title": "Sub Industry",
-            "visible": true,
-            "mData": "Sub Industry",
-            "orderable": true
+            "orderable": true,
+            "mRender": function (data, type, row) {
+                return row["Industry"] + " /<br/>" + row["Sub Industry"];
+            }
         });
 
         return columnsToDisplay;
@@ -720,13 +723,6 @@
         });
 
         columnsToDisplay.push({
-            "title": "Market",
-            "visible": true,
-            "mData": "Market",
-            "orderable": true
-        });
-
-        columnsToDisplay.push({
             "title": "Station",
             "visible": true,
             "mData": "Station",
@@ -740,13 +736,6 @@
             "orderable": true
         });
 
-        //columnsToDisplay.push({
-        //    "title": "Station Code",
-        //    "visible": true,
-        //    "mData": "Station Code",
-        //    "orderable": true
-        //});
-
         columnsToDisplay.push({
             "title": "Market Advertiser",
             "visible": true,
@@ -755,16 +744,12 @@
         });
 
         columnsToDisplay.push({
-            "title": "Industry",
+            "title": "Industry /<br/>Sub Industry",
             "visible": true,
-            "mData": "Industry",
-            "orderable": true
-        });
-        columnsToDisplay.push({
-            "title": "Sub Industry",
-            "visible": true,
-            "mData": "Sub Industry",
-            "orderable": true
+            "orderable": true,
+            "mRender": function (data, type, row) {
+                return row["Industry"] + " /<br/>" + row["Sub Industry"];
+            }
         });
 
         return columnsToDisplay;
@@ -807,7 +792,7 @@
                 orderable: false,
                 className: 'select-checkbox'
             }],
-            "select": "multi",
+            "select": "os",
             "language": {
                 search: "Filter Results:"
             },
@@ -820,21 +805,11 @@
 
             if (type === 'row')
             {
-
-                var rows = matchTable.rows(indexes).nodes();
-                $.each($(rows),
-                    function () {
-                        if ($(this).hasClass('not-selectable')) {
-                            matchTable.row($(this)).deselect();
-                        }
-                    }
-                );
-
                 var count = matchTable.rows({ selected: true }).count();
                 if (count > 0) {
                     $("#dtUpdates_filter input").hide();
                     $("#dtUpdates_filter label").hide();
-                    $("#btnUpdate").show();
+                    $("#btnUpdate").prop("disabled", false).removeClass("disabled-button");
                 }
             }
         });
@@ -845,7 +820,7 @@
             if (count == 0) {
                 $("#dtUpdates_filter input").show();
                 $("#dtUpdates_filter label").show();
-                $("#btnUpdate").hide();
+                $("#btnUpdate").prop("disabled", true).addClass("disabled-button");
             }
         });
 
@@ -881,11 +856,9 @@
 
         $("#dtUpdates_filter input").show();
         $("#dtUpdates_filter label").show();
-        $("#btnUpdate").hide();
 
         var updateRowId = $('#dtUpdates').dataTable().fnFindCellRowIndexes(stationAdvertiserId, 1);
         $(updateTable.row(updateRowId).node()).addClass('not-selectable');
-        updateTable.row(updateRowId).deselect();
 
         $.unblockUI();
 
@@ -952,6 +925,7 @@
         }
 
         var updateStationAdvertiserIds = new Array();
+        selectedTableItems = new Array();
 
         var updatesTable = $("#dtUpdates").DataTable();
 
@@ -960,6 +934,10 @@
             updateStationAdvertiserIds.push({
                 "inStationId": d.stationId,
                 "inStationAdvertiserName": d.StationAdvertiserWithoutId
+            });
+
+            selectedTableItems.push({
+                "stationAdvertiserId": d.stationAdvertiserId
             });
         });
 
@@ -1053,7 +1031,7 @@
                 } else {
                     bootbox.alert("All station advertisers have been updated.", function () { });
                     searchForStationAdvertiser();
-                    clearUpdateFields();
+                    //clearUpdateFields();
                 }
             },
             error: function (jQxhr, textStatus, errorThrown) {
@@ -1081,7 +1059,6 @@
         $("#ddlUpdateIndustry").val("-1");
         getSubIndustries(["ddlUpdateSubIndustry"], "-1", "-1");
 
-        $("#btnUpdate").hide();
         $("#dtUpdates_filter input").show();
         $("#dtUpdates_filter label").show();
 
@@ -1103,4 +1080,54 @@
 
         $.unblockUI();
     }
+
+    function getSelectedResultsRows(stationAdvertiserId) {
+        setLocalStorage("gResultsRowSelected", "");
+
+        var resultsSelectedItem = new Array();
+
+        resultsSelectedItem.push({
+            "stationAdvertiserId": stationAdvertiserId
+        });
+
+        setLocalStorage("gResultsRowSelected", JSON.stringify(resultsSelectedItem));
+    }
+
+    function loadSelectedResultsRows() {
+        if (getLocalStorage("gResultsRowSelected").length <= 0) {
+            return;
+        }
+
+        var resultsSelectedItems = $.parseJSON(getLocalStorage("gResultsRowSelected"));
+
+        var tbResults = $("#dtResults").DataTable();
+
+        for (var i = 0; i < resultsSelectedItems.length; i++) {
+            var selectedItem = resultsSelectedItems[i];
+            var resultRowId = $('#dtResults').dataTable().fnFindCellRowIndexes(selectedItem.stationAdvertiserId, 1);
+            $(tbResults.row(resultRowId).node()).addClass('selected');
+            $("#rdo_" + selectedItem.stationAdvertiserId).click();
+        }
+
+    }
+
+    function loadSelectedTableItems() {
+        if (selectedTableItems.length == 0) {
+            return;
+        }
+
+        var tbUpdates = $("#dtUpdates").DataTable();
+
+        for (var i = 0; i < selectedTableItems.length; i++) {
+            var selectedItem = selectedTableItems[i];
+            tbUpdates.rows(function (idx, data, node) {
+                if (data.stationAdvertiserId === selectedItem.stationAdvertiserId) {
+                    tbUpdates.row(idx).select();
+                }
+            });
+        }
+
+        selectedTableItems = new Array();
+    }
+
 </script>
