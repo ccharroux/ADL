@@ -60,7 +60,15 @@
 
 
     <style>
-           .rptView
+         td.highlightBackground{
+            background:   #aed6f1   !important;
+        }
+
+         tr.highlightBackground{
+            background:   #aed6f1   !important;
+        }
+          
+        .rptView
         {
             margin-left: 5px;
             vertical-align: top;
@@ -84,6 +92,10 @@
         }
         .contact-section {
             padding-bottom: 2em!important;
+        }
+        .redText
+        {
+            color: red !important;
         }
     </style>
 
@@ -548,7 +560,8 @@
 
 
             if (reportObject.columnsToDisplay.length == 0 ||
-                IsInArray(reportObject.columnsToDisplay, objectName) == true) {
+                IsInArray(reportObject.columnsToDisplay, objectName) == true)
+            {
 
                 var className = "";
 
@@ -577,11 +590,23 @@
                         {
                             className = "text-align-right";
                         }
-                        
+
+
                     }
                 }
 
+                if (objectName.toLowerCase().indexOf("revenue") > -1 ||
+                    objectName.toLowerCase().indexOf("change") > -1
+                    )
+                {
+                    className = "text-align-right";
+                    if (objectValue != null) {
+                        if (objectValue.toString().indexOf("-") > -1) {
+                            className = "text-align-right redText";
+                        }
+                    }
 
+                }
 
                 ctr++;
                 columnsToExport.push(ctr);
@@ -651,6 +676,28 @@
             "select": true,
             language: {
                 search: "Filter Results:"
+            },
+            createdRow: function (row, data, index) {
+                //
+                // if the second column cell is blank apply special formatting
+                //
+                //console.log(data["Station"]);
+                if (!data["Station"] == false) {
+                    if (data["Station"] == "Total") {
+                        //console.dir(row);
+                        //console.log("HITTTTT");
+                        $(row).addClass('highlightBackground');
+                    }
+                }
+
+                if (!data["Owner"] == false) {
+                    if (data["Owner"].indexOf("Total") > -1) {
+                        //console.dir(row);
+                        //console.log("HITTTTT");
+                        $(row).addClass('highlightBackground');
+                    }
+                }
+
             },
             "buttons": [
                //{
