@@ -637,7 +637,7 @@
                         str = str + '<div id="productButtons' + productId + '" class="col-md-7" style="text-align:left;">';
 
                         // enable button
-                        str = str + '<input type="button" id="productAdd' + productId + '" style="margin-right:3px;margin-left:3px;" class="" onClick="enableOwnerProduct(' + '\'' + productId + '\');" Value="Enable" />';
+                        str = str + '<input type="button" id="productAdd' + productId + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="enableOwnerProduct(' + '\'' + productId + '\');" Value="Enable" />';
 
                         // edit button
                         str = str + '<input type="button" id="productEdit' + productId + '" stye="margin-right:3px;margin-left:3px;" class="hidden" onClick="editProduct(\'' + productId + '\')" Value="Edit" />';
@@ -691,6 +691,9 @@
                 }
                 else {
 
+                    var dmaEligible = false;
+                    var dmxEligible = false;
+
                     $.each(data.report.rows, function (index) {
 
                         var obj = data.report.rows[index];
@@ -724,7 +727,34 @@
                             $("#productAdd" + productId).removeClass('hidden');
                         }
 
+                        //product list returns only eligible products
+                        //if dma or dmx is not returned then they are
+                        //not eligible for this market
+                        if (productId.toUpperCase() == "DMA") {
+                            dmaEligible = true;
+                        }
+
+                        if (productId.toUpperCase() == "DMX") {
+                            dmxEligible = true;
+                        }
+
+
                     });
+
+                    //add message if dma is not eligable
+                    if (dmaEligible == false) {
+                        $(".row_DMA").show();
+                        var dmaMessage = "<div class='col-md-12' style='padding-left: 0px;'>Parent Owner is not active for DMA.</div>";
+                        $("#productButtonsDMA").append(dmaMessage);
+
+                    }
+
+                    //add message if dmx is not eligable
+                    if (dmxEligible == false) {
+                        $(".row_DMX").show();
+                        var dmxMessage = "<div class='col-md-12' style='padding-left: 0px;'>Parent Owner is not active for DMX.</div>";
+                        $("#productButtonsDMX").append(dmxMessage);
+                    }
 
 
                     if (ownerID > 0) {

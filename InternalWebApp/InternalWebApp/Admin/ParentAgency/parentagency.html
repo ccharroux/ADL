@@ -77,7 +77,7 @@
                             <label for="txtParentAgencyName">Parent Agency Name</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" class="field-width-450 mkaRequired" maxlength="50" id="txtParentAgencyName" errorMessage="You must enter a Parent Agency Name." value="" />
+                            <input type="text" class="field-width-450 mkaRequired" maxlength="50" style="text-transform: uppercase;" id="txtParentAgencyName" errorMessage="You must enter a Parent Agency Name." value="" />
                         </div>
                     </div>
 
@@ -86,7 +86,7 @@
                             <label for="txtLinkedParentAgency">Linked Parent Agency</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input class="field-width-450 disabled" type="text" id="txtLinkedParentAgency" disabled="disabled" errorMessage="Please use the Search Parent Agency to link a Parent Agency." /><span id="parentLinkedMessage" class="hidden to-be-linked-message">* Will be linked</span>
+                            <input class="field-width-450 disabled" type="text" style="text-transform: uppercase;" id="txtLinkedParentAgency" disabled="disabled" errorMessage="Please use the Search Parent Agency to link a Parent Agency." /><span id="parentLinkedMessage" class="hidden to-be-linked-message">* Will be linked</span>
                         </div>
                     </div>
 
@@ -105,7 +105,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <div>
-                                <input value="Search Parent Agency" onclick="excludeFromBackButton(); searchLinkParentAgency();" class="default-button-450" type="button">
+                                <input value="Search Parent Agency" onclick="includeInBackButton(); searchLinkParentAgency();" class="default-button-450" type="button">
                             </div>
                         </div>
                     </div>
@@ -205,6 +205,7 @@
     var parentAgencyId = 0;
     var bLinkParentAgency = false;
     var bIsNew = false;
+    var sMarketAgencyName = "";
 
     $(document).ready(function () {
 
@@ -215,6 +216,14 @@
 
         getParentAgency();
 
+        //cleanupBackButton();
+        if (getLocalStorage("gSearchResults").length > 0)
+        {
+            setTimeout('loadSearchResults()', 1000);
+        } else {
+            //load back button data
+            setTimeout('loadLastSearchFromBackButton()', 1000);
+        }
     });
 
     function setupUIFields()
@@ -224,6 +233,8 @@
         $("#txtParentAgencyId").val(parentAgencyId);
 
         bIsNew = parentAgencyId <= 0;
+
+        sMarketAgencyName = getParameterByName("MarketAgencyName") == null ? "" : getParameterByName("MarketAgencyName");
     }
 
     function getParentAgency()
@@ -234,6 +245,12 @@
             initializeActiveDate();
             $(".link-parent-agency").hide();
             $('.change-date').hide();
+
+            if (sMarketAgencyName.length > 0)
+            {
+                $("#txtParentAgencyName").val(sMarketAgencyName);
+            }
+
             loadSearchResults();
             return;
         }
@@ -354,7 +371,7 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inParentAgencyId": $("#txtParentAgencyId").val(),
-                "inParentAgencyName": $("#txtParentAgencyName").val(),
+                "inParentAgencyName": $("#txtParentAgencyName").val().toUpperCase(),
                 "inIsNew": bIsNew
             }),
             processData: false,
@@ -461,6 +478,8 @@
 
         setLocalStorage("gSearchResults", "");
 
+        cleanupBackButton();
+
         turnOnLinkParentAgency();
 
     }
@@ -526,5 +545,9 @@
             //show
             $(".link-parent").show();
         }
+    }
+
+    function loadLastSearchFromBackButton() {
+        loadReportParameters();
     }
 </script>
