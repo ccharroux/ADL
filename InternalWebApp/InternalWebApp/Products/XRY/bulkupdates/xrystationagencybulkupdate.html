@@ -127,17 +127,14 @@
             width: 240px !important;
         }
 
-        select.dropdown-select {
-            width: 240px !important;
-        }
-
-        input[type=text] {
+        input[type=text].report-filter {
             width: 240px !important;
         }
 
         select#dtResults_length, select#dtUpdates_length {
             width: 60px !important;
         }
+        
     </style>
 </head>
 <body>
@@ -152,7 +149,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>Station Agency Bulk Updates</h2>
+                        <h2>Station Agency<br/>Bulk Updates</h2>
                     </div>
                 </div>
 
@@ -172,34 +169,37 @@
                 <div class="row search-section">
 
                     <div class="row" style="margin-bottom: 20px;">
-                        <div class="col-md-2">
+                        <div class="col-md-4 text-align-left">
                             <label for="ddlMarket" class="dropdown-label" style="color: red;"> * Market</label><br />
                             <select id="ddlMarket" onchange="getOwnerList(['ddlOwner'], this.options[this.selectedIndex].value, '-1');" class="dropdown-select report-filter mkaRequired" errorMessage="Please select a Market to search."></select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-4 text-align-left">
                             <label for="ddlOwner" class="dropdown-label">Owner</label><br />
                             <select id="ddlOwner" class="dropdown-select report-filter"></select>
                         </div>
-                        <div class="col-md-2">
-                            <label for="txtStationAgency" class="dropdown-label"> ** Station Agency</label><br />
-                            <input type="text" id="txtStationAgency" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter a Station Advertiser Name to search." />
-                        </div>
-                        <div class="col-md-2">
-                            <label for="txtMarketAgency" class="dropdown-label"> ** Market Agency</label><br />
-                            <input type="text" id="txtMarketAgency" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter a Market Advertiser Name to search." />
-                        </div>
-                        <div class="col-md-2">
+                        
+                        <div class="col-md-4 text-align-left">
                             <label for="ddlAccountType" class="dropdown-label">Account Type</label><br />
                             <select id="ddlAccountType" class="dropdown-select report-filter"></select>
                         </div>
-                        <div class="col-md-2">
+                        
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 text-align-left">
+                            <label for="txtStationAgency" class="dropdown-label"> ** Station Agency</label><br />
+                            <input type="text" id="txtStationAgency" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter a Station Advertiser Name to search." />
+                        </div>
+                        <div class="col-md-4 text-align-left">
+                            <label for="txtMarketAgency" class="dropdown-label"> ** Market Agency</label><br />
+                            <input type="text" id="txtMarketAgency" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter a Market Advertiser Name to search." />
+                        </div>
+                        <div class="col-md-4">
                             <div style="display:table-cell; float:right">
                                 <label class="dropdown-label">&nbsp;</label><br />
-                                <input type="button" class="search-button" value="Search" onclick="clearUpdateFields(); searchForStationAgency();" />
+                                <input type="button" class="search-button" value="Search" onclick="searchForStationAgency();" />
                             </div>
                         </div>
                     </div>
-
                     <div class="row">
                         <div class="col-md-12 multi-field-message-area">
                             <p class="multi-field-message" style="text-align: left;">&nbsp;** At least one of the following fields needs to be entered: Station Agency or Market Agency.</p>
@@ -209,19 +209,28 @@
                     <div id="matchInfo" class="match-info">
                         <h3 class="match-info-header">Update Information</h3>
                         <div class="row">
-                            <div class="col-md-3 match-info-row">
+                            <div class="col-md-6 match-info-row text-align-left">
                                 <input type="hidden" id="txtUpdateMarketAgencyId" value="" />
                                 <label for="txtUpdateMarketAgency" class="dropdown-label">Market Agency</label><br/>
-                                <input type="text" id="txtUpdateMarketAgency" readonly="readonly" style="width: 450px !important;" maxlength="50" class="report-filter" />
+                                <input type="text" id="txtUpdateMarketAgency" readonly="readonly" maxlength="50" class="field-width-450 disabled" />
                             </div>
-                            <div class="col-md-2 match-info-row">
+                            <div class="col-md-4 match-info-row text-align-left">
                                 <label for="ddlUpdateAccountType" class="dropdown-label">Account Type</label><br/>
-                                <select id="ddlUpdateAccountType" disabled="disabled" class="dropdown-select report-filter"></select>
+                                <select id="ddlUpdateAccountType" disabled="disabled" class="disabled"></select>
                             </div>
-                            <div class="col-md-7 match-info-row"style="text-align:right">
+                            <div class="col-md-2 match-info-row text-align-right">
                                 <label for="btnUpdate" class="dropdown-label">&nbsp;</label><br />
-                                <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startStationAgencyUpdate();" />
+                                <input type="button" id="btnUpdate" disabled="disabled" class="search-button disabled-button" value="Update" onclick="startStationAgencyUpdate();" />
                             </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-md-6 table-titles" style="text-align: center">
+                            <h3>Search Results</h3>
+                        </div>
+                        <div class="col-md-6 table-titles" style="text-align: center">
+                            <h3>Items to be Updated</h3>
                         </div>
                     </div>
 
@@ -281,12 +290,19 @@
 </body>
 </html>
 <script>
+
+    var selectedTableItems = new Array();
+
     $(document).ready(function () {
         buildXRYMenu("Audit");
         getMarketsByProduct();
         getAccountTypes(["ddlAccountType", "ddlUpdateAccountType"], "-1");
         getOwnerList(["ddlOwner"], "-1", "-1");
         buildQuickReports(['xry']);
+
+        $(".table-titles").hide();
+
+        cleanupBackButton();
     });
 
     function getMarketsByProduct() {
@@ -438,8 +454,8 @@
 
         var sUrl = ServicePrefix + "/api/StationAgencyAudit/GetStationAgencyAuditList?";
         sUrl += "inApiToken=" + getLocalStorage("APIToken");
-        sUrl += "&inStationAgencyName=" + $("#txtStationAgency").val();
-        sUrl += "&inMarketAgencyName=" + $("#txtMarketAgency").val();
+        sUrl += "&inStationAgencyName=" + encodeURIComponent($("#txtStationAgency").val());
+        sUrl += "&inMarketAgencyName=" + encodeURIComponent($("#txtMarketAgency").val());
         sUrl += "&inMarketId=" + $("#ddlMarket").val();
         sUrl += "&inAccountTypeId=" + $("#ddlAccountType").val();
         sUrl += "&inOwnerId=" + $("#ddlOwner").val();
@@ -458,6 +474,10 @@
                 } else {
                     loadResultsData(data);
                     loadMatchingData(data);
+                    $(".table-titles").show();
+
+                    loadSelectedResultsRows();
+                    loadSelectedTableItems();
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -479,7 +499,8 @@
         columnsToDisplay.push({
             "mRender": function (data, type, row) {
                 return '<input type="radio" id="rdo_' + row.stationAgencyId + '" name="agencies" onclick="loadUpdateInformation(' + row.stationAgencyId + ',' + row.marketAgencyId +
-                    ',\'' + row.MarketAgencyWithoutId + '\',' + row.accountTypeId + '); markAsNotSelectable(' + row.stationAgencyId + '); fixResultsSelect(' + row.stationAgencyId + ');">';
+                    ',\'' + row.MarketAgencyWithoutId + '\',' + row.accountTypeId + '); getSelectedResultsRows(' + row.stationAgencyId + '); markAsNotSelectable(' + row.stationAgencyId +
+                    '); fixResultsSelect(' + row.stationAgencyId + ');">';
             },
             "orderable": false,
             "searchable": false
@@ -493,12 +514,12 @@
             "searchable": false
         });
 
-        columnsToDisplay.push({
-            "title": "Market",
-            "visible": true,
-            "mData": "Market",
-            "orderable": true
-        });
+        //columnsToDisplay.push({
+        //    "title": "Market",
+        //    "visible": true,
+        //    "mData": "Market",
+        //    "orderable": true
+        //});
         columnsToDisplay.push({
             "title": "Station",
             "visible": true,
@@ -616,12 +637,12 @@
             "searchable": false
         });
 
-        columnsToDisplay.push({
-            "title": "Market",
-            "visible": true,
-            "mData": "Market",
-            "orderable": true
-        });
+        //columnsToDisplay.push({
+        //    "title": "Market",
+        //    "visible": true,
+        //    "mData": "Market",
+        //    "orderable": true
+        //});
         columnsToDisplay.push({
             "title": "Station",
             "visible": true,
@@ -691,7 +712,7 @@
                 orderable: false,
                 className: 'select-checkbox'
             }],
-            "select": "multi",
+            "select": "os",
             "language": {
                 search: "Filter Results:"
             },
@@ -702,20 +723,12 @@
 
         matchTable.on('select', function (e, dt, type, indexes) {
             if (type === 'row') {
-                var rows = matchTable.rows(indexes).nodes();
-                $.each($(rows),
-                    function () {
-                        if ($(this).hasClass('not-selectable')) {
-                            matchTable.row($(this)).deselect();
-                        }
-                    }
-                );
-
+                
                 var count = matchTable.rows({ selected: true }).count();
                 if (count > 0) {
                     $("#dtUpdates_filter input").hide();
                     $("#dtUpdates_filter label").hide();
-                    $("#btnUpdate").show();
+                    $("#btnUpdate").prop("disabled", false).removeClass("disabled-button");
                 }
             }
         });
@@ -726,7 +739,7 @@
             if (count == 0) {
                 $("#dtUpdates_filter input").show();
                 $("#dtUpdates_filter label").show();
-                $("#btnUpdate").hide();
+                $("#btnUpdate").prop("disabled", true).addClass("disabled-button");
             }
         });
 
@@ -761,11 +774,11 @@
 
         $("#dtUpdates_filter input").show();
         $("#dtUpdates_filter label").show();
-        $("#btnUpdate").hide();
+        //$("#btnUpdate").hide();
 
         var updateRowId = $('#dtUpdates').dataTable().fnFindCellRowIndexes(stationAgencyId, 1);
         $(updateTable.row(updateRowId).node()).addClass('not-selectable');
-        updateTable.row(updateRowId).deselect();
+        //updateTable.row(updateRowId).deselect();
 
         $.unblockUI();
 
@@ -833,6 +846,7 @@
 
         //load array of station agencies based on the api, etc.
         var updateStationAgencyIds = new Array();
+        selectedTableItems = new Array();
 
         var updatesTable = $("#dtUpdates").DataTable();
 
@@ -841,6 +855,10 @@
             updateStationAgencyIds.push({
                 "inStationId": d.stationId,
                 "inStationAgencyName": d.StationAgencyWithoutId
+            });
+
+            selectedTableItems.push({
+                "stationAgencyId": d.stationAgencyId
             });
         });
 
@@ -928,7 +946,7 @@
                 } else {
                     bootbox.alert("All station advertisers have been updated.", function () { });
                     searchForStationAgency();
-                    clearUpdateFields();
+                    //clearUpdateFields();
                 }
             },
             error: function (jQxhr, textStatus, errorThrown) {
@@ -974,4 +992,52 @@
         $.unblockUI();
     }
 
+    function getSelectedResultsRows(stationAgencyId) {
+        setLocalStorage("gResultsRowSelected", "");
+
+        var resultsSelectedItem = new Array();
+
+        resultsSelectedItem.push({
+            "stationAgencyId": stationAgencyId
+        });
+
+        setLocalStorage("gResultsRowSelected", JSON.stringify(resultsSelectedItem));
+    }
+
+    function loadSelectedResultsRows() {
+        if (getLocalStorage("gResultsRowSelected").length <= 0) {
+            return;
+        }
+
+        var resultsSelectedItems = $.parseJSON(getLocalStorage("gResultsRowSelected"));
+
+        var tbResults = $("#dtResults").DataTable();
+
+        for (var i = 0; i < resultsSelectedItems.length; i++) {
+            var selectedItem = resultsSelectedItems[i];
+            var resultRowId = $('#dtResults').dataTable().fnFindCellRowIndexes(selectedItem.stationAgencyId, 1);
+            $(tbResults.row(resultRowId).node()).addClass('selected');
+            $("#rdo_" + selectedItem.stationAgencyId).click();
+        }
+
+    }
+
+    function loadSelectedTableItems() {
+        if (selectedTableItems.length == 0) {
+            return;
+        }
+
+        var tbUpdates = $("#dtUpdates").DataTable();
+
+        for (var i = 0; i < selectedTableItems.length; i++) {
+            var selectedItem = selectedTableItems[i];
+            tbUpdates.rows(function (idx, data, node) {
+                if (data.stationAgencyId === selectedItem.stationAgencyId) {
+                    tbUpdates.row(idx).select();
+                }
+            });
+        }
+
+        selectedTableItems = new Array();
+    }
 </script>
