@@ -1093,6 +1093,20 @@
             return;
         }
 
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Can't send reminders: Failed to get result from InsertRemindersIntoQueue");
+            return;
+        }
+
+        if (data.report.rows[0].remindersSent <= 0) {
+            var failureReason = data.report.rows[0].failureReason;
+            if (failureReason == null || failureReason.trim() == "") {
+                failureReason = "(unknown)";
+            }
+            bootbox.alert("Can't send reminders: " + failureReason);
+            return;
+        }
+
         getReminders();
     }
 
