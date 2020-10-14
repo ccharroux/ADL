@@ -380,6 +380,7 @@
 
     //global vars
 
+    var productId = "";
     var personnelId = 0;
     var nameOfUser = "";
     var emailAddress = "";
@@ -401,8 +402,9 @@
         loadProductList();
         getPersonnelWebSetup();
         
-
         gDataTableDefaultRows = 10;
+
+
     });
 
     function buildUIDialogs() {
@@ -1258,6 +1260,7 @@
         //gets nameOfUser param from /admin/personnel/personnellist.html page
         getPageParameters();
 
+        productId = getParameterByName("productId");
 
         $("#nameOfPersonnel").html("<a onclick='goToPersonnelPage()'>" + nameOfUser.toUpperCase()+ "</a>");
     }
@@ -2267,6 +2270,8 @@
 
         $("#ddlProduct").append(str);
 
+        var bProductSelected = false;
+
         $.ajax({
             url: ServicePrefix + '/api/Personnel/GetPersonnelProductList',
             dataType: 'json',
@@ -2290,7 +2295,18 @@
                         str = '';
                         var obj = data.report.rows[index];
                         if (obj.active == true) {
-                            str = str + '<option value="' + obj.productId.toUpperCase() + '">';
+                            str = str + '<option value="' + obj.productId.toUpperCase();
+                            str = str + '"';
+
+                            if (productId.toUpperCase() == obj.productId.toUpperCase())
+                            {
+                                bProductSelected = true;
+                                str = str + " selected ";
+                            }
+
+                            str = str + '">';
+
+
                             str = str + obj.productId.toUpperCase();
                             str = str + '</option>';
                         }
@@ -2300,6 +2316,10 @@
 
                     convertToChosenSelect("ddlProduct", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
+                    if (bProductSelected == true)
+                    {
+                        loadScreenForProductChange();
+                    }
                 }
 
             },
