@@ -126,24 +126,26 @@
         }
 
         th.select-checkbox {
-            width: 15px;
+            width: 20px !important;
         }
 
         select.report-filter
         {
             width: 240px !important;
         }
-        select.dropdown-select
+        
+        input[type=text].report-filter
         {
             width: 240px !important;
         }
-        input[type=text]
-        {
-            width: 240px !important;
-        }
+        
         select#dtResults_length, select#dtUpdates_length
         {
             width: 60px!important;
+        }
+
+        .dataTables_length {
+            padding-top: 0;
         }
     </style>
 
@@ -180,11 +182,11 @@
                             <label for="ddlOwner" class="dropdown-label">Owner</label><br />
                             <select id="ddlOwner" class="dropdown-select report-filter"></select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label for="dtStartDate" class="dropdown-label" style="color: red;"> * Start Date</label><br />
                             <input type="text" id="dtStartDate" class="report-filter mkaRequired" style="text-align:center; max-width: 100px;" errorMessage="Please enter a Start Date to search.">
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label for="dtEndDate" class="dropdown-label" style="color: red;"> * End Date</label><br />
                             <input type="text" id="dtEndDate" class="report-filter mkaRequired" style="text-align:center; max-width: 100px;" errorMessage="Please enter a End Date to search.">
                         </div>
@@ -192,20 +194,18 @@
 
 
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-3 text-align-left">
                             <label for="txtMarketAdvertiser" class="dropdown-label"> ** Market Advertiser</label><br />
                             <input type="text" id="txtMarketAdvertiser" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter an Advertiser Name to search." />
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-3 text-align-left">
                             <label for="txtMarketAgency" class="dropdown-label"> ** Market Agency</label><br />
                             <input type="text" id="txtMarketAgency" maxlength="50" class="report-filter multi-field-search" errorMessage="Please enter an Agency Name to search." />
                         </div>
 
-                        <div class="col-md-6">
-                            <div style="display:table-cell; float:right">
-                                <label class="dropdown-label">&nbsp;</label><br />
-                                <input type="button" class="search-button" value="Search" onclick="searchForAdvertiserRevenue(false);" /> <!--clearUpdateFields(); -->
-                            </div>
+                        <div class="col-md-6 text-align-right">
+                            <label class="dropdown-label">&nbsp;</label><br />
+                            <input type="button" class="search-button" value="Search" onclick="searchForAdvertiserRevenue(false);" />
                         </div>
                     </div>
 
@@ -219,27 +219,29 @@
                     <div id="matchInfo" class="match-info">
                         <h3 class="match-info-header">Update Information</h3>
                         <div class="row">
-                            <div class="col-md-5 match-info-row">
+                            <div class="col-md-6 match-info-row text-align-left">
                                 <!--
                                 turn these into search boxes
                                 -->
-                                <input type="hidden" id="txtUpdateMarketAdvertiserId" class="report-filter" value="" />
+                                <input type="hidden" id="txtUpdateMarketAdvertiserId" class="update-filter" value="" />
                                 <label for="txtUpdateMarketAdvertiser" class="dropdown-label">Market Advertiser</label><br />
-                                <input type="text" id="txtUpdateMarketAdvertiser" onclick="includeInBackButton(); searchMarketAdvertiser();" readonly="readonly" style="width: 450px !important;" maxlength="50" class="report-filter" />
-                            </div>
-                            <div class="col-md-5 match-info-row">
-                                <input type="hidden" id="txtUpdateMarketAgencyId" class="report-filter" value="" />
-                                <label for="txtUpdateMarketAgency" class="dropdown-label">Market Agency</label><br />
-                                <input type="text" id="txtUpdateMarketAgency" onclick="includeInBackButton(); searchMarketAgency();" readonly="readonly" style="width: 450px !important;" maxlength="50" class="report-filter" />
-                            </div>
-                            <div class="col-md-2 match-info-row" style="text-align:right">
-                                <label class="dropdown-label">&nbsp;</label><br />
-                                <input type="button" id="btnUpdate" style="display: none;" class="search-button" value="Update" onclick="startAdvertiserRevenueUpdate();" />
+                                <input type="text" id="txtUpdateMarketAdvertiser" onclick="includeInBackButton(); searchMarketAdvertiser();" readonly="readonly" maxlength="50" class="update-filter field-width-450" />
                             </div>
                         </div>
-                        <div class="row" id="updateInformationInstuctions" style="display:none">
+                        <div class="row">
+                            <div class="col-md-6 match-info-row text-align-left">
+                                <input type="hidden" id="txtUpdateMarketAgencyId" class="update-filter" value="" />
+                                <label for="txtUpdateMarketAgency" class="dropdown-label">Market Agency</label><br />
+                                <input type="text" id="txtUpdateMarketAgency" onclick="includeInBackButton(); searchMarketAgency();" readonly="readonly" maxlength="50" class="update-filter field-width-450" />
+                            </div>
+                            <div class="col-md-6 match-info-row text-align-right">
+                                <label class="dropdown-label">&nbsp;</label><br />
+                                <input type="button" id="btnUpdate" disabled="disabled" class="search-button disabled-button" value="Update" onclick="startAdvertiserRevenueUpdate();" />
+                            </div>
+                        </div>
+                        <div class="row" id="updateInformationInstuctions">
                             <div class="col-md-12 text-align-left">
-                                Click the Market Advertiser or Market Agency box to search for Update Information.
+                                Click the Market Advertiser or Market Agency box to search for new Market Advertisers and Agencies.
                             </div>
                         </div>
                     </div>
@@ -659,7 +661,7 @@
             //shift/ctrl mouse click
             "select": "os",
             "language": {
-                search: "Filter Results:"
+                search: "Filter:"
             },
             "buttons": [
             ]
@@ -671,8 +673,8 @@
                 if (count > 0) {
                     $("#dtResults_filter input").hide();
                     $("#dtResults_filter label").hide();
-                    $("#btnUpdate").show();
-                    $("#updateInformationInstuctions").show();
+                    $("#btnUpdate").prop("disabled", false).removeClass("disabled-button");
+                    //$("#updateInformationInstuctions").show();
                 }
             }
         });
@@ -681,9 +683,9 @@
 
             var count = searchTable.rows({ selected: true }).count();
             if (count == 0) {
-                //clearUpdateFields();
                 $("#dtResults_filter input").show();
                 $("#dtResults_filter label").show();
+                $("#btnUpdate").prop("disabled", true).addClass("disabled-button");
             }
         });
 
@@ -834,6 +836,13 @@
             }
         });
 
+        $(".update-filter").each(function () {
+            var control = $(this).attr("id");
+            if (control.indexOf("_chosen") == -1) {
+                searchCriteriaObj[control] = $(this).val();
+            }
+        });
+
         if (!$.fn.DataTable.isDataTable('#dtResults')) {
             return;
         }
@@ -869,6 +878,13 @@
         }
 
         $(".report-filter").each(function () {
+            var control = $(this).attr("id");
+            if (control.indexOf("_chosen") == -1) {
+                searchCriteriaObj[control] = $(this).val();
+            }
+        });
+
+        $(".update-filter").each(function () {
             var control = $(this).attr("id");
             if (control.indexOf("_chosen") == -1) {
                 searchCriteriaObj[control] = $(this).val();
@@ -1018,7 +1034,6 @@
                 } else {
                     bootbox.alert("All advertiser revenue have been redirected.", function () { });
                     searchForAdvertiserRevenue();
-                    //clearUpdateFields();
                 }
             },
             error: function (jQxhr, textStatus, errorThrown) {
@@ -1036,19 +1051,6 @@
         } else {
             return true;
         }
-    }
-
-    function clearUpdateFields() {
-        $("#txtUpdateMarketAdvertiserId").val("");
-        $("#txtUpdateMarketAdvertiser").val("");
-        $("#txtUpdateMarketAgencyId").val("");
-        $("#txtUpdateMarketAgency").val("");
-
-        $("#btnUpdate").hide();
-        $("#updateInformationInstuctions").hide();
-        $("#dtResults_filter input").show();
-        $("#dtResults_filter label").show();
-
     }
 
     function loadLastSearchFromBackButton() {
