@@ -120,7 +120,7 @@
         }
 
         th.select-checkbox {
-            width: 15px;
+            width: 20px !important;
         }
 
         select.report-filter {
@@ -133,6 +133,10 @@
 
         select#dtResults_length, select#dtUpdates_length {
             width: 60px !important;
+        }
+
+        .dataTables_length {
+            padding-top: 0;
         }
     </style>
 
@@ -675,6 +679,8 @@
                     loadSelectedResultsRows();
                     loadSelectedTableItems();
                     loadSelectedUpdateRows();
+
+                    selectNewParentAdvertiser();
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -725,18 +731,6 @@
             "mData": "Advertiser",
             "orderable": true
         });
-        //columnsToDisplay.push({
-        //    "title": "Industry",
-        //    "visible": true,
-        //    "mData": "Industry",
-        //    "orderable": true
-        //});
-        //columnsToDisplay.push({
-        //    "title": "Sub Industry",
-        //    "visible": true,
-        //    "mData": "Sub Industry",
-        //    "orderable": true
-        //});
 
         columnsToDisplay.push({
             "title": "Industry /<br/>Sub Industry",
@@ -795,7 +789,7 @@
                 selector: 'td:not(:first-child)'
             },
             language: {
-                search: "Filter Results:"
+                search: "Filter:"
             },
             "buttons": [
             ]
@@ -856,20 +850,6 @@
             "orderable": true
         });
 
-        //columnsToDisplay.push({
-        //    "title": "Industry",
-        //    "visible": true,
-        //    "mData": "Industry",
-        //    "orderable": true
-        //});
-
-        //columnsToDisplay.push({
-        //    "title": "Sub Industry",
-        //    "visible": true,
-        //    "mData": "Sub Industry",
-        //    "orderable": true
-        //});
-
         columnsToDisplay.push({
             "title": "Industry /<br/>Sub Industry",
             "visible": true,
@@ -923,7 +903,7 @@
             }],
             "select": "os",
             "language": {
-                search: "Filter Results:"
+                search: "Filter:"
             },
             "buttons": [
             ]
@@ -941,7 +921,6 @@
             {
                 $("#dtUpdates_filter input").hide();
                 $("#dtUpdates_filter label").hide();
-                //$("#btnCreateParent").prop("disabled", false).removeClass("disabled-button");
                 $("#btnUpdate").prop("disabled",false).removeClass("disabled-button");
                 $("#btnLinkMarketAdvertiser").prop("disabled", false).removeClass("disabled-button");
             }
@@ -1244,7 +1223,7 @@
         getSelectedUpdateRows();
         var sMarketAdvertiser = encodeURIComponent($("#txtUpdateMarketAdvertiser").val());
         window.location = "/Admin/ParentAdvertiser/parentadvertiser.html?ParentAdvertiserID=0&MarketAdvertiserName=" + sMarketAdvertiser +
-            "&IndustryID=" + $("#ddlUpdateIndustry").val() + "&SubIndustryID=" + $("#ddlUpdateSubIndustry").val();
+            "&IndustryID=" + $("#ddlUpdateIndustry").val() + "&SubIndustryID=" + $("#ddlUpdateSubIndustry").val() + "&FromAudit=true";
     }
 
     function linkMarketAdvertiser()
@@ -1352,5 +1331,19 @@
 
         loadReportParameters();
         searchForMarketAdvertiser(true);
+    }
+
+    function selectNewParentAdvertiser()
+    {
+
+        if (getLocalStorage("gNewParentAdvertiser").length <= 0)
+        {
+            return;
+        }
+
+        var newParentAdvertiser = $.parseJSON(getLocalStorage("gNewParentAdvertiser"));
+        $("#ddlUpdateParentAdvertiser").val(newParentAdvertiser["parentAdvertiserId"]);
+
+        setLocalStorage("gNewParentAdvertiser", "");
     }
 </script>
