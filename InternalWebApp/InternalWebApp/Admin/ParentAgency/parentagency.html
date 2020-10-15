@@ -206,6 +206,7 @@
     var bLinkParentAgency = false;
     var bIsNew = false;
     var sMarketAgencyName = "";
+    var bFromAudit = false;
 
     $(document).ready(function () {
 
@@ -235,6 +236,8 @@
         bIsNew = parentAgencyId <= 0;
 
         sMarketAgencyName = getParameterByName("MarketAgencyName") == null ? "" : getParameterByName("MarketAgencyName");
+
+        bFromAudit = getParameterByName("FromAudit") == null ? false : getParameterByName("FromAudit").toLowerCase() == 'true';
     }
 
     function getParentAgency()
@@ -387,6 +390,18 @@
                         var obj = data.report.rows[0];
 
                         $("#txtParentAgencyId").val(obj["_updateStatus"]);
+
+                        if (bFromAudit) {
+                            setLocalStorage("gNewParentAgency", "");
+
+                            var newParentAgency = {
+                                "parentAgencyId": obj["_updateStatus"]
+                            };
+
+                            setLocalStorage("gNewParentAgency", JSON.stringify(newParentAgency));
+                        } else {
+                            setLocalStorage("gNewParentAgency", "");
+                        }
 
                         window.location = "/admin/parentagency/parentagency.html?ParentAgencyID=" + $("#txtParentAgencyId").val();
                     }
