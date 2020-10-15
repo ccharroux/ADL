@@ -236,6 +236,7 @@
     var iIndustryId = -1;
     var iSubIndustryId = -1;
     var sMarketAdvertiserName = "";
+    var bFromAudit = false;
 
     $(document).ready(function () {
 
@@ -263,6 +264,9 @@
         sMarketAdvertiserName = getParameterByName("MarketAdvertiserName") == null ? "" : getParameterByName("MarketAdvertiserName");
         iIndustryId = getParameterByName("IndustryID") == null ? -1 : getParameterByName("IndustryID");
         iSubIndustryId = getParameterByName("SubIndustryID") == null ? -1 : getParameterByName("SubIndustryID");
+
+        bFromAudit = getParameterByName("FromAudit") == null ? false : getParameterByName("FromAudit").toLowerCase() == 'true';
+
     }
 
     function setupUI()
@@ -546,6 +550,17 @@
                         var obj = data.report.rows[0];
 
                         $("#txtParentAdvertiserId").val(obj["_updateStatus"]);
+
+                        if (bFromAudit)
+                        {
+                            setLocalStorage("gNewParentAdvertiser", "");
+
+                            var newParentAdvertiser = {
+                                "parentAdvertiserId": obj["_updateStatus"]
+                            };
+
+                            setLocalStorage("gNewParentAdvertiser", JSON.stringify(newParentAdvertiser));
+                        }
 
                         window.location = "/admin/parentadvertiser/parentadvertiser.html?ParentAdvertiserID=" + $("#txtParentAdvertiserId").val();
                     }
