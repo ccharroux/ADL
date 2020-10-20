@@ -122,6 +122,10 @@
                                     <select id="ddlMarket" style="width:220px" onchange="getStations();"></select>
                                 </div>
                                 <div class="col-md-3">
+                                    <label for="ddlOwner">Owner</label><br />
+                                    <select id="ddlOwner" style="width:220px" onchange="getMarkets();"></select>
+                                </div>
+                                <div class="col-md-3">
                                     <label for="ddlYearPeriod">Year-Period</label><br />
                                     <select id="ddlYearPeriod" onchange="getRevenueDetail();"></select><br />
                                     <a href="#" onclick="moveToPreviousPeriod();">Previous Period</a> | <a href="#" onclick="moveToNextPeriod();">Next Period</a>
@@ -183,7 +187,7 @@
                         <div class="stationNavigation">
                             <div class="col-md-6 ">
                                 <label for="ddlStation">Station</label>
-                                <select id="ddlStation" onchange="getRevenueDetail();"></select>
+                                <select id="ddlStation" onchange="getRevenueDetail();"></select>&nbsp;&nbsp;<span id="spOwnerName"></span>
                                 <div class="stationNavigation" style="display:none">
                                     <a href="#" onclick="moveToPreviousStation();">Previous Station</a> | <a href="#" onclick="moveToNextStation();">Next Station</a>
                                 </div>
@@ -301,6 +305,7 @@
     var gotMarkets = false;
     var gotYearsPeriods = false;
     var gotStations = false;
+    var gotOwners = false;
     var initializedRevenueDetail = false;
     var revenueDetailChanged = false;
     var needUnrank = false;
@@ -314,7 +319,10 @@
 
         buildTVBMenu('Revenue');
         buildUIDialogs();
-        getMarkets();
+
+        getOwnerListByProduct();
+
+        //getMarkets();
         // stations will be loaded once market is selected
         getYearsPeriods();
         getRevenueDetail(); // just to initialize table
@@ -540,6 +548,12 @@
     }
 
     function getMarkets() {
+
+        if (!gotOwners)
+        {
+            return;
+        }
+
         var url = ServicePrefix + '/api/Market/GetMarketListForReminders';
 
         var settings = {
@@ -549,7 +563,8 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inProductId": "TVB",
-                "inActiveOnly": true
+                "inActiveOnly": true,
+                "inOwnerId": $("#ddlOwner").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -661,7 +676,8 @@
             + '&inMarketId=' + $('#ddlMarket').val()
             + '&inActiveOnly=true'
             + '&inOmitNonReportingStations=true'
-            + '&inTimeSalesOnly=true';
+            + '&inTimeSalesOnly=true'
+            + '&inOwnerId=' + $('#ddlOwner').val();
 
         var settings = {
             dataType: 'json',
@@ -714,7 +730,7 @@
             $(".marketStatus").show();
             $(".marketStatusEmpty").hide();
             $(".stationNavigation").show();
-            str = str + '<option value="' + data.report.rows[index].reid + '">' + data.report.rows[index].fullName + '</option>';
+            str = str + '<option value="' + data.report.rows[index].reid + '" data-owner-name="' + data.report.rows[index].owner + '">' + data.report.rows[index].fullName + '</option>';
 
         });
 
@@ -786,6 +802,15 @@
 
     function getRevenueDetail()
     {
+
+        if ($("#ddlOwner").val() == "-1") {
+            //assign value to span
+            $("#spOwnerName").html("Owner:&nbsp;&nbsp;" + buildOwnerWrapper($("#ddlStation :selected").data("owner-name")));
+        } else {
+            //clear span
+            $("#spOwnerName").html("");
+        }
+
         $("#dtRevenueDetail").hide();
         $("#dtRevenueDetail_wrapper").hide();
         setStationLabels();
@@ -2005,6 +2030,51 @@
         else {
             bootbox.alert("Station Comment Updated");
         }
+    }
+
+    function getOwnerListByProduct() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerListByProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": 'TVB'
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOwnersSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function getOwnersSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+
+        var str = '';
+
+        $("#ddlOwner").html("<option value='-1'> -- Select an Owner</option>");
+
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str = str + "<option value='" + obj.ownerid + "'>" + obj.ownername + "</option>";
+
+        });
+        $("#ddlOwner").append(str);
+
+        convertToChosenSelect('ddlOwner', gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotOwners = true;
+
+        getMarkets();
     }
 
 </script>
