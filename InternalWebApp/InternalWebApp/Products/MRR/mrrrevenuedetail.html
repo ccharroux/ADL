@@ -127,27 +127,31 @@
                                 <div class="col-md-6">
                                     &nbsp;
                                 </div>
-                                <div class="col-md-6" style="color:green;font-style:italic">
+                                <div class="col-md-6" style="color: #1FB57B;font-style:italic">
                                     additional filters
                                 </div>
  
                             </div>
                             <div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label for="ddlMarket" >Market</label><br />
                                     <select id="ddlMarket" class="report-filter" style="width:220px"   onchange="getStations();"></select>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
+                                    <label for="ddlOwner">Owner</label><br />
+                                    <select id="ddlOwner" class="report-filter" style="width:220px" onchange="getMarkets();"></select>
+                                </div>
+                                <div class="col-md-2">
                                     <label for="ddlYearPeriod">Year-Period</label><br />
                                     <select id="ddlYearPeriod" class="report-filter" onchange="getRevenueDetail();"></select><br />
                                     <a href="#" onclick="moveToPreviousPeriod();">Previous Period</a> | <a href="#" onclick="moveToNextPeriod();">Next Period</a>
                                </div>
  
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label for="ddlMediaType" >Media Type</label><br />
                                     <select id="ddlMediaType" class="report-filter"  onchange="getMarkets();"></select>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label for="ddlSchedule" >Schedule</label><br />
                                     <select id="ddlSchedule" class="report-filter"  onchange="getMarkets();"></select>
                                 </div>    
@@ -210,7 +214,7 @@
                             <div class="stationNavigation">
                                 <div class="col-md-6 " >
                                     <label for="ddlStation">Station</label>
-                                    <select id="ddlStation" onchange="getRevenueDetail();"></select>
+                                    <select id="ddlStation" onchange="getRevenueDetail();"></select>&nbsp;&nbsp;<span id="spOwnerName"></span>
                                     <div class="stationNavigation" style="display:none">
                                         <a href="#" onclick="moveToPreviousStation();">Previous Station</a> | <a href="#" onclick="moveToNextStation();">Next Station</a>
                                     </div>
@@ -382,6 +386,7 @@
     var gotMarkets = false;
     var gotYearsPeriods = false;
     var gotStations = false;
+    var gotOwners = false;
     var initializedRevenueDetail = false;
     var revenueDetailChanged = false;
     var revenueAmountsAllValid = true;
@@ -395,6 +400,7 @@
         buildUIDialogs();
         getMediaTypes();
         getSchedules();
+        getOwnerListByProduct();
         // markets will be loaded once media types and schedules are both loaded
         // stations will be loaded once market is selected
         getYearsPeriods();
@@ -786,8 +792,10 @@
 
     }
 
-    function getMarkets() {
-        if (!gotMediaTypes || !gotSchedules) {
+    function getMarkets()
+    {
+       
+        if (!gotMediaTypes || !gotSchedules || !gotOwners) {
             return;
         }
 
@@ -802,7 +810,8 @@
                 "inProductId": "MRR",
                 "inActiveOnly": true,
                 "inMediaTypeId": $("#ddlMediaType").val(),
-                "inScheduleId": $("#ddlSchedule").val()
+                "inScheduleId": $("#ddlSchedule").val(),
+                "inOwnerId": $("#ddlOwner").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -883,6 +892,53 @@
         getRevenueDetail();
     }
 
+    function getOwnerListByProduct() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerListByProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": 'MRR'
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr)
+            {
+                getOwnersSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function getOwnersSuccess(data, textStatus, jQxhr)
+    {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+       
+        var str = '';
+
+        $("#ddlOwner").html("<option value='-1'> -- Select an Owner</option>");
+
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str = str + "<option value='" + obj.ownerid + "'>" + obj.ownername + "</option>";
+
+        });
+        $("#ddlOwner").append(str);
+
+        convertToChosenSelect('ddlOwner', gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotOwners = true;
+
+        getMarkets();
+    }
+
     //--------------
     // Filters END
     //--------------
@@ -924,7 +980,8 @@
                 "inProductId": "MRR",
                 "inMarketId": $("#ddlMarket").val(),
                 "inActiveOnly": "1",
-                "inOmitNonReportingStations": "1"
+                "inOmitNonReportingStations": "1",
+                "inOwnerId": $("#ddlOwner").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -965,7 +1022,7 @@
             $(".marketStatus").show();
             $(".marketStatusEmpty").hide();
             $(".stationNavigation").show();
-            str = str + '<option value="' + data.report.rows[index].reid + '">' + data.report.rows[index].fullName + '</option>';
+            str = str + '<option value="' + data.report.rows[index].reid + '" data-owner-name="' + data.report.rows[index].Owner + '">' + data.report.rows[index].fullName + '</option>';
 
         });
 
@@ -1006,6 +1063,8 @@
         $("#ddlStationBottom").html($("#ddlStation option:selected").text());
         $("#stationStatusLabel").text("Station [ " + $("#ddlStation option:selected").text() + " ] Status:");
 
+        
+
         gotStations = true;
 
         getRevenueDetail();
@@ -1043,6 +1102,18 @@
 
     function getRevenueDetail()
     {
+        //put in code here to look at stuff
+        //assign value to ownership span
+        //doesn't meet criteria be sure to clear span
+
+        if ($("#ddlOwner").val() == "-1") {
+            //assign value to span
+            $("#spOwnerName").html("Owner:&nbsp;&nbsp;" + buildOwnerWrapper($("#ddlStation :selected").data("owner-name")));
+        } else {
+            //clear span
+            $("#spOwnerName").html("");
+        }
+
         $("#dtRevenueDetail").hide();
         setStationLabels();
         $("#txtStationComment").html("");
