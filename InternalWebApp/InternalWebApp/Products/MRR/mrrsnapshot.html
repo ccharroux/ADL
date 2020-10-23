@@ -153,7 +153,9 @@
                 <!-- data table html -->
                 <div class="dataTable-top-margin">
                     <div id="dtResultsHolder">
-                        <table id="dtResults" class="dataTable-border dataTable-headers dataTable-cell-border"></table>
+                        <table id="dtResults" class="dataTable-border dataTable-headers dataTable-cell-border">
+                            <tfoot></tfoot>
+                        </table>
                     </div>
                     <div id="noDataFound" style="display:none; color: red">No data found</div>
                 </div>
@@ -627,7 +629,7 @@
                     "visible": true,
                     "mData": objectName,
                     "orderable": bSortable,
-                    "className": className
+                    "className": className 
                 });
 
 
@@ -636,9 +638,13 @@
 
         loadResults(dataObj, columns);
     }
-    function IsInArray(arrayToSearch, valToFind) {
-        for (var i = 0; i < arrayToSearch.length; i++) {
-            if (arrayToSearch[i].toLowerCase() == valToFind.toLowerCase()) {
+
+    function IsInArray(arrayToSearch, valToFind)
+    {
+        for (var i = 0; i < arrayToSearch.length; i++)
+        {
+            if (arrayToSearch[i].toLowerCase() == valToFind.toLowerCase())
+            {
                 return true;
             }
         }
@@ -666,14 +672,17 @@
         //this code rebuilds the datatable with the updated data from the search 
         //or initial load.
 
-
         searchTable = $("#dtResults").DataTable({
             "dom": "Blfrtip",
-            "pageLength": gDataTableDefaultRows,
+            "pageLength": 25,
             "order": [],
             "data": results,
+            "footer": true,
             "columns": columns,
             "select": true,
+            'fnInitComplete' : function () {
+                $("thead tr").clone().appendTo($("tfoot")) ;
+            },
             language: {
                 search: "Filter Results:"
             },
@@ -731,6 +740,7 @@
             ],
         });
 
+  
     }
  
     function destroyDataTable()
@@ -751,7 +761,7 @@
         //Once you remove the datatable from the DOM, you need add the HTML back to the page.
         //I added a name to the DIV that has the table html. I used the datatable name plus added "Holder".
         //The following coding adds the table back.
-        $("#" + 'dtResults' + "Holder").html('<table id="dtResults" class="dataTable-border dataTable-headers dataTable-cell-border"></table>');
+        $("#" + 'dtResults' + "Holder").html('<table id="dtResults" class="dataTable-border dataTable-headers dataTable-cell-border"><tfoot> </tfoot> </table>');
     }
  
 
