@@ -1088,7 +1088,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Stations") + ' role="button" aria-expended="false">Stations<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block"><a href="/admin/station/stationlist.html?MenuItem=true class="approved"">Stations</a></li>';
+    menuItems += '                  <li style="display:block"><a href="/admin/station/stationlist.html?MenuItem=true" class="approved">Stations</a></li>';
     menuItems += '                  <li style="display:block"><a href="">MRR/X-Ray Link</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
