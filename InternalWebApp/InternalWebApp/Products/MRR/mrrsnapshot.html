@@ -47,7 +47,8 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.7/css/fixedHeader.dataTables.min.css">
+ 
     <!--Chosen Dropdown-->
     <link rel="stylesheet" href="/css/chosen.min.css" />
 
@@ -60,6 +61,18 @@
 
 
     <style>
+
+        #dtResults thead
+        {
+            display:none;
+        }
+
+        /*table.dataTable thead th, table.dataTable thead td {
+            padding: 3px 3px !important;
+            max-width: none !important;
+            font-size: 15px !important;
+            max-width: none;
+        }*/
          td.highlightBackground{
             background:   #aed6f1   !important;
         }
@@ -97,6 +110,23 @@
         {
             color: red !important;
         }
+
+        .dataTables_scrollBody
+        {
+            height: auto !important;
+            max-height: 480px !important;
+        }
+
+        td, th
+        {
+            max-width:35px !important;
+            min-width:35px !important;
+            width: 35px!important;
+        }
+        .dataTables_scrollBody
+        {
+            overflow-x: hidden!important;
+        } 
     </style>
 
 
@@ -154,7 +184,7 @@
                 <div class="dataTable-top-margin">
                     <div id="dtResultsHolder">
                         <table id="dtResults" class="dataTable-border dataTable-headers dataTable-cell-border">
-                            <tfoot></tfoot>
+ 
                         </table>
                     </div>
                     <div id="noDataFound" style="display:none; color: red">No data found</div>
@@ -192,6 +222,7 @@
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+    <script src="https://cdn.datatables.net/fixedheader/3.1.7/js/dataTables.fixedHeader.min.js" type="text/javascript"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
     <!--Chosen Dropdown-->
@@ -220,6 +251,8 @@
 
     $(document).ready(function ()
     {
+
+ 
         buildMRRMenu("Products");
         buildQuickReports(['mrr pre-release']);
         convertToChosenSelect("ddlQuickReport", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
@@ -629,6 +662,7 @@
                     "visible": true,
                     "mData": objectName,
                     "orderable": bSortable,
+ 
                     "className": className 
                 });
 
@@ -671,18 +705,24 @@
 
         //this code rebuilds the datatable with the updated data from the search 
         //or initial load.
+        var holdCategory = "";
+        var holdOwner = "";
 
         searchTable = $("#dtResults").DataTable({
             "dom": "Blfrtip",
             "pageLength": 25,
             "order": [],
             "data": results,
-            "footer": true,
+            "paging": false,
+            "autoWidth": true,
+            //fixedHeader: {
+            //    header: true 
+            //},
+            "scrollY": '800px',
+            "scrollX": false,
             "columns": columns,
             "select": true,
-            'fnInitComplete' : function () {
-                $("thead tr").clone().appendTo($("tfoot")) ;
-            },
+ 
             language: {
                 search: "Filter Results:"
             },
@@ -691,22 +731,61 @@
                 // if the second column cell is blank apply special formatting
                 //
                 //console.log(data["Station"]);
+
+
+                if (!data["Category"] == false) {
+                    var temp = data["Category"];
+                    if (data["Category"] == holdCategory)
+                    {
+                        row.cells[0].innerText = "";
+                    }
+                    holdCategory = temp;
+                }
+
+                //if (!data["Station"] == false) {
+                //    if (data["Station"] == "Total") {
+                //        //console.dir(row);
+                //        //console.log("HITTTTT");
+                //        $(row).addClass('highlightBackground');
+                //        if (!data["Category"] == false) {
+                //            row.cells[0].innerText = holdCategory;
+                //        }
+                //        row.cells[1].innerText = data["Owner"];
+                //    }
+                //}
+
+                if (!data["Owner"] == false) {
+                    var temp = data["Owner"];
+                    if (data["Owner"] == holdOwner) {
+                        row.cells[1].innerText = "";
+                    }
+                    holdOwner = temp;
+
+                    if (data["Owner"].indexOf("Total") > -1)
+                    {
+                        row.cells[1].innerText = data["Owner"];
+                        //console.dir(row);
+                        //console.log("HITTTTT");
+                        $(row).addClass('highlightBackground');
+                        if (!data["Category"] == false) {
+                            row.cells[0].innerText = holdCategory;
+                        }
+                    }
+
+                }
                 if (!data["Station"] == false) {
                     if (data["Station"] == "Total") {
                         //console.dir(row);
                         //console.log("HITTTTT");
                         $(row).addClass('highlightBackground');
+                        if (!data["Category"] == false) {
+                            row.cells[0].innerText = holdCategory;
+                        }
+                        row.cells[1].innerText = data["Owner"];
+                        holdCategory = "";
+                        
                     }
                 }
-
-                if (!data["Owner"] == false) {
-                    if (data["Owner"].indexOf("Total") > -1) {
-                        //console.dir(row);
-                        //console.log("HITTTTT");
-                        $(row).addClass('highlightBackground');
-                    }
-                }
-
             },
             "buttons": [
                //{
@@ -739,8 +818,8 @@
                }
             ],
         });
-
-  
+ 
+ 
     }
  
     function destroyDataTable()
@@ -761,7 +840,9 @@
         //Once you remove the datatable from the DOM, you need add the HTML back to the page.
         //I added a name to the DIV that has the table html. I used the datatable name plus added "Holder".
         //The following coding adds the table back.
-        $("#" + 'dtResults' + "Holder").html('<table id="dtResults" class="dataTable-border dataTable-headers dataTable-cell-border"><tfoot> </tfoot> </table>');
+        $("#" + 'dtResults' + "Holder").html('<table id="dtResults"   class="dataTable-border dataTable-headers dataTable-cell-border">  </table>');
+
+
     }
  
 
