@@ -51,14 +51,13 @@
             width: 300px !important;
         }
 
-        input[type=Text] 
-        {
+        input[type=Text] {
             width: 300px;
         }
-        .productButtonClass
-        {
-            margin-right:3px;
-            margin-left:3px;
+
+        .productButtonClass {
+            margin-right: 3px;
+            margin-left: 3px;
         }
     </style>
 </head>
@@ -77,7 +76,7 @@
                         <h2>Market</h2>
                     </div>
                 </div>
-                <div id="divQuickReport"  >
+                <div id="divQuickReport">
                     <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
                     <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
                 </div>
@@ -99,7 +98,7 @@
 
                         </div>
                     </div>
-                    
+
 
 
                     <!-- Market Number -->
@@ -177,10 +176,15 @@
                     </div>
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="ddlPartner">Partner</label>
+                            <label>Partner</label>
                         </div>
-                        <div class="col-md-9 text-align-left">
-                            Has been moved to product pages
+                        <div class="col-md-3 text-align-left">
+                            <label id="lblPartnerName" style="display: none;"></label>
+                            <input type="button" id="btnViewPartners" onclick="viewPartners();" value="View Partners" class="default-button" style="display: none;" />
+                        </div>
+                        <div class="col-md-3 text-align-left">
+                            <input type="button" id="btnUpdatePartners" onclick="updatePartners();" value="Update Partners" class="default-button" style="display: none;" />
+                            <label id="lblComplimentaryMarketUpdate" style="color: red; display: none;">* This is a complimentary market. Partner assignments can only be done on a primary market.</label>
                         </div>
                     </div>
                     <div class="row input-row">
@@ -285,9 +289,9 @@
 
     var marketId = 0;
     var bSecondaryMarketsOnly = false;
+    var bHasProductsEnabled = false;
 
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
 
         buildMainMenu("Markets");
         marketId = (getParameterByName("MarketID") == null ? 0 : getParameterByName("MarketID"));
@@ -296,8 +300,7 @@
         setLocalStorage("NonPrimaryOnly", bSecondaryMarketsOnly);
 
         // local storage for quick reports
-        if (marketId > 0)
-        {
+        if (marketId > 0) {
             //setLocalStorage("quickReportQS", "ddlMarket|" + marketId);
         }
         //else
@@ -306,6 +309,8 @@
         //}
 
         buildQuickReports(['market']);
+
+
 
         checkForInsertOrUpdate();
         getMediaTypes();
@@ -323,11 +328,10 @@
         cleanupBackButton();
 
         loadFeatureButtons();
-       
+
     });
 
-    function checkForInsertOrUpdate()
-    {
+    function checkForInsertOrUpdate() {
         if (marketId == 0 || marketId == null) {
 
         } else {
@@ -549,8 +553,7 @@
 
     function getProductListSuccess(data, textStatus, jQxhr) {
 
-        if (data.response.status != "SUCCESS")
-        {
+        if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
         }
         else {
@@ -571,7 +574,7 @@
 
                 // open master div
                 str = str + '<div class="row row_' + productId + '" style="display:none;padding-top:3px;">';
-        
+
                 // product name
                 str = str + '<div class="col-md-3" style="text-align:left">';
                 str = str + productId + " - " + obj.P_ProductName;
@@ -640,7 +643,7 @@
                 $("#productAddXRY").removeClass('hidden');
                 $("#productAddTVB").removeClass('hidden');
                 $("#productAddMSS").removeClass('hidden');
- 
+                setupPartnerSection();
             }
         }
 
@@ -649,7 +652,8 @@
     }
 
     function getMarketProducts() {
-        if (marketId <= 0 ) {
+        if (marketId <= 0) {
+
         }
 
         var url = ServicePrefix + '/api/Market/GetMarketProductList';
@@ -675,8 +679,7 @@
 
     }
 
-    function getMarketProductsSuccess(data, textStatus, jQxhr)
-    {
+    function getMarketProductsSuccess(data, textStatus, jQxhr) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
@@ -690,7 +693,7 @@
 
             var obj = data.report.rows[index];
 
-            // This code is added to restrict 
+            // This code is added to restrict
             // visibility of products that are NOT allowed
             // to be set up for a station
             // default is set to hidden in getProductListSuccess routine...
@@ -699,32 +702,29 @@
 
             $(".row_" + productId).show();
 
-            if (obj.activeDate != null && obj.activeFlag == true)
-            {
+            if (obj.activeDate != null && obj.activeFlag == true) {
                 $("#productEdit" + productId).removeClass('hidden');
                 $("#productDisable" + productId).removeClass('hidden');
                 $("#date" + productId).html(extractDateOnly(obj.activeDate));
                 $("#date" + productId).css("color", "green");
 
                 //chkPrimaryMarket
- 
-                if ($('#chkPrimaryMarket').is(':checked') == false)
-                {
+
+                if ($('#chkPrimaryMarket').is(':checked') == false) {
                     $("#productAddStations" + productId).removeClass('hidden');
                 }
-                else
-                {
+                else {
                     $("#productAddStations" + productId).addClass('hidden');
                 }
+
+                bHasProductsEnabled = true;
             }
-            else if (obj.disableDate != null && obj.activeFlag == false)
-            {
+            else if (obj.disableDate != null && obj.activeFlag == false) {
                 $("#productAdd" + productId).removeClass('hidden');
                 $("#date" + productId).html(extractDateOnly(obj.disableDate));
                 $("#date" + productId).css("color", "red");
             }
-            else if (obj.disableDate == null && obj.activeDate == null)
-            {
+            else if (obj.disableDate == null && obj.activeDate == null) {
                 $("#productAdd" + productId).removeClass('hidden');
 
             }
@@ -732,8 +732,7 @@
             // product specific buttons
             //-------------------------
             // revenue definition
-            if (productId.toUpperCase() == "MRR" && obj.activeFlag == true)
-            {
+            if (productId.toUpperCase() == "MRR" && obj.activeFlag == true) {
                 var btnStr = '<input id="mrrReportSetup" value="Report Setup" class="productButtonClass" onclick="goToMarketReportSetup()" type="button">';
                 btnStr = btnStr + '<input id="mrrRevenueDefinition" class="productButtonClass" value="Revenue Definition" onclick="goToRevenueDefinition(' + marketId + ');" type="button">';
 
@@ -756,7 +755,7 @@
 
 
         });
-            
+
         //add message if dma is not eligable
         if (dmaEligible == false) {
             $(".row_DMA").show();
@@ -772,40 +771,36 @@
             $("#productButtonsDMX").append(dmxMessage);
         }
 
+        setupPartnerSection();
+    }
 
+    function addStationLookupButton(productId, obj) {
+        // only allow these products
+        if (productId != 'MRR' &&
+            productId != 'XRY' &&
+            productId != 'DMA') {
+            return;
         }
 
-        function addStationLookupButton(productId, obj)
-        {
-            // only allow these products
-            if (productId != 'MRR' &&
-                productId != 'XRY' && 
-                productId != 'DMA')
-            {
-                return;
-            }
-
-            // only allow active
-            if (obj.activeFlag != true)
-            {
-                return;
-            }
-
-            // build link
-            var url = '/utilities/genericreport/genericReport.html?hideHeader=true&reportId=21&productId=' + productId + '&marketid=' + marketId;
-
-            // build button
-            var str = '<input type="button"  id="viewStations' + productId + '"  class="productButtonClass" ' +
-                ' onClick="showComponentDialog(' + "'" + url + "','Stations'" + ')" Value="Stations" />';
-
-            // add to object
-            $("#productButtons" + productId).append(str);
-
+        // only allow active
+        if (obj.activeFlag != true) {
+            return;
         }
+
+        // build link
+        var url = '/utilities/genericreport/genericReport.html?hideHeader=true&reportId=21&productId=' + productId + '&marketid=' + marketId;
+
+        // build button
+        var str = '<input type="button"  id="viewStations' + productId + '"  class="productButtonClass" ' +
+            ' onClick="showComponentDialog(' + "'" + url + "','Stations'" + ')" Value="Stations" />';
+
+        // add to object
+        $("#productButtons" + productId).append(str);
+
+    }
 
     function getMarket() {
-        if (marketId <= 0)
-        {
+        if (marketId <= 0) {
             return;
         }
 
@@ -957,8 +952,8 @@
                         window.location = "/admin/market/market.html?MarketID=" + $("#txtMarketId").val();
                     }
 
-               });
-          });
+                });
+            });
         }
     }
 
@@ -971,9 +966,8 @@
         var parentMarketId = 0;
 
         if ($("#ddlMediaType").val() <= 0 || $("#ddlParentMarket").val() <= 0) {
-            if ($("#ddlMediaType").val() <= 0)
-            {
-                bootbox.alert("Please choose Media Type first.", function () {});
+            if ($("#ddlMediaType").val() <= 0) {
+                bootbox.alert("Please choose Media Type first.", function () { });
                 $("#ddlParentMarket").val(-1);
             }
 
@@ -1075,9 +1069,8 @@
 
     function enableProduct(productId) {
 
-  
-        if (productId.toLowerCase() == 'dmx')
-        {
+
+        if (productId.toLowerCase() == 'dmx') {
 
             if ($("#productDisableXRY").is(":visible") == false) {
                 bootbox.alert("You cannot activate DMX for this market unless XRY is enabled.");
@@ -1088,18 +1081,15 @@
         }
 
 
-        if (productId.toLowerCase() == 'mrr')
-        {
+        if (productId.toLowerCase() == 'mrr') {
             window.location = "/products/mrr/mrrmarketproduct.html?MarketId=" + marketId + "&ProductNew=1";
         }
 
-        if (productId.toLowerCase() == 'xry')
-        {
+        if (productId.toLowerCase() == 'xry') {
             window.location = "/products/xry/xrymarketproduct.html?MarketId=" + marketId + "&ProductNew=1";
         }
 
-        if (productId.toLowerCase() == 'dma')
-        {
+        if (productId.toLowerCase() == 'dma') {
             var pageParameters = {};
             pageParameters["marketName"] = $("#txtMarketName").val();
 
@@ -1108,13 +1098,11 @@
             window.location = "/products/dma/dmamarketmapping.html?MarketId=" + marketId + "&ParentMarketId=" + $("#ddlParentMarket").val() + "&Edit=false";
         }
 
-        if (productId.toLowerCase() == 'mss')
-        {
+        if (productId.toLowerCase() == 'mss') {
             window.location = "/products/mss/mssmarketproduct.html?MarketId=" + marketId + "&ProductNew=1";
         }
 
-        if (productId.toLowerCase() == 'tvb')
-        {
+        if (productId.toLowerCase() == 'tvb') {
             //if media type is not Television, deny request to activate TVB for the market
             var mediaType = $("#ddlMediaType option:selected").text();
             if (mediaType.toUpperCase() != gMediaTypeTelevision.toUpperCase()) {
@@ -1147,21 +1135,19 @@
 
         //removing for now until we decide the categories can be edited
         //if (productId.toLowerCase() == 'dma') {
- 
+
         //    window.location = "/Products/DMA/dmamarketmapping.html?MarketId=" + marketId + "&MarketName=" + $("#txtMarketName").val() +
         //        "&ParentMarketId=" + $("#ddlParentMarket").val() + "&Edit=true";
         //}
     }
 
-    function disableProduct(productId)
-    {
+    function disableProduct(productId) {
         bootbox.alert('This functionality is still under development.', function () {
         });
 
     }
 
-    function assignStations(productId)
-    {
+    function assignStations(productId) {
         window.location = '/admin/market/complementarymarket.html?MarketID=' + $("#txtMarketId").val() + '&ProductID=' + productId;
     }
     function goToStationList() {
@@ -1169,10 +1155,91 @@
 
     }
 
-    function loadFeatureButtons()
-    {
+    function loadFeatureButtons() {
         if (marketId > 0) {
             getFeatureButtons("MarketId", marketId);
         }
+    }
+
+    function setupPartnerSection() {
+        //this will all be based on what comes back from the api
+        //except when creating a new market
+        //call new api to get this information
+        if (marketId <= 0) {
+            //hide buttons etc
+            $("#lblPartnerName").text("Partner information will not show up until a product is enabled.");
+            $("#lblPartnerName").show();
+            return;
+        }
+
+        //check if products are enabled for the market
+        //is there already an api for this??
+        // set flag in this function
+        //if no products display message from above
+        //console.log(bSecondaryMarketsOnly);
+        //console.log(bHasProductsEnabled);
+        if (bHasProductsEnabled == false) {
+            $("#lblPartnerName").text("Partner information will not show up until a product is enabled.");
+            $("#lblPartnerName").show();
+        } else {
+            //get the partner information for the market
+            getPartnersForMarket();
+
+            if (bSecondaryMarketsOnly) {
+                //label and view
+                $("#lblComplimentaryMarketUpdate").show();
+            } else {
+                //label, view, and update
+                $("#btnUpdatePartners").show();
+            }
+        }
+
+    }
+
+    function getPartnersForMarket() {
+        var url = ServicePrefix + '/api/Partner/GetPartnerListByMarket';
+        url += '?inApiToken=' + getLocalStorage("APIToken");
+        url += '&inMarketId=' + marketId;
+
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getPartnersForMarketSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getPartnersForMarketSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+            if (data.report.rows.length == 0) {
+                $("#lblPartnerName").text("Could not find a partner for the market.");
+                $("#lblPartnerName").show();
+            } else if (data.report.rows.length == 1) {
+                $("#lblPartnerName").text(data.report.rows[0].Partner);
+                $("#lblPartnerName").show();
+            } else {
+                $("#btnViewPartners").show();
+            }
+        }
+    }
+
+    function viewPartners()
+    {
+        getPartnerAssignmentsByMarketForViewing(marketId);
+    }
+
+    function updatePartners()
+    {
+        getPartnersListForUpdating(marketId);
     }
 </script>

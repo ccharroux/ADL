@@ -1118,7 +1118,6 @@ function buildMainMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/admin/marketsize/marketsizelist.html?MenuItem=true">Market Sizes</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/position/positionlist.html?MenuItem=true">Positions</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/region/regionlist.html?MenuItem=true">Regions</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="/admin/keyword/keywordlist.html?MenuItem=true">Keywords</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
@@ -3154,3 +3153,309 @@ function convertMontNumberToText(inMonth)
 
     return monthText;
 }
+
+function getPartnerAssignmentsByMarketForViewing(inMarketId)
+{
+    //figure out passing in the market on the other pages
+    //display table
+    //just have ok button to close
+    var url = ServicePrefix + '/api/Partner/GetProductPartnerListByMarket';
+    url += '?inApiToken=' + getLocalStorage("APIToken");
+    url += '&inMarketId=' + inMarketId;
+
+    $.ajax({
+        url: url,
+        dataType: 'json',
+        type: 'get',
+        contentType: 'application/json',
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+            getPartnerAssignmentsByMarketForViewingSuccess(data, textStatus, jQxhr);
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    });
+
+}
+
+function getPartnerAssignmentsByMarketForViewingSuccess(data, textStatus, jQxhr)
+{
+    if (data.response.status != "SUCCESS")
+    {
+        MKAErrorMessageRtn(data.response.errorMessage[0]);
+    } else
+    {
+        //var sMsg = "";
+        //build the table tags
+        var table = '<div style="display: flex; justify-content: center;"><table style="align-self: center;" class="table-striped" id="tblParticipants"> ';
+        // add headers here
+        table += '<tr><th>Product</th><th>Partner</th><th>Product Status</th></tr> ';
+        $.each(data.report.rows,function(index)
+        {
+            var obj = data.report.rows[index];
+            //build the table rows
+            var tr = '<tr> ';
+            tr += '<td class="col-md-5 text-align-left"> ';
+            tr += '<label> ' + obj.Product + '</label> </td> ';
+            tr += '<td class="col-md-4 text-align-left"> ';
+            tr += '<label>' + obj.Partner + '</label> </td> ';
+            tr += '<td class="col-md-3 text-align-left"> ';
+            tr += '<label> ' + obj["Product Status"] + '</label> </td> ';
+            tr += '</tr> ';
+            table += tr;
+        });
+        table += "</table></div>";
+        //build the table end tags
+        //build bootbox message
+        var dialog = bootbox.dialog({
+            title: "Product Partner Assignments",
+            message: table,
+            size: 'large',
+            buttons: {
+                yes: {
+                    label: "Ok",
+                    className: 'btn-primary',
+                    callback: function()
+                    {
+                        return;
+                    }
+                }
+            },
+            onEscape: function()
+            {
+                dialog.modal("hide");
+                return;
+            }
+        });
+    }
+}
+
+function getPartnersListForUpdating(marketId) {
+    // <select id="ddlPartnerList" class="mkaRequired field-width-325" value="0" errorMessage="You must select a Partner."></select>
+    var url = ServicePrefix + '/api/Partner/GetPartnerList';
+
+    var settings = {
+        dataType: 'json',
+        type: 'post',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken")
+        }),
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+            getPartnersListSuccess(data, textStatus, jQxhr, marketId);
+        },
+        error: function (jQxhr, textStatus, errorThrown) {
+            genericAjaxError(jQxhr, textStatus, errorThrown);
+        }
+    };
+
+    $.ajax(url, settings);
+}
+
+function getPartnersListSuccess(data, textStatus, jQxhr, marketId) {
+
+    if (data.response.status != "SUCCESS") {
+        MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+    } else
+    {
+        var str = '<div id="rwErrorMessage" class="row" style="display: none;"><div class="col-md-12 text-align-center" style="color: red;">&nbsp;*&nbsp;<span id="spErrorMessage"></span></div></div>';
+        str = str + '<div class="row" style="margin-bottom: 10px;"><div class="col-md-3">&nbsp;</div>';
+        str = str + '<div class="col-md-2"><label for="ddlUpdatePartnerList">Partners</label></div><div class="col-md-7 text-align-left">';
+        str = str + '<select id="ddlUpdatePartnerList" class="mkaRequired field-width-325" value="0" errorMessage="You must select a Partner.">';
+
+        str = str + '<option value="-1">-- Select a Partner</option>';
+        $.each(data.report.rows, function (index) {
+            str = str + '<option value="' + data.report.rows[index].partnerId + '">' + data.report.rows[index].partnerName + '</option>';
+        });
+
+        str = str + '</select></div></div>';
+
+        getPartnerAssignmentsByMarketForUpdating(marketId, str);
+    }
+}
+
+function getPartnerAssignmentsByMarketForUpdating(inMarketId, partnerList)
+{
+    //get partner list
+    //create dropdown
+    //get assignment list
+    //create table with checkboxed
+    //based on update flag display
+    //display update button and checkboxes in the table
+    //have label for update message
+    //figure out passing in the market on the other pages
+    //display table
+    //just have ok button to close
+    var url = ServicePrefix + '/api/Partner/GetProductPartnerListByMarket';
+    url += '?inApiToken=' + getLocalStorage("APIToken");
+    url += '&inMarketId=' + inMarketId;
+
+    $.ajax({
+        url: url,
+        dataType: 'json',
+        type: 'get',
+        contentType: 'application/json',
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+            getPartnerAssignmentsByMarketForUpdatingSuccess(data, textStatus, jQxhr, inMarketId, partnerList);
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    });
+
+}
+
+function getPartnerAssignmentsByMarketForUpdatingSuccess(data, textStatus, jQxhr, inMarketId, partnerList)
+{
+    if (data.response.status != "SUCCESS") {
+        MKAErrorMessageRtn(data.response.errorMessage[0]);
+    } else {
+
+        //need to build dropdown of partners
+        //add select all and clear all checkboxes
+        //call function get back select with partner names
+        //add to text to message variable
+
+        //build the table tags
+        var table = partnerList + '<div style="display: flex; justify-content: center;"><table style="align-self: center;" class="table-striped" id="tblProductPartners"> ';
+        // add headers here
+        table += '<tr><th></th><th>Product</th><th>Partner</th><th>Product Status</th></tr> ';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            //build the table rows
+            var tr = '<tr> ';
+            tr += '<td class="col-md-1 text-align-center"> ';
+            tr += obj["Active Flag"] == true ? '<input type="checkbox" id="updPartner' + obj.productId + '" name="productsPartner" value="' + obj.productId + '"> ' : '&#8212;';
+            tr += '</td>';
+            tr += '<td class="col-md-5 text-align-left"> ';
+            tr += '<label> ' + obj.Product + '</label> </td> ';
+            tr += '<td class="col-md-4 text-align-left"> ';
+            tr += '<label>' + obj.Partner + '</label> </td> ';
+            tr += '<td class="col-md-2 text-align-left"> ';
+            tr += '<label> ' + obj["Product Status"] + '</label> </td> ';
+            tr += '</tr> ';
+            table += tr;
+        });
+        table += "</table></div>";
+        //build the table end tags
+        //build bootbox message
+        var dialog = bootbox.dialog({
+            title: "Product Partner Assignments",
+            message: table,
+            size: 'large',
+            buttons: {
+                yes: {
+                    label: "Update",
+                    className: 'btn-primary',
+                    callback: function () {
+                        //will need to build the functionality to call the api to do updates
+                        //will probably need to build the list of products to assign here and pass to function
+                        var productsSelected = [];
+                        $.each($('input[name=productsPartner]'), function () {
+                            if ($(this).is(':checked'))
+                            {
+                                productsSelected.push($(this).val());
+                            }
+                        });
+
+                        //add validation
+                        //add message area for errors
+                        //keep message box from closing if validation errors
+                        //if validation fails return false
+                        if (productsSelected.length == 0)
+                        {
+                            $("#spErrorMessage").text("No products selected. Please select a product to update.");
+                            $("#rwErrorMessage").show();
+                            return false;
+                        }
+
+                        if ($("#ddlUpdatePartnerList").val() == -1) {
+                            $("#spErrorMessage").text("No partner was selected. Please select a partner to assign.");
+                            $("#rwErrorMessage").show();
+                            return false;
+                        }
+
+                        var partnerId = $("#ddlUpdatePartnerList").val();
+                        updatePartnerAssignmentsByMarket(productsSelected, inMarketId, partnerId);
+
+                        return true;
+                    }
+                },
+                cancel: {
+                    label: "Cancel",
+                    className: '',
+                    callback: function () {
+                        return;
+                    }
+                }
+            },
+            onEscape: function () {
+                dialog.modal("hide");
+                return;
+            }
+        });
+
+        dialog.on('shown.bs.modal', function (e) {
+            // Do something with the dialog just after it has been shown to the user...
+            convertToChosenSelect("ddlUpdatePartnerList", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+        });
+    }
+}
+
+function updatePartnerAssignmentsByMarket(updateProducts, marketId, partnerId)
+{
+    //updateProducts is an array of products
+    //call api to update
+    var url = ServicePrefix + '/api/Partner/UpdatePartnerMarketProduct';
+
+    var settings = {
+        dataType: 'json',
+        type: 'post',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            "inApiToken": getLocalStorage("APIToken"),
+            "inMarketId": marketId,
+            "inPartnerId": partnerId,
+            "inProducts": updateProducts
+        }),
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+            updatePartnerAssignmentsByMarketSuccess(data, textStatus, jQxhr);
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    };
+
+    $.ajax(url, settings);
+
+}
+
+function updatePartnerAssignmentsByMarketSuccess(data, textStatus, jQxhr)
+{
+    if (data.response.status != "SUCCESS")
+    {
+        MKAErrorMessageRtn(data.response.errorMessage[0]);
+    } else
+    {
+        
+        if (data.response.errorMessage[0] != undefined && data.response.errorMessage[0].length > 0)
+        {
+            bootbox.alert(data.response.errorMessage[0], function () {
+            });
+        } else
+        {
+            bootbox.alert("The assigning of a partner to product(s) was successful.", function () {
+                window.location = location.href;
+            });
+        }
+        
+    }
+}
+
+//will need functions for clear all and select all
+
