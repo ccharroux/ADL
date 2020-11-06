@@ -28,9 +28,9 @@ function getPartnerAssignmentsByMarketForViewingSuccess(data, textStatus, jQxhr)
     } else {
         //var sMsg = "";
         //build the table tags
-        var table = '<div style="display: flex; justify-content: center;"><table style="align-self: center;" class="table-striped" id="tblParticipants"> ';
+        var table = '<div style="display: flex; justify-content: center;"><table style="align-self: center; width: 90%;" class="table-striped" id="tblParticipants"> ';
         // add headers here
-        table += '<tr><th>Product</th><th>Partner</th><th>Product Status</th></tr> ';
+        table += '<tr style="border-bottom: 1px solid black;"><th>Product</th><th>Partner</th><th>Product Status</th></tr> ';
         $.each(data.report.rows, function (index) {
             var obj = data.report.rows[index];
             //build the table rows
@@ -69,7 +69,7 @@ function getPartnerAssignmentsByMarketForViewingSuccess(data, textStatus, jQxhr)
 }
 
 function getPartnersListForUpdating(marketId) {
-    // <select id="ddlPartnerList" class="mkaRequired field-width-325" value="0" errorMessage="You must select a Partner."></select>
+
     var url = ServicePrefix + '/api/Partner/GetPartnerList';
 
     var settings = {
@@ -149,23 +149,18 @@ function getPartnerAssignmentsByMarketForUpdatingSuccess(data, textStatus, jQxhr
         MKAErrorMessageRtn(data.response.errorMessage[0]);
     } else {
 
-        //need to build dropdown of partners
-        //add select all and clear all checkboxes
-        //call function get back select with partner names
-        //add to text to message variable
-
         //build the table tags
         var table = partnerList + '<div style="display: flex; justify-content: center;"><table style="align-self: center; width: 90%;" class="table-striped" id="tblProductPartners"> ';
         // add headers here
         table += '<tr style="border-bottom: 1px solid black;">';
-        table += '<th class="text-align-center"><input type="checkbox" id="chkUpdatePartnerSelectAll" onclick="updatePartnerSelectAllChecked(this);" style="margin-top: 10px;">';
+        table += '<th class="text-align-center"><input type="checkbox" id="chkUpdatePartnerSelectAll" onclick="updatePartnerSelectAllChecked(this);" style="margin-top: 10px;"></th>';
         table += '<th>Product</th><th>Partner</th><th>Product Status</th>';
         table += '</tr> ';
 
         $.each(data.report.rows, function (index) {
             var obj = data.report.rows[index];
             //build the table rows
-            var tr = '<tr> '
+            var tr = '<tr> ';
             tr += '<td class="col-md-2 text-align-center"> ';
             tr += obj["Active Flag"] == true ? '<input type="checkbox" id="updPartner' + obj.productId + '" name="productsPartner" value="' + obj.productId + '" onclick="checkOnAllPartnerProductBoxes();"> ' : '&#8212;';
             tr += '</td>';
@@ -179,8 +174,7 @@ function getPartnerAssignmentsByMarketForUpdatingSuccess(data, textStatus, jQxhr
             table += tr;
         });
         table += "</table></div>";
-        //build the table end tags
-        //build bootbox message
+        
         var dialog = bootbox.dialog({
             title: "Product Partner Assignments",
             message: table,
@@ -190,8 +184,9 @@ function getPartnerAssignmentsByMarketForUpdatingSuccess(data, textStatus, jQxhr
                     label: "Update",
                     className: 'btn-primary',
                     callback: function () {
-                        //will need to build the functionality to call the api to do updates
-                        //will probably need to build the list of products to assign here and pass to function
+
+                        $("#spErrorMessage").text("");
+
                         var productsSelected = [];
                         $.each($('input[name=productsPartner]'), function () {
                             if ($(this).is(':checked')) {
@@ -236,15 +231,13 @@ function getPartnerAssignmentsByMarketForUpdatingSuccess(data, textStatus, jQxhr
         });
 
         dialog.on('shown.bs.modal', function (e) {
-            // Do something with the dialog just after it has been shown to the user...
             convertToChosenSelect("ddlUpdatePartnerList", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
         });
     }
 }
 
 function updatePartnerAssignmentsByMarket(updateProducts, marketId, partnerId) {
-    //updateProducts is an array of products
-    //call api to update
+
     var url = ServicePrefix + '/api/Partner/UpdatePartnerMarketProduct';
 
     var settings = {
@@ -271,20 +264,6 @@ function updatePartnerAssignmentsByMarket(updateProducts, marketId, partnerId) {
 }
 
 function updatePartnerAssignmentsByMarketSuccess(data, textStatus, jQxhr) {
-    //if (data.response.status != "SUCCESS" && data.response.status != "BLOCK") {
-    //    MKAErrorMessageRtn(data.response.errorMessage[0]);
-    //} else {
-
-    //    if (data.response.status == "BLOCK" && data.response.errorMessage[0] != undefined && data.response.errorMessage[0].length > 0) {
-    //        bootbox.alert(data.response.errorMessage[0], function () {
-    //        });
-    //    } else {
-    //        bootbox.alert("The assigning of a partner to product(s) was successful.", function () {
-    //            window.location = location.href;
-    //        });
-    //    }
-
-    //}
 
     if (data.response.status == "BLOCK") {
         bootbox.alert(data.response.errorMessage[0], function () { });
@@ -301,7 +280,7 @@ function updatePartnerAssignmentsByMarketSuccess(data, textStatus, jQxhr) {
     });
 
 }
-//will need functions for clear all and select all
+
 function updatePartnerSelectAllChecked(element) {
     if ($(element).is(':checked')) {
         $('input[name=productsPartner]').each(function () {
