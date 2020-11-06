@@ -185,6 +185,7 @@ function getPartnerAssignmentsByMarketForUpdatingSuccess(data, textStatus, jQxhr
                     className: 'btn-primary',
                     callback: function () {
 
+                        $("#rwErrorMessage").hide();
                         $("#spErrorMessage").text("");
 
                         var productsSelected = [];
