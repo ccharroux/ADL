@@ -233,6 +233,12 @@ function getPartnerAssignmentsByMarketForUpdatingSuccess(data, textStatus, jQxhr
 
         dialog.on('shown.bs.modal', function (e) {
             convertToChosenSelect("ddlUpdatePartnerList", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+            if ($("#ddlPartnerList").length > 0)
+            {
+                $("#ddlUpdatePartnerList").val($("#ddlPartnerList").val());
+            }
+
         });
     }
 }
@@ -276,8 +282,10 @@ function updatePartnerAssignmentsByMarketSuccess(data, textStatus, jQxhr) {
         return;
     }
 
-    bootbox.alert("The assigning of a partner to product(s) was successful.", function () {
-        window.location = location.href;
+    bootbox.alert("The assigning of a partner to product(s) was successful.", function ()
+    {
+        var sLocation = location.href;
+        window.location = sLocation.replace("&ProductNew=1", "");
     });
 
 }
