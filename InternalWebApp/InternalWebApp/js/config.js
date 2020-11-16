@@ -1,5 +1,6 @@
 var gTimeToExpire = 6000; // seconds
 var ServicePrefix = "https://devservices.millerkaplan.com";
+var bForceDR = false;
 
 var bNonProd = true;
 if (window.location.toString().toLowerCase().indexOf("devmediainternal.millerkaplan.com") > -1) {
@@ -16,6 +17,12 @@ else if (window.location.toString().toLowerCase().indexOf("demomediainternal.mil
 }
 else if (window.location.toString().toLowerCase().indexOf("mediainternal.millerkaplan.com") > -1) {
     ServicePrefix = "https://servicesinternal.millerkaplan.com/";
+    bNonProd = false;
+}
+
+if (bForceDR == true)
+{
+    ServicePrefix = "https://drservicesinternal.millerkaplan.com/";
     bNonProd = false;
 }
 
