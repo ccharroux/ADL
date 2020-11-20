@@ -2757,7 +2757,7 @@ function getFeatureButtons(featureToken, featureValue, bIsInternalUser) {
                         sStyle = 'background-color:green;margin-bottom:5px;';
                     }
 
-                    var sButton = '<' +
+                    var sButton = '<div class="mka-tooltip"><' +
                         'input type="button" data-feature-active="' +
                         obj.Active +
                         '" data-feature-token="' +
@@ -2776,7 +2776,7 @@ function getFeatureButtons(featureToken, featureValue, bIsInternalUser) {
                         sStyle +
                         '" value="' +
                         btnValue +
-                        '" onclick="processFeature(this)"/><br/>';
+                        '" onclick="processFeature(this)"/><span class="mka-tooltiptext">' + obj.Description + '</span></div><br/>';
 
                     //DEV-
                     if (obj["Internal Only"] == true && bIsInternalUser)
