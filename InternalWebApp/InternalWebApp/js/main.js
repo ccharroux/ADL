@@ -2776,7 +2776,7 @@ function getFeatureButtons(featureToken, featureValue, bIsInternalUser) {
                         sStyle +
                         '" value="' +
                         btnValue +
-                        '" onclick="processFeature(this)"/><span class="mka-tooltiptext">' + obj.Description + '</span></div><br/>';
+                        '" onclick="processFeature(this)"/><span class="mka-tooltiptext">' + obj.Tooltip + '</span></div><br/>';
 
                     //DEV-
                     if (obj["Internal Only"] == true && bIsInternalUser)
