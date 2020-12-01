@@ -81,18 +81,28 @@
                 </div>     
                 <!-- search / filter area -->
                 <div class="row search-section">
-                    <div class="col-md-10 ">
-                        <label for="searchText">Ownership</label>
+                    <div class="col-md-3">
+                        <label for="searchText">Ownership</label><br/>
                         <input type="text" id="searchText" class="report-filter"/>
-                        <!--<label for="ddlMediaType" style="padding-left:10px">Media Type</label>
-                        <select id="ddlMediaType">
-                        </select>-->
-                        <input type="button" class="search-button" value="Search" onclick="getOwnerList()" />
                     </div>
-                    <div class="col-md-2 ">
-                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editOwnership(0)" />
+                    <div class="col-md-3">
+                        <label for="ddlMediaType" class="search-ddl-label">Media Type</label><br/>
+                        <select id="ddlMediaType" class="search-ddl-select report-filter" style="" onchange=""></select>
                     </div>
-                </div>
+                    <div class="col-md-3">
+                        <label for="ddlProduct" class="search-ddl-label">Product</label><br/>
+                        <select id="ddlProduct" class="search-ddl-select report-filter" style="" onchange=""></select>
+                    </div>
+
+                    <div class="col-md-2">
+                        &nbsp;<br/>
+                        <input type="button" class="search-button" value="Search" onclick="getOwnerList()"/>
+                    </div>
+                    <div class="col-md-1">
+                        &nbsp;<br/>
+                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editOwnership(0)"/>
+                    </div>
+                    </div>
 
 
 
@@ -168,12 +178,102 @@
 
         buildQuickReports(['owner']);
 
+        //load media types
+        loadMediaTypes();
+        //load products
+
         loadScreen();
         setupUI();
-        setupSearch();
+        //setupSearch();
 
 
     });
+
+    function loadMediaTypes()
+    {
+
+        var control = "ddlMediaType";
+
+        $.ajax({
+            url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Media Type --</option>';
+                    $.each(data.report.rows, function (index) {
+                        //if (data.report.rows[index].MediaTypeName.toLowerCase() == mediaTypeName.toLowerCase()) {
+                            str = str +
+                                '<option value="' +
+                                data.report.rows[index].MediaTypeID +
+                                '">' +
+                                data.report.rows[index].MediaTypeName +
+                                '</option>';
+                        //}
+                    });
+
+                    $("#" + control).html(str);
+
+                    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    loadProducts();
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function loadProducts()
+    {
+        $.ajax({
+            url: ServicePrefix + '/api/Product/GetProductList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Product --</option>';
+
+                    $.each(data.report.rows, function (index) {
+                        str = str + '<option value="' + data.report.rows[index].P_ProductID + '">' + data.report.rows[index].P_ProductName + '</option>';
+                    });
+
+                    $("#ddlProduct").html(str);
+
+                    convertToChosenSelect("ddlProduct", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                }
+
+                setupSearch();
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
 
     function setupSearch()
     {
@@ -345,6 +445,16 @@
                 var table = $("#dtOwnershipList").DataTable();
                 table.search('').draw();
             });
+
+        $("#searchText").on('change paste input', function ()
+        {
+            if ($("#searchText").val().length <= 1)
+            {
+                $("#ddlMediaType").val("");
+                $("#ddlProduct").val("");
+            }
+
+        });
     }
     function getOwnerList(bSilent) {
 
@@ -377,7 +487,9 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inOwnerName": $("#searchText").val(),
                 "inActiveOnly": "1",
-                "inAddDetails": "1"
+                "inAddDetails": "1",
+                "inMediaTypeId": $("#ddlMediaType").val(),
+                "inProductId": $("#ddlProduct").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
