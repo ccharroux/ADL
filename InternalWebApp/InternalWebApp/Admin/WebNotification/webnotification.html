@@ -432,8 +432,10 @@
 
         columns.push({
             mRender: function (data, type, row) {
-                if (row["Status"].toUpperCase() == "PENDING") {
-                    return '<a href="#" onclick="initiateSendEmail(\'' + row["Personnel ID"] + '\',\'' + row["Email"] + '\',\'' + row["Token"] + '\')">Send</a> <a href="#" onclick="deletePendingNotification()>Delete</a>';
+                if (row["Status"].toUpperCase() == "PENDING")
+                {
+                    return '<a href="#" onclick="initiateSendEmail(\'' + row["Personnel ID"] + '\',\'' + row["Email"] + '\',\'' + row["Token"] + '\')">Send</a>&nbsp;' +
+                        '<a href="#" onclick="deletePendingNotification(\'' + row["Personnel ID"] + '\',\'' + row["Status ID"] + '\',\'' + row["Action ID"] + '\',\'' + row["Date"] + '\')">Delete</a>';
                 }
                 return '';
 
@@ -925,6 +927,75 @@
         }
     }
 
+    function deletePendingNotification(personnelId, statusId, actionId, loginDate)
+    {
+        var strMessage = "Are you sure you want to delete this notification?";
 
+        bootbox.dialog({
+            message: strMessage,
+            buttons: {
+                btnCancel: {
+                    label: "Cancel",
+                    callback: function () {
+                        return;
+                    }
+                },
+                btnContinue: {
+                    label: "Continue",
+                    callback: function () {
+                        //continue deletion
+                        continueDeletingNotification(personnelId, statusId, actionId, loginDate);
+                    }
+                }
+            }
+        });
+    }
+
+    function continueDeletingNotification(personnelId, statusId, actionId, loggedInDate)
+    {
+        
+        var url = ServicePrefix + '/api/Notification/DeleteWebNotification';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": personnelId,
+                "inStatusId": statusId,
+                "inActionId": actionId,
+                "inLoggedInDate": loggedInDate
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                continueDeletingNotificationSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function continueDeletingNotificationSuccess(data, textStatus, jQxhr)
+    {
+        if (data.response.status == "BLOCK")
+        {
+            bootbox.alert(MKAErrorMessageRtn(data.response.errorMessage[0]));
+        }else if (data.response.status == "SUCCESS")
+        {
+            bootbox.alert("The web notification has been deleted",
+                function()
+                {
+                    getClientPersonnelNotificationList();
+                });
+        } else
+        {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+    }
 
 </script>
