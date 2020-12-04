@@ -87,24 +87,22 @@
                     </div>
                     <div class="col-md-3">
                         <label for="ddlMediaType" class="search-ddl-label">Media Type</label><br/>
-                        <select id="ddlMediaType" class="search-ddl-select report-filter" style="" onchange=""></select>
+                        <select id="ddlMediaType" class="search-ddl-select report-filter" style="" onchange="getOwnerListByMediaProduct()"></select>
                     </div>
                     <div class="col-md-3">
                         <label for="ddlProduct" class="search-ddl-label">Product</label><br/>
-                        <select id="ddlProduct" class="search-ddl-select report-filter" style="" onchange=""></select>
+                        <select id="ddlProduct" class="search-ddl-select report-filter" style="" onchange="getOwnerListByMediaProduct()"></select>
                     </div>
 
-                    <div class="col-md-2">
+                    <!--<div class="col-md-2">
                         &nbsp;<br/>
                         <input type="button" class="search-button" value="Search" onclick="getOwnerList()"/>
-                    </div>
-                    <div class="col-md-1">
+                    </div>-->
+                    <div class="col-md-3">
                         &nbsp;<br/>
                         <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editOwnership(0)"/>
                     </div>
                     </div>
-
-
 
 
                 <!-- new datatable start -->
@@ -173,20 +171,17 @@
 
     $(document).ready(function () {
 
+        buildEvents();
+        loadScreen();
 
         buildMainMenu("Ownerships");
 
+        loadMediaTypes();
+        loadProducts();
+
         buildQuickReports(['owner']);
 
-        //load media types
-        loadMediaTypes();
-        //load products
-
-        loadScreen();
-        setupUI();
-        //setupSearch();
-
-
+        setTimeout(loadLastSearch, 500);
     });
 
     function loadMediaTypes()
@@ -227,7 +222,6 @@
 
                     convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
-                    loadProducts();
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -267,7 +261,7 @@
 
                 }
 
-                setupSearch();
+                
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -275,23 +269,16 @@
         });
     }
 
-    function setupSearch()
+    function loadLastSearch()
     {
-        //var search = getParameterByName("search");
-
-        //if (!search == false) {
-        //    if (search.length > 0) {
-        //        $("#searchText").val(search);
-        //        getOwnerList();
-        //    }
-        //}
-
+       
         loadReportParameters();
-        getOwnerList(true);
+        getOwnerList();
 
         setLocalStorage("search", $("#searchText").val().trim());
         setLocalStorage("searchPage", window.location);
     }
+
     function loadScreen()
     {
         var reportTitle = "Ownerships List";
@@ -436,8 +423,20 @@
 
     }
 
-    function setupUI()
+    function buildEvents()
     {
+        var input = document.getElementById("searchText");
+        // Execute a function when the user releases a key on the keyboard
+        input.addEventListener("keyup", function (event) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Number 13 is the "Enter" key on the keyboard
+            if (event.keyCode === 13) {
+                $("#ddlMediaType").val("");
+                $("#ddlProduct").val("");
+                getOwnerList();
+            }
+        });
 
         $("body").on("click",
             "#clear_search_button",
@@ -445,26 +444,43 @@
                 var table = $("#dtOwnershipList").DataTable();
                 table.search('').draw();
             });
-
-        $("#searchText").on('change paste input', function ()
-        {
-            if ($("#searchText").val().length <= 1)
-            {
-                $("#ddlMediaType").val("");
-                $("#ddlProduct").val("");
-            }
-
-        });
     }
 
-    function getOwnerList(bSilent) {
+    function getOwnerListByMediaProduct()
+    {
+        $("#searchText").val("");
+        getOwnerList();
+    }
 
-        if (!bSilent) {
-            bSilent = false;
+    function getOwnerList() {
+
+        var table = $("#dtOwnershipList").DataTable();
+        table.clear().draw();
+
+        var searchCtr = 0;
+
+        if ($("#ddlMediaType").val() == 0) {
+            searchCtr = searchCtr;
+        }
+        else {
+            searchCtr = searchCtr + 1;
         }
 
-        if (validationPassed(bSilent) == false)
-        {
+        if ($("#ddlProduct").val() == "") {
+            searchCtr = searchCtr;
+        }
+        else {
+            searchCtr = searchCtr + 1;
+        }
+
+        if ($("#searchText").val() == 0) {
+            searchCtr = searchCtr;
+        }
+        else {
+            searchCtr = searchCtr + 1;
+        }
+
+        if (searchCtr == 0) {
             return;
         }
 
@@ -495,62 +511,7 @@
         });
 
     }
-
-    function validationPassed(bSilent)
-    {
-
-        //if ($("#searchText").val().trim() == 0) {
-        //    if (bSilent == false) {
-        //        bootbox.alert("Please enter text to search for Owner(s)",
-        //            function () {
-        //            });
-        //    }
-
-        //    return;
-
-        //}
-
-        if ($("#ddlProduct").val() != "")
-        {
-            return true;
-        }
-
-        if ($("#searchText").val().trim().length == 0 && $("#ddlMediaType").val() == "" && $("#ddlProduct").val() == "") {
-            if (bSilent == false) {
-                bootbox.alert("Please complete at least the owner that you're looking for and the media type or the product.",
-                    function () {
-                    });
-            }
-
-            return false;
-        }
-
-        if ($("#searchText").val().trim().length > 0 && $("#ddlMediaType").val() == "" && $("#ddlProduct").val() == "")
-        {
-            if (bSilent == false)
-            {
-                bootbox.alert("Please select a Media Type or Product to be added to the search.",
-                            function () {
-                            });
-            }
-
-            return false;
-        }
-
-        if ($("#searchText").val().trim().length == 0 && $("#ddlMediaType").val() != "") {
-            if (bSilent == false) {
-                bootbox.alert("Please enter text to search for Owner(s).",
-                    function () {
-                    });
-            }
-
-            return false;
-        }
-
-
-        return true;
-    }
-
+    
     function viewDashboardOwnership(ownerID) {
 
         window.location = "/admin/ownership/ownershipview.html?ownerID=" + ownerID;
