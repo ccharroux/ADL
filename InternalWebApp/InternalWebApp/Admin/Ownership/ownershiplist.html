@@ -456,25 +456,19 @@
 
         });
     }
+
     function getOwnerList(bSilent) {
 
         if (!bSilent) {
             bSilent = false;
         }
 
-        if ($("#searchText").val().trim() == 0) {
-            if (bSilent == false)
-            {
-                bootbox.alert("Please enter text to search for Owner(s)",
-                    function()
-                    {
-                    });
-            }
-
+        if (validationPassed(bSilent) == false)
+        {
             return;
-
         }
 
+       
         setLocalStorage("search", $("#searchText").val().trim());
         setLocalStorage("searchPage", window.location);
 
@@ -501,6 +495,62 @@
         });
 
     }
+
+    function validationPassed(bSilent)
+    {
+
+        //if ($("#searchText").val().trim() == 0) {
+        //    if (bSilent == false) {
+        //        bootbox.alert("Please enter text to search for Owner(s)",
+        //            function () {
+        //            });
+        //    }
+
+        //    return;
+
+        //}
+
+        if ($("#ddlProduct").val() != "")
+        {
+            return true;
+        }
+
+        if ($("#searchText").val().trim().length == 0 && $("#ddlMediaType").val() == "" && $("#ddlProduct").val() == "") {
+            if (bSilent == false) {
+                bootbox.alert("Please complete at least the owner that you're looking for and the media type or the product.",
+                    function () {
+                    });
+            }
+
+            return false;
+        }
+
+        if ($("#searchText").val().trim().length > 0 && $("#ddlMediaType").val() == "" && $("#ddlProduct").val() == "")
+        {
+            if (bSilent == false)
+            {
+                bootbox.alert("Please select a Media Type or Product to be added to the search.",
+                            function () {
+                            });
+            }
+
+            return false;
+        }
+
+        if ($("#searchText").val().trim().length == 0 && $("#ddlMediaType").val() != "") {
+            if (bSilent == false) {
+                bootbox.alert("Please enter text to search for Owner(s).",
+                    function () {
+                    });
+            }
+
+            return false;
+        }
+
+
+        return true;
+    }
+
     function viewDashboardOwnership(ownerID) {
 
         window.location = "/admin/ownership/ownershipview.html?ownerID=" + ownerID;
