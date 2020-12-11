@@ -657,13 +657,7 @@
             "pageLength": gDataTableDefaultRows,
             "data": [],
             "columns": [
-                //{ "data": 'ownerGroupName' },
-                {"mRender": function(data, type, row)
-                    {
-                        var link = '<a href="#" onclick="gotoOwnerDashboard(' + row.ownerGroupId + ')">' + row.ownerGroupName + '</a>';
-                        return link;
-                    }
-                },
+                { "data": 'ownerGroupName' },
                 { "data": 'isNationwide' }
             ],
             "columnDefs": [
@@ -1294,7 +1288,7 @@
             }),
             proccessData: false,
             success: function (data, textStatus, jQxhr) {
-                getOwnerSuccess(data, textStatus, jQxhr);
+                getOwnerSuccess(data, textStatus, jQxhr, ownerId);
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
@@ -1304,7 +1298,7 @@
         $.ajax(url, settings);
     }
 
-    function getOwnerSuccess(data, textStatus, jQxhr) {
+    function getOwnerSuccess(data, textStatus, jQxhr, ownerId) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
@@ -1318,7 +1312,8 @@
 
                 var obj = data.report.rows[index];
 
-                $("#spanOwner").text(obj["Owner Name"]);
+                var link = '<a href="#" onclick="gotoOwnerDashboard(' + ownerId + ')">' + obj["Owner Name"] + '</a>';
+                $("#spanOwner").html(link);
             });
         }
 
