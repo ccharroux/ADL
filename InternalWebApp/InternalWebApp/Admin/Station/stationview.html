@@ -557,7 +557,12 @@
             "pageLength": gDataTableDefaultRows,
             "data": [],
             "columns": [
-                { "data": 'marketName' },
+                { "mRender": function(data, type, row)
+                    {
+                        var link = '<a href="#" onclick="gotoMarketDashboard(' + row.marketId + ')">' + row.marketName + '</a>';
+                        return link;
+                    }
+                },
                 { "data": 'isPrimary' }
             ],
             "columnDefs": [
@@ -652,7 +657,13 @@
             "pageLength": gDataTableDefaultRows,
             "data": [],
             "columns": [
-                { "data": 'ownerGroupName' },
+                //{ "data": 'ownerGroupName' },
+                {"mRender": function(data, type, row)
+                    {
+                        var link = '<a href="#" onclick="gotoOwnerDashboard(' + row.ownerGroupId + ')">' + row.ownerGroupName + '</a>';
+                        return link;
+                    }
+                },
                 { "data": 'isNationwide' }
             ],
             "columnDefs": [
@@ -1147,7 +1158,9 @@
             $.each(data.report.rows, function (index) {
                 var obj = data.report.rows[index];
 
-                $("#spanStation").text(obj["fullName"] + " (" + stationId + ")");
+                var link = '<a href="#" onclick="gotoStationEdit(' + stationId + ')">' + obj["fullName"] + ' (' + stationId + ')</a>';
+
+                $("#spanStation").html(link);
                 setPreviousFullName(obj);
 
                 $("#spanCallLettersSuffix").text(obj["callLetters"] + " / " + obj["suffix"]);
@@ -1942,4 +1955,18 @@
         }
 
     }
+
+    function gotoMarketDashboard(marketId) {
+        window.location = '/admin/market/marketview.html?marketId=' + marketId;
+    }
+
+    function gotoOwnerDashboard(ownerId) {
+        window.location = '/admin/ownership/ownershipview.html?ownerID=' + ownerId;
+    }
+
+    function gotoStationEdit(stationId)
+    {
+        window.location = '/admin/station/station.html?stationID=' + stationId;
+    }
+
 </script>
