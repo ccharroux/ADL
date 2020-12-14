@@ -157,6 +157,8 @@
                             <input type="button" id="btnConfirm" value="Confirm" onclick="confirmRevenue();" />
                             &nbsp; &nbsp;
                             <input type="button" id="btnDelete" value="Delete" onclick="deleteRevenue();" />
+                            &nbsp; &nbsp;
+                            <input type="button" id="btnDeleteAll" value="Delete Owner File" onclick="deleteAllRevenue();" />
                         </span>
                     </div>
                 </div>
@@ -1206,6 +1208,67 @@
         }
         else {
             bootbox.alert(getStationArray("delete").length + ' rows of data deleted');
+            getData();
+        }
+    }
+
+    function deleteAllRevenue()
+    {
+        var ownerId = currentOwnerId();
+        if (ownerId == '' || ownerId == 'all') {
+            bootbox.alert("Must select a specific owner first to delete.");
+            return;
+        }
+
+        var message = "Delete pending revenue figures for " + currentPeriod() + "/" + currentYear() + ", owner: " + currentOwnerName() + "?";
+
+        bootbox.confirm(
+            message,
+            function (confirmed) {
+                if (confirmed) {
+                    deleteAllRevenueConfirmed();
+                }
+            }
+        );
+    }
+
+    function deleteAllRevenueConfirmed()
+    {
+        var url = ServicePrefix + '/api/TVB/DeleteAllRepFirmRevenue';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inYear": currentYear(),
+                "inPeriod": currentPeriod(),
+                "inRepFirmId": $("#ddlRepFirm").val(),
+                "inOwnerId": currentOwnerId(),
+                "inDeleteAllFlag": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deleteAllRevenueSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function deleteAllRevenueSuccess(data, textStatus, jQxhr)
+    {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+            var sOwnerName = currentOwnerName();
+
+            bootbox.alert('Owner: ' + sOwnerName + ' data file has been deleted');
             getData();
         }
     }
