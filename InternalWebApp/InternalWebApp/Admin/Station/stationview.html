@@ -557,7 +557,12 @@
             "pageLength": gDataTableDefaultRows,
             "data": [],
             "columns": [
-                { "data": 'marketName' },
+                { "mRender": function(data, type, row)
+                    {
+                        var link = '<a href="#" onclick="gotoMarketDashboard(' + row.marketId + ')">' + row.marketName + '</a>';
+                        return link;
+                    }
+                },
                 { "data": 'isPrimary' }
             ],
             "columnDefs": [
@@ -1147,7 +1152,9 @@
             $.each(data.report.rows, function (index) {
                 var obj = data.report.rows[index];
 
-                $("#spanStation").text(obj["fullName"] + " (" + stationId + ")");
+                var link = '<a href="#" onclick="gotoStationEdit(' + stationId + ')">' + obj["fullName"] + ' (' + stationId + ')</a>';
+
+                $("#spanStation").html(link);
                 setPreviousFullName(obj);
 
                 $("#spanCallLettersSuffix").text(obj["callLetters"] + " / " + obj["suffix"]);
@@ -1281,7 +1288,7 @@
             }),
             proccessData: false,
             success: function (data, textStatus, jQxhr) {
-                getOwnerSuccess(data, textStatus, jQxhr);
+                getOwnerSuccess(data, textStatus, jQxhr, ownerId);
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
@@ -1291,7 +1298,7 @@
         $.ajax(url, settings);
     }
 
-    function getOwnerSuccess(data, textStatus, jQxhr) {
+    function getOwnerSuccess(data, textStatus, jQxhr, ownerId) {
 
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
@@ -1305,7 +1312,8 @@
 
                 var obj = data.report.rows[index];
 
-                $("#spanOwner").text(obj["Owner Name"]);
+                var link = '<a href="#" onclick="gotoOwnerDashboard(' + ownerId + ')">' + obj["Owner Name"] + '</a>';
+                $("#spanOwner").html(link);
             });
         }
 
@@ -1942,4 +1950,18 @@
         }
 
     }
+
+    function gotoMarketDashboard(marketId) {
+        window.location = '/admin/market/marketview.html?marketId=' + marketId;
+    }
+
+    function gotoOwnerDashboard(ownerId) {
+        window.location = '/admin/ownership/ownershipview.html?ownerID=' + ownerId;
+    }
+
+    function gotoStationEdit(stationId)
+    {
+        window.location = '/admin/station/station.html?stationID=' + stationId;
+    }
+
 </script>

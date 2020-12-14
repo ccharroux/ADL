@@ -220,7 +220,7 @@
                         </div>
                         <div class="form-group rptView rptMediaType" >
                             <label for="ddlMediaType" class="dropdown-label rptView rptMediaType">Media Type</label>
-                            <select id="ddlMediaType" apiInput="inMediaTypeId" class="dropdown-select rptView rptMediaType report-filter"></select>
+                            <select id="ddlMediaType" apiInput="inMediaTypeId" onchange="updateDependentLists(this)" class="dropdown-select rptView rptMediaType report-filter"></select>
                         </div>
                         <div class="form-group rptView rptMarket" >
                             <label for="ddlMarket" class="dropdown-label rptView rptMarket">Market</label>
@@ -736,7 +736,27 @@
                 params.push(null);
             }
 
- 
+            if (objectValue.reloadBasedMediaType != undefined) {
+
+                thisControl = "ddlMediaType";
+
+                if ($("#" + thisControl).val() != "") {
+                    // add value to array
+                    params.push($("#" + thisControl).val()); // this will be the market value...
+                }
+                else {
+                    params.push(null);
+                }
+
+                if (controlThatWasClicked.id == thisControl) {
+                    bReloadNeeded = true;
+
+                }
+
+            }
+            else {
+                params.push(null);
+            }
 
             if (bReloadNeeded == true) {
                 // set object parameters to the array
@@ -2717,6 +2737,115 @@
                     convertToChosenSelect("ddlPersonnelList", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
                     saveLoadedControlSelection("ddlPersonnelList");
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getMarketListByProductMediaType(inProduct,inMarket,inOwner, inMediaType)
+    {
+        var control = this.objectName;
+
+        if (inProduct == "" || inProduct == null || inProduct == undefined) {
+            var str = '';
+            str = '<option value="">-- Select a Market --</option>';
+            $("#" + control).html(str);
+            convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+            return;
+        }
+
+        var url = '/api/Market/GetMarketListByProductMediaType?inApiToken=' + getLocalStorage("APIToken");
+        url += '&inProductId=' + inProduct;
+        url += '&inMediaTypeId=' + inMediaType;
+
+        $.ajax({
+            url: ServicePrefix + url,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+
+                }
+                else {
+
+                    var str = '';
+
+                    $("#ddlMarket").html("<option value=''> -- Select a Market --</option>");
+
+
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = str + "<option value='" + obj["Market Id"] + "'>" + obj["Market Name"] + "</option>";
+
+                    });
+
+                    $("#ddlMarket").append(str);
+
+                    convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    $("#ddlMarket").change();
+
+                    saveLoadedControlSelection("ddlMarket");
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getOwnerListByProductMarket(inProduct, inMarket)
+    {
+        var control = this.objectName;
+
+        if (inProduct == "" || inProduct == null || inProduct == undefined) {
+            $("#" + control).html("<option value=''> -- Select an Owner --</option>");
+            convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerListByProductMarket',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": inProduct,
+                "inMarketId": inMarket
+    }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+
+                    $("#" + control).html("<option value=''> -- Select an Owner --</option>");
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = str + "<option value='" + obj.ownerid + "'>" + obj.ownername + "</option>";
+
+                    });
+                    $("#" + control).append(str);
+
+                    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    saveLoadedControlSelection(control);
                 }
 
             },
