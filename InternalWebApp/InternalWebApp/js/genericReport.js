@@ -2705,11 +2705,12 @@ function getReportFilterArray_PersonnelContactList() {
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerListByProductMarket",
+        jsCall: "getOwnerListByProductMarketMediaType",
         objectName: "ddlOwner",
         required: false,
         reloadBasedProduct: true,
-        reloadBasedMarket: true
+        reloadBasedMarket: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
@@ -2720,6 +2721,7 @@ function getReportFilterArray_PersonnelContactList() {
         reloadBasedMarket: true,
         reloadBasedOwner: true,
         reloadBasedProduct: true,
+        reloadBasedMediaType: true,
         required: false
     }
     arrayFilters.push(arrayObject);

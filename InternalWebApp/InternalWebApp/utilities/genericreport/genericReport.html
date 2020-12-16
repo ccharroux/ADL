@@ -1662,7 +1662,7 @@
         });
 
     }
-    function getStationListByGeneralFilters(product, marketId, ownerId)
+    function getStationListByGeneralFilters(product, marketId, ownerId, mediaTypeId)
     {
         var control = this.objectName;
 
@@ -1680,6 +1680,7 @@
                 "inProduct": product,
                 "inMarketId": marketId,
                 "inOwnerId": ownerId,
+                "inMediaTypeId": mediaTypeId
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -2792,8 +2793,6 @@
 
                     convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
-                    $("#ddlMarket").change();
-
                     saveLoadedControlSelection("ddlMarket");
                 }
 
@@ -2824,6 +2823,62 @@
                 "inProductId": inProduct,
                 "inMarketId": inMarket
     }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+
+                    $("#" + control).html("<option value=''> -- Select an Owner --</option>");
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = str + "<option value='" + obj.ownerid + "'>" + obj.ownername + "</option>";
+
+                    });
+                    $("#" + control).append(str);
+
+                    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    saveLoadedControlSelection(control);
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getOwnerListByProductMarketMediaType(inProduct, inMarket, inOwner, inMediaType) {
+        var control = this.objectName;
+
+        if (inProduct == "" || inProduct == null || inProduct == undefined) {
+            $("#" + control).html("<option value=''> -- Select an Owner --</option>");
+            convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+            return;
+        }
+
+        console.log(inMediaType);
+
+        var url = ServicePrefix + '/api/Owner/GetOwnerListByProductMarketMediaType';
+        url += "?inApiToken=" + getLocalStorage("APIToken");
+        url += "&inProductId=";
+        url += inProduct == null ? "" : inProduct;
+        url += "&inMarketId=";
+        url += inMarket == null ? "" : inMarket;
+        url += "&inMediaTypeId=";
+        url += inMediaType == null ? "" : inMediaType;
+
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
