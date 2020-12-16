@@ -27,7 +27,7 @@ if (bForceDR == true)
 }
 
 var currentPage = window.location.toString().toLocaleLowerCase();
- 
+
 if (currentPage.indexOf("http:") > -1)
 {
     // not secure...

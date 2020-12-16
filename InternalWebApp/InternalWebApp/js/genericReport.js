@@ -314,6 +314,7 @@ reportName.push("rptXRYOwnerGroupMarketAnalysis");
 reportName.push("rptTVBReportingMarketStatus");
 
 reportName.push("rptTVBStationIssueList");
+reportName.push("rptGetParentHistoryAndMarketStatusByParentMarket");
 
 function buildReportArray()
 {
@@ -3833,7 +3834,8 @@ function getReportFilterArray_DMAMRRCategoryMappingList() {
 
     arrayObject = {
         token: "ParentMarket",
-        jsCall: 'getParentMarketListDMA',
+        jsCall: 'getParentMarketList',
+        jsCallParameters: ['DMA'],
         objectName: "ddlParentMarket",
         required: false
     }
@@ -12488,6 +12490,52 @@ function getReportObject_TVBStationIssueList() {
         columnsToDisplay: columnsToDisplay,
         product: ['tvb'],
         sortable: true,
+        approved: false
+    }
+
+    return tempObject;
+}
+function getReportFilterArray_GetParentHistoryAndMarketStatusByParentMarket() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlParentMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_GetParentHistoryAndMarketStatusByParentMarket()
+{
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+    columnsToDisplay.push('Parent Market');
+    columnsToDisplay.push('Market');
+    columnsToDisplay.push('Period');
+    columnsToDisplay.push('Revision');
+    columnsToDisplay.push('Review Date');
+    columnsToDisplay.push('Review Operator');
+    columnsToDisplay.push('Complete');
+    columnsToDisplay.push('Rank Date');
+    columnsToDisplay.push('Rank Operator');
+    columnsToDisplay.push('Release Date');
+    columnsToDisplay.push('Release Operator');
+    columnsToDisplay.push('Revision Date');
+    columnsToDisplay.push('Comment');
+
+    tempObject = {
+        reportTitle: "DMX Parent History Summary",
+        apiControllerAction: '/api/DMXReport/GetParentHistoryAndMarketStatusByParentMarket',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['dmx'],
+        sortable: false,
         approved: false
     }
 
