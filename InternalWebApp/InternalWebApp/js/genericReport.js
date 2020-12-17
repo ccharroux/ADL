@@ -3129,7 +3129,7 @@ function getReportObject_MRRMarketRelease() {
     columnsToDisplay.push("Stations Pending");
     columnsToDisplay.push("Contacts Pending");
     columnsToDisplay.push("Schedule");
-    columnsToDisplay.push("On Hold");
+    columnsToDisplay.push("Status"); // Active or On Hold
 
 
     tempObject =
