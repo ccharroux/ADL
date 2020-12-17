@@ -1662,6 +1662,75 @@
         });
 
     }
+
+    function getProductListHidden(inProduct, inHideObject) {
+
+        if (!inProduct) {
+            inProduct = "";
+        }
+
+        if (!inHideObject) {
+            inHideObject = false;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Product/GetProductList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    if (inProduct == "") {
+                        str = '<option value="">-- Select a Product --</option>';
+                    }
+
+                    $.each(data.report.rows, function (index) {
+
+                        if (inProduct == "") {
+                            str = str + '<option value="' + data.report.rows[index].P_ProductID + '">' + data.report.rows[index].P_ProductName + '</option>';
+                        }
+                        else {
+                            if (inProduct.toUpperCase() == data.report.rows[index].P_ProductID.toUpperCase()) {
+                                str = str + '<option value="' + data.report.rows[index].P_ProductID + '">' + data.report.rows[index].P_ProductName + '</option>';
+                            }
+                        }
+                    });
+
+                    $("#ddlProduct").html(str);
+
+                    if (param_productId != null) {
+
+                        $("#ddlProduct").val(param_productId.toUpperCase());
+                    }
+                    convertToChosenSelect("ddlProduct", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    if (inHideObject) {
+                        $("#ddlProduct").val(inProduct);
+                        $(".rptProduct").hide();
+                    }
+
+                    saveLoadedControlSelection("ddlProduct");
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
     function getStationListByGeneralFilters(product, marketId, ownerId, mediaTypeId)
     {
         var control = this.objectName;

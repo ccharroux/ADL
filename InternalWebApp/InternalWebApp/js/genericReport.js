@@ -11690,18 +11690,32 @@ function getReportFilterArray_MRRUserListing() {
     var arrayObject = new Object();
 
     arrayObject = {
+        token: "Product",
+        jsCall: "getProductListHidden",
+        jsCallParameters: ['MRR', true],
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
         token: "Market",
-        jsCall: "getMarketListByProduct",
+        jsCall: "getMarketListByProductMediaType",
         jsCallParameters: ['MRR'],
         objectName: "ddlMarket",
+        reloadBasedProduct: true,
+        reloadBasedMediaType: true,
         required: false
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerListByProduct",
+        jsCall: "getOwnerListByProductMarketMediaType",
         jsCallParameters: ['MRR'],
+        reloadBasedProduct: true,
+        reloadBasedMarket: true,
+        reloadBasedMediaType: true,
         objectName: "ddlOwner",
         required: false
     }
