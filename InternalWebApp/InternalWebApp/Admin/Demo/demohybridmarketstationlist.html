@@ -60,7 +60,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2 id="pageTitle">Demo Markets</h2>
+                        <h2 id="pageTitle">Demo Hybrid Markets/Stations</h2>
                     </div>
                 </div>
                 <div id="divQuickReport">
@@ -69,30 +69,58 @@
                 </div>
                 <!-- search / filter area -->
                 <div class="row search-section">
-                    <div class="col-md-10 ">
+                    <div class="col-md-1">
                         <label for="ddlProduct" class="dropdown-label">Product</label>
-                        <select id="ddlProduct" class="search-ddl-select dropdown-select report-filter" onchange="getDemoMarkets();"></select>
-                        <label for="ddlMediaType" class="dropdown-label">Media Type</label>
-                        <select id="ddlMediaType" class="search-ddl-select dropdown-select report-filter" onchange="getDemoMarkets();"></select>
-                        <label for="ddlMarket" class="dropdown-label">Market</label>
-                        <select id="ddlMarket" class="search-ddl-select dropdown-select report-filter" onchange="getDemoMarkets();"></select>
                     </div>
-                    <div class="col-md-2 ">
-                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editDemoMarket('', 0)" />
+                    <div class="col-md-2">
+                        <select id="ddlProduct" class="search-ddl-select dropdown-select report-filter" onchange="getDemoHybridMarketStationList();"></select>
+                    </div>
+                    <div class="col-md-1">
+                        <label for="ddlMediaType" class="dropdown-label">Media Type</label>
+                    </div>
+                    <div class="col-md-2">
+                        <select id="ddlMediaType" class="search-ddl-select dropdown-select report-filter" onchange="getDemoHybridMarketStationList();"></select>
+                    </div>
+                    <div class="col-md-1">
+                        <label for="ddlMarket" class="dropdown-label">Market</label>
+                    </div>
+                    <div class="col-md-2">
+                        <select id="ddlMarket" class="search-ddl-select dropdown-select report-filter" onchange="getDemoHybridMarketStationList();"></select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1 col-md-offset-3">
+                        <label for="ddlStation" class="dropdown-label">Station</label>
+                    </div>
+                    <div class="col-md-2">
+                        <select id="ddlStation" class="search-ddl-select dropdown-select report-filter" onchange="getDemoHybridMarketStationList();"></select>
+                    </div>
+                    <div class="col-md-1">
+                        <label for="ddlOwner" class="dropdown-label">Owner</label>
+                    </div>
+                    <div class="col-md-2">
+                        <select id="ddlOwner" class="search-ddl-select dropdown-select report-filter" onchange="getDemoHybridMarketStationList();"></select>
+                    </div>
+                    <div class="col-md-2 col-md-offset-1">
+                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="addDemoHybridMarketStation()" />
                     </div>
                 </div>
 
                 <!-- start datatable-->
                 <div class="dataTable-top-margin">
-                    <table id="dtDemoMarketList" class="dataTable-border dataTable-headers dataTable-cell-border">
+                    <table id="dtDemoHybridMarketStationList" class="dataTable-border dataTable-headers dataTable-cell-border">
                         <thead>
                             <tr>
                                 <th class="exportColumn">Product</th>
                                 <th class="exportColumn">Media Type</th>
-                                <th class="exportColumn">Market</th>
+                                <th class="exportColumn">Production Market</th>
+                                <th class="exportColumn">Production Station</th>
+                                <th class="exportColumn">Production Owner</th>
+                                <th class="exportColumn">Demo Market</th>
+                                <th class="exportColumn">Demo Station</th>
+                                <th class="exportColumn">Demo Owner</th>
                                 <th class="exportColumn">Description</th>
-                                <th class="exportColumn">Active</th>
-                                <th class="exportColumn">On Hold</th>
+                                <th class="exportColumn">Issues</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -140,11 +168,15 @@
     var gotProducts = false;
     var gotMediaTypes = false;
     var gotMarkets = false;
+    var gotStations = false;
+    var gotOwners = false;
 
     $(document).ready(function () {
         getProducts();
         getMediaTypes();
-        getMarkets(); // Possible future improvement: filter this list by product and/or media type
+        getMarkets(); // Possible future improvement: filter some of these lists based on others
+        getStations();
+        getOwners();
 
         setEventListeners();
 
@@ -152,9 +184,9 @@
 
         clearSearchButtonSetup();
 
-        buildMainMenu("Markets");
+        buildMainMenu("Stations");
 
-        buildQuickReports(['market']);
+        buildQuickReports(['station']);
 
         // Reset this variable
         //setLocalStorage("quickReportQS", null);
@@ -199,7 +231,7 @@
 
         $("#ddlProduct").html(str);
         gotProducts = true;
-        getDemoMarkets();
+        getDemoHybridMarketStationList();
     }
 
     function getMediaTypes() {
@@ -236,7 +268,7 @@
         $("#ddlMediaType").html(str);
         convertToChosenSelect("ddlMediaType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
         gotMediaTypes = true;
-        getDemoMarkets();
+        getDemoHybridMarketStationList();
     }
 
     function getMarkets() {
@@ -273,7 +305,81 @@
         $("#ddlMarket").html(str);
         convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
         gotMarkets = true;
-        getDemoMarkets();
+        getDemoHybridMarketStationList();
+    }
+
+    function getStations() {
+        $.ajax({
+            url: ServicePrefix + '/api/Station/GetStationList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getStationsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getStationsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '<option value="">-- All Stations --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str += '<option value="' + obj.stationId + '">' + obj.stationName + '</option>';
+        });
+
+        $("#ddlStation").html(str);
+        convertToChosenSelect("ddlStation", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+        gotStations = true;
+        getDemoHybridMarketStationList();
+    }
+
+    function getOwners() {
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOwnersSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getOwnersSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '<option value="">-- All Owners --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str += '<option value="' + obj.OwnerID + '">' + obj.OwnerName + '</option>';
+        });
+
+        $("#ddlOwner").html(str);
+        convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+        gotOwners = true;
+        getDemoHybridMarketStationList();
     }
 
     function setEventListeners() {
@@ -295,34 +401,80 @@
         //    // Number 13 is the "Enter" key on the keyboard
         //    if (event.keyCode === 13) {
 
-        //        getDemoMarkets();
+        //        getDemoHybridMarketStationList();
         //    }
         //});
     }
 
     function setDataTable() {
-        var reportTitle = "Demo Markets List";
-        var exportColumns = returnTableColumnsByClass("dtDemoMarketList", "exportColumn");
-        
-        $("#dtDemoMarketList").DataTable({
+        var reportTitle = "Demo Hybrid Markets/Stations List";
+        var exportColumns = returnTableColumnsByClass("dtDemoHybridMarketStationList", "exportColumn");
+
+        $("#dtDemoHybridMarketStationList").DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
             "data": [],
             "columns": [
                 { "data": 'productName' },
-                { "data": 'mediaTypeName' },
+                { "data": 'productionMediaTypeName' },
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="/admin/market/marketview.html?marketId=' + row.marketId + '">' + row.marketName + '</a>';
+                        return '<a href="/admin/market/marketview.html?marketId=' + row.productionMarketId + '">' + row.productionMarketName + '</a>';
                     }
                 },
-                { "data": 'demoDescription' },
-                { "data": 'marketActive' },
-                { "data": 'marketOnHold' },
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="#" onclick="editDemoMarket(\'' + row.productId + '\',' + row.marketId + ')">Edit</a><br>'
-                            + '<a href="#" onclick="deleteDemoMarket(\'' + row.productId + '\',' + row.marketId + ')">Delete</a>';
+                        return '<a href="/admin/station/stationview.html?stationId=' + row.productionStationId + '">' + row.productionStationName + '</a>';
+                    }
+                },
+                {
+                    mRender: function (data, type, row) {
+                        return '<a href="/admin/ownership/ownershipview.html?ownerId=' + row.productionOwnerId + '">' + row.productionOwnerName + '</a>';
+                    }
+                },
+                {
+                    mRender: function (data, type, row) {
+                        return '<a href="/admin/market/marketview.html?marketId=' + row.demoMarketId + '">' + row.demoMarketName + '</a>';
+                    }
+                },
+                {
+                    mRender: function (data, type, row) {
+                        return '<a href="/admin/station/stationview.html?stationId=' + row.demoStationId + '">' + row.demoStationName + '</a>';
+                    }
+                },
+                {
+                    mRender: function (data, type, row) {
+                        return '<a href="/admin/ownership/ownershipview.html?ownerId=' + row.demoOwnerId + '">' + row.demoOwnerName + '</a>';
+                    }
+                },
+                { "data": 'demoMarketDemoDescription' },
+                {
+                    mRender: function (data, type, row) {
+                        var issues = '';
+                        if (row.productionMarketActive.toLowerCase().startsWith("active") == false) {
+                            issues += 'Production market: ' + row.productionMarketActive + '<br />';
+                        }
+                        if (row.productionMarketOnHold.toLowerCase().startsWith("on hold")) {
+                            issues += 'Production market: ' + row.productionMarketOnHold + '<br />';
+                        }
+                        if (row.productionStationActive.toLowerCase().startsWith("active") == false) {
+                            issues += 'Production station: ' + row.productionStationActive + '<br />';
+                        }
+                        if (row.demoMarketActive.toLowerCase().startsWith("active") == false) {
+                            issues += 'Demo market: ' + row.demoMarketActive + '<br />';
+                        }
+                        if (row.demoMarketOnHold.toLowerCase().startsWith("on hold")) {
+                            issues += 'Demo market: ' + row.demoMarketOnHold + '<br />';
+                        }
+                        if (row.demoStationActive.toLowerCase().startsWith("active") == false) {
+                            issues += 'Demo station: ' + row.demoStationActive + '<br />';
+                        }
+                        return issues;
+                    }
+                },
+                {
+                    mRender: function (data, type, row) {
+                        return '<a href="#" onclick="deleteDemoHybridMarketStation(\'' + row.productId + '\',' + row.productionStationId + ',' + row.demoStationId + ')">Delete</a>';
                     },
                     "orderable": false,
                     "searchable": false,
@@ -337,7 +489,7 @@
                //        columns: exportColumns,
                //        format: {
                //            header: function (data, columnIdx) {
-               //                return returnExportColumnHeadingTitle("dtDemoMarketList", data, columnIdx);
+               //                return returnExportColumnHeadingTitle("dtDemoHybridMarketStationList", data, columnIdx);
                //            }
                //        }
                //    }
@@ -349,7 +501,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtDemoMarketList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtDemoHybridMarketStationList", data, columnIdx);
                            }
                        }
                    }
@@ -361,7 +513,7 @@
                //        columns: exportColumns,
                //        format: {
                //            header: function (data, columnIdx) {
-               //                return returnExportColumnHeadingTitle("dtDemoMarketList", data, columnIdx);
+               //                return returnExportColumnHeadingTitle("dtDemoHybridMarketStationList", data, columnIdx);
                //            }
                //        }
                //    }
@@ -373,7 +525,7 @@
                        columns: exportColumns,
                        format: {
                            header: function (data, columnIdx) {
-                               return returnExportColumnHeadingTitle("dtDemoMarketList", data, columnIdx);
+                               return returnExportColumnHeadingTitle("dtDemoHybridMarketStationList", data, columnIdx);
                            }
                        }
                    }
@@ -400,29 +552,30 @@
 
     function clearSearchButtonSetup() {
         $("body").on("click", "#clear_search_button", function () {
-            var table = $("#dtDemoMarketList").DataTable();
+            var table = $("#dtDemoHybridMarketStationList").DataTable();
             table.search('').draw();
         });
     }
 
     function loadLastSearch() {
         loadReportParameters();
-        //getDemoMarkets();
-        setTimeout(getDemoMarkets, 500);
+        //getDemoHybridMarketStationList();
+        setTimeout(getDemoHybridMarketStationList, 500);
     }
 
-    function getDemoMarkets() {
+    function getDemoHybridMarketStationList() {
         if (gotProducts   == false
          || gotMediaTypes == false
-         || gotMarkets    == false) {
+         || gotMarkets    == false
+         || gotStations   == false
+         || gotOwners     == false) {
             return;
         }
 
         setLocalStorage("search", $("#ddlMediaType").val());
         setLocalStorage("searchPage", window.location);
 
-        // /api/Demo/GetDemoMarketList is a simpler version for generic report "Demo Market List"
-        var url = ServicePrefix + '/api/Demo/GetDemoMarketListForMaintenance'
+        var url = ServicePrefix + '/api/Demo/GetDemoHybridMarketStationList'
             + '?inApiToken=' + getLocalStorage("APIToken");
 
         if ($("#ddlProduct").val() != "") {
@@ -437,6 +590,14 @@
             url += '&inMarketId=' + $("#ddlMarket").val();
         }
 
+        if ($("#ddlStation").val() != -1) {
+            url += '&inStationId=' + $("#ddlStation").val();
+        }
+
+        if ($("#ddlOwner").val() != -1) {
+            url += '&inOwnerId=' + $("#ddlOwner").val();
+        }
+
         $.ajax({
             url: url,
             dataType: 'json',
@@ -444,7 +605,7 @@
             contentType: 'application/json',
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                populateDataTable("dtDemoMarketList", data);
+                populateDataTable("dtDemoHybridMarketStationList", data);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -452,11 +613,11 @@
         });
     }
 
-    function editDemoMarket(productId, marketId) {
+    function addDemoHybridMarketStation() {
         bootbox.alert('This functionality is still under development.');
     }
 
-    function deleteDemoMarket(productId, marketId) {
+    function deleteDemoHybridMarketStation(productId, productionStationId, demoStationId) {
         bootbox.alert('This functionality is still under development.');
     }
 
