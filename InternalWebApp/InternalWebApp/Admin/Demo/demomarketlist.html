@@ -70,15 +70,15 @@
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-10 ">
-                        <label for="ddlMediaType" class="dropdown-label">Media Type</label>
-                        <select id="ddlMediaType" class="search-ddl-select dropdown-select report-filter" onchange="getDemoMarketList();"></select>
-                        <label for="ddlMarket" class="dropdown-label">Market</label>
-                        <select id="ddlMarket" class="search-ddl-select dropdown-select report-filter" onchange="getDemoMarketList();"></select>
                         <label for="ddlProduct" class="dropdown-label">Product</label>
-                        <select id="ddlProduct" class="search-ddl-select dropdown-select report-filter" onchange="getDemoMarketList();"></select>
+                        <select id="ddlProduct" class="search-ddl-select dropdown-select report-filter" onchange="getDemoMarkets();"></select>
+                        <label for="ddlMediaType" class="dropdown-label">Media Type</label>
+                        <select id="ddlMediaType" class="search-ddl-select dropdown-select report-filter" onchange="getDemoMarkets();"></select>
+                        <label for="ddlMarket" class="dropdown-label">Market</label>
+                        <select id="ddlMarket" class="search-ddl-select dropdown-select report-filter" onchange="getDemoMarkets();"></select>
                     </div>
                     <div class="col-md-2 ">
-                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editDemoMarket(0)" />
+                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="editDemoMarket('', 0)" />
                     </div>
                 </div>
 
@@ -137,10 +137,14 @@
 </html>
 <script>
 
+    var gotProducts = false;
+    var gotMediaTypes = false;
+    var gotMarkets = false;
+
     $(document).ready(function () {
-        getMediaTypes();
-        getMarkets(); // TODO should this be filtered by media type and/or product?
         getProducts();
+        getMediaTypes();
+        getMarkets(); // Possible future improvement: filter this list by media type and/or product
 
         setEventListeners();
 
@@ -160,78 +164,6 @@
         setLocalStorage("search", $("#ddlMediaType").val()  );
         setLocalStorage("searchPage", window.location);
     });
-
-    function getMediaTypes() {
-        $.ajax({
-            url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getMediaTypesSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function getMediaTypesSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-            return
-        }
-
-        var str = '<option value="-1">-- Select a Media Type</option>';
-        $.each(data.report.rows, function (index) {
-            var obj = data.report.rows[index];
-            str += '<option value="' + obj.MediaTypeID + '">' + obj.MediaTypeName + '</option>';
-        });
-
-        $("#ddlMediaType").html(str);
-
-        convertToChosenSelect("ddlMediaType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-    }
-
-    function getMarkets() {
-        $.ajax({
-            url: ServicePrefix + '/api/Market/GetMarketList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getMarketsSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function getMarketsSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        var str = '<option value="">-- Select a Market --</option>';
-        $.each(data.report.rows, function (index) {
-            var obj = data.report.rows[index];
-            str += '<option value="' + obj.marketId + '">' + obj.marketName + '</option>';
-        });
-
-        $("#ddlMarket").html(str);
-
-        convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-    }
 
     function getProducts() {
         $.ajax({
@@ -266,6 +198,82 @@
         });
 
         $("#ddlProduct").html(str);
+        gotProducts = true;
+        getDemoMarkets();
+    }
+
+    function getMediaTypes() {
+        $.ajax({
+            url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMediaTypesSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getMediaTypesSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return
+        }
+
+        var str = '<option value="-1">-- All Media Types --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str += '<option value="' + obj.MediaTypeID + '">' + obj.MediaTypeName + '</option>';
+        });
+
+        $("#ddlMediaType").html(str);
+        convertToChosenSelect("ddlMediaType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+        gotMediaTypes = true;
+        getDemoMarkets();
+    }
+
+    function getMarkets() {
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getMarketsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '<option value="">-- All Markets --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str += '<option value="' + obj.marketId + '">' + obj.marketName + '</option>';
+        });
+
+        $("#ddlMarket").html(str);
+        convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+        gotMarkets = true;
+        getDemoMarkets();
     }
 
     function setEventListeners() {
@@ -287,7 +295,7 @@
         //    // Number 13 is the "Enter" key on the keyboard
         //    if (event.keyCode === 13) {
 
-        //        getDemoMarketList();
+        //        getDemoMarkets();
         //    }
         //});
     }
@@ -303,15 +311,18 @@
             "columns": [
                 { "data": 'productName' },
                 { "data": 'mediaTypeName' },
-                { "data": 'marketName' },
-                { "data": 'demoDescription' },
-                { "data": 'marketActive' },
-                { "data": 'marketOnHold' }, // TODO not on hold -> leave blank (improved filtering)
                 {
                     mRender: function (data, type, row) {
-                        // TODO also pass row.productId wrapped in single quotes
-                        return '<a href="#" onclick="editDemoMarket(' + row.marketId + ')">Edit</a><br>'
-                            + '<a href="#" onclick="deleteDemoMarket(' + row.marketId + ')">Delete</a>';
+                        return '<a href="/admin/market/marketview.html?marketId=' + row.marketId + '">' + row.marketName + '</a>';
+                    }
+                },
+                { "data": 'demoDescription' },
+                { "data": 'marketActive' },
+                { "data": 'marketOnHold' },
+                {
+                    mRender: function (data, type, row) {
+                        return '<a href="#" onclick="editDemoMarket(\'' + row.productId + '\',' + row.marketId + ')">Edit</a><br>'
+                            + '<a href="#" onclick="deleteDemoMarket(\'' + row.productId + '\',' + row.marketId + ')">Delete</a>';
                     },
                     "orderable": false,
                     "searchable": false,
@@ -403,11 +414,15 @@
 
     function loadLastSearch() {
         loadReportParameters();
-        //getDemoMarketList();
+        //getDemoMarkets();
         setTimeout(getDemoMarketList, 500);
     }
 
-    function getDemoMarketList() {
+    function getDemoMarkets() {
+        if (gotProducts == false || gotMediaTypes == false || gotMarkets == false) {
+            return;
+        }
+
         setLocalStorage("search", $("#ddlMediaType").val());
         setLocalStorage("searchPage", window.location);
 
