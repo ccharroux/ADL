@@ -1123,19 +1123,34 @@ function getReportFilterArray_UserListing() {
     var arrayObject = new Object();
 
     arrayObject = {
+        token: "Product",
+        jsCall: "getProductListHidden",
+        jsCallParameters: ['XRY', true],
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
         token: "Market",
-        jsCall: "getMarketListByProduct",
+        jsCall: "getMarketListByProductMediaType",
         jsCallParameters: ['XRY'],
         objectName: "ddlMarket",
+        reloadBasedProduct: true,
+        reloadBasedMediaType: true,
         required: false
+
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerListByProduct",
+        jsCall: "getOwnerListByProductMarketMediaType",
         jsCallParameters: ['XRY'],
         objectName: "ddlOwner",
+        reloadBasedProduct: true,
+        reloadBasedMarket: true,
+        reloadBasedMediaType: true,
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -1457,19 +1472,22 @@ function getReportFilterArray_StationListing() {
 
     arrayObject = {
         token:  "Market",
-        jsCall:  "getMarketListByProduct",
+        jsCall: "getMarketListByProductMediaType",
         objectName:  "ddlMarket",
         required: false,
-        reloadBasedProduct: true
+        reloadBasedProduct: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
         token:  "Owner",
-        jsCall: "getOwnerListByProduct",
+        jsCall: "getOwnerListByProductMarketMediaType",
         objectName:  "ddlOwner",
         required: false,
-        reloadBasedProduct: true
+        reloadBasedProduct: true,
+        reloadBasedMarket: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
