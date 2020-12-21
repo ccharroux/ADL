@@ -614,11 +614,52 @@
     }
 
     function addDemoHybridMarketStation() {
-        bootbox.alert('This functionality is still under development.');
+        window.location = "/admin/demo/demohybridmarketstation.html";
     }
 
     function deleteDemoHybridMarketStation(productId, productionStationId, demoStationId) {
-        bootbox.alert('This functionality is still under development.');
+        bootbox.confirm("Are you sure you want to delete this demo hybrid market/station (" + productId + " / station " + productionStationId + " -> station " + demoStationId + "?", function (result) {
+            if (result == true) {
+                deleteDemoHybridMarketStationConfirmed(productId, productionStationId, demoStationId);
+            }
+        });
+    }
+
+    function deleteDemoHybridMarketStationConfirmed(productId, productionStationId, demoStationId) {
+        $.ajax({
+            url: ServicePrefix + '/api/Demo/DeleteDemoHybridMarketStation',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": productId,
+                "inProductionStationId": productionStationId,
+                "inDemoStationId": demoStationId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deleteDemoHybridMarketStationSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function deleteDemoHybridMarketStationSuccess(data, textStatus, jQxhr) {
+        if (data.response.status == "BLOCK") {
+            bootbox.alert(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert('Demo hybrid market/station deleted.');
+        getDemoHybridMarketStationList();
     }
 
 </script>

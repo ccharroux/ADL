@@ -176,7 +176,7 @@
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getProductListSuccess(data, textStatus, jQxhr);
+                getProductsSuccess(data, textStatus, jQxhr);
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
@@ -184,7 +184,7 @@
         });
     }
 
-    function getProductListSuccess(data, textStatus, jQxhr) {
+    function getProductsSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
@@ -453,11 +453,51 @@
     }
 
     function editDemoMarket(productId, marketId) {
-        bootbox.alert('This functionality is still under development.');
+        window.location = "/admin/demo/demomarket.html?ProductID=" + productId + "&marketId=" + marketId;
     }
 
     function deleteDemoMarket(productId, marketId) {
-        bootbox.alert('This functionality is still under development.');
+        bootbox.confirm("Are you sure you want to delete this demo market (" + productId + " / " + marketId + "?", function (result) {
+            if (result == true) {
+                deleteDemoMarketConfirmed(productId, marketId);
+            }
+        });
+    }
+
+    function deleteDemoMarketConfirmed(productId, marketId) {
+        $.ajax({
+            url: ServicePrefix + '/api/Demo/DeleteDemoMarket',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": productId,
+                "inMarketId": marketId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deleteDemoMarketSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function deleteDemoMarketSuccess(data, textStatus, jQxhr) {
+        if (data.response.status == "BLOCK") {
+            bootbox.alert(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert('Demo market deleted.');
+        getDemoMarkets();
     }
 
 </script>
