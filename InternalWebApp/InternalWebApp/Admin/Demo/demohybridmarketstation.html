@@ -73,7 +73,15 @@
                                     <label for="ddlProduct">Product</label>
                                 </div>
                                 <div class="col-md-8 text-align-left">
-                                    <select id="ddlProduct" class="mkaRequired field-width-325" errorMessage="You must select a Product."></select>
+                                    <select id="ddlProduct" onchange="productChanged();" class="mkaRequired field-width-325" errorMessage="You must select a Product."></select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 text-align-left">
+                                    <label for="ddlProductionMarket">Production Market</label>
+                                </div>
+                                <div class="col-md-8 text-align-left">
+                                    <select id="ddlProductionMarket" onchange="productionMarketChanged();" class="field-width-325"></select>
                                 </div>
                             </div>
                             <div class="row">
@@ -82,6 +90,14 @@
                                 </div>
                                 <div class="col-md-8 text-align-left">
                                     <select id="ddlProductionStation" class="mkaRequired field-width-325" errorMessage="You must select a Production Station."></select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 text-align-left">
+                                    <label for="ddlDemoMarket">Demo Market</label>
+                                </div>
+                                <div class="col-md-8 text-align-left">
+                                    <select id="ddlDemoMarket" onchange="demoMarketChanged();" class="field-width-325"></select>
                                 </div>
                             </div>
                             <div class="row">
@@ -139,6 +155,12 @@
 </html>
 <script>
 
+    var gotProducts = false;
+    var gotProductionMarkets = false;
+    var gotDemoMarkets = false;
+    var gotProductionStations = false;
+    var gotDemoStations = false;
+
     $(document).ready(function ()
     {
         buildMainMenu("Stations");
@@ -155,8 +177,8 @@
 
         buildQuickReports(['station']);
 
-        getProducts();
-        getStations();
+        getProducts(); // success -> getProductionMarkets() -> getProductionStations()
+                       //   and also getDemoMarkets()       -> getDemoStations()
     });
 
     function getProducts() {
@@ -184,7 +206,7 @@
             return;
         }
 
-        var str = '<option value="">-- All Products --</option>';
+        var str = '<option value="">-- Select a Product --</option>';
         $.each(data.report.rows, function (index) {
             var obj = data.report.rows[index];
             var productId = obj.P_ProductID.toUpperCase();
@@ -192,20 +214,44 @@
         });
 
         $("#ddlProduct").html(str);
+        gotProducts = true;
+        productChanged();
     }
 
-    function getStations() {
+    function productChanged() {
+        getProductionMarkets();
+        getDemoMarkets();
+    }
+
+    function getProductionMarkets() {
+        if (gotProducts == false) {
+            return;
+        }
+
+        var url;
+        var data;
+        if (gotProducts && ($("#ddlProduct").val() != "")) {
+            url = ServicePrefix + '/api/Market/GetMarketListByProduct';
+            data = JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": $("#ddlProduct").val()
+            });
+        } else {
+            url = ServicePrefix + '/api/Market/GetMarketList';
+            data = JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            });
+        }
+
         $.ajax({
-            url: ServicePrefix + '/api/Station/GetStationList',
+            url: url,
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
+            data: data,
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                getStationsSuccess(data, textStatus, jQxhr);
+                getProductionMarketsSuccess(data, textStatus, jQxhr);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -213,23 +259,203 @@
         });
     }
 
-    function getStationsSuccess(data, textStatus, jQxhr) {
+    function getProductionMarketsSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
-        var str = '<option value="">-- All Stations --</option>';
+        var currentSelection = "";
+        var foundCurrentSelection = false;
+        if (gotProductionMarkets) {
+            currentSelection = $("#ddlProductionMarket").val();
+        }
+
+        var str = '<option value="">-- All Markets --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str += '<option value="' + obj.marketId + '">' + obj.marketName + '</option>';
+            if (obj.marketId == currentSelection) {
+                foundCurrentSelection = true;
+            }
+        });
+
+        $("#ddlProductionMarket").html(str);
+        convertToChosenSelect("ddlProductionMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+        if (foundCurrentSelection) {
+            $("#ddlProductionMarket").val(currentSelection);
+        }
+        gotProductionMarkets = true;
+        productionMarketChanged();
+    }
+
+    function productionMarketChanged() {
+        getProductionStations();
+    }
+
+    function getDemoMarkets() {
+        if (gotProducts == false) {
+            return;
+        }
+
+        // /api/Demo/GetDemoMarketList was built for a generic report and doesn't return IDs separately
+        var url = ServicePrefix + '/api/Demo/GetDemoMarketListForMaintenance'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inProductId=' + $("#ddlProduct").val();
+
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getDemoMarketsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getDemoMarketsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var currentSelection = "";
+        var foundCurrentSelection = false;
+        if (gotDemoMarkets) {
+            currentSelection = $("#ddlDemoMarket").val();
+        }
+
+        var str = '<option value="">-- All Markets --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str += '<option value="' + obj.marketId + '">' + obj.marketName + '</option>';
+            if (obj.marketId == currentSelection) {
+                foundCurrentSelection = true;
+            }
+        });
+
+        $("#ddlDemoMarket").html(str);
+        convertToChosenSelect("ddlDemoMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+        if (foundCurrentSelection) {
+            $("#ddlDemoMarket").val(currentSelection);
+        }
+        gotDemoMarkets = true;
+        demoMarketChanged();
+    }
+
+    function demoMarketChanged() {
+        getDemoStations();
+    }
+
+    function getProductionStations() {
+        if (gotProductionMarkets == false) {
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Station/GetStationList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": $("#ddlProductionMarket").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getProductionStationsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getProductionStationsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var currentSelection = "";
+        var foundCurrentSelection = false;
+        if (gotProductionStations) {
+            currentSelection = $("#ddlProductionStation").val();
+        }
+
+        var str = '<option value="">-- Select a Production Station --</option>';
         $.each(data.report.rows, function (index) {
             var obj = data.report.rows[index];
             str += '<option value="' + obj.stationId + '">' + obj.stationName + ' (' + obj.stationId + ')</option>';
+            if (obj.stationId == currentSelection) {
+                foundCurrentSelection = true;
+            }
         });
 
         $("#ddlProductionStation").html(str);
         convertToChosenSelect("ddlProductionStation", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+        if (foundCurrentSelection) {
+            $("#ddlProductionStation").val(currentSelection);
+        }
+        gotProductionStations = true;
+    }
+
+    function getDemoStations() {
+        if (gotDemoMarkets == false) {
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Station/GetStationList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": $("#ddlDemoMarket").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getDemoStationsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getDemoStationsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var currentSelection = "";
+        var foundCurrentSelection = false;
+        if (gotDemoStations) {
+            currentSelection = $("#ddlDemoStation").val();
+        }
+
+        var str = '<option value="">-- Select a Demo Station --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            str += '<option value="' + obj.stationId + '">' + obj.stationName + ' (' + obj.stationId + ')</option>';
+            if (obj.stationId == currentSelection) {
+                foundCurrentSelection = true;
+            }
+        });
 
         $("#ddlDemoStation").html(str);
         convertToChosenSelect("ddlDemoStation", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+        if (foundCurrentSelection) {
+            $("#ddlDemoStation").val(currentSelection);
+        }
+        gotDemoStations = true;
     }
 
     function updateDemoHybridMarketStation() {
