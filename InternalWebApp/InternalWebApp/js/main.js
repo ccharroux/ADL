@@ -1,5 +1,3 @@
- 
-
 const gMediaTypeRadio = "RADIO";
 const gMediaTypeTelevision = "TELEVISION";
 const gMediaTypeNewspapers = "NEWSPAPERS";
@@ -605,19 +603,13 @@ function getFavoritesForQuickList() {
                     $("#favoritesQuickList").append('<li class="display-block"><a href="' + url + '">' + title + '</a></li>');
                 });
 
-
-
             }
-
 
         },
         error: function (jqXhr, textStatus, errorThrown) {
             genericAjaxError(jqXhr, textStatus, errorThrown);
         }
     });
-
-
-
 
 }
 
@@ -1112,6 +1104,16 @@ function buildMainMenu(selectedItem) {
     menuItems += '                  <li style="display:block;"><a href="/admin/training/traininglist.html?MenuItem=true">Training</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/customersupport/customersupportlist.html?MenuItem=true">Customer Support</a></li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/relationship/relationshiplists.html?MenuItem=true">MKA User Groups</a></li>';
+
+    if (bIsDemo == false) {
+        menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">Demo Maintenance <span style="margin-right:10px;" class="caret"></span></a>'
+        menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
+        menuItems += '                          <li style="display:block;"><a href="/admin/demo/demomarketlist.html?MenuItem=true">Demo Markets</a></li>';
+        menuItems += '                          <li style="display:block;"><a href="/admin/demo/demohybridmarketstationlist.html?MenuItem=true">Demo Hybrids</a></li>';
+        menuItems += '                      </ul>';
+        menuItems += '                  </li>';
+    }
+
     menuItems += '                  <li style="display:block;"><a href="/admin/techtools/techtoolsdashboard.html?MenuItem=true">Tech Tools</a></li>';
     menuItems += '                  <li style="display:block;text-align:center;">----------------------</li>';
     menuItems += '                  <li style="display:block;"><a href="/admin/format/formatlist.html?MenuItem=true">Formats</a></li>';
