@@ -77,7 +77,7 @@
                                         <span id="spanProduct"></span>
                                     </div>
                                     <div class="newDemoMarket">
-                                        <select id="ddlProduct" class="mkaRequired field-width-325" errorMessage="You must select a Product."></select>
+                                        <select id="ddlProduct" onchange="productChanged();" class="mkaRequired field-width-325" errorMessage="You must select a Product."></select>
                                     </div>
                                 </div>
                             </div>
@@ -140,6 +140,8 @@
     <script src="/js/config.js"></script>
     <!-- MAIN JS -->
     <script src="/js/main.js"></script>
+    <!-- Demo JS -->
+    <script src="/js/demo.js"></script>
     <!-- genericReport JS -->
     <script src="/js/genericReport.js"></script>
 
@@ -152,6 +154,8 @@
     var productId;
     var marketId;
     var newDemoMarket = true;
+    var gotProducts = false;
+    var gotMarkets = false;
 
     $(document).ready(function ()
     {
@@ -179,8 +183,7 @@
             $(".existingDemoMarket").show();
             $(".newDemoMarket").hide();
         } else {
-            getProducts();
-            getMarkets();
+            getProducts(); // success -> getMarkets()
             $(".existingDemoMarket").hide();
             $(".newDemoMarket").show();
         }
@@ -221,39 +224,58 @@
         $("#spanProduct").text(data.report.rows[0].P_ProductName);
     }
 
+    //function getProducts() {
+    //    $.ajax({
+    //        url: ServicePrefix + '/api/Product/GetProductList',
+    //        dataType: 'json',
+    //        type: 'post',
+    //        contentType: 'application/json',
+    //        data: JSON.stringify({
+    //            "inApiToken": getLocalStorage("APIToken")
+    //        }),
+    //        processData: false,
+    //        success: function (data, textStatus, jQxhr) {
+    //            getProductsSuccess(data, textStatus, jQxhr);
+    //        },
+    //        error: function (jQxhr, textStatus, errorThrown) {
+    //            genericAjaxError(jQxhr, textStatus, errorThrown);
+    //        }
+    //    });
+    //}
+
+    //function getProductsSuccess(data, textStatus, jQxhr) {
+    //    if (data.response.status != "SUCCESS") {
+    //        MKAErrorMessageRtn(data.response.errorMessage[0]);
+    //        return;
+    //    }
+
+    //    var str = '<option value="">-- Select a Product --</option>';
+    //    $.each(data.report.rows, function (index) {
+    //        var obj = data.report.rows[index];
+    //        var productId = obj.P_ProductID.toUpperCase();
+    //        str += '<option value="' + productId + '">' + obj.P_ProductName + '</option>';
+    //    });
+
+    //    $("#ddlProduct").html(str);
+    //}
+
     function getProducts() {
-        $.ajax({
-            url: ServicePrefix + '/api/Product/GetProductList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getProductsSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        });
-    }
+        var demoProductList = getDemoProductList();
 
-    function getProductsSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        var str = '<option value="">-- All Products --</option>';
-        $.each(data.report.rows, function (index) {
-            var obj = data.report.rows[index];
-            var productId = obj.P_ProductID.toUpperCase();
-            str += '<option value="' + productId + '">' + obj.P_ProductName + '</option>';
+        var str = '<option value="">-- Select a Product --</option>';
+        $.each(demoProductList, function (index) {
+            var obj = demoProductList[index];
+            var productId = obj.demoProductId.toUpperCase();
+            str += '<option value="' + productId + '">' + obj.demoProductName + '</option>';
         });
 
         $("#ddlProduct").html(str);
+        gotProducts = true;
+        productChanged();
+    }
+
+    function productChanged() {
+        getMarkets();
     }
 
     function getMarket() {
@@ -292,14 +314,31 @@
     }
 
     function getMarkets() {
+        if (gotProducts == false) {
+            return;
+        }
+
+        var url;
+        var data;
+        if ($("#ddlProduct").val() != "") {
+            url = ServicePrefix + '/api/Market/GetMarketListByProduct';
+            data = JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": $("#ddlProduct").val()
+            });
+        } else {
+            url = ServicePrefix + '/api/Market/GetMarketList';
+            data = JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            });
+        }
+
         $.ajax({
-            url: ServicePrefix + '/api/Market/GetMarketList',
+            url: url,
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
+            data: data,
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 getMarketsSuccess(data, textStatus, jQxhr);
@@ -316,14 +355,32 @@
             return;
         }
 
-        var str = '<option value="">-- All Markets --</option>';
+        var currentSelection = "";
+        var foundCurrentSelection = false;
+        if (gotMarkets) {
+            currentSelection = $("#ddlMarket").val();
+        }
+
+        var str = '<option value="">-- Select a Market --</option>';
         $.each(data.report.rows, function (index) {
             var obj = data.report.rows[index];
-            str += '<option value="' + obj.marketId + '">' + obj.marketName + '</option>';
+            // GetMarketList appends " (ID)", GetMarketListByProduct doesn't
+            var marketName = obj.marketName;
+            if ($("#ddlProduct").val() != "") {
+                marketName += " (" + obj.marketId + ")";
+            }
+            str += '<option value="' + obj.marketId + '">' + marketName + '</option>';
+            if (obj.marketId == currentSelection) {
+                foundCurrentSelection = true;
+            }
         });
 
         $("#ddlMarket").html(str);
         convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+        if (foundCurrentSelection) {
+            $("#ddlMarket").val(currentSelection);
+        }
+        gotMarkets = true;
     }
 
     function getDemoMarket() {
