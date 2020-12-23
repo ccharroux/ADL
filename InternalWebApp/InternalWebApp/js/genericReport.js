@@ -6568,21 +6568,9 @@ function getReportFilterArray_MediaAdvertisers() {
     var arrayObject = new Object();
 
     arrayObject = {
-        token: "Product",
-        jsCall: "getProductListHidden",
-        jsCallParameters: ['XRY', true],
-        objectName: "ddlProduct",
-        required: true
-    }
-    arrayFilters.push(arrayObject);
-
-    arrayObject = {
         token: "Market",
-        jsCall: "getMarketListByProductMediaType",
-        jsCallParameters: ['XRY'],
+        jsCall: "getXRYMarketList",
         objectName: "ddlMarket",
-        reloadBasedProduct: true,
-        reloadBasedMediaType: true,
         required: true
     }
     arrayFilters.push(arrayObject);
