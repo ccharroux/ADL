@@ -6458,10 +6458,21 @@ function getReportFilterArray_Advertisers() {
     var arrayObject = new Object();
 
     arrayObject = {
+        token: "Product",
+        jsCall: "getProductListHidden",
+        jsCallParameters: ['XRY', true],
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
         token: "Market",
-        jsCall: "getXRYMarketList",
+        jsCall: "getMarketListByProductMediaType",
+        jsCallParameters: ['XRY'],
         objectName: "ddlMarket",
         required: false,
+        reloadBasedProduct: true,
         reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
@@ -6490,11 +6501,6 @@ function getReportFilterArray_Advertisers() {
         token: "Industry",
         jsCall: "getIndustryList",
         objectName: "ddlIndustry",
-        //onchange: function () {
-
-        //    getSubIndustryList($("#ddlIndustry").val(), '');
-
-        //},
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -6568,7 +6574,6 @@ function getReportFilterArray_MediaAdvertisers() {
     var arrayFilters = new Array();
     var arrayObject = new Object();
 
- 
     arrayObject = {
         token: "Market",
         jsCall: "getXRYMarketList",
@@ -6836,10 +6841,22 @@ function getReportFilterArray_Agencies() {
     var arrayObject = new Object();
 
     arrayObject = {
+        token: "Product",
+        jsCall: "getProductListHidden",
+        jsCallParameters: ['XRY', true],
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
         token: "Market",
-        jsCall: "getXRYMarketList",
+        jsCall: "getMarketListByProductMediaType",
+        jsCallParameters: ['XRY'],
         objectName: "ddlMarket",
-        required: false
+        required: false,
+        reloadBasedProduct: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
