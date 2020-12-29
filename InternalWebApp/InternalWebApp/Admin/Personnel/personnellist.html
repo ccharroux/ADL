@@ -210,14 +210,15 @@
                     "searchable": true
                 },
                 {
-                    mRender: function (data, type, row) {
-
-                        var str =  '<a href="#" onclick="editPersonnel(' + row.personnelId + ')">Edit</a>&nbsp;&nbsp;<a href="#" onclick="deletePersonnel(' + row.marketId + ')">Delete</a>'
+                    mRender: function (data, type, row)
+                    {
+                        var name = row.name.replace(/'/g,"#");
+                        var str = '<a href="#" onclick="editPersonnel(' + row.personnelId + ')">Edit</a>&nbsp;&nbsp;<a href="#" onclick="deletePersonnel(' + row.personnelId + ')">Delete</a>';
 
                         if (row.ownerName != "NONE") {
-                            str = str + '<br><a href="#" onclick="assignmentPersonnel(' + row.personnelId + ',' + "'" + row.name + "'" + ',' +  "'" + row.emailAddress + "'" + ')">Assignment</a>';
-                            str = str + '<br><a href="#" onclick="groupAssignmentPersonnel(' + row.personnelId + ',' + "'" + row.name + "'" + ')">Group Assignment</a>';
-                            str = str + '<br><a href="#" onclick="personnelSnapshot(' + row.personnelId + ',' + "'" + row.name + "'" + ')">Personnel Dashboard</a>';
+                            str = str + '<br><a href="#" onclick="assignmentPersonnel(' + row.personnelId + ',' + "'" + name + "'" + ',' +  "'" + row.emailAddress + "'" + ')">Assignment</a>';
+                            str = str + '<br><a href="#" onclick="groupAssignmentPersonnel(' + row.personnelId + ',' + "'" + name + "'" + ')">Group Assignment</a>';
+                            str = str + '<br><a href="#" onclick="personnelSnapshot(' + row.personnelId + ',' + "'" + name + "'" + ')">Personnel Dashboard</a>';
                         }
                         return str;
 
@@ -477,18 +478,22 @@
 
     }
     function assignmentPersonnel(personnelId, name, emailAddress) {
-        setAssignmentPageParameters(name, emailAddress);
+        var resetName = name.replace(/#/g, "'");
+        setAssignmentPageParameters(resetName, emailAddress);
         window.location = "/admin/personnel/personnelassignment.html?personnelID=" + personnelId;
 
     }
 
     function groupAssignmentPersonnel(personnelId, name) {
-        setGroupAssignmentPageParameters(name);
+        var resetName = name.replace(/#/g, "'");
+        setGroupAssignmentPageParameters(resetName);
         window.location = "/admin/personnel/personnelgroupassignment.html?personnelID=" + personnelId;
 
     }
-    function personnelSnapshot(personnelId, name) {
-        setAssignmentPageParameters(name);
+    function personnelSnapshot(personnelId, name)
+    {
+        var resetName = name.replace(/#/g, "'");
+        setAssignmentPageParameters(resetName);
         window.location = "/admin/personnel/personnelview.html?personnelID=" + personnelId;
 
     }
