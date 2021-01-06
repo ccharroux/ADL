@@ -28,6 +28,7 @@ if (bForceDR == true)
     bNonProd = false;
 }
 
+
 var currentPage = window.location.toString().toLocaleLowerCase();
 
 if (currentPage.indexOf("http:") > -1)

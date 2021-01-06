@@ -316,6 +316,10 @@ reportName.push("rptTVBReportingMarketStatus");
 reportName.push("rptTVBStationIssueList");
 reportName.push("rptGetParentHistoryAndMarketStatusByParentMarket");
 
+reportName.push("rptGetParentAdvertiserSetupStatusList");
+reportName.push("rptGetParentAgencySetupStatusList");
+
+
 function buildReportArray()
 {
     var reportCounter = 1;
@@ -12621,6 +12625,74 @@ function getReportObject_GetParentHistoryAndMarketStatusByParentMarket()
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['dmx'],
+        sortable: false,
+        approved: false
+    }
+
+    return tempObject;
+}
+
+ 
+function getReportFilterArray_GetParentAdvertiserSetupStatusList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlParentMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_GetParentAdvertiserSetupStatusList() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject = {
+        reportTitle: "Parent Advertiser Setup Status List",
+        apiControllerAction: '/api/ParentAdvertiser/GetParentAdvertiserSetupStatusList',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['dmx', 'parent advertiser'],
+        sortable: false,
+        approved: false
+    }
+
+    return tempObject;
+}
+function getReportFilterArray_GetParentAgencySetupStatusList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlParentMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_GetParentAgencySetupStatusList() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject = {
+        reportTitle: "Parent Agency Setup Status List",
+        apiControllerAction: '/api/ParentAgency/GetParentAgencySetupStatusList',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['dmx', 'parent agency'],
         sortable: false,
         approved: false
     }
