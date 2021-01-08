@@ -282,7 +282,7 @@ function linkParentAdvertiserByLink(parentAdvertiserId, industry, subIndustry)
         msg = "<u>Parent Advertiser</u><br>Industry: <b>";
         msg = msg + removeID(parentIndustry) + "</b>,";
         msg = msg + " Sub-Industry: <b>" + removeID(parentSubIndustry) + "</b><br>";
-        msg = msg + "<center><font color='red'>DOES NOT MATCH</font></center><br><u>Market Advertiser</u><br>Industry: <b>";
+        msg = msg + "<center><font color='red'>DOES NOT MATCH</font></center><u>Market Advertiser</u><br>Industry: <b>";
         msg = msg + (industry) + "</b>,";
         msg = msg + " Sub-Industry: <b>" + (subIndustry) + "</b><br><br>Assignment not allowed!";
 
