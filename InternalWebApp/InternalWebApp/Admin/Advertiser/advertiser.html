@@ -98,7 +98,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <!--<input type="hidden" id="oldIndustryId" value="" />-->
-                            <select id="ddlIndustry" class="mkaRequired field-width-450" style="" errorMessage="You must select an Industry."></select>
+                            <select id="ddlIndustry" class="mkaRequired field-width-450" style="" errorMessage="You must select an Industry."  onchange="resetErrorMessage()" ></select>
                         </div>
                     </div>
 
@@ -108,7 +108,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <!--<input type="hidden" id="oldSubIndustryId" />-->
-                            <select id="ddlSubIndustry" class="mkaRequired field-width-450" style="" errorMessage="You must select a Sub Industry."></select>
+                            <select id="ddlSubIndustry" class="mkaRequired field-width-450" style="" onchange="resetErrorMessage()" errorMessage="You must select a Sub Industry."></select>
                         </div>
                     </div>
 
@@ -122,6 +122,7 @@
                             <input type="hidden" id="txtParentAdvertiserId" value="" />
                             <input type="text" id="txtParentAdvertiserName" class="disabled mkaRequired field-width-450 margin-right-10" disabled="disabled" style="" errorMessage="You must select a Parent Advertiser"><span id="parentLinkedMessage" class="hidden to-be-linked-message">* Will be linked</span>
                         </div>
+                        <div style="text-align:left;color:red;display:none" id="invalidParentRelationship">&nbsp;&nbsp;&nbsp;&nbsp;Parent Advertiser Industry or Sub-Industry do not match. Invalid Setup.</div>
                     </div>
 
                     <div class="row input-row">
@@ -447,7 +448,6 @@
             getSubIndustryList($(this).val(), '');
         });
 
-
         if (getLocalStorage("StandardInputId") != "") {
             $(".standardInputArea").show();
             getStandardInputData(getLocalStorage("StandardInputId"));
@@ -456,17 +456,25 @@
             $(".standardInputArea").hide();
         }
 
-        if (getLocalStorage("MediaStandardInputId") != "") {
+        if (getLocalStorage("MediaStandardInputId") != "")
+        {
             $(".mediaStandardInputArea").show();
             getStandardMediaInputData(getLocalStorage("MediaStandardInputId"));
         }
-        else {
+        else
+        {
             $(".mediaStandardInputArea").hide();
         }
         
     });
 
-    function setUIFields() {
+    function resetErrorMessage()
+    {
+       $("#invalidParentRelationship").hide();
+    }
+
+    function setUIFields()
+    {
         advertiserId = (getParameterByName("AdvertiserID") == null ? 0 : getParameterByName("AdvertiserID"));
 
         bIsFromReport = getParameterByName("FromReport") == null ? false : getParameterByName("FromReport");
@@ -673,30 +681,39 @@
         $("#chkActive").prop('checked', true);
     }
 
-    function getAdvertiser() {
-        if (advertiserId <= 0) {
+    function getAdvertiser()
+    {
+        $("#invalidParentRelationship").hide();
+
+        if (advertiserId <= 0)
+        {
             initializeActiveDate();
+
             $('.link-parent').hide();
             $('.advertiser-link-advertiser').hide();
             $('.change-date').hide();
 
             //the name should've been supplied through the URL
             //along with industry and sub-industry
-            if (sAdvertiserName.length > 0) {
+            if (sAdvertiserName.length > 0)
+            {
                 $("#txtAdvertiserName").val(sAdvertiserName.toUpperCase());
-                if (iIndustryId > -1) {
+                if (iIndustryId > -1)
+                {
                     $("#ddlIndustry").val(iIndustryId);
                     getSubIndustryList(iIndustryId, iSubIndustryId);
                 }
-
-            } else {
+            }
+            else
+            {
                 getSubIndustryList("-1", "");
             }
 
             loadSearchResults();
 
             //determine media code
-            if (iMarketId > 0) {
+            if (iMarketId > 0)
+            {
                 $("#ddlMarket").val(iMarketId);
             }
 
@@ -732,10 +749,25 @@
                             $("#ddlMarket").val(obj["marketId"]);
                         }
 
+                        if (
+                            obj["parentIndustryId"] == null ||
+                            obj["parentSubIndustryId"] == null ||
+                            obj["parentIndustryId"] != obj["industryId"] ||
+                            obj["parentSubIndustryId"] != obj["subIndustryId"]
+                        )
+                        {
+                            $("#invalidParentRelationship").html("&nbsp;&nbsp;&nbsp;&nbsp;Parent and Market Advertiser Industry or Sub-Industry do not match. Parent Settings: Industry (" + obj["parentIndustryId"] + "), Sub-Industry (" + obj["parentSubIndustryId"] + ").");
+                            $("#invalidParentRelationship").show();
+                        }
+                        else
+                        {
+                            $("#invalidParentRelationship").hide();
 
+                        }
 
                         $("#txtAdvertiserId").val(obj["advertiserId"]);
                         $("#txtAdvertiserName").val(obj["advertiserName"]);
+
 
                         $("#ddlIndustry").val(obj["industryId"]);
 
