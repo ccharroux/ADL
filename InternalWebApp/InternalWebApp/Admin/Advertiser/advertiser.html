@@ -121,20 +121,28 @@
                             <input type="hidden" id="oldParentAdvertiserName" value="" />
                             <input type="hidden" id="txtParentAdvertiserId" value="" />
                             <input type="text" id="txtParentAdvertiserName" class="disabled mkaRequired field-width-450 margin-right-10" disabled="disabled" style="" errorMessage="You must select a Parent Advertiser"><span id="parentLinkedMessage" class="hidden to-be-linked-message">* Will be linked</span>
+                            <div style="margin-top:5px;">
+                                <span>
+                                    <input value="Parent Advertiser Search" onclick="excludeFromBackButton(); searchParentAdvertiser();" class="default-button-200" type="button">
+                                </span>
+                                <span>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="default-button-200" onclick="generateParentAdvertiser()" value="Generate Parent Advertiser" />
+                                </span>
+                            </div>
                         </div>
                         <div style="text-align:left;color:red;display:none" id="invalidParentRelationship">&nbsp;&nbsp;&nbsp;&nbsp;Parent Advertiser Industry or Sub-Industry do not match. Invalid Setup.</div>
                     </div>
 
-                    <div class="row input-row">
+                    <!--<div class="row input-row">
                         <div class="col-md-3">
 
                         </div>
                         <div class="col-md-9 text-align-left">
                             <div>
-                                <input value="Parent Advertiser Search" onclick="excludeFromBackButton(); searchParentAdvertiser();" class="default-button-450" type="button">
+                                
                             </div>
                         </div>
-                    </div>
+                    </div>-->
 
                     <div class="row input-row link-parent" style="display: none;">
                         <div class="col-md-3 text-align-left">
@@ -1439,4 +1447,74 @@
         });
     }
 
+    function generateParentAdvertiser()
+    {
+        var ParentAdvertiserName = $("#txtAdvertiserName").val();
+        var Industry = $("#ddlIndustry").val();
+        var SubIndustry = $("#ddlSubIndustry").val();
+
+        if (ParentAdvertiserName.length == 0)
+        {
+            bootbox.alert("An Advertiser Name is required to Generate a Parent Advertiser", function () { });
+            return;
+        }
+
+        if ($("#ddlIndustry").prop('selectedIndex') == 0) {
+            bootbox.alert("An Industry needs to be selected to Generate a Parent Advertiser", function () { });
+            return;
+        }
+
+        if ($("#ddlSubIndustry").prop('selectedIndex') == 0) {
+            bootbox.alert("A Sub-Industry needs to be selected to Generate a Parent Advertiser", function () { });
+            return;
+        }
+
+        updateParentAdvertiser(ParentAdvertiserName, Industry, SubIndustry)
+    }
+
+    function updateParentAdvertiser(ParentAdvertiserName, Industry, SubIndustry)
+    {
+
+        $.ajax({
+            url: ServicePrefix + '/api/ParentAdvertiser/UpdateParentAdvertiser',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inParentAdvertiserId": '0',
+                "inParentAdvertiserName": ParentAdvertiserName,
+                "inIndustryId": Industry,
+                "inSubIndustryId": SubIndustry,
+                "inIsNew": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                        $("#invalidParentRelationship").hide();
+                        var obj = data.report.rows[0];
+
+                        var newParentAdvertiser = obj["_updateStatus"]
+
+                        $("#oldParentAdvertiserId").val($("#txtParentAdvertiserId").val());
+                        $("#oldParentAdvertiserName").val($("#txtParentAdvertiserName").val());
+                        $("#txtParentAdvertiserId").val(newParentAdvertiser);
+ 
+                        $("#txtParentAdvertiserName").val(ParentAdvertiserName);
+
+                        bootbox.alert("New Parent Advertiser created", function () { });
+                        $("btnGenerateParentAdvertiser").hide();
+
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
+
+    }
 </script>
