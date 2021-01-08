@@ -272,7 +272,23 @@ function fixAgency() {
     });
 }
 
-function linkParentAdvertiserByLink(parentAdvertiserId) {
+function linkParentAdvertiserByLink(parentAdvertiserId, industry, subIndustry)
+{
+
+    if ((removeID(parentIndustry) != industry) || (removeID(parentSubIndustry) != subIndustry))
+    {
+        var msg = "";
+
+        msg = "<u>Parent Advertiser</u><br>Industry: <b>";
+        msg = msg + removeID(parentIndustry) + "</b>,";
+        msg = msg + " Sub-Industry: <b>" + removeID(parentSubIndustry) + "</b><br>";
+        msg = msg + "<center><font color='red'>DOES NOT MATCH</font></center><br><u>Market Advertiser</u><br>Industry: <b>";
+        msg = msg + (industry) + "</b>,";
+        msg = msg + " Sub-Industry: <b>" + (subIndustry) + "</b><br><br>Assignment not allowed!";
+
+        bootbox.alert(msg, function () { });
+        return;
+    }
 
     var rowId = $('#dtSearchResults').dataTable().fnFindCellRowIndexes(parentAdvertiserId, 0);
 
@@ -427,8 +443,6 @@ function linkPersonnel() {
 
     searchResults["hidPersonnelId"] = rowData[0].personnelId;
     searchResults["txtPersonnel"] = rowData[0].name;
-
-    console.log(searchResults);
 
     setLocalStorage("gSearchResults", JSON.stringify(searchResults));
 
@@ -683,6 +697,9 @@ function buildAgencySearch(searchCriteria) {
 }
 
 function buildParentAdvertiserSearch(searchCriteria) {
+ 
+    parentIndustry = searchCriteria["industryName"];
+    parentSubIndustry = searchCriteria["subIndustryName"];
 
     $(".search-check-box").hide();
 
@@ -742,7 +759,10 @@ function buildParentAdvertiserSearch(searchCriteria) {
 
     columns.push({
         "mRender": function (data, type, row) {
-            return '<a href="#" onclick="linkParentAdvertiserByLink(' + row.parentAdvertiserId + ')">Assign Parent Advertiser</a>';
+            return '<a href="#" onclick="linkParentAdvertiserByLink(' + row.parentAdvertiserId +
+                ",'" + row.IN_ShortDescription +
+                "', '" + row.SI_Description + "'" +
+                ')">Assign Parent Advertiser</a>';
         },
         "orderable": false,
         "searchable": false,
@@ -750,7 +770,7 @@ function buildParentAdvertiserSearch(searchCriteria) {
     });
 
     //need to document this more
-    $("#previousPage").html(searchCriteria["advertiserName"]);
+    $("#previousPage").html(searchCriteria["advertiserName"] + '  (<i><font size="2">' + searchCriteria["industryName"] + '  /  ' + searchCriteria["subIndustryName"] + '</font></i>)');
 
 }
 
@@ -1443,7 +1463,6 @@ function createNewMarketAdvertiserFromLink(id, advertiserName, industryId, subIn
 
 function createNewMarketAgencyFromLink(id, agencyName, accountTypeId)
 {
-    console.log(id + " " + agencyName + " " + accountTypeId);
 
     var agencyUrl = '/admin/agency/agency.html?AgencyID=' + id;
 

@@ -313,7 +313,7 @@ $(document).ready(function ()
         if (!inSettings.data == false) {
             window.localStorage.setItem("AJAXErrorData", inSettings.data);
         }
-        console.log(inSettings);
+
         gAJAXError = true;
     });
 
@@ -1960,7 +1960,30 @@ function resetDataTableDOMWithCaption(tableToDestroyId, divOfTableId, classOfTab
 
 }
 
+function removeID(inData)
+{
 
+        if (!inData) {
+            return "";
+        }
+
+        var ret = inData;
+
+        // find parens
+        var bIDIncluded = false;
+
+        if ((inData.lastIndexOf("(") > -1) && (inData.lastIndexOf(")") > -1)) {
+            bIDIncluded = true;
+        }
+
+        if (bIDIncluded == true)
+        {
+            var init = inData.lastIndexOf('(');
+            ret = inData.substr(0, init);
+        }
+
+        return ret;
+}
 function buildMarketWrapper(inData) {
 
     if (!inData)
@@ -2616,8 +2639,7 @@ function getBackButtonPage() {
 }
 
 function updatedGoBack() {
-    console.log('----------------');
-    console.log($.parseJSON(getLocalStorage("backButtonData")));
+ 
 
     excludeFromBackButton();
     window.location = getBackButtonPage();
