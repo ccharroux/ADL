@@ -1026,6 +1026,11 @@ function sendErrorEmail(message, AJAXErrorURL, AJAXErrorData)
     //console.log(message);
     //console.log(AJAXErrorURL);
     //console.log(AJAXErrorData);
+    if (AJAXErrorURL == null)
+    {
+        return;
+    }
+
 
     $.ajax({
         url: ServicePrefix + '/api/Email/EmailAPIError',
@@ -1983,6 +1988,14 @@ function removeID(inData)
         }
 
         return ret;
+}
+function getIDFromString(inData)
+{
+    var init = inData.lastIndexOf('(');
+    var fin = inData.lastIndexOf(')');
+
+    ID = inData.substr(init + 1, fin - init - 1);
+    return ID;
 }
 function buildMarketWrapper(inData) {
 

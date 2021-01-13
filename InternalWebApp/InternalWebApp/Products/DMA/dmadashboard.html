@@ -491,35 +491,33 @@
                             var year = "";
                             var period = "";
 
+                            // rank
                             if (row["Last Review Date"] > row["Last Rank Date"])
                             {
                                 msg = "Rank";
-                                year = row["Last Review Date"].toString().substr(0, 4);
-                                period = row["Last Review Date"].toString().substr(5, 2);
-                            }
-
-                            if (row["Last Rank Date"] > row["Last Release Date"]) {
-                                msg = "Release";
                                 year = row["Last Rank Date"].toString().substr(0, 4);
                                 period = row["Last Rank Date"].toString().substr(5, 2);
                             }
 
+                            // release
+                            if (row["Last Rank Date"] > row["Last Release Date"]) {
+                                msg = "Release";
+                                year = row["Last Release Date"].toString().substr(0, 4);
+                                period = row["Last Release Date"].toString().substr(5, 2);
+                            }
+
+                            // review
                             if (row["Last Review Date"] == row["Last Release Date"]) {
                                 msg = "Review";
                                 year = row["Last Release Date"].toString().substr(0, 4);
                                 period = row["Last Release Date"].toString().substr(5, 2);
-
-                                if (period.toUpperCase() = 'Q4')
-                                {
-                                    period = "Q1";
-                                    iYear = parseInt(year) + 1;
-                                    year = iYear.toString();
-                                }
                             }
 
+                            var obj = buildNewYearPeriodObject(year, period, 1);
+                            year = obj["year"];
+                            period = obj["period"];
 
- 
-                          return '<a href="/products/dma/dmarelease.html?parentmarket=' + row["Parent Market"] + "&year=" + year + "&period=" + period + '">' + msg + '</a>';
+                            return '<a href="/products/dma/dmarelease.html?ParentMarketID=' + getIDFromString(row["Parent Market"]) + "&Year=" + year + "&Period=" + period + '">' + msg + '</a>';
 
                         },
                         "orderable": false,
@@ -543,6 +541,28 @@
         loadResults(dataObj, columns);
     }
 
+    function buildNewYearPeriodObject(year, period, direction)
+    {
+        var iPeriod = parseInt(period.replace("Q", "")) + direction;
+
+        if (iPeriod == 5)
+        {
+            iPeriod = 1;
+            iYear = parseInt(year) + 1;
+            year = iYear.toString();
+        }
+
+        if (iPeriod == 0) {
+            iPeriod = 4;
+            iYear = parseInt(year) - 1;
+            year = iYear.toString();
+        }
+
+        var newPeriod = "Q" + iPeriod.toString();
+
+        return { "year": year, "period": newPeriod };
+
+    }
     function IsInArray(arrayToSearch, valToFind) {
         for (var i = 0; i < arrayToSearch.length; i++) {
             if (arrayToSearch[i].toLowerCase() == valToFind.toLowerCase()) {
