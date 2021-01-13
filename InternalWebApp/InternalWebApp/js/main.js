@@ -235,8 +235,14 @@ var navTool = {
 
         var para = document.createElement("div");
         para.setAttribute("style", "text-align:center");
+
         var node = document.createElement("a");
-        node.setAttribute("href", "javascript:navTool.goWhere('" + parentElement + "', -1, '" + functionToRun + "'," + bAllowAllSelection + ")");
+        var increment = -1; // starting 
+        if (parentElement.toLowerCase() == "ddlyear")
+        {
+            increment = 1;
+        }
+        node.setAttribute("href", "javascript:navTool.goWhere('" + parentElement + "'," +  increment + ",'" + functionToRun + "'," + bAllowAllSelection + ")");
         node.innerHTML = "<<";
         para.appendChild(node);
 
@@ -244,9 +250,14 @@ var navTool = {
         node.innerHTML = "&nbsp;Navigation&nbsp;";
         para.appendChild(node);
 
-
         node = document.createElement("a");
-        node.setAttribute("href", "javascript:navTool.goWhere('" + parentElement + "', 1, '" + functionToRun + "'," + bAllowAllSelection + ")");
+        increment = 1;
+        if (parentElement.toLowerCase() == "ddlyear") {
+            increment =  -1;
+        }
+        node.setAttribute("href", "javascript:navTool.goWhere('" + parentElement + "'," +  increment + ",'" + functionToRun + "'," + bAllowAllSelection + ")");
+
+        //node.setAttribute("href", "javascript:navTool.goWhere('" + parentElement + "', 1, '" + functionToRun + "'," + bAllowAllSelection + ")");
         node.innerHTML = ">>";
         para.appendChild(node);
 
