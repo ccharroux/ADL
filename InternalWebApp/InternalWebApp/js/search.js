@@ -272,19 +272,21 @@ function fixAgency() {
     });
 }
 
-function linkParentAdvertiserByLink(parentAdvertiserId, industry, subIndustry)
+function linkParentAdvertiserByLink(parentAdvertiserId, industryId, subIndustryId)
 {
 
-    if ((removeID(parentIndustry) != industry) || (removeID(parentSubIndustry) != subIndustry))
+    if (((parentIndustryId).toUpperCase().trim() != industryId.toUpperCase().trim()) ||
+        ((parentSubIndustryId).toUpperCase().trim() != subIndustryId.toUpperCase().trim())
+       )
     {
         var msg = "";
 
         msg = "<u>Parent Advertiser</u><br>Industry: <b>";
-        msg = msg + removeID(parentIndustry) + "</b>,";
-        msg = msg + " Sub-Industry: <b>" + removeID(parentSubIndustry) + "</b><br>";
+        msg = msg +  (parentIndustryId) + "</b>,";
+        msg = msg + " Sub-Industry: <b>" + (parentSubIndustryId) + "</b><br>";
         msg = msg + "<center><font color='red'>DOES NOT MATCH</font></center><u>Market Advertiser</u><br>Industry: <b>";
-        msg = msg + (industry) + "</b>,";
-        msg = msg + " Sub-Industry: <b>" + (subIndustry) + "</b><br><br>Assignment not allowed!";
+        msg = msg + (industryId) + "</b>,";
+        msg = msg + " Sub-Industry: <b>" + (subIndustryId) + "</b><br><br>Assignment not allowed!";
 
         bootbox.alert(msg, function () { });
         return;
@@ -698,8 +700,13 @@ function buildAgencySearch(searchCriteria) {
 
 function buildParentAdvertiserSearch(searchCriteria) {
  
-    parentIndustry = searchCriteria["industryName"];
-    parentSubIndustry = searchCriteria["subIndustryName"];
+    //alert(searchCriteria);
+
+    parentIndustryId = searchCriteria["industryID"].trim();
+    parentSubIndustryId = searchCriteria["subIndustryID"].trim();
+
+    //console.log(parentIndustryId);
+    //console.log(parentSubIndustryId);
 
     $(".search-check-box").hide();
 
@@ -760,8 +767,8 @@ function buildParentAdvertiserSearch(searchCriteria) {
     columns.push({
         "mRender": function (data, type, row) {
             return '<a href="#" onclick="linkParentAdvertiserByLink(' + row.parentAdvertiserId +
-                ",'" + row.IN_ShortDescription +
-                "', '" + row.SI_Description + "'" +
+                ",'" + row.industryId +
+                "', '" + row.subIndustryId + "'" +
                 ')">Assign Parent Advertiser</a>';
         },
         "orderable": false,

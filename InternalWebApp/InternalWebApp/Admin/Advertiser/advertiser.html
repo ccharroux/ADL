@@ -442,6 +442,7 @@
     var sAdvertiserName = "";
     var iIndustryId = -1;
     var iSubIndustryId = -1;
+    var bFromSearch = false;
 
     $(document).ready(function () {
 
@@ -758,10 +759,13 @@
                         }
 
                         if (
-                            obj["parentIndustryId"] == null ||
+                            (obj["parentIndustryId"] == null ||
                             obj["parentSubIndustryId"] == null ||
                             obj["parentIndustryId"] != obj["industryId"] ||
-                            obj["parentSubIndustryId"] != obj["subIndustryId"]
+                            obj["parentSubIndustryId"] != obj["subIndustryId"]) &&
+                            (
+                                bFromSearch == false 
+                            )
                         )
                         {
                             $("#invalidParentRelationship").html("&nbsp;&nbsp;&nbsp;&nbsp;Parent and Market Advertiser Industry or Sub-Industry do not match. Parent Settings: Industry (" + obj["parentIndustryId"] + "), Sub-Industry (" + obj["parentSubIndustryId"] + ").");
@@ -828,6 +832,7 @@
 
                         $('.advertiser-link-advertiser').show();
 
+                        bFromSearch == false;
                         getSubIndustryList(obj["industryId"], obj["subIndustryId"]);
                         loadSearchResults(); //may need to find a better place for this
                     });
@@ -1241,6 +1246,7 @@
             return;
         }
 
+        bFromSearch = true;
         //load current fields
         //if the market ones are there load link advertiser
         //if the parent advertiser are there load parent advertiser
@@ -1271,6 +1277,7 @@
         $("#txtActiveDate").val(searchResults["activeDate"]);
         $('#chkActive').prop("checked", searchResults["active"]);
         $('#txtChangeDate').val(searchResults["changeDate"]);
+        $('#invalidParentRelationship').hide();
 
 
         setLocalStorage("gSearchResults", "");
