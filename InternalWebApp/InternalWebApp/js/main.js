@@ -1084,6 +1084,8 @@ function buildMainMenu(selectedItem) {
     menuItems += productDashboard('tvb');
     //menuItems += productDashboard('mss');
     menuItems += productDashboard('dma');
+    menuItems += productDashboard('dmx');
+
 
     menuItems += '              </ul>';
     menuItems += '        </li>';
@@ -1163,6 +1165,8 @@ function buildXRYMenu(selectedItem) {
     menuItems += productDashboard('tvb');
     //menuItems += productDashboard('mss');
     menuItems += productDashboard('dma');
+    menuItems += productDashboard('dmx');
+
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        </li>';
@@ -1284,6 +1288,8 @@ function buildMRRMenu(selectedItem) {
     menuItems += productDashboard('tvb');
     //menuItems += productDashboard('mss');
     menuItems += productDashboard('dma');
+    menuItems += productDashboard('dmx');
+
     menuItems += '</ul>';
     menuItems += '</li>';
     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "MRR Reports") + ' href="" role="button" aria-expanded="false">MRR Reports <span style="margin-right:10px;" class="caret"></span></a>';
@@ -1336,6 +1342,8 @@ function buildTVBMenu(selectedItem) {
     menuItems += productDashboard('tvb');
  //   menuItems += productDashboard('mss');
     menuItems += productDashboard('dma');
+    menuItems += productDashboard('dmx');
+
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
@@ -1383,6 +1391,7 @@ function buildMSSMenu(selectedItem) {
     menuItems += productDashboard('tvb');
     //menuItems += productDashboard('mss');
     menuItems += productDashboard('dma');
+    menuItems += productDashboard('dmx');
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += productDashboard('');
@@ -1393,7 +1402,47 @@ function buildMSSMenu(selectedItem) {
     $("#menu").html(menuItems);
 
 }
+function buildDMXMenu(selectedItem) {
 
+    var menuItems = '';
+
+    menuItems += '<h1><a href="/admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
+    menuItems += '<nav role="navigation" style="margin-top:20px">';
+
+    menuItems += '<ul>';
+
+    //    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="/Products/DMA/dmarelease.html">Release</a></li>';
+    menuItems += buildGenericReportsLink2(selectedItem);
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += productDashboard('mrr');
+    menuItems += productDashboard('xry');
+    menuItems += productDashboard('tvb');
+    //menuItems += productDashboard('mss');
+    menuItems += productDashboard('dma');
+    menuItems += productDashboard('dmx');
+    menuItems += '              </ul>';
+    menuItems += '        </li>';
+
+
+    menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '<ul class="dropdown-menu" role="menu">';
+
+    menuItems += '        <li style="display:block"><a href="/Products/DMX/dmxrelease.html?MenuItem=true">Release</a></li>';
+    menuItems += '</ul>';
+    menuItems += '</li>';
+    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "DMX Reports") + ' href="/utilities/genericreport/genericreportlist.html?tag=dmx&MenuItem=true" role="button" aria-expanded="false">DMX Reports </span></a>';
+    menuItems += '       </li>';
+
+    menuItems += productDashboard('');
+    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
+    menuItems += '    </ul>';
+    menuItems += '</nav>';
+
+    $("#menu").html(menuItems);
+
+
+}
 function buildDMAMenu(selectedItem) {
 
     var menuItems = '';
@@ -1412,6 +1461,8 @@ function buildDMAMenu(selectedItem) {
     menuItems += productDashboard('tvb');
     //menuItems += productDashboard('mss');
     menuItems += productDashboard('dma');
+    menuItems += productDashboard('dmx');
+
     menuItems += '              </ul>';
     menuItems += '        </li>';
 
@@ -1478,6 +1529,10 @@ function productDashboard(productId) {
         case 'dma':
             style = 'display:block;';
             strOut = '<a href="/Products/DMA/dmadashboard.html?MenuItem=true">DMA</a>';
+            break;
+        case 'dmx':
+            style = 'display:block;';
+            strOut = '<a href="/Products/DMX/dmxdashboard.html?MenuItem=true">DMX</a>';
             break;
     }
 
@@ -1648,6 +1703,8 @@ function buildTechMenu(selectedItem) {
     menuItems += productDashboard('tvb');
     //menuItems += productDashboard('mss');
     menuItems += productDashboard('dma');
+    menuItems += productDashboard('dmx');
+
     menuItems += '              </ul>';
     menuItems += '        </li>';
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "TechTools") + ' role="button" aria-expanded="false">Tools <span style="margin-right:10px;" class="caret"></span></a>';
