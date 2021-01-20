@@ -11463,11 +11463,9 @@ function getReportFilterArray_QueryUserCounts() {
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerListByProductMarket",
+        jsCall: "getOwnerListByProduct",
         jsCallParameters: ['XRY'],
         objectName: "ddlOwner",
-        reloadBasedProduct: true,
-        reloadBasedMarket: true,
         required: true
     }
     arrayFilters.push(arrayObject);
