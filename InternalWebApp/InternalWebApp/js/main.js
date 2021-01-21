@@ -2059,6 +2059,11 @@ function removeID(inData)
 }
 function getIDFromString(inData)
 {
+    if (!inData)
+    {
+        return "";
+    }
+
     var init = inData.lastIndexOf('(');
     var fin = inData.lastIndexOf(')');
 
@@ -2216,6 +2221,42 @@ function buildOwnerWrapper(inData) {
 
     return ret;
 }
+function buildIndustryWrapper(inData) {
+
+    if (!inData) {
+        return "";
+    }
+
+    var ret = inData;
+
+    // find parens
+    var bIDIncluded = false;
+
+    if ((inData.lastIndexOf("(") > -1) &&
+        (inData.lastIndexOf(")") > -1)) {
+        bIDIncluded = true;
+    }
+
+    if (bIDIncluded == true) {
+        var ID = '';
+
+        var init = inData.lastIndexOf('(');
+        var fin = inData.lastIndexOf(')');
+
+        ID = inData.substr(init + 1, fin - init - 1);
+
+        if (ID.length > 0) {
+            if (isNaN(ID) == false) {
+                ret = "<a href='#' onclick='window.location=\"/Admin/industry/industry.html?IndustryId=" + ID + "\"'>";
+                ret = ret + inData
+                ret = ret + "</a>";
+            }
+        }
+
+    }
+
+    return ret;
+}
 function buildAgencyWrapper(inData) {
 
     if (!inData)
@@ -2289,7 +2330,42 @@ function buildAdvertiserWrapper(inData) {
 
     return ret;
 }
+function buildParentAgencyWrapper(inData) {
 
+    if (!inData) {
+        return "";
+    }
+
+    var ret = inData;
+
+    // find parens
+    var bIDIncluded = false;
+
+    if ((inData.lastIndexOf("(") > -1) &&
+        (inData.lastIndexOf(")") > -1)) {
+        bIDIncluded = true;
+    }
+
+    if (bIDIncluded == true) {
+        var ID = '';
+
+        var init = inData.lastIndexOf('(');
+        var fin = inData.lastIndexOf(')');
+
+        ID = inData.substr(init + 1, fin - init - 1);
+
+        if (ID.length > 0) {
+            if (isNaN(ID) == false) {
+                ret = "<a href='#' onclick='window.location=\"/Admin/parentagency/parentagency.html?ParentAgencyID=" + ID + "\"'>";
+                ret = ret + inData
+                ret = ret + "</a>";
+            }
+        }
+
+    }
+
+    return ret;
+}
 function buildParentAdvertiserWrapper(inData)
 {
     if (!inData) {
@@ -2484,6 +2560,42 @@ function buildCustomLink(objectName, data, bSortable, className) {
         return column;
     }
 
+    //create same code for Parent Agency
+    if (objectName == "Parent Agency") {
+        column = {
+            "title": objectName,
+            "visible": true,
+            "mRender": function (data, type, row) {
+                if (row["Parent Agency"] != null) {
+                    return buildParentAgencyWrapper(row["Parent Agency"]);
+                } else {
+                    return '';
+                }
+            },
+            "orderable": bSortable,
+            "className": className
+        };
+        return column;
+    }
+
+    //create same code for Industry
+    if (objectName == "Industry") {
+        column = {
+            "title": objectName,
+            "visible": true,
+            "mRender": function (data, type, row) {
+                if (row["Industry"] != null) {
+                    return buildIndustryWrapper(row["Industry"]);
+                } else {
+                    return '';
+                }
+            },
+            "orderable": bSortable,
+            "className": className
+        };
+        return column;
+    }
+
     // standard column build
     column = {
         "title": objectName,
@@ -2499,17 +2611,23 @@ function buildCustomLink(objectName, data, bSortable, className) {
             if (row[objectName] != null &&
                 row[objectName] != "" &&
                 isNaN(row[objectName].toString().replace("<b>", "").replace("</b>", "").replace("$", "").replace(new RegExp('\,'), '')
-                ) == false) {
-                if (row[objectName].toString().indexOf("-") > -1) {
+                ) == false)
+            {
+                if (row[objectName].toString().indexOf("-") > -1)
+                {
                     textClassName = "redText";
                 }
             }
+
             // negative %
             if (row[objectName] != null &&
                 row[objectName] != "" &&
-                isNaN(row[objectName].toString().replace("<b>", "").replace("</b>", "").replace("%", "").replace(new RegExp('\,'), '')) == false) {
-                if (row[objectName].toString().indexOf("%") > -1) {
-                    if (row[objectName].toString().indexOf("-") > -1) {
+                isNaN(row[objectName].toString().replace("<b>", "").replace("</b>", "").replace("%", "").replace(new RegExp('\,'), '')) == false)
+            {
+                if (row[objectName].toString().indexOf("%") > -1)
+                {
+                    if (row[objectName].toString().indexOf("-") > -1)
+                    {
                         textClassName = "redText";
                     }
                 }
