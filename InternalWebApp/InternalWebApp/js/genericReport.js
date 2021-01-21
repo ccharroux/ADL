@@ -11504,6 +11504,15 @@ function getReportFilterArray_QueryUserCounts() {
     var arrayObject = new Object();
 
     arrayObject = {
+        token: "Product",
+        jsCall: "getProductListHidden",
+        jsCallParameters: ['XRY', true],
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
         token: "Owner",
         jsCall: "getOwnerListByProduct",
         jsCallParameters: ['XRY'],
@@ -11511,11 +11520,14 @@ function getReportFilterArray_QueryUserCounts() {
         required: true
     }
     arrayFilters.push(arrayObject);
+
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListByProduct",
+        jsCall: "getMarketListByProductOwner",
         jsCallParameters: ['XRY'],
         objectName: "ddlMarket",
+        reloadBasedProduct: true,
+        reloadBasedOwner: true,
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -11537,9 +11549,7 @@ function getReportFilterArray_QueryUserCounts() {
         required: true
     }
     arrayFilters.push(arrayObject);
-
-
-
+    
     return arrayFilters;
 }
 function getReportObject_QueryUserCounts() {
