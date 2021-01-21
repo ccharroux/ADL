@@ -19,10 +19,13 @@ var gAJAXError = false;
 var release =
 {
     "DEV": "N/A",
-    "STAGING": "11/13/2020",
-    "PRODUCTION": "11/13/2020",
-    "DEMO": "11/13/2020"
+    "STAGING": "01/21/2021",
+    "PRODUCTION": "",
+    "DEMO": ""
 }
+release["DEMO"] = release["STAGING"];
+release["PRODUCTION"] = release["STAGING"];
+
 var dateOfCode = new Date();
 release["DEV"] = (dateOfCode.getMonth() + 1) + '-' + dateOfCode.getDate() + '-' + dateOfCode.getFullYear();
 
@@ -2607,11 +2610,22 @@ function buildCustomLink(objectName, data, bSortable, className) {
             var ret = "";
 
             // negative numbers
+            var adjustedData = "";
 
-            if (row[objectName] != null &&
+            if (row[objectName] != null && row[objectName] != "")
+            {
+                adjustedData = replaceAll(row[objectName].toString(), "<br>", "");
+                adjustedData = replaceAll(row[objectName].toString(), "<br/>", "");
+                adjustedData = replaceAll(row[objectName].toString(), "<b>", "");
+                adjustedData = replaceAll(row[objectName].toString(), "</b>", "");
+                adjustedData = replaceAll(row[objectName].toString(), "$", "");
+                adjustedData = replaceAll(row[objectName].toString(), ",", "");
+            }
+            adjustedData = adjustedData.replace("$", "");
+
+             if (row[objectName] != null &&
                 row[objectName] != "" &&
-                isNaN(row[objectName].toString().replace("<b>", "").replace("</b>", "").replace("$", "").replace(new RegExp('\,'), '')
-                ) == false)
+                isNaN(adjustedData) == false)
             {
                 if (row[objectName].toString().indexOf("-") > -1)
                 {
@@ -2622,7 +2636,9 @@ function buildCustomLink(objectName, data, bSortable, className) {
             // negative %
             if (row[objectName] != null &&
                 row[objectName] != "" &&
-                isNaN(row[objectName].toString().replace("<b>", "").replace("</b>", "").replace("%", "").replace(new RegExp('\,'), '')) == false)
+                isNaN(adjustedData) == false
+                // isNaN(row[objectName].toString().replace("<b>", "").replace("</b>", "").replace("%", "").replace(new RegExp('\,'), '')) == false
+            )
             {
                 if (row[objectName].toString().indexOf("%") > -1)
                 {
