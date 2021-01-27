@@ -94,15 +94,10 @@ reportName.push("rptUsersAssignedInvalidMarket");
 reportName.push("rptUsersWithDisabledStationAssigned");
 reportName.push("rptXRAYImportScript");
 reportName.push("rptXRYAccountAndRevenueAssignment");
-
 reportName.push("rptMRRReportMatrix");
-
 reportName.push("rptMarketProductStationSummary");
-
 reportName.push("rptAsyncJobQueueStatus");
-
 reportName.push("rptDisabledAEList");
-
 reportName.push("rptMRRRevenueWithoutSubmitterList");
 reportName.push("rptMRRRevenueOutOfBalanceList");
 reportName.push("rptMRRRevenueEntryMissingList");
@@ -216,53 +211,37 @@ reportName.push("rptXRYOwnersWithoutRecipients")
 reportName.push("rptMRRImportMarketCategoryWarningToleranceList")
 reportName.push("rptAccountExecutiveStatusMarketOwnerList")
 reportName.push("rptMediaActionList")
-
 reportName.push("rptAdvertiserListByOwner");
 reportName.push("rptAgencyListByOwner");
 reportName.push("rptUsersNotLoggedInAfterDateList");
-
 reportName.push("rptStandardInputList");
-
 reportName.push("rptQueryMarketCounts");
 reportName.push("rptQueryUserCounts");
 reportName.push("rptQueryCountsByOwnerMarket");
 reportName.push("rptQueryDetailByOwnerMarket");
 reportName.push("rptImportScriptListByOwner");
- 
 reportName.push("rptStandardInputNotIncludedList");
-
 reportName.push("rptMRRUserListing");
-
 reportName.push("rptMRRUploadTemplateByOwnerWithRevenueExtended");
-
 reportName.push("rptCategoryGrowthByMarket");
 reportName.push("rptTimeSalesVsAllRepBillingStations");
-
 reportName.push("rptPersonnelGroupList");
-
 reportName.push("rptAdvertiserByCategory");
 reportName.push("rptTVBInvalidStationList");
 reportName.push("rptMRRCategoryYTDList");
-
 reportName.push("rptXrayDeleteStationRevenueLogList");
 reportName.push("rptExclusiveAccountChanges");
 reportName.push("rptMarketInfo");
-
 reportName.push("rptInternalUserFavorites");
 reportName.push("rptAsyncStatusIncompleteList");
 reportName.push("rptMisMatchedParentAdvertiserIndustrySubIndustryList");
-
 reportName.push("rptMRROwnerGroupMarketAnalysis");
 reportName.push("rptXRYOwnerGroupMarketAnalysis");
-
 reportName.push("rptTVBReportingMarketStatus");
-
 reportName.push("rptTVBStationIssueList");
 reportName.push("rptGetParentHistoryAndMarketStatusByParentMarket");
-
 reportName.push("rptGetParentAdvertiserSetupStatusList");
 reportName.push("rptGetParentAgencySetupStatusList");
-
 reportName.push("rptDMXXRYRevenueReviewByParentMarket");
 reportName.push("rptDMXXRYRevenueReviewByMarket");
 reportName.push("rptDMXXRYRevenueReviewByStation");
@@ -270,6 +249,7 @@ reportName.push("rptDMXXRYRevenueReviewByParentAdvertiser");
 reportName.push("rptDMXXRYRevenueReviewByParentAgency");
 reportName.push("rptDMXXRYRevenueReviewByAdvertiser");
 reportName.push("rptDMXXRYRevenueReviewByAgency");
+reportName.push("rptDMAParentMarketAssignedCategoryTemplate");
 
 
 
@@ -13449,4 +13429,38 @@ function getReportObject_DMXXRYRevenueReviewByAgency() {
     return tempObject;
 }
 
+function getReportFilterArray_DMAParentMarketAssignedCategoryTemplate() {
 
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        jsCallParameters: ['DMA'],
+        objectName: "ddlParentMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_DMAParentMarketAssignedCategoryTemplate() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+ 
+
+    tempObject = {
+        reportTitle: "DMA Parent Market Category Template",
+        apiControllerAction: '/api/DMAReport/GetParentMarketAssignedCategoryTemplate',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['dma'],
+        sortable: true,
+        approved: false,
+        visible: true
+    }
+
+    return tempObject;
+}
