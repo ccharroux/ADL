@@ -250,7 +250,7 @@ reportName.push("rptDMXXRYRevenueReviewByParentAgency");
 reportName.push("rptDMXXRYRevenueReviewByAdvertiser");
 reportName.push("rptDMXXRYRevenueReviewByAgency");
 reportName.push("rptDMAParentMarketAssignedCategoryTemplate");
-
+reportName.push("rptMRRStationRevenueYTDByMediaType");
 
 
 function buildReportArray()
@@ -13457,6 +13457,73 @@ function getReportObject_DMAParentMarketAssignedCategoryTemplate() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['dma'],
+        sortable: true,
+        approved: false,
+        visible: true
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRStationRevenueYTDByMediaType() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    //create new method to shrink to just tv and radio maybe??
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMRRMediaTypeList",
+        objectName: "ddlMediaType",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "FromYearPeriod",
+        jsCall: "getPeriodList_YYYYMM",
+        objectName: "ddlFromYYYYMM",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "ToYearPeriod",
+        jsCall: "getPeriodList_YYYYMM",
+        objectName: "ddlToYYYYMM",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "IncludeMarketsOnHold",
+        objectName: "chkIncludeMarketsOnHold",
+        jsCall: null,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "IncludeInactiveStations",
+        objectName: "chkIncludeInactiveStations",
+        jsCall: null,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_MRRStationRevenueYTDByMediaType() {
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "MRR Station Revenue YTD By Media Type",
+        apiControllerAction: "/api/MRRReport/GetStationRevenueYTDByMediaType",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['mrr', 'corporate'],
         sortable: true,
         approved: false,
         visible: true

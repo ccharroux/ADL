@@ -389,13 +389,19 @@
                             <label for="ddlIndustry" class="dropdown-label rptView rptIndustry">Industry</label>
                             <select id="ddlIndustry" apiInput="inIndustryId" class="dropdown-select rptView rptIndustry report-filter" ></select>
                         </div>
-
                         <div class="form-group rptButton" style="text-align:right">
                             <label for="btnReport" class="dropdown-label">&nbsp;</label>
                             <input type="button" id="btnReport" class="search-button" value="Show" onclick="getReport()" /><br />
                             <input id="btnReportData" style="display:none" type="button" value="Notification Data" onclick="getMatchedNotification()" />
                         </div>
-
+                        <div class="form-group rptView rptIncludeMarketsOnHold">
+                            <label for="chkIncludeMarketsOnHold" class="dropdown-label rptView rptIncludeMarketsOnHold">Include Markets On Hold</label>
+                            <input type="checkbox" id="chkIncludeMarketsOnHold" apiInput="inIncludeMarketsOnHold" class="dropdown-select rptView rptIncludeMarketsOnHold report-filter" />
+                        </div>
+                        <div class="form-group rptView rptIncludeInactiveStations">
+                            <label for="chkIncludeInactiveStations" class="dropdown-label rptView rptIncludeInactiveStations">Include Inactive Stations</label>
+                            <input type="checkbox" id="chkIncludeInactiveStations" apiInput="inIncludeInactiveStations" class="dropdown-select rptView rptIncludeInactiveStations report-filter" />
+                        </div>
                     </div>
                 </div>
                 <div class="form-group rptView rptMRRNationwideTVByRegion">
@@ -1375,6 +1381,51 @@
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+    }
+
+    function getMRRMediaTypeList() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                var str = '';
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    str = '<option value="">-- Select a Media Type --</option>';
+                    $.each(data.report.rows, function (index) {
+                        if (data.report.rows[index].MediaTypeName.toLowerCase() == "radio" ||
+                            data.report.rows[index].MediaTypeName.toLowerCase() == "television") {
+                            str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+                        }
+                    });
+
+
+                    $("#ddlMediaType").html(str);
+
+                    convertToChosenSelect("ddlMediaType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    saveLoadedControlSelection("ddlMediaType");
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
     }
 
     function getPersonnel()
