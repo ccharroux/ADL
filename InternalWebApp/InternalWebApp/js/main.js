@@ -3393,3 +3393,61 @@ function convertMontNumberToText(inMonth)
 
     return monthText;
 }
+
+function productScheduleValidation(inProductId, inReportingPeriodId, inSubmittingPeriodId) {
+
+    var sErrorMessage = "";
+
+    //valid dates ReportingPeriodId,SubmittingPeriodId
+    //MRR, 1,1 -one month at a time
+    //MRR, 1,2 -three months at a time
+    //MRR, 2,2 -one quarter at a time
+    //MRR, 2,3 -two quarters at a time
+    //XRY, 1,1 -one month at a time
+    //TVB, 1,1 -one month at a time
+
+
+    switch (inProductId.toUpperCase()) {
+        //case MRR:
+        //Currently MRR Market Product on page: mrrmarketproduct.html loads only the
+        //Reporting/Submitting period that is allowed in the Report Period dropdown.
+        //No validation needed.
+        case "XRY":
+            if (inReportingPeriodId != "1") {
+                sErrorMessage = "Invalid Reporting Frequency selected for product - XRY. Valid Reporting Frequency for this product include: Monthly";
+                break;
+            }
+
+            if (inSubmittingPeriodId != "1") {
+                sErrorMessage = "Invalid Submitting Frequency selected for product - XRY. Valid Submitting Frequency for this product include: Monthly";
+                break;
+            }
+
+            break;
+        default:
+            sErrorMessage = "Invalid product passed for Reporting/Submitting market product validation for product - " + inProductId;
+            break;
+        //case MSS:
+        //Currently code on page mssmarketproduct.html
+        //defaults Reporting/Submitting period to -One month at a time
+        //when updating/enabling MSS product.
+        //case TVB:
+        //Currently code on page: tvbmarketproduct.html
+        //defaults Reporting/Submitting period to -One month at a time
+        //when updating/enabling TVB product.
+        //case DMA/DMX
+        //Currently code on page dmamarketproduct.html and dmxmarketproduct.html
+        //defaults Reporting/Submitting period to -One month at a time
+        //when updating/enabling DMA/DMX
+
+    }
+
+    if (sErrorMessage != "") {
+        bootbox.alert(sErrorMessage, function () {
+        });
+        return false;
+    }
+
+    return true;
+
+}
