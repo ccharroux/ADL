@@ -297,6 +297,8 @@
     var gBulkMarketSubmit = false;
     var gBulkSubmit = false;
 
+    var iTotalSendableMarkets = 0;
+
     $(document).ready(function () {
 
         buildMRRMenu('Revenue');
@@ -371,7 +373,7 @@
 
                         if (bSendable)
                         {
-                            return '<input type="checkbox" id="chkMarket_' + row.marketId + '" class="sendable-market" />';
+                            return '<input type="checkbox" id="chkMarket_' + row.marketId + '" class="sendable-market" onclick="checkOnSelectAllMarketBox();" />';
                         } else
                         {
                             return '<input type="checkbox" id="chkMarket_' + row.marketId + '" class="unsendable-market" disabled />';
@@ -1249,6 +1251,8 @@
 
     function mrrReminderSelectAllChecked(selectAllBox)
     {
+        iTotalSendableMarkets = 0;
+
         var table = $("#dtReminders").DataTable();
 
         table.rows().every(function (index, element) {
@@ -1262,6 +1266,7 @@
             if ($(selectAllBox).is(':checked')) {
                 if (sClassName.toLowerCase() === "sendable-market")
                 {
+                    iTotalSendableMarkets++;
                     $(inputCheckbox[0]).prop('checked', true);
                 }
             } else {
@@ -1271,6 +1276,38 @@
             }
         });
 
+    }
+
+    function checkOnSelectAllMarketBox()
+    {
+        //console.log(iTotalSendableMarkets);
+        var iCheckedItems = 0;
+        var table = $("#dtReminders").DataTable();
+
+        table.rows().every(function(index, element)
+        {
+            var row = $(this.node());
+            var statusElement = row.find('td').eq(0);
+
+            var inputCheckbox = $(statusElement).find("input");
+
+            var sClassName = inputCheckbox[0].className;
+
+            if (sClassName.toLowerCase() === "sendable-market") {
+                if ($(inputCheckbox[0]).is(':checked'))
+                {
+                    iCheckedItems++;
+                }
+            }
+        });
+
+        if (iTotalSendableMarkets == iCheckedItems)
+        {
+            $("#chkSelectAllSendableMarkets").prop('checked', true);
+        } else
+        {
+            $("#chkSelectAllSendableMarkets").prop('checked', false);
+        }
     }
 
     function sendMarketRemindersBulkInitiate()
@@ -1338,7 +1375,7 @@
             }
         };
 
-        var message = "This will send emails to " + marketList.length + " markets. Do you wish to continue?";
+        var message = "This will send emails to " + marketList.length + " market(s). Do you wish to continue?";
 
         bootbox.confirm(message, function (result) {
             if (result)
