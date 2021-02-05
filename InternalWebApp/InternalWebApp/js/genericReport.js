@@ -6351,6 +6351,8 @@ function getReportObject_RevenueComparisonStationDetail() {
     columnsToDisplay.push("Station");
     columnsToDisplay.push("Market");
     columnsToDisplay.push("DMA Revenue");
+    columnsToDisplay.push("MRR Revenue");
+    columnsToDisplay.push("Revenue Diff");
 
     var arrButtons = new Array();
 
