@@ -543,8 +543,6 @@
     function getTheReportAJAX() {
 
 
-
-
         $.ajax({
             url: ServicePrefix + api,
             dataType: 'json',
@@ -625,28 +623,38 @@
                         {
                             className = "text-align-right";
                         }
-
-
                     }
                 }
+
 
                 if (objectName.toLowerCase().indexOf("revenue") > -1 ||
                     objectName.toLowerCase().indexOf("change") > -1
                     )
                 {
+
+
                     className = "text-align-right";
-                    if (objectValue != null) {
-                        if (objectValue.toString().indexOf("-") > -1) {
-                            className = "text-align-right redText";
-                        }
-                    }
+
+                    //if (objectValue != null) {
+
+                    //    console.log('------');
+                    //    console.log(objectValue.toString().indexOf("-"));
+                    //    console.log(objectValue);
+
+                    //    if (objectValue.toString().indexOf("-") > -1)
+                    //    {
+                    //        className = "text-align-right redText";
+                    //    }
+                    //    else
+                    //    {
+                    //        className = "text-align-right";
+                    //    }
+                    //}
 
                 }
 
                 ctr++;
                 columnsToExport.push(ctr);
-
-
 
                 var bSortable = true;
                 if (reportObject.sortable == 'undefined') {
@@ -657,15 +665,41 @@
                     bSortable = reportObject.sortable;
                 }
 
-                columns.push({
-                    "title": objectName,
-                    "visible": true,
-                    "mData": objectName,
-                    "orderable": bSortable,
- 
-                    "className": className 
-                });
 
+                if (objectName.toLowerCase().indexOf("total") > -1)
+                {
+                        // do not use
+                }
+                else if (objectName.toLowerCase().indexOf("change") > -1)
+                {
+                    columns.push({
+                        "title": objectName,
+                        "visible": true,
+                        mRender: function (data, type, row) {
+ 
+                            if (row[objectName].toString().lastIndexOf('-') > -1) {
+                                return "<font color='red'>" + row[objectName] + "</font>"
+                            }
+                            else 
+                            {
+                                return row[objectName];
+                            }
+
+                        },
+                        "orderable": bSortable,
+                        "className": className
+                    });
+                }
+                else
+                {
+                    columns.push({
+                        "title": objectName,
+                        "visible": true,
+                        "mData": objectName,
+                        "orderable": bSortable,
+                        "className": className
+                    });
+                }
 
             }
         });
