@@ -455,7 +455,6 @@
                     if (objectValue.toString().indexOf('%') > 0)
                     {
                         className = "text-align-right";
-
                     }
                     else
                     {
@@ -469,6 +468,9 @@
                 }
 
 
+                if (objectName.toLowerCase().indexOf("last") > -1) {
+                    className = "text-align-center";
+                }
 
                 ctr++;
                 columnsToExport.push(ctr);
@@ -490,15 +492,21 @@
                             var msg = 'View Parent History';
                             var year = "";
                             var period = "";
-
+                            var bMakeLink = true;
                             year = row["Last Release Date"].toString().substr(0, 4);
                             period = row["Last Release Date"].toString().substr(5, 2);
 
                             // rank
                             if (row["Last Review Date"] == row["Last Release Date"]) {
-                                msg = "Rank";
+                                if (row["Market"] == "") {
+                                    msg = "Waiting on Markets";
+                                }
+                                else {
+                                    msg = "";
+                                }
                                 year = row["Last Review Date"].toString().substr(0, 4);
                                 period = row["Last Review Date"].toString().substr(5, 2);
+                                bMakeLink = false;
                             }
 
                             // review
@@ -506,6 +514,7 @@
                                 msg = "Review";
                                 year = row["Last Release Date"].toString().substr(0, 4);
                                 period = row["Last Release Date"].toString().substr(5, 2);
+                                bMakeLink = true;
                             }
 
                             // release
@@ -513,13 +522,26 @@
                                 msg = "Release";
                                 year = row["Last Release Date"].toString().substr(0, 4);
                                 period = row["Last Release Date"].toString().substr(5, 2);
+                                bMakeLink = true;
                             }
 
                             var obj = buildNewYearPeriodObject(year, period, 1);
                             year = obj["year"];
                             period = obj["period"];
 
-                            return '<a href="/products/dmx/dmxrelease.html?ParentMarketID=' + getIDFromString(row["Parent Market"]) + "&Year=" + year + "&Period=" + period + '">' + msg + '</a>';
+ 
+                            if (row["Market"] != "") {
+                                bMakeLink = false;
+                                msg = "";
+                            }
+
+                            if (bMakeLink) {
+                                return '<a href="/products/dmx/dmxrelease.html?ParentMarketID=' + getIDFromString(row["Parent Market"]) + "&Year=" + year + "&Period=" + period + '">' + msg + '</a>';
+                            }
+                            else {
+                                return msg;
+                            }
+
 
                         },
                         "orderable": false,
