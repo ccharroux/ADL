@@ -19,7 +19,7 @@ var gAJAXError = false;
 var release =
 {
     "DEV": "N/A",
-    "STAGING": "01/21/2021",
+    "STAGING": "02/12/2021",
     "PRODUCTION": "",
     "DEMO": ""
 }
