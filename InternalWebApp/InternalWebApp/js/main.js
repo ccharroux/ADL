@@ -1520,7 +1520,7 @@ function productDashboard(productId) {
             break;
         case 'mrr':
             style = 'display:block;';
-            strOut = '<a href="/products/mrr/mrrdashboard.html?MenuItem=true">MRR</a>';
+            strOut = '<a href="/products/mrr/mrrreminders.html?MenuItem=true">MRR</a>';
             break;
         case 'xry':
             style = 'display:block;';
