@@ -340,6 +340,9 @@
     var modeSilent = "silent";
     var modeReDeliver = "redeliver";
 
+    var currentOwnerName;
+    var currentOwnerId;
+
     $(document).ready(function () {
         buildXRYMenu("Revenue");
         buildQuickReports(['xry']);
@@ -888,11 +891,12 @@
                     var sActions = '';
 
                     if (row["Rank Date"] != null && row["Release Date"] == null) {
-                        sActions += '&nbsp;&nbsp;<a href="#" onclick="deliverOwnership();">Deliver</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="deliverOwnershipNoEmail();">Release without email</a>';
+                        sActions += '&nbsp;&nbsp;<a href="#" onclick="deliverOwnership(\'' + encodeURI(row["Ownership"]) + '\');">Deliver</a>'
+                            + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="deliverOwnershipNoEmail(\'' + encodeURI(row["Ownership"]) + '\');">Release without email</a>';
                     }
 
                     if (row["Rank Date"] != null && row["Release Date"] != null) {
-                        sActions += '&nbsp;&nbsp;<a href="#" onclick="redeliverOwnership();">Re-deliver</a>';
+                        sActions += '&nbsp;&nbsp;<a href="#" onclick="redeliverOwnership(\'' + encodeURI(row["Ownership"]) + '\');">Re-deliver</a>';
                     }
 
                     return sActions;
@@ -1066,11 +1070,13 @@
     }
 
     //nationwide
-    function deliverOwnership() {
+    function deliverOwnership(Ownership) {
         currentMode = modeRelease;
+        currentOwnerName = decodeURI(Ownership);
+        currentOwnerId = getIDFromString(currentOwnerName);
 
         bootbox.confirm({
-            message: "Email nationwide " + $("#ddlOwner").text() + " recipients for " + currentYearPeriodText() + "?",
+            message: "Email nationwide " + currentOwnerName + " recipients for " + currentYearPeriodText() + "?",
             callback: function (confirmed) {
                 if (confirmed) {
                     deliverOwnership_ValidateRecipients();
@@ -1079,11 +1085,13 @@
         });
     }
 
-    function deliverOwnershipNoEmail() {
+    function deliverOwnershipNoEmail(Ownership) {
         currentMode = modeSilent;
+        currentOwnerName = decodeURI(Ownership);
+        currentOwnerId = getIDFromString(currentOwnerName);
 
         bootbox.confirm({
-            message: "Release " + currentYearPeriodText() + " for nationwide " + $("#ddlOwner").text() + " recipients without email?",
+            message: "Release " + currentYearPeriodText() + " for nationwide " + currentOwnerName + " recipients without email?",
             callback: function (confirmed) {
                 if (confirmed) {
                     deliverOwnership_ValidateRecipients();
@@ -1094,9 +1102,11 @@
 
     function redeliverOwnership() {
         currentMode = modeReDeliver;
+        currentOwnerName = decodeURI(Ownership);
+        currentOwnerId = getIDFromString(currentOwnerName);
 
         bootbox.confirm({
-            message: "Re-deliver email to nationwide " + $("#ddlOwner").text() + " recipients for " + currentYearPeriodText() + "?",
+            message: "Re-deliver email to nationwide " + currentOwnerName + " recipients for " + currentYearPeriodText() + "?",
             callback: function (confirmed) {
                 if (confirmed) {
                     deliverOwnership_ValidateRecipients();
@@ -1106,7 +1116,7 @@
     }
 
     function currentYearPeriodText() {
-        return $("#ddlPeriod").text() + " " + $("#ddlYear").val();
+        return $("#ddlPeriod option:selected").text() + " " + $("#ddlYear option:selected").val();
     }
 
     function deliverOwnership_ValidateRecipients() {
@@ -1128,7 +1138,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inOwnerId": $("#ddlOwner").val(),
+                "inOwnerId": currentOwnerId,
                 "inYear": $("#ddlYear").val(),
                 "inPeriod": $("#ddlPeriod").val(),
                 "inIsRevision": (currentMode == modeReDeliver),
@@ -1171,7 +1181,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inOwnerId": $("#ddlOwner").val(),
+                "inOwnerId": currentOwnerId,
                 "inYear": $("#ddlYear").val(),
                 "inPeriod": $("#ddlPeriod").val()
             }),
@@ -1202,7 +1212,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inOwnerId": $("#ddlOwner").val(),
+                "inOwnerId": currentOwnerId,
                 "inYear": $("#ddlYear").val(),
                 "inPeriod": $("#ddlPeriod").val(),
                 "inIsRevision": (currentMode == modeReDeliver),
@@ -1230,13 +1240,13 @@
     function deliverOwnership_ReportOverallSuccess() {
         switch (currentMode) {
             case modeRelease:
-                bootbox.alert($("#ddlOwner").text() + ", " + currentYearPeriodText() + ": Released, email sent to nationwide recipients.");
+                bootbox.alert(currentOwnerName + ", " + currentYearPeriodText() + ": Released, email sent to nationwide recipients.");
                 break;
             case modeSilent:
-                bootbox.alert($("#ddlOwner").text() + ", " + currentYearPeriodText() + ": Released without email.");
+                bootbox.alert(currentOwnerName + ", " + currentYearPeriodText() + ": Released without email.");
                 break;
             case modeReDeliver:
-                bootbox.alert($("#ddlOwner").text() + ", " + currentYearPeriodText() + ": Email sent to nationwide recipients.");
+                bootbox.alert(currentOwnerName + ", " + currentYearPeriodText() + ": Email sent to nationwide recipients.");
                 break;
             default: // should never happen
                 MKAErrorMessageRtn("XRY nationwide delivery: currentMode is invalid");
