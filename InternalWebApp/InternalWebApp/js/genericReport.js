@@ -27,19 +27,14 @@ reportName.push("rptMarketRevenueXRay");
 reportName.push("rptStationListing");
 reportName.push("rptMarketDelivery");
 reportName.push("rptTVBUserListing");
- 
 reportName.push("rptParentOwnershipList");
- 
 reportName.push("rptOwnershipList");
- 
 reportName.push("rptActiveStationList");
 reportName.push("rptDisabledStationList");
 reportName.push("rptStationChanges");
 reportName.push("rptMRREstimatedStationList");
 reportName.push("rptMRRStationManagerList");
 reportName.push("rptDetailedStationSetup");
-
- 
 reportName.push("rptOwnershipGroupList");
 reportName.push("rptOwnershipGroupDistributionList");
 reportName.push("rptMarketOwnershipGroup");
@@ -60,46 +55,31 @@ reportName.push("rptMarketReleaseList");
 reportName.push("rptPersonnelContactList");
 reportName.push("rptPersonnelRecipientList");
 reportName.push("rptWebUserList");
-
 reportName.push("rptMRRNoPrimaryContactList");
-
 reportName.push("rptMRRMarketRelease");
 reportName.push("rptMRRMarketStationRelease");
-
 reportName.push("rptXRYMarketRelease");
 reportName.push("rptXRYMarketStationRelease");
-
 reportName.push("rptTVBMarketRelease");
 reportName.push("rptTVBMarketStationRelease");
- 
 reportName.push("rptFeatureImplementationList");
-
 reportName.push("rptTVBMRRCompare");
-
 reportName.push("rptMRRReportList");
 reportName.push("rptMRRMarketReportList");
 reportName.push("rptMRROwnerReportList");
-
 reportName.push("rptTVBRepBillingStationList");
- 
 reportName.push("rptTVBMarketNielsenRankingList");
-
 reportName.push("rptOwnerStationGrid");
 reportName.push("rptGeneralStationData");
-
 reportName.push("rptAPIActivityList");
 reportName.push("rptAPIAccessList");
 reportName.push("rptDMAMRRCategoryMappingList");
 reportName.push("rptCorporateGroupUserList");
-
 reportName.push("rptKeywordIndustryList");
 reportName.push("rptAdminDeviceList");
-
 reportName.push("rptParentMarketCategoryTemplateList");
-
 reportName.push("rptSAMLOwnerList");
 reportName.push("rptSAMLUserExceptionList");
-
 reportName.push("rptAdvertiserRevenueInWrongMarket");
 reportName.push("rptAgencyRevenueInWrongMarket");
 reportName.push("rptDisabledUserAccountExecutive");
@@ -114,34 +94,23 @@ reportName.push("rptUsersAssignedInvalidMarket");
 reportName.push("rptUsersWithDisabledStationAssigned");
 reportName.push("rptXRAYImportScript");
 reportName.push("rptXRYAccountAndRevenueAssignment");
-
 reportName.push("rptMRRReportMatrix");
-
 reportName.push("rptMarketProductStationSummary");
-
 reportName.push("rptAsyncJobQueueStatus");
-
 reportName.push("rptDisabledAEList");
-
 reportName.push("rptMRRRevenueWithoutSubmitterList");
 reportName.push("rptMRRRevenueOutOfBalanceList");
 reportName.push("rptMRRRevenueEntryMissingList");
 reportName.push("rptAdvertiserAgencyRevenueList");
 reportName.push("rptMRRMarketDistributionList");
-
 reportName.push("rptOwnershipProductList");
-
 reportName.push("rptEmailStatusList");
-
 reportName.push("rptMRRUploadTemplateByOwner");
 reportName.push("rptMRRUploadTemplateByOwnerWithRevenue");
-
 reportName.push("rptMRRMarketRevisionHistory");
-
 reportName.push("rptMRRNationwideTVByAffiliation");
 reportName.push("rptMRRNationwideTVByRegion");
 reportName.push("rptMRRNationwideTVBySize");
-
 reportName.push("rptMRRNationwideRadioByFormat");
 reportName.push("rptMRRNationwideRadioByRegion");
 reportName.push("rptMRRNationwideRadioBySize");
@@ -166,60 +135,43 @@ reportName.push("rptMediaAdvertisersList");
 reportName.push("rptParentAdvertiserList");
 reportName.push("rptParentAdvertiserAdvertiserList");
 reportName.push("rptStationAdvertisersList");
-
 reportName.push("rptAgencyList");
 reportName.push("rptAgencyAdvertiserAccountsList");
 reportName.push("rptDisabledAgencyList");
 reportName.push("rptParentAgencyList");
 reportName.push("rptParentAgencyAgencyList");
 reportName.push("rptStationAgencyList");
-
 reportName.push("rptUsersNotSetupInSystem");
 reportName.push("rptXRAYDataRetentionList");
 reportName.push("rptMRRComplimentaryMarketRevenueEntry");
 reportName.push("rptMRRModeUsageSummary");
-
 reportName.push("rptMRROutstandingStationList");
 reportName.push("rptTVBOutstandingStationList");
-
 reportName.push("rptAgencyDisabledAndNotMergedList");
 reportName.push("rptAdvertiserDisabledAndNotMergedList");
-
 reportName.push("rptAPILogList");
 reportName.push("rptImpersonationLogList");
-
-
 
 // TVB
 reportName.push("rptTimeSalesVsRepBilling");
 reportName.push("rptRepBillingSubmissionStatusList");
 reportName.push("rptRepBillingStationList");
 reportName.push("rptTimeSalesStationList");
-
 reportName.push("rptRepBillingCompareList");
 reportName.push("rptTimeSalesCompareList");
-
 reportName.push("rptTimeSalesCompleteRevenueList");
-
 reportName.push("rptTimeSalesPersonnelContactList");
 reportName.push("rptPersonnelContactListForEstimates");
 reportName.push("rptPersonnelContactListByRepFirm");
-
 reportName.push("rptAEStatusList");
 reportName.push("rptAdvertisers");
 reportName.push("rptMediaAdvertisers");
 reportName.push("rptStationAdvertisers");
 reportName.push("rptAgencies");
 reportName.push("rptStationAgencies");
- 
 reportName.push("rptAdvertisersRevenueResearch");
-
 reportName.push("rptMediaRevenueResearch");
- 
 reportName.push("rptMarketStationProductCountList");
-
-
- 
 reportName.push("rptTrafficSystemAdvertiser");
 reportName.push("rptCorporateAgency");
 reportName.push("rptMonthToMonth");
@@ -227,42 +179,29 @@ reportName.push("rptLAIndSummary");
 reportName.push("rptIRMktbyIndAnalysis");
 reportName.push("rptTop50Advertisers");
 reportName.push("rptPostedData");
-
 reportName.push("rptActiveMarketLog");
 reportName.push("rptActiveMarketLogSummary");
-
 reportName.push("rptMRRStationSubmissionStatusByMarket");
-
 reportName.push("rptExclusiveAdvertiserChanges");
 reportName.push("rptMRRMarketTotalsForNAB");
 reportName.push("rptSweeperLogMRRRevenue");
-
 reportName.push("rptRABSummaryByRegion");
 reportName.push("rptRAB");
 reportName.push("rptProductMarketOwnerActivationList");
 reportName.push("rptXRYMarketExclusivitySettings");
-
 reportName.push("rptAEWebUserMatches");
-
 reportName.push("rptRevenueWithDisabledAdvertisersAgencies");
 reportName.push("rptMarketStationSummary");
-
 reportName.push("rptXRYImportTypeIssueList");
-
 reportName.push("rptXRYContactListByMarketOwner");
 reportName.push("rptXRYAdvertiserExclusivitySpecs");
-
 reportName.push("rptDemoMarketList");
 reportName.push("rptDemoStationList");
-
 reportName.push("rptInactiveStationAssignmentList");
 reportName.push("rptMRRStationSubmissionStatus");
-
 reportName.push("rptMediaRevenueWithDisabledAdvertisers");
-
 reportName.push("rptComplementaryMarketStationGapAnalysis");
 reportName.push("rptUnreleasedMarketIssueList");
-
 reportName.push("rptTVBReviewUserListing");
 reportName.push("rptUsersByProduct");
 //reportName.push("rptOutstandingStations");
@@ -272,49 +211,47 @@ reportName.push("rptXRYOwnersWithoutRecipients")
 reportName.push("rptMRRImportMarketCategoryWarningToleranceList")
 reportName.push("rptAccountExecutiveStatusMarketOwnerList")
 reportName.push("rptMediaActionList")
-
 reportName.push("rptAdvertiserListByOwner");
 reportName.push("rptAgencyListByOwner");
 reportName.push("rptUsersNotLoggedInAfterDateList");
-
 reportName.push("rptStandardInputList");
-
 reportName.push("rptQueryMarketCounts");
 reportName.push("rptQueryUserCounts");
 reportName.push("rptQueryCountsByOwnerMarket");
 reportName.push("rptQueryDetailByOwnerMarket");
 reportName.push("rptImportScriptListByOwner");
- 
 reportName.push("rptStandardInputNotIncludedList");
-
 reportName.push("rptMRRUserListing");
-
 reportName.push("rptMRRUploadTemplateByOwnerWithRevenueExtended");
-
 reportName.push("rptCategoryGrowthByMarket");
 reportName.push("rptTimeSalesVsAllRepBillingStations");
-
 reportName.push("rptPersonnelGroupList");
-
 reportName.push("rptAdvertiserByCategory");
 reportName.push("rptTVBInvalidStationList");
 reportName.push("rptMRRCategoryYTDList");
-
 reportName.push("rptXrayDeleteStationRevenueLogList");
 reportName.push("rptExclusiveAccountChanges");
 reportName.push("rptMarketInfo");
-
 reportName.push("rptInternalUserFavorites");
 reportName.push("rptAsyncStatusIncompleteList");
 reportName.push("rptMisMatchedParentAdvertiserIndustrySubIndustryList");
-
 reportName.push("rptMRROwnerGroupMarketAnalysis");
 reportName.push("rptXRYOwnerGroupMarketAnalysis");
-
 reportName.push("rptTVBReportingMarketStatus");
-
 reportName.push("rptTVBStationIssueList");
 reportName.push("rptGetParentHistoryAndMarketStatusByParentMarket");
+reportName.push("rptGetParentAdvertiserSetupStatusList");
+reportName.push("rptGetParentAgencySetupStatusList");
+reportName.push("rptDMXXRYRevenueReviewByParentMarket");
+reportName.push("rptDMXXRYRevenueReviewByMarket");
+reportName.push("rptDMXXRYRevenueReviewByStation");
+reportName.push("rptDMXXRYRevenueReviewByParentAdvertiser");
+reportName.push("rptDMXXRYRevenueReviewByParentAgency");
+reportName.push("rptDMXXRYRevenueReviewByAdvertiser");
+reportName.push("rptDMXXRYRevenueReviewByAgency");
+reportName.push("rptDMAParentMarketAssignedCategoryTemplate");
+reportName.push("rptMRRStationRevenueYTDByMediaType");
+
 
 function buildReportArray()
 {
@@ -474,6 +411,102 @@ function getDMAReportObjectByKeyValue(inKey, inValue) {
     return null;
 
 }
+
+function buildReportLink(row, reportNameToFind)
+{
+ 
+    var revenuePeriodParts = row["Revenue Period"].split("/");
+    var reportIndex = reportName.indexOf(reportNameToFind);
+    var action = "";
+    var link = "";
+
+    if (reportIndex == -1) {
+        return link;
+    }
+
+    switch (reportNameToFind)
+    {
+        case "rptDMXXRYRevenueReviewByParentAgency":
+            action = "/utilities/genericreport/genericReport.html?reportid=" + reportIndex +
+                "&parentmarketid=" + $("#ddlParentMarket").val() +
+                "&marketid=" + getIDFromString(row["Market"]) +
+                "&parentadvertiserid=" + getIDFromString(row["Parent Advertiser"]) +
+                "&stationid=" + getIDFromString(row["Station"]) +
+                "&revenueperiod=" + revenuePeriodParts[1] +
+                "&revenueyear=" + revenuePeriodParts[0] +
+                "&industryid=" + getIDFromString(row["Industry"]);
+            link = '<a href="' + action + '">' + 'by Parent Agency</a>';
+            break;
+
+        case "rptDMXXRYRevenueReviewByAdvertiser":
+            action = "/utilities/genericreport/genericReport.html?reportid=" + reportIndex +
+                "&parentmarketid=" + $("#ddlParentMarket").val() +
+                "&marketid=" + getIDFromString(row["Market"]) +
+                "&parentadvertiserid=" + getIDFromString(row["Parent Advertiser"]) +
+                "&stationid=" + getIDFromString(row["Station"]) +
+                "&revenueperiod=" + revenuePeriodParts[1] +
+                "&revenueyear=" + revenuePeriodParts[0] +
+                "&industryid=" + getIDFromString(row["Industry"]);
+            link = '<a href="' + action + '">' + 'by Advertiser</a>';
+            break;
+
+        case "rptDMXXRYRevenueReviewByAgency":
+            action = "/utilities/genericreport/genericReport.html?reportid=" + reportIndex +
+                "&parentmarketid=" + $("#ddlParentMarket").val() +
+                "&marketid=" + getIDFromString(row["Market"]) +
+                "&parentagencyid=" + getIDFromString(row["Parent Agency"]) +
+                "&stationid=" + getIDFromString(row["Station"]) +
+                "&revenueperiod=" + revenuePeriodParts[1] +
+                "&revenueyear=" + revenuePeriodParts[0] +
+                "&industryid=" + getIDFromString(row["Industry"]);
+            link = '<a href="' + action + '">' + 'by Agency</a>';
+            break;
+
+        case "rptDMXXRYRevenueReviewByParentAdvertiser":
+            action = "/utilities/genericreport/genericReport.html?reportid=" + reportIndex +
+                "&parentmarketid=" + $("#ddlParentMarket").val() +
+                "&marketid=" + getIDFromString(row["Market"]) +
+                "&stationid=" + getIDFromString(row["Station"]) +
+                "&revenueperiod=" + revenuePeriodParts[1] +
+                "&revenueyear=" + revenuePeriodParts[0] +
+                "&industryid=" + getIDFromString(row["Industry"]);
+                link = '<a href="' + action + '">' + 'by Parent Advertiser</a>';
+            break;
+
+        case "rptDMXXRYRevenueReviewByMarket":
+            action = "/utilities/genericreport/genericReport.html?reportid=" + reportIndex +
+                   "&parentmarketid=" + $("#ddlParentMarket").val() +
+                   "&marketid=" + getIDFromString(row["Market"]) +
+                   "&revenueperiod=" + revenuePeriodParts[1] +
+                   "&revenueyear=" + revenuePeriodParts[0] +
+                   "&industryid=" + getIDFromString(row["Industry"]);
+            link = '<a href="' + action + '">' + 'by Market</a>';
+            break;
+
+        case "rptDMXXRYRevenueReviewByStation":
+                action = "/utilities/genericreport/genericReport.html?reportid=" + reportIndex +
+                "&parentmarketid=" + $("#ddlParentMarket").val() +
+                "&marketid=" + getIDFromString(row["Market"]) +
+                "&revenueperiod=" + revenuePeriodParts[1] +
+                "&revenueyear=" + revenuePeriodParts[0] +
+                "&industryid=" + getIDFromString(row["Industry"]);
+                link = '<a href="' + action + '">' + 'by Station</a>';
+            break;
+
+        case "rptDMXXRYRevenueReviewByParentMarket":
+            action = "/utilities/genericreport/genericReport.html?reportid=" + reportIndex +
+                "&parentmarketid=" + $("#ddlParentMarket").val() +
+                "&revenueperiod=" + revenuePeriodParts[1] +
+                "&revenueyear=" + revenuePeriodParts[0];
+            link =  '<a href="' + action + '">' + 'by Parent Market</a>';
+            break;
+    }
+ 
+    return link;
+
+}
+
+
 //-------------------------
 // REPORT AREA
 //-------------------------
@@ -1819,19 +1852,22 @@ function getReportFilterArray_ActiveStationList() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListByProduct",
+        jsCall: "getMarketListByProductMediaType",
         objectName: "ddlMarket",
         required: false,
-        reloadBasedProduct: true
+        reloadBasedProduct: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerListByProduct",
+        jsCall: "getOwnerListByProductMarketMediaType",
         objectName: "ddlOwner",
         required: false,
-        reloadBasedProduct: true
+        reloadBasedProduct: true,
+        reloadBasedMarket: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
@@ -1881,19 +1917,22 @@ function getReportFilterArray_DisabledStationList() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListByProduct",
+        jsCall: "getMarketListByProductMediaType",
         objectName: "ddlMarket",
         required: false,
-        reloadBasedProduct: true
+        reloadBasedProduct: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerListByProduct",
+        jsCall: "getOwnerListByProductMarketMediaType",
         objectName: "ddlOwner",
         required: false,
-        reloadBasedProduct: true
+        reloadBasedProduct: true,
+        reloadBasedMarket: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
@@ -2800,19 +2839,22 @@ function getReportFilterArray_PersonnelRecipientList() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListByProduct",
+        jsCall: "getMarketListByProductMediaType",
         objectName: "ddlMarket",
         required: false,
-        reloadBasedProduct: true
+        reloadBasedProduct: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerListByProduct",
+        jsCall: "getOwnerListByProductMarketMediaType",
         objectName: "ddlOwner",
         required: false,
-        reloadBasedProduct: true
+        reloadBasedProduct: true,
+        reloadBasedMarket: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
@@ -2823,7 +2865,8 @@ function getReportFilterArray_PersonnelRecipientList() {
         required: false,
         reloadBasedMarket: true,
         reloadBasedOwner: true,
-        reloadBasedProduct: true
+        reloadBasedProduct: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
@@ -2879,19 +2922,22 @@ function getReportFilterArray_WebUserList() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListByProduct",
+        jsCall: "getMarketListByProductMediaType",
         objectName: "ddlMarket",
         required: false,
-        reloadBasedProduct: true
+        reloadBasedProduct: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerListByProduct",
+        jsCall: "getOwnerListByProductMarketMediaType",
         objectName: "ddlOwner",
         required: false,
-        reloadBasedProduct: true
+        reloadBasedProduct: true,
+        reloadBasedMarket: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
@@ -2910,7 +2956,8 @@ function getReportFilterArray_WebUserList() {
         required: false,
         reloadBasedMarket: true,
         reloadBasedOwner: true,
-        reloadBasedProduct: true
+        reloadBasedProduct: true,
+        reloadBasedMediaType: true
 }
     arrayFilters.push(arrayObject);
 
@@ -2973,9 +3020,10 @@ function getReportFilterArray_MRRNoPrimaryContactList() {
     arrayObject = {
         token: "Market",
         objectName: "ddlMarket",
-        jsCall: "getMarketListByProduct",
+        jsCall: "getMarketListByProductMediaType",
         jsCallParameters: ['MRR'],
-        required: false
+        required: false,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
@@ -2983,9 +3031,11 @@ function getReportFilterArray_MRRNoPrimaryContactList() {
     arrayObject = {
         token: "Owner",
         objectName: "ddlOwner",
-        jsCall: "getOwnerListByProduct",
+        jsCall: "getOwnerListByProductMarketMediaType",
         jsCallParameters: ['MRR'],
-        required: false
+        required: false,
+        reloadBasedMarket: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
@@ -3004,7 +3054,8 @@ function getReportFilterArray_MRRNoPrimaryContactList() {
         required: false,
         reloadBasedProduct: true,
         reloadBasedOwner: true,
-        reloadBasedMarket: true
+        reloadBasedMarket: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
@@ -4922,9 +4973,11 @@ function getReportFilterArray_MRRMarketDistributionList() {
     arrayObject = {
         token: "Market",
         objectName: "ddlMarket",
-        jsCall: "getMarketListByProduct",
+        jsCall: "getMarketListByProductMediaType",
         jsCallParameters: ['MRR'],
-        required: true
+        required: true,
+        reloadBasedProduct: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
@@ -4932,8 +4985,11 @@ function getReportFilterArray_MRRMarketDistributionList() {
     arrayObject = {
         token: "Owner",
         objectName: "ddlOwner",
-        jsCall: "getOwnerListByProduct",
+        jsCall: "getOwnerListByProductMarketMediaType",
         jsCallParameters: ['MRR'],
+        reloadBasedProduct: true,
+        reloadBasedMarket: true,
+        reloadBasedMediaType: true,
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -4946,7 +5002,8 @@ function getReportFilterArray_MRRMarketDistributionList() {
         required: false,
         reloadBasedProduct: true,
         reloadBasedOwner: true,
-        reloadBasedMarket: true
+        reloadBasedMarket: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
@@ -6173,6 +6230,7 @@ function getReportFilterArray_RevenueComparisonMarket() {
 }
 
 function getReportObject_RevenueComparisonStation() {
+
     var tempObject = new Object();
     var columnsToDisplay = new Array();
 
@@ -6280,6 +6338,7 @@ function getReportFilterArray_RevenueComparisonStation() {
 }
 
 function getReportObject_RevenueComparisonStationDetail() {
+
     var tempObject = new Object();
     var columnsToDisplay = new Array();
 
@@ -6292,6 +6351,8 @@ function getReportObject_RevenueComparisonStationDetail() {
     columnsToDisplay.push("Station");
     columnsToDisplay.push("Market");
     columnsToDisplay.push("DMA Revenue");
+    columnsToDisplay.push("MRR Revenue");
+    columnsToDisplay.push("Revenue Diff");
 
     var arrButtons = new Array();
 
@@ -6434,10 +6495,22 @@ function getReportFilterArray_Advertisers() {
     var arrayObject = new Object();
 
     arrayObject = {
+        token: "Product",
+        jsCall: "getProductListHidden",
+        jsCallParameters: ['XRY', true],
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
         token: "Market",
-        jsCall: "getXRYMarketList",
+        jsCall: "getMarketListByProductMediaType",
+        jsCallParameters: ['XRY'],
         objectName: "ddlMarket",
-        required: false
+        required: false,
+        reloadBasedProduct: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
@@ -6465,11 +6538,6 @@ function getReportFilterArray_Advertisers() {
         token: "Industry",
         jsCall: "getIndustryList",
         objectName: "ddlIndustry",
-        //onchange: function () {
-
-        //    getSubIndustryList($("#ddlIndustry").val(), '');
-
-        //},
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -6810,10 +6878,22 @@ function getReportFilterArray_Agencies() {
     var arrayObject = new Object();
 
     arrayObject = {
+        token: "Product",
+        jsCall: "getProductListHidden",
+        jsCallParameters: ['XRY', true],
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
         token: "Market",
-        jsCall: "getXRYMarketList",
+        jsCall: "getMarketListByProductMediaType",
+        jsCallParameters: ['XRY'],
         objectName: "ddlMarket",
-        required: false
+        required: false,
+        reloadBasedProduct: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
@@ -9825,7 +9905,15 @@ function getReportFilterArray_MRRStationSubmissionStatus() {
     var arrayFilters = new Array();
     var arrayObject = new Object();
 
-    arrayObject = new Object();
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductListHidden",
+        jsCallParameters: ['MRR', true],
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
     arrayObject = {
         token: "Year",
         jsCall: "getYearList",
@@ -9834,7 +9922,6 @@ function getReportFilterArray_MRRStationSubmissionStatus() {
     }
     arrayFilters.push(arrayObject);
 
-    arrayObject = new Object();
     arrayObject = {
         token: "Period",
         objectName: "ddlPeriod",
@@ -9843,12 +9930,13 @@ function getReportFilterArray_MRRStationSubmissionStatus() {
     }
     arrayFilters.push(arrayObject);
 
-    arrayObject = new Object();
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListByProduct",
+        jsCall: "getMarketListByProductMediaType",
         jsCallParameters: ['MRR'],
         objectName: "ddlMarket",
+        reloadBasedProduct: true,
+        reloadBasedMediaType: true,
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -9861,7 +9949,6 @@ function getReportFilterArray_MRRStationSubmissionStatus() {
     }
     arrayFilters.push(arrayObject);
 
-    arrayObject = new Object();
     arrayObject = {
         token: "StationStatus",
         jsCall: "getStationStatus",
@@ -11192,10 +11279,11 @@ function getReportFilterArray_UsersNotLoggedInAfterDateList() {
 
     arrayObject = {
         token: "Owner",
-        jsCall: "getOwnerListByProduct",
+        jsCall: "getOwnerListByProductMarketMediaType",
         objectName: "ddlOwner",
         required: false,
         reloadBasedProduct: true,
+        reloadBasedMediaType: true
     }
     arrayFilters.push(arrayObject);
 
@@ -11398,6 +11486,15 @@ function getReportFilterArray_QueryUserCounts() {
     var arrayObject = new Object();
 
     arrayObject = {
+        token: "Product",
+        jsCall: "getProductListHidden",
+        jsCallParameters: ['XRY', true],
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
         token: "Owner",
         jsCall: "getOwnerListByProduct",
         jsCallParameters: ['XRY'],
@@ -11405,11 +11502,14 @@ function getReportFilterArray_QueryUserCounts() {
         required: true
     }
     arrayFilters.push(arrayObject);
+
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListByProduct",
+        jsCall: "getMarketListByProductOwner",
         jsCallParameters: ['XRY'],
         objectName: "ddlMarket",
+        reloadBasedProduct: true,
+        reloadBasedOwner: true,
         required: false
     }
     arrayFilters.push(arrayObject);
@@ -11431,9 +11531,7 @@ function getReportFilterArray_QueryUserCounts() {
         required: true
     }
     arrayFilters.push(arrayObject);
-
-
-
+    
     return arrayFilters;
 }
 function getReportObject_QueryUserCounts() {
@@ -12250,10 +12348,11 @@ function getReportFilterArray_MarketInfo() {
 
     arrayObject = {
         token: "Market",
-        jsCall: "getMarketListAll",
+        jsCall: "getMarketListByProductMediaType",
         objectName: "ddlMarket",
-        required: false
-    }
+        required: false,
+        reloadBasedMediaType: true
+}
     arrayFilters.push(arrayObject);
 
     arrayObject = new Object();
@@ -12571,6 +12670,865 @@ function getReportObject_GetParentHistoryAndMarketStatusByParentMarket()
         product: ['dmx'],
         sortable: false,
         approved: false
+    }
+
+    return tempObject;
+}
+
+ 
+function getReportFilterArray_GetParentAdvertiserSetupStatusList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlParentMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_GetParentAdvertiserSetupStatusList() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject = {
+        reportTitle: "Parent Advertiser Setup Status List",
+        apiControllerAction: '/api/ParentAdvertiser/GetParentAdvertiserSetupStatusList',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['dmx', 'parent advertiser'],
+        sortable: false,
+        approved: false
+    }
+
+    return tempObject;
+}
+function getReportFilterArray_GetParentAgencySetupStatusList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlParentMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_GetParentAgencySetupStatusList() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject = {
+        reportTitle: "Parent Agency Setup Status List",
+        apiControllerAction: '/api/ParentAgency/GetParentAgencySetupStatusList',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['dmx', 'parent agency'],
+        sortable: false,
+        approved: false
+    }
+
+    return tempObject;
+}
+
+
+
+function getReportFilterArray_DMXXRYRevenueReviewByParentMarket() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlParentMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        jsCallParameters: ['months'],
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_DMXXRYRevenueReviewByParentMarket() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Industry");
+    columnsToDisplay.push("DMX Revenue");
+    columnsToDisplay.push("XRY Revenue");
+    columnsToDisplay.push("Revenue Diff");
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+
+            return buildReportLink(row, "rptDMXXRYRevenueReviewByMarket");
+         },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject = {
+        reportTitle: "DMX/XRY Compare by Parent Market",
+        apiControllerAction: '/api/DMXReport/GetDMXXRYRevenueReviewByParentMarket',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['dmx'],
+        sortable: true,
+        approved: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_DMXXRYRevenueReviewByMarket() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlParentMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        jsCallParameters: ['months'],
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Industry",
+        objectName: "ddlIndustry",
+        jsCall: "getIndustryListForReports",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+ 
+    return arrayFilters;
+}
+function getReportObject_DMXXRYRevenueReviewByMarket() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Industry");
+    columnsToDisplay.push("DMX Revenue");
+    columnsToDisplay.push("XRY Revenue");
+    columnsToDisplay.push("Revenue Diff");
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+            return buildReportLink(row, "rptDMXXRYRevenueReviewByStation") + "<br>" + buildReportLink(row, "rptDMXXRYRevenueReviewByParentMarket");
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject = {
+        reportTitle: "DMX/XRY Compare by Market",
+        apiControllerAction: '/api/DMXReport/GetDMXXRYRevenueReviewByMarket',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['dmx'],
+        sortable: true,
+        approved: false,
+        visible : false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_DMXXRYRevenueReviewByStation() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlParentMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        jsCallParameters: ['months'],
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Industry",
+        objectName: "ddlIndustry",
+        jsCall: "getIndustryListForReports",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_DMXXRYRevenueReviewByStation() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Industry");
+    columnsToDisplay.push("Station");
+
+    columnsToDisplay.push("DMX Revenue");
+    columnsToDisplay.push("XRY Revenue");
+    columnsToDisplay.push("Revenue Diff");
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+
+            return buildReportLink(row, "rptDMXXRYRevenueReviewByParentAdvertiser")  + "<br>" + buildReportLink(row, "rptDMXXRYRevenueReviewByMarket");
+
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject = {
+        reportTitle: "DMX/XRY Compare by Station",
+        apiControllerAction: '/api/DMXReport/GetDMXXRYRevenueReviewByStation',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['dmx'],
+        sortable: true,
+        approved: false,
+        visible: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_DMXXRYRevenueReviewByParentAdvertiser() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlParentMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        jsCallParameters: ['months'],
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Industry",
+        objectName: "ddlIndustry",
+        jsCall: "getIndustryListForReports",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationListByGeneralFilters",
+        objectName: "ddlStation",
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_DMXXRYRevenueReviewByParentAdvertiser() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Industry");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Parent Advertiser");
+
+    columnsToDisplay.push("DMX Revenue");
+    columnsToDisplay.push("XRY Revenue");
+    columnsToDisplay.push("Revenue Diff");
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+
+            return buildReportLink(row, "rptDMXXRYRevenueReviewByParentAgency")  + "<br>" + buildReportLink(row, "rptDMXXRYRevenueReviewByAdvertiser");
+
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject = {
+        reportTitle: "DMX/XRY Compare by Parent Advertiser",
+        apiControllerAction: '/api/DMXReport/GetDMXXRYRevenueReviewByParentAdvertiser',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['dmx'],
+        sortable: true,
+        approved: false,
+        visible: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_DMXXRYRevenueReviewByParentAgency() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlParentMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        jsCallParameters: ['months'],
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    //arrayObject = new Object();
+    //arrayObject = {
+    //    token: "Industry",
+    //    objectName: "ddlIndustry",
+    //    jsCall: "getIndustryListForReports",
+    //    required: true
+    //}
+    //arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationListByGeneralFilters",
+        objectName: "ddlStation",
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "ParentAdvertiserHidden",
+        jsCall: null,
+        objectName: "hidParentAdvertiser",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_DMXXRYRevenueReviewByParentAgency() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Industry");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Parent Advertiser");
+    columnsToDisplay.push("Parent Agency");
+
+    columnsToDisplay.push("DMX Revenue");
+    columnsToDisplay.push("XRY Revenue");
+    columnsToDisplay.push("Revenue Diff");
+  
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+
+            return buildReportLink(row, "rptDMXXRYRevenueReviewByAgency") + "<br>" + buildReportLink(row, "rptDMXXRYRevenueReviewByParentAdvertiser");
+         },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject = {
+        reportTitle: "DMX/XRY Compare by Parent Agency",
+        apiControllerAction: '/api/DMXReport/GetDMXXRYRevenueReviewByParentAgency',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['dmx'],
+        sortable: true,
+        approved: false,
+        visible: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_DMXXRYRevenueReviewByAdvertiser() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlParentMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        jsCallParameters: ['months'],
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    //arrayObject = new Object();
+    //arrayObject = {
+    //    token: "Industry",
+    //    objectName: "ddlIndustry",
+    //    jsCall: "getIndustryListForReports",
+    //    required: true
+    //}
+    //arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationListByGeneralFilters",
+        objectName: "ddlStation",
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "ParentAdvertiserHidden",
+        jsCall: null,
+        objectName: "hidParentAdvertiser",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_DMXXRYRevenueReviewByAdvertiser() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Industry");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Parent Advertiser");
+    columnsToDisplay.push("Advertiser");
+    columnsToDisplay.push("DMX Revenue");
+    columnsToDisplay.push("XRY Revenue");
+    columnsToDisplay.push("Revenue Diff");
+ 
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+
+            return buildReportLink(row, "rptDMXXRYRevenueReviewByAgency") ;
+        },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject = {
+        reportTitle: "DMX/XRY Compare by Advertiser",
+        apiControllerAction: '/api/DMXReport/GetDMXXRYRevenueReviewByAdvertiser',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['dmx'],
+        sortable: true,
+        approved: false,
+        visible: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_DMXXRYRevenueReviewByAgency() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlParentMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Year",
+        jsCall: "getYearList",
+        objectName: "ddlYear",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Period",
+        objectName: "ddlPeriod",
+        jsCall: "getPeriodList",
+        jsCallParameters: ['months'],
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Industry",
+        objectName: "ddlIndustry",
+        jsCall: "getIndustryListForReports",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "Station",
+        jsCall: "getStationListByGeneralFilters",
+        objectName: "ddlStation",
+        reloadBasedMarket: true,
+        reloadBasedOwner: true,
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "ParentAgencyHidden",
+        jsCall: null,
+        objectName: "hidParentAgency",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token: "AdvertiserHidden",
+        jsCall: null,
+        objectName: "hidAdvertiser",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_DMXXRYRevenueReviewByAgency() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Industry");
+    columnsToDisplay.push("Station");
+    columnsToDisplay.push("Parent Agency");
+    columnsToDisplay.push("Agency");
+
+    columnsToDisplay.push("DMX Revenue");
+    columnsToDisplay.push("XRY Revenue");
+    columnsToDisplay.push("Revenue Diff");
+    columnsToDisplay.push({
+        "action": "edit",
+        "mRender": function (data, type, row) {
+
+            return buildReportLink(row, "rptDMXXRYRevenueReviewByParentAgency") + "<br>" + buildReportLink(row, "rptDMXXRYRevenueReviewByAdvertiser");
+         },
+        "orderable": false,
+        "searchable": false,
+        "className": "text-align-right"
+    });
+
+    tempObject = {
+        reportTitle: "DMX/XRY Compare by Agency",
+        apiControllerAction: '/api/DMXReport/GetDMXXRYRevenueReviewByAgency',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['dmx'],
+        sortable: true,
+        approved: false,
+        visible: false
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_DMAParentMarketAssignedCategoryTemplate() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        jsCallParameters: ['DMA'],
+        objectName: "ddlParentMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_DMAParentMarketAssignedCategoryTemplate() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+ 
+
+    tempObject = {
+        reportTitle: "DMA Parent Market Category Template",
+        apiControllerAction: '/api/DMAReport/GetParentMarketAssignedCategoryTemplate',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['dma'],
+        sortable: true,
+        approved: false,
+        visible: true
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_MRRStationRevenueYTDByMediaType() {
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    //create new method to shrink to just tv and radio maybe??
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMRRMediaTypeList",
+        objectName: "ddlMediaType",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "FromYearPeriod",
+        jsCall: "getPeriodList_YYYYMM",
+        objectName: "ddlFromYYYYMM",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "ToYearPeriod",
+        jsCall: "getPeriodList_YYYYMM",
+        objectName: "ddlToYYYYMM",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "IncludeMarketsOnHold",
+        objectName: "chkIncludeMarketsOnHold",
+        jsCall: null,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "IncludeInactiveStations",
+        objectName: "chkIncludeInactiveStations",
+        jsCall: null,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_MRRStationRevenueYTDByMediaType() {
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject =
+    {
+        reportTitle: "MRR Station Revenue YTD By Media Type",
+        apiControllerAction: "/api/MRRReport/GetStationRevenueYTDByMediaType",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['mrr', 'corporate'],
+        sortable: true,
+        approved: false,
+        visible: true
     }
 
     return tempObject;

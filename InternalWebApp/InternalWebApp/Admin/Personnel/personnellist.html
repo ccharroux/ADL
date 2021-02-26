@@ -167,8 +167,7 @@
 <script>
 
 
-
-
+    var names = new Array();
 
     $(document).ready(function () {
 
@@ -188,6 +187,7 @@
     {
         var reportTitle = "Personnel List";
         var exportColumns = returnTableColumnsByClass("dtPersonnelList", "exportColumn");
+        names = new Array();
 
         $("#dtPersonnelList").DataTable({
             "dom": "Blfrtip",
@@ -210,14 +210,26 @@
                     "searchable": true
                 },
                 {
-                    mRender: function (data, type, row) {
-
-                        var str =  '<a href="#" onclick="editPersonnel(' + row.personnelId + ')">Edit</a>&nbsp;&nbsp;<a href="#" onclick="deletePersonnel(' + row.marketId + ')">Delete</a>'
+                    mRender: function (data, type, row)
+                    {
+                        var name = row.name.replace(/'/g,"#");
+                        var str = '<a href="#" onclick="editPersonnel(' + row.personnelId + ')">Edit</a>&nbsp;&nbsp;<a href="#" onclick="deletePersonnel(' + row.personnelId + ')">Delete</a>';
 
                         if (row.ownerName != "NONE") {
-                            str = str + '<br><a href="#" onclick="assignmentPersonnel(' + row.personnelId + ',' + "'" + row.name + "'" + ',' +  "'" + row.emailAddress + "'" + ')">Assignment</a>';
-                            str = str + '<br><a href="#" onclick="groupAssignmentPersonnel(' + row.personnelId + ',' + "'" + row.name + "'" + ')">Group Assignment</a>';
-                            str = str + '<br><a href="#" onclick="personnelSnapshot(' + row.personnelId + ',' + "'" + row.name + "'" + ')">Personnel Dashboard</a>';
+
+                            //var resetName = name.replace(/#/g, "'");
+                            //setAssignmentPageParameters(name, row.emailAddress);
+
+                            var name = new Object();
+                            name["personnelId"] = row.personnelId;
+                            name["name"] = row.name;
+                            name["emailAddress"] = row.emailAddress;
+                                
+                            names.push(name);
+
+                            str = str + '<br><a href="#" onclick="assignmentPersonnel(' + row.personnelId + ')">Assignment</a>';
+                            str = str + '<br><a href="#" onclick="groupAssignmentPersonnel(' + row.personnelId + ')">Group Assignment</a>';
+                            str = str + '<br><a href="#" onclick="personnelSnapshot(' + row.personnelId  + ')">Personnel Dashboard</a>';
                         }
                         return str;
 
@@ -476,19 +488,26 @@
         window.location = "/admin/personnel/personnel.html?personnelID=" + personnelId;
 
     }
-    function assignmentPersonnel(personnelId, name, emailAddress) {
-        setAssignmentPageParameters(name, emailAddress);
+    function assignmentPersonnel(personnelId)
+    {
+        buildAssignmentPageParameters(personnelId);
         window.location = "/admin/personnel/personnelassignment.html?personnelID=" + personnelId;
 
     }
 
-    function groupAssignmentPersonnel(personnelId, name) {
-        setGroupAssignmentPageParameters(name);
+    function groupAssignmentPersonnel(personnelId) {
+
+        buildAssignmentPageParameters(personnelId);
+        //var resetName = name.replace(/#/g, "'");
+        //setGroupAssignmentPageParameters(resetName);
         window.location = "/admin/personnel/personnelgroupassignment.html?personnelID=" + personnelId;
 
     }
-    function personnelSnapshot(personnelId, name) {
-        setAssignmentPageParameters(name);
+    function personnelSnapshot(personnelId)
+    {
+        buildAssignmentPageParameters(personnelId);
+        //var resetName = name.replace(/#/g, "'");
+        //setAssignmentPageParameters(resetName);
         window.location = "/admin/personnel/personnelview.html?personnelID=" + personnelId;
 
     }
@@ -501,11 +520,21 @@
 
     }
 
-    function setAssignmentPageParameters(name, emailAddress) {
+    function buildAssignmentPageParameters(personnelId)
+    {
+        let obj = names.find(o => o.personnelId === personnelId);
+        var pageParameters = {};
+        pageParameters["personnelName"] = obj["name"];
+        pageParameters["emailAddress"] = obj["emailAddress"];
+
+        setLocalStorage("gPageParameters", JSON.stringify(pageParameters));
+    }
+
+    function setAssignmentPageParameters(name, emailAddress)
+    {
         var pageParameters = {};
         pageParameters["personnelName"] = name;
         pageParameters["emailAddress"] = emailAddress;
-
         setLocalStorage("gPageParameters", JSON.stringify(pageParameters));
     }
 

@@ -98,7 +98,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <!--<input type="hidden" id="oldIndustryId" value="" />-->
-                            <select id="ddlIndustry" class="mkaRequired field-width-450" style="" errorMessage="You must select an Industry."></select>
+                            <select id="ddlIndustry" class="mkaRequired field-width-450" style="" errorMessage="You must select an Industry."  onchange="resetErrorMessage()" ></select>
                         </div>
                     </div>
 
@@ -108,7 +108,7 @@
                         </div>
                         <div class="col-md-9 text-align-left">
                             <!--<input type="hidden" id="oldSubIndustryId" />-->
-                            <select id="ddlSubIndustry" class="mkaRequired field-width-450" style="" errorMessage="You must select a Sub Industry."></select>
+                            <select id="ddlSubIndustry" class="mkaRequired field-width-450" style="" onchange="resetErrorMessage()" errorMessage="You must select a Sub Industry."></select>
                         </div>
                     </div>
 
@@ -120,20 +120,29 @@
                             <input type="hidden" id="oldParentAdvertiserId" value="" />
                             <input type="hidden" id="oldParentAdvertiserName" value="" />
                             <input type="hidden" id="txtParentAdvertiserId" value="" />
-                            <input type="text" id="txtParentAdvertiserName" class="disabled field-width-450 margin-right-10" disabled="disabled" style="" errorMessage=""><span id="parentLinkedMessage" class="hidden to-be-linked-message">* Will be linked</span>
+                            <input type="text" id="txtParentAdvertiserName" class="disabled mkaRequired field-width-450 margin-right-10" disabled="disabled" style="" errorMessage="You must select a Parent Advertiser"><span id="parentLinkedMessage" class="hidden to-be-linked-message">* Will be linked</span>
+                            <div style="margin-top:5px;">
+                                <span>
+                                    <input value="Parent Advertiser Search" onclick="excludeFromBackButton(); searchParentAdvertiser();" class="default-button-200" type="button">
+                                </span>
+                                <span>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="default-button-200" onclick="generateParentAdvertiser()" value="Generate Parent Advertiser" />
+                                </span>
+                            </div>
                         </div>
+                        <div style="text-align:left;color:red;display:none" id="invalidParentRelationship">&nbsp;&nbsp;&nbsp;&nbsp;Parent Advertiser Industry or Sub-Industry do not match. Invalid Setup.</div>
                     </div>
 
-                    <div class="row input-row">
+                    <!--<div class="row input-row">
                         <div class="col-md-3">
 
                         </div>
                         <div class="col-md-9 text-align-left">
                             <div>
-                                <input value="Parent Advertiser Search" onclick="excludeFromBackButton(); searchParentAdvertiser();" class="default-button-450" type="button">
+                                
                             </div>
                         </div>
-                    </div>
+                    </div>-->
 
                     <div class="row input-row link-parent" style="display: none;">
                         <div class="col-md-3 text-align-left">
@@ -433,6 +442,7 @@
     var sAdvertiserName = "";
     var iIndustryId = -1;
     var iSubIndustryId = -1;
+    var bFromSearch = false;
 
     $(document).ready(function () {
 
@@ -447,7 +457,6 @@
             getSubIndustryList($(this).val(), '');
         });
 
-
         if (getLocalStorage("StandardInputId") != "") {
             $(".standardInputArea").show();
             getStandardInputData(getLocalStorage("StandardInputId"));
@@ -456,17 +465,25 @@
             $(".standardInputArea").hide();
         }
 
-        if (getLocalStorage("MediaStandardInputId") != "") {
+        if (getLocalStorage("MediaStandardInputId") != "")
+        {
             $(".mediaStandardInputArea").show();
             getStandardMediaInputData(getLocalStorage("MediaStandardInputId"));
         }
-        else {
+        else
+        {
             $(".mediaStandardInputArea").hide();
         }
         
     });
 
-    function setUIFields() {
+    function resetErrorMessage()
+    {
+       $("#invalidParentRelationship").hide();
+    }
+
+    function setUIFields()
+    {
         advertiserId = (getParameterByName("AdvertiserID") == null ? 0 : getParameterByName("AdvertiserID"));
 
         bIsFromReport = getParameterByName("FromReport") == null ? false : getParameterByName("FromReport");
@@ -673,30 +690,39 @@
         $("#chkActive").prop('checked', true);
     }
 
-    function getAdvertiser() {
-        if (advertiserId <= 0) {
+    function getAdvertiser()
+    {
+        $("#invalidParentRelationship").hide();
+
+        if (advertiserId <= 0)
+        {
             initializeActiveDate();
+
             $('.link-parent').hide();
             $('.advertiser-link-advertiser').hide();
             $('.change-date').hide();
 
             //the name should've been supplied through the URL
             //along with industry and sub-industry
-            if (sAdvertiserName.length > 0) {
+            if (sAdvertiserName.length > 0)
+            {
                 $("#txtAdvertiserName").val(sAdvertiserName.toUpperCase());
-                if (iIndustryId > -1) {
+                if (iIndustryId > -1)
+                {
                     $("#ddlIndustry").val(iIndustryId);
                     getSubIndustryList(iIndustryId, iSubIndustryId);
                 }
-
-            } else {
+            }
+            else
+            {
                 getSubIndustryList("-1", "");
             }
 
             loadSearchResults();
 
             //determine media code
-            if (iMarketId > 0) {
+            if (iMarketId > 0)
+            {
                 $("#ddlMarket").val(iMarketId);
             }
 
@@ -732,10 +758,28 @@
                             $("#ddlMarket").val(obj["marketId"]);
                         }
 
+                        if (
+                            (obj["parentIndustryId"] == null ||
+                            obj["parentSubIndustryId"] == null ||
+                            obj["parentIndustryId"] != obj["industryId"] ||
+                            obj["parentSubIndustryId"] != obj["subIndustryId"]) &&
+                            (
+                                bFromSearch == false 
+                            )
+                        )
+                        {
+                            $("#invalidParentRelationship").html("&nbsp;&nbsp;&nbsp;&nbsp;Parent and Market Advertiser Industry or Sub-Industry do not match. Parent Settings: Industry (" + obj["parentIndustryId"] + "), Sub-Industry (" + obj["parentSubIndustryId"] + ").");
+                            $("#invalidParentRelationship").show();
+                        }
+                        else
+                        {
+                            $("#invalidParentRelationship").hide();
 
+                        }
 
                         $("#txtAdvertiserId").val(obj["advertiserId"]);
                         $("#txtAdvertiserName").val(obj["advertiserName"]);
+
 
                         $("#ddlIndustry").val(obj["industryId"]);
 
@@ -788,6 +832,7 @@
 
                         $('.advertiser-link-advertiser').show();
 
+                        bFromSearch == false;
                         getSubIndustryList(obj["industryId"], obj["subIndustryId"]);
                         loadSearchResults(); //may need to find a better place for this
                     });
@@ -907,7 +952,9 @@
     }
 
     function validationPassed() {
+
         var loopBreak = true;
+
         $(".mkaRequired").each(function (index, el) {
             var eID = "#" + $(el).attr("id");
             var errorMessage = $(el).attr("errorMessage");
@@ -934,8 +981,11 @@
         return loopBreak;
     }
 
-    function updateAdvertiser() {
-        if (validationPassed() == false) {
+    function updateAdvertiser()
+    {
+
+        if (validationPassed() == false)
+        {
             return;
         }
 
@@ -1144,9 +1194,11 @@
             "active": $('#chkActive').is(':checked'),
             "changeDate": $('#txtChangeDate').val(),
             "searchHeading": "Parent Advertiser Search",
+            "industryName": $("#ddlIndustry option:selected").text(),
+            "subIndustryName": $("#ddlSubIndustry option:selected").text(),
             "searchPage": window.location
         }
-
+        console.log(searchCriteriaObj);
         setLocalStorage("gSearchCriteria", JSON.stringify(searchCriteriaObj));
 
         window.location = "/utilities/search.html";
@@ -1194,6 +1246,7 @@
             return;
         }
 
+        bFromSearch = true;
         //load current fields
         //if the market ones are there load link advertiser
         //if the parent advertiser are there load parent advertiser
@@ -1224,6 +1277,7 @@
         $("#txtActiveDate").val(searchResults["activeDate"]);
         $('#chkActive').prop("checked", searchResults["active"]);
         $('#txtChangeDate').val(searchResults["changeDate"]);
+        $('#invalidParentRelationship').hide();
 
 
         setLocalStorage("gSearchResults", "");
@@ -1400,4 +1454,74 @@
         });
     }
 
+    function generateParentAdvertiser()
+    {
+        var ParentAdvertiserName = $("#txtAdvertiserName").val();
+        var Industry = $("#ddlIndustry").val();
+        var SubIndustry = $("#ddlSubIndustry").val();
+
+        if (ParentAdvertiserName.length == 0)
+        {
+            bootbox.alert("An Advertiser Name is required to Generate a Parent Advertiser", function () { });
+            return;
+        }
+
+        if ($("#ddlIndustry").prop('selectedIndex') == 0) {
+            bootbox.alert("An Industry needs to be selected to Generate a Parent Advertiser", function () { });
+            return;
+        }
+
+        if ($("#ddlSubIndustry").prop('selectedIndex') == 0) {
+            bootbox.alert("A Sub-Industry needs to be selected to Generate a Parent Advertiser", function () { });
+            return;
+        }
+
+        updateParentAdvertiser(ParentAdvertiserName, Industry, SubIndustry);
+    }
+
+    function updateParentAdvertiser(ParentAdvertiserName, Industry, SubIndustry)
+    {
+
+        $.ajax({
+            url: ServicePrefix + '/api/ParentAdvertiser/UpdateParentAdvertiser',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inParentAdvertiserId": '0',
+                "inParentAdvertiserName": ParentAdvertiserName,
+                "inIndustryId": Industry,
+                "inSubIndustryId": SubIndustry,
+                "inIsNew": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                        $("#invalidParentRelationship").hide();
+                        var obj = data.report.rows[0];
+
+                        var newParentAdvertiser = obj["_updateStatus"]
+
+                        $("#oldParentAdvertiserId").val($("#txtParentAdvertiserId").val());
+                        $("#oldParentAdvertiserName").val($("#txtParentAdvertiserName").val());
+                        $("#txtParentAdvertiserId").val(newParentAdvertiser);
+ 
+                        $("#txtParentAdvertiserName").val(ParentAdvertiserName);
+
+                        bootbox.alert("New Parent Advertiser created", function () { });
+                        $("btnGenerateParentAdvertiser").hide();
+
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
+
+    }
 </script>

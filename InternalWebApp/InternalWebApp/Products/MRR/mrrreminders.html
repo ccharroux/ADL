@@ -137,7 +137,7 @@
                     <div class="col-md-12 ">
                         <center>
                             <label for="chkOnlyPendingMarkets" class="checkboxView">
-                                <input type="checkbox" id="chkOnlyPendingMarkets" value="" onclick="getReminders();" />&nbsp;Only pending markets
+                                <input type="checkbox" id="chkOnlyPendingMarkets" value="" checked="checked" onclick="getReminders();" />&nbsp;Only pending markets
                             </label>
  
                             <label for="chkOnlyMarketsForCurrentContact" class="checkboxView">
@@ -145,7 +145,7 @@
                             </label>
  
                             <label for="chkForceUserView" class="checkboxView forceUserView">
-                                <input type="checkbox" id="chkForceUserView" value="" onclick="getReminders();" checked="checked" />&nbsp;Show Contacts
+                                <input type="checkbox" id="chkForceUserView" value="" onclick="getReminders();" />&nbsp;Show Contacts
                             </label>
 
                             <label for="chkOnlyPrimaryContacts" class="checkboxView OnlyPrimaryContacts">
@@ -169,6 +169,7 @@
                     </div>
                     <div class="col-md-2" style="height:56px; text-align:center">
                         <input style="margin-top:10px" id="btnSendAll" type="button" value="Send All" onclick="sendRemindersBulkInitiate();" />
+                        <input style="margin-top:10px" id="btnSendAllMarkets" type="button" value="Send All Markets" onclick="sendMarketRemindersBulkInitiate();" />
                     </div>
                 </div>
 
@@ -177,42 +178,44 @@
                 <div class="dataTable-top-margin">
                     <table id="dtReminders" class="dataTable-border dataTable-headers dataTable-cell-border">
                         <thead>
-                            <tr>
-                                <th class="exportColumn singleMarketOrContactColumn">Contact</th>
-                                <th class="exportColumn singleMarketOrContactColumn">Primary</th>
-                                <th class="exportColumn allMarketsColumn">Market</th>
-                                <th class="exportColumn singleMarketOrContactColumn">Station</th>
-                                <th class="exportColumn singleMarketOrContactColumn text-align-right"># Reminders</th>
- 
-                                <th class="exportColumn singleMarketOrContactColumn">Input On</th>
-                                <th class="exportColumn">Sent By</th>
-                                <th class="exportColumn">Sent On</th>
-                                <th class="exportColumn allMarketsAndContactsColumn text-align-right">Stations Pending</th>
-                                <th class="exportColumn allMarketsAndContactsColumn text-align-right">Contacts Pending</th>
-                                <th class="allMarketsAndContactsColumn text-align-center">Media</th>
-                                <th class="allMarketsAndContactsColumn text-align-center">Schedule</th>
-                                <th class="allMarketsAndContactsColumn text-align-center">On Hold</th>
-                                <th class="text-align-center">Send</th>
-                            </tr>
+                        <tr>
+                            <th class="allMarketsColumnChkBox"><input type="checkbox" id="chkSelectAllSendableMarkets" onclick="mrrReminderSelectAllChecked(this);"/></th>
+                            <th class="exportColumn singleMarketOrContactColumn">Contact</th>
+                            <th class="exportColumn singleMarketOrContactColumn">Primary</th>
+                            <th class="exportColumn allMarketsColumn">Market</th>
+                            <th class="exportColumn singleMarketOrContactColumn">Station</th>
+                            <th class="exportColumn singleMarketOrContactColumn text-align-right"># Reminders</th>
+
+                            <th class="exportColumn singleMarketOrContactColumn">Input On</th>
+                            <th class="exportColumn">Sent By</th>
+                            <th class="exportColumn">Sent On</th>
+                            <th class="exportColumn allMarketsAndContactsColumn text-align-right">Stations Pending</th>
+                            <th class="exportColumn allMarketsAndContactsColumn text-align-right">Contacts Pending</th>
+                            <th class="allMarketsAndContactsColumn text-align-center">Media</th>
+                            <th class="allMarketsAndContactsColumn text-align-center">Schedule</th>
+                            <th class="allMarketsAndContactsColumn text-align-center">On Hold</th>
+                            <th class="text-align-center">Send</th>
+                        </tr>
                         </thead>
                         <tfoot>
-                            <tr>
-                                <th class="singleMarketOrContactColumn">Contact</th>
-                                <th class="singleMarketOrContactColumn">Primary</th>
-                                <th class="allMarketsColumn">Market</th>
-                                <th class="singleMarketOrContactColumn">Station</th>
-                                <th class="singleMarketOrContactColumn text-align-right"># Reminders</th>
- 
-                                <th class="singleMarketOrContactColumn">Input On</th>
-                                <th>Sent By</th>
-                                <th>Sent On</th>
-                                <th class="allMarketsAndContactsColumn text-align-right">Stations Pending</th>
-                                <th class="allMarketsAndContactsColumn text-align-right">Contacts Pending</th>
-                                <th class="allMarketsAndContactsColumn text-align-center">Media</th>
-                                <th class="allMarketsAndContactsColumn text-align-center">Schedule</th>
-                                <th class="allMarketsAndContactsColumn text-align-center">On Hold</th>
-                                <th class="text-align-center">Send</th>
-                            </tr>
+                        <tr>
+                            <th class="allMarketsColumnChkBox"></th>
+                            <th class="singleMarketOrContactColumn">Contact</th>
+                            <th class="singleMarketOrContactColumn">Primary</th>
+                            <th class="allMarketsColumn">Market</th>
+                            <th class="singleMarketOrContactColumn">Station</th>
+                            <th class="singleMarketOrContactColumn text-align-right"># Reminders</th>
+
+                            <th class="singleMarketOrContactColumn">Input On</th>
+                            <th>Sent By</th>
+                            <th>Sent On</th>
+                            <th class="allMarketsAndContactsColumn text-align-right">Stations Pending</th>
+                            <th class="allMarketsAndContactsColumn text-align-right">Contacts Pending</th>
+                            <th class="allMarketsAndContactsColumn text-align-center">Media</th>
+                            <th class="allMarketsAndContactsColumn text-align-center">Schedule</th>
+                            <th class="allMarketsAndContactsColumn text-align-center">On Hold</th>
+                            <th class="text-align-center">Send</th>
+                        </tr>
                         </tfoot>
                     </table>
                 </div>
@@ -291,6 +294,11 @@
     var currentStationId = null;
     var currentPersonnelId = null;
 
+    var gBulkMarketSubmit = false;
+    var gBulkSubmit = false;
+
+    var iTotalSendableMarkets = 0;
+
     $(document).ready(function () {
 
         buildMRRMenu('Revenue');
@@ -306,7 +314,6 @@
         //setEventListeners();
 
         clearSearchButtonSetup();
-
 
         buildQuickReports(['MRR Notifications']);
 
@@ -354,6 +361,28 @@
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
             "columns": [
+                {
+                    mRender: function (data, type, row)
+                    {
+                        var bSendable = true;
+
+                        if (row["Input On"] != null ||row["Stations Pending"] == 0 || row["Status"] == "On Hold")
+                        {
+                            bSendable = false;
+                        }
+
+                        if (bSendable)
+                        {
+                            return '<input type="checkbox" id="chkMarket_' + row.marketId + '" class="sendable-market" onclick="checkOnSelectAllMarketBox();" />';
+                        } else
+                        {
+                            return '<input type="checkbox" id="chkMarket_' + row.marketId + '" class="unsendable-market" disabled />';
+                        }
+                        
+                    },
+                    "orderable": false,
+                    "searchable": false
+                },
                 {
                     mRender: function (data, type, row) {
                         return '<a href="#" style="color:blue" onclick="selectContactId(' + row.personnelId + ')">' + row.Contact + '</a>';
@@ -409,35 +438,39 @@
             ],
             "columnDefs": [
                 {
+                    "targets":[0],
+                    "className": "allMarketsColumnChkBox text-align-center"
+                },
+                {
                     "targets": [
-                        0, // Contact
-                        1, // Primary
-                        3 // Station Name
+                        1, // Contact
+                        2, // Primary
+                        4 // Station Name
                     ],
                     "className": "singleMarketOrContactColumn"
                 },
                 {
                     "targets": [
-                        2 // Market Name
+                        3 // Market Name
                     ],
                     "className": "allMarketsColumn"
                 },
                 {
                     "targets": [
-                        4 // Number of Reminders
+                        5 // Number of Reminders
                     ],
                     "className": "singleMarketOrContactColumn text-align-right"
                 },
                 {
                     "targets": [
-                        5 // Input On
+                        6 // Input On
                     ],
                     "className": "singleMarketOrContactColumn"
                 },
                 {
                     "targets": [
-                        8, // Stations Pending
-                        9 // Contacts Pending
+                        9, // Stations Pending
+                        10 // Contacts Pending
  
                     ],
                     "className": "allMarketsAndContactsColumn text-align-right"
@@ -445,16 +478,16 @@
                 {
                     "targets": [
  
-                        10, // Media Type
-                        11, // Schedule
-                        12 // On Hold
+                        11, // Media Type
+                        12, // Schedule
+                        13 // On Hold
                     ],
                     "className": "allMarketsAndContactsColumn text-align-center"
                 },
                     {
                         "targets": [
 
-                            13  // Send
+                            14  // Send
  
                         ],
                         "className": "text-align-center"
@@ -462,10 +495,11 @@
             ],
             "fnDrawCallback": function (oSettings) {
                 showHideColumns();
+                checkOnSelectAllMarketBox();
             },
             "footerCallback": function (row, data, start, end, display) {
-                var columnTotalStationsPending = 8;
-                var columnTotalContactsPending = 9;
+                var columnTotalStationsPending = 9;
+                var columnTotalContactsPending = 10;
 
                 var api = this.api();
 
@@ -527,7 +561,7 @@
                            }
                        }
                    }
-               },
+               }
                //{
                //    extend: 'print',
                //    title: reportTitle,
@@ -774,7 +808,7 @@
         }
 
         $("#ddlYearPeriod").html(str);
-        convertToChosenSelect("ddlYearPeriod", false, false)
+        convertToChosenSelect("ddlYearPeriod", false, false);
 
         gotYearsPeriods = true;
         getReminders();
@@ -912,6 +946,7 @@
     function getReminders() {
 
         $("#btnSendAll").hide();
+        $("#btnSendAllMarkets").hide();
         bulkSendArray = new Array();
 
         if (!gotContacts || !gotYearsPeriods) {
@@ -980,8 +1015,12 @@
                             bShow = true;
                         }
 
-                        if (bShow) {
+                        if (bShow)
+                        {
                             $("#btnSendAll").show();
+                        } else
+                        {
+                            $("#btnSendAllMarkets").show();
                         }
                     }
                 }
@@ -1006,17 +1045,21 @@
         var marketId = $("#ddlMarket").val();
         var contactId = $("#ddlContact").val();
 
+        $("#chkSelectAllSendableMarkets").prop('checked', false);
+
         if (marketId == -1 && contactId == -1 && $("#chkForceUserView").is(":checked") == false)
         {
             $(".allMarketsAndContactsColumn").show();
             $(".singleMarketOrContactColumn").hide();
             $(".allMarketsAndContactsTotal").show();
+            $(".allMarketsColumnChkBox").show();
         }
         else
         {
             $(".allMarketsAndContactsColumn").hide();
             $(".singleMarketOrContactColumn").show();
             $(".allMarketsAndContactsTotal").hide();
+            $(".allMarketsColumnChkBox").hide();
         }
 
         if (marketId == -1)
@@ -1050,6 +1093,13 @@
 
         if (gBulkSubmit == true) {
             sendRemindersBulkAjax();
+            return;
+        }
+
+        console.log(gBulkMarketSubmit);
+        if (gBulkMarketSubmit == true)
+        {
+            sendMarketRemindersBulkAjax();
             return;
         }
 
@@ -1201,5 +1251,169 @@
             }
         });
     }
+
+    function mrrReminderSelectAllChecked(selectAllBox)
+    {
+        iTotalSendableMarkets = 0;
+
+        var table = $("#dtReminders").DataTable();
+
+        table.rows().every(function (index, element) {
+            var row = $(this.node());
+            var statusElement = row.find('td').eq(0);
+
+            var inputCheckbox = $(statusElement).find("input");
+
+            var sClassName = inputCheckbox[0].className;
+
+            if ($(selectAllBox).is(':checked')) {
+                if (sClassName.toLowerCase() === "sendable-market")
+                {
+                    iTotalSendableMarkets++;
+                    $(inputCheckbox[0]).prop('checked', true);
+                }
+            } else {
+                if (sClassName.toLowerCase() === "sendable-market") {
+                    $(inputCheckbox[0]).prop('checked', false);
+                }
+            }
+        });
+
+    }
+
+    function checkOnSelectAllMarketBox()
+    {
+        //console.log(iTotalSendableMarkets);
+        var iCheckedItems = 0;
+        var table = $("#dtReminders").DataTable();
+
+        table.rows().every(function(index, element)
+        {
+            var row = $(this.node());
+            var statusElement = row.find('td').eq(0);
+
+            var inputCheckbox = $(statusElement).find("input");
+
+            var sClassName = inputCheckbox[0].className;
+
+            if (sClassName.toLowerCase() === "sendable-market") {
+                if ($(inputCheckbox[0]).is(':checked'))
+                {
+                    iCheckedItems++;
+                }
+            }
+        });
+
+        if (iTotalSendableMarkets == iCheckedItems)
+        {
+            $("#chkSelectAllSendableMarkets").prop('checked', true);
+        } else
+        {
+            $("#chkSelectAllSendableMarkets").prop('checked', false);
+        }
+    }
+
+    function sendMarketRemindersBulkInitiate()
+    {
+        gBulkMarketSubmit = true;
+        $("#txtEmailNote").val("");
+        $("#emailNoteDialog").dialog("open");
+    }
+
+    function sendMarketRemindersBulkAjax()
+    {
+        var marketList = new Array();
+
+        var table = $("#dtReminders").DataTable();
+
+        table.rows().every(function (index, element) {
+            var row = $(this.node());
+
+            var statusElement = row.find('td').eq(0);
+
+            var inputCheckbox = $(statusElement).find("input");
+
+            if ($(inputCheckbox[0]).is(':checked')) {
+                var rData = this.data();
+
+                marketList.push({
+                    "inMarketId": rData.marketId,
+                    "inMarketName": rData.Market,
+                    "inStationId": rData.stationId,
+                    "inPersonnelId": rData.personnelId
+                });
+            }
+
+        });
+
+        if (marketList.length == 0)
+        {
+            bootbox.alert("Please select at least one market to send a reminder.");
+            return;
+        }
+
+
+        var url = ServicePrefix + '/api/MRR/InsertMarketRemindersIntoQueueInput';
+
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarkets": marketList,
+                "inYear": currentYear(),
+                "inPeriod": currentPeriod(),
+                "inOnlyPendingMarkets": $("#chkOnlyPendingMarkets").is(':checked'),
+                "inEmailNote": $("#txtEmailNote").val(),
+                "inOnlyPrimaryContacts": $("#chkOnlyPrimaryContacts").prop('checked')
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                sendMarketReminderSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        var message = "This will send emails to " + marketList.length;
+        message +=  marketList.length == 1 ? " market" : " markets";
+        message += ". Do you wish to continue?";
+
+        bootbox.confirm(message, function (result) {
+            if (result)
+            {
+                $.ajax(url, settings);
+            }
+            else {
+                return;
+            }
+        });
+
+    }
+
+    function sendMarketReminderSuccess(data, textStatus, jQxhr)
+    {
+        if (data.response.status == "FAIL") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.response.status == "BLOCK")
+        {
+            bootbox.alert(data.response.errorMessage[0]);
+
+        } else
+        {
+            bootbox.alert("All market reminders have been sent.");
+        }
+
+        $("#chkSelectAllSendableMarkets").prop('checked', false);
+        gBulkMarketSubmit = false;
+        getReminders();
+    }
+
 </script>
 

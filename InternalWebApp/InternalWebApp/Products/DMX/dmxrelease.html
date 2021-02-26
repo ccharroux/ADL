@@ -125,7 +125,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2>DMA Release Dashboard</h2>
+                        <h2>DMX Release Dashboard</h2>
                     </div>
                 </div>
                 <div id="divQuickReport" >
@@ -137,7 +137,7 @@
                     <div class="col-md-12">
                         <div class="form-group rptView rptParentMarket" id="rptParentMarket" >
                             <label for="ddlParentMarket" class="dropdown-label rptView rptParentMarket">Parent Market</label>
-                            <select id="ddlParentMarket" apiInput="inParentMarketId" class="dropdown-select rptView rptParentMarket" onchange="getMarketListByParentDMA()"></select>
+                            <select id="ddlParentMarket" apiInput="inParentMarketId" class="dropdown-select rptView rptParentMarket" onchange="getMarketListByParentDMX()"></select>
                         </div>
 
                         <div class="form-group rptView rptMarket" id="rptMarket">
@@ -154,8 +154,9 @@
                         </div>
                         <div class="form-group rptView rptLastPeriod" id="rptLastPeriod">
                             <label for="chkLastPeriod" class="dropdown-label rptView rptLastPeriod">vs Last Period &nbsp;</label>
-                            <input type="checkbox" checked="checked" id="chkLastPeriod" apiInput="inLastPeriod" value="true" class="dropdown-select rptView rptLastPeriod"/><div><i>&nbsp;(un-check for vs Last Year)</i></div>
+                            <input type="checkbox" checked="checked" id="chkLastPeriod" apiInput="inLastPeriod" value="true" class="dropdown-select rptView rptLastPeriod" /><div><i>&nbsp;(un-check for vs Last Year)</i></div>
                         </div>
+
                         <div class="form-group col-md-3 rptButton">
                             <label for="btnReport" class="dropdown-label">&nbsp;</label>
                             <input type="button" id="btnReport" class="search-button" value="Show" onclick="getReport()" />
@@ -168,7 +169,7 @@
                 <!-- data table html -->
                 <div class="dataTable-top-margin">
                     <table id="dtResults" class="dataTable-border dataTable-headers dataTable-cell-border"></table>
-                    <div id="noDataFound" style="display:none; color: red">Data not generated yet. Requires child markets to be released.</div>
+                    <div id="noDataFound" style="display:none; color: red">No data found</div>
                 </div>
             </div>
 
@@ -242,16 +243,16 @@
 
         buildUIDialogs();
 
-        buildDMAMenu("Revenue");
-        buildQuickReports(['dma']);
+        buildDMXMenu("Revenue");
+        buildQuickReports(['dmx']);
 
         reportObject = getReportObject();
         reportFilterArray = getReportFilterArray();
         displayFilters(reportFilterArray);
 
         getYearList();
-        getPeriodList('quarters');
-        getParentMarketList('DMA');
+        getPeriodList('months');
+        getParentMarketList('DMX');
 
         navTool.buildNavComponent("rptParentMarket", "ddlParentMarket", "getReportQuiet", false);
         navTool.buildNavComponent("rptMarket", "ddlMarket", "getReportQuiet", true);
@@ -284,7 +285,7 @@
 
     function buildFromQueryString()
     {
-        getMarketListByParentDMA();
+        getMarketListByParentDMX();
         getReport();
     }
     function canWePreBuildIt()
@@ -328,11 +329,11 @@
 
         tempObject =
         {
-            reportTitle: "DMA Parent Market Release",
-            apiControllerAction: "/api/DMAReport/GetDMAParentAndMarketRevenueListVsPeriod",
+            reportTitle: "DMX Parent Market Release",
+            apiControllerAction: "/api/DMXReport/GetDMXParentAndMarketRevenueListVsPeriod",
             apiType: "get",
             columnsToDisplay: columnsToDisplay,
-            product: 'dma'
+            product: 'dmx'
         }
 
         return tempObject;
@@ -363,7 +364,7 @@
         arrayObject = {
             token: "Parent Market",
             jsCall: "getParentMarketList",
-            jsCallParameters: ['DMA'],
+            jsCallParameters: ['DMX'],
             objectName: "ddlParentMarket",
             required: true
         }
@@ -376,6 +377,7 @@
             required: false
         }
         arrayFilters.push(arrayObject);
+
 
         arrayObject = {
             token: "LastPeriod",
@@ -489,30 +491,25 @@
             return;
         }
 
-        $.each(reportFilterArray, function (objectName, objectValue) {
-
+        $.each(reportFilterArray, function (objectName, objectValue)
+        {
             var control = objectValue.objectName;
             var nameOfParm = $("#" + control).attr("apiInput");
             var item = "#" + control;
             var isRequired = objectValue.required;
             var val = $(item).val();
 
-            if ($(item).prop("tagName").toString().toUpperCase() == "INPUT")
-            {
-                if ($(item).prop("type").toString().toUpperCase() == "CHECKBOX")
-                {
+            if ($(item).prop("tagName").toString().toUpperCase() == "INPUT") {
+                if ($(item).prop("type").toString().toUpperCase() == "CHECKBOX") {
                     val = $(item).prop("checked");
                 }
             }
 
-            if ($(item).val() != "")
-            {
-                if (reportObject.apiType.toLowerCase() == "post")
-                {
+            if ($(item).val() != "") {
+                if (reportObject.apiType.toLowerCase() == "post") {
                     apiParameters[nameOfParm] = val;
                 }
-                else
-                {
+                else {
                     api = api + "&" + nameOfParm + "=" + val;
                 }
 
@@ -537,14 +534,9 @@
 
         });
 
-
-
-
-
     }
+
     function getTheReportAJAX() {
-
-
 
 
         $.ajax({
@@ -571,10 +563,12 @@
             }
         });
     }
+
     function buildColumnsArray(dataObj) {
         columnsToExport = new Array();
 
-        if (!dataObj["report"]["rows"]) {
+        if (!dataObj["report"]["rows"])
+        {
             destroyDataTable();
             $("#noDataFound").show();
             //$("#parentMarketHistory").hide();
@@ -595,24 +589,24 @@
 
         $.each(data, function (objectName, objectValue) {
 
-
+ 
             if (reportObject.columnsToDisplay.length == 0 || IsInArray(reportObject.columnsToDisplay, objectName) == true) {
 
                 var className = "";
 
-                if (objectValue === null) {
+                if (objectValue === null)
+                {
                     className = "";
                 }
-                else {
-
-                    if (objectValue.toString().indexOf('%') > -1)
+                else
+                {
+ 
+                    if (objectValue.toString().indexOf('$') > -1)
                     {
                         className = "text-align-right";
-
                     }
-                    else if (objectValue.indexOf("$") > -1)
+                    else if (objectValue.toString().indexOf('%') > -1)
                     {
-
                         className = "text-align-right";
                     }
                     else
@@ -625,6 +619,12 @@
                             }
                         }
                     }
+
+                }
+
+ 
+                if (isNaN(objectName.toString().substring(0, 4)) == false) {
+                    className = "text-align-right";
                 }
 
                 ctr++;
@@ -773,7 +773,7 @@
 
     }
 
-    function getMarketListByParentDMA() {
+    function getMarketListByParentDMX() {
 
  
         if ($("#ddlParentMarket").val() == null ||
@@ -791,7 +791,7 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inProductId": 'dma',
+                "inProductId": 'dmx',
                 "inParentMarketId" : $("#ddlParentMarket").val()
             }),
             processData: false,
@@ -810,7 +810,7 @@
 
                         str = str + '<option ';
 
-                        str = str + ' value="' + data.report.rows[index].marketId + '">' + data.report.rows[index]["market Name"]  +' ('+ data.report.rows[index].marketId+ ')'+ '</option>';
+                        str = str + ' value="' + data.report.rows[index].marketId + '">' + data.report.rows[index]["market Name"] + '</option>';
 
                     });
 
@@ -836,7 +836,7 @@
         }
         
         $.ajax({
-            url: ServicePrefix + '/api/dmareport/GetDMAParentMarketHistory?inApiToken=' + 
+            url: ServicePrefix + '/api/dmxreport/GetDMXParentMarketHistory?inApiToken=' + 
                     getLocalStorage("APIToken") + 
                     '&inYear=' + $("#ddlYear").val() + 
                     "&inPeriod=" + $("#ddlPeriod").val() + 
@@ -855,10 +855,12 @@
                 else {
                     $("#parentMarketHistory").show();
                     $("#parentMarketHistory").html("");
+
                     var ignoreCols = 'ParentMarketID,RevenuePeriod,RevenueYear,'
                     var arrIgnoreCols = ignoreCols.split(',');
                     var iRowCtr = 0;
                     var str = '';
+
                     $.each(data.report.rows, function (index)
                     {
 
@@ -927,13 +929,13 @@
                             }
                             if (ignoreCols.includes(key) == false)
                             {
-                                //str = str + '<div class="tableCol" id="fld' + key.replace(' ', '') + revision + '">';
                                 var addClass = "";
                                 if ((key.toLowerCase() == "revision") ||
-                                    (key.toLowerCase() == "iscomplete")) {
+                                    (key.toLowerCase() == "iscomplete"))
+                                {
                                     addClass = " text-align-center"
                                 }
-                                str = str + '<div class="tableCol' + addClass + '" id="fld' + key.replace(' ', '') + revision + '">';
+                                str = str + '<div class="tableCol' + addClass +'" id="fld' + key.replace(' ', '') + revision + '">';
                                 str = str + value;
                                 str = str + '</div>';
                             }
@@ -942,10 +944,28 @@
                         $("#parentMarketHistory").append(str);
                         str = "";
 
+                        //////// The row is complete...
+                        //////// What can we do???
+                        //////if (bHasBeenRanked == false)
+                        //////{
+
+                        //////    var msg = '<input type="button" id="btnRank"    value="Rank" onclick="rankIt(\'' + revision + '\', \'' + comment + '\')" \>';
+                        //////    $("#fldRankDate" + revision.toString()).html(msg);
+
+                        //////}
+                        //////else if (bHasBeenRanked == true && bHasBeenReviewed == false) {
+ 
+                        //////    var msg = '<input type="button" id="btnReview"   value="Review" onclick="reviewIt(\'' + revision + '\', \'' + comment + '\')" \>';
+                        //////    $("#fldReviewDate" + revision.toString()).html(msg);
+                        //////}
+                        //////else if (bHasBeenRanked == true && bHasBeenReviewed == true && bHasBeenReleased == false) {
+                        //////    var msg = '<input type="button" id="btnRelease"  value="Release" onclick="releaseIt(\'' + revision + '\', \'' + comment + '\')" \>';
+                        //////    $("#fldReleaseDate" + revision.toString()).html(msg);
+                        //////}
+
                         // The row is complete...
                         // What can we do???
-                        if (bHasBeenRanked == false)
-                        {
+                        if (bHasBeenRanked == false) {
 
                             var msg = '<input type="button" id="btnRank"    value="Rank" onclick="rankIt(\'' + revision + '\', \'' + comment + '\')" \>';
                             msg = '<font color="red">Waiting on Markets</font>';
@@ -953,7 +973,7 @@
 
                         }
                         else if (bHasBeenRanked == true && bHasBeenReviewed == false) {
- 
+
                             var msg = '<input type="button" id="btnReview"   value="Review" onclick="reviewIt(\'' + revision + '\', \'' + comment + '\')" \>';
                             $("#fldReviewDate" + revision.toString()).html(msg);
                         }
@@ -961,8 +981,6 @@
                             var msg = '<input type="button" id="btnRelease"  value="Release" onclick="releaseIt(\'' + revision + '\', \'' + comment + '\')" \>';
                             $("#fldReleaseDate" + revision.toString()).html(msg);
                         }
-
-
 
 
                     });
@@ -1024,12 +1042,13 @@
         var inTypeOfUpdate = action;
         var comments = $("#comments").val();
         cancelIt();
+
         //if (validationPassed() === false) {
         //    return;
         //}
 
         $.ajax({
-            url: ServicePrefix + '/api/DMAParentMarketHistory/DMAUpdateParentMarketHistory',
+            url: ServicePrefix + '/api/DMXParentMarketHistory/DMXUpdateParentMarketHistory',
             dataType: 'json',
             type: 'post',
             contentType: 'application/json',
@@ -1053,7 +1072,7 @@
                     //if new load new parent market id
                     bootbox.alert("Your request to " + inTypeOfUpdate + ' data has completed!', function () { //reload the page
  
-                        window.location.href = "/products/dma/dmarelease.html?ParentMarketID=" + $("#ddlParentMarket").val() + "&Period=" + $("#ddlPeriod").val() + "&Year=" + $("#ddlYear").val();
+                        window.location.href = "/products/dmx/dmxrelease.html?ParentMarketID=" + $("#ddlParentMarket").val() + "&Period=" + $("#ddlPeriod").val() + "&Year=" + $("#ddlYear").val();
 
                     });
                    

@@ -111,11 +111,19 @@
                             <input type="hidden" id="oldParentAgencyId" value="" />
                             <input type="hidden" id="oldParentAgencyName" value="" />
                             <input type="hidden" id="txtParentAgencyId" value="" />
-                            <input type="text" id="txtParentAgencyName" class="disabled field-width-450 margin-right-10" disabled="disabled" style="" errorMessage=""><span id="parentLinkedMessage" class="hidden to-be-linked-message">* Will be linked and revenues merged</span>
+                            <input type="text" id="txtParentAgencyName" class="disabled mkaRequired field-width-450 margin-right-10" disabled="disabled" style="" errorMessage="You must select a Parent Agency"><span id="parentLinkedMessage" class="hidden to-be-linked-message">* Will be linked and revenues merged</span>
+                            <div style="margin-top:5px;">
+                                <span>
+                                    <input value="Parent Agency Search" onclick="excludeFromBackButton(); searchParentAgency();" class="default-button-200" type="button">
+                                </span>
+                                <span>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="default-button-200" onclick="generateParentAgency()" value="Generate Parent Agency" />
+                                </span>
+                            </div>                     
                         </div>
                     </div>
 
-                    <div class="row input-row">
+                    <!--<div class="row input-row">
                         <div class="col-md-3">
 
                         </div>
@@ -124,7 +132,7 @@
                                 <input value="Parent Agency Search" onclick="includeInBackButton; searchParentAgency();" class="default-button-450" type="button">
                             </div>
                         </div>
-                    </div>
+                    </div>-->
 
                     <div class="row input-row link-parent" style="display: none;">
                         <div class="col-md-3 text-align-left">
@@ -263,18 +271,18 @@
                         </div>
                         <div class="row input-row">
                             <div class="col-md-3 text-align-left">
-                                <label>Advertiser</label>
+                                <label>Agency</label>
                             </div>
                             <div class="col-md-9 text-align-left">
-                                <label id="lblAdvertiser" class="nonBold"></label>
+                                <label id="lblAgency" class="nonBold"></label>
                             </div>
                         </div>
                         <div class="row input-row">
                             <div class="col-md-3 text-align-left">
-                                <label>Advertiser Raw</label>
+                                <label>Agency Raw</label>
                             </div>
                             <div class="col-md-9 text-align-left">
-                                <label id="lblAdvertiserRaw" class="nonBold"></label>
+                                <label id="lblAgencyRaw" class="nonBold"></label>
                             </div>
                         </div>
                         <div class="row input-row">
@@ -696,22 +704,22 @@
 
 
                     if (bLinkParentAgency) {
-                        //make call to update link advertiser
-                        //make call to disable old parent advertiser
-                        //write log "Parent Advertiser Name"
+                        //make call to update link Agency
+                        //make call to disable old parent Agency
+                        //write log "Parent Agency Name"
 
-                        //do a call if bLinkAdvertiser is true
+                        //do a call if bLinkAgency is true
                         linkParentAgency();
                     }
                     else if (bLinkAgency) {
-                        //make call to update advertiser links
-                        //part of update get station advertiser count
-                        //part of update get media advertiser count
-                        //write log "Station Advertiser Code" if station advertiser count > 0
-                        //write log "Media Advertiser Code" if media advertiser count > 0
-                        //check for advertiser revenues
+                        //make call to update Agency links
+                        //part of update get station Agency count
+                        //part of update get media Agency count
+                        //write log "Station Agency Code" if station Agency count > 0
+                        //write log "Media Agency Code" if media Agency count > 0
+                        //check for Agency revenues
                         //if > 0 update revenues (should be a separate api call)
-                        //write log "Advertiser ID" passing # of revenue records
+                        //write log "Agency ID" passing # of revenue records
                         linkAgency();
                     } else {
                         window.location = "/Admin/agency/agency.html?AgencyID=" + $("#txtAgencyId").val();
@@ -890,7 +898,7 @@
 
         cleanupBackButton();
 
-        //turnOnLinkMarketAdvertiser();
+        //turnOnLinkMarketAgency();
         turnOnLinkParentAgency();
         turnOnLinkAgency();
     }
@@ -1047,9 +1055,9 @@
 
                     if (data.report.rows.length > 0) {
                         $("#lblOwner").html(data.report.rows[0].Owner);
-                        $("#lblAdvertiserRaw").html(data.report.rows[0]["Advertiser Raw"]);
                         $("#lblAgencyRaw").html(data.report.rows[0]["Agency Raw"]);
-                        $("#lblAdvertiser").html(data.report.rows[0]["Advertiser"]);
+                        $("#lblAgencyRaw").html(data.report.rows[0]["Agency Raw"]);
+                        $("#lblAgency").html(data.report.rows[0]["Agency"]);
                         $("#lblAgency").html(data.report.rows[0]["Agency"]);
                         $("#lblStation").html(data.report.rows[0]["Station"]);
                         $("#lblRevenue").html(data.report.rows[0]["Revenue"]);
@@ -1082,5 +1090,56 @@
 
     function loadLastSearchFromBackButton() {
         loadReportParameters();
+    }
+    function generateParentAgency()
+    {
+        var ParentAgencyName = $("#txtAgencyName").val();
+
+        if (ParentAgencyName.length == 0) {
+            bootbox.alert("An Agency Name is required to Generate a Parent Agency", function () { });
+            return;
+        }
+
+        updateParentAgency(ParentAgencyName);
+    }
+    function updateParentAgency(ParentAgencyName)
+    {
+ 
+        $.ajax({
+            url: ServicePrefix + '/api/ParentAgency/UpdateParentAgency',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inParentAgencyId": 0,
+                "inParentAgencyName": ParentAgencyName,
+                "inIsNew": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var obj = data.report.rows[0];
+
+                    var newParentAgency = obj["_updateStatus"]
+
+                    $("#oldParentAgencyId").val($("#txtParentAgencyId").val());
+                    $("#oldParentAgencyName").val($("#txtParentAgencyName").val());
+                    $("#txtParentAgencyId").val(newParentAgency);
+                    $("#txtParentAgencyName").val(ParentAgencyName);
+
+                    bootbox.alert("New Parent Agency created", function () { });
+                    $("btnGenerateParentAgency").hide();
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
     }
 </script>

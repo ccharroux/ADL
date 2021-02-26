@@ -147,10 +147,18 @@
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-12 ">
-
+                        
+                        <input type="hidden" id="hidAgency" apiInput="inAgencyId" class="dropdown-select rptView rptAgencyHidden report-filter" />
+                        <input type="hidden" id="hidAdvertiser" apiInput="inAdvertiserId" class="dropdown-select rptView rptAdvertiserHidden report-filter" />
+                        <input type="hidden" id="hidParentAgency" apiInput="inParentAgencyId" class="dropdown-select rptView rptParentAgencyHidden report-filter" />
+                        <input type="hidden" id="hidParentAdvertiser" apiInput="inParentAdvertiserId" class="dropdown-select rptView rptParentAdvertiserHidden report-filter" />
+                        <div class="form-group rptView rptErrorDates">
+                            <label for="ddlErrorDates" class="dropdown-label rptView rptErrorDates">Date</label>
+                            <select id="ddlErrorDates" apiInput="inErrorDate" onchange="getErrorIPAddresses(this.val);" class="dropdown-select rptView rptErrorDates report-filter"></select>
+                        </div>
                         <div class="form-group rptView rptRelationshipOwners">
                             <label for="ddlRelationshipOwners" class="dropdown-label rptView rptRelationshipOwners">Creators</label>
-                            <select id="ddlRelationshipOwners" apiInput="inRelationshipOwnerId" onchange="getPersonnelGroups(this.val);" class="dropdown-select rptView rptRelationshipOwners report-filter"></select>
+                            <select id="ddlRelationshipOwners" apiInput="inRelationshipOwnerId" onchange="getPersonnelGroups();" class="dropdown-select rptView rptRelationshipOwners report-filter"></select>
                         </div>
 
                         <div class="form-group rptView rptPersonnelGroups">
@@ -158,13 +166,14 @@
                             <select id="ddlPersonnelGroups" apiInput="inRelationshipListId" class="dropdown-select rptView rptPersonnelGroups report-filter"></select>
                         </div>
 
-                        <div class="form-group rptView rptErrorDates">
-                            <label for="ddlErrorDates" class="dropdown-label rptView rptErrorDates">Date</label>
-                            <select id="ddlErrorDates" apiInput="inErrorDate" onchange="getErrorIPAddresses(this.val);" class="dropdown-select rptView rptErrorDates report-filter"></select>
-                        </div>
+
                         <div class="form-group rptView rptErrorIPAddress">
                             <label for="ddlErrorIPAddress" class="dropdown-label rptView rptErrorIPAddress">IP Address</label>
                             <select id="ddlErrorIPAddress" apiInput="inErrorIPAddress" class="dropdown-select rptView rptErrorIPAddress report-filter"></select>
+                        </div>
+                        <div class="form-group rptView rptParentMarket">
+                            <label for="ddlParentMarket" class="dropdown-label rptView rptParentMarket">Parent Market</label>
+                            <select id="ddlParentMarket" apiInput="inParentMarketId" class="dropdown-select rptView rptParentMarket report-filter"></select>
                         </div>
                         <div class="form-group rptView rptTVBOutstandingStationMode">
                             <label for="ddlTVBOutstandingStationMode" class="dropdown-label rptView rptTVBOutstandingStationMode">Mode</label>
@@ -226,10 +235,7 @@
                             <label for="ddlMarket" class="dropdown-label rptView rptMarket">Market</label>
                             <select id="ddlMarket" apiInput="inMarketId" onchange="updateDependentLists(this)" class="dropdown-select rptView rptMarket report-filter"></select>
                         </div>
-                        <div class="form-group rptView rptParentMarket">
-                            <label for="ddlParentMarket" class="dropdown-label rptView rptParentMarket">Parent Market</label>
-                            <select id="ddlParentMarket" apiInput="inParentMarketId" class="dropdown-select rptView rptParentMarket report-filter"></select>
-                        </div>
+
 
                         <div class="form-group rptView rptParentOwner">
                             <label for="ddlParentOwner" class="dropdown-label rptView rptParentOwner">Parent Owner</label>
@@ -379,13 +385,23 @@
                             <label for="chkFilter" class="dropdown-label rptView rptFilter">Filter</label>
                             <input type="checkbox" id="chkFilter" onchange="loadFilter(this)" apiInput="none" class="dropdown-select rptView rptFilter report-filter" />
                         </div>
-
+                        <div class="form-group rptView rptIndustry">
+                            <label for="ddlIndustry" class="dropdown-label rptView rptIndustry">Industry</label>
+                            <select id="ddlIndustry" apiInput="inIndustryId" class="dropdown-select rptView rptIndustry report-filter" ></select>
+                        </div>
                         <div class="form-group rptButton" style="text-align:right">
                             <label for="btnReport" class="dropdown-label">&nbsp;</label>
                             <input type="button" id="btnReport" class="search-button" value="Show" onclick="getReport()" /><br />
                             <input id="btnReportData" style="display:none" type="button" value="Notification Data" onclick="getMatchedNotification()" />
                         </div>
-
+                        <div class="form-group rptView rptIncludeMarketsOnHold">
+                            <label for="chkIncludeMarketsOnHold" class="dropdown-label rptView rptIncludeMarketsOnHold">Include Markets On Hold</label>
+                            <input type="checkbox" id="chkIncludeMarketsOnHold" apiInput="inIncludeMarketsOnHold" class="dropdown-select rptView rptIncludeMarketsOnHold report-filter" />
+                        </div>
+                        <div class="form-group rptView rptIncludeInactiveStations">
+                            <label for="chkIncludeInactiveStations" class="dropdown-label rptView rptIncludeInactiveStations">Include Inactive Stations</label>
+                            <input type="checkbox" id="chkIncludeInactiveStations" apiInput="inIncludeInactiveStations" class="dropdown-select rptView rptIncludeInactiveStations report-filter" />
+                        </div>
                     </div>
                 </div>
                 <div class="form-group rptView rptMRRNationwideTVByRegion">
@@ -500,6 +516,14 @@
     var paramRevenuePeriod = null;
     var param_stationId = null;
     var param_marketAdvertiserId = null;
+    var param_industryId = null;
+    var param_parentMarketId = null;
+    var param_parentAdvertiserId = null;
+    var param_parentAgencyId = null;
+    var param_advertiserId = null;
+    var param_agencyId = null;
+    var passedYear = null;
+    var passedPeriod = null;
 
     $(document).ready(function () {
  
@@ -514,15 +538,16 @@
         paramRevenuePeriod = getParameterByName("period");
         param_stationId = getParameterByName("stationId");
         param_marketAdvertiserId = getParameterByName("MarketAdvertiserId");
-
-        removeLocalStorage("notificationData");
+        param_industryId = getParameterByName("industryid");
+        param_parentMarketId = getParameterByName("parentmarketid");
+        param_parentAdvertiserId = getParameterByName("parentadvertiserid");
+        param_parentAgencyId = getParameterByName("parentagencyid");
+        param_advertiserId = getParameterByName("advertiserid");
+        param_agencyId = getParameterByName("agencyid");
+        passedYear = getParameterByName("passedYear");
+        passedPeriod = getParameterByName("passedPeriod");
 
         $("#btnReportData").hide();
-
-        if (!param_marketAdvertiserId == false)
-        {
-            $("#txtMarketAdvertiser").val(param_marketAdvertiserId);
-        }
 
         reportId = getParameterByName("reportId");
         var reportTitle = getParameterByName("reportTitle");
@@ -550,31 +575,78 @@
 
         // build menu
         buildMainMenu("");
-
-        buildQuickReports(reportObject.product);
  
         // display filters
         displayFilters(reportFilterArray);
 
-        var passedYear = getParameterByName("passedYear");
- 
-        if (!passedYear == false && passedYear != null)
-        {
- 
-            $("#ddlYear").val(passedYear);
-        }
+        setTimeout(loadParameters, 1500);
 
-        var passedPeriod = getParameterByName("passedPeriod");
-        if (!passedPeriod == false && passedPeriod != null) {
-            $("#ddlPeriod").val(passedPeriod);
-        }
-
-
-
-        autoRun(reportFilterArray);
-
-
+        autoRun();
+        buildQuickReports(reportObject.product);
+        removeLocalStorage("notificationData");
     });
+
+    function loadParameters()
+    {
+        if (!param_marketAdvertiserId == false) {
+            $("#txtMarketAdvertiser").val(param_marketAdvertiserId).change();
+        }
+
+        if (!param_parentMarketId == false) {
+            $("#ddlParentMarket").val(param_parentMarketId).change();
+        }
+
+        if (!param_industryId == false) {
+            $("#ddlIndustry").val(param_industryId).change();;
+        }
+
+        if (!init_marketId == false) {
+            $("#ddlMarket").val(init_marketId).change();;
+        }
+
+        if (!param_parentAdvertiserId== false) {
+            $("#hidParentAdvertiser").val(param_parentAdvertiserId).change();
+        }
+
+        if (!param_parentAgencyId == false) {
+            $("#hidParentAgency").val(param_parentAgencyId).change();
+        }
+
+        if (!param_advertiserId == false) {
+            $("#hidAdvertiser").val(param_advertiserId).change();
+        }
+
+        if (!param_agencyId == false) {
+            $("#hidAgency").val(param_agencyId).change();
+        }
+
+        if (!passedYear == false && passedYear != null) {
+            $("#ddlYear").val(passedYear).change();;
+        }
+
+        if (!passedPeriod == false && passedPeriod != null) {
+            $("#ddlPeriod").val(passedPeriod).change();;
+        }
+
+        if (!param_year == false && param_year != null) {
+            $("#ddlYear").val(param_year).change();;
+        }
+
+        if (!paramRevenuePeriod == false && paramRevenuePeriod != null) {
+            $("#ddlPeriod").val(paramRevenuePeriod).change();;
+        }
+
+        setTimeout(loadStationParameters, 2000);
+
+
+
+    }
+    function loadStationParameters()
+    {
+        if (!param_stationId == false) {
+            $("#ddlStation").val(param_stationId).change();;
+        }
+    }
     function validReportId(reportId)
     {
         if (!reportId)
@@ -608,8 +680,6 @@
     function setUIEventsAndLabels(reportObject)
     {
  
-
-
         $("select").change(function () {
 
             $("#btnReport").addClass("flash-button");
@@ -637,7 +707,7 @@
             });
     }
 
-    function autoRun(reportFilterArray)
+    function autoRun()
     {
         // Auto Run
         if (reportFilterArray.length == 0)
@@ -658,7 +728,7 @@
  
         $.each(reportFilterArray, function (objectName, objectValue)
         {
-            var bReloadNeeded = false;
+           var bReloadNeeded = false;
 
             // create array
             var params = new Array();
@@ -805,11 +875,8 @@
         {
             loadReportParameters();
             runReportFromAdvancedSearch();
-
             return;
         }
-
-
  
         var searchCriteria = $.parseJSON(searchResults);
 
@@ -906,7 +973,6 @@
 
         for (var i = 0; i < arrayFilters.length; i++)
         {
-            //console.log(arrayFilters);
 
             if (!arrayFilters[i].filterValue == false)
             {
@@ -1315,6 +1381,51 @@
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+    }
+
+    function getMRRMediaTypeList() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                var str = '';
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    str = '<option value="">-- Select a Media Type --</option>';
+                    $.each(data.report.rows, function (index) {
+                        if (data.report.rows[index].MediaTypeName.toLowerCase() == "radio" ||
+                            data.report.rows[index].MediaTypeName.toLowerCase() == "television") {
+                            str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+                        }
+                    });
+
+
+                    $("#ddlMediaType").html(str);
+
+                    convertToChosenSelect("ddlMediaType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    saveLoadedControlSelection("ddlMediaType");
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
     }
 
     function getPersonnel()
@@ -1736,7 +1847,6 @@
         var control = this.objectName;
 
         var str = '';
-        str = '<option value="">-- Select a Station --</option>';
         $("#" + control).html(str);
 
         $.ajax({
@@ -1760,12 +1870,13 @@
                 else {
 
                     var str = '';
+                    str = '<option value="">-- Select a Station --</option>';
                     $.each(data.report.rows, function (index)
                     {
-                        str = str + '<option value="' + data.report.rows[index]["Station Id"] + '">' + data.report.rows[index].Station + '</option>';
+                        str = str + '<option value="' + data.report.rows[index]["Station Id"] + '">' + data.report.rows[index].Station  + ' (' + +data.report.rows[index]["Station Id"] +')' + '</option>';
                     });
 
-                    $("#" + control).append(str);
+                    $("#" + control).html(str);
 
                     convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
@@ -2815,21 +2926,23 @@
         });
     }
 
-    function getMarketListByProductMediaType(inProduct,inMarket,inOwner, inMediaType)
+    function getMarketListByProductMediaType(inProduct, inMarket, inOwner, inMediaType)
     {
         var control = this.objectName;
 
-        if (inProduct == "" || inProduct == null || inProduct == undefined) {
-            var str = '';
-            str = '<option value="">-- Select a Market --</option>';
-            $("#" + control).html(str);
-            convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-            return;
-        }
+        //if (inProduct == "" || inProduct == null || inProduct == undefined) {
+        //    var str = '';
+        //    str = '<option value="">-- Select a Market --</option>';
+        //    $("#" + control).html(str);
+        //    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+        //    return;
+        //}
 
         var url = '/api/Market/GetMarketListByProductMediaType?inApiToken=' + getLocalStorage("APIToken");
-        url += '&inProductId=' + inProduct;
-        url += '&inMediaTypeId=' + inMediaType;
+        url += '&inProductId=';
+        url += inProduct != null ? inProduct : "";
+        url += '&inMediaTypeId=';
+        url += inMediaType != null ? inMediaType: "";
 
         $.ajax({
             url: ServicePrefix + url,
@@ -2861,7 +2974,7 @@
 
                     convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
-                    $("#ddlMarket").change();
+                    $("#ddlMarket").val("").change();
 
                     saveLoadedControlSelection("ddlMarket");
                 }
@@ -2927,13 +3040,11 @@
     function getOwnerListByProductMarketMediaType(inProduct, inMarket, inOwner, inMediaType) {
         var control = this.objectName;
 
-        if (inProduct == "" || inProduct == null || inProduct == undefined) {
-            $("#" + control).html("<option value=''> -- Select an Owner --</option>");
-            convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-            return;
-        }
-
-        console.log(inMediaType);
+        //if (inProduct == "" || inProduct == null || inProduct == undefined) {
+        //    $("#" + control).html("<option value=''> -- Select an Owner --</option>");
+        //    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+        //    return;
+        //}
 
         var url = ServicePrefix + '/api/Owner/GetOwnerListByProductMarketMediaType';
         url += "?inApiToken=" + getLocalStorage("APIToken");
@@ -2979,6 +3090,59 @@
             }
         });
     }
+
+    function getMarketListByProductOwner(inProduct, inMarket, inOwner)
+    {
+       var control = "ddlMarket";
+
+        if (inProduct == "" || inProduct == null || inProduct == undefined) {
+            $("#" + control).html("<option value=''> -- Select a Market --</option>");
+            convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketListByOwnerProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": inProduct,
+                "inOwnerId": inOwner
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+
+                    $("#" + control).html("<option value=''> -- Select a Market --</option>");
+
+                    $.each(data.report.rows, function (index) {
+                        var obj = data.report.rows[index];
+                        str = str + "<option value='" + obj.MarketId + "'>" + obj.Market + " (" + obj.MarketId + ")</option>";
+
+                    });
+                    $("#" + control).append(str);
+
+                    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    saveLoadedControlSelection(control);
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+
 
     //--------------------------------
     // Filters get loaded end here
@@ -3960,16 +4124,51 @@
 
         convertToChosenSelect("ddlPersonnelGroups", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
-
     }
 
     function getThisReport(rptTitle)
     {
         var urlString = '/utilities/genericreport/genericReport.html?reportId=' + getReportIdByToken(rptTitle);
         urlString = urlString + '&passedYear=' + $("#ddlYear").val() + '&passedPeriod=' + $("#ddlPeriod").val();
-
-
         window.location = urlString;
     }
 
+    function getIndustryListForReports() {
+        $.ajax({
+            url: ServicePrefix + '/api/Industry/GetIndustryList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select an Industry --</option>';
+
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].industryId + '">' + data.report.rows[index].industryName + ' (' + data.report.rows[index].industryId + ')' + '</option>';
+
+                    });
+
+                    $("#ddlIndustry").html(str);
+
+                    convertToChosenSelect('ddlIndustry', gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
 </script>
