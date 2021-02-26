@@ -335,6 +335,11 @@
 
     var product = 'XRY';
 
+    var currentMode = "";
+    var modeRelease = "release";
+    var modeSilent = "silent";
+    var modeReDeliver = "redeliver";
+
     $(document).ready(function () {
         buildXRYMenu("Revenue");
         buildQuickReports(['xry']);
@@ -1062,15 +1067,180 @@
 
     //nationwide
     function deliverOwnership() {
-        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+        currentMode = modeRelease;
+
+        bootbox.confirm({
+            message: "Email nationwide " + $("#ddlOwner").text() + " recipients for " + currentYearPeriodText() + "?",
+            callback: function (confirmed) {
+                if (confirmed) {
+                    deliverOwnership_ValidateRecipients();
+                }
+            }
+        });
     }
 
     function deliverOwnershipNoEmail() {
-        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+        currentMode = modeSilent;
+
+        bootbox.confirm({
+            message: "Release " + currentYearPeriodText() + " for nationwide " + $("#ddlOwner").text() + " recipients without email?",
+            callback: function (confirmed) {
+                if (confirmed) {
+                    deliverOwnership_ValidateRecipients();
+                }
+            }
+        });
     }
 
     function redeliverOwnership() {
-        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+        currentMode = modeReDeliver;
+
+        bootbox.confirm({
+            message: "Re-deliver email to nationwide " + $("#ddlOwner").text() + " recipients for " + currentYearPeriodText() + "?",
+            callback: function (confirmed) {
+                if (confirmed) {
+                    deliverOwnership_ValidateRecipients();
+                }
+            }
+        });
+    }
+
+    function currentYearPeriodText() {
+        return $("#ddlPeriod").text() + " " + $("#ddlYear").val();
+    }
+
+    function deliverOwnership_ValidateRecipients() {
+        if (currentMode == modeSilent) {
+            deliverOwnership_MarkOwnerYearPeriodReleased();
+            return;
+        }
+
+        // This API's parameters include:
+        //   * inPersonnelId (optional) - only notify the specified recipient
+        //       - Not sure how desktop app's UI (frmReformatRevenueXRay) allowed this
+        //   * inIsRevision - affects which template is used
+        //       - Desktop app's UI apparently tied this to "Re-deliver", also something about double-clicking a grid row
+        // Any changes to these parameters should also be applied to deliverOwnership_DeliverToRecipients()
+        $.ajax({
+            url: ServicePrefix + '/api/XRAY/InsertOwnerDeliveryNotificationsIntoQueue',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerId": $("#ddlOwner").val(),
+                "inYear": $("#ddlYear").val(),
+                "inPeriod": $("#ddlPeriod").val(),
+                "inIsRevision": (currentMode == modeReDeliver),
+                "inValidateOnly": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deliverOwnership_ValidateRecipients_Success(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function deliverOwnership_ValidateRecipients_Success(data, textStatus, jQxhr) {
+        if (data.response.status == "BLOCK") {
+            bootbox.alert(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        deliverOwnership_MarkOwnerYearPeriodReleased();
+    }
+
+    function deliverOwnership_MarkOwnerYearPeriodReleased() {
+        if (currentMode == modeReDeliver) {
+            deliverOwnership_DeliverToRecipients();
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/XRAY/UpdateOwnerYearPeriodReleased',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerId": $("#ddlOwner").val(),
+                "inYear": $("#ddlYear").val(),
+                "inPeriod": $("#ddlPeriod").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deliverOwnership_MarkOwnerYearPeriodReleased(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function deliverOwnership_MarkOwnerYearPeriodReleased(data, textStatus, jQxhr) {
+        if (currentMode == modeSilent) {
+            deliverOwnership_ReportOverallSuccess();
+            return;
+        }
+
+        deliverOwnership_DeliverToRecipients();
+    }
+
+    function deliverOwnership_DeliverToRecipients() {
+        $.ajax({
+            url: ServicePrefix + '/api/XRAY/InsertOwnerDeliveryNotificationsIntoQueue',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerId": $("#ddlOwner").val(),
+                "inYear": $("#ddlYear").val(),
+                "inPeriod": $("#ddlPeriod").val(),
+                "inIsRevision": (currentMode == modeReDeliver),
+                "inValidateOnly": false
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deliverOwnership_DeliverToRecipients_Success(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function deliverOwnership_DeliverToRecipients_Success(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        deliverOwnership_ReportOverallSuccess();
+    }
+
+    function deliverOwnership_ReportOverallSuccess() {
+        switch (currentMode) {
+            case modeRelease:
+                bootbox.alert($("#ddlOwner").text() + ", " + currentYearPeriodText() + ": Released, email sent to nationwide recipients.");
+                break;
+            case modeSilent:
+                bootbox.alert($("#ddlOwner").text() + ", " + currentYearPeriodText() + ": Released without email.");
+                break;
+            case modeReDeliver:
+                bootbox.alert($("#ddlOwner").text() + ", " + currentYearPeriodText() + ": Email sent to nationwide recipients.");
+                break;
+            default: // should never happen
+                MKAErrorMessageRtn("XRY nationwide delivery: currentMode is invalid");
+        }
     }
 
 </script>
