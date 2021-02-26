@@ -237,16 +237,21 @@
 </html>
 <script>
     var exportColumns;
+    var exportColumnsGenerated;
     var reportTitle;
 
     var gotYearsPeriods = false;
+
+    var minimumPercentSubmittedBeforeEstimate = 80; // same as tvbrevenuedetail.html
+    var minimumPercentAchieved = false;
 
     $(document).ready(function ()
     {
 
         reportTitle = "TVB Time Sales Estimates";
         exportColumns = returnTableColumnsByClass("dt", "exportColumn");
-
+        exportColumnsGenerated = returnTableColumnsByClass("dtGenerated", "exportColumn");
+        
         loadInitialData();
 
         loadGeneratedData();
@@ -445,7 +450,7 @@
             success: function (data, textStatus, jQxhr) {
 
                 populateDataTable("dt", data);
-
+                getTimeSalesStationsSubmitted();
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -457,13 +462,55 @@
 
     }
 
+    function getTimeSalesStationsSubmitted() {
+        var url = ServicePrefix + '/api/TVB/GetTimeSalesStationsSubmitted';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getTimeSalesStationsSubmittedSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function getTimeSalesStationsSubmittedSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            MKAErrorMessageRtn("Failed to get time sales stations submitted");
+            return;
+        }
+
+        var submittedCount = data.report.rows[0].submittedCount;
+        var totalCount = data.report.rows[0].totalCount;
+        var submittedPercent = Math.round(1000 * submittedCount / totalCount) / 10; // one decimal place, .toFixed() apparently has occasional float weirdness
+        minimumPercentAchieved = (submittedPercent >= minimumPercentSubmittedBeforeRank);
+    }
+
     function genericAjaxError(jqXhr, textStatus, errorThrown) {
         MKAErrorMessageRtn(errorThrown);
     }
 
     function generateEstimates(ownerId, ownerName) {
         bootbox.confirm(
-            "Generate estimates for " + ownerName + "?",
+            warningBeforeGenerating() + "Generate estimates for " + ownerName + "?",
             function (confirmed) {
                 if (confirmed) {
                     generateEstimates_InsertTimeSalesEstimatesByOwner(ownerId, "generate");
@@ -474,7 +521,7 @@
 
     function reGenerateEstimates(ownerId, ownerName) {
         bootbox.confirm(
-            "Discard and re-generate estimates for " + ownerName + "?",
+            warningBeforeGenerating() + "Discard and re-generate estimates for " + ownerName + "?",
             function (confirmed) {
                 if (confirmed) {
                     generateEstimates_InsertTimeSalesEstimatesByOwner(ownerId, "regenerate");
@@ -586,7 +633,7 @@
                //{
                //    extend: 'csv',
                //    exportOptions: {
-               //        columns: exportColumns,
+               //        columns: exportColumnsGenerated,
                //        format: {
                //            header: function (data, columnIdx) {
                //                return returnExportColumnHeadingTitle("dtGenerated", data, columnIdx);
@@ -598,7 +645,7 @@
                    extend: 'excel',
                    title: reportTitle,
                    exportOptions: {
-                       columns: exportColumns,
+                       columns: exportColumnsGenerated,
                        format: {
                            header: function (data, columnIdx) {
                                return returnExportColumnHeadingTitle("dtGenerated", data, columnIdx);
@@ -610,7 +657,7 @@
                    extend: 'pdf',
                    title: reportTitle,
                    exportOptions: {
-                       columns: exportColumns,
+                       columns: exportColumnsGenerated,
                        format: {
                            header: function (data, columnIdx) {
                                return returnExportColumnHeadingTitle("dtGenerated", data, columnIdx);
@@ -622,7 +669,7 @@
                //    extend: 'print',
                //    title: reportTitle,
                //    exportOptions: {
-               //        columns: exportColumns,
+               //        columns: exportColumnsGenerated,
                //        format: {
                //            header: function (data, columnIdx) {
                //                return returnExportColumnHeadingTitle("dtGenerated", data, columnIdx);
@@ -656,7 +703,7 @@
 
     function generateAll() {
         bootbox.confirm(
-            "Generate estimates for all owners?",
+            warningBeforeGenerating() + "Generate estimates for all owners?",
             function (confirmed) {
                 if (confirmed) {
                     generateEstimates_InsertTimeSalesEstimatesAllOwners("generate");
@@ -667,7 +714,7 @@
 
     function reGenerateAll() {
         bootbox.confirm(
-            "Discard and re-generate estimates for all owners?",
+            warningBeforeGenerating() + "Discard and re-generate estimates for all owners?",
             function (confirmed) {
                 if (confirmed) {
                     generateEstimates_InsertTimeSalesEstimatesAllOwners("regenerate");
@@ -710,6 +757,12 @@
         };
 
         $.ajax(url, settings);
+    }
+
+    function warningBeforeGenerating() {
+        return minimumPercentAchieved
+            ? ""
+            : "(Note: Number of stations submitted is below the usual minimum.) ";
     }
 
 </script>

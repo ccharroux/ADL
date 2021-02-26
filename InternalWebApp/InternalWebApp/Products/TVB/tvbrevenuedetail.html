@@ -312,6 +312,7 @@
     var revenueAmountsAllValid = true;
     var postSaveCallback = null;
     var minimumPercentSubmittedBeforeRank = 80; // also appears in tvbrevenuedetailrepbilling.html, but plan is to eventually rank and release rep billing data separately from / after time sales data anyway
+    var minimumPercentAchieved = false;
     var timeoutObject = null;
 
     $(document).ready(function () {
@@ -367,6 +368,13 @@
     }
     function openinternalCommentDialog()
     {
+        confirmIfNeeded(
+            minimumPercentAchieved == false,
+            "Number of stations submitted is below the usual minimum. Proceed anyway?",
+            openinternalCommentDialog_Proceed
+        );
+    }
+    function openinternalCommentDialog_Proceed() {
         $("#internalCommentDialog").dialog("open");
         $("#comments").val($("#InternalCommentText").html());
     }
@@ -1175,10 +1183,10 @@
         var newText = submittedPercent + "% (" + submittedCount + " of " + totalCount + ")";
 
         if (submittedPercent >= minimumPercentSubmittedBeforeRank) {
-            $(".marketHistoryButton").show();
+            minimumPercentAchieved = true;
         } else {
-            $(".marketHistoryButton").hide();
-            newText += " - need at least " + minimumPercentSubmittedBeforeRank + "% before ranking";
+            minimumPercentAchieved = false;
+            newText += " - recommend at least " + minimumPercentSubmittedBeforeRank + "% before ranking";
         }
 
         $("#TimeSalesStationsSubmitted").text(newText);
@@ -1677,7 +1685,15 @@
         $("#ddlYearPeriod").trigger("change");
     }
 
-    function rankYearPeriod()
+    function rankYearPeriod() {
+        confirmIfNeeded(
+            minimumPercentAchieved == false,
+            "Number of stations submitted is below the usual minimum. Proceed anyway?",
+            rankYearPeriod_Proceed
+        );
+    }
+
+    function rankYearPeriod_Proceed()
     {
         var url = ServicePrefix + '/api/TVB/GetYearPeriodOkayToRank';
 
