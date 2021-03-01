@@ -340,6 +340,13 @@
     var modeSilent = "silent";
     var modeReDeliver = "redeliver";
 
+    var currentRecipientsDescription;
+
+    var currentMarketName;
+    var currentMarketId;
+    var currentStationId;
+    var currentPersonnelId;
+
     var currentOwnerName;
     var currentOwnerId;
 
@@ -677,11 +684,12 @@
                     var sActions = '';
 
                     if (row.Ranked.toLowerCase() == "yes" && row["Delivered On"] == null) {
-                        sActions += '<a href="#" onclick="deliverMarket();">Deliver</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="deliverMarketNoEmail();">Release without e-mail</a>';
+                        sActions += '<a href="#" onclick="deliverMarket(\'' + encodeURI(row["Market"]) + '\');">Deliver</a>'
+                            + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" onclick="deliverMarketNoEmail(\'' + encodeURI(row["Market"]) + '\');">Release without e-mail</a>';
                     }
 
                     if (row["Delivered On"] != null) {
-                        sActions += '&nbsp;&nbsp;<a href="#" onclick="redeliverMarket();">Re-deliver</a>';
+                        sActions += '&nbsp;&nbsp;<a href="#" onclick="redeliverMarket(\'' + encodeURI(row["Market"]) + '\');">Re-deliver</a>';
                     }
 
                     return sActions;
@@ -794,12 +802,20 @@
 
 
                     if (row["Delivered On"] == null) {
-                        sActions += '&nbsp;&nbsp;<a href="#" onclick="deliverRecipient();">Deliver</a>';
+                        sActions += '&nbsp;&nbsp;<a href="#" onclick="deliverRecipient('
+                            + row["Personnel ID"]
+                            + ',\'' + encodeURI(row["E-Mail"]) + '\''
+                            + ',\'' + encodeURI(row["Station"]) + '\''
+                            + ');">Deliver</a>';
                     }
 
 
                     if (row["Delivered On"] != null) {
-                        sActions += '&nbsp;&nbsp;<a href="#" onclick="redeliverRecipient();">Re-deliver</a>';
+                        sActions += '&nbsp;&nbsp;<a href="#" onclick="redeliverRecipient('
+                            + row["Personnel ID"]
+                            + ',\'' + encodeURI(row["E-Mail"]) + '\''
+                            + ',\'' + encodeURI(row["Station"]) + '\''
+                            + ');">Re-deliver</a>';
                     }
 
                     return sActions;
@@ -1039,34 +1055,247 @@
 
     }
 
-    //All markets
-    function deliverMarket() {
-        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+    function currentYearPeriodText() {
+        return $("#ddlPeriod option:selected").text() + " " + $("#ddlYear option:selected").val();
     }
 
-    function deliverMarketNoEmail() {
-        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+    //"All markets" -> deliver to one market
+    function setGlobalVariables_AllMarkets(Market) {
+        currentMarketName = decodeURI(Market);
+        currentMarketId = getIDFromString(currentMarketName);
+        currentRecipientsDescription = currentMarketName + " recipients";
+        currentStationId = null;
+        currentPersonnelId = null;
     }
 
-    function redeliverMarket() {
-        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+    function deliverMarket(Market) {
+        setGlobalVariables_AllMarkets(Market);
+        deliverMarket_Confirm();
     }
 
-    //market
+    function deliverMarket_Confirm() {
+        currentMode = modeRelease;
+
+        bootbox.confirm({
+            message: "Email " + currentRecipientsDescription + " for " + currentYearPeriodText() + "?",
+            callback: function (confirmed) {
+                if (confirmed) {
+                    deliverMarket_ValidateRecipients();
+                }
+            }
+        });
+    }
+
+    function deliverMarketNoEmail(Market) {
+        setGlobalVariables_AllMarkets(Market);
+        deliverMarketNoEmail_Confirm();
+    }
+
+    function deliverMarketNoEmail_Confirm() {
+        currentMode = modeSilent;
+
+        bootbox.confirm({
+            message: "Release " + currentYearPeriodText() + " for " + currentRecipientsDescription + " without email?",
+            callback: function (confirmed) {
+                if (confirmed) {
+                    deliverMarket_ValidateRecipients();
+                }
+            }
+        });
+    }
+
+    function redeliverMarket(Market) {
+        setGlobalVariables_AllMarkets(Market);
+        redeliverMarket_Confirm();
+    }
+
+    function redeliverMarket_Confirm() {
+        currentMode = modeReDeliver;
+
+        bootbox.confirm({
+            message: "Re-deliver email to " + currentRecipientsDescription + " for " + currentYearPeriodText() + "?",
+            callback: function (confirmed) {
+                if (confirmed) {
+                    deliverMarket_ValidateRecipients();
+                }
+            }
+        });
+    }
+
+    function deliverMarket_ValidateRecipients() {
+        if (currentMode == modeSilent) {
+            deliverMarket_MarkMarketYearPeriodReleased();
+            return;
+        }
+
+        // This API's parameters include:
+        //   * inStationId (optional) - only notify the specified station
+        //       - Confirm whether desktop app offered this option separately from single-recipient
+        //   * inIsRevision - affects which template is used
+        //       - Confirm whether desktop app handled this similarly to nationwide
+        // Any changes to these parameters should also be applied to deliverMarket_DeliverToRecipients()
+        $.ajax({
+            url: ServicePrefix + '/api/XRAY/InsertMarketDeliveryNotificationsIntoQueue',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": currentMarketId,
+                "inYear": $("#ddlYear").val(),
+                "inPeriod": $("#ddlPeriod").val(),
+                "inStationId": currentStationId,
+                "inPersonnelId": currentPersonnelId,
+                "inIsRevision": (currentMode == modeReDeliver),
+                "inValidateOnly": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deliverMarket_ValidateRecipients_Success(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function deliverMarket_ValidateRecipients_Success(data, textStatus, jQxhr) {
+        if (data.response.status == "BLOCK") {
+            bootbox.alert(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        deliverMarket_MarkMarketYearPeriodReleased();
+    }
+
+    function deliverMarket_MarkMarketYearPeriodReleased() {
+        if (currentMode == modeReDeliver) {
+            deliverMarket_DeliverToRecipients();
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/XRAY/UpdateMarketYearPeriodReleased',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": currentMarketId,
+                "inYear": $("#ddlYear").val(),
+                "inPeriod": $("#ddlPeriod").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deliverMarket_MarkMarketYearPeriodReleased_Success(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function deliverMarket_MarkMarketYearPeriodReleased_Success(data, textStatus, jQxhr) {
+        if (currentMode == modeSilent) {
+            deliverMarket_ReportOverallSuccess();
+            return;
+        }
+
+        deliverMarket_DeliverToRecipients();
+    }
+
+    function deliverMarket_DeliverToRecipients() {
+        $.ajax({
+            url: ServicePrefix + '/api/XRAY/InsertMarketDeliveryNotificationsIntoQueue',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": currentMarketId,
+                "inYear": $("#ddlYear").val(),
+                "inPeriod": $("#ddlPeriod").val(),
+                "inStationId": currentStationId,
+                "inPersonnelId": currentPersonnelId,
+                "inIsRevision": (currentMode == modeReDeliver),
+                "inValidateOnly": false
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deliverMarket_DeliverToRecipients_Success(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function deliverMarket_DeliverToRecipients_Success(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        deliverMarket_ReportOverallSuccess();
+    }
+
+    function deliverMarket_ReportOverallSuccess() {
+        switch (currentMode) {
+            case modeRelease:
+                bootbox.alert(currentMarketName + ", " + currentYearPeriodText() + ": Released, email sent to ' + currentRecipientsDescription + '.");
+                break;
+            case modeSilent:
+                bootbox.alert(currentMarketName + ", " + currentYearPeriodText() + ": Released without email.");
+                break;
+            case modeReDeliver:
+                bootbox.alert(currentMarketName + ", " + currentYearPeriodText() + ": Email sent to ' + currentRecipientsDescription + '.");
+                break;
+            default: // should never happen
+                MKAErrorMessageRtn("XRY market delivery: currentMode is invalid");
+                return;
+        }
+        getReport();
+    }
+
+    //"Market" -> select one market -> "Deliver" / "Re-deliver" (to all recipients in that market)
+    function setGlobalVariables_Market() {
+        currentMarketName = $("#ddlMarket option:selected").text();
+        currentMarketId = $("#ddlMarket").val();
+        currentRecipientsDescription = currentMarketName + " recipients";
+        currentStationId = null;
+        currentPersonnelId = null;
+    }
+
     function marketDeliverAllRecipients() {
-        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+        setGlobalVariables_Market();
+        deliverMarket_Confirm();
     }
 
     function marketRedeliverAllRecipients() {
-        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+        setGlobalVariables_Market();
+        redeliverMarket_Confirm();
     }
 
-    function deliverRecipient() {
-        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+    //"Market" -> select one market -> "Deliver" / "Re-deliver" (single recipient / station)
+    function deliverRecipient(personnelId, emailAddress, Station) {
+        setGlobalVariables_Market();
+        currentStationId = getIDFromString(Station);
+        currentPersonnelId = personnelId;
+        currentRecipientsDescription = decodeURI(emailAddress);
+        deliverMarket_Confirm();
     }
 
-    function redeliverRecipient() {
-        bootbox.alert("This functionality hasn't been implemented yet.", function () { });
+    function redeliverRecipient(personnelId, emailAddress, Station) {
+        setGlobalVariables_Market();
+        currentStationId = getIDFromString(Station);
+        currentPersonnelId = personnelId;
+        currentRecipientsDescription = decodeURI(emailAddress);
+        redeliverMarket_Confirm();
     }
 
     //nationwide
@@ -1113,10 +1342,6 @@
                 }
             }
         });
-    }
-
-    function currentYearPeriodText() {
-        return $("#ddlPeriod option:selected").text() + " " + $("#ddlYear option:selected").val();
     }
 
     function deliverOwnership_ValidateRecipients() {
