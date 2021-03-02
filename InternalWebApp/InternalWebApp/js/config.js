@@ -35,9 +35,9 @@ if (currentPage.indexOf("http:") > -1)
 {
     // not secure...
     // and not prod
-    if (bNonProd)
-    {
+    //if (bNonProd)
+    //{
           ServicePrefix = ServicePrefix.replace("https:", "http:");
-    }
+    //}
 }
 
