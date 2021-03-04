@@ -110,6 +110,7 @@
                                 <div class="col-md-12 text-align-center">
                                     <hr />
                                     <label for="ddlDemoMarket">Demo</label>
+                                    <input value="Copy" onclick="copyProductionToDemo();" class="default-button" style="width: 50px; margin-left: 50px" type="button">
                                     <hr />
                                 </div>
  
@@ -186,6 +187,8 @@
     var gotDemoMarkets = false;
     var gotProductionStations = false;
     var gotDemoStations = false;
+
+    var modeCopyProductionToDemo = false;
 
     $(document).ready(function ()
     {
@@ -410,7 +413,8 @@
             contentType: 'application/json',
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
-                "inMarketId": $("#ddlProductionMarket").val()
+                "inMarketId": $("#ddlProductionMarket").val(),
+                "inProductId": $("#ddlProduct").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -483,8 +487,13 @@
 
         var currentSelection = "";
         var foundCurrentSelection = false;
-        if (gotDemoStations) {
-            currentSelection = $("#ddlDemoStation").val();
+        if (modeCopyProductionToDemo) {
+            modeCopyProductionToDemo = false;
+            currentSelection = $("#ddlProductionStation").val();
+        } else {
+            if (gotDemoStations) {
+                currentSelection = $("#ddlDemoStation").val();
+            }
         }
 
         var str = '<option value="">-- Select a Demo Station --</option>';
@@ -572,6 +581,26 @@
 
         });
         return loopBreak;
+    }
+
+    function copyProductionToDemo() {
+        var demoMarketWasChanged = false;
+        var productionMarketId = $("#ddlProductionMarket").val();
+        if ($("#ddlDemoMarket").val() != productionMarketId) {
+            var currentDemoMarketId = $("#ddlDemoMarket").val();
+            $("#ddlDemoMarket").val(productionMarketId);
+            if ($("#ddlDemoMarket").val() != productionMarketId) {
+                bootbox.alert("Production market is not a demo market - cannot copy");
+                $("#ddlDemoMarket").val(currentDemoMarketId);
+                return;
+            }
+            demoMarketWasChanged = true;
+        }
+
+        if (demoMarketWasChanged || ($("#ddlProductionStation").val() != $("#ddlDemoStation").val())) {
+            modeCopyProductionToDemo = true;
+            demoMarketChanged();
+        }
     }
 
 </script>
