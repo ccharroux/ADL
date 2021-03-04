@@ -1079,8 +1079,9 @@
         gotOwnerGroups = true;
     }
 
-    // currently this cross-references from individual to owner, but only if exactly one; SP may be adjusted later to say e.g. "2 owners"
-    // currently this does not cross-reference from individual to market(s); SP may be adjusted later to do so, preferably after implementing a PersonnelMarketRoles table
+    // currently this cross-references from individual to market / owner, but only if exactly one
+    //   (DEV-9375) or if a market / owner was selected when they were recorded
+    // SP may be adjusted later to say e.g. "2 owners"
     function getCurrentTrainees() {
         $.ajax({
             url: ServicePrefix + '/api/Training/GetTrainingEventTrainees',
@@ -1369,7 +1370,10 @@
             data: JSON.stringify({
                 "inApiToken": getLocalStorage("APIToken"),
                 "inTrainingEventId": trainingEventId,
-                "inPersonnelList": personnelList
+                "inPersonnelList": personnelList,
+                "inMarketId": $("#ddlMarket").val(),
+                "inOwnerId": $("#ddlOwner").val(),
+                "inOwnerGroupId": $("#ddlOwnerGroup").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
