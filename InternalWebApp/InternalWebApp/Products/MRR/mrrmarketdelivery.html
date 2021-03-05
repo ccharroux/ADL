@@ -52,12 +52,17 @@
             margin-left: 25px;
             margin-right: 25px;
         }
-        .marketNameColumn { min-width: 150px; }
-        .dateColumn { max-width: 150px; }
+        .marketNameColumn { min-width: 100px; }
+        .dateColumn { min-width: 75px; }
         .revisionColumn { max-width: 100px; }
         .mediaTypeColumn { max-width: 100px; }
-        .clientCommentColumn { min-width: 150px; }
+        .clientCommentColumn { min-width: 100px; }
         .actionColumn { min-width: 150px; }
+        .stationNameColumn { min-width: 150px; }
+        .recipientColumn { min-width: 250px; }
+        .ownerNameColumn { min-width: 150px; }
+        .emailColumn { min-width: 250px; }
+        .partnerColumn { min-width: 100px; }
         /* Bootbox and jQuery UI clash, workaround caused problems elsewhere, so just hide it and use the Cancel button within the dialog body */
         .ui-dialog-titlebar-close {
             display: none;
@@ -164,10 +169,27 @@
                                     <th class="exportColumn text-align-right revisionColumn">Revision</th>
                                     <th class="exportColumn clientCommentColumn">Client Comment</th>
                                     <th class="exportColumn mediaTypeColumn">Media</th>
-                                    <th class="actionColumn text-align-center"></th>
+                                    <th class="exportColumn partnerColumn">Partner</th>
+                                    <th class="actionColumn"></th>
                                 </tr>
                             </thead>
  
+                        </table>
+                    </div>
+
+                    <div id="divRecipients" class="col-md-12">
+                        <table id="dtMarketDeliveryListRecipients" class="dataTable-border dataTable-headers dataTable-cell-border">
+                            <thead>
+                                <tr>
+                                    <th class="exportColumn marketNameColumn">Market</th>
+                                    <th class="exportColumn stationNameColumn">Station</th>
+                                    <th class="exportColumn recipientColumn">Recipient</th>
+                                    <th class="exportColumn ownerColumn">Ownership</th>
+                                    <th class="exportColumn emailColumn">E-mail</th>
+                                    <th class="actionColumn"></th>
+                                </tr>
+                            </thead>
+
                         </table>
                     </div>
                 </div>
@@ -194,7 +216,7 @@
                                         <th class="exportColumn text-align-right revisionColumn">Revision</th>
                                         <th class="exportColumn clientCommentColumn">Client Comment</th>
                                         <th class="exportColumn mediaTypeColumn">Media</th>
-                                        <th class="actionColumn">Partner</th>
+                                        <th class="exportColumn partnerColumn">Partner</th>
                                     </tr>
                                 </thead>
  
@@ -274,6 +296,7 @@
     var gotYearsPeriods = false;
     var initializedDataTable = false;
     var initializedDataTablePartnerReview = false;
+    var initializedDataTableRecipients = false;
     var currentMarketId = null;
     var currentRevision = null;
     var currentMarketName = null;
@@ -287,6 +310,7 @@
 
         buildMRRMenu('Revenue');
         buildUIDialogs();
+        $("#divRecipients").hide();
         getMediaTypes();
         // possible future addition
         //getSchedules();
@@ -352,22 +376,22 @@
                 { "data": 'Revision' },
                 { "data": 'Client Comment' },
                 { "data": 'Media' },
+                { "data": 'Partner' },
                 {
                     mRender: partnerReview ? function (data, type, row) {
-                        return row["Partner"];
+                        return '';
                     } : function (data, type, row) {
-                        if (row["Delivered On"] != null)
-                        {
-                            return '<a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', \'' + modeReDeliver + '\')">Re-send emails</a>';
+                        if (row["Delivered On"] != null) {
+                            var textReleased = '<a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', \'' + modeReDeliver + '\')">Re-send emails</a>';
+                            textReleased += ' | <a href="#" onclick="showRecipients(' + row["Market ID"] + ',\'' + row["Market"] + '\')">Re-send to individuals</a>';
+                            return textReleased;
                         }
 
-                        var text = '<a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', \'' + modeRelease + '\')">Release</a>';
-
-                        if (row["Revision"] > 0)
-                        {
-                            text += ' <br> <a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', \'' + modeSilent + '\')">Release without email</a>';
+                        var textUnreleased = '<a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', \'' + modeRelease + '\')">Release</a>';
+                        if (row["Revision"] > 0) {
+                            textUnreleased += ' | <a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', \'' + modeSilent + '\')">Release without email</a>';
                         }
-                        return text;
+                        return textUnreleased;
                     },
                     "orderable": false,
                     "searchable": false
@@ -384,7 +408,7 @@
             "ordering": false,
             "paging": false,
             "info": false,
-            "searching": false,
+            // "searching": false,
             "pagingType": "full_numbers",
             "buttons": [],
             //"buttons": [
@@ -463,8 +487,104 @@
         }
     }
 
+    function setUpDataTableRecipients() {
+        $("#dtMarketDeliveryListRecipients").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "columns": [
+                { "data": 'Market' },
+                { "data": 'Station' },
+                { "data": 'Recipient' },
+                { "data": 'Owner' },
+                { "data": 'Email' },
+                {
+                    mRender: function (data, type, row) {
+                        return '<a href="#" onclick="deliverRecipient(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', ' + row["Personnel ID"] + ')">Deliver</a>';
+                    },
+                    "orderable": false,
+                    "searchable": false
+                }
+            ],
+            "ordering": false,
+            "paging": false,
+            "info": false,
+            "searching": false,
+            "pagingType": "full_numbers",
+            "buttons": [],
+            //"buttons": [
+            //   {
+            //       extend: 'csv',
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtRevenueDetail", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   },
+            //   {
+            //       extend: 'excel',
+            //       title: reportTitle,
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtRevenueDetail", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   },
+            //   {
+            //       extend: 'pdf',
+            //       title: reportTitle,
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtRevenueDetail", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   },
+            //   {
+            //       extend: 'print',
+            //       title: reportTitle,
+            //       exportOptions: {
+            //           columns: exportColumns,
+            //           format: {
+            //               header: function (data, columnIdx) {
+            //                   return returnExportColumnHeadingTitle("dtRevenueDetail", data, columnIdx);
+            //               }
+            //           }
+            //       }
+            //   }
+            //   //,
+            //   //this button is supposed to handle column visibility
+            //   //however it isn't working on our site
+            //   //'colvis'
+            //],
+            initComplete: setUpDataTableSuccess,
+            //createdRow: function (row, data, index) {
+            //    //this adds the class to every row
+            //    $(row).addClass('single-line-height');
+            //    //this adds the class to total rows
+            //    if (data["isTotal"]) {
+            //        // need to target td's because tr's already have background colors, with or without striping
+            //        $(row).find("td").addClass("total-category");
+            //    }
+            //},
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+
+        initializedDataTableRecipients = true;
+    }
+
     function setUpDataTableSuccess() {
-        if ((initializedDataTable == false) || (initializedDataTablePartnerReview == false)) {
+        if ((initializedDataTable == false) || (initializedDataTablePartnerReview == false) || (initializedDataTableRecipients == false)) {
             return;
         }
 
@@ -491,6 +611,9 @@
 
         if ((initializedDataTable == false) || (initializedDataTablePartnerReview == false)) {
             setUpDataTable(partnerReview);
+        }
+        if (initializedDataTableRecipients == false) {
+            setUpDataTableRecipients();
         }
 
         var mediaTypeId = $("#ddlMediaType").val();
@@ -1033,6 +1156,48 @@
         );
     }
 
+    function showRecipients(marketId, marketName) {
+        var dtMarketDeliveryList = $("#dtMarketDeliveryList").DataTable();
+        dtMarketDeliveryList.search('"' + marketName + '"').draw();
+
+        var url = ServicePrefix + '/api/MRR/GetMarketDeliveryListRecipients';
+
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPeriod": currentRevenuePeriod(),
+                "inYear": currentRevenueYear(),
+                "inMarketId": marketId,
+                "inShowDelivered": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketDeliveryListRecipientsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getMarketDeliveryListRecipientsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        $("#divRecipients").show();
+        populateDataTable("dtMarketDeliveryListRecipients", data);
+    }
+
+    function deliverRecipient(marketId, revision, marketName, personnelId) {
+        // TODO
+    }
+    
     function checkOwnerGroupsOkayToRelease() {
         if (currentMode == modeReDeliver) {
             postSendEmailToMarketRecipients();
