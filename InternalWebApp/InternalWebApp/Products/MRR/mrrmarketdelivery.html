@@ -294,12 +294,20 @@
     // possible future addition
     //var gotSchedules = false;
     var gotYearsPeriods = false;
+
     var initializedDataTable = false;
     var initializedDataTablePartnerReview = false;
     var initializedDataTableRecipients = false;
+
     var currentMarketId = null;
     var currentRevision = null;
     var currentMarketName = null;
+    var currentStationId = null;
+    var currentStationName = null;
+    var currentPersonnelId = null;
+    var currentRecipient = null;
+    var currentOwnerName = null;
+
     var currentMode = "";
     var modeRelease = "release";
     var modeSilent = "silent";
@@ -382,14 +390,32 @@
                         return '';
                     } : function (data, type, row) {
                         if (row["Delivered On"] != null) {
-                            var textReleased = '<a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', \'' + modeReDeliver + '\')">Re-send emails</a>';
-                            textReleased += ' | <a href="#" onclick="showRecipients(' + row["Market ID"] + ',\'' + row["Market"] + '\')">Re-send to individuals</a>';
+                            var textReleased = '<a href="#" onclick="releaseMarket('
+                                + row["Market ID"]
+                                + ',' + row["Revision"]
+                                + ',\'' + encodeURI(row["Market"]) + '\''
+                                + ',\'' + modeReDeliver + '\''
+                                + ')">Re-send emails</a>';
+                            textReleased += ' | <a href="#" onclick="showRecipients('
+                                + row["Market ID"]
+                                + ',\'' + encodeURI(row["Market"]) + '\''
+                                + ')">Re-send to individuals</a>';
                             return textReleased;
                         }
 
-                        var textUnreleased = '<a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', \'' + modeRelease + '\')">Release</a>';
+                        var textUnreleased = '<a href="#" onclick="releaseMarket('
+                            + row["Market ID"]
+                            + ',' + row["Revision"]
+                            + ',\'' + encodeURI(row["Market"]) + '\''
+                            + ',\'' + modeRelease + '\''
+                            + ')">Release</a>';
                         if (row["Revision"] > 0) {
-                            textUnreleased += ' | <a href="#" onclick="releaseMarket(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', \'' + modeSilent + '\')">Release without email</a>';
+                            textUnreleased += ' | <a href="#" onclick="releaseMarket('
+                                + row["Market ID"]
+                                + ',' + row["Revision"]
+                                + ',\'' + encodeURI(row["Market"]) + '\''
+                                + ', \'' + modeSilent + '\''
+                                + ')">Release without email</a>';
                         }
                         return textUnreleased;
                     },
@@ -499,7 +525,15 @@
                 { "data": 'Email' },
                 {
                     mRender: function (data, type, row) {
-                        return '<a href="#" onclick="deliverRecipient(' + row["Market ID"] + ',' + row["Revision"] + ',\'' + row["Market"] + '\', ' + row["Personnel ID"] + ')">Deliver</a>';
+                        return '<a href="#" onclick="deliverRecipient('
+                            + row["Market ID"]
+                            + ',\'' + encodeURI(row["Market"]) + '\''
+                            + ',\'' + encodeURI(row["Station"]) + '\''
+                            + ',' + row["Revision"]
+                            + ',' + row["Personnel ID"]
+                            + ',\'' + encodeURI(row["Recipient"]) + '\''
+                            + ',\'' + encodeURI(row["Owner"]) + '\''
+                            + ')">Deliver</a>';
                     },
                     "orderable": false,
                     "searchable": false
@@ -911,7 +945,7 @@
     function releaseMarket(marketId, revision, marketName, mode) {
         currentMarketId = marketId;
         currentRevision = revision;
-        currentMarketName = marketName;
+        currentMarketName = decodeURI(marketName);
         currentMode = mode;
 
         var currentMessage = "Release " + currentMarketName + " for " + currentYearPeriodText() + " and email recipients?"
@@ -1158,7 +1192,7 @@
 
     function showRecipients(marketId, marketName) {
         var dtMarketDeliveryList = $("#dtMarketDeliveryList").DataTable();
-        dtMarketDeliveryList.search('"' + marketName + '"').draw();
+        dtMarketDeliveryList.search('"' + decodeURI(marketName) + '"').draw();
 
         var url = ServicePrefix + '/api/MRR/GetMarketDeliveryListRecipients';
 
@@ -1194,10 +1228,103 @@
         populateDataTable("dtMarketDeliveryListRecipients", data);
     }
 
-    function deliverRecipient(marketId, revision, marketName, personnelId) {
-        // TODO
+    function deliverRecipient(marketId, marketName, stationName, revision, personnelId, recipient, ownerName) {
+        currentMarketId = marketId;
+        currentRevision = revision;
+        currentMarketName = decodeURI(marketName);
+        currentStationName = decodeURI(stationName);
+        currentStationId = getIDFromString(currentStationName);
+        currentPersonnelId = personnelId;
+        currentRecipient = decodeURI(recipient);
+        currentOwnerName = decodeURI(ownerName);
+
+        bootbox.confirm({
+            message: "Send email to " + currentRecipient + " for " + currentMarketName + " / " + currentOwnerName + " / " + currentStationName + " for " + currentYearPeriodText() + "?",
+            callback: function (confirmed) {
+                if (confirmed) {
+                    validateSingleRecipient();
+                }
+            }
+        });
+    }
+
+    function validateSingleRecipient() {
+
+        var url = ServicePrefix + '/api/MRR/InsertMarketDeliveryNotificationsIntoQueue';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": currentMarketId,
+                "inStationId": currentStationId,
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod(),
+                "inPersonnelId": currentPersonnelId,
+                "inIsRevision": currentRevision > 0,
+                "inValidateOnly": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                validateSingleRecipientSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function validateSingleRecipientSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        sendEmailToSingleMarketRecipient();
     }
     
+    function sendEmailToSingleMarketRecipient() {
+        var url = ServicePrefix + '/api/MRR/InsertMarketDeliveryNotificationsIntoQueue';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": currentMarketId,
+                "inStationId": currentStationId,
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod(),
+                "inPersonnelId": currentPersonnelId,
+                "inIsRevision": currentRevision > 0,
+                "inValidateOnly": false
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                sendEmailToSingleMarketRecipientSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function sendEmailToSingleMarketRecipientSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert(currentRecipient + " has been notified that " + currentMarketName + " is released for " + currentYearPeriodText());
+    }
+
     function checkOwnerGroupsOkayToRelease() {
         if (currentMode == modeReDeliver) {
             postSendEmailToMarketRecipients();
