@@ -82,6 +82,33 @@
                         </div>
                     </div>
 
+                    <hr />
+                    <div><b>Exclusivity and Threshold</b></div>
+                    <hr />
+
+                    <!--Exclusivity-->
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label>Exclusivity</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <span id="lblExclusivity"></span>
+                            <input type="button" id="btnUpdateParentMarketOptions" onclick="updateParentMarketOptions();" style="width:240px; margin-left: 50px;" value="Update Parent Market Options" class="default-button" />
+                        </div>
+                    </div>
+
+                    <!--Mininum Participants-->
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label>Minimum Participants</label>
+                        </div>
+                        <div class="col-md-9 text-align-left">
+                            <span id="lblMinimumParticipants"></span>
+                        </div>
+                    </div>
+
+                    <hr />
+
                     <!--Partner List-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
@@ -91,7 +118,7 @@
                             <select id="ddlPartnerList" class="mkaRequired field-width-325" value="0" errorMessage="You must select a Partner."></select>
                         </div>
                         <div class="col-md-3 text-align-right">
-                            <input type="button" id="btnUpdatePartners" onclick="updatePartners();" style="width:180px"  value="Update Partners" class="default-button" style="display: none;" />
+                            <input type="button" id="btnUpdatePartners" onclick="updatePartners();" style="width:180px; display: none;" value="Update Partners" class="default-button" />
                         </div>
                     </div>
 
@@ -142,6 +169,7 @@
     var marketId = 0;
     var productId = "DMX";
     var productIsNew = 0;
+    var parentMarketId = 0;
 
     $(document).ready(function () {
         buildMainMenu("Markets");
@@ -195,12 +223,51 @@
                 $("#lblMarketName").text("Market Name: " + obj.marketName);
                 $("#lblMarketId").text("Market ID: " + obj.marketId);
                 $("#lblMediaType").text("Media Type: " + obj.mediaTypeName);
-                $("#hdnParentMarketId").text(obj.parentMarketId);
+                parentMarketId = obj.parentMarketId;
             });
 
             $(".entity-label").removeClass("hidden");
-            getPartnerList();
+            getParentMarketOptions();
         }
+    }
+
+    function getParentMarketOptions() {
+        var url = ServicePrefix + '/api/DMX/GetParentMarketDMX'
+            + '?inApiToken=' + getLocalStorage("APIToken")
+            + '&inParentMarketId=' + parentMarketId;
+
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getParentMarketOptionsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function getParentMarketOptionsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.report.rows.length == 0) {
+            $("#lblExclusivity").text("Not configured");
+            $("#lblMinimumParticipants").text("Not configured");
+        } else {
+            var obj = data.report.rows[0];
+            $("#lblExclusivity").text(obj["ExclusivityMethod"]);
+            $("#lblMinimumParticipants").text(obj["MinimumParticipants"]);
+        }
+
+        getPartnerList();
     }
 
     function getPartnerList() {
@@ -365,6 +432,10 @@
         });
 
         return loopBreak;
+    }
+
+    function updateParentMarketOptions() {
+        window.location = "/Products/DMX/dmxparentmarketoptions.html?parentmarketid=" + parentMarketId;
     }
 
     function updatePartners() {
