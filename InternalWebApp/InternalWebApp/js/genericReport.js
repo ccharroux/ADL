@@ -251,6 +251,7 @@ reportName.push("rptDMXXRYRevenueReviewByAdvertiser");
 reportName.push("rptDMXXRYRevenueReviewByAgency");
 reportName.push("rptDMAParentMarketAssignedCategoryTemplate");
 reportName.push("rptMRRStationRevenueYTDByMediaType");
+reportName.push("rptDMXParentMarketExclusivitySettings");
 
 
 function buildReportArray()
@@ -13532,4 +13533,33 @@ function getReportObject_MRRStationRevenueYTDByMediaType() {
     }
 
     return tempObject;
+}
+
+function getReportFilterArray_DMXParentMarketExclusivitySettings() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+    return arrayFilters;
+}
+
+function getReportObject_DMXParentMarketExclusivitySettings() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+
+
+    tempObject =
+    {
+
+        reportTitle: "DMX Parent Market Exclusivity Settings",
+        apiControllerAction: "/api/DMX/GetParentMarketDMXList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['dmx', 'advertiser', 'agency'],
+        approved: false
+    }
+
+    return tempObject;
+
 }
