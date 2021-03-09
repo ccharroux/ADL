@@ -13547,7 +13547,9 @@ function getReportObject_DMXParentMarketExclusivitySettings() {
     var tempObject = new Object();
 
     columnsToDisplay = new Array();
-
+    columnsToDisplay.push("Parent Market Name");
+    columnsToDisplay.push("Minimum Participants");
+    columnsToDisplay.push("Exclusivity Method");
 
     tempObject =
     {
