@@ -217,6 +217,7 @@
                                         <th class="exportColumn clientCommentColumn">Client Comment</th>
                                         <th class="exportColumn mediaTypeColumn">Media</th>
                                         <th class="exportColumn partnerColumn">Partner</th>
+                                        <th class="actionColumn"></th>
                                     </tr>
                                 </thead>
  
@@ -387,7 +388,12 @@
                 { "data": 'Partner' },
                 {
                     mRender: partnerReview ? function (data, type, row) {
-                        return '';
+                        var textPartnerReview = '<a href="#" onclick="partnerApprovedMarket('
+                                + row["Market ID"]
+                                + ',' + row["Revision"]
+                                + ',\'' + encodeURI(row["Market"]) + '\''
+                                + ')">Partner approved</a>';
+                        return textPartnerReview;
                     } : function (data, type, row) {
                         if (row["Delivered On"] != null) {
                             var textReleased = '<a href="#" onclick="releaseMarket('
@@ -952,10 +958,10 @@
 
         var currentMessage = "Release " + currentMarketName + " for " + currentYearPeriodText() + " and email recipients?"
         if (mode == modeSilent) {
-            var currentMessage = "Release " + currentMarketName + " for " + currentYearPeriodText() + " WITHOUT emailing recipients?"
+            currentMessage = "Release " + currentMarketName + " for " + currentYearPeriodText() + " WITHOUT emailing recipients?"
         }
         if (mode == modeReDeliver) {
-            var currentMessage = "Re-release to recipients for " + currentMarketName + " for " + currentYearPeriodText() + "?"
+            currentMessage = "Re-release to recipients for " + currentMarketName + " for " + currentYearPeriodText() + "?"
         }
 
         bootbox.confirm({
@@ -1511,6 +1517,63 @@
         bootbox.alert(
             mediaTypeQualifier() + "stations are ready for next submission cycle"
         );
+    }
+
+    function partnerApprovedMarket(marketId, revision, marketName) {
+        currentMarketId = marketId;
+        currentRevision = revision;
+        currentMarketName = decodeURI(marketName);
+
+        var currentMessage = "Partner approved " + currentMarketName + " for " + currentYearPeriodText() + "?"
+
+        bootbox.confirm({
+            message: currentMessage,
+            callback: function (confirmed) {
+                if (confirmed) {
+                    partnerApprovedMarketConfirmed();
+                } else {
+                    clearCurrentSettings();
+                }
+            }
+        });
+    }
+
+    function partnerApprovedMarketConfirmed() {
+        var url = ServicePrefix + '/api/Product/InsertProductReleaseApproval';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": "MRR",
+                "inMarketId": currentMarketId,
+                "inRevenueYear": currentRevenueYear(),
+                "inRevenuePeriod": currentRevenuePeriod(),
+                "inRevision": currentRevision
+                // possible future improvement: UI to enter notes and pass them here as "inNotes"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                partnerApprovedMarketSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function partnerApprovedMarketSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        clearCurrentSettings();
+        getMarketDeliveryList();
     }
 
 </script>
