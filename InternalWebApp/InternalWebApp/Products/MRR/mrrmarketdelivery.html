@@ -1637,62 +1637,63 @@
             }
         });
 
-        function partnerApprovedMarket(marketId, revision, marketName) {
-            currentMarketId = marketId;
-            currentRevision = revision;
-            currentMarketName = decodeURI(marketName);
-
-            var currentMessage = "Partner approved " + currentMarketName + " for " + currentYearPeriodText() + "?"
-
-            bootbox.confirm({
-                message: currentMessage,
-                callback: function (confirmed) {
-                    if (confirmed) {
-                        partnerApprovedMarketConfirmed();
-                    } else {
-                        clearCurrentSettings();
-                    }
-                }
-            });
-        }
-
-        function partnerApprovedMarketConfirmed() {
-            var url = ServicePrefix + '/api/Product/InsertProductReleaseApproval';
-
-            var settings = {
-                dataType: 'json',
-                type: 'post',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    "inApiToken": getLocalStorage("APIToken"),
-                    "inProductId": "MRR",
-                    "inMarketId": currentMarketId,
-                    "inRevenueYear": currentRevenueYear(),
-                    "inRevenuePeriod": currentRevenuePeriod(),
-                    "inRevision": currentRevision
-                    // possible future improvement: UI to enter notes and pass them here as "inNotes"
-                }),
-                processData: false,
-                success: function (data, textStatus, jQxhr) {
-                    partnerApprovedMarketSuccess(data, textStatus, jQxhr);
-                },
-                error: function (jqXhr, textStatus, errorThrown) {
-                    genericAjaxError(jqXhr, textStatus, errorThrown);
-                }
-            };
-
-            $.ajax(url, settings);
-        }
-
-        function partnerApprovedMarketSuccess(data, textStatus, jQxhr) {
-            if (data.response.status != "SUCCESS") {
-                MKAErrorMessageRtn(data.response.errorMessage[0]);
-                return;
-            }
-
-            clearCurrentSettings();
-            getMarketDeliveryList();
-        }
-
     }
+
+    function partnerApprovedMarket(marketId, revision, marketName) {
+        currentMarketId = marketId;
+        currentRevision = revision;
+        currentMarketName = decodeURI(marketName);
+
+        var currentMessage = "Partner approved " + currentMarketName + " for " + currentYearPeriodText() + "?"
+
+        bootbox.confirm({
+            message: currentMessage,
+            callback: function (confirmed) {
+                if (confirmed) {
+                    partnerApprovedMarketConfirmed();
+                } else {
+                    clearCurrentSettings();
+                }
+            }
+        });
+    }
+
+    function partnerApprovedMarketConfirmed() {
+        var url = ServicePrefix + '/api/Product/InsertProductReleaseApproval';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": "MRR",
+                "inMarketId": currentMarketId,
+                "inRevenueYear": currentRevenueYear(),
+                "inRevenuePeriod": currentRevenuePeriod(),
+                "inRevision": currentRevision
+                // possible future improvement: UI to enter notes and pass them here as "inNotes"
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                partnerApprovedMarketSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function partnerApprovedMarketSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        clearCurrentSettings();
+        getMarketDeliveryList();
+    }
+
 </script>
