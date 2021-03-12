@@ -52,17 +52,50 @@
             margin-left: 25px;
             margin-right: 25px;
         }
-        .marketNameColumn { min-width: 100px; }
-        .dateColumn { min-width: 75px; }
-        .revisionColumn { max-width: 100px; }
-        .mediaTypeColumn { max-width: 100px; }
-        .clientCommentColumn { min-width: 100px; }
-        .actionColumn { min-width: 150px; }
-        .stationNameColumn { min-width: 150px; }
-        .recipientColumn { min-width: 250px; }
-        .ownerNameColumn { min-width: 150px; }
-        .emailColumn { min-width: 250px; }
-        .partnerColumn { min-width: 100px; }
+
+        .marketNameColumn {
+            min-width: 100px;
+        }
+
+        .dateColumn {
+            min-width: 75px;
+        }
+
+        .revisionColumn {
+            max-width: 100px;
+        }
+
+        .mediaTypeColumn {
+            max-width: 100px;
+        }
+
+        .clientCommentColumn {
+            min-width: 100px;
+        }
+
+        .actionColumn {
+            min-width: 150px;
+        }
+
+        .stationNameColumn {
+            min-width: 150px;
+        }
+
+        .recipientColumn {
+            min-width: 250px;
+        }
+
+        .ownerNameColumn {
+            min-width: 150px;
+        }
+
+        .emailColumn {
+            min-width: 250px;
+        }
+
+        .partnerColumn {
+            min-width: 100px;
+        }
         /* Bootbox and jQuery UI clash, workaround caused problems elsewhere, so just hide it and use the Cancel button within the dialog body */
         .ui-dialog-titlebar-close {
             display: none;
@@ -97,7 +130,7 @@
                         <h2 id="pageTitle">Market Delivery - MRR</h2>
                     </div>
                 </div>
-                <div id="divQuickReport"  >
+                <div id="divQuickReport">
                     <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
                     <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
                 </div>
@@ -120,25 +153,25 @@
                                     <select id="ddlMarket" style="width: 300px;" class="dropdown-select" onchange="getMarketDeliveryList();"></select>
                                 </div>
                                 <div class="col-md-3">
-                                        <label for="ddlYearPeriod">Year-Period</label><br />
-                                        <select id="ddlYearPeriod" onchange="getMarketDeliveryList();"></select><br />
-                                        <a href="#" onclick="moveToPreviousPeriod();">Previous Period</a> | <a href="#" onclick="moveToNextPeriod();">Next Period</a>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label for="ddlMediaType">Media Type</label><br />
-                                        <select id="ddlMediaType" onchange="getMarketDeliveryList();"></select>
-                                    </div>
-                                    <!-- possible future addition -->
-                                    <!--<div class="col-md-3">
-            <label for="ddlSchedule">Schedule</label><br />
-            <select id="ddlSchedule" onchange="getMarketDeliveryList();"></select>
-        </div>-->
-                                    <div class="col-md-3">
-                                        <label for="chkShowDelivered">Show Delivered</label><br />
-                                        <input id="chkShowDelivered" checked="checked" type="checkbox" onchange="getMarketDeliveryList();" />
-                                    </div>
+                                    <label for="ddlYearPeriod">Year-Period</label><br />
+                                    <select id="ddlYearPeriod" onchange="getMarketDeliveryList();"></select><br />
+                                    <a href="#" onclick="moveToPreviousPeriod();">Previous Period</a> | <a href="#" onclick="moveToNextPeriod();">Next Period</a>
                                 </div>
+
+                                <div class="col-md-3">
+                                    <label for="ddlMediaType">Media Type</label><br />
+                                    <select id="ddlMediaType" onchange="getMarketDeliveryList();"></select>
+                                </div>
+                                <!-- possible future addition -->
+                                <!--<div class="col-md-3">
+                                    <label for="ddlSchedule">Schedule</label><br />
+                                    <select id="ddlSchedule" onchange="getMarketDeliveryList();"></select>
+                                </div>-->
+                                <div class="col-md-3">
+                                    <label for="chkShowDelivered">Show Delivered</label><br />
+                                    <input id="chkShowDelivered" checked="checked" type="checkbox" onchange="getMarketDeliveryList();" />
+                                </div>
+                            </div>
                         </center>
                         <hr />
                     </div>
@@ -177,7 +210,7 @@
                                     <th class="actionColumn"></th>
                                 </tr>
                             </thead>
- 
+
                         </table>
                     </div>
 
@@ -224,7 +257,7 @@
                                         <th class="actionColumn"></th>
                                     </tr>
                                 </thead>
- 
+
                             </table>
                         </div>
                     </div>
@@ -299,7 +332,9 @@
     // possible future addition
     //var gotSchedules = false;
     var gotYearsPeriods = false;
+    var isPartner = false;
 
+    var initPage = false;
     var initializedDataTable = false;
     var initializedDataTablePartnerReview = false;
     var initializedDataTableRecipients = false;
@@ -344,6 +379,8 @@
         //setLocalStorage("search", $("#searchText").val().trim() + '|' + $("#searchTextNumber").val().trim() + '|' + $("#ddlMediaType").val()  );
         //setLocalStorage("searchPage", window.location);
         loadReportParameters();
+
+        getMarketDeliveryList(true);
     });
 
     function buildUIDialogs() {
@@ -379,28 +416,18 @@
 
     function setUpDataTable(partnerReview)
     {
-        console.log("setUpDataTable - START");
-        console.log(initializedDataTablePartnerReview);
-        console.log(initializedDataTable);
-    
+
         if (initializedDataTablePartnerReview == true && partnerReview == true)
         {
-            console.log("setUpDataTable - EXIT");
-
             return;
         }
 
         if (initializedDataTable == true && partnerReview == false)
         {
-            console.log("setUpDataTable - EXIT");
             return;
         }
 
         var dtMarketDeliveryList = dtMarketDeliveryListId(partnerReview);
-        //console.log(dtMarketDeliveryList);
-
-        //console.log(partnerReview);
-        //console.log("#" + dtMarketDeliveryList);
 
         $("#" + dtMarketDeliveryList).DataTable({
             "dom": "Blfrtip",
@@ -417,16 +444,34 @@
                 {
                     mRender: function (data, type, row)
                     {
-                        if (partnerReview == true) {
-                            var textPartnerReview = '<a href="#" onclick="partnerApprovedMarket('
-                                    + row["Market ID"]
-                                    + ',' + row["Revision"]
-                                    + ',\'' + encodeURI(row["Market"]) + '\''
-                                    + ')">Partner approved</a>';
+                        var textPartnerReview = '<a href="#" onclick="partnerApprovedMarket('
+                                        + row["Market ID"]
+                                        + ',' + row["Revision"]
+                                        + ',\'' + encodeURI(row["Market"]) + '\''
+                                        + ',' + encodeURI(row["isPartner"]) 
+                                        + ')">';
+
+                        if (partnerReview == true)
+                        {
+
+                            var message = '';
+
+                            if (row['isPartner'] == false)
+                            {
+                                message = 'Approve without Partner';
+                            }
+                            else
+                            {
+                                message = 'Partner Approval';
+                            }
+
+                            var textPartnerReview = textPartnerReview + message;
+
+                            textPartnerReview = textPartnerReview + '</a>';
                             return textPartnerReview;
                         }
                         else {
- 
+
                             if (row["Delivered On"] != null) {
                                 var textReleased = '<a href="#" onclick="releaseMarket('
                                     + row["Market ID"]
@@ -548,14 +593,12 @@
             }
         });
 
-        console.log("setUpDataTable - INIT COMPLETE");
-
         if (partnerReview) {
             initializedDataTablePartnerReview = true;
         } else {
             initializedDataTable = true;
         }
-        console.log("setUpDataTable - END");
+
 
     }
 
@@ -675,8 +718,14 @@
         $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="/images/red-x.png" /></button>');
     }
 
-    function getMarketDeliveryList()
+    function getMarketDeliveryList(bFirstRun)
     {
+        if (bFirstRun == undefined && initPage == false)
+        {
+            return;
+        }
+
+        initPage = true;
 
         getMarketDeliveryList_PerGrid(false);
 
@@ -684,8 +733,6 @@
 
     function getMarketDeliveryList_PerGrid(partnerReview)
     {
-        console.log("getMarketDeliveryList_PerGrid");
-        console.log(partnerReview);
 
         // possible future addition
         //if ((gotMediaTypes == false) || (gotSchedules == false) || (gotYearsPeriods == false)) {
@@ -693,7 +740,14 @@
             return;
         }
 
-        console.log("getMarketDeliveryList_PerGrid - 2")
+        if (partnerReview == false) {
+            getMarketDeliveryList_PerGrid(true);
+        }
+
+        if (partnerReview == true) {
+            checkOwnerGroupsOkayToRelease();
+        };
+
         var dtMarketDeliveryList = dtMarketDeliveryListId(partnerReview);
 
         var reportTitle = "Market Delivery List";
@@ -703,13 +757,11 @@
         {
             setUpDataTable(partnerReview);
         }
-    
+
         if (initializedDataTablePartnerReview == false && partnerReview == true)
         {
             setUpDataTable(partnerReview);
         }
- 
-        console.log("getMarketDeliveryList_PerGrid - 3")
 
         if (initializedDataTableRecipients == false) {
             setUpDataTableRecipients();
@@ -719,8 +771,7 @@
         if (mediaTypeId == -1) {
             mediaTypeId = "";
         }
-        console.log("getMarketDeliveryList_PerGrid - 4")
-        console.log("PRE /api/MRR/GetMarketDeliveryList")
+
 
         var url = ServicePrefix + '/api/MRR/GetMarketDeliveryList';
 
@@ -769,20 +820,9 @@
                 $("#divPartnerReview").show();
             }
         }
- 
+
         populateDataTable(dtMarketDeliveryList, data);
 
-        if (partnerReview == false)
-        {
-            console.log("in partner review");
-            getMarketDeliveryList_PerGrid(true);
-            console.log("out partner review");
-        }
-
-        if (partnerReview == true)
-        {
-            checkOwnerGroupsOkayToRelease();
-        };
 
     }
 
@@ -1369,7 +1409,7 @@
 
         sendEmailToSingleMarketRecipient();
     }
-    
+
     function sendEmailToSingleMarketRecipient() {
         var url = ServicePrefix + '/api/MRR/InsertMarketDeliveryNotificationsIntoQueue';
 
@@ -1639,12 +1679,18 @@
 
     }
 
-    function partnerApprovedMarket(marketId, revision, marketName) {
+    function partnerApprovedMarket(marketId, revision, marketName, isPartner)
+    {
         currentMarketId = marketId;
         currentRevision = revision;
         currentMarketName = decodeURI(marketName);
 
-        var currentMessage = "Partner approved " + currentMarketName + " for " + currentYearPeriodText() + "?"
+        var currentMessage = "Partner Approve: " + currentMarketName + " for " + currentYearPeriodText() + "?"
+
+        if (isPartner == false)
+        {
+            currentMessage = "Approve without Partner: " + currentMarketName + " for " + currentYearPeriodText() + "?"
+        }
 
         bootbox.confirm({
             message: currentMessage,
