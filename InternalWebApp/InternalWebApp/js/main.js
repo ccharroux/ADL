@@ -1036,14 +1036,14 @@ function MKAErrorMessageDeliveryRtn(message, postCallback) {
 
 function sendErrorEmail(message, AJAXErrorURL, AJAXErrorData)
 {
-    //console.log('ERROR');
-    //console.log(message);
-    //console.log(AJAXErrorURL);
+    AJAXErrorData["Password"] = "xxxxxx";
+
     //console.log(AJAXErrorData);
     if (AJAXErrorURL == null)
     {
         return;
     }
+
 
 
     $.ajax({
