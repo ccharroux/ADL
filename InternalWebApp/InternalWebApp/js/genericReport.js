@@ -253,6 +253,7 @@ reportName.push("rptDMAParentMarketAssignedCategoryTemplate");
 reportName.push("rptMRRStationRevenueYTDByMediaType");
 reportName.push("rptDMXParentMarketExclusivitySettings");
 
+reportName.push("rptMarketHoldList");
 
 function buildReportArray()
 {
@@ -13559,6 +13560,34 @@ function getReportObject_DMXParentMarketExclusivitySettings() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['dmx', 'advertiser', 'agency'],
+        approved: false
+    }
+
+    return tempObject;
+
+}
+
+function getReportFilterArray_MarketHoldList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+    return arrayFilters;
+}
+
+function getReportObject_MarketHoldList() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+ 
+    tempObject =
+    {
+
+        reportTitle: "Market's on Hold List",
+        apiControllerAction: "/api/MarketReport/GetMarketHoldList",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['market'],
         approved: false
     }
 
