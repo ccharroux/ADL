@@ -224,7 +224,10 @@
                         </div>
                     </div>
                     <!-- Products -->
-                    <div id="divProductList" class="hidden default-button-section">
+ 
+                    <a href="#products"></a>
+                        <div id="divProductList" class="hidden default-button-section">
+
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="row product-list-header width-100">
@@ -250,7 +253,7 @@
                         </div>
                     </div>
 
-                </div>
+</div>
 
             </div>
         </div>
@@ -572,17 +575,38 @@
                 var productId = obj.P_ProductID.toUpperCase();
 
                 // open master div
-                str = str + '<div class="row row_' + productId + '" style="display:none;padding-top:3px;">';
+                str = str + '<div class="row row_' + productId + '" style="display:none;padding-top:3px;padding-bottom: 3px;border-bottom:1px solid silver">';
 
                 // product name
                 str = str + '<div class="col-md-3" style="text-align:left">';
                 str = str + productId + " - " + obj.P_ProductName;
+                str = str + "<div id='productOnHoldMessage" + productId + "' class='hidden'><font color='red'>ON HOLD</font></div>";
+
                 str = str + '</div>';
 
                 // product id
                 str = str + '<div class="col-md-2" style="text-align:left">';
                 str = str + '<div id="date' + productId + '" />';
-                str = str + '</div>';
+ 
+                // hold button
+                str = str +
+                    '<input type="button"  id="productOnHold' +
+                    productId +
+                    '" class="hidden productOnHoldButtonClass" onClick="productMarketOnHold(' +
+                    '\'' +
+                    productId +
+                    '\', true)" Value="Put on Hold" />';
+                // OFF hold button
+                str = str +
+                    '<input type="button"  id="productOffHold' +
+                    productId +
+                    '" class="hidden productOffHoldButtonClass" style="background-color:red" onClick="productMarketOnHold(' +
+                    '\'' +
+                    productId +
+                    '\', false)" Value="Remove Hold" />'; str = str + '</div>';
+
+
+
 
                 // product button div
                 str = str + '<div id="productButtons' + productId + '" class="col-md-7" style="text-align:left;">';
@@ -637,6 +661,7 @@
                 //getMarketProducts();
                 getMarket();
             } else {
+                $("#productAddDMX").removeClass('hidden');
                 $("#productAddDMA").removeClass('hidden');
                 $("#productAddMRR").removeClass('hidden');
                 $("#productAddXRY").removeClass('hidden');
@@ -701,11 +726,23 @@
 
             $(".row_" + productId).show();
 
-            if (obj.activeDate != null && obj.activeFlag == true) {
+            if (obj.activeDate != null && obj.activeFlag == true)
+            {
                 $("#productEdit" + productId).removeClass('hidden');
                 $("#productDisable" + productId).removeClass('hidden');
-                $("#date" + productId).html(extractDateOnly(obj.activeDate));
+                $("#date" + productId).html("&nbsp;&nbsp;&nbsp;" + extractDateOnly(obj.activeDate));
                 $("#date" + productId).css("color", "green");
+
+                if (obj.onHoldFlag == true)
+                {
+                    $("#productOffHold" + productId).removeClass('hidden');
+                    $("#productOnHoldMessage" + productId).removeClass('hidden');
+                }
+                else
+                {
+                    $("#productOnHold" + productId).removeClass('hidden');
+
+                }
 
                 //chkPrimaryMarket
 
@@ -1191,6 +1228,7 @@
     }
 
     function getPartnersForMarket() {
+
         var url = ServicePrefix + '/api/Partner/GetPartnerListByMarket';
         url += '?inApiToken=' + getLocalStorage("APIToken");
         url += '&inMarketId=' + marketId;
@@ -1236,4 +1274,45 @@
     {
         getPartnersListForUpdating(marketId);
     }
+
+    function productMarketOnHold(productId, onHoldFlag)
+    {
+
+        var url = ServicePrefix + '/api/Market/UpdateMarketOnHold';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": productId,
+                "inMarketId": marketId,
+                "inMarketOnHold" : onHoldFlag
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                productMarketOnHoldSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function productMarketOnHoldSuccess(data, textStatus, jQxhr) {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+        else {
+            window.location = "/admin/market/market.html?marketId=" + marketId; // + "#products";
+        }
+    }
+
+
 </script>

@@ -19,7 +19,7 @@ var gAJAXError = false;
 var release =
 {
     "DEV": "N/A",
-    "STAGING": "02/12/2021",
+    "STAGING": "03/18/2021",
     "PRODUCTION": "",
     "DEMO": ""
 }
@@ -324,10 +324,16 @@ $(document).ready(function ()
     {
         window.localStorage.setItem("AJAXErrorURL", inSettings.url);
 
-        if (!inSettings.data == false) {
+
+        if (!inSettings.data == false)
+        {
+            if (inSettings.data.toString().indexOf("Password") > -1) {
+                AJAXErrorData = new Object();
+            }
+
             window.localStorage.setItem("AJAXErrorData", inSettings.data);
         }
-
+ 
         gAJAXError = true;
     });
 
@@ -967,6 +973,12 @@ function MKAErrorMessageRtn(message, preCallback, postCallback) {
     var AJAXErrorURL = window.localStorage.getItem("AJAXErrorURL");
     var AJAXErrorData = window.localStorage.getItem("AJAXErrorData");
 
+
+    if (AJAXErrorData.toString().indexOf("Password") > -1)
+    {
+        AJAXErrorData = new Object();
+    }
+
     if (!message)
     {
         message = "";
@@ -1004,6 +1016,10 @@ function MKAErrorMessageDeliveryRtn(message, postCallback) {
     var AJAXErrorURL = window.localStorage.getItem("AJAXErrorURL");
     var AJAXErrorData = window.localStorage.getItem("AJAXErrorData");
 
+    if (AJAXErrorData.toString().indexOf("Password") > -1) {
+        AJAXErrorData = new Object();
+    }
+
     if (message.toString().toLowerCase().indexOf('token is invalid') > -1) {
         newMessage = "Your Token has expired - Please login again";
         bootbox.alert(newMessage, function () {
@@ -1036,15 +1052,16 @@ function MKAErrorMessageDeliveryRtn(message, postCallback) {
 
 function sendErrorEmail(message, AJAXErrorURL, AJAXErrorData)
 {
-    AJAXErrorData["Password"] = "xxxxxx";
 
-    //console.log(AJAXErrorData);
+    if (AJAXErrorData.toString().indexOf("Password") > -1)
+    {
+        AJAXErrorData = new Object();
+    }
+ 
     if (AJAXErrorURL == null)
     {
         return;
     }
-
-
 
     $.ajax({
         url: ServicePrefix + '/api/Email/EmailAPIError',

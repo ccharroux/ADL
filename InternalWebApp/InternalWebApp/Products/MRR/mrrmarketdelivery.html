@@ -127,7 +127,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2 id="pageTitle">Market Delivery - MRR</h2>
+                        <h2 id="pageTitle">Report Delivery - MRR</h2>
                     </div>
                 </div>
                 <div id="divQuickReport">
@@ -444,6 +444,8 @@
                 {
                     mRender: function (data, type, row)
                     {
+                        var snapshotLink = '<br><a href="/products/mrr/mrrsnapshot.html?marketId=' + getIDFromString(row['Market']) + "&Year=" + currentRevenueYear() + "&Period=" + currentRevenuePeriod() + '">View Snapshot</a>';
+
                         var textPartnerReview = '<a href="#" onclick="partnerApprovedMarket('
                                         + row["Market ID"]
                                         + ',' + row["Revision"]
@@ -453,12 +455,18 @@
 
                         if (partnerReview == true)
                         {
-
+                            var notifyLink = '';
                             var message = '';
 
                             if (row['isPartner'] == false)
                             {
                                 message = 'Approve without Partner';
+                                notifyLink = '<br><a href="#" onclick="NotifyPartner(';
+                                notifyLink = notifyLink + "'" + row["Partner"] + "', ";
+                                notifyLink = notifyLink + "'" + row["Market"] + "'";
+                                notifyLink = notifyLink + ')">';
+                                notifyLink = notifyLink + "Notify Partner</a>";
+ 
                             }
                             else
                             {
@@ -468,7 +476,8 @@
                             var textPartnerReview = textPartnerReview + message;
 
                             textPartnerReview = textPartnerReview + '</a>';
-                            return textPartnerReview;
+                            // EXIT
+                            return textPartnerReview + notifyLink + snapshotLink;
                         }
                         else {
 
@@ -484,7 +493,8 @@
                                     + row["Market ID"]
                                     + ',\'' + encodeURI(row["Market"]) + '\''
                                     + ')">Re-send to Individuals</a>';
-                                return textReleased;
+                                // EXIT
+                                return textReleased + snapshotLink;
                             }
 
                             var textUnreleased = '<a href="#" onclick="releaseMarket('
@@ -502,8 +512,8 @@
                                     + ', \'' + modeSilent + '\''
                                     + ')">Release without Email</a>';
                             }
-
-                            return textUnreleased;
+                            // EXIT
+                            return textUnreleased + snapshotLink;
                         }
                     },
                     "orderable": false,
@@ -751,7 +761,7 @@
 
         var dtMarketDeliveryList = dtMarketDeliveryListId(partnerReview);
 
-        var reportTitle = "Market Delivery List";
+        var reportTitle = "Report Delivery List";
         var exportColumns = returnTableColumnsByClass(dtMarketDeliveryList, "exportColumn");
 
         if (initializedDataTable == false && partnerReview == false)
@@ -1775,4 +1785,50 @@
         getMarketDeliveryList();
     }
 
+    function NotifyPartner(Partner, Market)
+    {
+
+        var url = ServicePrefix + '/api/Partner/InsertPartnerAwaitingReleaseNotification';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": "MRR",
+                "inMarket": Market,
+                "inPartner": Partner
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                NotifyPartnerSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function NotifyPartnerSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        window.setTimeout(function () {
+            bootbox.hideAll();
+        }, 2500); // 1
+
+        bootbox.dialog({
+            closeButton: false,
+            title: "Success",
+            message: " E-Mail Notification sent" 
+
+        });
+
+ 
+    }
 </script>
