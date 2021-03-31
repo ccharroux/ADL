@@ -3507,6 +3507,14 @@
  
         resetDataTableDOM("dtResults", "dtResultsHolder", "cell-border");
 
+        // If relevant, patch in a footer section so it can be populated
+        // Possible future improvement: generalize this to .generic-report-footer, also in genericReport.js / xrygenericreport.html / dmagenericreport.html
+        var hasFooter = false;
+        if (reportObject.footerFormat !== "undefined" && $(".rev-research-footer").length === 0) {
+            hasFooter = true;
+            $("#dtResults").append(reportObject.footerFormat);
+        }
+
         //this code rebuilds the datatable with the updated data from the search 
         //or initial load.
         //"dom": '<"top"iflp<"clear">>rt<"bottom"iflp<"clear">>',
@@ -3519,6 +3527,8 @@
 
             "columns": columns,
             "select": true,
+            "footer": hasFooter,
+            "footerCallback": reportObject.footerCallback,
             language: {
                 search: "Filter Results:"
             },
@@ -3539,7 +3549,8 @@
                    title: reportObject.reportTitle,
                    exportOptions: {
                        columns: columnsToExport
-                   }
+                   },
+                   footer: hasFooter
                },
                //{
                //    extend: 'pdf',
@@ -3565,7 +3576,8 @@
                    exportOptions: {
                        columns: columnsToExport
  
-                   }
+                   },
+                   footer: hasFooter
                }
             ]
         });

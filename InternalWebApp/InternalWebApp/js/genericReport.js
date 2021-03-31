@@ -9496,8 +9496,82 @@ function getReportObject_RepBillingCompareList() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['tvb', 'TVB Data Review', 'old admin'],
-        sortable: true
+        sortable: true,
+        // Possible future improvement: generalize this to .generic-report-footer, also in genericreport.html / xrygenericreport.html / dmagenericreport.html)
+        footerFormat: '<tfoot class="rev-research-footer" style="display: none"><tr>'
+            + '<th>Totals</th>' // market
+            + '<th></th>' // owner
+            + '<th></th>' // station
+            + '<th></th>' // rep firm
+            + '<th></th>' // national non-political current
+            + '<th></th>' // national non-political prior
+            + '<th></th>' // national non-political growth
+            + '<th></th>' // national political current
+            + '<th></th>' // national political prior
+            + '<th></th>' // national political growth
+            + '<th></th>' // national time sales current
+            + '<th></th>' // national time sales prior
+            + '<th></th>' // national time sales growth
+            + '</tr></tfoot>',
+        footerCallback: function (row, data, start, end, display) {
 
+            $(".rev-research-footer").show();
+
+            var api = this.api();
+
+            // Remove the formatting to get integer data for summation
+            var intVal = function (i) {
+                return typeof i === 'string' ?
+                    i.replace(/[\$,]/g, '') * 1 :
+                    typeof i === 'number' ?
+                    i : 0;
+            };
+
+            // DataTables approach runs into https://datatables.net/manual/tech-notes/4 for some reason
+            //var columnsWithTotals = [
+            //    4, // national non-political current
+            //    5, // national non-political prior
+            //    7, // national political current
+            //    8, // national political prior
+            //    10, // national time sales current
+            //    11 // national time sales prior
+            //];
+            //columnsWithTotals.forEach(function (currentColumn) {
+            //    var totalAmount = api.column(currentColumn).data().reduce(function (a, b) {
+            //        return intVal(a) + intVal(b);
+            //    }, 0);
+            //    $(api.column(currentColumn).footer()).html(
+            //        totalAmount.toLocaleString('en-US', {
+            //            style: 'currency',
+            //            currency: 'USD',
+            //            minimumFractionDigits: 0
+            //        })
+            //    );
+            //});
+
+            var columnsWithTotals = [
+                [4, "National Non-Political Current"],
+                [5, "National Non-Political Prior"],
+                [7, "National Political Current"],
+                [8, "National Political Prior"],
+                [10, "National Time Sales Current"],
+                [11, "National Time Sales Prior"]
+            ];
+            columnsWithTotals.forEach(function (currentColumn) {
+                var totalAmount = 0;
+                data.forEach(function (currentRow) {
+                    totalAmount += intVal(currentRow[currentColumn[1]]);
+                });
+                $(api.column(currentColumn[0]).footer()).html(
+                    totalAmount.toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 0
+                    })
+                );
+            });
+
+        }
     }
 
     return tempObject;
