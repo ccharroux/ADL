@@ -1711,10 +1711,21 @@
     }
     function getProductList(inProduct)
     {
+ 
+        var productArray = new Array();
+        var workingProduct = "";
 
         if (!inProduct)
         {
             inProduct = "";
+        }
+
+        if (Array.isArray(inProduct) == true) {
+            productArray = inProduct;
+        }
+        else
+        {
+            workingProduct = inProduct;
         }
 
         $.ajax({
@@ -1734,19 +1745,33 @@
                 else {
 
                     var str = '';
-                    if (inProduct == "") {
+
+                    if (workingProduct == "" || productArray.length > 0)
+                    {
                         str = '<option value="">-- Select a Product --</option>';
                     }
 
                     $.each(data.report.rows, function (index) {
 
-                        if (inProduct == "")
+                        if (productArray.length > 0)
+                        {
+                            var id = data.report.rows[index].P_ProductID.toUpperCase();
+                            
+                            if (productArray.indexOf(id) > -1)
+                            {
+                                workingProduct = id;
+                            }
+                            console.log(workingProduct);
+ 
+                        }
+
+                        if (workingProduct == "")
                         {
                             str = str + '<option value="' + data.report.rows[index].P_ProductID + '">' + data.report.rows[index].P_ProductName + '</option>';
                         }
                         else
                         {
-                            if (inProduct.toUpperCase() == data.report.rows[index].P_ProductID.toUpperCase())
+                            if (workingProduct.toUpperCase() == data.report.rows[index].P_ProductID.toUpperCase())
                             {
                                 str = str + '<option value="' + data.report.rows[index].P_ProductID + '">' + data.report.rows[index].P_ProductName + '</option>';
                             }
