@@ -37,6 +37,8 @@
     <!-- Theme style  -->
     <link rel="stylesheet" href="/css/style.css">
 
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
     <!--Chosen Dropdown-->
     <link rel="stylesheet" href="/css/chosen.min.css" />
 
@@ -253,8 +255,30 @@
                         </div>
                     </div>
 
-</div>
+                </div>
 
+            </div>
+        </div>
+
+        <div id="marketOnHoldDateDialog" title="" style="display:none">
+            <div class="row">
+                <div class="col-md-2 marketOnHoldDateLabel">Market:</div>
+                <div class="col-md-7 marketOnHoldDateValue"><span id="spanMarketOnHoldDate_Market"></span></div>
+            </div>
+            <div class="row">
+                <div class="col-md-2 marketOnHoldDateLabel">Product:</div>
+                <div class="col-md-7 marketOnHoldDateValue"><span id="spanMarketOnHoldDate_Product"></span></div>
+            </div>
+            <div class="row">
+                <div class="col-md-2 marketOnHoldDateLabel">Hold Date:</div>
+                <div class="col-md-7 marketOnHoldDateValue"><input type="text" id="dtMarketOnHoldDate_Date" /></div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 col-md-offset-9">
+                    <input type="button" onclick="productMarketOnHoldConfirm();" Value="Confirm" />
+                    <br /> &nbsp; <br />
+                    <input type="button" onclick="productMarketOnHoldCancel();" Value="Cancel" />
+                </div>
             </div>
         </div>
 
@@ -282,6 +306,9 @@
     <!-- partner JS -->
     <script src="/js/partner.js"></script>
 
+    <!-- jQuery UI -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
     <!--Chosen Dropdown-->
     <script src="/js/chosen.jquery.min.js"></script>
 
@@ -296,6 +323,7 @@
     $(document).ready(function () {
 
         buildMainMenu("Markets");
+        buildUIDialogs();
         marketId = (getParameterByName("MarketID") == null ? 0 : getParameterByName("MarketID"));
         bSecondaryMarketsOnly = (getParameterByName("NonPrimaryOnly") == null ? false : (getParameterByName("NonPrimaryOnly").toLowerCase() === 'true'));
 
@@ -332,6 +360,22 @@
         loadFeatureButtons();
 
     });
+
+    function buildUIDialogs() {
+        $(function () {
+            $("#marketOnHoldDateDialog").dialog({
+                autoOpen: false,
+                resizable: false,
+                width: 700,
+                height: 500,
+                modal: true,
+                title: "Market on Hold",
+                create: function (event, ui) {
+                    $(event.target).parent().css('position', 'fixed');
+                }
+            });
+        });
+    }
 
     function checkForInsertOrUpdate() {
         if (marketId == 0 || marketId == null) {
@@ -564,9 +608,9 @@
 
             $("#productList").html("");
 
-            var holdOwnerID = "0";
+            //var holdOwnerID = "0";
             var productList = "";
-            var holdObject = new Object();
+            //var holdObject = new Object();
 
 
             $.each(data.report.rows, function (index) {
@@ -580,7 +624,7 @@
                 // product name
                 str = str + '<div class="col-md-3" style="text-align:left">';
                 str = str + productId + " - " + obj.P_ProductName;
-                str = str + "<div id='productOnHoldMessage" + productId + "' class='hidden'><font color='red'>ON HOLD</font></div>";
+                str = str + "<div id='productOnHoldMessage" + productId + "' class='hidden'><font color='red'>ON HOLD as of <span id='productOnHoldDate" + productId + "'></span></font></div>";
 
                 str = str + '</div>';
 
@@ -596,6 +640,14 @@
                     '\'' +
                     productId +
                     '\', true)" Value="Put on Hold" />';
+                // adjust hold date button
+                str = str +
+                    '<input type="button"  id="productAdjustHoldDate' +
+                    productId +
+                    '" class="hidden productOnHoldButtonClass" onClick="productMarketOnHold(' +
+                    '\'' +
+                    productId +
+                    '\', true)" Value="Adjust Hold Date" />';
                 // OFF hold button
                 str = str +
                     '<input type="button"  id="productOffHold' +
@@ -603,7 +655,9 @@
                     '" class="hidden productOffHoldButtonClass" style="background-color:red" onClick="productMarketOnHold(' +
                     '\'' +
                     productId +
-                    '\', false)" Value="Remove Hold" />'; str = str + '</div>';
+                    '\', false)" Value="Remove Hold" />';
+
+                str = str + '</div>';
 
 
 
@@ -735,6 +789,8 @@
 
                 if (obj.onHoldFlag == true)
                 {
+                    $("#productOnHoldDate" + productId).text(obj.onHoldDate.substr(0, 10)); // e.g. "2019-02-11T00:00:00"
+                    $("#productAdjustHoldDate" + productId).removeClass('hidden');
                     $("#productOffHold" + productId).removeClass('hidden');
                     $("#productOnHoldMessage" + productId).removeClass('hidden');
                 }
@@ -1275,9 +1331,49 @@
         getPartnersListForUpdating(marketId);
     }
 
-    function productMarketOnHold(productId, onHoldFlag)
-    {
+    function currentDate() {
+        var d = new Date();
+        var currentMonth = d.getMonth() + 1;
+        var currentDay = d.getDate(); // getDay() = day of week
+        var currentYear = d.getFullYear();
+        return currentMonth + "/" + currentDay + "/" + currentYear;
+    }
 
+    function productMarketOnHold(productId, onHoldFlag) {
+        if (onHoldFlag == false) {
+            productMarketOnHoldConfirmed(productId, onHoldFlag);
+            return;
+        }
+
+        var alreadyOnHold = false;
+        var holdDate = $("#productOnHoldDate" + productId).text();
+        if (holdDate == "") {
+            holdDate = currentDate();
+        } else {
+            alreadyOnHold = true;
+        }
+
+        $("#spanMarketOnHoldDate_Market").text($("#txtMarketName").val());
+        $("#spanMarketOnHoldDate_Product").text(productId);
+        $("#dtMarketOnHoldDate_Date").val(holdDate);
+        $("#dtMarketOnHoldDate_Date").datepicker();
+        $("#marketOnHoldDateDialog").dialog({
+            "title": (alreadyOnHold ? "Adjust Hold Date" : "Put Market on Hold")
+        });
+        $("#marketOnHoldDateDialog").dialog("open");
+    }
+
+    function productMarketOnHoldConfirm() {
+        var productId = $("#spanMarketOnHoldDate_Product").text();
+        productMarketOnHoldConfirmed(productId, true);
+    }
+
+    function productMarketOnHoldCancel() {
+        $("#marketOnHoldDateDialog").dialog("close");
+    }
+
+    function productMarketOnHoldConfirmed(productId, onHoldFlag)
+    {
         var url = ServicePrefix + '/api/Market/UpdateMarketOnHold';
 
         var settings = {
@@ -1288,7 +1384,8 @@
                 "inApiToken": getLocalStorage("APIToken"),
                 "inProductId": productId,
                 "inMarketId": marketId,
-                "inMarketOnHold" : onHoldFlag
+                "inMarketOnHold": onHoldFlag,
+                "inHoldDate": $("#dtMarketOnHoldDate_Date").val()
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
