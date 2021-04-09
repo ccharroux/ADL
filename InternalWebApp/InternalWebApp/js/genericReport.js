@@ -254,6 +254,13 @@ reportName.push("rptMRRStationRevenueYTDByMediaType");
 reportName.push("rptDMXParentMarketExclusivitySettings");
 
 reportName.push("rptMarketHoldList");
+reportName.push("rptStationParticipationDMX");
+reportName.push("rptStationParticipationDMA");
+reportName.push("rptStationParticipationTVB");
+reportName.push("rptStationParticipationXRY");
+reportName.push("rptStationParticipationMRR");
+
+
 
 function buildReportArray()
 {
@@ -292,6 +299,7 @@ function buildReportObjectArray()
     for (var x = 0; x < reportName.length; x++)
     {
         var module = reportName[x].replace("rpt", "");
+        console.log(module);
         arrayObject = window[("getReportObject_" + module)]();
         arrayObject.filters = window[("getReportFilterArray_" + module)]();
         reportObjectArray.push(arrayObject);
@@ -13667,4 +13675,220 @@ function getReportObject_MarketHoldList() {
 
     return tempObject;
 
+}
+ 
+function getReportFilterArray_StationParticipationDMA() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        jsCallParameters: ['DMA'],
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        jsCallParameters: ['DMA'],
+        objectName: "ddlParentMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_StationParticipationDMA() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject = {
+        reportTitle: "DMA Station Participation",
+        apiControllerAction: '/api/ProductReport/GetStationParticipationByProduct',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['dma', 'station'],
+        sortable: true,
+        approved: false,
+        visible: true
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_StationParticipationDMX() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+    arrayObject = {
+        token: "ParentMarket",
+        jsCall: "getParentMarketList",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlParentMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_StationParticipationDMX() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject = {
+        reportTitle: "DMX Station Participation",
+        apiControllerAction: '/api/ProductReport/GetStationParticipationByProduct',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['dmx', 'station'],
+        sortable: true,
+        approved: false,
+        visible: true
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_StationParticipationXRY() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['XRY'],
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_StationParticipationXRY()
+{
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject = {
+        reportTitle: "XRY Station Participation",
+        apiControllerAction: '/api/ProductReport/GetStationParticipationByProduct',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['XRY', 'station'],
+        sortable: true,
+        approved: false,
+        visible: true
+    }
+
+    return tempObject;
+}
+
+function getReportFilterArray_StationParticipationMRR() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+ 
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        jsCallParameters: ['MRR'],
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['MRR'],
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_StationParticipationMRR() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject = {
+        reportTitle: "MRR Station Participation",
+        apiControllerAction: '/api/ProductReport/GetStationParticipationByProduct',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['MRR', 'station'],
+        sortable: true,
+        approved: false,
+        visible: true
+    }
+
+    return tempObject;
+}
+function getReportFilterArray_StationParticipationTVB() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductList",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProduct",
+        jsCallParameters: ['TVB'],
+        objectName: "ddlMarket",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_StationParticipationTVB() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject = {
+        reportTitle: "TVB Station Participation",
+        apiControllerAction: '/api/ProductReport/GetStationParticipationByProduct',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['TVB', 'station'],
+        sortable: true,
+        approved: false,
+        visible: true
+    }
+
+    return tempObject;
 }
