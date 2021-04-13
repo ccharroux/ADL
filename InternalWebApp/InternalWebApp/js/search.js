@@ -900,8 +900,23 @@ function buildParentAgencySearch(searchCriteria) {
         "className": "text-align-right"
     });
 
+    if (searchCriteria["linkParentAgencyName"].length > 0)
+    {
+        $("#previousPage").html(searchCriteria["linkParentAgencyName"]);
+    }
+
+    if (searchCriteria["agencyName"] != undefined && searchCriteria["agencyName"].length > 0)
+    {
+        $("#previousPage").html(searchCriteria["agencyName"]);
+    }
+
+    if (searchCriteria["parentAgencyName"] != undefined && searchCriteria["parentAgencyName"].length > 0) {
+        $("#previousPage").html(searchCriteria["parentAgencyName"]);
+    }
+
+
     //need to document this more
-    $("#previousPage").html(searchCriteria["linkParentAgencyName"].length > 0 ? searchCriteria["linkParentAgencyName"] : searchCriteria["agencyName"]);
+    //$("#previousPage").html(searchCriteria["linkParentAgencyName"].length > 0 ? searchCriteria["linkParentAgencyName"] : searchCriteria["agencyName"]);
 }
 
 function buildParentAgencyAuditSearch(searchCriteria) {
