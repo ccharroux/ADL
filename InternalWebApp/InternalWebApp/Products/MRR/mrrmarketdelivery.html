@@ -175,15 +175,19 @@
                         </center>
                         <hr />
                     </div>
-                    <div class="col-md-12 releaseOwnerGroups">
+                    <div class="col-md-12">
                         <center>
                             <div>
                                 <div class="col-md-6">
                                     &nbsp;
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-3 releaseOwnerGroups">
                                     <input type="button" id="btnReleaseOwnerGroups" onclick="releaseOwnerGroups()" value="Deliver Ownership Groupings" />
                                 </div>
+                                <div class="col-md-3">
+                                    <input style="" id="btnReleaseAllMarkets" type="button" value="Release All Markets" onclick="releaseAllMarketsBulkInitiate();"/>
+                                </div>
+
                             </div>
                         </center>
                     </div>
@@ -198,17 +202,18 @@
                     <div class="col-md-12">
                         <table id="dtMarketDeliveryList" class="dataTable-border dataTable-headers dataTable-cell-border">
                             <thead>
-                                <tr>
-                                    <th class="exportColumn marketNameColumn">Market</th>
-                                    <th class="exportColumn dateColumn">Ranked On</th>
-                                    <th class="exportColumn dateColumn">Approved On</th>
-                                    <th class="exportColumn dateColumn">Delivered On</th>
-                                    <th class="exportColumn text-align-right revisionColumn">Revision</th>
-                                    <th class="exportColumn clientCommentColumn">Client Comment</th>
-                                    <th class="exportColumn mediaTypeColumn">Media</th>
-                                    <th class="exportColumn partnerColumn">Partner</th>
-                                    <th class="actionColumn"></th>
-                                </tr>
+                            <tr>
+                                <th class="allMarketsColumnChkBox"><input type="checkbox" id="chkSelectAllReleasableMarkets" onclick="mrrReleaseSelectAllChecked(this);" /></th>
+                                <th class="exportColumn marketNameColumn">Market</th>
+                                <th class="exportColumn dateColumn">Ranked On</th>
+                                <th class="exportColumn dateColumn">Approved On</th>
+                                <th class="exportColumn dateColumn">Delivered On</th>
+                                <th class="exportColumn text-align-right revisionColumn">Revision</th>
+                                <th class="exportColumn clientCommentColumn">Client Comment</th>
+                                <th class="exportColumn mediaTypeColumn">Media</th>
+                                <th class="exportColumn partnerColumn">Partner</th>
+                                <th class="actionColumn"></th>
+                            </tr>
                             </thead>
 
                         </table>
@@ -245,17 +250,18 @@
                         <div class="col-md-12">
                             <table id="dtMarketDeliveryListPartnerReview" class="dataTable-border dataTable-headers dataTable-cell-border">
                                 <thead>
-                                    <tr>
-                                        <th class="exportColumn marketNameColumn">Market</th>
-                                        <th class="exportColumn dateColumn">Ranked On</th>
-                                        <th class="exportColumn dateColumn">Approved On</th>
-                                        <th class="exportColumn dateColumn">Delivered On</th>
-                                        <th class="exportColumn text-align-right revisionColumn">Revision</th>
-                                        <th class="exportColumn clientCommentColumn">Client Comment</th>
-                                        <th class="exportColumn mediaTypeColumn">Media</th>
-                                        <th class="exportColumn partnerColumn">Partner</th>
-                                        <th class="actionColumn"></th>
-                                    </tr>
+                                <tr>
+                                    <th class="allMarketsColumnChkBox"><input type="checkbox" id="chkSelectAllReleasableMarketsPartner" onclick="mrrReleaseSelectAllChecked(this);" /></th>
+                                    <th class="exportColumn marketNameColumn">Market</th>
+                                    <th class="exportColumn dateColumn">Ranked On</th>
+                                    <th class="exportColumn dateColumn">Approved On</th>
+                                    <th class="exportColumn dateColumn">Delivered On</th>
+                                    <th class="exportColumn text-align-right revisionColumn">Revision</th>
+                                    <th class="exportColumn clientCommentColumn">Client Comment</th>
+                                    <th class="exportColumn mediaTypeColumn">Media</th>
+                                    <th class="exportColumn partnerColumn">Partner</th>
+                                    <th class="actionColumn"></th>
+                                </tr>
                                 </thead>
 
                             </table>
@@ -286,6 +292,21 @@
                 </div>
                 <hr />
                 (Cancel = do not send emails at all - market is still released)
+            </center>
+        </div>
+        
+        <div id="allMarketCommentDialog" title="" style="display:none">
+            <center>
+                <textArea style="width:100%;overflow:auto" maxlength="250" id="allMarketComment" placeholder="Enter release comment here..."></textArea>
+                <hr />
+                <div style="margin-top:5px;margin-bottom:5px">
+                    <input type="button" id="btnAllMarketProcess" value="Process" onclick="allMarketCommentProcess()" \>
+                </div>
+                <div style="margin-top:5px;margin-bottom:5px">
+                    <input type="button" id="btnAllMarketCancel" value="Cancel" onclick="allMarketCommentCancel()" \>
+                </div>
+                <hr />
+                (Cancel = do not send emails at all - market(s) are still released)
             </center>
         </div>
 
@@ -353,6 +374,11 @@
     var modeSilent = "silent";
     var modeReDeliver = "redeliver";
 
+    var currentDataTable = "";
+    var iTotalReleasableMarkets = 0;
+
+    var currentMarketList = new Array();
+
     $(document).ready(function () {
 
         getMarketList();
@@ -396,6 +422,18 @@
                     $(event.target).parent().css('position', 'fixed');
                 }
             });
+
+            $("#allMarketCommentDialog").dialog({
+                autoOpen: false,
+                resizable: false,
+                width: 600,
+                height: 350,
+                modal: true,
+                title: "Enter Comment for All Markets being released to include in notifications (optional)",
+                create: function (event, ui) {
+                    $(event.target).parent().css('position', 'fixed');
+                }
+            });
         });
     }
 
@@ -429,10 +467,26 @@
 
         var dtMarketDeliveryList = dtMarketDeliveryListId(partnerReview);
 
+        currentDataTable = dtMarketDeliveryList;
+
         $("#" + dtMarketDeliveryList).DataTable({
             "dom": "Blfrtip",
             "pageLength": gDataTableDefaultRows,
             "columns": [
+                {
+                    mRender: function (data, type, row) {
+                        if (partnerReview == false && row["Delivered On"] == null)
+                        {
+                            $("#btnReleaseAllMarkets").show();
+                            return '<input type="checkbox" id="chkMarket_' + row["Market ID"] + '" class="releasable-market" onclick="checkOnSelectAllMarketBox();" />';
+                        } else {
+                            //return '<input type="checkbox" id="chkMarket_' + row["Market ID"] + '" class="unreleasable-market" disabled />';
+                            return '';
+                        }
+                    },
+                    "orderable": false,
+                    "searchable": false
+                },
                 { "data": 'Market' },
                 { "data": 'Ranked On' },
                 { "data": 'Approved On' },
@@ -523,8 +577,12 @@
             ],
             "columnDefs": [
                 {
+                    "targets": [0],
+                    "className": "allMarketsColumnChkBox text-align-center"
+                },
+                {
                     "targets": [
-                        4 // Revision
+                        5 // Revision
                     ],
                     "className": "text-align-right"
                 }
@@ -1082,12 +1140,14 @@
         currentMarketName = decodeURI(marketName);
         currentMode = mode;
 
-        var currentMessage = "Release " + currentMarketName + " for " + currentYearPeriodText() + " and email recipients?"
-        if (mode == modeSilent) {
-            var currentMessage = "Release " + currentMarketName + " for " + currentYearPeriodText() + " WITHOUT emailing recipients?"
+        var currentMessage = "Release " + currentMarketName + " for " + currentYearPeriodText() + " and email recipients?";
+        if (mode == modeSilent)
+        {
+            var currentMessage = "Release " + currentMarketName + " for " + currentYearPeriodText() + " WITHOUT emailing recipients?";
         }
-        if (mode == modeReDeliver) {
-            var currentMessage = "Re-release to recipients for " + currentMarketName + " for " + currentYearPeriodText() + "?"
+        if (mode == modeReDeliver)
+        {
+            var currentMessage = "Re-release to recipients for " + currentMarketName + " for " + currentYearPeriodText() + "?";
         }
 
         bootbox.confirm({
@@ -1676,6 +1736,7 @@
             mediaTypeQualifier() + "stations are ready for next submission cycle"
         );
     }
+
     function getMarketList() {
 
         $.ajax({
@@ -1831,4 +1892,367 @@
 
  
     }
+
+    function mrrReleaseSelectAllChecked(selectAllBox) {
+        iTotalReleasableMarkets = 0;
+
+        var table = $("#" + currentDataTable).DataTable();
+
+        table.rows().every(function (index, element) {
+            var row = $(this.node());
+            var statusElement = row.find('td').eq(0);
+
+            var inputCheckbox = $(statusElement).find("input");
+
+            var sClassName = ""; 
+
+            if (inputCheckbox.length > 0)
+            {
+                sClassName = inputCheckbox[0].className;
+            }
+
+            if ($(selectAllBox).is(':checked')) {
+                if (sClassName.toLowerCase() === "releasable-market") {
+                    iTotalReleasableMarkets++;
+                    $(inputCheckbox[0]).prop('checked', true);
+                }
+            } else {
+                if (sClassName.toLowerCase() === "releasable-market") {
+                    $(inputCheckbox[0]).prop('checked', false);
+                }
+            }
+        });
+    }
+
+    function checkOnSelectAllMarketBox()
+    {
+        var partnerReview = currentDataTable === "dtMarketDeliveryListPartnerReview" ? true : false;
+
+        var iCheckedItems = 0;
+        var table = $("#" + currentDataTable).DataTable();
+
+        table.rows().every(function (index, element) {
+            var row = $(this.node());
+            var statusElement = row.find('td').eq(0);
+
+            var inputCheckbox = $(statusElement).find("input");
+
+            var sClassName = "";
+
+            if (inputCheckbox.length > 0)
+            {
+                sClassName = inputCheckbox[0].className;
+            }
+
+            if (sClassName.toLowerCase() === "releasable-market") {
+                if ($(inputCheckbox[0]).is(':checked')) {
+                    iCheckedItems++;
+                }
+            }
+        });
+
+        if (iTotalReleasableMarkets === iCheckedItems) {
+            if (partnerReview)
+            {
+                $("#chkSelectAllReleasableMarketsPartner").prop('checked', true);
+            } else
+            {
+                $("#chkSelectAllReleasableMarkets").prop('checked', true);
+            }
+        } else {
+            if (partnerReview) {
+                $("#chkSelectAllReleasableMarketsPartner").prop('checked', false);
+            } else {
+                $("#chkSelectAllReleasableMarkets").prop('checked', false);
+            }
+        }
+    }
+
+    function releaseAllMarketsBulkInitiate()
+    {
+        //get number of markets and ask if you would like to release this #
+        //build the array of information
+        //validate recipients only -- need to check this out more (do we need this)
+        //UpdateMarketYearPeriodRelease
+        //display box saying how many released out of how many sent
+        //notify recipients
+        //display box saying how many released out of how many sent
+
+        currentMode = modeRelease;
+
+        currentMarketList = new Array();
+
+        currentMarketList = getAllMarketsToBeReleased();
+
+        if (currentMarketList.length === 0) {
+            bootbox.alert("Please select at least one (1) market to release.");
+            return;
+        }
+
+        var currentMessage = "Do you want to release " + currentMarketList.length;
+        var sMarkets = currentMarketList.length > 1 ? " markets" : " market";
+        currentMessage += sMarkets;
+        currentMessage += "?";
+
+        bootbox.confirm({
+            message: currentMessage,
+            callback: function (confirmed) {
+                if (confirmed) {
+                    //call a new api to validate the recipients??
+                    validateAllRecipients();
+                } else {
+                    clearCurrentSettings();
+                    return;
+                }
+            }
+        });
+
+
+    }
+
+    function getAllMarketsToBeReleased()
+    {
+        var marketList = new Array();
+
+        var table = $("#" + currentDataTable).DataTable();
+
+        table.rows().every(function (index, element) {
+            var row = $(this.node());
+
+            var statusElement = row.find('td').eq(0);
+
+            var inputCheckbox = $(statusElement).find("input");
+
+            if ($(inputCheckbox[0]).is(':checked')) {
+                var rData = this.data();
+
+                marketList.push({
+                    "inMarketId": rData["Market ID"],
+                    "inMarketName": rData["Market"],
+                    "inIsRevision": rData["Revision"] > 0,
+                    "inRevision": rData["Revision"]
+                });
+            }
+
+        });
+
+        return marketList;
+    }
+
+    function validateAllRecipients()
+    {
+        //on success record as released 
+        var url = ServicePrefix + '/api/MRR/InsertMarketDeliveryNotificationsIntoQueueByMarketList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod(),
+                "inMarkets": currentMarketList,
+                "inValidateOnly": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                validateRecipientsByMarketListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+    }
+
+    function validateRecipientsByMarketListSuccess(data, textStatus, jQxhr)
+    {
+        if (data.response.status == "FAIL") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.response.status == "BLOCK") {
+            bootbox.alert(data.response.errorMessage[0]);
+            return;
+        }
+
+        setAllMarketsToReleasedByMarketList();
+    }
+
+    function setAllMarketsToReleasedByMarketList()
+    {
+        //UpdateMarketYearPeriodReleaseByMarketList
+        //on success
+        //display a prompt to add to the message for all the markets
+        //save the update
+        //on success send the emails
+        var url = ServicePrefix + '/api/MRR/UpdateMarketYearPeriodReleaseByMarketList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod(),
+                "inMarkets": currentMarketList
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                updateMarketYearPeriodAsReleasedByMarketListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function updateMarketYearPeriodAsReleasedByMarketListSuccess(data, textStatus, jQxhr)
+    {
+        if (data.response.status == "FAIL") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.response.status == "BLOCK") {
+            bootbox.alert(data.response.errorMessage[0]);
+            return;
+        }
+
+        //display message box
+        //save message
+        //send release notifications
+        window.setTimeout(function () {
+            bootbox.hideAll();
+            prepToSendEmailToMarketRecipientsByMarketList();
+        }, 2500); // 1
+
+        var marketLength = currentMarketList.length;
+
+        bootbox.dialog({
+            closeButton: false,
+            title: "Market Revenue Reporting",
+            message:  marketLength + " markets are released for " + currentYearPeriodText()//,
+
+        });
+        
+    }
+
+    function prepToSendEmailToMarketRecipientsByMarketList()
+    {
+        $("#allMarketCommentDialog").dialog("open");
+    }
+
+    function allMarketCommentCancel() {
+        $("#allMarketCommentDialog").dialog("close");
+    }
+
+    function allMarketCommentProcess() {
+        $("#allMarketCommentDialog").dialog("close");
+        updateAllMarketsCommentByMarketList();
+    }
+
+    function updateAllMarketsCommentByMarketList()
+    {
+        //save comment for each market
+        var url = ServicePrefix + '/api/MRR/UpdateMarketYearPeriodClientRevisionMessageByMarketList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod(),
+                "inMessage": $("#allMarketComment").val(),
+                "inMarkets": currentMarketList
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                updateClientCommentByMarketListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+
+        //send emails
+    }
+
+    function updateClientCommentByMarketListSuccess(data, textStatus, jQxhr)
+    {
+        if (data.response.status == "FAIL") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.response.status == "BLOCK") {
+            bootbox.alert(data.response.errorMessage[0]);
+            return;
+        }
+
+        sendEmailToMarketRecipientsByMarketList();
+    }
+
+    function sendEmailToMarketRecipientsByMarketList()
+    {
+        var url = ServicePrefix + '/api/MRR/InsertMarketDeliveryNotificationsIntoQueueByMarketList';
+
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inYear": currentRevenueYear(),
+                "inPeriod": currentRevenuePeriod(),
+                "inMarkets": currentMarketList,
+                "inValidateOnly": false
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                sendEmailToMarketRecipientsByMarketListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        };
+
+        $.ajax(url, settings);
+    }
+
+    function sendEmailToMarketRecipientsByMarketListSuccess(data, textStatus, jQxhr)
+    {
+        if (data.response.status == "FAIL") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        if (data.response.status == "BLOCK") {
+            bootbox.alert(data.response.errorMessage[0]);
+            return;
+        }
+
+        window.setTimeout(function () {
+            bootbox.hideAll();
+            checkOwnerGroupsOkayToRelease();
+        }, 2500); // 1
+
+        bootbox.dialog({
+            closeButton: false,
+            title: "Market Revenue Reporting",
+            message: "Market Recipients for the selected markets have been notified that the market has been released for " + currentYearPeriodText()
+        });
+    }
+
 </script>

@@ -272,11 +272,11 @@ function fixAgency() {
     });
 }
 
-function linkParentAdvertiserByLink(parentAdvertiserId, industryId, subIndustryId)
+function linkParentAdvertiserByLink(parentAdvertiserId, industryId, subIndustryId, replacingParent)
 {
 
-    if (((parentIndustryId).toUpperCase().trim() != industryId.toUpperCase().trim()) ||
-        ((parentSubIndustryId).toUpperCase().trim() != subIndustryId.toUpperCase().trim())
+    if (replacingParent == false && (((parentIndustryId).toUpperCase().trim() != industryId.toUpperCase().trim()) ||
+        ((parentSubIndustryId).toUpperCase().trim() != subIndustryId.toUpperCase().trim()))
        )
     {
         var msg = "";
@@ -708,6 +708,13 @@ function buildParentAdvertiserSearch(searchCriteria) {
     //console.log(parentIndustryId);
     //console.log(parentSubIndustryId);
 
+    var replacingParent = false;
+
+    if (searchCriteria["deactivatingParent"] != undefined)
+    {
+        replacingParent = searchCriteria["deactivatingParent"];
+    }
+
     $(".search-check-box").hide();
 
     if ($('.search-text:visible').val().length > 0) {
@@ -769,6 +776,7 @@ function buildParentAdvertiserSearch(searchCriteria) {
             return '<a href="#" onclick="linkParentAdvertiserByLink(' + row.parentAdvertiserId +
                 ",'" + row.industryId +
                 "', '" + row.subIndustryId + "'" +
+                ", " + replacingParent +
                 ')">Assign Parent Advertiser</a>';
         },
         "orderable": false,
@@ -776,9 +784,21 @@ function buildParentAdvertiserSearch(searchCriteria) {
         "className": "text-align-right"
     });
 
-    //need to document this more
-    $("#previousPage").html(searchCriteria["advertiserName"] + '  (<i><font size="2">' + searchCriteria["industryName"] + '  /  ' + searchCriteria["subIndustryName"] + '</font></i>)');
+    if (searchCriteria["linkParentAdvertiserName"] != undefined &&
+        searchCriteria["linkParentAdvertiserName"].length > 0)
+    {
+        $("#previousPage").html(searchCriteria["linkParentAdvertiserName"] + '  (<i><font size="2">' + searchCriteria["industryName"] + '  /  ' + searchCriteria["subIndustryName"] + '</font></i>)');
+    }
 
+    if (searchCriteria["advertiserName"] != undefined && searchCriteria["advertiserName"].length > 0)
+    {
+        //need to document this more
+        $("#previousPage").html(searchCriteria["advertiserName"] + '  (<i><font size="2">' + searchCriteria["industryName"] + '  /  ' + searchCriteria["subIndustryName"] + '</font></i>)');
+    }
+    
+    if (searchCriteria["parentAdvertiserName"] != undefined && searchCriteria["parentAdvertiserName"].length > 0) {
+        $("#previousPage").html(searchCriteria["parentAdvertiserName"] + '  (<i><font size="2">' + searchCriteria["industryName"] + '  /  ' + searchCriteria["subIndustryName"] + '</font></i>)');
+    }
 }
 
 function buildParentAdvertiserAuditSearch(searchCriteria) {
