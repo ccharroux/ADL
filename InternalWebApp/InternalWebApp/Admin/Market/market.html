@@ -647,7 +647,7 @@
                     '" class="hidden productOnHoldButtonClass" onClick="productMarketOnHold(' +
                     '\'' +
                     productId +
-                    '\', true)" Value="Adjust Hold Date" />';
+                    '\', true)" Value="Adjust Date" />';
                 // OFF hold button
                 str = str +
                     '<input type="button"  id="productOffHold' +
@@ -1358,7 +1358,7 @@
         $("#dtMarketOnHoldDate_Date").val(holdDate);
         $("#dtMarketOnHoldDate_Date").datepicker();
         $("#marketOnHoldDateDialog").dialog({
-            "title": (alreadyOnHold ? "Adjust Hold Date" : "Put Market on Hold")
+            "title": (alreadyOnHold ? "Adjust Date" : "Put Market on Hold")
         });
         $("#marketOnHoldDateDialog").dialog("open");
     }
@@ -1374,6 +1374,35 @@
 
     function productMarketOnHoldConfirmed(productId, onHoldFlag)
     {
+        // If putting market on hold, then validate that hold date is a valid date
+        // Possible future improvement: move this validation logic into a generic function, e.g. in main.js
+        if (onHoldFlag) {
+            var holdDate = $("#dtMarketOnHoldDate_Date").val();
+            var allowedFormats = [
+                'mm/dd/yy', // month and day with leading zeroes, year with 4 digits
+                'm/d/yy', // month and day without leading zeroes, year with 4 digits
+                'yy-mm-dd',
+                'yy-m-d'
+            ];
+            var validHoldDate = false;
+            allowedFormats.forEach(function (allowedFormat) {
+                if (validHoldDate) {
+                    return;
+                }
+                try {
+                    var parsedHoldDate = $.datepicker.parseDate(allowedFormat, holdDate);
+                    validHoldDate = true;
+                }
+                catch (e) {
+                    // try next allowed format
+                }
+            });
+            if (validHoldDate == false) {
+                bootbox.alert('Invalid hold date: ' + holdDate);
+                return;
+            };
+        }
+
         var url = ServicePrefix + '/api/Market/UpdateMarketOnHold';
 
         var settings = {
@@ -1385,7 +1414,7 @@
                 "inProductId": productId,
                 "inMarketId": marketId,
                 "inMarketOnHold": onHoldFlag,
-                "inHoldDate": $("#dtMarketOnHoldDate_Date").val()
+                "inHoldDate": holdDate
             }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
