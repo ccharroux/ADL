@@ -364,20 +364,35 @@ $(document).ready(function ()
     var bResetHeaderBackButtonAlreadyRun = false;
 
     $(document).ajaxStop(function () {
-
+        //alert(1);
         resetHeaderBackButton();
         bResetHeaderBackButtonAlreadyRun = true;
     });
 
-    function resetHeaderBackButton() {
-        if (bResetHeaderBackButtonAlreadyRun == false && apiToken != "") {
-            $.blockUI();
+    function resetHeaderBackButton()
+    {
+        if (bResetHeaderBackButtonAlreadyRun == false && apiToken != "")
+        {
+ 
+ 
+            if (unblockHandle != null  )
+            {
+                $.blockUI();
+            }
+
             gShowHeader = showHeader();
             buildBackButtonGeneric();
-            unblockHandle = setInterval("$.unblockUI();", 1000);
+
+ 
+            if (unblockHandle != null) {
+                setTimeout("$.unblockUI();", 1000);
+            }
+                //$.unblockUI();
+                //setThisQueryToRunLongNoAutoUnBlock();
+ 
         }
     }
-
+ 
     $(document).ajaxStart(function () {
 
     });
@@ -397,12 +412,12 @@ $(document).ready(function ()
 
     if (bLongQuery == false) {
         // Force unblock after 10 seconds
-
         unblockHandle = setInterval("$.unblockUI();", 10000);
     }
     else
     {
         clearTimeout(unblockHandle);
+        unblockHandle = null;
     }
     // Set Ajax
     $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
@@ -3278,6 +3293,7 @@ function formatNumber(num) {
 function setThisQueryToRunLongNoAutoUnBlock()
 {
     clearTimeout(unblockHandle);
+    unblockHandle = null;
     $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
     //console.log(unblockHandle);
 }
