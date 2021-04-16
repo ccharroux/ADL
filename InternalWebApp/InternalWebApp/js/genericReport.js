@@ -299,7 +299,7 @@ function buildReportObjectArray()
     for (var x = 0; x < reportName.length; x++)
     {
         var module = reportName[x].replace("rpt", "");
-        console.log(module);
+        //console.log(module);
         arrayObject = window[("getReportObject_" + module)]();
         arrayObject.filters = window[("getReportFilterArray_" + module)]();
         reportObjectArray.push(arrayObject);
@@ -424,9 +424,12 @@ function getDMAReportObjectByKeyValue(inKey, inValue) {
 
 function buildReportLink(row, reportNameToFind)
 {
- 
+     //console.log(reportNameToFind);
+    var adjustedReport = reportNameToFind.toString().replace("AgencyFromAdvertiser", "Agency").replace("AgencyFromParent", "Agency");
+
+    //console.log(adjustedReport);
     var revenuePeriodParts = row["Revenue Period"].split("/");
-    var reportIndex = reportName.indexOf(reportNameToFind);
+    var reportIndex = reportName.indexOf(adjustedReport);
     var action = "";
     var link = "";
 
@@ -460,7 +463,30 @@ function buildReportLink(row, reportNameToFind)
             link = '<a href="' + action + '">' + 'by Advertiser</a>';
             break;
 
-        case "rptDMXXRYRevenueReviewByAgency":
+        case "rptDMXXRYRevenueReviewByAgencyFromAdvertiser":
+            //"&parentagencyid=" + getIDFromString(row["Parent Agency"]) +
+                //"&parentadvertiserid=" + getIDFromString(row["Parent Advertiser"]) +
+            action = "/utilities/genericreport/genericReport.html?reportid=" + reportIndex +
+                "&parentmarketid=" + $("#ddlParentMarket").val() +
+                "&marketid=" + getIDFromString(row["Market"]) +
+                "&advertiserid=" + getIDFromString(row["Advertiser"]) +
+                "&stationid=" + getIDFromString(row["Station"]) +
+                "&revenueperiod=" + revenuePeriodParts[1] +
+                "&revenueyear=" + revenuePeriodParts[0] +
+                "&industryid=" + getIDFromString(row["Industry"]);
+            if (row["Industry"] == "TOTALS") {
+                link = "";
+            }
+            else {
+                link = '<a href="' + action + '">' + 'by Agency</a>';
+            }
+ 
+            break;
+
+        case "rptDMXXRYRevenueReviewByAgencyFromParent":
+            //"&parentadvertiserid=" + getIDFromString(row["Parent Advertiser"]) +
+                //"&advertiserid=" + getIDFromString(row["Advertiser"]) +
+ 
             action = "/utilities/genericreport/genericReport.html?reportid=" + reportIndex +
                 "&parentmarketid=" + $("#ddlParentMarket").val() +
                 "&marketid=" + getIDFromString(row["Market"]) +
@@ -469,7 +495,13 @@ function buildReportLink(row, reportNameToFind)
                 "&revenueperiod=" + revenuePeriodParts[1] +
                 "&revenueyear=" + revenuePeriodParts[0] +
                 "&industryid=" + getIDFromString(row["Industry"]);
-            link = '<a href="' + action + '">' + 'by Agency</a>';
+            if (row["Industry"] == "TOTALS") {
+                link = "";
+            }
+            else {
+                link = '<a href="' + action + '">' + 'by Agency</a>';
+            }
+
             break;
 
         case "rptDMXXRYRevenueReviewByParentAdvertiser":
@@ -13261,7 +13293,7 @@ function getReportObject_DMXXRYRevenueReviewByParentAgency() {
         "action": "edit",
         "mRender": function (data, type, row) {
 
-            return buildReportLink(row, "rptDMXXRYRevenueReviewByAgency") + "<br>" + buildReportLink(row, "rptDMXXRYRevenueReviewByParentAdvertiser");
+            return buildReportLink(row, "rptDMXXRYRevenueReviewByAgencyFromParent") + "<br>" + buildReportLink(row, "rptDMXXRYRevenueReviewByParentAdvertiser");
          },
         "orderable": false,
         "searchable": false,
@@ -13373,7 +13405,7 @@ function getReportObject_DMXXRYRevenueReviewByAdvertiser() {
         "action": "edit",
         "mRender": function (data, type, row) {
 
-            return buildReportLink(row, "rptDMXXRYRevenueReviewByAgency") ;
+            return buildReportLink(row, "rptDMXXRYRevenueReviewByAgencyFromAdvertiser") + '<br>' + buildReportLink(row, "rptDMXXRYRevenueReviewByParentAdvertiser");
         },
         "orderable": false,
         "searchable": false,
@@ -13467,6 +13499,15 @@ function getReportFilterArray_DMXXRYRevenueReviewByAgency() {
 
     arrayObject = new Object();
     arrayObject = {
+        token: "ParentAdvertiserHidden",
+        jsCall: null,
+        objectName: "hidParentAdvertiser",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
         token: "AdvertiserHidden",
         jsCall: null,
         objectName: "hidAdvertiser",
@@ -13486,6 +13527,10 @@ function getReportObject_DMXXRYRevenueReviewByAgency() {
     columnsToDisplay.push("Station");
     columnsToDisplay.push("Parent Agency");
     columnsToDisplay.push("Agency");
+    columnsToDisplay.push("Advertiser");
+
+    columnsToDisplay.push("Advertiser Revenue");
+    columnsToDisplay.push("Agency Revenue");
 
     columnsToDisplay.push("DMX Revenue");
     columnsToDisplay.push("XRY Revenue");
