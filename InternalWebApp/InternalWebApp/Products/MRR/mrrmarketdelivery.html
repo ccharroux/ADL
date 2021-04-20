@@ -185,7 +185,7 @@
                                     <input type="button" id="btnReleaseOwnerGroups" onclick="releaseOwnerGroups()" value="Deliver Ownership Groupings" />
                                 </div>
                                 <div class="col-md-3">
-                                    <input style="" id="btnReleaseAllMarkets" type="button" value="Release All Markets" onclick="releaseAllMarketsBulkInitiate();"/>
+                                    <input style="" id="btnReleaseAllMarkets" type="button" value="Release Multiple Markets" class="disabled-button" disabled="disabled" onclick="releaseAllMarketsBulkInitiate();"/>
                                 </div>
 
                             </div>
@@ -1922,11 +1922,24 @@
                 }
             }
         });
+
+        if (iTotalReleasableMarkets > 0)
+        {
+            $("#btnReleaseAllMarkets").removeClass("disabled-button");
+            $("#btnReleaseAllMarkets").prop("disabled", false);
+        } else
+        {
+            $("#btnReleaseAllMarkets").addClass("disabled-button");
+            $("#btnReleaseAllMarkets").prop("disabled", true);
+        }
+
     }
 
     function checkOnSelectAllMarketBox()
     {
         var partnerReview = currentDataTable === "dtMarketDeliveryListPartnerReview" ? true : false;
+
+        iTotalReleasableMarkets = 0;
 
         var iCheckedItems = 0;
         var table = $("#" + currentDataTable).DataTable();
@@ -1944,12 +1957,22 @@
                 sClassName = inputCheckbox[0].className;
             }
 
-            if (sClassName.toLowerCase() === "releasable-market") {
+            if (sClassName.toLowerCase() === "releasable-market")
+            {
+                iTotalReleasableMarkets++;
                 if ($(inputCheckbox[0]).is(':checked')) {
                     iCheckedItems++;
+                    $("#btnReleaseAllMarkets").removeClass("disabled-button");
+                    $("#btnReleaseAllMarkets").prop("disabled",false);
                 }
             }
         });
+
+        if (iCheckedItems == 0)
+        {
+            $("#btnReleaseAllMarkets").addClass("disabled-button");
+            $("#btnReleaseAllMarkets").prop("disabled", true);
+        }
 
         if (iTotalReleasableMarkets === iCheckedItems) {
             if (partnerReview)
