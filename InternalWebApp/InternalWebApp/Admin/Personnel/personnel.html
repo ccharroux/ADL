@@ -282,7 +282,7 @@
                             <input type="text" id="txtEmailAddress" maxlength="50" class="mkaRequired field-width-325" errorMessage="You must enter an Email Address" />
                         </div>
                         <div id="divResetPassword" class="col-md-4 text-align-center hidden">
-                            <input onclick="excludeFromBackButton(); checkIfPasswordResetIsAllowed(gEmailTokenPasswordChange);" value="Reset Password" class="default-button" type="button" />
+                            <input onclick="excludeFromBackButton(); checkIfPasswordResetIsAllowed(gEmailTokenPasswordChange);" value="Reset Password" class="default-button checkForDirty" type="button" />
                         </div>
                     </div>
 
@@ -331,7 +331,7 @@
                                 </div>
                                 <div>
                                     <select id="ddlAssignedOwnerships" size="7" class="field-width-325"></select>
-                                    <input type="button" class="default-button background-red" onclick="removeOwnership();" value="Remove" />
+                                    <input type="button" class="default-button  checkForDirty background-red" onclick="removeOwnership();" value="Remove" />
                                 </div>
                             </div>
                             <div class="col-md-6 text-align-left">
@@ -342,7 +342,7 @@
 
                                 <div>
                                     <select id="ddlOwnership" size="7" class="field-width-325"></select>
-                                    <input type="button" class="default-button background-green" onclick="addOwnership();" value="Add" />
+                                    <input type="button" class="default-button  checkForDirty background-green" onclick="addOwnership();" value="Add" />
                                 </div>
                             </div>
 
@@ -379,16 +379,16 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="col-md-3">
-                                    <input type="button" value="Assignments" class="default-button" onclick="goToAssignments()" />
+                                    <input type="button" value="Assignments" class="default-button  checkForDirty" onclick="goToAssignments()" />
                                 </div>
                                 <div class="col-md-3">
-                                    <input type="button" value="Copy Assignments" class="default-button" onclick="goToCopyAssignments()" />
+                                    <input type="button" value="Copy Assignments" class="default-button  checkForDirty" onclick="goToCopyAssignments()" />
                                 </div>
                                 <div class="col-md-3">
                                     <input type="button" value="Group Assignments" class="default-button" onclick="goToGroupAssignments()" />
                                 </div>
                                 <div class="col-md-3">
-                                    <input type="button" value="Dashboard" class="default-button" onclick="goToPersonnelSnapshot()" />
+                                    <input type="button" value="Dashboard" class="default-button  checkForDirty"  onclick="goToPersonnelSnapshot()" />
                                 </div>
                             </div>
                         </div>
@@ -443,8 +443,10 @@
     var emailAddress = "";
     var bSendUsernameChangeEmail = false;
     var bSendUsernameAndPasswordChangeEmail = false;
+    var bDirty = false;
 
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         buildMainMenu("Personnel");
         buildQuickReports(['personnel', 'owner', 'market', 'station']);
 
@@ -452,9 +454,41 @@
         setLocalStorage("gPageParameters", "");
 
         getStateList();
+        setTimeout(setupEvents, 1000);
 
     });
+    function setupEvents()
+    {
+        //$(window).on('beforeunload ', function () {
+        //    //if (bDirty == true) {
+        //    //    bootbox.confirm("You have made changes to this user. Would you like to save them now?", function (result) {
+        //    //        if (result == true) {
+        //    //            initiatePersonnelUpdate();
+        //    //        }
+        //    //    });
+        //    //}
+        //    alert( "Are you sure");
+        //});
+        window.onbeforeunload = function (e) {
+            if (bDirty == true)
+            {
+                return 'You have unsaved changes. Please save them before leaving this page';
+            }
+        };
 
+        $("#ddlPosition").change(function () {
+            bDirty = true;
+        });
+        $("#ddlState").change(function () {
+            bDirty = true;
+        });
+        $("input").keypress(function () {
+            bDirty = true;
+        });
+        $("textarea").keypress(function () {
+            bDirty = true;
+        });
+    }
     function getStateList() {
         var url = ServicePrefix + '/api/State/GetStateList';
 
@@ -990,6 +1024,7 @@
 
     function removeOwnership() {
 
+
         if ($('#ddlAssignedOwnerships > option:selected').length == 0) {
             bootbox.alert('Select an Ownership to remove.');
             return;
@@ -1515,6 +1550,7 @@
                 //Pending notification from webnotification page
                 getPersonnelWebSetup();
                 updatePersonnel();
+                window.location = "/admin/personnel/personnel.html?PersonnelId=" + personnelID;
             });
 
         }
@@ -1559,6 +1595,7 @@
             processData: false,
             success: function (data, textStatus, jQxhr) {
                 updatePersonnelSuccess(data, textStatus, jQxhr);
+                bDirty = false;
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
@@ -1657,6 +1694,20 @@
     }
 
     function checkIfPasswordResetIsAllowed(emailToken) {
+
+        //if (bDirty == true)
+        //{
+
+
+        //}
+        //else
+        //{
+            checkIfPasswordResetIsAllowedContinued(emailToken);
+        //}
+    }
+
+    function checkIfPasswordResetIsAllowedContinued(emailToken)
+    {
         var url = ServicePrefix + '/api/Personnel/GetPersonnelOkayToResetPasswordFromInternal'
             + '?inApiToken=' + getLocalStorage("APIToken")
             + '&inPersonnelId=' + personnelID;
@@ -1679,11 +1730,13 @@
     function checkIfPasswordResetIsAllowedSuccess(data, textStatus, jQxhr, emailToken) {
         if (data.response.status != "SUCCESS") {
             MKAErrorMessageRtn(data.response.errorMessage[0]);
+            window.location = "/admin/personnel/personnel.html?PersonnelId=" + personnelID;
             return;
         }
 
         if (data.report.rows.length == 0) {
             MKAErrorMessageRtn("Can't reset password: Failed to get result from GetPersonnelOkayToResetPasswordFromInternal");
+            window.location = "/admin/personnel/personnel.html?PersonnelId=" + personnelID;
             return;
         }
 
@@ -1692,7 +1745,10 @@
             if (failureReason == null || failureReason.trim() == "") {
                 failureReason = "(unknown)";
             }
-            bootbox.alert("Can't reset password: " + failureReason);
+            bootbox.alert("Can't reset password: " + failureReason, function () {
+                 window.location = "/admin/personnel/personnel.html?PersonnelId=" + personnelID;
+            });
+
             return;
         }
 
@@ -1704,9 +1760,12 @@
                 showResetPasswordDialog();
                 break;
             default:
-                bootbox.alert("There was an issue when finding an email token. Invalid email token: " + emailToken);
+                bootbox.alert("There was an issue when finding an email token. Invalid email token: " + emailToken, function () {
+                    window.location = "/admin/personnel/personnel.html?PersonnelId=" + personnelID;
+                });
                 break;
         }
+ 
 
     }
 
