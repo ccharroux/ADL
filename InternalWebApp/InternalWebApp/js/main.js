@@ -1813,7 +1813,7 @@ function getYearList() {
 
     var thisYear = (new Date()).getFullYear();
 
-    for (var i = thisYear; i > (thisYear - 10) ; i--) {
+    for (var i = thisYear; i > (thisYear - 20) ; i--) {
 
         str = str + '<option ';
         if (i == thisYear) {
