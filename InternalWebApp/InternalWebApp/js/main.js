@@ -2669,11 +2669,11 @@ function buildCustomLink(objectName, data, bSortable, className) {
                     textClassName = "redText";
                 }
             }
-
+             //console.log(adjustedData);
             // negative %
             if (row[objectName] != null &&
-                row[objectName] != "" &&
-                isNaN(adjustedData) == false
+                row[objectName] != "" //&&
+               // isNaN(adjustedData) == false
                 // isNaN(row[objectName].toString().replace("<b>", "").replace("</b>", "").replace("%", "").replace(new RegExp('\,'), '')) == false
             )
             {
