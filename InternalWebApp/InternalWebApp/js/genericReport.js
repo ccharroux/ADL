@@ -260,6 +260,7 @@ reportName.push("rptStationParticipationTVB");
 reportName.push("rptStationParticipationXRY");
 reportName.push("rptStationParticipationMRR");
 
+reportName.push("rptMRRCategoryMissingDefinitionList");
 
 
 function buildReportArray()
@@ -13930,6 +13931,40 @@ function getReportObject_StationParticipationTVB() {
         apiType: "get",
         columnsToDisplay: columnsToDisplay,
         product: ['TVB', 'station'],
+        sortable: true,
+        approved: false,
+        visible: true
+    }
+
+    return tempObject;
+}
+function getReportFilterArray_MRRCategoryMissingDefinitionList() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        jsCallParameters: ['MRR'],
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+function getReportObject_MRRCategoryMissingDefinitionList() {
+
+    var tempObject = new Object();
+    var columnsToDisplay = new Array();
+
+    tempObject = {
+        reportTitle: "MRR Category Missing Definition List",
+        apiControllerAction: '/api/MRRReport/GetMRRCategoryMissingDefinitionList',
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['MRR'],
         sortable: true,
         approved: false,
         visible: true
