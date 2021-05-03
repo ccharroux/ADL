@@ -261,6 +261,9 @@ reportName.push("rptStationParticipationXRY");
 reportName.push("rptStationParticipationMRR");
 
 reportName.push("rptMRRCategoryMissingDefinitionList");
+reportName.push("rptDMXUserListing");
+reportName.push("rptDMAUserListing");
+
 
 
 function buildReportArray()
@@ -13971,4 +13974,184 @@ function getReportObject_MRRCategoryMissingDefinitionList() {
     }
 
     return tempObject;
+}
+function getReportFilterArray_DMAUserListing() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductListHidden",
+        jsCallParameters: ['DMA', true],
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProductMediaType",
+        jsCallParameters: ['DMA'],
+        objectName: "ddlMarket",
+        reloadBasedProduct: true,
+        reloadBasedMediaType: true,
+        required: false
+
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProductMarketMediaType",
+        jsCallParameters: ['DMA'],
+        objectName: "ddlOwner",
+        reloadBasedProduct: true,
+        reloadBasedMarket: true,
+        reloadBasedMediaType: true,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Personnel",
+        jsCall: null,
+        objectName: "hidPersonnel",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+    arrayObject = {
+        token: "Position",
+        jsCall: "getPositionList",
+        objectName: "ddlPosition",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_DMAUserListing() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    //columnsToDisplay.push("Access Level");
+    columnsToDisplay.push("User")
+    columnsToDisplay.push("Email");
+    columnsToDisplay.push("Phone");
+    columnsToDisplay.push("Position");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Owner");
+
+    tempObject =
+    {
+        reportTitle: "DMA User Listing",
+        apiControllerAction: "/api/DMAReport/GetDMAUserListing",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['personnel', 'dma'],
+        approved: false
+    }
+
+    return tempObject;
+
+}
+function getReportFilterArray_DMXUserListing() {
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+
+    arrayObject = {
+        token: "Product",
+        jsCall: "getProductListHidden",
+        jsCallParameters: ['DMX', true],
+        objectName: "ddlProduct",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Market",
+        jsCall: "getMarketListByProductMediaType",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlMarket",
+        reloadBasedProduct: true,
+        reloadBasedMediaType: true,
+        required: false
+
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Owner",
+        jsCall: "getOwnerListByProductMarketMediaType",
+        jsCallParameters: ['DMX'],
+        objectName: "ddlOwner",
+        reloadBasedProduct: true,
+        reloadBasedMarket: true,
+        reloadBasedMediaType: true,
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Personnel",
+        jsCall: null,
+        objectName: "hidPersonnel",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+
+    arrayObject = {
+        token: "Position",
+        jsCall: "getPositionList",
+        objectName: "ddlPosition",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "MediaType",
+        jsCall: "getMediaTypeList",
+        objectName: "ddlMediaType",
+        required: false
+    }
+    arrayFilters.push(arrayObject);
+    return arrayFilters;
+}
+function getReportObject_DMXUserListing() {
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+    //columnsToDisplay.push("Access Level");
+    columnsToDisplay.push("User")
+    columnsToDisplay.push("Email");
+    columnsToDisplay.push("Phone");
+    columnsToDisplay.push("Position");
+    columnsToDisplay.push("Market");
+    columnsToDisplay.push("Owner");
+
+    tempObject =
+    {
+        reportTitle: "DMX User Listing",
+        apiControllerAction: "/api/DMXReport/GetDMXUserListing",
+        apiType: "get",
+        columnsToDisplay: columnsToDisplay,
+        product: ['personnel', 'DMX'],
+        approved: false
+    }
+
+    return tempObject;
+
 }
