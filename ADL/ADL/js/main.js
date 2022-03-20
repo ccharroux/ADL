@@ -5,6 +5,8 @@ const gMediaTypeOutOfHome = "OUT OF HOME";
 const gMediaTypeNetwork = "NETWORK";
 const gMediaTypeSurvey = "SURVEY";
 
+const cLocation = "../../";
+
 // TEMP AREA
 
 var testURL = ServicePrefix + "services/PixxGet.asmx/GetMemberID";
