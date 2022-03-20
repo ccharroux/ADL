@@ -1,0 +1,1342 @@
+﻿
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>MKA Internal Media Site</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Facebook and Twitter integration -->
+    <meta property="og:title" content="" />
+    <meta property="og:image" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:site_name" content="" />
+    <meta property="og:description" content="" />
+    <meta name="twitter:title" content="" />
+    <meta name="twitter:image" content="" />
+    <meta name="twitter:url" content="" />
+    <meta name="twitter:card" content="" />
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="../../css/animate.css">
+    <!-- Icomoon Icon Fonts-->
+    <link rel="stylesheet" href="../../css/icomoon.css">
+    <!-- Simple Line Icons -->
+    <link rel="stylesheet" href="../../css/simple-line-icons.css">
+    <!-- Bootstrap  -->
+    <link rel="stylesheet" href="../../css/bootstrap.css">
+    <!-- Theme style  -->
+    <link rel="stylesheet" href="../../css/style.css">
+    <!-- DataTables style -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
+    <!--Chosen Dropdown-->
+    <link rel="stylesheet" href="../../css/chosen.min.css" />
+    <!-- FullCalendar -->
+    <link rel="stylesheet" href="../../Content/fullcalendar.min.css" />
+    <!-- Modernizr JS -->
+    <script src="../../js/modernizr-2.6.2.min.js"></script>
+    <!-- FOR IE9 below -->
+    <!--[if lt IE 9]>
+    <script src="js/respond.min.js"></script>
+    <![endif]-->
+    <style>
+        .filterLabel {
+            margin-left: 10px;
+            /*margin-right: 5px;*/
+            text-align:left;
+            width:100px;
+        }
+        .filterLabelWide {
+            /*width: 175px;*/
+            /*margin-left: 10px;
+            margin-right: 5px;*/
+        }
+        .filterControlDate {
+            width: 95px;
+            text-align: center;
+ 
+        }
+        .filterControlLeft {
+            /*width: 225px;*/
+            margin-left: 10px;
+            margin-right: 5px;
+        }
+        .filterControlRight {
+            /*width: 325px;*/
+            margin-left: 10px;
+            margin-right: 5px;
+        }
+        select
+        {
+            max-width:225px;
+            min-width:225px;
+        }
+        .container
+        {
+            width: 80%!important;
+        }
+        .addButtonDiv
+        {
+            position: absolute;
+            top:265px;
+            right: 80px;
+            z-index: 0;
+        }
+        .fc-agendaMonth-button, .fc-agendaWeek-button, .fc-agendaDay-button , .fc-listYear-button
+        {
+            display: none!important;
+        }
+        .ddlTraineePreSelected {
+            width: 400px !important;
+            min-width: 400px !important;
+            max-width: 400px !important;
+        }
+ 
+    </style>
+</head>
+<body>
+
+    <div id="fh5co-page">
+        <header id="fh5co-header" role="banner">
+            <div class="container">
+                <div class="header-inner" id="menu"></div>
+            </div>
+        </header>
+        <div id="fh5co-contact-section" class="contact-section">
+            <div class="container">
+                
+
+                <div style="margin: 0px auto 0 auto">
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
+                            <h2 id="pageTitle">Training Calendar</h2>
+                        </div>
+                    </div>
+                    <div id="divQuickReport" >
+                        <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                        <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                    </div>
+
+                    <!-- search / filter area -->
+                    <div  >
+                        <div>
+                            <div class="row" style="height:70px;"  >
+                                <div class="col-md-3">
+                                    <label class="filterLabel" style="width:100% !important">Dates (From-To)</label><br />
+                                    <input type="text" id="dtStartDate" style="margin-left: 10px;" class="filterControlDate report-filter" />
+                                    <label for="dtEndDate"> - </label>
+                                    <input type="text" id="dtEndDate" class="filterControlDate report-filter" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="ddlType" class="filterLabel">Type</label><br />
+                                    <select id="ddlType" class="filterControlLeft report-filter">
+                                        <option selected="selected" value="All">-- All Types --</option>
+                                        <option value="Individual">Individual only</option>
+                                        <option value="Cluster">Cluster only</option>
+                                        <option value="OwnerGroup">Owner group only</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="ddlTopic" class="filterLabel">Topic</label><br />
+                                    <select id="ddlTopic" class="filterControlLeft report-filter"></select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="ddlMethod" class="filterLabel">Method</label><br />
+                                    <select id="ddlMethod" class="filterControlLeft report-filter"></select>
+                                </div>
+                            </div>
+                            <div class="row" style="height:70px;"  >
+                                <div class="col-md-3">
+                                    <label for="ddlMediaType" class="filterLabel">Media Type</label><br />
+                                    <select id="ddlMediaType" class="filterControlRight report-filter" onchange="mediaTypeChanged();"></select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="ddlOwner" class="filterLabel">Owner</label><br /> <!-- owner first because filtering trainees by market (especially when not also filtering by owner) is slower -->
+                                    <select id="ddlOwner" class="filterControlRight report-filter" onchange="getTraineeList();"></select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="ddlMarket" class="filterLabel">Market</label><br />
+                                    <select id="ddlMarket" class="filterControlRight report-filter" onchange="getTraineeList();"></select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="ddlStatus" class="filterLabel">Status</label><br />
+                                    <select id="ddlStatus" class="filterControlLeft report-filter"></select>
+                                    <div style="vertical-align: middle; display:table-cell;float:right"><input type="button" value="Show" onclick="getTrainingList();" /></div>
+                                </div>
+                            </div>
+                            <div class="row" style="height:70px" >
+                                <div class="col-md-3">
+                                    <label for="ddlRole" class="filterLabel">Role</label><br />
+                                    <select id="ddlRole" class="filterControlRight report-filter"></select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="ddlPosition" class="filterLabel">Position(s)</label><br />
+                                    <select multiple="multiple" id="ddlPosition" style="height: 33px !important;" class="filterControlRight report-filter"></select>
+                                </div>
+                                <div id="divTrainee" class="col-md-3">
+                                    <label for="ddlTrainee" class="filterLabel">Trainee</label><br />
+                                    <select id="ddlTrainee" class="filterControlRight report-filter"></select>
+                                    <!--&nbsp;
+                        <input type="checkbox" id="chkIncludeInternal" class="report-filter" />
+                        &nbsp;
+                        Include internal users-->
+                                    <!--</span>-->
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="ddlTrainer" class="filterLabel">Trainer</label><br />
+                                    <select id="ddlTrainer" class="filterControlRight report-filter"></select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12" style="text-align:right">
+                                    
+                                    <input type="button" value="+" class="addNewButton addNewButton-list-pages" style="margin-top:10px" onclick="addTraining();" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="searchResults text-align-center" style="width: 100%">
+                    (click on event to view full details / edit / delete)
+                </div>
+                <div id="divCalendar" class="searchResults text-align-center" style="width: 800px; margin: 25px auto 0 auto"></div>
+                <!-- start datatable-->
+                <div id="divResults" class="searchResults dataTable-top-margin">
+                    <table id="dtTrainingList" class="dataTable-border dataTable-headers dataTable-cell-border" style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th class="exportColumn">Training Date</th>
+ 
+                                <th class="exportColumn">Trainer</th>
+                                <th class="exportColumn">Training Topic</th>
+                                <th class="exportColumn">Training Method</th>
+                                <th class="exportColumn">Training Status</th>
+                                <th class="exportColumn">Notes</th>
+                                <th class="exportColumn">Users</th>
+                                <th class="exportColumn">Clust.</th>
+                                <th class="exportColumn">Groups</th>
+                                <th class="exportColumn">Personnel</th>
+                                <th class="exportColumn">Market</th>
+                                <th class="exportColumn">Owner</th>
+                                <th class="exportColumn">Group</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <!--<tfoot>
+                            <tr>
+                                <th>Training Date</th>
+                                <th>Training Time</th>
+                                <th>Trainer</th>
+                                <th>Training Topic</th>
+                                <th>Training Method</th>
+                                <th>Training Status</th>
+                                <th>Notes</th>
+                                <th># Individuals</th>
+                                <th># Clusters</th>
+                                <th># Groups</th>
+                                <th>Personnel</th>
+                                <th>Market</th>
+                                <th>Owner</th>
+                                <th>Group</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>-->
+                    </table>
+                </div>
+                <!-- end datatable -->
+            </div>
+        </div>
+        <!--<div id="map" data-animate-effect="fadeIn"></div>-->
+    </div>
+
+    <div id="eventDialog" style="display:none">
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Training Date
+            </div>
+            <div class="col-md-9 text-align-left">
+                <span id="spanTrainingDate"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Training Time
+            </div>
+            <div class="col-md-9 text-align-left">
+                <span id="spanTrainingTime"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Trainer
+            </div>
+            <div class="col-md-9 text-align-left">
+                <span id="spanTrainerName"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Topic
+            </div>
+            <div class="col-md-9 text-align-left">
+                <span id="spanTopicName"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Method
+            </div>
+            <div class="col-md-9 text-align-left">
+                <span id="spanMethodName"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Status
+            </div>
+            <div class="col-md-9 text-align-left">
+                <span id="spanStatusName"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Personnel
+            </div>
+            <div class="col-md-9 text-align-left">
+                <span id="spanTraineeName"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Market
+            </div>
+            <div class="col-md-9 text-align-left">
+                <span id="spanMarketName"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Owner
+            </div>
+            <div class="col-md-9 text-align-left">
+                <span id="spanOwnerName"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-align-left">
+                Group
+            </div>
+            <div class="col-md-9 text-align-left">
+                <span id="spanOwnerGroupName"></span>
+            </div>
+        </div>
+        <div class="row margin-top-50">
+            <div class="col-md-12 text-align-center">
+                <input type="button" value="Edit" onclick="editFromEventDialog();" />
+                &nbsp;
+                <input type="button" value="Delete" onclick="deleteFromEventDialog();" />
+            </div>
+        </div>
+        <div class="hidden">
+            <span id="spanTrainingEventId"></span>
+            <span id="spanTrainingEventSummary"></span>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="../../js/jquery.min.js"></script>
+    <!-- jQuery Easing -->
+    <script src="../../js/jquery.easing.1.3.js"></script>
+    <!-- Bootstrap -->
+    <script src="../../js/bootstrap.min.js"></script>
+    <!-- Bootbox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+    <!-- Waypoints -->
+    <script src="../../js/jquery.waypoints.min.js"></script>
+    <!-- BlockUI JS -->
+    <script src="../../js/blockUI.js"></script>
+    <!-- Config JS -->
+    <script src="../../js/config.js"></script>
+    <!-- MAIN JS -->
+    <script src="../../js/main.js"></script>
+    <!-- genericReport JS -->
+    <script src="../../js/genericReport.js"></script>
+    <!-- DataTables JS -->
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!--Chosen Dropdown-->
+    <script src="../../js/chosen.jquery.min.js"></script>
+    <!-- FullCalendar (uses Moment) -->
+    <script type="text/javascript" src="../../scripts/moment.min.js"></script>
+    <script type="text/javascript" src="../../scripts/fullcalendar/fullcalendar.min.js"></script>
+</body>
+</html>
+<script>
+
+    var gotMediaTypes = false;
+    var gotOwners = false;
+    var gotMarkets = false;
+    var gotPreSelectedTrainee = false; // for jumping to this page with the Trainee filter set from the query string
+
+    function isPreSelectedTrainee() {
+        if (getParameterByName("TraineePersonnelID") != null) {
+            return true;
+        }
+        return false;
+    }
+
+    $(document).ready(function () {
+        $(".searchResults").hide();
+        buildUIDialogs();
+
+        loadDefaultDates();
+        $("#dtStartDate").datepicker();
+        $("#dtEndDate").datepicker();
+
+        getTrainerList();
+        getTopicList();
+        getMethodList();
+        getStatusList();
+        getMediaTypes(); // success -> get owners and markets -> get trainees
+        getRoleList();
+        getPositionList();
+
+        setEventListeners();
+
+        setDataTable();
+
+        clearSearchButtonSetup();
+
+        buildMainMenu("Training");
+
+        buildQuickReports(['training']);
+
+        // Reset this variable
+        //setLocalStorage("quickReportQS", null);
+
+        if (isPreSelectedTrainee() == false) {
+            setTimeout(loadLastSearch, 1000);
+        }
+
+        setLocalStorage("search", $("#ddlMediaType").val()  );
+        setLocalStorage("searchPage", window.location);
+        convertToChosenSelect("ddlType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+    });
+
+    function buildUIDialogs() {
+        $("#eventDialog").dialog({
+            autoOpen: false,
+            resizable: false,
+            width: 600,
+            height: 450,
+            modal: true,
+            title: 'Event',
+            create: function (event, ui) {
+                $(event.target).parent().css('position', 'fixed');
+            }
+        });
+    }
+
+    function loadDefaultDates() {
+        var d = new Date();
+        var currentMonth = d.getMonth() + 1;
+        var currentYear = d.getFullYear();
+        var lastDayOfTheMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+
+        if (isPreSelectedTrainee()) {
+            $("#dtStartDate").val("01/01/1970");
+        } else {
+            $("#dtStartDate").val(currentMonth + "/01/" + currentYear);
+        }
+        $("#dtEndDate").val(currentMonth + "/" + lastDayOfTheMonth.getDate() + "/" + currentYear);
+    }
+
+    function getTrainerList() {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/GetExistingTrainers',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getTrainerListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getTrainerListSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '<option value="">-- All Trainers --</option>';
+        $.each(data.report.rows, function (index) {
+            str = str + '<option value="' + data.report.rows[index]["trainerPersonnelId"] + '">' + data.report.rows[index]["trainer"] + '</option>';
+        });
+        $("#ddlTrainer").html(str);
+
+        convertToChosenSelect("ddlTrainer", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+    }
+
+    function getTopicList() {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/GetTrainingTopics',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getTopicListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getTopicListSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '<option value="">-- All Topics --</option>';
+        $.each(data.report.rows, function (index) {
+            str = str + '<option value="' + data.report.rows[index].trainingTopicId + '">' + data.report.rows[index].trainingTopicDescription + '</option>';
+        });
+        $("#ddlTopic").html(str);
+
+        convertToChosenSelect("ddlTopic", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+    }
+
+    function getMethodList() {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/GetTrainingMethods',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMethodListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getMethodListSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '<option value="">-- All Methods --</option>';
+        $.each(data.report.rows, function (index) {
+            str = str + '<option value="' + data.report.rows[index].trainingMethodId + '">' + data.report.rows[index].trainingMethodDescription + '</option>';
+        });
+        $("#ddlMethod").html(str);
+
+        convertToChosenSelect("ddlMethod", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+    }
+
+    function getStatusList() {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/GetTrainingStatuses',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getStatusListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getStatusListSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '<option value="">-- All Statuses --</option>';
+        $.each(data.report.rows, function (index) {
+            str = str + '<option value="' + data.report.rows[index].trainingStatusId + '">' + data.report.rows[index].trainingStatusDescription + '</option>';
+        });
+        $("#ddlStatus").html(str);
+
+        convertToChosenSelect("ddlStatus", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+    }
+
+    function getMediaTypes() {
+        $.ajax({
+            url: ServicePrefix + '/api/MediaType/GetMediaTypeList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMediaTypesSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getMediaTypesSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '<option value="">-- All Media Types --</option>';
+        $.each(data.report.rows, function (index) {
+            str = str + '<option value="' + data.report.rows[index].MediaTypeID + '">' + data.report.rows[index].MediaTypeName + '</option>';
+        });
+        $("#ddlMediaType").html(str);
+
+        convertToChosenSelect("ddlMediaType", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotMediaTypes = true;
+
+        mediaTypeChanged();
+    }
+
+    function mediaTypeChanged() {
+        getOwnerList();
+        getMarketList();
+    }
+
+    function getOwnerList() {
+        if (gotMediaTypes == false) {
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMediaTypeId": $("#ddlMediaType").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getOwnerListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getOwnerListSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var currentOwnerId = $("#ddlOwner").val();
+
+        var str = '<option value="">-- All Owners --</option>';
+        $.each(data.report.rows, function (index) {
+            str = str + '<option value="' + data.report.rows[index].OwnerID + '"' + (data.report.rows[index].OwnerID == currentOwnerId ? ' selected' : '') + '>' + data.report.rows[index].OwnerName + ' (' + data.report.rows[index].OwnerID + ')' + '</option>'; // OwnerName does not include ID
+        });
+        $("#ddlOwner").html(str);
+
+        convertToChosenSelect("ddlOwner", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotOwners = true;
+
+        getTraineeList();
+    }
+
+    function getMarketList() {
+        if (gotMediaTypes == false) {
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMediaTypeId": $("#ddlMediaType").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getMarketListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getMarketListSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var currentMarketId = $("#ddlMarket").val();
+        if (currentMarketId == 0) { // workaround because database still contains MarketID 0
+            currentMarketId = -1;
+        }
+
+        var str = '<option value="">-- All Markets --</option>';
+        $.each(data.report.rows, function (index) {
+            str = str + '<option value="' + data.report.rows[index].marketId + '"' + (data.report.rows[index].marketId == currentMarketId ? ' selected' : '') + '>' + data.report.rows[index].marketName + '</option>'; // marketName also includes ID
+        });
+        $("#ddlMarket").html(str);
+
+        convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotMarkets = true;
+
+        getTraineeList();
+    }
+
+    function getRoleList() {
+        $.ajax({
+            url: ServicePrefix + '/api/XRAY/GetXRYAccessLevelList?inApiToken=' + getLocalStorage("APIToken"),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getRoleListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getRoleListSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '<option value="">-- All Roles --</option>';
+        str = str + '<option value="MRRContact">MRR: Contact</option>';
+        str = str + '<option value="MRRRecipient">MRR: Recipient</option>';
+        str = str + '<option value="MRRManager">MRR: Manager</option>';
+        $.each(data.report.rows, function (index) {
+            if (data.report.rows[index]["Access Description"] != "No Access") {
+                str = str + '<option value="XRY' + data.report.rows[index].AccessLevelId + '">XRY: ' + data.report.rows[index]["Access Description"] + '</option>';
+            }
+        });
+        $("#ddlRole").html(str);
+
+        convertToChosenSelect("ddlRole", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+    }
+
+    function getPositionList() {
+        $.ajax({
+            url: ServicePrefix + '/api/Position/GetPositionList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getPositionListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getPositionListSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '';
+        $.each(data.report.rows, function (index) {
+            str = str + '<option value="' + data.report.rows[index]["Position Code"] + '">' + data.report.rows[index]["Position Title"] + '</option>';
+        });
+        $("#ddlPosition").html(str);
+
+        convertToChosenSelect("ddlPosition", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+    }
+
+    function getTraineeList() {
+        if (gotMarkets == false || gotOwners == false) {
+            return;
+        }
+
+        if (isPreSelectedTrainee() == true && gotPreSelectedTrainee == false) {
+            var preSelectedPersonnelId = getParameterByName("TraineePersonnelID");
+            getPreSelectedPersonnel(preSelectedPersonnelId);
+            return;
+        }
+
+        $.ajax({
+            url: ServicePrefix + '/api/Personnel/GetPersonnelListByMarketOwner',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": $("#ddlMarket").val(),
+                "inOwnerId": $("#ddlOwner").val(),
+                "inOmitInternal": ($("#chkIncludeInternal").prop("checked") == false)
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getTraineeListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getTraineeListSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var currentTraineeId = $("#ddlTrainee").val();
+
+        var str = '<option value="">-- All Trainees --</option>';
+        if (data.report.rows.length == 0 && $("#ddlOwner").val() == "" && $("#ddlMarket").val() == "") {
+            str = str + '<option value="n/a">-- Select market and/or owner first--</option>';
+        } else {
+            $.each(data.report.rows, function (index) {
+                str = str + '<option value="' + data.report.rows[index].personnelId + '"' + (data.report.rows[index].personnelId == currentTraineeId ? ' selected' : '') + '>' + data.report.rows[index].name + '</option>'; // name includes ID
+            });
+        }
+        $("#ddlTrainee").html(str);
+
+        convertToChosenSelect("ddlTrainee", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+    }
+
+    function getPreSelectedPersonnel(preSelectedPersonnelId) {
+        $.ajax({
+            url: ServicePrefix + '/api/Personnel/GetPersonnel',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inPersonnelId": preSelectedPersonnelId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getPreSelectedPersonnelSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getPreSelectedPersonnelSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        var str = '';
+        if (data.report.rows.length == 0) {
+            str = '<option value="">-- PersonnelID ' + preSelectedPersonnelId + ' Not Found --</option>';
+        } else {
+            var obj = data.report.rows[0];
+            str = str + '<option value="' + obj.personnelId + '">' + obj.firstName + ' ' + obj.lastName + ' (' + obj.email + ')' + '</option>';
+        }
+        $("#ddlTrainee").html(str);
+
+        $("#ddlTrainee").addClass("ddlTraineePreSelected");
+        $("#divTrainee").removeClass("col-md-3");
+        $("#divTrainee").addClass("col-md-6");
+
+        convertToChosenSelect("ddlPersonnel", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        gotPreSelectedTrainee = true;
+
+        getTrainingList();
+    }
+
+    function setEventListeners() {
+        //var input = document.getElementById("searchTextNumber");
+        //input.addEventListener("keyup", function (event) {
+        //    // Cancel the default action, if needed
+        //    event.preventDefault();
+        //    // Number 13 is the "Enter" key on the keyboard
+        //    if (event.keyCode === 13) {
+        //        setLocalStorage("search", "");
+        //        editMarket(document.getElementById("searchTextNumber").value);
+        //    }
+        //});
+
+        //var input = document.getElementById("searchText");
+        //input.addEventListener("keyup", function (event) {
+        //    // Cancel the default action, if needed
+        //    event.preventDefault();
+        //    // Number 13 is the "Enter" key on the keyboard
+        //    if (event.keyCode === 13) {
+
+        //        getMarketList();
+        //    }
+        //});
+    }
+
+    function getTrainingEventSummary(obj) {
+        var str = obj["Trainer"];
+        str += " / " + obj["Training Topic"];
+        str += " / " + obj["Training Method"];
+        str += " / " + obj["Training Status"];
+
+        if (obj["Individual Trainees"] == 1) {
+            str += " / " + obj["Trainee"];
+        }
+        if (obj["Individual Trainees"] > 1) {
+            str += " / " + obj["Individual Trainees"] + " individual trainees";
+        }
+
+        if (obj["Cluster Trainees"] == 1) {
+            str += " / " + obj["Market"] + " / " + obj["Owner"];
+        }
+        if (obj["Cluster Trainees"] > 1) {
+            str += " / " + obj["Cluster Trainees"] + " clusters";
+        }
+
+        if (obj["Owner Group Trainees"] == 1) {
+            str += " / " + obj["Owner"] + " / " + obj["Owner Group"];
+        }
+        if (obj["Owner Group Trainees"] > 1) {
+            str += " / " + obj["Owner Group Trainees"] + " owner groups";
+        }
+
+        return str;
+    }
+
+    function getTrainingEventSummaryWithDateTime(obj) {
+        var str = obj["Training Date"];
+        if (obj["Training Time"] != null) {
+            str += " / " + obj["Training Time"];
+        }
+
+        return str + " / " + getTrainingEventSummary(obj);
+    }
+
+    function setDataTable() {
+        var reportTitle = "Training List";
+        var exportColumns = returnTableColumnsByClass("dtTrainingList", "exportColumn");
+
+        $("#dtTrainingList").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "order": [[0, 'asc']], // Training Date
+            "columns": [
+                {
+                     
+                    mRender: function (data, type, row) {
+                        return row["Training Date"] + ' ' + row["Training Time"];
+                    }
+                },
+                { "data": 'Trainer' },
+                { "data": 'Training Topic' },
+                { "data": 'Training Method' },
+                { "data": 'Training Status' },
+                { "data": 'Notes' },
+                { "data": 'Individual Trainees', "className": "text-align-center" },
+                { "data": 'Cluster Trainees', "className": "text-align-center" },
+                { "data": 'Owner Group Trainees', "className": "text-align-center" },
+                { "data": 'Trainee' },
+                { "data": 'Market' },
+                { "data": 'Owner' },
+                { "data": 'Owner Group' },
+                {
+                    mRender: function (data, type, row) {
+                        var trainingEventId = row["Training Event ID"];
+                        return '<a href="#" onclick="editTraining(' + trainingEventId + ')">Edit</a>&nbsp;&nbsp;<a href="#" onclick="deleteTraining(' + trainingEventId + ',\'' + encodeURI(getTrainingEventSummaryWithDateTime(row)) + '\')">Delete</a>';
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": "text-align-center"
+                }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtTrainingList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               {
+                   extend: 'excel',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtTrainingList", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dtTrainingList", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dtTrainingList", data, columnIdx);
+                           }
+                       }
+                   }
+               }
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            initComplete: function () {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="../../images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+    }
+
+    function clearSearchButtonSetup() {
+        $("body").on("click", "#clear_search_button", function () {
+            var table = $("#dtTrainingList").DataTable();
+            table.search('').draw();
+        });
+    }
+
+    function loadLastSearch() {
+        //var search = getParameterByName("search");
+
+        //if (!search == false) {
+        //    if (search.length > 0) {
+        //        var sArray = new Array();
+        //        sArray = search.split("|");
+
+        //        //$("#searchText").val(sArray[0].toString());
+        //        //$("#searchTextNumber").val(sArray[1].toString());
+        //        $("#ddlMediaType").val(sArray[0].toString());
+
+        //        getMarketList();
+        //    }
+        //}
+
+        loadReportParameters();
+        setTimeout(getTrainingList, 1000);
+    }
+
+
+    function getTrainingList() {
+        //if ($("#ddlMediaType").val().length == 0)
+        //{
+        //    var table = $("#dtTrainingList").DataTable();
+        //    table.clear().draw();
+        //    return;
+        //}
+
+        //if ( $("#searchText").val().trim().length > 0 && $("#searchText").val().trim().length < 3)
+        //{
+        //    bootbox.alert('Market Name filter must be 3 characters or more. Filter being ignored.', function () {});
+        //    $("#searchText").val("");
+        //}
+        clearTimeout (unblockHandle);
+        unblockHandle = null;
+        setLocalStorage("search", $("#ddlMediaType").val());
+        setLocalStorage("searchPage", window.location);
+
+        var trainingType = $("#ddlType").val();
+        var userRole = $("#ddlRole").val();
+
+        var delimiter = '~';
+        var positionList = '';
+        if ($("#ddlPosition").val() != null) {
+            $("#ddlPosition").val().forEach(position => positionList += delimiter + position);
+            positionList = positionList.substr(delimiter.length);
+        }
+        $.blockUI();
+
+        $.ajax({
+            url: ServicePrefix + '/api/Training/GetTraining',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inStartDate": $("#dtStartDate").val(),
+                "inEndDate": $("#dtEndDate").val(),
+                "inMediaTypeId": $("#ddlMediaType").val(),
+                "inMarketId": $("#ddlMarket").val(),
+                "inOwnerId": $("#ddlOwner").val(),
+                "inTrainingTopicId": $("#ddlTopic").val(),
+                "inTrainingMethodId": $("#ddlMethod").val(),
+                "inTrainingStatusId": $("#ddlStatus").val(),
+                "inOnlyIndividual": (trainingType == "Individual"),
+                "inOnlyCluster": (trainingType == "Cluster"),
+                "inOnlyOwnerGroup": (trainingType == "OwnerGroup"),
+                "inIncludeInternal": isPreSelectedTrainee() || $("#chkIncludeInternal").prop('checked'),
+                "inOnlyMRRContacts": (userRole == "MRRContact"),
+                "inOnlyMRRRecipients": (userRole == "MRRRecipient"),
+                "inOnlyMRRManagers": (userRole == "MRRManager"),
+                "inXRYAccessLevelId": (userRole != null && userRole.substr(0, 3) == "XRY" ? userRole.substr(3) : null),
+                "inPositionCodeList": positionList,
+                "inPersonnelId": $("#ddlTrainee").val(),
+                "inTrainerPersonnelId": $("#ddlTrainer").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                    return;
+                }
+                // DEV-9110: show calendar even if empty, also show grid for simplicity/consistency
+                populateDataTable("dtTrainingList", data);
+                $(".searchResults").show();
+                populateCalendar(data);
+                if (data.report.rows.length == 0) {
+                    bootbox.alert("No matching events found");
+                    return;
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function populateCalendar(data) {
+        var trainingEventId;
+        var trainingTitle;
+        var url;
+        var events = [];
+
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+
+            trainingEventId = obj["Training Event ID"];
+
+            trainingTitle = getTrainingEventSummary(obj);
+            trainingEventSummary = getTrainingEventSummaryWithDateTime(obj);
+
+            events = events.concat([{
+                title: trainingTitle,
+                start: obj["Training Date Time ISO 8601"],
+                // url: url
+                extendedProps: {
+                    trainingDate: obj["Training Date"],
+                    trainingTime: obj["Training Time"],
+                    trainerName: obj["Trainer"],
+                    topicName: obj["Training Topic"],
+                    methodName: obj["Training Method"],
+                    statusName: obj["Training Status"],
+                    traineeName: obj["Trainee"],
+                    marketName: obj["Market"],
+                    ownerName: obj["Owner"],
+                    ownerGroupName: obj["Owner Group"],
+                    trainingEventId: obj["Training Event ID"],
+                    trainingEventSummary: trainingEventSummary
+                }
+            }]);
+        });
+
+        if ($('#divCalendar')) {
+            $('#divCalendar').fullCalendar('destroy');
+        }
+
+        $('#divCalendar').fullCalendar({
+            header: {
+//                left: 'prevYear,prev,next,nextYear today',
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month'//,agendaWeek,agendaDay,listYear'
+            },
+            validRange: {
+                start: $("#dtStartDate").val(),
+                end: moment($("#dtEndDate").val()).endOf('day')
+            },
+            //lazyFetching: false,
+            defaultDate: $("#dtEndDate").val(),
+            navLinks: true, // can click day/week names to navigate views
+            editable: true,
+            eventLimit: true, // allow "more" link when too many events
+            events: events,
+            // if eventLimit is hit, these events are not triggered unless user clicked on "+N more" first
+            //eventMouseover: function (event, jsEvent, view) {
+            // jsEvent.pageX, jsEvent.pageY = mouse coordinates
+            // $("#divCalendarEventSummary").html(event.extendedProps.trainingEventSummary);
+            //},
+            //eventMouseout: function (event, jsEvent, view) {
+            //    $("#divCalendarEventSummary").html("");
+            //}
+            eventClick: function (event, jsEvent, view) {
+                showEventDialog(event.extendedProps);
+            },
+        });
+
+        //$('#divCalendar').fullCalendar({
+        //    validRange: {
+        //        start: $("#dtStartDate").val(),
+        //        end: $("#dtEndDate").val()
+        //    },
+        //    defaultDate: $("#dtEndDate").val(),
+        //});
+    }
+
+    function showEventDialog(eventExtendedProps) {
+        $("#spanTrainingDate").text(eventExtendedProps.trainingDate);
+        $("#spanTrainingTime").text((eventExtendedProps.trainingTime == null) ? "unspecified" : eventExtendedProps.trainingTime);
+        $("#spanTrainerName").text(eventExtendedProps.trainerName);
+        $("#spanTopicName").text(eventExtendedProps.topicName);
+        $("#spanMethodName").text(eventExtendedProps.methodName);
+        $("#spanStatusName").text(eventExtendedProps.statusName);
+        $("#spanTraineeName").text(eventExtendedProps.traineeName);
+        $("#spanMarketName").text(eventExtendedProps.marketName);
+        $("#spanOwnerName").text(eventExtendedProps.ownerName);
+        $("#spanOwnerGroupName").text(eventExtendedProps.ownerGroupName);
+        $("#spanTrainingEventId").text(eventExtendedProps.trainingEventId);
+        $("#spanTrainingEventSummary").text(eventExtendedProps.trainingEventSummary);
+
+        $("#eventDialog").dialog("open");
+    }
+
+    function closeEventDialog() {
+        $("#eventDialog").dialog("close");
+    }
+
+    function editFromEventDialog() {
+        var trainingEventId = $("#spanTrainingEventId").text();
+        editTraining(trainingEventId);
+    }
+
+    function deleteFromEventDialog() {
+        var trainingEventId = $("#spanTrainingEventId").text();
+        var trainingEventSummary = $("#spanTrainingEventSummary").text();
+        deleteTraining(trainingEventId, trainingEventSummary);
+    }
+
+    function addTraining() {
+        window.location = "/admin/training/training.html";
+    }
+
+    function editTraining(trainingEventId) {
+        window.location = "/admin/training/training.html?trainingEventId=" + trainingEventId;
+    }
+
+    function deleteTraining(trainingEventId, trainingEventSummary) {
+        bootbox.confirm('Delete this training entry? (' + decodeURI(trainingEventSummary) + ')', function (result) {
+            if (result) {
+                deleteTrainingConfirmed(trainingEventId);
+            }
+        });
+    }
+
+    function deleteTrainingConfirmed(trainingEventId) {
+        $.ajax({
+            url: ServicePrefix + '/api/Training/DeleteTrainingEvent',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inTrainingEventId": trainingEventId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deleteTrainingSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function deleteTrainingSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        closeEventDialog(); // in case that's where user clicked Delete
+        getTrainingList();
+    }
+</script>

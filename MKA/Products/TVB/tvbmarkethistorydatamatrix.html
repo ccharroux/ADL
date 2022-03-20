@@ -1,0 +1,414 @@
+﻿<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>MKA Internal Media Site</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+    <!-- Facebook and Twitter integration -->
+    <meta property="og:title" content="" />
+    <meta property="og:image" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:site_name" content="" />
+    <meta property="og:description" content="" />
+    <meta name="twitter:title" content="" />
+    <meta name="twitter:image" content="" />
+    <meta name="twitter:url" content="" />
+    <meta name="twitter:card" content="" />
+
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="shortcut icon" href="../../favicon.ico">
+
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
+
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700" rel="stylesheet">
+
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="../../css/animate.css">
+    <!-- Icomoon Icon Fonts-->
+    <link rel="stylesheet" href="../../css/icomoon.css">
+    <!-- Simple Line Icons -->
+    <link rel="stylesheet" href="../../css/simple-line-icons.css">
+    <!-- Bootstrap  -->
+    <link rel="stylesheet" href="../../css/bootstrap.css">
+    <!-- Theme style  -->
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
+
+    <!-- Modernizr JS -->
+    <script src="../../js/modernizr-2.6.2.min.js"></script>
+
+    <!-- FOR IE9 below -->
+    <!--[if lt IE 9]>
+    <script src="js/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+<body>
+
+
+    <div id="fh5co-page">
+        <header id="fh5co-header" role="banner">
+            <div class="container">
+                <div class="header-inner" id="menu"></div>
+            </div>
+        </header>
+        <div id="fh5co-contact-section" class="contact-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12 text-center fh5co-heading">
+                        <h2>TVB Market History Maintenance </h2>
+                        <h4>Markets that are active for TVB and have Stations active for TVB</h4>
+                    </div>
+                </div>
+ 
+
+                <!-- start datatable coding-->
+
+                <div class="dataTable-top-margin">
+                    <table id="dt" class="dataTable-border dataTable-headers dataTable-cell-border">
+                        <thead>
+                            <tr>
+                                <th class="exportColumn">Market</th>
+                                <th class="exportColumn">Active<br />Period</th>
+                                <th class="exportColumn">Released<br />Period</th>
+                                <th class="exportColumn">Reviewed<br />Period</th>
+                                <th class="exportColumn">Revenue<br />Entered</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <h3 id="generatingData" style="color:red;width: 100%;text-align: center;display:none">Please wait...Working on this Request...</h3>
+                </div>
+
+                <!-- end datatable coding-->
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- jQuery -->
+    <script src="../../js/jquery.min.js"></script>
+    <!-- jQuery Easing -->
+    <script src="../../js/jquery.easing.1.3.js"></script>
+    <!-- Bootstrap -->
+    <script src="../../js/bootstrap.min.js"></script>
+    <!-- Bootbox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+    <!-- Waypoints -->
+    <script src="../../js/jquery.waypoints.min.js"></script>
+    <!-- BlockUI JS -->
+    <script src="../../js/blockUI.js"></script>
+    <!-- Config JS -->
+    <script src="../../js/config.js"></script>
+    <!-- MAIN JS -->
+    <script src="../../js/main.js"></script>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+
+</body>
+</html>
+<script>
+    var exportColumns;
+    var reportTitle;
+
+    $(document).ready(function ()
+    {
+
+        reportTitle = "TVB Market History Matrix";
+        exportColumns = returnTableColumnsByClass("dt", "exportColumn");
+
+        loadInitalData();
+
+        buildTechMenu("TechTools");
+        getData();
+        
+        setLocalStorage("search", "");
+        setLocalStorage("searchPage", window.location);
+
+    });
+
+
+    function loadInitalData()
+    {
+        $("#dt").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                {
+                    mRender: function (data, type, row) {
+
+                        var dataToParse = row["market"] + ' (' + row["marketId"] + ')';
+
+                        return buildMarketWrapper(dataToParse);
+                    },
+                    "orderable": true,
+                    "searchable": true,
+                    "className": "text-align-left"
+                },
+                { "data": 'Active Period', "className": "text-align-center" },
+                { "data": 'Released Period', "className": "text-align-center" },
+                { "data": 'Reviewed Period', "className": "text-align-center" },
+                { "data": 'Revenue Entered', "className": "text-align-center" },
+                {
+                    mRender: function (data, type, row) {
+                        var yearToStart = '2001';
+                        if (!row['Revenue Entered'] == false) {
+                            yearToStart = row['Revenue Entered'];
+                            yearToStart = yearToStart.substring(0, 4);
+
+                        }
+
+                        return '<a href="#" onclick="addData(' + row.marketId + ',\'' + row.market + '\',' + yearToStart + ');">Data Update</a>';
+                    },
+                    "orderable": false,
+                    "searchable": false, "className": "text-align-center"
+                },                
+                {
+                mRender: function (data, type, row) {
+ 
+
+                    return '<a href="#" onclick="openData(' + row.marketId + ',\'' + row.market + '\',' + ');">Open for Submission</a>';
+                    },
+                    "orderable": false,
+                    "searchable": false, "className": "text-align-center"
+                }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dt", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               {
+                   extend: 'excel',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dt", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               //{
+               //    extend: 'pdf',
+               //    title: reportTitle,
+               //    exportOptions: {
+               //        columns: exportColumns,
+               //        format: {
+               //            header: function (data, columnIdx) {
+               //                return returnExportColumnHeadingTitle("dt", data, columnIdx);
+               //            }
+               //        }
+               //    }
+               //},
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dt", data, columnIdx);
+                           }
+                       }
+                   }
+               }
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            initComplete: function () {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="../../images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+        });
+    }
+ 
+
+
+
+
+    function getData() {
+ 
+  
+
+        //filling out url for ajax
+        var url = ServicePrefix + '/api/TVBReport/GetTVBMarketHistoryDataMatrixList?inApiToken=' + getLocalStorage("APIToken");
+
+
+        //filling out settings for ajax call
+        var settings = {
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                populateDataTable("dt", data);
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        }
+
+        //ajax call
+        $.ajax(url, settings);
+
+    }
+
+    function openData(marketId, market)
+    {
+        if (isThisProduction() == true)
+        {
+            bootbox.alert("Sorry! This functionality is not allowed in " + environment);
+            return;
+        }
+        
+        bootbox.confirm('Are you sure you want to open up submissions?<br><br>NOTE: Even though you have selected market ' + marketId + '-' + market + ', this process will open up submissions for ALL TVB Markets.', function (result)
+        {
+
+            if (result)
+            {
+               doOpenData(marketId, market);
+            }
+
+        });
+    }
+    
+    function doOpenData(marketId, market)
+    {
+        //filling out url for ajax call
+        var url = ServicePrefix + '/api/TVB/OpenTVBCurrentMarketForSubmission';
+        var message = "Open for Submission for " + market;
+        clearTimeout(unblockHandle);
+        unblockHandle = null;
+
+        //filling out settings for ajax call
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId 
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                ajaxUpdateSuccess(data, textStatus, jQxhr, message);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown, message);
+            }
+        };
+        //ajax call
+        $.ajax(url, settings);
+
+    }
+
+    function addData(marketId, market, yearToStart)
+    {
+        if (isThisProduction() == true) {
+            bootbox.alert("Sorry! This functionality is not allowed in " + environment);
+            return;
+        }
+
+        bootbox.confirm('Are you sure you want to update data?<br><br>NOTE: Even though you have selected market ' + marketId + '-' + market + ', this process will update ALL TVB Markets.', function (result)
+        {
+
+            if (result) {
+                $("#dt_wrapper").hide();
+                $("#generatingData").show();
+                doaddData(marketId, yearToStart, market);
+            }
+            
+        });
+    }
+    function doaddData(marketId, yearToStart, market)
+    {
+
+        //filling out url for ajax call
+        var url = ServicePrefix + '/api/TVB/BulkUpdateTVBRevenueMarket';
+        var message = "Data Updated for " + market;
+        clearTimeout(unblockHandle);
+        unblockHandle = null;
+ 
+
+        //filling out settings for ajax call
+        var settings = {
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": marketId,
+                "inFromYear" : yearToStart
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                ajaxUpdateSuccess(data, textStatus, jQxhr, message);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown, message);
+            }
+        };
+        //ajax call
+        $.ajax(url, settings);
+    }
+
+ 
+    function ajaxUpdateSuccess(data, textStatus, jQxhr, message)
+    {
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+        }
+        else {
+            bootbox.alert(message + ' has been successfully been completed. Ranking has been added to the queue and you will receive an email when it completes or check Reports > Tech > Async Queue Status for updates.', function () { window.location = '/products/tvb/tvbmarkethistorydatamatrix.html'; });
+                
+            }   
+    }
+
+    function genericAjaxError(jqXhr, textStatus, errorThrown) {
+        MKAErrorMessageRtn(errorThrown);
+    }
+</script>

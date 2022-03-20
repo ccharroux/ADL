@@ -1,0 +1,790 @@
+﻿
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>MKA Internal Media Site</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Facebook and Twitter integration -->
+    <meta property="og:title" content="" />
+    <meta property="og:image" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:site_name" content="" />
+    <meta property="og:description" content="" />
+    <meta name="twitter:title" content="" />
+    <meta name="twitter:image" content="" />
+    <meta name="twitter:url" content="" />
+    <meta name="twitter:card" content="" />
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="../../css/animate.css">
+    <!-- Icomoon Icon Fonts-->
+    <link rel="stylesheet" href="../../css/icomoon.css">
+    <!-- Simple Line Icons -->
+    <link rel="stylesheet" href="../../css/simple-line-icons.css">
+    <!-- Bootstrap  -->
+    <link rel="stylesheet" href="../../css/bootstrap.css">
+    <!-- Theme style  -->
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
+    <!--Chosen Dropdown-->
+    <link rel="stylesheet" href="../../css/chosen.min.css" />
+    <!-- Modernizr JS -->
+    <script src="../../js/modernizr-2.6.2.min.js"></script>
+    <!-- FOR IE9 below -->
+    <!--[if lt IE 9]>
+    <script src="js/respond.min.js"></script>
+    <![endif]-->
+    <style>
+        select
+        {
+           width: 300px;
+        }
+
+        a {
+            white-space: nowrap !important;
+        }
+
+        td {
+            max-width: 100px !important;
+        }
+        .selectTd
+        {
+            height:265px;
+            vertical-align: middle!important;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="fh5co-page">
+        <header id="fh5co-header" role="banner">
+            <div class="container">
+                <div class="header-inner" id="menu"></div>
+            </div>
+        </header>
+        <div id="fh5co-contact-section" class="contact-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
+                        <h2 id="pageTitle"></h2>
+                        <h3 id="patient"></h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div>
+                        <label for="ddlPatients" class="dropdown-label">Patients</label><br>
+                        <select id="ddlPatients" class="search-ddl-select dropdown-select report-filter" onchange="getList();"></select>
+
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-7 selectTd" >
+                        <!-- search / filter area -->
+                        <hr>
+                        <!-- start datatable-->
+                        <div class="dataTable-top-margin">
+                            <table id="dt" class="dataTable-border dataTable-headers dataTable-cell-border">
+                                <thead>
+                                    <tr>
+                                        <th class="exportColumn">Time</th>
+                                        <th class="exportColumn">ADL</th>
+                                        <th class="exportColumn">Frequency</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+
+                            </table>
+                        </div>
+                        <!-- end datatable -->
+
+                    </div>
+                    <div class="col-md-1 selectTd" style="padding-top:60px">
+                        &nbsp;
+                    </div>
+                    <div class="col-md-3 selectTd">
+                        
+                        <hr>
+                        <label>Available ADL's</label>
+                        <br>
+                        <select id="ddlSystemADL" size=10>
+                            
+                        </select>
+                        <hr /> 
+                        <input type="button" value="Add ADL" onclick="moveMe('ddlSystemADL','ddlAssignedADL')"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--<div id="map" data-animate-effect="fadeIn"></div>-->
+    </div>
+    <div id="DateDialog" title="" style="display:none">
+        <div class="row">
+            <div class="col-md-2 marketOnHoldDateLabel">Market:</div>
+            <div class="col-md-7 marketOnHoldDateValue"><span id="spanMarketOnHoldDate_Market"></span></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2 marketOnHoldDateLabel">Product:</div>
+            <div class="col-md-7 marketOnHoldDateValue"><span id="spanMarketOnHoldDate_Product"></span></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2 marketOnHoldDateLabel">Hold Date:</div>
+            <div class="col-md-7 marketOnHoldDateValue"><input type="text" id="dtMarketOnHoldDate_Date" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 col-md-offset-9">
+                <input type="button" onclick="productMarketOnHoldConfirm();" Value="Confirm" />
+                <br /> &nbsp; <br />
+                <input type="button" onclick="productMarketOnHoldCancel();" Value="Cancel" />
+            </div>
+        </div>
+    </div>
+    <!-- jQuery -->
+    <script src="../../js/jquery.min.js"></script>
+    <!-- jQuery Easing -->
+    <script src="../../js/jquery.easing.1.3.js"></script>
+    <!-- Bootstrap -->
+    <script src="../../js/bootstrap.min.js"></script>
+    <!-- Bootbox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+    <!-- Waypoints -->
+    <script src="../../js/jquery.waypoints.min.js"></script>
+    <!-- BlockUI JS -->
+    <script src="../../js/blockUI.js"></script>
+    <!-- Config JS -->
+    <script src="../../js/config.js"></script>
+    <!-- MAIN JS -->
+    <script src="../../js/main.js"></script>
+    <!-- genericReport JS -->
+    <script src="../../js/genericReport.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+    <!-- plug-in to abbreviate HTML -->
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.20/dataRender/ellipsis.js"></script>
+    <!-- jQuery UI -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!--Chosen Dropdown-->
+    <script src="../../js/chosen.jquery.min.js"></script>
+</body>
+</html>
+<script>
+
+
+
+
+    $(document).ready(function () {
+
+        if (doesUserHaveAccessToFeature("adl facility assignment") == false)
+        {
+            return;
+        }
+        else {            
+            buildUIDialogs();
+            setTitle("Patient Scheduling");
+            setPatient("Carl Charroux");
+            setEventListeners();
+            setDataTable();
+           // addDialogComponents();
+            loadPatients("ddlPatients");
+            setDateControl();
+            buildMainMenu("Admin");
+            //loadSearchResults();
+            //getProductList(); // success -> getNewsList()
+            //getListFacilityADLS('ddlAssignedADL');
+            getPatientADLS();
+            getListSystemADLS('ddlSystemADL','ddlAssignedADL');
+        }
+     });
+
+    function getPatientADLS()
+    {
+
+/*         var url = ServicePrefix + '/api/News/GetNewsList';
+        url += '?inApiToken=' + getLocalStorage("APIToken");
+        
+        var productId = $("#ddlProduct").val();
+        if (productId != "") {
+            url += '&inProductId=' + productId;
+        }
+        if ($("#chkIncludeDeleted").prop("checked") || productId == "DEL" || productId == "UPD") {
+            url += '&inIncludeDeleted=true';
+        } */
+
+        $.ajax({
+            url: testURL,
+            dataType: 'json',
+            //type: 'get',
+            type: 'post',
+            data: JSON.stringify(testURLData),
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                data = testADLPatientADLSData;
+                console.log(data);
+            
+                populateDataTable("dt", data);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function setDateControl()
+    {
+        var holdDate  = currentDate();
+
+        $("#dtDate").val(holdDate);
+        $("#dtDate").datepicker({
+                                maxDate: "0",
+                                onSelect: function(dateText, inst) { 
+                        getList();
+                    }
+                                }); 
+    }
+
+    function buildUIDialogs() {
+
+        $(function () {
+            $("#DateDialog").dialog({
+                autoOpen: false,
+                resizable: false,
+                width: 700,
+                height: 500,
+                modal: true,
+                title: "Patient Care",
+                create: function (event, ui) {
+                    $(event.target).parent().css('position', 'fixed');
+                }
+            });
+        });
+        
+
+
+    }
+    function setEventListeners() {
+        
+
+
+        //var input = document.getElementById("searchTextNumber");
+        //input.addEventListener("keyup", function (event) {
+        //    // Cancel the default action, if needed
+        //    event.preventDefault();
+        //    // Number 13 is the "Enter" key on the keyboard
+        //    if (event.keyCode === 13) {
+        //        setLocalStorage("search", "");
+        //        editMarket(document.getElementById("searchTextNumber").value);
+        //    }
+        //});
+
+        //var input = document.getElementById("searchText");
+        //input.addEventListener("keyup", function (event) {
+        //    // Cancel the default action, if needed
+        //    event.preventDefault();
+        //    // Number 13 is the "Enter" key on the keyboard
+        //    if (event.keyCode === 13) {
+
+        //        getMarketList();
+        //    }
+        //});
+        $("body").on("click", "#clear_search_button", function () {
+            //this gets the datatable and gives access to the apis
+            var table = $("#dt").DataTable();
+            //this redraws the table and passes no search data 
+            //returning all rows back into the table unless there are any
+            //filter columns set
+            table.search('').draw();
+        });
+    }
+
+    function setDataTable() 
+    {
+    
+        var reportTitle = $("#pageTitle").text();
+
+        var exportColumns = returnTableColumnsByClass("dt", "exportColumn");
+
+        $("#dt").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "order": [[ 0, "asc" ]],
+            "searching" : false,
+            "paging":false,
+            "columns": [
+                { "data": "adlTime"},
+                {
+                    "data": 'adl',
+                    "className": "text-align-left"
+                },
+                {
+                    "data": 'adlFrequency',
+                    "className": "text-align-left"
+                },
+/*                 {
+                    mRender: function (data, type, row) {
+
+                        var action = '';
+                        
+                        if (row["ProductID"] == 'DEL')
+                        {
+                            action = action + '<font color="red">';
+
+                        }
+                        
+                        action = action + row["ProductID"];
+
+                        if (row["ProductID"] == 'DEL')
+                        {
+                            action = action + '</font>';
+                        }
+
+                        return action;
+                    },
+                    "orderable": true,
+                    "searchable": true,
+                    "className": "text-align-center"
+                },
+                { "data": 'NewsTitle' },
+                {
+                    "data": 'NewsDateTime',
+                    "className": "text-align-center"
+                },
+                { "data": 'NewsText', "render": $.fn.dataTable.render.ellipsis(200, true, false) },
+                {
+                    "data": 'Creator',
+                    "className": "text-align-center"
+                }, */
+                {
+                    mRender: function (data, type, row) {
+
+                        var action = '';
+
+                            action = action + "<a href='#' onclick='editItem(" + row.adlId + ");'>Edit</a><br>";
+                            action = action + "<a href='#' onclick='deleteItem(" + row.adlId + ");'>Delete</a>";
+
+                        
+/*                             if (row["IsPublic"].toUpperCase() == "YES")
+                            {
+                                action = action + " <a href='#' onclick='unapproveNews(" + row.NewsKey + ");'>Unapprove</a><br>";
+                            }
+                            else
+                            {
+                                action = action + " <a href='#' onclick='approveNews(" + row.NewsKey + ");'>Approve</a><br>";
+                            }
+                        
+                            action = action + " <a href='#' onclick='deleteNews(" + row.NewsKey + ");'>Delete</a><br>"; */
+ 
+                        return action;
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": "text-align-center"
+                }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [
+ 
+               {
+                   extend: 'excel',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dt", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+  
+               {
+                   extend: 'pdf',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dt", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dt", data, columnIdx);
+                           }
+                       }
+                   }
+               }
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+/*             initComplete: function () {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="../../images/red-x.png" /></button>');
+            }, */
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            }
+            /*,
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
+            }
+            */
+        });
+
+    }
+
+    function getListFacilityADLS(control)
+    {
+ 
+        $.ajax({
+            //url: ServicePrefix + '/api/Market/GetMarketListByProduct',
+            url: testURL,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify(testURLData),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                data = testADLFacilityAssignmentData;
+                console.log(data);
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+   
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].adlId + '">' + data.report.rows[index].adl + '</option>';
+
+                    });
+ 
+                    $("#"+control).html(str);
+ 
+                    //convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+
+    }
+    function getListSystemADLS(control, controlToCheck)
+    {
+ 
+        $.ajax({
+            //url: ServicePrefix + '/api/Market/GetMarketListByProduct',
+            url: testURL,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify(testURLData),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                data = testADLSystemData;
+                console.log(data);
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+   
+                    $.each(data.report.rows, function (index) {
+
+                        if (inThisList(data.report.rows[index].adlId, controlToCheck) == false)
+                        {
+                            str = str + '<option value="' + data.report.rows[index].adlId + '">' + data.report.rows[index].adl + '</option>';
+                        }
+                    });
+ 
+                    $("#"+control).html(str);
+ 
+                    //convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+
+
+    }
+    function getList() {
+
+/*         var url = ServicePrefix + '/api/News/GetNewsList';
+        url += '?inApiToken=' + getLocalStorage("APIToken");
+        
+        var productId = $("#ddlProduct").val();
+        if (productId != "") {
+            url += '&inProductId=' + productId;
+        }
+        if ($("#chkIncludeDeleted").prop("checked") || productId == "DEL" || productId == "UPD") {
+            url += '&inIncludeDeleted=true';
+        } */
+
+        $.ajax({
+            url: testURL,
+            dataType: 'json',
+            //type: 'get',
+            type: 'post',
+            data: JSON.stringify(testURLData),
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                data = testADLFacilityAssignmentata;
+                console.log(data);
+            
+                populateDataTable("dt", data);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    // functional area
+    function addItem() {
+        functionalityNotAvailable();
+        return;
+
+        window.location = "/admin/news/news.html";
+    }
+
+    function editItem(id) {
+        functionalityNotAvailable();
+        return;
+
+        window.location = "/admin/news/news.html?NewsKey=" + id;
+    }
+
+
+    function deleteItem(id) {
+
+        bootbox.confirm("Are you sure you want to delete this Facility?", function (result) {
+            if (result == true) {
+                deleteItemConfirmed(id);
+             }
+        });
+    }
+
+    function deleteItemConfirmed(id) {
+
+        functionalityNotAvailable();
+        return;
+
+        $.ajax({
+            url: ServicePrefix + '/api/News/UpdateNewsSoftDelete',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inNewsKey": id
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                deleteItemSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        });
+    }
+    
+    function deleteItemSuccess(data, textStatus, jQxhr) {
+
+        // not used here
+
+    function approve(NewsKey) {
+        bootbox.confirm("Are you sure you want to approve this news article?", function (result) {
+            if (result == true) {
+                approveNewsConfirmed(NewsKey);
+            }
+        });
+    }
+    function approveNewsConfirmed(NewsKey) {
+        $.ajax({
+            url: ServicePrefix + '/api/News/UpdateNewsApprove',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inNewsKey": NewsKey
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                approveNewsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function approveNewsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert('News article approved.');
+        getNewsList();
+    }
+
+    function unapproveNews(NewsKey) {
+        bootbox.confirm("Are you sure you want to unapprove this news article?", function (result) {
+            if (result == true) {
+                unapproveNewsConfirmed(NewsKey);
+            }
+        });
+    }
+
+    function unapproveNewsConfirmed(NewsKey) {
+        $.ajax({
+            url: ServicePrefix + '/api/News/UpdateNewsUnapprove',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inNewsKey": NewsKey
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                unapproveNewsSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function unapproveNewsSuccess(data, textStatus, jQxhr) {
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert('News article unapproved.');
+        getNewsList();
+    }
+
+        if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+
+        bootbox.alert('not approved.');
+        getList();
+    }
+
+    function loadSearchResults() {
+        loadReportParameters();
+        //getNewsList();
+    }
+
+    function getProductList() {
+        $.ajax({
+ //           url: ServicePrefix + '/api/Product/GetProductList',
+            url: testURL,
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+/*             data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+ */            data: JSON.stringify(testURLData),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                getProductListSuccess(data, textStatus, jQxhr);
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getProductListSuccess(data, textStatus, jQxhr) {
+
+/*         if (data.response.status != "SUCCESS") {
+            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            return;
+        }
+ */
+        var str = '<option value="">-- All Products --</option>';
+        $.each(data.report.rows, function (index) {
+            var obj = data.report.rows[index];
+            var productId = obj.P_ProductID.toUpperCase();
+            str += '<option value="' + productId + '">' + obj.P_ProductName + '</option>';
+        });
+        str += '<option value="DEL">DEL (hidden on public web site)</option>';
+        str += '<option value="UPD">UPD (hidden on public web site)</option>';
+        $("#ddlProduct").html(str);
+
+        getNewsList();
+    }
+function moveMe(control1, control2)
+{
+    var text = $('#' + control1 + ' option:selected').text();
+    var val = $('#' + control1 + ' option:selected').text();
+    if (val == "")
+    {
+         return;
+    }
+
+    $('#' + control2).append('<option value=' + val + '>'+ text +'</option>');
+ 
+    $("#" + control1).find("option:selected").remove();
+    
+    $('#' + control1 + " option:selected").removeAttr("selected");
+    $('#' + control2 + " option:selected").removeAttr("selected");
+    // get control 1
+    // add to control 2
+    // remove from control 1
+
+}
+</script>

@@ -1,0 +1,458 @@
+﻿<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>MKA Internal Media Site</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Facebook and Twitter integration -->
+    <meta property="og:title" content="" />
+    <meta property="og:image" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:site_name" content="" />
+    <meta property="og:description" content="" />
+    <meta name="twitter:title" content="" />
+    <meta name="twitter:image" content="" />
+    <meta name="twitter:url" content="" />
+    <meta name="twitter:card" content="" />
+
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="shortcut icon" href="../../favicon.ico">
+
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
+
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700" rel="stylesheet">
+
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="../../css/animate.css">
+    <!-- Icomoon Icon Fonts-->
+    <link rel="stylesheet" href="../../css/icomoon.css">
+    <!-- Simple Line Icons -->
+    <link rel="stylesheet" href="../../css/simple-line-icons.css">
+    <!-- Bootstrap  -->
+    <link rel="stylesheet" href="../../css/bootstrap.css">
+    <!-- Theme style  -->
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
+    <link rel="stylesheet" href="../..//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <!--Chosen Dropdown-->
+    <link rel="stylesheet" href="../../css/chosen.min.css" />
+
+    <!-- Modernizr JS -->
+    <script src="../../js/modernizr-2.6.2.min.js"></script>
+    <!-- FOR IE9 below -->
+    <!--[if lt IE 9]>
+        <script src="js/respond.min.js"></script>
+    <![endif]-->
+
+    <style>
+        .requiredText {
+            color: red !important;
+        }
+
+        .vertical-center {
+            vertical-align: middle;
+        }
+    </style>
+
+</head>
+<body>
+    <div id="fh5co-page">
+        <header id="fh5co-header" role="banner">
+            <div class="container">
+                <div class="header-inner" id="menu"></div>
+            </div>
+        </header>
+
+        <div id="fh5co-contact-section" class="contact-section">
+            <div class="container">
+                <div class="row" id="reportTitleRow">
+                    <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
+                        <h2 id="pageTitle">X-Ray Import Data Mapping Rule List</h2>
+                    </div>
+                </div>
+                <div id="divQuickReport">
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>
+
+                <div class="row search-section">
+                    <div>
+                        <div class="col-md-4">
+                            <label for="ddlScript" class="requiredText dropdown-label rptView"> * Script</label><br />
+                            <select id="ddlScript" apiInput="inScriptId" onchange="" class="mkaRequired dropdown-select rptView report-filter" errorMessage="Please select a Script to search."></select>
+                        </div>
+                        <div class="col-md-4">
+                            <div style="display:table-cell; text-align: right;">
+                                <label class="dropdown-label">&nbsp;</label><br />
+                                <input type="button" class="search-button" value="Search" onclick="getDataMappingRules();" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div style="display:table-cell; float: right;">
+                                <label class="dropdown-label">&nbsp;</label><br />
+                                <input type="button" value="+" class="addNewButton addNewButton-list-pages vertical-center" onclick="editRule(0)" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div id="dtResultsHolder" class="col-md-12 dataTable-top-margin">
+                            <table id="dtResults" class="dataTable-border dataTable-headers dataTable-cell-border"></table>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="../../js/jquery.min.js"></script>
+    <!-- jQuery Easing -->
+    <script src="../../js/jquery.easing.1.3.js"></script>
+    <!-- Bootstrap -->
+    <script src="../../js/bootstrap.min.js"></script>
+    <!-- Bootbox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+    <!-- Waypoints -->
+    <script src="../../js/jquery.waypoints.min.js"></script>
+    <!-- BlockUI JS -->
+    <script src="../../js/blockUI.js"></script>
+    <!-- Config JS -->
+    <script src="../../js/config.js"></script>
+    <!-- MAIN JS -->
+    <script src="../../js/main.js"></script>
+    <!-- genericReport JS -->
+    <script src="../../js/genericReport.js"></script>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <!--Chosen Dropdown-->
+    <script src="../../js/chosen.jquery.min.js"></script>
+
+</body>
+</html>
+
+<script>
+    $(document).ready(function () {
+        if (doesUserHaveAccessToFeature("XRAYIMPORTRULEADMIN") == false) {
+            return;
+        } else {
+            buildXRYMenu("Utility");
+            buildQuickReports(['xry']);
+
+            //get list of scripts
+            getScriptsList();
+
+            cleanupBackButton();
+        }
+    });
+
+    function getScriptsList() {
+        var control = "ddlScript";
+
+        $.ajax({
+            url: ServicePrefix + '/api/DataInput/GetDataInputList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="-1">-- Select a Script --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option value="' + data.report.rows[index].dataInputId + '">' + data.report.rows[index].inputSystem + ' (' + data.report.rows[index].dataInputId + ')' + '</option>';
+
+                    });
+
+                    $("#" + control).html(str);
+                    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function getDataMappingRules() {
+        //add validation to make sure required fields are completed
+        if (searchValidationPassed() == false) {
+            return;
+        }
+
+        var sUrl = ServicePrefix + "/api/XrayImport/GetImportDataMappingRulesList?";
+        sUrl += "inApiToken=" + getLocalStorage("APIToken");
+        sUrl += "&inScriptId=" + $("#ddlScript").val();
+
+        $.ajax({
+            url: sUrl,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                } else {
+                    loadResultsData(data);
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                MKAErrorMessageRtn(errorThrown);
+            }
+        });
+    }
+
+    function loadResultsData(data) {
+        //get columns
+        var columns = getResultsColumns();
+        //load the data
+        loadResultsDataTable(data, columns);
+    }
+
+    function getResultsColumns() {
+        var columnsToDisplay = new Array();
+
+        columnsToDisplay.push({
+            "title": "dataRuleId",
+            "visible": false,
+            "mData": "dataRuleId",
+            "orderable": false,
+            "searchable": false
+        });
+
+        columnsToDisplay.push({
+            "title": "scriptId",
+            "visible": false,
+            "mData": "scriptId",
+            "orderable": false,
+            "searchable": false
+        });
+
+        columnsToDisplay.push({
+            "title": "Column",
+            "visible": true,
+            "mData": "Column",
+            "className": "exportColumn"
+        });
+
+        columnsToDisplay.push({
+            "title": "Compare Value",
+            "visible": true,
+            "mData": "Compare Value",
+            "className": "exportColumn"
+        });
+
+        columnsToDisplay.push({
+            "title": "Required",
+            "visible": true,
+            "mData": "Required",
+            "className": "text-align-center exportColumn"
+        });
+
+        columnsToDisplay.push({
+            "title": "Active",
+            "visible": true,
+            "mData": "Active",
+            "className": "text-align-center exportColumn"
+        });
+
+        columnsToDisplay.push({
+            "mRender": function (data, type, row) {
+
+                var strActions = "";
+
+                //if the delete date is null, the rule is considered active.
+                //edit and delete options will show.
+                //otherwise, only the reactivate item will show.
+                if (row["Delete Date"] == null) {
+                    strActions += '<a href="#" onclick="editRule(' + row.dataRuleId + ');">Edit</a>';
+                    strActions += '&nbsp;&nbsp;<a href="#" onclick="deleteRule(' + row.dataRuleId + ');">Delete</a>';
+                } else {
+                    strActions += '<a href="#" onclick="reactivateRule(' + row.dataRuleId + ');">Reactivate</a>';
+                }
+
+                return strActions;
+            },
+            "searchable": false,
+            "className": "text-align-right"
+        });
+
+        return columnsToDisplay;
+    }
+
+    function loadResultsDataTable(data, columns) {
+
+        var results = data["report"]["rows"];
+
+        var searchTable;
+
+        if ($.fn.DataTable.isDataTable('#dtResults')) {
+            searchTable = $('#dtResults').DataTable();
+            searchTable.destroy();
+        }
+
+        resetDataTableDOM("dtResults", "dtResultsHolder", "dataTable-border dataTable-headers dataTable-cell-border");
+
+        searchTable = $("#dtResults").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "order": [],
+            "data": results,
+            "columns": columns,
+            "columnDefs": [
+                {
+                    orderable: false,
+                    targets: '_all'
+                }
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [
+            ],
+            initComplete: function () {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="../../images/red-x.png" /></button>');
+            },
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            "language": {
+                search: "Filter Results:"
+            }
+        });
+    }
+
+    function searchValidationPassed() {
+
+        var loopBreak = true;
+        $(".mkaRequired").each(function (index, el) {
+            var eID = "#" + $(el).attr("id");
+            var errorMessage = $(el).attr("errorMessage");
+
+            // Text
+            if ($(eID).prop('tagName').toLowerCase() == "input") {
+                if ($(eID).val().trim() == "") {
+
+                    bootbox.alert(errorMessage, function () { });
+
+                    loopBreak = false;
+                    return false;
+                }
+            }
+
+            // Select
+            if ($(eID).prop('tagName').toLowerCase() == "select") {
+                if ($(eID).val() == null || $(eID).val() == "-1") {
+                    bootbox.alert(errorMessage, function () { });
+                    loopBreak = false;
+                    return false;
+                }
+            }
+        });
+
+        return loopBreak;
+    }
+
+    function editRule(dataRuleId) {
+        window.location = "/products/xry/import/xryimportdatamappingrule.html?DataMappingRuleId=" + dataRuleId;
+    }
+
+    function deleteRule(dataMappingRuleId) {
+
+        $.ajax({
+            url: ServicePrefix + '/api/XrayImport/DeleteImportDataMappingRule',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inDataMappingRuleId": dataMappingRuleId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    bootbox.alert('Import Data Mapping Rule was deleted.', function () {
+                    });
+
+                    getDataMappingRules();
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function reactivateRule(dataMappingRuleId) {
+       
+        $.ajax({
+            url: ServicePrefix + '/api/XrayImport/ReactivateImportDataMappingRule',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inDataMappingRuleId": dataMappingRuleId
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    bootbox.alert('Import Data Mapping Rule was reactivated.', function () {
+                    });
+
+                    getDataMappingRules();
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+</script>

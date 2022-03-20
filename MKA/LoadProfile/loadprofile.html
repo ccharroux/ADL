@@ -1,0 +1,919 @@
+﻿<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>MKA Internal Media Site</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+    <!-- Facebook and Twitter integration -->
+    <meta property="og:title" content="" />
+    <meta property="og:image" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:site_name" content="" />
+    <meta property="og:description" content="" />
+    <meta name="twitter:title" content="" />
+    <meta name="twitter:image" content="" />
+    <meta name="twitter:url" content="" />
+    <meta name="twitter:card" content="" />
+
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="shortcut icon" href="../../favicon.ico">
+
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
+
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700" rel="stylesheet">
+
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="../../css/animate.css">
+    <!-- Icomoon Icon Fonts-->
+    <link rel="stylesheet" href="../../css/icomoon.css">
+    <!-- Simple Line Icons -->
+    <link rel="stylesheet" href="../../css/simple-line-icons.css">
+    <!-- Bootstrap  -->
+    <link rel="stylesheet" href="../../css/bootstrap.css">
+    <!-- Theme style  -->
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
+    <link rel="stylesheet" href="../..//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <!--Chosen Dropdown-->
+    <link rel="stylesheet" href="../../css/chosen.min.css" />
+
+    <!-- Modernizr JS -->
+    <script src="../../js/modernizr-2.6.2.min.js"></script>
+    <!-- FOR IE9 below -->
+    <!--[if lt IE 9]>
+    <script src="js/respond.min.js"></script>
+    <![endif]-->
+
+
+    <style>
+        .rdo-label {
+            padding-left: 5px;
+        }
+
+        .rtpViewRight {
+            margin-right: 5px;
+            vertical-align: top;
+            display: inline-block;
+        }
+
+        .rptView {
+            margin-left: 5px;
+            vertical-align: top;
+            display: inline-block;
+        }
+
+        .rptStartDate, .rptEndDate {
+            /*max-width:100px;*/
+            text-align: center;
+        }
+
+        .requiredText {
+            color: red !important;
+        }
+
+        .rptButton {
+            vertical-align: top;
+            display: inline-block;
+            float: right;
+        }
+
+        .contact-section {
+            padding-bottom: 2em !important;
+        }
+    </style>
+
+
+</head>
+<body>
+    <div id="fh5co-page">
+        <header id="fh5co-header" role="banner">
+            <div class="container">
+                <div class="header-inner" id="menu"></div>
+            </div>
+        </header>
+        <div id="fh5co-contact-section" class="contact-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
+                        <h2>Admin Load Profile</h2>
+                    </div>
+                </div>
+                <div id="divQuickReport">
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>
+                <div class="margin-top-0">
+                    <div class="row">
+                        <!--
+                        select by radio buttons market/owner
+                        ddl of owner or market
+                        -->
+                        <div class="col-md-12 text-align-left">
+                            <b>Select by:</b>&nbsp;&nbsp;
+                            <input type="radio" id="rdoMarket" name="profileOptions" value="market" class="report-filter" /><label for="rdoMarket" class="rdo-label rtpViewRight">Market</label>
+                            <input type="radio" id="rdoOwner" name="profileOptions" value="owner" class="report-filter" /><label for="rdoOwner" class="rdo-label rtpViewRight">Owner</label>
+                        </div>
+
+                        <!-- cluster api
+                        if market selected
+                        display ddl of markets
+                        checkboxes of owners
+                        -->
+                    </div>
+
+                        <div class="row text-align-left" style="margin-top: 20px;">
+                            <div class="col-md-2"></div>
+                            <div class="col-md-7 market-choice">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label class="dropdown-label rptView">Market</label>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <select id="ddlMarket" class="dropdown-select rptView report-filter" onchange="getOwnersByMarket();"></select>
+                                    </div>
+                                </div>
+                                <div class="row" style="margin-top: 20px;">
+                                    <div class="col-md-2">
+                                    </div>
+                                    <div class="col-md-4 text-align-center">
+                                        <input type="button" id="btnSelectAll" class="search-button" value="Select All" onclick="selectAll();" />
+                                        <input type="button" id="btnClearAll" class="search-button" value="Clear All" onclick="clearAll();" />
+                                    </div>
+                                    <div class="col-md-6">
+                                    </div>
+                                </div>
+                                <div class="row" style="margin-top: 20px;">
+                                    <div class="col-md-2">
+                                        <label class="dropdown-label rptView">Owners</label>
+                                    </div>
+                                    <div class="col-md-9 text-align-left">
+                                        <div id="owner-by-market">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- cluster api
+            if owner selected
+            checkboxes of markets
+            -->
+                            <div class="col-md-7 owner-choice" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label class="dropdown-label rptView">Owner</label>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <select id="ddlOwner" class="dropdown-select rptView report-filter text-align-left" onchange="getMarketsByOwner(); getOwnerGroupsByOwner();"></select>
+                                    </div>
+                                </div>
+                                <div class="row" style="margin-top: 20px;">
+                                    <div class="col-md-2">
+                                    </div>
+                                    <div class="col-md-4 text-align-center">
+                                        <input type="button" class="search-button" value="Select All" onclick="selectAll();" />
+                                        <input type="button" class="search-button" value="Clear All" onclick="clearAll();" />
+                                    </div>
+                                    <div class="col-md-6">
+                                    </div>
+                                </div>
+                                <div class="row" style="margin-top: 20px;">
+                                    <div class="col-md-2">
+                                        <label class="dropdown-label rptView">Markets</label>
+                                    </div>
+                                    <div class="col-md-9 text-align-left">
+                                        <div id="market-by-owner">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row" style="margin-top: 20px;">
+                                    <div class="col-md-2">
+                                        <label class="dropdown-label rptView">Owner&nbsp;Groups</label>
+                                    </div>
+                                    <div class="col-md-9 text-align-left">
+                                        <div id="ownergroup-by-owner">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 text-align-left">
+ 
+                                <input type="checkbox" id="chkKeepAssignments" /><label for="chkKeepAssignments" class="dropdown-select report-filter rdo-label rtpViewRight"></label><label class="dropdown-label rptView">Retain Current Assignments</label>
+                                <hr />
+                                <center>
+                                    <input type="button" id="btnReport" class="search-button" value="Assign" onclick="assignItems();" />
+                                </center>
+                            </div>
+
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- jQuery -->
+    <script src="../../js/jquery.min.js"></script>
+    <!-- jQuery Easing -->
+    <script src="../../js/jquery.easing.1.3.js"></script>
+    <!-- Bootstrap -->
+    <script src="../../js/bootstrap.min.js"></script>
+    <!-- Bootbox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+    <!-- Waypoints -->
+    <script src="../../js/jquery.waypoints.min.js"></script>
+    <!-- BlockUI JS -->
+    <script src="../../js/blockUI.js"></script>
+    <!-- Config JS -->
+    <script src="../../js/config.js"></script>
+    <!-- MAIN JS -->
+    <script src="../../js/main.js"></script>
+    <!-- genericReport JS -->
+    <script src="../../js/genericReport.js"></script>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <!--Chosen Dropdown-->
+    <script src="../../js/chosen.jquery.min.js"></script>
+
+</body>
+</html>
+
+<script>
+    $(document).ready(function () {
+
+        buildTechMenu("TechTools");
+        buildQuickReports(['tech']);
+
+        setupUI();
+
+        //load functionality based on market
+        getMarketList(true);
+        getOwnersList(true);
+
+        //resetting the ddl chosen with to match
+        //the ddlowner width was set to 0 because it was hidden on load
+        $("#ddlOwner").chosen({ width: '425' });
+        $("#ddlMarket").chosen({ width: '425' });
+    });
+
+    function setupUI() {
+
+        $("#rdoMarket").prop("checked", true);
+
+        //setup radio button click
+        //if market clicked
+        //select first market and load owners for that market
+        //if owner clicked
+        //select first owner and load markets and owner groups for that owner
+
+        $('input[type=radio][name=profileOptions]').change(function () {
+
+            if (this.value == 'market') {
+
+                $(".market-choice").show();
+                //hide owner sections
+                $(".owner-choice").hide();
+
+                getMarketList(false);
+
+            } else if (this.value == 'owner') {
+
+                //hide market section
+                $(".market-choice").hide();
+                //hide owner sections
+                $(".owner-choice").show();
+                //get list of markets for owner
+                //get list of owner groups for owner
+                getOwnersList(false);
+                
+            } else {
+
+                //defaulting to market value if the radio button value is lost
+                $(".market-choice").show();
+                //hide owner sections
+                $(".owner-choice").hide();
+
+                getMarketList(false);
+            }
+        });
+
+        $(".owner-choice").hide();
+
+    }
+
+    function getMarketList(pageLoad) {
+
+        if (!pageLoad) {
+            pageLoad = false;
+        }
+
+        if (pageLoad == false)
+        {
+            return;
+        }
+
+        var control = "ddlMarket";
+
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+
+                    $.each(data.report.rows, function (index) {
+
+                        if (index == 0) {
+                            str = str + '<option value="' + data.report.rows[index].marketId + '" selected="selected">' + data.report.rows[index].marketName + '</option>';
+                        } else {
+                            str = str + '<option value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
+                        }
+                    });
+
+                    $("#" + control).html(str);
+                    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    //now get the list of owners
+                    getOwnersByMarket();
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getOwnersByMarket() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerListByMarket',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inMarketId": $("#ddlMarket").val(),
+                "inIncludeBA": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    $("#owner-by-market").html('');
+                    var str = "";
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+                      
+                        str = str +
+                            '<input type="checkbox" id="o_' +
+                            obj.ownerid +
+                            '" value="' +
+                            obj.ownerid +
+                            '" name="checkOwners" class="report-filter"/><label for="o_' +
+                            obj.ownerid +
+                            '" class="rdo-label">' +
+                            obj.ownername +
+                            '</label><br/>';
+                    });
+
+                    $("#owner-by-market").html(str);
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function getOwnersList(pageLoad) {
+        
+        if (!pageLoad)
+        {
+            pageLoad = false;
+        }
+
+        if (pageLoad == false)
+        {
+            return;
+        }
+
+        var control = "ddlOwner";
+
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetOwnerList',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inActiveOnly": true,
+                "inAddDetails": false
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+
+                    $.each(data.report.rows, function (index) {
+
+                        if (index == 0) {
+                            str = str + '<option value="' + data.report.rows[index].OwnerID + '" selected="selected">' + data.report.rows[index].OwnerName + '&nbsp;(' + data.report.rows[index].OwnerID + ')</option>';
+                        } else {
+                            str = str + '<option value="' + data.report.rows[index].OwnerID + '">' + data.report.rows[index].OwnerName + '&nbsp;(' + data.report.rows[index].OwnerID + ')</option>';
+                        }
+                    });
+
+                    $("#" + control).html(str);
+                    convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    //get markets
+                    getMarketsByOwner();
+                    //get ownergroups
+                    getOwnerGroupsByOwner();
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getMarketsByOwner() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/Owner/GetMarketListByOwner',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerId": $("#ddlOwner").val()
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    $("#market-by-owner").html('');
+                    var str = "";
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+                        
+                        str = str +
+                            '<input type="checkbox" id="m_' +
+                            obj.M_MarketID +
+                            '" value="' +
+                            obj.M_MarketID +
+                            '" name="checkMarkets" class="report-filter" /><label for="m_' +
+                            obj.M_MarketID +
+                            '" class="rdo-label rtpViewRight" >' +
+                            obj.M_MarketName +
+                            '&nbsp;(' +
+                            obj.M_MarketID +
+                            ')</label><br/>';
+                    });
+
+                    $("#market-by-owner").html(str);
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function getOwnerGroupsByOwner() {
+
+        $.ajax({
+            url: ServicePrefix + '/api/OwnerGroup/GetOwnerGroupListByOwner',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerId": $("#ddlOwner").val(),
+                "inActiveOnly": true,
+                "inIncludeNationwide": true
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    $("#ownergroup-by-owner").html('');
+
+                    var str = "";
+                    $.each(data.report.rows, function (index) {
+
+                        var obj = data.report.rows[index];
+                        
+                        str = str +
+                            '<input type="checkbox" id="og_' +
+                            obj.ownerGroupId +
+                            '" value="' +
+                            obj.ownerGroupId +
+                            '" name="checkOwnerGroups" class="report-filter" /><label for="og_' +
+                            obj.ownerGroupId +
+                            '" class="rdo-label rtpViewRight" >' +
+                            obj.ownerGroupName +
+                            '&nbsp;(' +
+                            obj.ownerGroupId +
+                            ')</label><br/>';
+                    });
+
+                    $("#ownergroup-by-owner").html(str);
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function assignItems() {
+
+        //call validation function
+        //validateSelections();
+        var aOwners = new Array();
+        var aMarkets = new Array();
+        var aOwnerGroups = new Array();
+
+        if ($("#rdoMarket").is(':checked'))
+        {
+            aMarkets.push($("#ddlMarket").val());
+
+            $('input[name=checkOwners]:checked').each(function () {
+                //code
+                aOwners.push($(this).attr('value'));
+            });
+
+            if (aOwners.length == 0) {
+                bootbox.alert(
+                    "You haven't selected any owners to assign.",
+                    function () {
+
+                    }
+                );
+                return;
+            }
+        }
+
+        if ($("#rdoOwner").is(':checked'))
+        {
+            aOwners.push($("#ddlOwner").val());
+
+            $('input[name=checkMarkets]:checked').each(function () {
+                //code
+                aMarkets.push($(this).attr('value'));
+            });
+
+            $('input[name=checkOwnerGroups]:checked').each(function () {
+                //code
+                aOwnerGroups.push($(this).attr('value'));
+            });
+
+            if (aMarkets.length == 0 && aOwnerGroups.length == 0) {
+                bootbox.alert(
+                    "You haven't selected any markets or owner groups to assign.",
+                    function () {
+
+                    }
+                );
+                return;
+            }
+        }
+
+        //if retain current unchecked
+        //call delete api
+
+        if ($("#chkKeepAssignments").is(':checked'))
+        {
+            //keep assignments
+            //handle the other calls
+            if (aOwners.length > 0 && aMarkets.length > 0)
+            {
+                assignClusters(aOwners, aMarkets, aOwnerGroups);
+            }
+            else if (aOwnerGroups.length > 0)
+            {
+                assignOwnerGroups(aOwnerGroups);
+            }
+        }
+        else
+        {
+            //add message asking if you want to delete your assignments??
+            //call delete assignments
+            var msg = "You did not check <b>Retain Current Assignments</b>. This action will <font color='red'>DELETE</font> all of them. <br><br>Are you sure you want to <font color='red'>DELETE</font> your current assignments?";
+
+            var dialog = bootbox.dialog({
+                title: "Assignments",
+                message: msg,
+                size: 'large',
+                buttons: {
+                    yes: {
+                        label: "Yes",
+                        className: 'btn-primary',
+                        callback: function () {
+                            deleteAssignments(aOwners, aMarkets, aOwnerGroups);
+                        }
+                    },
+                    cancel: {
+                        label: "Cancel",
+                        className: '',
+                        callback: function () {
+                            return;
+                        }
+                    }
+                },
+                onEscape: function () {
+                    dialog.modal("hide");
+                    return;
+                }
+            });
+        
+        }
+
+    }
+
+    function deleteAssignments(aOwners, aMarkets, aOwnerGroups) {
+        setThisQueryToRunLongNoAutoUnBlock();
+
+        $.ajax({
+            url: ServicePrefix + '/api/LoadProfile/DeleteAssignments',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken")
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    if (aOwners.length > 0 && aMarkets.length > 0) {
+                        assignClusters(aOwners, aMarkets, aOwnerGroups);
+
+                    } else if (aOwnerGroups.length > 0) {
+                        assignOwnerGroups(aOwnerGroups);
+                    }
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+
+    function assignClusters(aOwners, aMarkets, aOwnerGroups)
+    {
+        var maxItems = 3;
+        var bLastRun = false;
+
+        if (aOwners.length == 0 && aMarkets.length == 0)
+        {
+            assignOwnerGroups(aOwnerGroups);
+            return;
+        }
+
+
+        var aLeftOverMarkets = new Array();
+        var aLeftOverOwners = new Array();
+        var aProcessMarkets = new Array();
+        var aProcessOwners = new Array();
+
+        // do we need to split the arrays?
+        if (aOwners.length <= maxItems && aMarkets.length <= maxItems)
+        {
+            bLastRun = true;
+            aProcessOwners = JSON.parse(JSON.stringify(aOwners));
+            aProcessMarkets = JSON.parse(JSON.stringify(aMarkets));
+        }
+        else
+        {
+            // this is an owner selection
+            if (aOwners.length == 1)
+            {
+                aLeftOverMarkets = aMarkets.slice(maxItems, aMarkets.length);
+                aProcessMarkets = aMarkets.slice(0, maxItems);
+                aProcessOwners = JSON.parse(JSON.stringify(aOwners));
+                aLeftOverOwners = JSON.parse(JSON.stringify(aOwners));
+            }
+            // this is a market selection
+            else
+            {
+                aLeftOverOwners = aOwners.slice(maxItems, aOwners.length);
+                aProcessOwners = aOwners.slice(0, maxItems);
+                aProcessMarkets = JSON.parse(JSON.stringify(aMarkets));
+                aLeftOverMarkets = JSON.parse(JSON.stringify(aMarkets));
+            }
+        }
+
+        //console.log('------------------');
+        //console.log('Last Run');
+        //console.log(bLastRun);
+        //console.log("markets");
+        //console.log(aMarkets);
+        //console.log(aProcessMarkets);
+        //console.log(aLeftOverMarkets);
+        //console.log("owners");
+        //console.log(aOwners);
+        //console.log(aProcessOwners);
+        //console.log(aLeftOverOwners);
+
+        setThisQueryToRunLongNoAutoUnBlock();
+
+        $.ajax({
+            url: ServicePrefix + '/api/LoadProfile/AssignCluster',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerId": aProcessOwners,
+                "inMarketId": aProcessMarkets
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS")
+                {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else
+                {
+                    if (bLastRun == true)
+                    {
+                        if (aOwnerGroups.length > 0)
+                        {
+                            assignOwnerGroups(aOwnerGroups);
+                        }
+                        else
+                        {
+                            //message that assignments are done
+                            bootbox.alert("Your assignments have been updated.", function () {});
+                        }
+                    }
+                    else
+                    {
+                        assignClusters(aLeftOverOwners, aLeftOverMarkets, aOwnerGroups);
+                        return;
+                    }
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown)
+            {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function assignOwnerGroups(aOwnerGroups) {
+
+        if (aOwnerGroups.length == 0) {
+            bootbox.alert(
+                "Your assignments have been updated.",
+                function () {
+
+                }
+            );
+            return;
+        }
+
+        setThisQueryToRunLongNoAutoUnBlock();
+
+        $.ajax({
+            url: ServicePrefix + '/api/LoadProfile/AssignOwnerGroup',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inOwnerGroupId": aOwnerGroups
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    //end of the line
+                    //send message that assignments are done
+                    bootbox.alert(
+                        "Your assignments have been updated.",
+                        function () {
+
+                        }
+                    );
+
+                }
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function selectAll()
+    {
+        if ($("#rdoMarket").is(':checked')) {
+            $("input[name=checkOwners]").prop('checked', true);
+        } else if ($("#rdoOwner").is(':checked'))
+        {
+            $("input[name=checkMarkets]").prop('checked', true);
+            $("input[name=checkOwnerGroups]").prop('checked', true);
+        } else
+        {
+            $("input[name=checkOwners]").prop('checked', true);
+        }
+    }
+
+    function clearAll()
+    {
+        if ($("#rdoMarket").is(':checked'))
+        {
+            $("input[name=checkOwners]").prop('checked', false);
+        } else if ($("#rdoOwner").is(':checked'))
+        {
+            $("input[name=checkMarkets]").prop('checked', false);
+            $("input[name=checkOwnerGroups]").prop('checked', false);
+        } else
+        {
+            $("input[name=checkOwners]").prop('checked', false);
+        }
+
+    }
+
+</script>

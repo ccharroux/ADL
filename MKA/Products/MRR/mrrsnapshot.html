@@ -1,0 +1,888 @@
+﻿<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>MKA Internal Media Site</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+    <!-- Facebook and Twitter integration -->
+    <meta property="og:title" content="" />
+    <meta property="og:image" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:site_name" content="" />
+    <meta property="og:description" content="" />
+    <meta name="twitter:title" content="" />
+    <meta name="twitter:image" content="" />
+    <meta name="twitter:url" content="" />
+    <meta name="twitter:card" content="" />
+
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="shortcut icon" href="../../favicon.ico">
+
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
+
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700" rel="stylesheet">
+
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="../../css/animate.css">
+    <!-- Icomoon Icon Fonts-->
+    <link rel="stylesheet" href="../../css/icomoon.css">
+    <!-- Simple Line Icons -->
+    <link rel="stylesheet" href="../../css/simple-line-icons.css">
+    <!-- Bootstrap  -->
+    <link rel="stylesheet" href="../../css/bootstrap.css">
+    <!-- Theme style  -->
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
+    <link rel="stylesheet" href="../..//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.7/css/fixedHeader.dataTables.min.css">
+ 
+    <!--Chosen Dropdown-->
+    <link rel="stylesheet" href="../../css/chosen.min.css" />
+
+    <!-- Modernizr JS -->
+    <script src="../../js/modernizr-2.6.2.min.js"></script>
+    <!-- FOR IE9 below -->
+    <!--[if lt IE 9]>
+    <script src="js/respond.min.js"></script>
+    <![endif]-->
+
+
+    <style>
+
+        #dtResults thead
+        {
+            display:none;
+        }
+
+        /*table.dataTable thead th, table.dataTable thead td {
+            padding: 3px 3px !important;
+            max-width: none !important;
+            font-size: 15px !important;
+            max-width: none;
+        }*/
+         td.highlightBackground{
+            background:   #aed6f1   !important;
+        }
+
+         tr.highlightBackground{
+            background:   #aed6f1   !important;
+        }
+          
+        .rptView
+        {
+            margin-left: 5px;
+            vertical-align: top;
+            display:inline-block;
+        }
+        .rptStartDate, .rptEndDate
+        {
+            /*max-width:100px;*/
+            text-align: center;
+        }
+ 
+        .requiredText
+        {
+            color: red!important;
+        }
+        .rptButton
+        {
+            vertical-align: top;
+            display:inline-block;
+            float:right;
+        }
+        .contact-section {
+            padding-bottom: 2em!important;
+        }
+        .redText
+        {
+            color: red !important;
+        }
+
+        .dataTables_scrollBody
+        {
+            height: auto !important;
+            max-height: 480px !important;
+        }
+
+        td, th
+        {
+            max-width:35px !important;
+            min-width:35px !important;
+            width: 35px!important;
+        }
+        .dataTables_scrollBody
+        {
+            overflow-x: hidden!important;
+        } 
+    </style>
+
+
+</head>
+<body>
+    <div id="fh5co-page">
+        <header id="fh5co-header" role="banner">
+            <div class="container">
+                <div class="header-inner" id="menu"></div>
+            </div>
+        </header>
+
+        <div id="fh5co-contact-section" class="contact-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
+                        <h2 id="reportTitle">MRR Snapshot</h2>
+                    </div>
+                </div>
+                <div id="divQuickReport" >
+                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
+                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
+                </div>
+                <!-- search / filter area -->
+                <div class="row search-section">
+                    <div class="col-md-12">
+                        <center>
+                            <div class="form-group rptView rptMediaType">
+                                <label for="ddlMarket" class="dropdown-label rptView rptMediaType">Market</label>
+                                <select id="ddlMarket" apiInput="inMarketId" onchange="getReport()" class="dropdown-select rptView rptMarket"></select>
+                            </div>
+                            <div class="form-group rptView rptYear">
+                                <label for="ddlYear" class="dropdown-label rptView rptYear">Year</label>
+                                <select id="ddlYear" apiInput="inYear" onchange="getReport()" class="dropdown-select rptView rptYear"></select>
+                            </div>
+                            <div class="form-group rptView rptPeriod">
+                                <label for="ddlPeriod" class="dropdown-label rptView rptPeriod">Period</label>
+                                <select id="ddlPeriod" apiInput="inPeriod" onchange="getReport()" class="dropdown-select rptView rptPeriod"></select>
+                            </div>
+                            <!--<div class="form-group col-md-3 rptButton" style="float:none;text-align:left">
+                                <label for="btnReport" class="dropdown-label">&nbsp;</label>
+                                <input type="button" id="btnReport" class="search-button" value="Show" onclick="getReport()" />
+                            </div>-->
+                            <div>
+                                <b>View:&nbsp;</b> <input type="radio" value="markettotals" name="radSnapshotView" checked="checked" onclick="changeReportView()" />&nbsp;Market Totals
+                                &nbsp;&nbsp;<input type="radio" value="contacts" name="radSnapshotView"  onclick="changeReportView()" />&nbsp;Contacts
+                                &nbsp;&nbsp;<input type="radio" value="clustertotals" name="radSnapshotView"   onclick="changeReportView()" />&nbsp;Cluster Totals
+                                &nbsp;&nbsp;<input type="radio" value="stationdetailbycluster" name="radSnapshotView" onclick="changeReportView()" />&nbsp;Stations by Cluster Totals
+                                &nbsp;&nbsp;<input type="radio" value="stationdetail" name="radSnapshotView" onclick="changeReportView()" />&nbsp;Station Totals
+                       </div>
+                        </center>
+                    </div>
+                </div>
+                <!-- data table html -->
+                <div class="dataTable-top-margin">
+                    <div id="dtResultsHolder">
+                        <table id="dtResults" class="dataTable-border dataTable-headers dataTable-cell-border">
+ 
+                        </table>
+                    </div>
+                    <div id="noDataFound" style="display:none; color: red">No data found</div>
+                </div>
+            </div>
+
+        </div>
+ 
+    </div>
+
+    <!-- jQuery -->
+    <script src="../../js/jquery.min.js"></script>
+    <!-- jQuery Easing -->
+    <script src="../../js/jquery.easing.1.3.js"></script>
+    <!-- Bootstrap -->
+    <script src="../../js/bootstrap.min.js"></script>
+    <!-- Bootbox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+    <!-- Waypoints -->
+    <script src="../../js/jquery.waypoints.min.js"></script>
+    <!-- BlockUI JS -->
+    <script src="../../js/blockUI.js"></script>
+    <!-- Config JS -->
+    <script src="../../js/config.js"></script>
+    <!-- MAIN JS -->
+    <script src="../../js/main.js"></script>
+    <!-- genericReport JS -->
+    <script src="../../js/genericReport.js"></script>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+    <script src="https://cdn.datatables.net/fixedheader/3.1.7/js/dataTables.fixedHeader.min.js" type="text/javascript"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <!--Chosen Dropdown-->
+    <script src="../../js/chosen.jquery.min.js"></script>
+
+</body>
+</html>
+<script>
+
+    var reportObject = new Object();
+    var reportFilterArray = new Object();
+
+    var api = "";
+    var apiParameters = new Object();
+    var apiToken = "";
+
+    var searchText = "";
+
+    var columns = [];
+    var columnsToDisplay = new Array();
+    var columnsToExport = new Array();
+
+    var inMarketId = getParameterByName("marketId");
+    var paramRevenueYear = getParameterByName("year");
+    var paramRevenuePeriod = getParameterByName("period");
+
+    $(document).ready(function ()
+    {
+
+ 
+        buildMRRMenu("Products");
+        buildQuickReports(['mrr pre-release']);
+        convertToChosenSelect("ddlQuickReport", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+        reportObject = getReportObject();
+        reportFilterArray = getReportFilterArray();
+        displayFilters(reportFilterArray);
+
+        getYearList();
+        getPeriodList('all', "priorperiod");
+        getMarketList();
+
+        loadReportParameters();
+        
+    });
+
+    function changeReportView()
+    {
+        reportObject = getReportObject();
+        reportFilterArray = getReportFilterArray();
+        getReport();
+    }
+
+    function getMarketList() {
+
+
+
+        $.ajax({
+            url: ServicePrefix + '/api/Market/GetMarketListByProduct',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "inApiToken": getLocalStorage("APIToken"),
+                "inProductId": 'mrr'
+            }),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+
+
+                if (data.response.status != "SUCCESS") {
+                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+                    str = '<option value="">-- Select a Market --</option>';
+                    $.each(data.report.rows, function (index) {
+
+                        str = str + '<option ';
+
+                        str = str + ' value="' + data.report.rows[index].marketId + '">' + data.report.rows[index].marketName + '</option>';
+
+                    });
+
+                    $("#ddlMarket").html(str);
+                    convertToChosenSelect("ddlMarket", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                    if (!inMarketId == false)
+                    {
+                        $("#ddlMarket").val(inMarketId);
+
+                        getReport();
+                    }
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+    //----------------
+    // Local Calls
+    //----------------
+    function getReportObject()
+    {
+        var view = $("input[name='radSnapshotView']:checked").val();
+
+        var tempObject = new Object();
+
+        columnsToDisplay = new Array();
+ 
+        switch (view )
+        {
+            case "markettotals":
+                tempObject =
+                {
+                    reportTitle: "MRR Snapshot Market Totals",
+                    apiControllerAction: "/api/MRRReport/GetMRRSnapshotMarketTotals",
+                    apiType: "get",
+                    columnsToDisplay: columnsToDisplay,
+                    product: 'mrr',
+                    sortable: false
+                }
+                break;
+            case "contacts":
+                tempObject =
+                {
+                    reportTitle: "MRR Snapshot Contacts",
+                    apiControllerAction: "/api/MRRReport/GetMRRSnapshotContacts",
+                    apiType: "get",
+                    columnsToDisplay: columnsToDisplay,
+                    product: 'mrr',
+                    sortable: true
+                }
+                break;
+            case "clustertotals":
+                tempObject =
+                {
+                    reportTitle: "MRR Snapshot Cluster Totals",
+                    apiControllerAction: "/api/MRRReport/GetMRRSnapshotClusterTotals",
+                    apiType: "get",
+                    columnsToDisplay: columnsToDisplay,
+                    product: 'mrr',
+                    sortable: false
+                }
+                break;
+
+            case "stationdetailbycluster":
+                tempObject =
+                {
+                    reportTitle: "MRR Snapshot Station by Cluster",
+                    apiControllerAction: "/api/MRRReport/GetMRRSnapshotStationDetailByCluster",
+                    apiType: "get",
+                    columnsToDisplay: columnsToDisplay,
+                    product: 'mrr',
+                    sortable: false
+                }
+                break;
+            case "stationdetailbycluster":
+                tempObject =
+                {
+                    reportTitle: "MRR Snapshot Stations By Custer",
+                    apiControllerAction: "/api/MRRReport/GetMRRSnapshotStationDetailByCluster",
+                    apiType: "get",
+                    columnsToDisplay: columnsToDisplay,
+                    product: 'mrr',
+                    sortable: false
+                }
+                break;
+            case "stationdetail":
+                tempObject =
+                {
+                    reportTitle: "MRR Snapshot Stations",
+                    apiControllerAction: "/api/MRRReport/GetMRRSnapshotStationDetail",
+                    apiType: "get",
+                    columnsToDisplay: columnsToDisplay,
+                    product: 'mrr',
+                    sortable: false
+                }
+                break;
+        }
+
+        $("#reportTitle").html(tempObject.reportTitle);
+        return tempObject;
+    }
+    function getReportFilterArray() {
+
+        var arrayFilters = new Array();
+        var arrayObject = new Object();
+
+        arrayObject = new Object();
+        arrayObject = {
+            token: "Year",
+            jsCall: "getYearList",
+            objectName: "ddlYear",
+            required: true
+        }
+        arrayFilters.push(arrayObject);
+
+        arrayObject = new Object();
+        arrayObject = {
+            token: "Period",
+            objectName: "ddlPeriod",
+            jsCall: "getPeriodList",
+            required: true
+        }
+        arrayFilters.push(arrayObject);
+
+        arrayObject = {
+            token: "Market",
+            jsCall: "getMediaList",
+            objectName: "ddlMarket",
+            required: true
+        }
+        arrayFilters.push(arrayObject);
+
+        return arrayFilters;
+    }
+
+
+    function displayFilters(arrayFilters) {
+
+        for (var i = 0; i < arrayFilters.length; i++) {
+
+            if (arrayFilters[i].required == true) {
+
+                var input = $("#" + arrayFilters[i].objectName);
+                $("label[for=" + input.attr("id") + "]").css("color", "red");
+                $("label[for=" + input.attr("id") + "]").prepend(" * ");
+
+            }
+        }
+
+    }
+    function getReport()
+    {
+        bLongQuery = true;
+        $("#noDataFound").hide();
+
+        api = reportObject.apiControllerAction;
+        apiParameters = new Object();
+        apiToken = getLocalStorage("APIToken");
+        searchText = "";
+        columns = [];
+
+
+        //------------------------
+        //setup the parameters for the API
+        //------------------------
+
+        if (reportObject.apiType.toLowerCase() == "post") {
+            apiParameters["inApiToken"] = apiToken;
+        }
+        else {
+            api = api + "?inApiToken=" + apiToken;
+        }
+
+        //------------------------
+        // loop thru filters
+        //------------------------
+        var itemsToCheckLength = reportFilterArray.length;
+
+        //-------------------------------
+        // This is the no filter use case
+        //-------------------------------
+        if (itemsToCheckLength == 0) {
+            getTheReportAJAX();
+            return;
+        }
+
+        $.each(reportFilterArray, function (objectName, objectValue)
+        {
+            var control = objectValue.objectName;
+
+            var nameOfParm = $("#" + control).attr("apiInput");
+            var item = "#" + control;
+            var isRequired = objectValue.required;
+
+ 
+            if ($(item).val() != "" && $(item).val() != null)
+            {
+                if (reportObject.apiType.toLowerCase() == "post")
+                {
+                    apiParameters[nameOfParm] = $(item).val();
+                }
+                else {
+                    api = api + "&" + nameOfParm + "=" + $(item).val();
+                }
+
+            }
+            else {
+                if (isRequired)
+                {
+                    //var msg = "Please select a " + nameOfParm.toLowerCase().replace("in", "").replace("id", "");
+                    //bootbox.alert(msg, function () { });
+                    return false;
+                }
+            }
+
+            // when done with the loop
+            // get the report
+            if (objectName == (itemsToCheckLength - 1)) {
+
+                getTheReportAJAX();
+            }
+
+        });
+
+
+
+
+
+    }
+    function getTheReportAJAX() {
+
+
+        $.ajax({
+            url: ServicePrefix + api,
+            dataType: 'json',
+            type: reportObject.apiType.toString().toLowerCase(),
+            contentType: 'application/json',
+            data: JSON.stringify(apiParameters),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status.toUpperCase() === "SUCCESS") {
+
+                    buildColumnsArray(data);
+
+                }
+                else {
+                    var msg = data.response.errorMessage[0];
+                    bootbox.alert(msg, function () { });
+                    return false;
+                }
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+    }
+    function buildColumnsArray(dataObj)
+    {
+        columnsToExport = new Array();
+
+        if (!dataObj["report"]["rows"]) {
+            destroyDataTable();
+            $("#noDataFound").show();
+
+            return;
+        }
+
+        if (dataObj["report"]["rows"].length == 0) {
+            destroyDataTable();
+            $("#noDataFound").show();
+            return;
+        }
+        destroyDataTable();
+        $('#dtResults').show();
+
+        var data = dataObj["report"]["rows"][0];
+        var ctr = -1;
+
+        $.each(data, function (objectName, objectValue) {
+
+
+            if (reportObject.columnsToDisplay.length == 0 ||
+                IsInArray(reportObject.columnsToDisplay, objectName) == true)
+            {
+
+                var className = "";
+
+
+                if (objectValue === null)
+                {
+                    className = "";
+                }
+                else
+                {
+                    if (isNaN(objectValue) == false)
+                    {
+                        if (objectValue.toString().length > 0)
+                        {
+                            className = "text-align-right";
+                        }
+                    }
+                    else
+                    {
+                        className = "";
+                        if (objectValue.toString().indexOf("$") > -1)
+                        {
+                            className = "text-align-right";
+                        }
+                        if (objectValue.toString().indexOf("%") > -1)
+                        {
+                            className = "text-align-right";
+                        }
+                    }
+                }
+
+
+                if (objectName.toLowerCase().indexOf("revenue") > -1 ||
+                    objectName.toLowerCase().indexOf("change") > -1
+                    )
+                {
+
+
+                    className = "text-align-right";
+
+                    //if (objectValue != null) {
+
+                    //    console.log('------');
+                    //    console.log(objectValue.toString().indexOf("-"));
+                    //    console.log(objectValue);
+
+                    //    if (objectValue.toString().indexOf("-") > -1)
+                    //    {
+                    //        className = "text-align-right redText";
+                    //    }
+                    //    else
+                    //    {
+                    //        className = "text-align-right";
+                    //    }
+                    //}
+
+                }
+
+                ctr++;
+                columnsToExport.push(ctr);
+
+                var bSortable = true;
+                if (reportObject.sortable == 'undefined') {
+                    bSortable = true;
+
+                }
+                else {
+                    bSortable = reportObject.sortable;
+                }
+
+
+                if (objectName.toLowerCase().indexOf("total") > -1)
+                {
+                        // do not use
+                }
+                else if (objectName.toLowerCase().indexOf("change") > -1)
+                {
+                    columns.push({
+                        "title": objectName,
+                        "visible": true,
+                        mRender: function (data, type, row) {
+ 
+                            if (row[objectName] == null)
+                            {
+                                return '';
+                            }
+
+                            if (row[objectName].toString().lastIndexOf('-') > -1) {
+                                return "<font color='red'>" + row[objectName] + "</font>"
+                            }
+                            else 
+                            {
+                                return row[objectName];
+                            }
+
+                        },
+                        "orderable": bSortable,
+                        "className": className
+                    });
+                }
+                else
+                {
+                    columns.push({
+                        "title": objectName,
+                        "visible": true,
+                        "mData": objectName,
+                        "orderable": bSortable,
+                        "className": className
+                    });
+                }
+
+            }
+        });
+
+        loadResults(dataObj, columns);
+    }
+
+    function IsInArray(arrayToSearch, valToFind)
+    {
+        for (var i = 0; i < arrayToSearch.length; i++)
+        {
+            if (arrayToSearch[i].toLowerCase() == valToFind.toLowerCase())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    function loadResults(data, columns) {
+        //data is the data from the ajax call
+        //columns is the array that was built previously
+
+        //assigns the data from the ajax call
+        var results = data["report"]["rows"];
+
+        //creating a variable that will used for datatable functions later
+        var searchTable;
+
+        //if the datatable already exists need to destroy it before building it
+        //again with new results from the search.
+        //if you try to destroy before it is a datatable, an error will occur.
+        //this code will only destroy it if the table is a datatable.
+        if ($.fn.DataTable.isDataTable('#dtResults')) {
+            searchTable = $('#dtResults').DataTable();
+            searchTable.destroy();
+        }
+
+        //this code rebuilds the datatable with the updated data from the search 
+        //or initial load.
+        var holdCategory = "";
+        var holdOwner = "";
+
+        searchTable = $("#dtResults").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": 25,
+            "order": [],
+            "data": results,
+            "paging": false,
+            "autoWidth": true,
+            //fixedHeader: {
+            //    header: true 
+            //},
+            "scrollY": '800px',
+            "scrollX": false,
+            "columns": columns,
+            "select": true,
+ 
+            language: {
+                search: "Filter Results:"
+            },
+            createdRow: function (row, data, index) {
+                //
+                // if the second column cell is blank apply special formatting
+                //
+                //console.log(data["Station"]);
+
+
+                if (!data["Category"] == false) {
+                    var temp = data["Category"];
+                    if (data["Category"] == holdCategory)
+                    {
+                        row.cells[0].innerText = "";
+                    }
+                    holdCategory = temp;
+                }
+
+                //if (!data["Station"] == false) {
+                //    if (data["Station"] == "Total") {
+                //        //console.dir(row);
+                //        //console.log("HITTTTT");
+                //        $(row).addClass('highlightBackground');
+                //        if (!data["Category"] == false) {
+                //            row.cells[0].innerText = holdCategory;
+                //        }
+                //        row.cells[1].innerText = data["Owner"];
+                //    }
+                //}
+
+                if (!data["Owner"] == false) {
+                    var temp = data["Owner"];
+                    if (data["Owner"] == holdOwner) {
+                        row.cells[1].innerText = "";
+                    }
+                    holdOwner = temp;
+
+                    if (data["Owner"].indexOf("Total") > -1)
+                    {
+                        row.cells[1].innerText = data["Owner"];
+                        //console.dir(row);
+                        //console.log("HITTTTT");
+                        $(row).addClass('highlightBackground');
+                        if (!data["Category"] == false) {
+                            row.cells[0].innerText = holdCategory;
+                        }
+                    }
+
+                }
+                if (!data["Station"] == false) {
+                    if (data["Station"] == "Total") {
+                        //console.dir(row);
+                        //console.log("HITTTTT");
+                        $(row).addClass('highlightBackground');
+                        if (!data["Category"] == false) {
+                            row.cells[0].innerText = holdCategory;
+                        }
+                        row.cells[1].innerText = data["Owner"];
+                        holdCategory = "";
+                        
+                    }
+                }
+            },
+            "buttons": [
+               //{
+               //    extend: 'csv',
+               //    exportOptions: {
+               //        columns: columnsToExport
+               //    }
+               //},
+               {
+                   extend: 'excel',
+                   title: reportObject.reportTitle,
+                   exportOptions: {
+                       columns: columnsToExport
+                   }
+               },
+               //{
+               //    extend: 'pdf',
+               //    title: reportObject.reportTitle,
+               //    exportOptions: {
+               //        columns: columnsToExport
+               //     }
+               //},
+               {
+                   extend: 'print',
+                   title: reportObject.reportTitle,
+                   exportOptions: {
+                       columns: columnsToExport
+
+                   }
+               }
+            ],
+        });
+ 
+ 
+    }
+ 
+    function destroyDataTable()
+    {
+
+        if ($.fn.DataTable.isDataTable('#dtResults'))
+        {
+            var searchTable = $('#dtResults').DataTable();
+            searchTable.destroy();
+            $('#dtResults').hide();
+        }
+
+        //If you want to repopulate the datatable with new columns and data,
+        //you need to remove the datatable from the DOM. 
+        //The .remove function will remove it.
+        $('#dtResults').remove();
+
+        //Once you remove the datatable from the DOM, you need add the HTML back to the page.
+        //I added a name to the DIV that has the table html. I used the datatable name plus added "Holder".
+        //The following coding adds the table back.
+        $("#" + 'dtResults' + "Holder").html('<table id="dtResults"   class="dataTable-border dataTable-headers dataTable-cell-border">  </table>');
+
+
+    }
+ 
+
+</script>
