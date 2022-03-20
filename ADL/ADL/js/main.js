@@ -5,7 +5,12 @@ const gMediaTypeOutOfHome = "OUT OF HOME";
 const gMediaTypeNetwork = "NETWORK";
 const gMediaTypeSurvey = "SURVEY";
 
-const cLocation = "../../";
+var startLocation = "";
+
+if (window.location.toString().toLowerCase().indexOf("pixxsports") > -1)
+{
+    startLocation = "http://www.pixxsports.com/adl/";
+}
 
 // TEMP AREA
 
@@ -36,7 +41,7 @@ var testADLPatientADLSData = {
         "rows" :[
             {
                 "adlTime" : "08:00",
-                "adl": "Meal Prepparation + Feeding: Breakfast",
+                "adl": "Meal Preparation + Feeding: Breakfast",
                 "adlFrequency": "Daily"
             },
             {
@@ -46,7 +51,7 @@ var testADLPatientADLSData = {
             },
             {
                 "adlTime" : "11:30",
-                "adl" : "Meal Prepparation + Feeding: Lunch",
+                "adl" : "Meal Preparation + Feeding: Lunch",
                 "adlFrequency" : "Daily"
             },
             {
@@ -56,7 +61,7 @@ var testADLPatientADLSData = {
             },
             {
                 "adlTime" : "17:00",
-                "adl" : "Meal Prepparation + Feeding: Dinner",
+                "adl" : "Meal Preparation + Feeding: Dinner",
                 "adlFrequency" : "Daily"
             },
             {
@@ -669,7 +674,7 @@ $(document).ready(function ()
         gAJAXError = true;
     });
 
-    setTimeout(resetHeaderBackButton, 1500);
+    //setTimeout(resetHeaderBackButton, 1500);
 
     environment = getEnvironment();
 
@@ -693,7 +698,7 @@ $(document).ready(function ()
         $("#fh5co-header").prepend("<div class='environment " + environmentClass + "'>" + environment + "</div>");
     }
 
-    var bResetHeaderBackButtonAlreadyRun = false;
+    //var bResetHeaderBackButtonAlreadyRun = false;
 
     $(document).ajaxStop(function () {
         //alert(1);
@@ -703,6 +708,8 @@ $(document).ready(function ()
 
     function resetHeaderBackButton()
     {
+        return;
+
         if (bResetHeaderBackButtonAlreadyRun == false && apiToken != "")
         {
  
@@ -792,13 +799,13 @@ $(document).ready(function ()
 
     setTimeout(getLastPage, delayForLastPage);
 
-    $(window).on("beforeunload", function (e) {
+/*     $(window).on("beforeunload", function (e) {
         if (gExcludeFromBackButton == false) {
             buildBackButton();
         }
 
         gExcludeFromBackButton = false;
-    });
+    }); */
 
     //DEV-6732
     //added functionality to look for internal messages on page ready
@@ -921,6 +928,9 @@ function addDialogComponents() {
  
     head.appendChild(link);
 
+    return;
+
+    // favorites only
     var d = '';
 
     d = d + '<div class="favoriteButtonClass" style="position:absolute;top:5px; right:10px;z-index:1000">';
@@ -1463,7 +1473,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "ADL") + '">Daily Work Area <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block"><a href="../../admin/adl care/list.html?MenuItem=true">Patient Care</a></li>';
-    menuItems += '                  <li style="display:block"><a href="../../admin/patient scheduling/list.html?MenuItem=true">Patient Maintenance</a></li>';
+    menuItems += '                  <li style="display:block"><a href="../../admin/users/list.html?MenuItem=true&patientsOnly=true">Patient Maintenance</a></li>';
     menuItems += '                  <li style="display:block"><a href="../../admin/patient scheduling/list.html?MenuItem=true">Patient Scheduling</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';
@@ -1541,7 +1551,7 @@ function buildXRYMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">ADL System</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
@@ -1664,7 +1674,7 @@ function buildMRRMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">ADL System</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
@@ -1719,7 +1729,7 @@ function buildTVBMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">ADL System</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
@@ -1768,7 +1778,7 @@ function buildTVBMenu(selectedItem) {
 function buildMSSMenu(selectedItem) {
     var menuItems = '';
 
-    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">ADL System</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
@@ -1800,7 +1810,7 @@ function buildDMXMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">ADL System</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
@@ -1841,7 +1851,7 @@ function buildDMAMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">ADL System</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
@@ -1884,7 +1894,7 @@ function buildCancelMenu(selectedItem)
 {
     var menuItems = '';
 
-    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">ADL System</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
     menuItems += '<ul>';
 
@@ -2088,7 +2098,7 @@ function buildTechMenu(selectedItem) {
 
     var menuItems = '';
 
-    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">MKA Internal Media Site</a></h1>';
+    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">ADL System</a></h1>';
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     menuItems += '<ul>';
@@ -3308,6 +3318,9 @@ function loadReportParameters() {
 }
 
 function buildBackButtonGeneric() {
+
+    return;
+
     if (gShowHeader == false) {
         $("#btnBack").hide();
         return;
