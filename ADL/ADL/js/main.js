@@ -1498,12 +1498,12 @@ function buildMainMenu(selectedItem) {
     //-----------------------
 
     // Facility Admin
-    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "My Settings") + '">My Settings<span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/users/item.html?userId='+ getLocalStorage("userId") +'&MenuItem=true" role="button" aria-expanded="false">Profile </a>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/facility/list.html?MenuItem=true">Facility Maintenance </a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/adl system/list.html?MenuItem=true">ADL Maintenance</a></li>';
-    menuItems += '              </ul>';
+ //   menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "My Settings") + '">My Settings<span style="margin-right:10px;" class="caret"></span></a>';
+//    menuItems += '              <ul class="dropdown-menu" role="menu">';
+  //  menuItems += '                  <li style="display:block;"><a href="../../admin/adl system/list.html?MenuItem=true">ADL Maintenance</a></li>';
+ //   menuItems += '                  <li style="display:block;"><a href="../../admin/facility/list.html?MenuItem=true">Facility Maintenance </a></li>';
+ //   menuItems += '                  <li style="display:block;"><a href="../../admin/users/item.html?userId='+ getLocalStorage("userId") +'&MenuItem=true" role="button" aria-expanded="false">Profile </a>';
+ //   menuItems += '              </ul>';
     //menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="../../admin/login/dashboard.html?MenuItem=true">Virtual Groups</a></li>';
     
     // SYSTEM SETTINGS
