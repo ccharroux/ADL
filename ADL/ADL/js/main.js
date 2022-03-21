@@ -1456,7 +1456,7 @@ function buildMainMenu(selectedItem) {
     
 
     menuItems += '<ul>';
-    menuItems += buildGenericReportsLink(selectedItem);
+   // menuItems += buildGenericReportsLink(selectedItem);
 
 /*     menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' role="button" aria-expanded="false">Products<span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
