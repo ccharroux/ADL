@@ -1,0 +1,85 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using System;
+using System.Net.Mime;
+using ADLAPICore.Models.State;
+using ADLAPICore.Library.Base;
+using ADLAPICore.Library.State;
+using ADLAPICore.Models.General;
+using System.Collections.Generic;
+using ADLAPICore.Library.utilities;
+using ADLAPICore.Library.Patient;
+using ADLAPICore.Models.Patient;
+
+namespace ADLAPICore.Controllers.Patient
+{
+
+    [ApiController]
+    [Route("[controller]")]
+ 
+    public class PatientController : ControllerBase
+    {
+        private readonly ILogger<PatientController> _logger;
+        private readonly IPatientClass _controllerClass;
+
+        public PatientController(ILogger<PatientController> logger,
+                                    IPatientClass controllerClass)
+        {
+            _logger = logger;
+            _controllerClass = controllerClass;
+        }
+
+        [HttpGet("PatientADLListByDay")]
+        public ActionResult PatientADLListByDay([FromQuery] PatientADLListByDayGetInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (PatientADLListByDayGetInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.GetPatientADLListByDay(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                PatientADLByDayResult r = new PatientADLByDayResult();
+                r.response = General.buildError(ex.Message);
+      
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
+        [HttpGet("PatientADLList")]
+        public ActionResult PatientADLList([FromQuery] PatientADLListGetInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (PatientADLListGetInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.GetPatientADLList(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                PatientADLResult r = new PatientADLResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
+
+    }
+}
