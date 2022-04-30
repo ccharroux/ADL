@@ -17,6 +17,7 @@ using ADLAPICore.Library.Country;
 using ADLAPICore.Library.Patient;
 using ADLAPICore.Library.UserMember;
 using ADLAPICore.Library.ADL;
+using ADLAPICore.Library.Role;
 
 namespace ADLAPICore
 {
@@ -35,12 +36,15 @@ namespace ADLAPICore
         {
             // Classes for depenency injection
 
-            services.AddTransient<ILoginClass, LoginClass>();
-            services.AddTransient<IFacilityClass, FacilityClass>();
-            services.AddTransient<IStateClass, RoleClass>();
+
+
             services.AddTransient<IADLClass, ADLClass>();
             services.AddTransient<ICountryClass, CountryClass>();
+            services.AddTransient<IFacilityClass, FacilityClass>();
+            services.AddTransient<ILoginClass, LoginClass>();
             services.AddTransient<IPatientClass, PatientClass>();
+            services.AddTransient<IRoleClass, RoleClass>();
+            services.AddTransient<IStateClass, StateClass>();
             services.AddTransient<IUserMemberClass, UserMemberClass>();
 
             services.AddTransient<IAccomplishmentsClass, AccomplishmentsClass>();

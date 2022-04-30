@@ -18,14 +18,23 @@ namespace ADLAPICore.Library.ADL
         public string deleteDate { get; set; }
         public Int32 orderNum { get; set; }
     }
-
     public class ADLResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public ADLResultRow resultRow = new ADLResultRow();
+
+        public ADLResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
+    public class ADLResultList
     {
         public ResponseModel response = new ResponseModel();
         public List<ADLResultRow> rows = new List<ADLResultRow>();
         private ADLResultRow resultRow = new ADLResultRow();
 
-        public ADLResult()
+        public ADLResultList()
         {
             this.response = General.buildError("Unexpected error");
         }
@@ -33,21 +42,19 @@ namespace ADLAPICore.Library.ADL
 
     public interface IADLClass
     {
-        public ADLResult GetADLList(ADLListGetInput input);
+        public ADLResultList GetADLList(ADLListGetInput input);
+        public ADLResult GetADL(ADLGetInput input);
     }
 
     public class ADLClass : IADLClass
     {
-            
-
             public ADLClass()
             { }
-
             
-            public ADLResult GetADLList(ADLListGetInput input)
+            public ADLResultList GetADLList(ADLListGetInput input)
             {
 
-                ADLResult result = new ADLResult();
+                ADLResultList result = new ADLResultList();
                 ADLResultRow resultRow = new ADLResultRow();
 
                 try
@@ -100,7 +107,7 @@ namespace ADLAPICore.Library.ADL
                 {
                     result.response = General.buildError(ex.Message);
 
-                    return new ADLResult { response = result.response };
+                    return new ADLResultList { response = result.response };
                 }
             }
             private ResponseModel Validate(ADLListGetInput input)
@@ -123,7 +130,87 @@ namespace ADLAPICore.Library.ADL
                     return result;
                 }
             }
- 
+            public ADLResult GetADL(ADLGetInput input)
+            {
+
+                ADLResult result = new ADLResult();
+                ADLResultRow resultRow = new ADLResultRow();
+
+            try
+                {
+
+                    result.response = Validate(input);
+
+                    if (result.response.status == ResponseModel.responseFAIL)
+                    {
+                        return result;
+                    }
+
+                    ADLDBClass lDB = new ADLDBClass();
+
+                    var dbResult = lDB.ADLDBCall(input);
+                    if (dbResult.response.status == ResponseModel.responseFAIL)
+                    {
+                        result.response = dbResult.response;
+                        return result;
+                    }
+
+                    resultRow = new ADLResultRow();
+
+                    foreach (DataRow row in dbResult.dt.Rows)
+                    {
+
+                        resultRow = new ADLResultRow
+                        {
+                            ADL = row["systemADL"].ToString(),
+                            SystemADLId = Convert.ToInt32(row["idsystemadl"]),
+                            ADLTypeId = Convert.ToInt32(row["idadltype"]),
+                            deleteDate = row["deleteDate"].ToString(),
+                            orderNum = Convert.ToInt32(row["orderNum"])
+                        };
+
+                    }
+
+                    // now the result
+                    result.response.status = ResponseModel.responseSUCCESS;
+                    result.response.errorMessage = new List<string>();
+
+                    return result;
+                }
+
+                catch (Exception ex)
+                {
+                    result.response = General.buildError(ex.Message);
+
+                    return new ADLResult { response = result.response };
+                }
+            }
+            private ResponseModel Validate(ADLGetInput input)
+            {
+                ResponseModel result = new ResponseModel();
+
+                try
+                {
+
+                    if (String.IsNullOrEmpty(input.inApiToken))
+                    {
+                        throw new ApplicationException("API Token is required for this method.");
+                    }
+
+                    if (input.inSystemADLId < 1)
+                    {
+                        throw new ApplicationException("System ADL must be > 0.");
+                    }
+
+                return result;
+                }
+                catch (Exception ex)
+                {
+                    result = General.buildError(ex.Message);
+                    return result;
+                }
+            }
+
     }
 
 }

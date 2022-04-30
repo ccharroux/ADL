@@ -35,11 +35,11 @@ namespace ADLAPICore.Library.State
         public StateResult GetStateList(StateListGetInput input);
     }
 
-    public class RoleClass : IStateClass
+    public class StateClass : IStateClass
     {
             
 
-            public RoleClass()
+            public StateClass()
             { }
 
             
