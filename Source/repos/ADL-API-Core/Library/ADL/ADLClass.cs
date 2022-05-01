@@ -15,7 +15,7 @@ namespace ADLAPICore.Library.ADL
         public Int32 SystemADLId { get; set; }
         public Int32 ADLTypeId { get; set; }
         public string ADL { get; set; }
-        public string deleteDate { get; set; }
+        public bool isActive { get; set; }
         public Int32 orderNum { get; set; }
     }
     public class ADLResult
@@ -81,13 +81,13 @@ namespace ADLAPICore.Library.ADL
                 
                     foreach (DataRow row in dbResult.dt.Rows)
                     {
- 
+
                         resultRow = new ADLResultRow
                         {
                             ADL = row["systemADL"].ToString(),
                             SystemADLId = Convert.ToInt32(row["idsystemadl"]),
                             ADLTypeId = Convert.ToInt32(row["idadltype"]),
-                            deleteDate = row["deleteDate"].ToString(),
+                            isActive = (row["deleteDate"] == DBNull.Value ? true : false),
                             orderNum = Convert.ToInt32(row["orderNum"])
                         };
                         
@@ -165,7 +165,7 @@ namespace ADLAPICore.Library.ADL
                             ADL = row["systemADL"].ToString(),
                             SystemADLId = Convert.ToInt32(row["idsystemadl"]),
                             ADLTypeId = Convert.ToInt32(row["idadltype"]),
-                            deleteDate = row["deleteDate"].ToString(),
+                            isActive = (row["deleteDate"] == DBNull.Value ? true : false),
                             orderNum = Convert.ToInt32(row["orderNum"])
                         };
 

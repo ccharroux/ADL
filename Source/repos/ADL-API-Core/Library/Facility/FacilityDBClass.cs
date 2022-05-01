@@ -6,6 +6,7 @@ using ADLAPICore.Library.Common;
 using System.Data;
 using ADLAPICore.Models.General;
 using ADLAPICore.Models.Facility;
+using ADLAPICore.Library.utilities;
 
 namespace ADLAPICore.Library.Facility
 {
@@ -17,6 +18,8 @@ namespace ADLAPICore.Library.Facility
         public DBResult FacilityOwnerListDBCall(FacilityOwnerListGetInput input);
         public DBResult FacilityListDBCall(FacilityListGetInput input);
         public DBResult FacilityDBCall(FacilityGetInput input);
+        public DBResult FacilityADLInsertDBCall(FacilityADLInsertInput input);
+        public DBResult FacilityADLDeleteDBCall(FacilityADLDeleteInput input);
     }
 
     class PatientDBClass : IFacilityDBClass
@@ -39,14 +42,13 @@ namespace ADLAPICore.Library.Facility
             }
             catch (Exception ex)
             {
-                result.response.status = ResponseModel.responseFAIL;
-                result.response.errorMessage = new List<string>();
-                result.response.errorMessage.Add(ex.Message);
-
+                result.response = General.buildError(ex.Message);
                 return new DBResult { dt = new DataTable(), response = result.response };
+
             }
 
         }
+
         public DBResult FacilityOwnerListDBCall(FacilityOwnerListGetInput input)
         {
             var result = new DBResult();
@@ -65,14 +67,13 @@ namespace ADLAPICore.Library.Facility
             }
             catch (Exception ex)
             {
-                result.response.status = ResponseModel.responseFAIL;
-                result.response.errorMessage = new List<string>();
-                result.response.errorMessage.Add(ex.Message);
-
+                result.response = General.buildError(ex.Message);
                 return new DBResult { dt = new DataTable(), response = result.response };
+
             }
 
         }
+        
         public DBResult FacilityListDBCall(FacilityListGetInput input)
         {
             var result = new DBResult();
@@ -89,14 +90,13 @@ namespace ADLAPICore.Library.Facility
             }
             catch (Exception ex)
             {
-                result.response.status = ResponseModel.responseFAIL;
-                result.response.errorMessage = new List<string>();
-                result.response.errorMessage.Add(ex.Message);
-
+                result.response = General.buildError(ex.Message);
                 return new DBResult { dt = new DataTable(), response = result.response };
+
             }
 
         }
+
         public DBResult FacilityDBCall(FacilityGetInput input)
         {
             var result = new DBResult();
@@ -117,14 +117,69 @@ namespace ADLAPICore.Library.Facility
             }
             catch (Exception ex)
             {
-                result.response.status = ResponseModel.responseFAIL;
-                result.response.errorMessage = new List<string>();
-                result.response.errorMessage.Add(ex.Message);
- 
+                result.response = General.buildError(ex.Message);
+                return new DBResult { dt = new DataTable(), response = result.response };
+
+            }
+
+        }
+
+        public DBResult FacilityADLInsertDBCall(FacilityADLInsertInput input)
+        {
+            var result = new DBResult();
+            try
+            {
+                DBClass.dbCmd = new MySqlCommand("insertadlfacility", DBClass.dbConn);
+                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+
+                MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
+                DBClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inFacilityId", input.inFacilityId);
+                DBClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inSystemAdlId", input.inSystemADLId);
+                DBClass.dbCmd.Parameters.Add(param);
+
+                result = DBClass.getDBResults();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
                 return new DBResult { dt = new DataTable(), response = result.response };
             }
 
         }
 
+        public DBResult FacilityADLDeleteDBCall(FacilityADLDeleteInput input)
+        {
+            var result = new DBResult();
+            try
+            {
+                DBClass.dbCmd = new MySqlCommand("deleteadlfacility", DBClass.dbConn);
+                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+
+                MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
+                DBClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inFacilityId", input.inFacilityId);
+                DBClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inSystemAdlId", input.inSystemADLId);
+                DBClass.dbCmd.Parameters.Add(param);
+
+                result = DBClass.getDBResults();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new DBResult { dt = new DataTable(), response = result.response };
+            }
+
+        }
     }
 }

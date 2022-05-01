@@ -51,7 +51,7 @@ namespace ADLAPICore.Library.UserMember
             var result = new DBResult();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("getUserList", DBClass.dbConn);
+                DBClass.dbCmd = new MySqlCommand("getUserListByFacility", DBClass.dbConn);
                 DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);

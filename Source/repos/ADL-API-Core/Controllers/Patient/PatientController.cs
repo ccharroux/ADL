@@ -30,8 +30,8 @@ namespace ADLAPICore.Controllers.Patient
             _controllerClass = controllerClass;
         }
 
-        [HttpGet("PatientADLListByDay")]
-        public ActionResult PatientADLListByDay([FromQuery] PatientADLListByDayGetInput input)
+        [HttpGet("ADLListByDay")]
+        public ActionResult ADLListByDay([FromQuery] PatientADLListByDayGetInput input)
         {
             try
             {
@@ -55,8 +55,8 @@ namespace ADLAPICore.Controllers.Patient
                 return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
             }
         }
-        [HttpGet("PatientADLList")]
-        public ActionResult PatientADLList([FromQuery] PatientADLListGetInput input)
+        [HttpGet("ADLList")]
+        public ActionResult ADLList([FromQuery] PatientADLListGetInput input)
         {
             try
             {
@@ -75,6 +75,32 @@ namespace ADLAPICore.Controllers.Patient
             {
 
                 PatientADLResult r = new PatientADLResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
+
+        [HttpGet("ADLListSummary")]
+        public ActionResult ADLListSummary([FromQuery] PatientADLListGetInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (PatientADLListGetInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.GetPatientADLSummaryList(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                PatientADLSummaryResult r = new PatientADLSummaryResult();
                 r.response = General.buildError(ex.Message);
 
                 return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);

@@ -38,8 +38,7 @@ namespace ADLAPICore.Library.Facility
 
         public FacilityADLResult()
         {
-            this.response.status = ResponseModel.responseFAIL;
-            this.response.errorMessage.Add("Unexpected error");
+            this.response = General.buildError("Unexpected error");
         }
     }
     public class FacilityResult
@@ -50,27 +49,47 @@ namespace ADLAPICore.Library.Facility
 
         public FacilityResult()
         {
-            this.response.status = ResponseModel.responseFAIL;
-            this.response.errorMessage.Add("Unexpected error");
+            this.response = General.buildError("Unexpected error");
         }
     }
+    public class FacilityPutResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public int ReturnCode { get; set; }
 
+        public FacilityPutResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
+    public class FacilityPostResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public int ReturnCode { get; set; }
+
+        public FacilityPostResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
+    
     public interface IFacilityClass
     {
         public FacilityADLResult GetFacilityADLList(FacilityADLListGetInput input);
         public FacilityResult GetFacility(FacilityGetInput input);
         public FacilityResult GetFacilityList(FacilityListGetInput input);
         public FacilityResult GetFacilityOwnerList(FacilityOwnerListGetInput input);
+        public FacilityPostResult InsertFacilityADL(FacilityADLInsertInput input);
+        public FacilityPutResult DeleteFacilityADL(FacilityADLDeleteInput input);
     }
 
     public class FacilityClass : IFacilityClass
     {
             
 
-            public FacilityClass()
-            { }
+        public FacilityClass()
+        { }
 
-        
         public FacilityADLResult GetFacilityADLList(FacilityADLListGetInput input)
         {
 
@@ -124,10 +143,7 @@ namespace ADLAPICore.Library.Facility
 
             catch (Exception ex)
             {
-                result.response.errorMessage = new List<string>();
-                result.response.status = ResponseModel.responseFAIL;
-                result.response.errorMessage.Add(ex.Message);
-
+                result.response = General.buildError(ex.Message);
                 return new FacilityADLResult { response = result.response };
             }
         }
@@ -151,9 +167,7 @@ namespace ADLAPICore.Library.Facility
             }
             catch (Exception ex)
             {
-                result.status = ResponseModel.responseFAIL;
-                result.errorMessage = new List<string>();
-                result.errorMessage.Add(ex.Message);
+                result = General.buildError(ex.Message);
                 return result;
             }
         }
@@ -233,10 +247,7 @@ namespace ADLAPICore.Library.Facility
 
             catch (Exception ex)
             {
-                result.response.errorMessage = new List<string>();
-                result.response.status = ResponseModel.responseFAIL;
-                result.response.errorMessage.Add(ex.Message);
-
+                result.response = General.buildError(ex.Message);
                 return new FacilityResult { response = result.response };
             }
         }
@@ -260,9 +271,7 @@ namespace ADLAPICore.Library.Facility
             }
             catch (Exception ex)
             {
-                result.status = ResponseModel.responseFAIL;
-                result.errorMessage = new List<string>();
-                result.errorMessage.Add(ex.Message);
+                result = General.buildError(ex.Message);
                 return result;
             }
         }
@@ -342,10 +351,7 @@ namespace ADLAPICore.Library.Facility
 
                 catch (Exception ex)
                 {
-                    result.response.errorMessage = new List<string>();
-                    result.response.status = ResponseModel.responseFAIL;
-                    result.response.errorMessage.Add(ex.Message);
-
+                    result.response = General.buildError(ex.Message);
                     return new FacilityResult { response = result.response };
                 }
             }
@@ -365,9 +371,7 @@ namespace ADLAPICore.Library.Facility
                 }
                 catch (Exception ex)
                 {
-                    result.status = ResponseModel.responseFAIL;
-                    result.errorMessage = new List<string>();
-                    result.errorMessage.Add(ex.Message);
+                    result = General.buildError(ex.Message);
                     return result;
                 }
             }
@@ -447,10 +451,7 @@ namespace ADLAPICore.Library.Facility
 
             catch (Exception ex)
             {
-                result.response.errorMessage = new List<string>();
-                result.response.status = ResponseModel.responseFAIL;
-                result.response.errorMessage.Add(ex.Message);
-
+                result.response = General.buildError(ex.Message);
                 return new FacilityResult { response = result.response };
             }
         }
@@ -470,9 +471,141 @@ namespace ADLAPICore.Library.Facility
             }
             catch (Exception ex)
             {
-                result.status = ResponseModel.responseFAIL;
-                result.errorMessage = new List<string>();
-                result.errorMessage.Add(ex.Message);
+                result = General.buildError(ex.Message);
+                return result;
+            }
+        }
+
+        public FacilityPostResult InsertFacilityADL(FacilityADLInsertInput input)
+        {
+
+            FacilityPostResult result = new FacilityPostResult();
+ 
+            try
+            {
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                PatientDBClass lDB = new PatientDBClass();
+
+                var dbResult = lDB.FacilityADLInsertDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    result.ReturnCode = Convert.ToInt32(row["returnCode"]);
+                }
+
+                if (result.ReturnCode < 0)
+                {
+                    throw new ApplicationException(DBCodes.Get(result.ReturnCode));
+                }
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new FacilityPostResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(FacilityADLInsertInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
+                return result;
+            }
+        }
+
+        public FacilityPutResult DeleteFacilityADL(FacilityADLDeleteInput input)
+        {
+
+            FacilityPutResult result = new FacilityPutResult();
+
+            try
+            {
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                PatientDBClass lDB = new PatientDBClass();
+
+                var dbResult = lDB.FacilityADLDeleteDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    result.ReturnCode = Convert.ToInt32(row["returnCode"]);
+                }
+
+                if (result.ReturnCode < 0)
+                {
+                    throw new ApplicationException(DBCodes.Get(result.ReturnCode));
+                }
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new FacilityPutResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(FacilityADLDeleteInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
                 return result;
             }
         }

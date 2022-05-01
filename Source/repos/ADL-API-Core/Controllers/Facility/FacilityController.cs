@@ -129,7 +129,56 @@ namespace ADLAPICore.Controllers.Facility
                 return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
             }
         }
-        
+
+        [HttpPost("ADL")]
+        public ActionResult ADLInsert([FromBody] FacilityADLInsertInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (FacilityADLInsertInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _facilityClass.InsertFacilityADL(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+                FacilityPostResult fr = new FacilityPostResult();
+                fr.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
+            }
+        }
+
+        [HttpPut("ADL")]
+        public ActionResult ADLDelete([FromBody] FacilityADLDeleteInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (FacilityADLDeleteInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _facilityClass.DeleteFacilityADL(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+                FacilityPutResult fr = new FacilityPutResult();
+                fr.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
+            }
+        }
         //[HttpGet("{facilityId}")]
         //public ActionResult Get([FromQuery] FacilityGetInput input)
         //{
