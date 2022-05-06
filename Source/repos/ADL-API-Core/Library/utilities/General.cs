@@ -14,5 +14,13 @@ namespace ADLAPICore.Library.utilities
             return r;
 
         }
+        public static ResponseModel buildSuccess()
+        {
+            ResponseModel r = new ResponseModel();
+            r.errorMessage = new List<string>();
+            r.status = ResponseModel.responseSUCCESS;
+            return r;
+
+        }
     }
 }

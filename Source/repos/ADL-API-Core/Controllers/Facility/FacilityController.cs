@@ -1,16 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ADLAPICore.Library.Base;
+using ADLAPICore.Library.Facility;
+using ADLAPICore.Library.utilities;
+using ADLAPICore.Models.Facility;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using ADLAPICore.Library.Common;
-using ADLAPICore.Library.Notifications;
 using System;
 using System.Net.Mime;
-using ADLAPICore.Models.Facility;
-using ADLAPICore.Library.Base;
-using ADLAPICore.Library.Facility;
-using ADLAPICore.Models.General;
-using System.Collections.Generic;
-using ADLAPICore.Library.utilities;
 
 namespace ADLAPICore.Controllers.Facility
 {
@@ -130,7 +126,7 @@ namespace ADLAPICore.Controllers.Facility
             }
         }
 
-        [HttpPost("ADL")]
+        [HttpPost("ADLInsert")]
         public ActionResult ADLInsert([FromBody] FacilityADLInsertInput input)
         {
             try
@@ -155,7 +151,7 @@ namespace ADLAPICore.Controllers.Facility
             }
         }
 
-        [HttpPut("ADL")]
+        [HttpPut("ADLDelete")]
         public ActionResult ADLDelete([FromBody] FacilityADLDeleteInput input)
         {
             try

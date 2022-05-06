@@ -130,5 +130,56 @@ namespace ADLAPICore.Controllers.UserMember
             }
         }
 
+        [HttpPut()]
+        public ActionResult Put([FromBody] UserMemberUpdateInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (UserMemberUpdateInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.UpdateUserMember(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                UserMemberUpdateResult r = new UserMemberUpdateResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
+
+        [HttpPost()]
+        public ActionResult Post([FromBody] UserMemberInsertInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (UserMemberInsertInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.InsertUserMember(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                UserMemberInsertResult r = new UserMemberInsertResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
     }
 }

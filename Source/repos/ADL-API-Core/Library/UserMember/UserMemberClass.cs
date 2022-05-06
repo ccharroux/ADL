@@ -37,6 +37,26 @@ namespace ADLAPICore.Library.UserMember
         public string Role { get; set; }
         public string RoleToken { get; set; }
     }
+    public class UserMemberInsertResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public int ReturnCode { get; set; }
+
+        public UserMemberInsertResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
+    public class UserMemberUpdateResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public int ReturnCode { get; set; }
+
+        public UserMemberUpdateResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
 
     public class UserMemberResult
     {
@@ -52,6 +72,8 @@ namespace ADLAPICore.Library.UserMember
 
     public interface IUserMemberClass
     {
+        public UserMemberInsertResult InsertUserMember(UserMemberInsertInput input);
+        public UserMemberUpdateResult UpdateUserMember(UserMemberUpdateInput input);
         public UserMemberResult GetUserMemberList(UserMemberListGetInput input);
         public UserMemberResult GetUserMemberListByFacility(UserMemberListByFacilityGetInput input);
         public UserMemberResult GetUserMemberAccessList(UserMemberAccessListGetInput input);
@@ -64,6 +86,160 @@ namespace ADLAPICore.Library.UserMember
         public UserMemberClass()
         { }
 
+        public UserMemberInsertResult InsertUserMember(UserMemberInsertInput input)
+        {
+
+            UserMemberInsertResult result = new UserMemberInsertResult();
+
+            try
+            {
+
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                UserMemberDBClass lDB = new UserMemberDBClass();
+
+                var dbResult = lDB.UserMemberInsertDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    result.ReturnCode = Convert.ToInt32(row["returncode"]);
+                }
+
+                // now the result
+                result.response = General.buildSuccess();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new UserMemberInsertResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(UserMemberInsertInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+                if (String.IsNullOrEmpty(input.inFirstName))
+                {
+                    throw new ApplicationException("Firstname is required for this method.");
+                }
+                if (String.IsNullOrEmpty(input.inLastName))
+                {
+                    throw new ApplicationException("Lastname is required for this method.");
+                }
+                if (String.IsNullOrEmpty(input.inEmailAddress))
+                {
+                    throw new ApplicationException("EmailAddress is required for this method.");
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
+                return result;
+            }
+        }
+        
+        public UserMemberUpdateResult UpdateUserMember(UserMemberUpdateInput input)
+        {
+
+            UserMemberUpdateResult result = new UserMemberUpdateResult();
+
+            try
+            {
+
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                UserMemberDBClass lDB = new UserMemberDBClass();
+
+                var dbResult = lDB.UserMemberUpdateDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    result.ReturnCode = Convert.ToInt32(row["returncode"]);
+                }
+
+                // now the result
+                result.response = General.buildSuccess();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new UserMemberUpdateResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(UserMemberUpdateInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+                if (input.inUserId < 1)
+                {
+                    throw new ApplicationException("User Id must be > 0.");
+                }
+                if (String.IsNullOrEmpty(input.inFirstName))
+                {
+                    throw new ApplicationException("Firstname is required for this method.");
+                }
+                if (String.IsNullOrEmpty(input.inLastName))
+                {
+                    throw new ApplicationException("Lastname is required for this method.");
+                }
+                if (String.IsNullOrEmpty(input.inEmailAddress))
+                {
+                    throw new ApplicationException("EmailAddress is required for this method.");
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
+                return result;
+            }
+        }
+       
         public UserMemberDetailRow GetUserMember(UserMemberGetInput input)
         {
 
@@ -151,7 +327,7 @@ namespace ADLAPICore.Library.UserMember
 
                 if (input.inUserId < 1)
                 {
-                    throw new ApplicationException("Role Id must be > 0.");
+                    throw new ApplicationException("User Id must be > 0.");
                 }
 
                 return result;
