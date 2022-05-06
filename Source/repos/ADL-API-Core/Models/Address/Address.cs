@@ -2,9 +2,9 @@
 
 namespace ADLAPICore.Models.Address
 {
-    public class Address
+    public class AddressRecord
     {
-        public Int32 AddressID { get; set; }
+        public Int32 AddressId { get; set; }
         public string Address1 { get; set; }
         public string Address2 { get; set; }
         public string City { get; set; }
@@ -14,4 +14,11 @@ namespace ADLAPICore.Models.Address
         public string Phone { get; set; }
 
     }
+    public class AddressGetInput
+    {
+        public string inApiToken { get; set; }
+        public Int32 inAddressId { get; set; }
+    }
+
+
 }

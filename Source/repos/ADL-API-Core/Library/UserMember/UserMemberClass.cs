@@ -25,7 +25,7 @@ namespace ADLAPICore.Library.UserMember
     {
         public ResponseModel response = new ResponseModel();
         public UserMemberProfile UserInfo { get; set; }
-        public Address UserMemberAddress { get; set; }
+        public AddressRecord UserMemberAddress { get; set; }
         public List<UserMemberResultRow> UserMemberAccess { get; set; }
     }
     public class UserMemberResultRow
@@ -101,7 +101,7 @@ namespace ADLAPICore.Library.UserMember
                     return result;
                 }
 
-                UserMemberDBClass lDB = new UserMemberDBClass();
+                AddressDBClass lDB = new AddressDBClass();
 
                 var dbResult = lDB.UserMemberInsertDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -176,7 +176,7 @@ namespace ADLAPICore.Library.UserMember
                     return result;
                 }
 
-                UserMemberDBClass lDB = new UserMemberDBClass();
+                AddressDBClass lDB = new AddressDBClass();
 
                 var dbResult = lDB.UserMemberUpdateDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -255,7 +255,7 @@ namespace ADLAPICore.Library.UserMember
                     return result;
                 }
 
-                UserMemberDBClass lDB = new UserMemberDBClass();
+                AddressDBClass lDB = new AddressDBClass();
 
                 var dbResult = lDB.UserMemberDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -355,7 +355,7 @@ namespace ADLAPICore.Library.UserMember
                         return result;
                     }
 
-                    UserMemberDBClass lDB = new UserMemberDBClass();
+                    AddressDBClass lDB = new AddressDBClass();
 
                     var dbResult = lDB.UserMemberListDBCall(input);
                     if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -440,7 +440,7 @@ namespace ADLAPICore.Library.UserMember
                     return result;
                 }
 
-                UserMemberDBClass lDB = new UserMemberDBClass();
+                AddressDBClass lDB = new AddressDBClass();
 
                 var dbResult = lDB.UserMemberListByFacilityDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -530,7 +530,7 @@ namespace ADLAPICore.Library.UserMember
                     return result;
                 }
 
-                UserMemberDBClass lDB = new UserMemberDBClass();
+                AddressDBClass lDB = new AddressDBClass();
 
                 var dbResult = lDB.UserMemberAccessListDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)

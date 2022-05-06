@@ -20,7 +20,7 @@ namespace ADLAPICore.Library.UserMember
         public DBResult UserMemberDBCall(UserMemberGetInput input);
     }
 
-    class UserMemberDBClass : IUserMemberDBClass
+    class AddressDBClass : IUserMemberDBClass
     {
         public DBResult UserMemberInsertDBCall(UserMemberInsertInput input)
         {
