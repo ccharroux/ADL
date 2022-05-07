@@ -72,7 +72,17 @@ namespace ADLAPICore.Library.Facility
             this.response = General.buildError("Unexpected error");
         }
     }
-    
+    public class FacilityAddressInsertResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public int ReturnCode { get; set; }
+
+        public FacilityAddressInsertResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
+
     public interface IFacilityClass
     {
         public FacilityADLResult GetFacilityADLList(FacilityADLListGetInput input);
@@ -81,6 +91,7 @@ namespace ADLAPICore.Library.Facility
         public FacilityResult GetFacilityOwnerList(FacilityOwnerListGetInput input);
         public FacilityPostResult InsertFacilityADL(FacilityADLInsertInput input);
         public FacilityPutResult DeleteFacilityADL(FacilityADLDeleteInput input);
+        public FacilityAddressInsertResult InsertFacilityAddress(FacilityAddressInsertInput input);
     }
 
     public class FacilityClass : IFacilityClass
@@ -99,7 +110,7 @@ namespace ADLAPICore.Library.Facility
             try
             {
 
-                result.response = Validate(input.inApiToken);
+                result.response = Validate(input);
 
                 if (result.response.status == ResponseModel.responseFAIL)
                 {
@@ -181,7 +192,7 @@ namespace ADLAPICore.Library.Facility
             try
             {
 
-                result.response = Validate(input.inApiToken);
+                result.response = Validate(input);
 
                 if (result.response.status == ResponseModel.responseFAIL)
                 {
@@ -285,7 +296,7 @@ namespace ADLAPICore.Library.Facility
                 try
                 {
 
-                    result.response = Validate(input.inApiToken);
+                    result.response = Validate(input);
 
                     if (result.response.status == ResponseModel.responseFAIL)
                     {
@@ -355,14 +366,14 @@ namespace ADLAPICore.Library.Facility
                     return new FacilityResult { response = result.response };
                 }
             }
-        private ResponseModel Validate(string inApiToken)
+        private ResponseModel Validate(FacilityListGetInput input)
             {
                 ResponseModel result = new ResponseModel();
 
                 try
                 {
 
-                    if (String.IsNullOrEmpty(inApiToken))
+                    if (String.IsNullOrEmpty(input.inApiToken))
                     {
                         throw new ApplicationException("API Token is required for this method.");
                     }
@@ -466,6 +477,10 @@ namespace ADLAPICore.Library.Facility
                 {
                     throw new ApplicationException("API Token is required for this method.");
                 }
+                if (input.inFacilityId < 1)
+                {
+                    throw new ApplicationException("Facility Id must be > 0.");
+                }
 
                 return result;
             }
@@ -533,7 +548,14 @@ namespace ADLAPICore.Library.Facility
                 {
                     throw new ApplicationException("API Token is required for this method.");
                 }
-
+                if (input.inFacilityId < 1)
+                {
+                    throw new ApplicationException("Facility Id must be > 0.");
+                }
+                if (input.inSystemADLId < 1)
+                {
+                    throw new ApplicationException("ADL Id must be > 0.");
+                }
                 return result;
             }
             catch (Exception ex)
@@ -600,7 +622,14 @@ namespace ADLAPICore.Library.Facility
                 {
                     throw new ApplicationException("API Token is required for this method.");
                 }
-
+                if (input.inFacilityId < 1)
+                {
+                    throw new ApplicationException("Facility Id must be > 0.");
+                }
+                if (input.inSystemADLId < 1)
+                {
+                    throw new ApplicationException("ADL Id must be > 0.");
+                }
                 return result;
             }
             catch (Exception ex)
@@ -609,6 +638,81 @@ namespace ADLAPICore.Library.Facility
                 return result;
             }
         }
+        
+        public FacilityAddressInsertResult InsertFacilityAddress(FacilityAddressInsertInput input)
+        {
+
+            FacilityAddressInsertResult result = new FacilityAddressInsertResult();
+
+            try
+            {
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                PatientDBClass lDB = new PatientDBClass();
+
+                var dbResult = lDB.FacilityAddressInsertDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    result.ReturnCode = Convert.ToInt32(row["returnCode"]);
+                }
+
+                if (result.ReturnCode < 0)
+                {
+                    throw new ApplicationException(DBCodes.Get(result.ReturnCode));
+                }
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new FacilityAddressInsertResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(FacilityAddressInsertInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+                if (input.inFacilityId < 1)
+                {
+                    throw new ApplicationException("Facility Id must be > 0.");
+                }
+                if (input.inAddressId < 1)
+                {
+                    throw new ApplicationException("Address Id must be > 0.");
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
+                return result;
+            }
+        }
+
     }
 
 }

@@ -37,6 +37,16 @@ namespace ADLAPICore.Library.UserMember
         public string Role { get; set; }
         public string RoleToken { get; set; }
     }
+    public class UserAddressInsertResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public int ReturnCode { get; set; }
+
+        public UserAddressInsertResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
     public class UserMemberInsertResult
     {
         public ResponseModel response = new ResponseModel();
@@ -72,6 +82,7 @@ namespace ADLAPICore.Library.UserMember
 
     public interface IUserMemberClass
     {
+        public UserAddressInsertResult InsertUserAddress(UserAddressInsertInput input);
         public UserMemberInsertResult InsertUserMember(UserMemberInsertInput input);
         public UserMemberUpdateResult UpdateUserMember(UserMemberUpdateInput input);
         public UserMemberResult GetUserMemberList(UserMemberListGetInput input);
@@ -85,6 +96,77 @@ namespace ADLAPICore.Library.UserMember
             
         public UserMemberClass()
         { }
+
+        public UserAddressInsertResult InsertUserAddress(UserAddressInsertInput input)
+        {
+
+            UserAddressInsertResult result = new UserAddressInsertResult();
+
+            try
+            {
+
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                AddressDBClass lDB = new AddressDBClass();
+
+                var dbResult = lDB.UserAddressInsertDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    result.ReturnCode = Convert.ToInt32(row["returncode"]);
+                }
+
+                // now the result
+                result.response = General.buildSuccess();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new UserAddressInsertResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(UserAddressInsertInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+                if (input.inUserId < 1)
+                {
+                    throw new ApplicationException("User Id must be > 0.");
+                }
+                if (input.inAddressId < 1)
+                {
+                    throw new ApplicationException("Address Id must be > 0.");
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
+                return result;
+            }
+        }
 
         public UserMemberInsertResult InsertUserMember(UserMemberInsertInput input)
         {

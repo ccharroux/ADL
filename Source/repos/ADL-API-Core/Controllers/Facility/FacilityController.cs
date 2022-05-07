@@ -17,13 +17,13 @@ namespace ADLAPICore.Controllers.Facility
     public class FacilityController : ControllerBase
     {
         private readonly ILogger<FacilityController> _logger;
-        private readonly IFacilityClass _facilityClass;
+        private readonly IFacilityClass _controllerClass;
 
         public FacilityController(ILogger<FacilityController> logger,
                                     IFacilityClass facilityClass)
         {
             _logger = logger;
-            _facilityClass = facilityClass;
+            _controllerClass = facilityClass;
         }
 
         [HttpGet()]
@@ -37,7 +37,7 @@ namespace ADLAPICore.Controllers.Facility
                 //----------------------------------
                 var cleanInput = (FacilityGetInput)genericLogic.cleanAllTextFromObject(input);
 
-                var result = _facilityClass.GetFacility(cleanInput);
+                var result = _controllerClass.GetFacility(cleanInput);
 
                 return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
             }
@@ -62,7 +62,7 @@ namespace ADLAPICore.Controllers.Facility
                 //----------------------------------
                 var cleanInput = (FacilityADLListGetInput)genericLogic.cleanAllTextFromObject(input);
 
-                var result = _facilityClass.GetFacilityADLList(cleanInput);
+                var result = _controllerClass.GetFacilityADLList(cleanInput);
 
                 return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
             }
@@ -87,7 +87,7 @@ namespace ADLAPICore.Controllers.Facility
                 //----------------------------------
                 var cleanInput = (FacilityListGetInput)genericLogic.cleanAllTextFromObject(input);
 
-                var result = _facilityClass.GetFacilityList(cleanInput);
+                var result = _controllerClass.GetFacilityList(cleanInput);
 
                 return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
             }
@@ -112,7 +112,7 @@ namespace ADLAPICore.Controllers.Facility
                 //----------------------------------
                 var cleanInput = (FacilityOwnerListGetInput)genericLogic.cleanAllTextFromObject(input);
 
-                var result = _facilityClass.GetFacilityOwnerList(cleanInput);
+                var result = _controllerClass.GetFacilityOwnerList(cleanInput);
 
                 return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
             }
@@ -137,7 +137,7 @@ namespace ADLAPICore.Controllers.Facility
                 //----------------------------------
                 var cleanInput = (FacilityADLInsertInput)genericLogic.cleanAllTextFromObject(input);
 
-                var result = _facilityClass.InsertFacilityADL(cleanInput);
+                var result = _controllerClass.InsertFacilityADL(cleanInput);
 
                 return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
             }
@@ -162,7 +162,7 @@ namespace ADLAPICore.Controllers.Facility
                 //----------------------------------
                 var cleanInput = (FacilityADLDeleteInput)genericLogic.cleanAllTextFromObject(input);
 
-                var result = _facilityClass.DeleteFacilityADL(cleanInput);
+                var result = _controllerClass.DeleteFacilityADL(cleanInput);
 
                 return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
             }
@@ -173,6 +173,33 @@ namespace ADLAPICore.Controllers.Facility
                 fr.response = General.buildError(ex.Message);
 
                 return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
+            }
+        }
+
+
+        [HttpPost("Address")]
+        public ActionResult InsertFacilityAddress([FromBody] FacilityAddressInsertInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (FacilityAddressInsertInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.InsertFacilityAddress(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                FacilityAddressInsertResult r = new FacilityAddressInsertResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
             }
         }
         //[HttpGet("{facilityId}")]

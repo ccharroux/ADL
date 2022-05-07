@@ -14,16 +14,46 @@ namespace ADLAPICore.Library.Facility
 
     interface IFacilityDBClass
     {
+        public DBResult FacilityAddressInsertDBCall(FacilityAddressInsertInput input);
         public DBResult FacilityADLListDBCall(FacilityADLListGetInput input);
         public DBResult FacilityOwnerListDBCall(FacilityOwnerListGetInput input);
         public DBResult FacilityListDBCall(FacilityListGetInput input);
         public DBResult FacilityDBCall(FacilityGetInput input);
         public DBResult FacilityADLInsertDBCall(FacilityADLInsertInput input);
         public DBResult FacilityADLDeleteDBCall(FacilityADLDeleteInput input);
+
     }
 
     class PatientDBClass : IFacilityDBClass
     {
+        public DBResult FacilityAddressInsertDBCall(FacilityAddressInsertInput input)
+        {
+            var result = new DBResult();
+            try
+            {
+                DBClass.dbCmd = new MySqlCommand("insertFacilityAddress", DBClass.dbConn);
+                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+
+                MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
+                DBClass.dbCmd.Parameters.Add(param);
+                param = new MySqlParameter("inFacilityId", input.inFacilityId);
+                DBClass.dbCmd.Parameters.Add(param);
+                param = new MySqlParameter("inAddressId", input.inAddressId);
+                DBClass.dbCmd.Parameters.Add(param);
+
+                result = DBClass.getDBResults();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new DBResult { dt = new DataTable(), response = result.response };
+            }
+
+        }
+        
         public DBResult FacilityADLListDBCall(FacilityADLListGetInput input)
         {
             var result = new DBResult();

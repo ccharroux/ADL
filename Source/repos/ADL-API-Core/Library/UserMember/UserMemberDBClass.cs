@@ -12,6 +12,7 @@ namespace ADLAPICore.Library.UserMember
 
     interface IUserMemberDBClass
     {
+        public DBResult UserAddressInsertDBCall(UserAddressInsertInput input);
         public DBResult UserMemberInsertDBCall(UserMemberInsertInput input);
         public DBResult UserMemberUpdateDBCall(UserMemberUpdateInput input);
         public DBResult UserMemberListDBCall(UserMemberListGetInput input);
@@ -22,6 +23,33 @@ namespace ADLAPICore.Library.UserMember
 
     class AddressDBClass : IUserMemberDBClass
     {
+        public DBResult UserAddressInsertDBCall(UserAddressInsertInput input)
+        {
+            var result = new DBResult();
+            try
+            {
+                DBClass.dbCmd = new MySqlCommand("insertUserAddress", DBClass.dbConn);
+                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+
+                MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
+                DBClass.dbCmd.Parameters.Add(param);
+                param = new MySqlParameter("inUserId", input.inUserId);
+                DBClass.dbCmd.Parameters.Add(param);
+                param = new MySqlParameter("inAddressId", input.inAddressId);
+                DBClass.dbCmd.Parameters.Add(param);
+
+                result = DBClass.getDBResults();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new DBResult { dt = new DataTable(), response = result.response };
+            }
+
+        }
         public DBResult UserMemberInsertDBCall(UserMemberInsertInput input)
         {
             var result = new DBResult();

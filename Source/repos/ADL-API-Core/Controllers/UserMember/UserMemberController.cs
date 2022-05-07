@@ -181,5 +181,31 @@ namespace ADLAPICore.Controllers.UserMember
                 return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
             }
         }
+        
+        [HttpPost("Address")]
+        public ActionResult InsertUserAddress([FromBody] UserAddressInsertInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (UserAddressInsertInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.InsertUserAddress(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                UserAddressInsertResult r = new UserAddressInsertResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
     }
 }

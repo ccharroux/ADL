@@ -3,14 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ADLAPICore.Library.Accomplishments;
-using ADLAPICore.Library.Game;
 using ADLAPICore.Library.Login;
-using ADLAPICore.Library.Member;
-using ADLAPICore.Library.Messages;
-using ADLAPICore.Library.Notifications;
-using ADLAPICore.Library.Sports;
-using ADLAPICore.Library.Stats;
 using ADLAPICore.Library.Facility;
 using ADLAPICore.Library.State;
 using ADLAPICore.Library.Country;
@@ -46,15 +39,7 @@ namespace ADLAPICore
             services.AddTransient<IStateClass, StateClass>();
             services.AddTransient<IUserMemberClass, UserMemberClass>();
 
-            services.AddTransient<IAccomplishmentsClass, AccomplishmentsClass>();
-            services.AddTransient<IGameClass, GameClass>();
-            services.AddTransient<IMemberClass, MemberClass>();
-            services.AddTransient<IMessagesClass, MessagesClass>();
-            services.AddTransient<INotificationsClass, NotificationsClass>();
-            services.AddTransient<ISportsClass, SportsClass>();
-            services.AddTransient<IStatsClass, StatsClass>();
-
-            // Cors
+             // Cors
              services.AddCors(options =>
             {
                 options.AddPolicy(
