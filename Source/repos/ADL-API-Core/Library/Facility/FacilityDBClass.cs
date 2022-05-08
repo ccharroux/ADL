@@ -24,7 +24,7 @@ namespace ADLAPICore.Library.Facility
 
     }
 
-    class PatientDBClass : IFacilityDBClass
+    class FacilityDBClass : IFacilityDBClass
     {
         public DBResult FacilityAddressInsertDBCall(FacilityAddressInsertInput input)
         {

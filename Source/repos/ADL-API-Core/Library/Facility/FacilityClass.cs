@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using ADLAPICore.Library.Common;
-using ADLAPICore.Models;
 using ADLAPICore.Models.General;
-using ADLAPICore.Models.Login;
 using ADLAPICore.Library.utilities;
-using ADLAPICore.Models.FacilityAccess;
 using ADLAPICore.Models.Facility;
+using ADLAPICore.Library.Patient;
 
 namespace ADLAPICore.Library.Facility
 {
@@ -117,7 +114,7 @@ namespace ADLAPICore.Library.Facility
                     return result;
                 }
 
-                PatientDBClass lDB = new PatientDBClass();
+                FacilityDBClass lDB = new FacilityDBClass();
 
                 var dbResult = lDB.FacilityADLListDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -199,7 +196,7 @@ namespace ADLAPICore.Library.Facility
                     return result;
                 }
 
-                PatientDBClass lDB = new PatientDBClass();
+                FacilityDBClass lDB = new FacilityDBClass();
 
                 var dbResult = lDB.FacilityOwnerListDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -303,7 +300,7 @@ namespace ADLAPICore.Library.Facility
                         return result;
                     }
 
-                    PatientDBClass lDB = new PatientDBClass();
+                FacilityDBClass lDB = new FacilityDBClass();
 
                     var dbResult = lDB.FacilityListDBCall(input);
                     if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -403,7 +400,7 @@ namespace ADLAPICore.Library.Facility
                     return result;
                 }
 
-                PatientDBClass lDB = new PatientDBClass();
+                FacilityDBClass lDB = new FacilityDBClass();
 
                 var dbResult = lDB.FacilityDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -505,7 +502,7 @@ namespace ADLAPICore.Library.Facility
                     return result;
                 }
 
-                PatientDBClass lDB = new PatientDBClass();
+                FacilityDBClass lDB = new FacilityDBClass();
 
                 var dbResult = lDB.FacilityADLInsertDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -579,7 +576,7 @@ namespace ADLAPICore.Library.Facility
                     return result;
                 }
 
-                PatientDBClass lDB = new PatientDBClass();
+                FacilityDBClass lDB = new FacilityDBClass();
 
                 var dbResult = lDB.FacilityADLDeleteDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -653,7 +650,7 @@ namespace ADLAPICore.Library.Facility
                     return result;
                 }
 
-                PatientDBClass lDB = new PatientDBClass();
+                FacilityDBClass lDB = new FacilityDBClass();
 
                 var dbResult = lDB.FacilityAddressInsertDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)

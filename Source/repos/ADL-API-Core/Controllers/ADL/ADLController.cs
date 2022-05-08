@@ -77,5 +77,81 @@ namespace ADLAPICore.Controllers.ADL
                 return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
             }
         }
+
+        [HttpPost("ADLInsert")]
+        public ActionResult ADLInsert([FromBody] ADLInsertInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (ADLInsertInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.InsertADL(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+                ADLPostResult fr = new ADLPostResult();
+                fr.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
+            }
+        }
+
+        [HttpPut("ADLDelete")]
+        public ActionResult ADLDelete([FromBody] ADLDeleteInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (ADLDeleteInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.DeleteADL(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+                ADLPutResult fr = new ADLPutResult();
+                fr.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
+            }
+        }
+
+        [HttpPut("ADLUpdate")]
+        public ActionResult ADLUpdate([FromBody] ADLUpdateInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (ADLUpdateInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.UpdateADL(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+                ADLPutResult fr = new ADLPutResult();
+                fr.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
+            }
+        }
+
     }
 }
