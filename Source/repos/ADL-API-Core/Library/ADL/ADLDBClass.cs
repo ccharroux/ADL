@@ -139,7 +139,7 @@ namespace ADLAPICore.Library.ADL
             var result = new DBResult();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("deleteadl", DBClass.dbConn);
+                DBClass.dbCmd = new MySqlCommand("deleteSystemADL", DBClass.dbConn);
                 DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);

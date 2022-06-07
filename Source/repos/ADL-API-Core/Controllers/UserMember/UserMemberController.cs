@@ -207,5 +207,6 @@ namespace ADLAPICore.Controllers.UserMember
                 return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
             }
         }
+
     }
 }

@@ -78,8 +78,8 @@ namespace ADLAPICore.Controllers.ADL
             }
         }
 
-        [HttpPost("ADLInsert")]
-        public ActionResult ADLInsert([FromBody] ADLInsertInput input)
+        [HttpPost()]
+        public ActionResult Post([FromBody] ADLInsertInput input)
         {
             try
             {
@@ -103,8 +103,8 @@ namespace ADLAPICore.Controllers.ADL
             }
         }
 
-        [HttpPut("ADLDelete")]
-        public ActionResult ADLDelete([FromBody] ADLDeleteInput input)
+        [HttpPut()]
+        public ActionResult Delete([FromBody] ADLDeleteInput input)
         {
             try
             {
@@ -128,8 +128,8 @@ namespace ADLAPICore.Controllers.ADL
             }
         }
 
-        [HttpPut("ADLUpdate")]
-        public ActionResult ADLUpdate([FromBody] ADLUpdateInput input)
+        [HttpPut()]
+        public ActionResult Put([FromBody] ADLUpdateInput input)
         {
             try
             {

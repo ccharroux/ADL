@@ -176,7 +176,6 @@ namespace ADLAPICore.Controllers.Facility
             }
         }
 
-
         [HttpPost("Address")]
         public ActionResult InsertFacilityAddress([FromBody] FacilityAddressInsertInput input)
         {
