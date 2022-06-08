@@ -22,6 +22,8 @@ namespace ADLAPICore.Library.Facility
         public DBResult FacilityADLInsertDBCall(FacilityADLInsertInput input);
         public DBResult FacilityADLDeleteDBCall(FacilityADLDeleteInput input);
         public DBResult FacilityAddressDBCall(FacilityAddressGetInput input);
+        public DBResult FacilityInsertDBCall(FacilityInsertInput input);
+        public DBResult FacilityUpdateDBCall(FacilityUpdateInput input);
 
     }
 
@@ -236,6 +238,59 @@ namespace ADLAPICore.Library.Facility
                 result.response = General.buildError(ex.Message);
                 return new DBResult { dt = new DataTable(), response = result.response };
 
+            }
+
+        }
+
+        public DBResult FacilityInsertDBCall(FacilityInsertInput input)
+        {
+            var result = new DBResult();
+            try
+            {
+                DBClass.dbCmd = new MySqlCommand("insertFacility", DBClass.dbConn);
+                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+
+                MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
+                DBClass.dbCmd.Parameters.Add(param);
+                param = new MySqlParameter("inFacility", input.inFacility);
+                DBClass.dbCmd.Parameters.Add(param);
+
+                result = DBClass.getDBResults();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new DBResult { dt = new DataTable(), response = result.response };
+            }
+
+        }
+        public DBResult FacilityUpdateDBCall(FacilityUpdateInput input)
+        {
+            var result = new DBResult();
+            try
+            {
+                DBClass.dbCmd = new MySqlCommand("insertFacility", DBClass.dbConn);
+                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+
+                MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
+                DBClass.dbCmd.Parameters.Add(param);
+                param = new MySqlParameter("inFacilityId", input.inFacilityId);
+                DBClass.dbCmd.Parameters.Add(param);
+                param = new MySqlParameter("inFacility", input.inFacility);
+                DBClass.dbCmd.Parameters.Add(param);
+
+                result = DBClass.getDBResults();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new DBResult { dt = new DataTable(), response = result.response };
             }
 
         }

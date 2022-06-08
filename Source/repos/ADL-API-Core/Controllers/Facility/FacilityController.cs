@@ -195,7 +195,7 @@ namespace ADLAPICore.Controllers.Facility
             catch (Exception ex)
             {
 
-                FacilityAddressInsertResult r = new FacilityAddressInsertResult();
+                FacilityPostResult r = new FacilityPostResult();
                 r.response = General.buildError(ex.Message);
 
                 return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
@@ -227,86 +227,56 @@ namespace ADLAPICore.Controllers.Facility
             }
         }
 
-        //[HttpGet("{facilityId}")]
-        //public ActionResult Get([FromQuery] FacilityGetInput input)
-        //{
-        //    try
-        //    {
-        //        //----------------------------------
-        //        // Clean inputs using reflection
-        //        //----------------------------------
-        //        var cleanInput = (FacilityGetInput)genericLogic.cleanAllTextFromObject(input);
+        [HttpPost()]
+        public ActionResult Post([FromBody] FacilityInsertInput input)
+        {
+            try
+            {
 
-        //        //----------------------------------------------
-        //        // Verify Token
-        //        //----------------------------------------------
-        //        //var tStatus = AccessClass.checkToken(cleanInput.inApiToken);
-        //        //if (tStatus.isValid == false)
-        //        //{
-        //        //    throw new ApplicationException(tStatus.message);
-        //        //}
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (FacilityInsertInput)genericLogic.cleanAllTextFromObject(input);
 
-        //        //var result = _facilityClass.GetNotificationSettings("1");
+                var result = _controllerClass.InsertFacility(cleanInput);
 
-        //       // return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
-        //    }
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
 
-        //    catch (Exception ex)
-        //    {
-        //        var result = new GeneralResult { Success = false, Message = ex.Message };
-        //        return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
-        //    }
-        //}
+            catch (Exception ex)
+            {
+                FacilityPostResult fr = new FacilityPostResult();
+                fr.response = General.buildError(ex.Message);
 
-        //[HttpPost]
-        //public ActionResult Post([FromBody] NotificationRecord input)
-        //{
-        //    try
-        //    {
-        //        var result = _facilityClass.InsertNotification(input);
+                return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
+            }
+        }
 
-        //        return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
-        //    }
+        [HttpPut()]
+        public ActionResult Put([FromBody] FacilityUpdateInput input)
+        {
+            try
+            {
 
-        //    catch (Exception ex)
-        //    {
-        //        var result = new GeneralResult { Success = false, Message = ex.Message };
-        //        return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
-        //    }
-        //}
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (FacilityUpdateInput)genericLogic.cleanAllTextFromObject(input);
 
-        //[HttpPut]
-        //public ActionResult Put([FromBody] NotificationRecord input)
-        //{
-        //    try
-        //    {
-        //        var result = _facilityClass.InsertNotification(input);
+                var result = _controllerClass.UpdateFacility(cleanInput);
 
-        //        return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
-        //    }
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
 
-        //    catch (Exception ex)
-        //    {
-        //        var result = new GeneralResult { Success = false, Message = ex.Message };
-        //        return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
-        //    }
-        //}
+            catch (Exception ex)
+            {
+                FacilityPutResult fr = new FacilityPutResult();
+                fr.response = General.buildError(ex.Message);
 
-        //[HttpDelete]
-        //public ActionResult Delete([FromBody] NotificationRecord input)
-        //{
-        //    try
-        //    {
-        //        var result = _facilityClass.InsertNotification(input);
-
-        //        return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
-        //    }
-
-        //    catch (Exception ex)
-        //    {
-        //        var result = new GeneralResult { Success = false, Message = ex.Message };
-        //        return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
-        //    }
-        //}
+                return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
+            }
+        }
     }
+ 
+
 }

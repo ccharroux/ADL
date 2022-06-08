@@ -12,4 +12,9 @@
         public int inFacilityId { get; set; }
         public int inAddressId { get; set; }
     }
+    public class FacilityInsertInput
+    {
+        public string inApiToken { get; set; }
+        public string inFacility { get; set; }
+    }
 }

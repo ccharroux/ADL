@@ -69,12 +69,12 @@ namespace ADLAPICore.Library.Facility
             this.response = General.buildError("Unexpected error");
         }
     }
-    public class FacilityAddressInsertResult
+    public class FacilityAddressPostResult
     {
         public ResponseModel response = new ResponseModel();
         public int ReturnCode { get; set; }
 
-        public FacilityAddressInsertResult()
+        public FacilityAddressPostResult()
         {
             this.response = General.buildError("Unexpected error");
         }
@@ -90,6 +90,7 @@ namespace ADLAPICore.Library.Facility
             this.response = General.buildError("Unexpected error");
         }
     }
+ 
 
     public interface IFacilityClass
     {
@@ -99,8 +100,10 @@ namespace ADLAPICore.Library.Facility
         public FacilityResult GetFacilityOwnerList(FacilityOwnerListGetInput input);
         public FacilityPostResult InsertFacilityADL(FacilityADLInsertInput input);
         public FacilityPutResult DeleteFacilityADL(FacilityADLDeleteInput input);
-        public FacilityAddressInsertResult InsertFacilityAddress(FacilityAddressInsertInput input);
+        public FacilityAddressPostResult InsertFacilityAddress(FacilityAddressInsertInput input);
         public FacilityAddressResult GetFacilityAddress(FacilityAddressGetInput input);
+        public FacilityPostResult InsertFacility(FacilityInsertInput input);
+        public FacilityPutResult UpdateFacility(FacilityUpdateInput input);
     }
 
     public class FacilityClass : IFacilityClass
@@ -648,10 +651,10 @@ namespace ADLAPICore.Library.Facility
             }
         }
         
-        public FacilityAddressInsertResult InsertFacilityAddress(FacilityAddressInsertInput input)
+        public FacilityAddressPostResult InsertFacilityAddress(FacilityAddressInsertInput input)
         {
 
-            FacilityAddressInsertResult result = new FacilityAddressInsertResult();
+            FacilityAddressPostResult result = new FacilityAddressPostResult();
 
             try
             {
@@ -691,7 +694,7 @@ namespace ADLAPICore.Library.Facility
             catch (Exception ex)
             {
                 result.response = General.buildError(ex.Message);
-                return new FacilityAddressInsertResult { response = result.response };
+                return new FacilityAddressPostResult { response = result.response };
             }
         }
         private ResponseModel Validate(FacilityAddressInsertInput input)
@@ -792,6 +795,149 @@ namespace ADLAPICore.Library.Facility
             }
         }
 
+        public FacilityPostResult InsertFacility(FacilityInsertInput input)
+        {
+
+            FacilityPostResult result = new FacilityPostResult();
+
+            try
+            {
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                FacilityDBClass lDB = new FacilityDBClass();
+
+                var dbResult = lDB.FacilityInsertDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    result.ReturnCode = Convert.ToInt32(row["returnCode"]);
+                }
+
+                if (result.ReturnCode < 0)
+                {
+                    throw new ApplicationException(DBCodes.Get(result.ReturnCode));
+                }
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new FacilityPostResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(FacilityInsertInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+                if (string.IsNullOrEmpty(input.inFacility))
+                {
+                    throw new ApplicationException("Facility must be supplied.");
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
+                return result;
+            }
+        }
+
+        public FacilityPutResult UpdateFacility(FacilityUpdateInput input)
+        {
+
+            FacilityPutResult result = new FacilityPutResult();
+
+            try
+            {
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                FacilityDBClass lDB = new FacilityDBClass();
+
+                var dbResult = lDB.FacilityUpdateDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    result.ReturnCode = Convert.ToInt32(row["returnCode"]);
+                }
+
+                if (result.ReturnCode < 0)
+                {
+                    throw new ApplicationException(DBCodes.Get(result.ReturnCode));
+                }
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new FacilityPutResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(FacilityUpdateInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+                if (input.inFacilityId < 1)
+                {
+                    throw new ApplicationException("Facility Id must be > 0.");
+                }
+                if (string.IsNullOrEmpty(input.inFacility))
+                {
+                    throw new ApplicationException("Facility must be supplied.");
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
+                return result;
+            }
+        }
     }
 
 }
