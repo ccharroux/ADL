@@ -19,6 +19,7 @@ namespace ADLAPICore.Library.UserMember
         public DBResult UserMemberListByFacilityDBCall(UserMemberListByFacilityGetInput input);
         public DBResult UserMemberAccessListDBCall(UserMemberAccessListGetInput input);
         public DBResult UserMemberDBCall(UserMemberGetInput input);
+        public DBResult UserMemberAddressDBCall(UserMemberAddressGetInput input);
     }
 
     class AddressDBClass : IUserMemberDBClass
@@ -202,6 +203,32 @@ namespace ADLAPICore.Library.UserMember
             try
             {
                 DBClass.dbCmd = new MySqlCommand("getUser", DBClass.dbConn);
+                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+
+                MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
+                DBClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inuserid", input.inUserId);
+                DBClass.dbCmd.Parameters.Add(param);
+
+                result = DBClass.getDBResults();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new DBResult { dt = new DataTable(), response = result.response };
+            }
+
+        }
+        public DBResult UserMemberAddressDBCall(UserMemberAddressGetInput input)
+        {
+            var result = new DBResult();
+            try
+            {
+                DBClass.dbCmd = new MySqlCommand("getUserAddress", DBClass.dbConn);
                 DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);

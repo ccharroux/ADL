@@ -21,4 +21,9 @@
         public string inApiToken { get; set; }
         public int inUserId { get; set; }
     }
+    public class UserMemberAddressGetInput
+    {
+        public string inApiToken { get; set; }
+        public int inUserId { get; set; }
+    }
 }

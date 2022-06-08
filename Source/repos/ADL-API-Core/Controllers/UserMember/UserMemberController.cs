@@ -208,5 +208,30 @@ namespace ADLAPICore.Controllers.UserMember
             }
         }
 
+        [HttpGet("Address")]
+        public ActionResult GetAddress([FromQuery] UserMemberAddressGetInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (UserMemberAddressGetInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.GetUserMemberAddress(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                UserMemberAddressResult r = new UserMemberAddressResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
     }
 }

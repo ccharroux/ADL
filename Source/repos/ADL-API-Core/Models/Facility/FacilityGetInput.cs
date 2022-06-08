@@ -5,6 +5,11 @@
         public string inApiToken { get; set; }
         public int inFacilityId { get; set; }   
     }
+    public class FacilityAddressGetInput
+    {
+        public string inApiToken { get; set; }
+        public int inFacilityId { get; set; }
+    }
     public class FacilityOwnerListGetInput
     {
         public string inApiToken { get; set; }

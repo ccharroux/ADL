@@ -201,6 +201,32 @@ namespace ADLAPICore.Controllers.Facility
                 return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
             }
         }
+
+        [HttpGet("Address")]
+        public ActionResult GetAddress([FromQuery] FacilityAddressGetInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (FacilityAddressGetInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.GetFacilityAddress(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+                FacilityAddressResult fr = new FacilityAddressResult();
+                fr.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
+            }
+        }
+
         //[HttpGet("{facilityId}")]
         //public ActionResult Get([FromQuery] FacilityGetInput input)
         //{

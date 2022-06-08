@@ -1,14 +1,10 @@
-﻿using System;
+﻿using ADLAPICore.Library.utilities;
+using ADLAPICore.Models.Address;
+using ADLAPICore.Models.General;
+using ADLAPICore.Models.UserMember;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using ADLAPICore.Library.Common;
-using ADLAPICore.Models;
-using ADLAPICore.Models.General;
-using ADLAPICore.Models.Login;
-using ADLAPICore.Library.utilities;
-using ADLAPICore.Models.State;
-using ADLAPICore.Models.UserMember;
-using ADLAPICore.Models.Address;
 
 namespace ADLAPICore.Library.UserMember
 {
@@ -20,7 +16,6 @@ namespace ADLAPICore.Library.UserMember
         public string EmailAddress { get; set; }
         public string MiddleName { get; set; }  
     }
-
     public class UserMemberDetailRow
     {
         public ResponseModel response = new ResponseModel();
@@ -67,6 +62,12 @@ namespace ADLAPICore.Library.UserMember
             this.response = General.buildError("Unexpected error");
         }
     }
+    public class UserMemberAddressResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public Int32 UserId { get; set; }
+        public Int32 AddressId { get; set; }
+    }
 
     public class UserMemberResult
     {
@@ -89,6 +90,7 @@ namespace ADLAPICore.Library.UserMember
         public UserMemberResult GetUserMemberListByFacility(UserMemberListByFacilityGetInput input);
         public UserMemberResult GetUserMemberAccessList(UserMemberAccessListGetInput input);
         public UserMemberDetailRow GetUserMember(UserMemberGetInput input);
+        public UserMemberAddressResult GetUserMemberAddress(UserMemberAddressGetInput input);
     }
 
     public class UserMemberClass : IUserMemberClass
@@ -396,6 +398,80 @@ namespace ADLAPICore.Library.UserMember
             }
         }
         private ResponseModel Validate(UserMemberGetInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+
+                if (input.inUserId < 1)
+                {
+                    throw new ApplicationException("User Id must be > 0.");
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
+                return result;
+            }
+        }
+
+        public UserMemberAddressResult GetUserMemberAddress(UserMemberAddressGetInput input)
+        {
+
+            UserMemberAddressResult result = new UserMemberAddressResult();
+
+            try
+            {
+
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                AddressDBClass lDB = new AddressDBClass();
+
+                var dbResult = lDB.UserMemberAddressDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                var resultRow = new UserMemberResultRow();
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    // user info
+                    result.AddressId = Convert.ToInt32(row["idaddress"]);
+                    result.UserId = Convert.ToInt32(row["iduser"]);
+
+                }
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new UserMemberAddressResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(UserMemberAddressGetInput input)
         {
             ResponseModel result = new ResponseModel();
 

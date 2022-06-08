@@ -8,7 +8,7 @@ using ADLAPICore.Library.Patient;
 
 namespace ADLAPICore.Library.Facility
 {
-    public class facilityResultRow
+    public class FacilityResultRow
     {
         public Int32 FacilityId { get; set; }
         public string Facility { get; set; }
@@ -21,7 +21,7 @@ namespace ADLAPICore.Library.Facility
         public string Owner { get; set; }   
         public Int32 UserId { get; set; }
     }
-    public class facilityADLResultRow
+    public class FacilityADLResultRow
     {
         public Int32 FacilityId { get; set; }
         public string SystemADL { get; set; }
@@ -30,8 +30,8 @@ namespace ADLAPICore.Library.Facility
     public class FacilityADLResult
     {
         public ResponseModel response = new ResponseModel();
-        public List<facilityADLResultRow> rows = new List<facilityADLResultRow>();
-        private facilityADLResultRow resultRow = new facilityADLResultRow();
+        public List<FacilityADLResultRow> rows = new List<FacilityADLResultRow>();
+        private FacilityADLResultRow resultRow = new FacilityADLResultRow();
 
         public FacilityADLResult()
         {
@@ -41,8 +41,8 @@ namespace ADLAPICore.Library.Facility
     public class FacilityResult
     {
         public ResponseModel response = new ResponseModel();
-        public List<facilityResultRow> rows = new List<facilityResultRow>();
-        private facilityResultRow resultRow = new facilityResultRow();
+        public List<FacilityResultRow> rows = new List<FacilityResultRow>();
+        private FacilityResultRow resultRow = new FacilityResultRow();
 
         public FacilityResult()
         {
@@ -79,6 +79,17 @@ namespace ADLAPICore.Library.Facility
             this.response = General.buildError("Unexpected error");
         }
     }
+    public class FacilityAddressResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public Int32 AddressId { get; set; }
+        public Int32 FacilityId { get; set; }
+
+        public FacilityAddressResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
 
     public interface IFacilityClass
     {
@@ -89,6 +100,7 @@ namespace ADLAPICore.Library.Facility
         public FacilityPostResult InsertFacilityADL(FacilityADLInsertInput input);
         public FacilityPutResult DeleteFacilityADL(FacilityADLDeleteInput input);
         public FacilityAddressInsertResult InsertFacilityAddress(FacilityAddressInsertInput input);
+        public FacilityAddressResult GetFacilityAddress(FacilityAddressGetInput input);
     }
 
     public class FacilityClass : IFacilityClass
@@ -102,7 +114,7 @@ namespace ADLAPICore.Library.Facility
         {
 
             FacilityADLResult result = new FacilityADLResult();
-            facilityADLResultRow resultRow = new facilityADLResultRow();
+            FacilityADLResultRow resultRow = new FacilityADLResultRow();
 
             try
             {
@@ -123,13 +135,13 @@ namespace ADLAPICore.Library.Facility
                     return result;
                 }
 
-                resultRow = new facilityADLResultRow();
-                result.rows = new List<facilityADLResultRow>();
+                resultRow = new FacilityADLResultRow();
+                result.rows = new List<FacilityADLResultRow>();
 
 
                 foreach (DataRow row in dbResult.dt.Rows)
                 {
-                    resultRow = new facilityADLResultRow
+                    resultRow = new FacilityADLResultRow
                     {
                         SystemADL = row["systemadl"].ToString(),
                         SystemADLId = Convert.ToInt32(row["idsystemadl"]),
@@ -184,7 +196,7 @@ namespace ADLAPICore.Library.Facility
         {
 
             FacilityResult result = new FacilityResult();
-            facilityResultRow resultRow = new facilityResultRow();
+            FacilityResultRow resultRow = new FacilityResultRow();
 
             try
             {
@@ -205,15 +217,15 @@ namespace ADLAPICore.Library.Facility
                     return result;
                 }
 
-                resultRow = new facilityResultRow();
-                result.rows = new List<facilityResultRow>();
+                resultRow = new FacilityResultRow();
+                result.rows = new List<FacilityResultRow>();
 
                 var holdFacilityid = -1;
 
                 foreach (DataRow row in dbResult.dt.Rows)
                 {
 
-                    resultRow = new facilityResultRow
+                    resultRow = new FacilityResultRow
                     {
                         Facility = row["facility"].ToString(),
                         FacilityId = Convert.ToInt32(row["idFacility"]),
@@ -288,7 +300,7 @@ namespace ADLAPICore.Library.Facility
             {
 
                 FacilityResult result = new FacilityResult();
-                facilityResultRow resultRow = new facilityResultRow();
+                FacilityResultRow resultRow = new FacilityResultRow();
 
                 try
                 {
@@ -309,15 +321,15 @@ namespace ADLAPICore.Library.Facility
                         return result;
                     }
 
-                    resultRow = new facilityResultRow();
-                    result.rows = new List<facilityResultRow>();
+                    resultRow = new FacilityResultRow();
+                    result.rows = new List<FacilityResultRow>();
 
                     var holdFacilityid = -1;
     
                     foreach (DataRow row in dbResult.dt.Rows)
                     {
 
-                        resultRow = new facilityResultRow
+                        resultRow = new FacilityResultRow
                         {
                             Facility = row["facility"].ToString(),
                             FacilityId = Convert.ToInt32(row["idFacility"]),
@@ -388,7 +400,7 @@ namespace ADLAPICore.Library.Facility
         {
 
             FacilityResult result = new FacilityResult();
-            facilityResultRow resultRow = new facilityResultRow();
+            FacilityResultRow resultRow = new FacilityResultRow();
 
             try
             {
@@ -409,15 +421,15 @@ namespace ADLAPICore.Library.Facility
                     return result;
                 }
 
-                resultRow = new facilityResultRow();
-                result.rows = new List<facilityResultRow>();
+                resultRow = new FacilityResultRow();
+                result.rows = new List<FacilityResultRow>();
 
                 var holdFacilityid = -1;
 
                 foreach (DataRow row in dbResult.dt.Rows)
                 {
 
-                    resultRow = new facilityResultRow
+                    resultRow = new FacilityResultRow
                     {
                         Facility = row["facility"].ToString(),
                         FacilityId = Convert.ToInt32(row["idFacility"]),
@@ -701,6 +713,76 @@ namespace ADLAPICore.Library.Facility
                 {
                     throw new ApplicationException("Address Id must be > 0.");
                 }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
+                return result;
+            }
+        }
+
+        public FacilityAddressResult GetFacilityAddress(FacilityAddressGetInput input)
+        {
+
+            FacilityAddressResult result = new FacilityAddressResult();
+
+            try
+            {
+
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                FacilityDBClass lDB = new FacilityDBClass();
+
+                var dbResult = lDB.FacilityAddressDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    result = new FacilityAddressResult();
+                    result.FacilityId = Convert.ToInt32(row["idFacility"]);
+                    result.AddressId = Convert.ToInt32(row["idAddress"]);
+                }
+
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new FacilityAddressResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(FacilityAddressGetInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+                if (input.inFacilityId < 1)
+                {
+                    throw new ApplicationException("Facility Id must be > 0.");
+                }
+
                 return result;
             }
             catch (Exception ex)
