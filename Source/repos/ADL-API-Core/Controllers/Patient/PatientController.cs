@@ -107,5 +107,31 @@ namespace ADLAPICore.Controllers.Patient
             }
         }
 
+
+        [HttpGet("ADLLogSummaryListByDate")]
+        public ActionResult ADLLogSummaryListByDate([FromQuery] PatientADLLogSummaryListByDateGetInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (PatientADLLogSummaryListByDateGetInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.GetPatientADLLogSummaryListByDate(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                PatientADLLogSummaryByDateResult r = new PatientADLLogSummaryByDateResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
     }
 }

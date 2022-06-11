@@ -16,6 +16,7 @@ namespace ADLAPICore.Library.Facility
         public string Address2 { get; set; }
         public string City { get; set; }
         public string State { get; set; }
+        public Int32 StateId { get; set; }
         public string Country { get; set; } 
         public string Phone { get; set; }
         public string Owner { get; set; }   
@@ -41,10 +42,21 @@ namespace ADLAPICore.Library.Facility
     public class FacilityResult
     {
         public ResponseModel response = new ResponseModel();
+        public Int32 FacilityId { get; set; }
+        public string Facility { get; set; }
+
+        public FacilityResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
+    public class FacilityListResult
+    {
+        public ResponseModel response = new ResponseModel();
         public List<FacilityResultRow> rows = new List<FacilityResultRow>();
         private FacilityResultRow resultRow = new FacilityResultRow();
 
-        public FacilityResult()
+        public FacilityListResult()
         {
             this.response = General.buildError("Unexpected error");
         }
@@ -96,8 +108,8 @@ namespace ADLAPICore.Library.Facility
     {
         public FacilityADLResult GetFacilityADLList(FacilityADLListGetInput input);
         public FacilityResult GetFacility(FacilityGetInput input);
-        public FacilityResult GetFacilityList(FacilityListGetInput input);
-        public FacilityResult GetFacilityOwnerList(FacilityOwnerListGetInput input);
+        public FacilityListResult GetFacilityList(FacilityListGetInput input);
+        public FacilityListResult GetFacilityOwnerList(FacilityOwnerListGetInput input);
         public FacilityPostResult InsertFacilityADL(FacilityADLInsertInput input);
         public FacilityPutResult DeleteFacilityADL(FacilityADLDeleteInput input);
         public FacilityAddressPostResult InsertFacilityAddress(FacilityAddressInsertInput input);
@@ -195,10 +207,10 @@ namespace ADLAPICore.Library.Facility
             }
         }
 
-        public FacilityResult GetFacilityOwnerList(FacilityOwnerListGetInput input)
+        public FacilityListResult GetFacilityOwnerList(FacilityOwnerListGetInput input)
         {
 
-            FacilityResult result = new FacilityResult();
+            FacilityListResult result = new FacilityListResult();
             FacilityResultRow resultRow = new FacilityResultRow();
 
             try
@@ -271,7 +283,7 @@ namespace ADLAPICore.Library.Facility
             catch (Exception ex)
             {
                 result.response = General.buildError(ex.Message);
-                return new FacilityResult { response = result.response };
+                return new FacilityListResult { response = result.response };
             }
         }
         private ResponseModel Validate(FacilityOwnerListGetInput input)
@@ -299,10 +311,10 @@ namespace ADLAPICore.Library.Facility
             }
         }
 
-        public FacilityResult GetFacilityList(FacilityListGetInput input)
+        public FacilityListResult GetFacilityList(FacilityListGetInput input)
             {
 
-                FacilityResult result = new FacilityResult();
+                FacilityListResult result = new FacilityListResult();
                 FacilityResultRow resultRow = new FacilityResultRow();
 
                 try
@@ -315,7 +327,7 @@ namespace ADLAPICore.Library.Facility
                         return result;
                     }
 
-                FacilityDBClass lDB = new FacilityDBClass();
+                    FacilityDBClass lDB = new FacilityDBClass();
 
                     var dbResult = lDB.FacilityListDBCall(input);
                     if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -340,11 +352,12 @@ namespace ADLAPICore.Library.Facility
                             Address2 = row["Address2"].ToString(),
                             City = row["City"].ToString(),
                             State = row["StateAbbreviation"].ToString(),
+                            //StateId = Convert.ToInt32(row["idState"]),
                             Country = row["CountryAbbreviation"].ToString(),
                             Phone = row["Phone"].ToString(),
                             Owner = row["OwnerName"].ToString(),
                             UserId = Convert.ToInt32(row["idUser"])
-                            
+                           
                         };
                         
                         // this is here so we don't add multiple 
@@ -375,7 +388,7 @@ namespace ADLAPICore.Library.Facility
                 catch (Exception ex)
                 {
                     result.response = General.buildError(ex.Message);
-                    return new FacilityResult { response = result.response };
+                    return new FacilityListResult { response = result.response };
                 }
             }
         private ResponseModel Validate(FacilityListGetInput input)
@@ -403,7 +416,6 @@ namespace ADLAPICore.Library.Facility
         {
 
             FacilityResult result = new FacilityResult();
-            FacilityResultRow resultRow = new FacilityResultRow();
 
             try
             {
@@ -423,44 +435,12 @@ namespace ADLAPICore.Library.Facility
                     result.response = dbResult.response;
                     return result;
                 }
-
-                resultRow = new FacilityResultRow();
-                result.rows = new List<FacilityResultRow>();
-
-                var holdFacilityid = -1;
-
+ 
                 foreach (DataRow row in dbResult.dt.Rows)
                 {
 
-                    resultRow = new FacilityResultRow
-                    {
-                        Facility = row["facility"].ToString(),
-                        FacilityId = Convert.ToInt32(row["idFacility"]),
-                        Address1 = row["Address1"].ToString(),
-                        Address2 = row["Address2"].ToString(),
-                        City = row["City"].ToString(),
-                        State = row["StateAbbreviation"].ToString(),
-                        Country = row["CountryAbbreviation"].ToString(),
-                        Phone = row["Phone"].ToString(),
-                        Owner = row["OwnerName"].ToString(),
-                        UserId = Convert.ToInt32(row["idUser"])
-
-                    };
-
-                    // this is here so we don't add multiple 
-                    // facility owner lines
-                    // set prior to Multiple / user -1
-                    if (holdFacilityid == resultRow.FacilityId)
-                    {
-                        result.rows[result.rows.Count - 1].UserId = -1;
-                        result.rows[result.rows.Count - 1].Owner = "Multiple";
-                    }
-                    else
-                    {
-                        result.rows.Add(resultRow);
-                    }
-
-                    holdFacilityid = resultRow.FacilityId;
+                    result.Facility = row["facility"].ToString();
+                    result.FacilityId = Convert.ToInt32(row["idFacility"]);
 
                 }
 

@@ -1,4 +1,6 @@
-﻿namespace ADLAPICore.Models.Facility
+﻿using System;
+
+namespace ADLAPICore.Models.Facility
 {
     public class FacilityGetInput
     {
@@ -24,4 +26,5 @@
         public string inApiToken { get; set; }
         public int inFacilityId { get; set; }
     }
+
 }

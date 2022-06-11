@@ -14,6 +14,7 @@ namespace ADLAPICore.Library.Patient
     {
         public DBResult PatientADLListByDay(PatientADLListByDayGetInput input);
         public DBResult PatientADLList(PatientADLListGetInput input);
+        public DBResult PatientADLLogSummaryListByDate(PatientADLLogSummaryListByDateGetInput input);
 
     }
 
@@ -59,6 +60,34 @@ namespace ADLAPICore.Library.Patient
                 DBClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inPatientId", input.inPatientId);
+                DBClass.dbCmd.Parameters.Add(param);
+
+                result = DBClass.getDBResults();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new DBResult { dt = new DataTable(), response = result.response };
+            }
+
+        }
+        public DBResult PatientADLLogSummaryListByDate(PatientADLLogSummaryListByDateGetInput input)
+        {
+            var result = new DBResult();
+            try
+            {
+                DBClass.dbCmd = new MySqlCommand("getPatientADLLogSummaryListByDate", DBClass.dbConn);
+                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+
+                MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
+                DBClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inFacilityId", input.inFacilityId);
+                DBClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inTransactionDate", input.inTransactionDate);
                 DBClass.dbCmd.Parameters.Add(param);
 
                 result = DBClass.getDBResults();

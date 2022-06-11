@@ -17,6 +17,7 @@ namespace ADLAPICore.Library.Patient
         public string TransactionDate { get; set; }
         public string UserName { get; set; }
     }
+
     public class PatientADLRow
     {
         public Int32 PatientId { get; set; }
@@ -24,14 +25,7 @@ namespace ADLAPICore.Library.Patient
         public string SystemADL { get; set; }
         public string TimeOfDay { get; set; }
     }
-    public class PatientADLSummaryRow
-    {
-        public Int32 PatientId { get; set; }
-        public Int32 SystemADLId { get; set; }
-        public string SystemADL { get; set; }
-        public string ScheduledDays { get; set; }
-        public string TimeOfDay { get; set; }
-    }
+
 
     public class PatientADLByDayResult
     {
@@ -55,6 +49,15 @@ namespace ADLAPICore.Library.Patient
             this.response = General.buildError("Unexpected error");
         }
     }
+
+    public class PatientADLSummaryRow
+    {
+        public Int32 PatientId { get; set; }
+        public Int32 SystemADLId { get; set; }
+        public string SystemADL { get; set; }
+        public string ScheduledDays { get; set; }
+        public string TimeOfDay { get; set; }
+    }
     public class PatientADLSummaryResult
     {
         public ResponseModel response = new ResponseModel();
@@ -66,12 +69,32 @@ namespace ADLAPICore.Library.Patient
             this.response = General.buildError("Unexpected error");
         }
     }
-    
+
+    public class PatientADLLogSummaryByDateRow
+    {
+        public string Patient{ get; set; }
+        public Int32 TotalADLs { get; set; }
+        public Int32 IncompleteADLs { get; set; }
+        public Decimal PctComplete  { get; set; }
+    }
+    public class PatientADLLogSummaryByDateResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public List<PatientADLLogSummaryByDateRow> rows = new List<PatientADLLogSummaryByDateRow>();
+        private PatientADLRow resultRow = new PatientADLRow();
+
+        public PatientADLLogSummaryByDateResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
+
     public interface IPatientClass
     {
         public PatientADLByDayResult GetPatientADLListByDay(PatientADLListByDayGetInput input);
         public PatientADLResult GetPatientADLList(PatientADLListGetInput input);
         public PatientADLSummaryResult GetPatientADLSummaryList(PatientADLListGetInput input);
+        public PatientADLLogSummaryByDateResult GetPatientADLLogSummaryListByDate(PatientADLLogSummaryListByDateGetInput input);
     }
 
     public class PatientClass : IPatientClass
@@ -333,6 +356,107 @@ namespace ADLAPICore.Library.Patient
                 return new PatientADLSummaryResult { response = result.response };
             }
         }
+
+        public PatientADLLogSummaryByDateResult GetPatientADLLogSummaryListByDate(PatientADLLogSummaryListByDateGetInput input)
+        {
+
+            PatientADLLogSummaryByDateResult result = new PatientADLLogSummaryByDateResult();
+            PatientADLLogSummaryByDateRow resultRow = new PatientADLLogSummaryByDateRow();
+
+            try
+            {
+
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                PatientDBClass lDB = new PatientDBClass();
+
+                var dbResult = lDB.PatientADLLogSummaryListByDate(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                resultRow = new PatientADLLogSummaryByDateRow();
+                result.rows = new List<PatientADLLogSummaryByDateRow>();
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    resultRow = new PatientADLLogSummaryByDateRow
+                    {
+                        Patient = row["patient"].ToString(),
+                        TotalADLs = Convert.ToInt32(row["ADLs"]),
+                        IncompleteADLs = Convert.ToInt32(row["ADLsNotCompleted"]),
+                        PctComplete = 0
+                    };
+
+                    // calculate pct complete
+                    if (resultRow.TotalADLs == resultRow.IncompleteADLs || 
+                        resultRow.TotalADLs == 0)
+                    { 
+                        resultRow.PctComplete = 0;
+                    }
+                    else if (resultRow.IncompleteADLs == 0)
+                    {
+                        resultRow.PctComplete = 100;
+                    }
+                    else
+                    {
+                        resultRow.PctComplete = 100 * ((resultRow.TotalADLs - resultRow.IncompleteADLs) / resultRow.TotalADLs);
+                    }
+                    result.rows.Add(resultRow);
+
+                }
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new PatientADLLogSummaryByDateResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(PatientADLLogSummaryListByDateGetInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+
+                if (input.inFacilityId <= 0)
+                {
+                    throw new ApplicationException("Facility Id must be greater than 0.");
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.status = ResponseModel.responseFAIL;
+                result.errorMessage = new List<string>();
+                result.errorMessage.Add(ex.Message);
+                return result;
+            }
+        }
+
+
+        /* private */
         private string ConvertDay(int inDay, string currentVal)
         {
             var retData = "";

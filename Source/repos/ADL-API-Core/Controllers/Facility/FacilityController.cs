@@ -94,7 +94,7 @@ namespace ADLAPICore.Controllers.Facility
 
             catch (Exception ex)
             {
-                FacilityResult fr = new FacilityResult();
+                FacilityListResult fr = new FacilityListResult();
                 fr.response = General.buildError(ex.Message);
 
                 return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
