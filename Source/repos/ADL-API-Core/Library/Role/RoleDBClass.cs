@@ -20,14 +20,15 @@ namespace ADLAPICore.Library.Role
         public DBResult RoleListDBCall(RoleListGetInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("getRoleList", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("getRoleList", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
-                result = DBClass.getDBResults();
+                dbClass.dbCmd.Parameters.Add(param);
+                result = dbClass.getDBResults();
 
                 return result;
             }

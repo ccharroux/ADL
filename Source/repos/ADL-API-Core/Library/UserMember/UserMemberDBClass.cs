@@ -26,20 +26,21 @@ namespace ADLAPICore.Library.UserMember
     {
         public DBResult UserAddressInsertDBCall(UserAddressInsertInput input)
         {
+            DBClass dbClass = new DBClass();
             var result = new DBResult();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("insertUserAddress", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("insertUserAddress", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("inUserId", input.inUserId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("inAddressId", input.inAddressId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -53,24 +54,25 @@ namespace ADLAPICore.Library.UserMember
         }
         public DBResult UserMemberInsertDBCall(UserMemberInsertInput input)
         {
+            DBClass dbClass = new DBClass();
             var result = new DBResult();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("insertUserMember", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("insertUserMember", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("infirstname", input.inFirstName);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("inmiddlename", input.inMiddleName);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("inlastname", input.inLastName);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("inemailaddress", input.inEmailAddress);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -85,26 +87,27 @@ namespace ADLAPICore.Library.UserMember
         public DBResult UserMemberUpdateDBCall(UserMemberUpdateInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
 
-                DBClass.dbCmd = new MySqlCommand("updateUserMember", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("updateUserMember", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("inuserid", input.inUserId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("infirstname", input.inFirstName);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("inmiddlename", input.inMiddleName);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("inlastname", input.inLastName);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("inemailaddress", input.inEmailAddress);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -119,18 +122,19 @@ namespace ADLAPICore.Library.UserMember
         public DBResult UserMemberListDBCall(UserMemberListGetInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("getUserList", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("getUserList", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inroleid", input.inRoleId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -145,21 +149,22 @@ namespace ADLAPICore.Library.UserMember
         public DBResult UserMemberListByFacilityDBCall(UserMemberListByFacilityGetInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("getUserListByFacility", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("getUserListByFacility", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inroleid", input.inRoleId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("infacilityid", input.inFacilityId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -174,18 +179,19 @@ namespace ADLAPICore.Library.UserMember
         public DBResult UserMemberAccessListDBCall(UserMemberAccessListGetInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("getUserAccessList", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("getUserAccessList", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inuserid", input.inUserId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -199,19 +205,20 @@ namespace ADLAPICore.Library.UserMember
         }
         public DBResult UserMemberDBCall(UserMemberGetInput input)
         {
+            DBClass dbClass = new DBClass();
             var result = new DBResult();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("getUser", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("getUser", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inuserid", input.inUserId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -226,18 +233,19 @@ namespace ADLAPICore.Library.UserMember
         public DBResult UserMemberAddressDBCall(UserMemberAddressGetInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("getUserAddress", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("getUserAddress", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inuserid", input.inUserId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }

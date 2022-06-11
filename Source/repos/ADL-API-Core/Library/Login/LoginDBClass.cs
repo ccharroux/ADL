@@ -18,19 +18,19 @@ namespace ADLAPICore.Library.Login
 
         public DBResult LoginDBCall(string emailAddress, string password)
         {
-
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("getLogin", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("getLogin", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inEmailAddress", emailAddress);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inPassword", password);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                return DBClass.getDBResults();
+                return dbClass.getDBResults();
             }
             catch (Exception ex)
             {

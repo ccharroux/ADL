@@ -20,37 +20,38 @@ namespace ADLAPICore.Library.Address
     {
         public DBResult AddressInsertDBCall(AddressInsertInput input)
         {
+            DBClass dbClass = new DBClass();
             var result = new DBResult();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("insertAddress", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("insertAddress", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inAddress1", input.inAddress1);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 
                 param = new MySqlParameter("inAddress2", input.inAddress2);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 
                 param = new MySqlParameter("inCity", input.inCity);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 
                 param = new MySqlParameter("inStateId", input.inStateId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 
                 param = new MySqlParameter("inCountryId", input.inCountryId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 
                 param = new MySqlParameter("inZipCode", input.inZipCode);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 
                 param = new MySqlParameter("inPhone", input.inPhone);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -65,40 +66,41 @@ namespace ADLAPICore.Library.Address
         public DBResult AddressUpdateDBCall(AddressUpdateInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
 
-                DBClass.dbCmd = new MySqlCommand("updateAddress", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("updateAddress", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inAddressId", input.inAddressId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inAddress1", input.inAddress1);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inAddress2", input.inAddress2);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inCity", input.inCity);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inStateId", input.inStateId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inCountryId", input.inCountryId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inZipCode", input.inZipCode);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inPhone", input.inPhone);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -112,19 +114,20 @@ namespace ADLAPICore.Library.Address
         }
         public DBResult AddressGetDBCall(AddressGetInput input)
         {
+            DBClass dbClass = new DBClass();
             var result = new DBResult();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("getAddress", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("getAddress", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inAddressid", input.inAddressId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }

@@ -32,19 +32,20 @@ namespace ADLAPICore.Library.Facility
         public DBResult FacilityAddressInsertDBCall(FacilityAddressInsertInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("insertFacilityAddress", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("insertFacilityAddress", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("inFacilityId", input.inFacilityId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("inAddressId", input.inAddressId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -60,16 +61,17 @@ namespace ADLAPICore.Library.Facility
         public DBResult FacilityADLListDBCall(FacilityADLListGetInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("getFacilityADLList", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("getFacilityADLList", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("infacilityId", input.inFacilityId);
-                DBClass.dbCmd.Parameters.Add(param);
-                result = DBClass.getDBResults();
+                dbClass.dbCmd.Parameters.Add(param);
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -85,16 +87,17 @@ namespace ADLAPICore.Library.Facility
         public DBResult FacilityOwnerListDBCall(FacilityOwnerListGetInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("getFacilityOwnerList", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("getFacilityOwnerList", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("infacilityId", input.inFacilityId);
-                DBClass.dbCmd.Parameters.Add(param);
-                result = DBClass.getDBResults();
+                dbClass.dbCmd.Parameters.Add(param);
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -110,14 +113,15 @@ namespace ADLAPICore.Library.Facility
         public DBResult FacilityListDBCall(FacilityListGetInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("getFacilityList", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("getFacilityList", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
-                result = DBClass.getDBResults();
+                dbClass.dbCmd.Parameters.Add(param);
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -133,18 +137,19 @@ namespace ADLAPICore.Library.Facility
         public DBResult FacilityDBCall(FacilityGetInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("getFacility", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("getFacility", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inFacilityId", input.inFacilityId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -160,21 +165,22 @@ namespace ADLAPICore.Library.Facility
         public DBResult FacilityADLInsertDBCall(FacilityADLInsertInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("insertadlfacility", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("insertadlfacility", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inFacilityId", input.inFacilityId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inSystemAdlId", input.inSystemADLId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -189,21 +195,22 @@ namespace ADLAPICore.Library.Facility
         public DBResult FacilityADLDeleteDBCall(FacilityADLDeleteInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("deleteadlfacility", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("deleteadlfacility", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inFacilityId", input.inFacilityId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inSystemAdlId", input.inSystemADLId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -218,18 +225,19 @@ namespace ADLAPICore.Library.Facility
         public DBResult FacilityAddressDBCall(FacilityAddressGetInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("getFacilityAddress", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("getFacilityAddress", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inFacilityId", input.inFacilityId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -245,17 +253,18 @@ namespace ADLAPICore.Library.Facility
         public DBResult FacilityInsertDBCall(FacilityInsertInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("insertFacility", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("insertFacility", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("inFacility", input.inFacility);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -270,19 +279,20 @@ namespace ADLAPICore.Library.Facility
         public DBResult FacilityUpdateDBCall(FacilityUpdateInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("insertFacility", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("insertFacility", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("inFacilityId", input.inFacilityId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("inFacility", input.inFacility);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }

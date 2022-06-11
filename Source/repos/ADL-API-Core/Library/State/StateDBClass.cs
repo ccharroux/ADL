@@ -20,14 +20,15 @@ namespace ADLAPICore.Library.State
         public DBResult StateListDBCall(StateListGetInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("getStateList", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("getStateList", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
-                result = DBClass.getDBResults();
+                dbClass.dbCmd.Parameters.Add(param);
+                result = dbClass.getDBResults();
 
                 return result;
             }

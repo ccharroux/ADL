@@ -22,14 +22,15 @@ namespace ADLAPICore.Library.Country
         public DBResult CountryListDBCall(string apitoken)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("getCountryList", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("getCountryList", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", apitoken);
-                DBClass.dbCmd.Parameters.Add(param);
-                result = DBClass.getDBResults();
+                dbClass.dbCmd.Parameters.Add(param);
+                result = dbClass.getDBResults();
 
                 return result;
             }

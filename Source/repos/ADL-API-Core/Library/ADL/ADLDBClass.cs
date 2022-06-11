@@ -25,14 +25,15 @@ namespace ADLAPICore.Library.ADL
         public DBResult ADLListDBCall(ADLListGetInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("getSystemADLList", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("getSystemADLList", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
-                result = DBClass.getDBResults();
+                dbClass.dbCmd.Parameters.Add(param);
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -47,18 +48,19 @@ namespace ADLAPICore.Library.ADL
         public DBResult ADLDBCall(ADLGetInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("getSystemADL", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("getSystemADL", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("insystemadlId", input.inSystemADLId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -73,21 +75,22 @@ namespace ADLAPICore.Library.ADL
         public DBResult ADLInsertDBCall(ADLInsertInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("insertadl", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("insertadl", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("insystemadl", input.inSystemADL);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inSystemAdltypeId", input.inSystemADLTypeId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -102,27 +105,28 @@ namespace ADLAPICore.Library.ADL
         public DBResult ADLUpdateDBCall(ADLUpdateInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("updateadl", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("updateadl", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("insystemadl", input.inSystemADL);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inSystemAdltypeId", input.inSystemADLTypeId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inSystemAdlId", input.inSystemADLId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inOrderNum", input.inOrderNum);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }
@@ -137,18 +141,19 @@ namespace ADLAPICore.Library.ADL
         public DBResult ADLDeleteDBCall(ADLDeleteInput input)
         {
             var result = new DBResult();
+            DBClass dbClass = new DBClass();
             try
             {
-                DBClass.dbCmd = new MySqlCommand("deleteSystemADL", DBClass.dbConn);
-                DBClass.dbCmd.CommandType = CommandType.StoredProcedure;
+                dbClass.dbCmd = new MySqlCommand("deleteSystemADL", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inSystemAdlId", input.inSystemADLId);
-                DBClass.dbCmd.Parameters.Add(param);
+                dbClass.dbCmd.Parameters.Add(param);
 
-                result = DBClass.getDBResults();
+                result = dbClass.getDBResults();
 
                 return result;
             }

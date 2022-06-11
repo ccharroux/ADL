@@ -15,19 +15,19 @@ namespace ADLAPICore.Library.Common
         public DBResult getDBResults();
     }       
 
-    public static class DBClass
+    public  class DBClass
     {
-        public static MySqlConnection dbConn = new MySqlConnection();
-        public static MySqlCommand dbCmd;
-        public static DBResult response = new DBResult();
-        public static DataTable dt;
+        public  MySqlConnection dbConn = new MySqlConnection();
+        public  MySqlCommand dbCmd;
+        public  DBResult response = new DBResult();
+        public  DataTable dt;
 
-        static DBClass()
+        public DBClass()
         {
             dbConn.ConnectionString = Startup.Configuration.GetSection("ConnectionStrings").GetSection("ADLDB").Value;
             dbConn.Open();
         }
-        public static ResponseModel executeDB()
+        public ResponseModel executeDB()
         {
             var response = new ResponseModel();
 
@@ -44,7 +44,7 @@ namespace ADLAPICore.Library.Common
                 return new ResponseModel { status = ResponseModel.responseFAIL, errorMessage = response.errorMessage};
             }
         }
-        public static DBResult getDBResults()
+        public DBResult getDBResults()
         {
             MySqlDataAdapter sda = new MySqlDataAdapter();
             DataTable dt = new DataTable();
@@ -58,6 +58,7 @@ namespace ADLAPICore.Library.Common
                 sda.Fill(dt);
 
                 dr.dt = dt;
+                sda.Dispose();
 
                 return dr;
             }
