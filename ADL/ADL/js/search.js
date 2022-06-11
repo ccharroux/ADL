@@ -1451,7 +1451,7 @@ function getOwnerList() {
 function getOwnerListSuccess(data, textStauts, jQxhr) {
 
     if (data.response.status != "SUCCESS") {
-        MKAErrorMessageRtn(data.response.errorMessage[0]);
+        GeneralErrorMessageRtn(data.response.errorMessage[0]);
     }
 
     else {

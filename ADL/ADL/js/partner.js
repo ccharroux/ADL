@@ -24,7 +24,7 @@
 
 function getPartnerAssignmentsByMarketForViewingSuccess(data, textStatus, jQxhr) {
     if (data.response.status != "SUCCESS") {
-        MKAErrorMessageRtn(data.response.errorMessage[0]);
+        GeneralErrorMessageRtn(data.response.errorMessage[0]);
     } else {
         //var sMsg = "";
         //build the table tags
@@ -94,7 +94,7 @@ function getPartnersListForUpdating(marketId) {
 function getPartnersListSuccess(data, textStatus, jQxhr, marketId) {
 
     if (data.response.status != "SUCCESS") {
-        MKAErrorMessageRtn(data.response.errorMessage[0]);
+        GeneralErrorMessageRtn(data.response.errorMessage[0]);
 
     } else {
         var str = '<div id="rwErrorMessage" class="row" style="display: none;"><div class="col-md-12 text-align-center" style="color: red;">&nbsp;*&nbsp;<span id="spErrorMessage"></span></div></div>';
@@ -146,7 +146,7 @@ function getPartnerAssignmentsByMarketForUpdating(inMarketId, partnerList) {
 
 function getPartnerAssignmentsByMarketForUpdatingSuccess(data, textStatus, jQxhr, inMarketId, partnerList) {
     if (data.response.status != "SUCCESS") {
-        MKAErrorMessageRtn(data.response.errorMessage[0]);
+        GeneralErrorMessageRtn(data.response.errorMessage[0]);
     } else {
 
         //build the table tags
@@ -278,7 +278,7 @@ function updatePartnerAssignmentsByMarketSuccess(data, textStatus, jQxhr) {
     }
 
     if (data.response.status != "SUCCESS") {
-        MKAErrorMessageRtn(data.response.errorMessage[0]);
+        GeneralErrorMessageRtn(data.response.errorMessage[0]);
         return;
     }
 

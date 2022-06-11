@@ -97,7 +97,7 @@
                     <!--First Name-->
                     <div class="row input-row">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtFirstName">Facility Name</label>
+                            <label for="txtFacilityName">Facility Name</label>
                         </div>
                         <div class="col-md-5 text-align-left">
                             <input type="text" class="mkaRequired field-width-325" id="txtFacilityName" maxlength="35" errorMessage="You must enter an ADL Name." />
@@ -189,7 +189,7 @@
                             <input type="text" id="txtEmailAddress" maxlength="50" class="mkaRequired field-width-325" errorMessage="You must enter an Email Address" />
                         </div>
                         <div id="divResetPassword" class="col-md-4 text-align-center hidden">
-                            <input onclick="excludeFromBackButton(); checkIfPasswordResetIsAllowed(gEmailTokenPasswordChange);" value="Reset Password" class="default-button checkForDirty" type="button" />
+                            <input onclick="checkIfPasswordResetIsAllowed(gEmailTokenPasswordChange);" value="Reset Password" class="default-button checkForDirty" type="button" />
                         </div>
                     </div>
 
@@ -208,7 +208,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div>
-                                    <input value="Update" onclick="excludeFromBackButton(); initiatePersonnelUpdate();" class="default-button" type="button" />
+                                    <input value="Update" onclick="initiatePersonnelUpdate();" class="default-button" type="button" />
                                 </div>
                                 <!--<div class="back-button-div">
                                     <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button" />
@@ -344,22 +344,24 @@
 
     $(document).ready(function ()
     {
-        buildMainMenu("Personnel");
-        buildQuickReports(['personnel', 'owner', 'market', 'station']);
+        buildMainMenu("Admin");
 
         facilityId = (getParameterByName("facilityId") == null ? 0 : getParameterByName("facilityId"));
-        setLocalStorage("gPageParameters", "");
+        getFacility(facilityId);
+            getFacilityAddress(facilityId);
+        //getStateList("ddlState");
+
         if (facilityId > 0)
         {
             setTitle("Facility Maintenance");
-            getUser(userId);
+
         }
         else
         {
             setTitle("New Facility");
         }
 
-        //getStateList();
+
         setTimeout(setupEvents, 1000);
 
     });
@@ -395,45 +397,7 @@
             bDirty = true;
         });
     }
-    function getStateList() {
-        return;
 
-        var url = ServicePrefix + '/api/State/GetStateList';
-
-        var settings = {
-            dataType: 'json',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            procssData: false,
-            success: function (data, textStatus, jQxhr) {
-                getStateListSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        }
-        $.ajax(url, settings);
-    }
-
-    function getStateListSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
-
-            });
-        } else {
-            var str = '';
-            str = '<option value="-1">-- Select a State</option>';
-            $.each(data.report.rows, function (index) {
-                str = str + '<option value="' + data.report.rows[index].stateAbbr + '">' + data.report.rows[index].stateAbbr + '</option>';
-            });
-            $("#ddlState").html(str);
-            convertToChosenSelect("ddlState", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-        }
-        getPositionList();
-    }
 
     function getPositionList() {
         var url = ServicePrefix + '/api/Position/GetPositionList';
@@ -536,8 +500,8 @@
                 str = str + '<div id="date' + productId + '" />';
                 str = str + '</div>';
                 str = str + '<div id="productButtons' + productId + '" class="col-md-6" style="text-align:left;">';
-                str = str + '<input type="button" id="productAdd' + productId + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="excludeFromBackButton(); enableProduct(' + '\'' + productId + '\');" Value="Enable" />';
-                str = str + '<input type="button" id="productDisable' + productId + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="excludeFromBackButton(); disableProduct(' + '\'' + productId + '\');" Value="Disable" />';
+                str = str + '<input type="button" id="productAdd' + productId + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="enableProduct(' + '\'' + productId + '\');" Value="Enable" />';
+                str = str + '<input type="button" id="productDisable' + productId + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="disableProduct(' + '\'' + productId + '\');" Value="Disable" />';
                 str = str + '</div>';
                 str = str + '</div>';
 
@@ -734,7 +698,6 @@
     function getUser() {
 
         if (userId <= 0) {
-            cleanupBackButton(window.location.pathname);
             return;
         }
 
@@ -799,7 +762,6 @@ var testURLData = { "EmailAddress": "CarlCharroux@yahoo.com", "PassKey": "123" }
 
                     // loadFeatureButtons();
 
-                    // cleanupBackButton(window.location.pathname);
                 });
         }
 
@@ -1160,7 +1122,7 @@ var testURLData = { "EmailAddress": "CarlCharroux@yahoo.com", "PassKey": "123" }
 
     function checkSAMLStatusSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            GeneralErrorMessageRtn(data.response.errorMessage[0]);
         } else {
 
             switch (data.report.rows[0].passwordOrSAML) {
@@ -1402,7 +1364,7 @@ var testURLData = { "EmailAddress": "CarlCharroux@yahoo.com", "PassKey": "123" }
 
     function initiateWebNotificationSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            GeneralErrorMessageRtn(data.response.errorMessage[0]);
         } else {
             $.each(data.report.rows, function (index) {
 
@@ -1440,7 +1402,7 @@ var testURLData = { "EmailAddress": "CarlCharroux@yahoo.com", "PassKey": "123" }
 
     function insertPendingNotificationSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            GeneralErrorMessageRtn(data.response.errorMessage[0]);
         } else {
 
             bootbox.alert("Pending record has been created for this user.", function () {
@@ -1630,13 +1592,13 @@ var testURLData = { "EmailAddress": "CarlCharroux@yahoo.com", "PassKey": "123" }
 
     function checkIfPasswordResetIsAllowedSuccess(data, textStatus, jQxhr, emailToken) {
         if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            GeneralErrorMessageRtn(data.response.errorMessage[0]);
             window.location = "/admin/personnel/personnel.html?userId=" + userId;
             return;
         }
 
         if (data.report.rows.length == 0) {
-            MKAErrorMessageRtn("Can't reset password: Failed to get result from GetPersonnelOkayToResetPasswordFromInternal");
+            GeneralErrorMessageRtn("Can't reset password: Failed to get result from GetPersonnelOkayToResetPasswordFromInternal");
             window.location = "/admin/personnel/personnel.html?userId=" + userId;
             return;
         }
@@ -1736,7 +1698,7 @@ var testURLData = { "EmailAddress": "CarlCharroux@yahoo.com", "PassKey": "123" }
 
     function resetPasswordSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            GeneralErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
@@ -1790,4 +1752,43 @@ var testURLData = { "EmailAddress": "CarlCharroux@yahoo.com", "PassKey": "123" }
         }
     }
 
+function getFacility(id) 
+{
+
+    var url = ServicePrefix + '/facility/' + getTokenInput() + "&inFacilityId=" + id;
+
+    var settings = {
+        dataType: 'json',
+        type: 'GET',
+        contentType: 'application/json',
+        procssData: false,
+        success: function (data, textStatus, jQxhr) {
+            console.log(data);
+            getFacilitySuccess(data, textStatus, jQxhr);
+        },
+        error: function (jQxhr, textStatus, errorThrown) {
+            genericAjaxError(jQxhr, textStatus, errorThrown);
+        }
+    }
+    $.ajax(url, settings);
+}
+
+function getFacilitySuccess(data, textStatus, jQxhr) 
+{
+
+    if (data.response.status != "SUCCESS") {
+        bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
+        });
+    } 
+    else 
+    {
+        $("#txtFacilityName").val(data.Facility);    
+    }
+    //getPositionList();
+}
+
+function getFacilityAddress(id)
+{
+
+}
 </script>

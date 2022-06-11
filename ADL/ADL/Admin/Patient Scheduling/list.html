@@ -85,10 +85,13 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div>
+                    <div class="col-md-4 col-md-offset-3">
+                        <label for="ddlFacilities" class="dropdown-label">Facilities</label><br>
+                        <select id="ddlFacilities" class="search-ddl-select dropdown-select report-filter" onchange="getPatientListByFacility('ddlFacilities', 'ddlPatients');"></select>
+                    </div>
+                    <div class="col-md-4 col-md-offset-3">
                         <label for="ddlPatients" class="dropdown-label">Patients</label><br>
                         <select id="ddlPatients" class="search-ddl-select dropdown-select report-filter" onchange="getPatientADLS();"></select>
-
                     </div>
 
                 </div>
@@ -126,7 +129,7 @@
                             
                         </select>
                         <hr /> 
-                        <input type="button" value="Add ADL" onclick="moveMe('ddlSystemADL','ddlAssignedADL')"/>
+                        <input type="button" value="Add ADL" onclick="addItem(0)"/>
                     </div>
                 </div>
             </div>
@@ -190,7 +193,7 @@
 </html>
 <script>
 
-
+    var systemALS = new Object();
 
 
     $(document).ready(function () {
@@ -199,50 +202,45 @@
         {
             return;
         }
-        else {            
+        else {     
+
+            getListSystemADLS();       
             buildUIDialogs();
             setTitle("Patient Scheduling");
-            setPatient("Carl Charroux");
+
             setEventListeners();
             setDataTable();
            // addDialogComponents();
-            loadPatients("ddlPatients");
+            loadFacilities("ddlFacilities");
+            //loadPatients("ddlPatients");
+            getPatientListByFacility("ddlFacilities", "ddlPatients");
+
             setDateControl();
             buildMainMenu("Admin");
-            //loadSearchResults();
-            //getProductList(); // success -> getNewsList()
-            //getListFacilityADLS('ddlAssignedADL');
-            getPatientADLS();
-            getListSystemADLS('ddlSystemADL','ddlAssignedADL');
+
+
         }
      });
 
     function getPatientADLS()
     {
 
-/*         var url = ServicePrefix + '/api/News/GetNewsList';
-        url += '?inApiToken=' + getLocalStorage("APIToken");
-        
-        var productId = $("#ddlProduct").val();
-        if (productId != "") {
-            url += '&inProductId=' + productId;
-        }
-        if ($("#chkIncludeDeleted").prop("checked") || productId == "DEL" || productId == "UPD") {
-            url += '&inIncludeDeleted=true';
-        } */
+        var inURL = ServicePrefix + "/patient/adllistsummary/" + getTokenInput();
+        inURL = inURL + "&inPatientId=" + $("#ddlPatients").val();
+
+        console.log(inURL);
 
         $.ajax({
-            url: testURL,
+            url: inURL,
             dataType: 'json',
-            //type: 'get',
-            type: 'post',
-            data: JSON.stringify(testURLData),
+            type: 'get',
+            //type: 'post',
+            //data: JSON.stringify(testURLData),
             contentType: 'application/json',
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                data = testADLPatientADLSData;
-                console.log(data);
-            
+                setupAvailableADLS(data, "ddlSystemADL");
+                setPatient($("#ddlPatients option:selected").text());
                 populateDataTable("dt", data);
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -333,56 +331,27 @@
             "searching" : false,
             "paging":false,
             "columns": [
-                { "data": "adlTime"},
+ 
                 {
-                    "data": 'adl',
+                    "data": 'TimeOfDay',
                     "className": "text-align-left"
                 },
                 {
-                    "data": 'adlFrequency',
+                    "data": 'SystemADL',
                     "className": "text-align-left"
                 },
-/*                 {
-                    mRender: function (data, type, row) {
-
-                        var action = '';
-                        
-                        if (row["ProductID"] == 'DEL')
-                        {
-                            action = action + '<font color="red">';
-
-                        }
-                        
-                        action = action + row["ProductID"];
-
-                        if (row["ProductID"] == 'DEL')
-                        {
-                            action = action + '</font>';
-                        }
-
-                        return action;
-                    },
-                    "orderable": true,
-                    "searchable": true,
-                    "className": "text-align-center"
-                },
-                { "data": 'NewsTitle' },
                 {
-                    "data": 'NewsDateTime',
+                    "data": 'ScheduledDays',
                     "className": "text-align-center"
-                },
-                { "data": 'NewsText', "render": $.fn.dataTable.render.ellipsis(200, true, false) },
-                {
-                    "data": 'Creator',
-                    "className": "text-align-center"
-                }, */
+                },                
+
                 {
                     mRender: function (data, type, row) {
 
                         var action = '';
 
-                            action = action + "<a href='#' onclick='editItem(" + row.adlId + ");'>Edit</a><br>";
-                            action = action + "<a href='#' onclick='deleteItem(" + row.adlId + ");'>Delete</a>";
+                            action = action + "<a href='#' onclick='editItem(" + row["SystemADLId"] + ");'>Edit</a><br>";
+                            action = action + "<a href='#' onclick='deleteItem(" + row["SystemADLId"] + ");'>Delete</a>";
 
                         
 /*                             if (row["IsPublic"].toUpperCase() == "YES")
@@ -480,7 +449,7 @@
                 data = testADLFacilityAssignmentData;
                 console.log(data);
                 if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                    GeneralErrorMessageRtn(data.response.errorMessage[0]);
                 }
                 else {
 
@@ -507,36 +476,39 @@
 
 
     }
-    function getListSystemADLS(control, controlToCheck)
+    function getListSystemADLS()
     {
  
         $.ajax({
-            //url: ServicePrefix + '/api/Market/GetMarketListByProduct',
-            url: testURL,
+            url: ServicePrefix + '/ADL/list/' + getTokenInput(),
             dataType: 'json',
-            type: 'post',
+            type: 'get',
             contentType: 'application/json',
-            data: JSON.stringify(testURLData),
+            //data: JSON.stringify(testURLData),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                data = testADLSystemData;
+                //data = testADLSystemData;
                 console.log(data);
                 if (data.response.status != "SUCCESS") {
-                    MKAErrorMessageRtn(data.response.errorMessage[0]);
+                    GeneralErrorMessageRtn(data.response.errorMessage[0]);
                 }
                 else {
+                    
+                    // set the object
+                    systemALS = data.rows;
+                    return;
 
-                    var str = '';
+    //                var str = '';
    
-                    $.each(data.report.rows, function (index) {
+   //                 $.each(data.rows, function (index) {
 
-                        if (inThisList(data.report.rows[index].adlId, controlToCheck) == false)
-                        {
-                            str = str + '<option value="' + data.report.rows[index].adlId + '">' + data.report.rows[index].adl + '</option>';
-                        }
-                    });
+  //                      if (inThisList(data.rows[index].SystemADLId, controlToCheck) == false)
+   //                     {
+   //                         str = str + '<option value="' + data.rows[index].SystemADLId + '">' + data.rows[index].ADL + '</option>';
+ //                       }
+ //                   });
  
-                    $("#"+control).html(str);
+//                    $("#"+control).html(str);
  
                     //convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
 
@@ -548,9 +520,62 @@
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+    }
 
+    function setupAvailableADLS(patientData, controlToLoad)
+    {
+        var patientCount = patientData.rows.length;
+        var systemCount = systemALS.length;
+        var bCheckNeeded = true;
+        var str = '';
 
+        if (patientCount == 0)
+        {
+            bCheckNeeded = false;
+        }
+        else if (patientCount == systemCount)
+        {
+            $("#"+controlToLoad).html(str);
+            return;
+        }
 
+        $.each(systemALS, function (index) {
+
+            var bAddMe = false;
+
+            if (bCheckNeeded == false)
+            {
+                bAddMe = true;
+            }
+            else if (inThisArray(systemALS[index].SystemADLId, patientData) == false)
+            {
+                bAddMe = true;
+            }
+
+            if (bAddMe == true)
+            {
+                str = str + '<option value="' + systemALS[index].SystemADLId + '">' + systemALS[index].ADL + '</option>';
+            }
+
+        });
+
+        $("#"+controlToLoad).html(str);
+    }
+
+    function inThisArray(id, arrayToCheck)
+    {
+        var bReturn = false;
+
+        $.each(arrayToCheck.rows, function (index) {
+            // we found it
+            if (id == arrayToCheck.rows[index].SystemADLId)
+            {
+                bReturn = true;
+                return bReturn;
+            }
+        });
+
+        return bReturn;
     }
     function getList() {
 
@@ -574,7 +599,7 @@
             contentType: 'application/json',
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                data = testADLFacilityAssignmentata;
+                data = testADLFacilityAssignmentData;
                 console.log(data);
             
                 populateDataTable("dt", data);
@@ -586,20 +611,27 @@
     }
 
     // functional area
-    function addItem() {
-        functionalityNotAvailable();
-        return;
+    function addItem() 
+    {
+    
+       //alert ($("#ddlSystemADL").attr('selected'));
 
-        window.location = "/admin/news/news.html";
+ 
+
+        var ind = $('#ddlSystemADL option:selected').index();
+
+        if (ind < 0)
+        {
+            bootbox.alert("Please select an ADL.", function (result) { return; });
+        }
+        var newItem = $('#ddlSystemADL option:selected').val();
+        window.location = '../../admin/patient scheduling/item.html?adlPatientAssignmentId=0&newId='+newItem;
     }
 
     function editItem(id) {
-        functionalityNotAvailable();
-        return;
 
-        window.location = "/admin/news/news.html?NewsKey=" + id;
+        window.location = "../../admin/patient scheduling/item.html?adlPatientAssignmentId=" + id;
     }
-
 
     function deleteItem(id) {
 
@@ -667,7 +699,7 @@
 
     function approveNewsSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            GeneralErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
@@ -705,7 +737,7 @@
 
     function unapproveNewsSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            GeneralErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
@@ -714,7 +746,7 @@
     }
 
         if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            GeneralErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
@@ -723,7 +755,7 @@
     }
 
     function loadSearchResults() {
-        loadReportParameters();
+        //loadReportParameters();
         //getNewsList();
     }
 
@@ -751,7 +783,7 @@
     function getProductListSuccess(data, textStatus, jQxhr) {
 
 /*         if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            GeneralErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
  */
@@ -767,24 +799,28 @@
 
         getNewsList();
     }
-function moveMe(control1, control2)
-{
-    var text = $('#' + control1 + ' option:selected').text();
-    var val = $('#' + control1 + ' option:selected').text();
-    if (val == "")
-    {
-         return;
-    }
-
-    $('#' + control2).append('<option value=' + val + '>'+ text +'</option>');
- 
-    $("#" + control1).find("option:selected").remove();
     
-    $('#' + control1 + " option:selected").removeAttr("selected");
-    $('#' + control2 + " option:selected").removeAttr("selected");
-    // get control 1
-    // add to control 2
-    // remove from control 1
+    function moveMe(control1, control2)
+    {
+        var text = $('#' + control1 + ' option:selected').text();
+        var val = $('#' + control1 + ' option:selected').text();
+        if (val == "")
+        {
+            return;
+        }
 
-}
+        $('#' + control2).append('<option value=' + val + '>'+ text +'</option>');
+    
+        $("#" + control1).find("option:selected").remove();
+        
+        $('#' + control1 + " option:selected").removeAttr("selected");
+        $('#' + control2 + " option:selected").removeAttr("selected");
+        
+        window.location = '../../admin/patient scheduling/item.html?adlPatientAssignmentId=0&name='+text;
+        
+        // get control 1
+        // add to control 2
+        // remove from control 1
+
+    }
 </script>

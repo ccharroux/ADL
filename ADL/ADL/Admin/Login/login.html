@@ -47,11 +47,11 @@
                         </div>
                         <br />
                         <div style='text-align:center'>
-                            <input type="button" value="Login" onclick="excludeFromBackButton(); login();" style="width:100%" />
+                            <input type="button" value="Login" onclick="login();" style="width:100%" />
                         </div>
                         <hr /> 
                         <div style='text-align:center'>
-                            <input type="button" value="Forgot Password" onclick="excludeFromBackButton(); login();" style="width:100%" />
+                            <input type="button" value="Forgot Password" onclick="login();" style="width:100%" />
                         </div>
                     </div>
                 </div>
@@ -94,14 +94,11 @@
             // Number 13 is the "Enter" key on the keyboard
             if (event.keyCode === 13)
             {
-                excludeFromBackButton();
                 login();
             }
         });
 
         document.getElementById("email").focus();
-
-        initializeBackButton();
     });
 
     function login()
@@ -121,7 +118,7 @@
             return false;
         }
 
-        var emailAdjusted = $("#email").val().toString().toLowerCase();
+       
 
         // if (emailAdjusted.indexOf(".com") == -1)
         // {
@@ -132,33 +129,60 @@
         // }
         var inURL = ServicePrefix + "services/PixxGet.asmx/GetMemberID";
 
- 
+        inURL = ServicePrefix + "/login?inEmailAddress=" + $("#email").val() + "&inPassword=" + $("#password").val();
+        
+        var faStr = "";
+        var str = "";
 
 	    $.ajax({
             url: inURL,
             dataType: 'json',
-            type: 'post',
+            type: 'get',
             contentType: 'application/json',
-            data: JSON.stringify({ "EmailAddress": emailAdjusted, "PassKey": $("#password").val() }),
+           // data: JSON.stringify({ "EmailAddress": emailAdjusted, "PassKey": $("#password").val() }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
-                // console.log(data.d);
-                // if (data.response.status != "SUCCESS") {
-                //     $("#password").val() == "";
-                //     MKAErrorMessageRtn(data.response.errorMessage[0]);
-                // }
-                // else {
-                    setLocalStorage("APIToken", "123456");
-                    setLocalStorage("userId", 1);
+                if (data.response.status != "SUCCESS") {
+                     $("#password").val() == "";
+                     GeneralErrorMessageRtn(data.response.errorMessage[0]);
+                }
+                else {
+                    setLocalStorage("APIToken", data.response.apiToken);                    
                     updateTokenTime();
+                    
+                    $.each(data.rows, function (index) 
+                    {
+                        //console.log()
+                        // get user info
+                        //str = str + '<option value="' + data.report.rows[index].stateAbbr + '">' + data.report.rows[index].stateAbbr + '</option>';
+                        
+                        setLocalStorage("firstName", data.rows[index].FirstName);
+                        setLocalStorage("lastName", data.rows[index].LastName);
+                        setLocalStorage("middleName", data.rows[index].MiddleName);
+
+                        setLocalStorage("userId", data.rows[index].UserId);
+                        console.log(JSON.stringify(data.rows[index].fa));
+                        setLocalStorage("fa", JSON.stringify(data.rows[index].fa));
+                        setLocalStorage("facilityAccess", JSON.stringify(data.rows[index].fa));
+                        
+                        setLocalStorage("currentFacility", "");
+
+                    });
+
+
+                    
+
+                    
+
+
                     window.location = '../../admin/login/dashboard.html?MenuItem=true';
-                // }
+                  }
 
         },
         error: function (jqXhr, textStatus, errorThrown) {
             $("#password").val() == "";
-            MKAErrorMessageRtn(errorThrown);
+            GeneralErrorMessageRtn(errorThrown);
         }
     });
 

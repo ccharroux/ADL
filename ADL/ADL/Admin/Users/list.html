@@ -73,9 +73,14 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div>
+                    <div class="col-md-5 col-md-offset-3">
                         <label for="ddlFacilities" class="dropdown-label">Facility</label><br>
                         <select id="ddlFacilities" class="search-ddl-select dropdown-select report-filter" onchange="getList();"></select>
+
+                    </div>
+                    <div class="col-md-5 col-md-offset-3">
+                        <label for="ddlRoles" class="dropdown-label">Role</label><br>
+                        <select id="ddlRoles" class="search-ddl-select dropdown-select report-filter" onchange="getList();"></select>
 
                     </div>
 
@@ -150,8 +155,6 @@
 <script>
 
 
-    var bSecondaryMarketsOnly = false;
-
     $(document).ready(function () {
 
         if (doesUserHaveAccessToFeature("adl system") == false)
@@ -162,11 +165,24 @@
             setTitle("User Maintenance");
             setEventListeners();
             setDataTable();
-            buildMainMenu("Admin");
-            //loadSearchResults();
-            //getProductList(); // success -> getNewsList()
+
+            var menuSet = "";
+            var fromAdmin = (getParameterByName("admin") == null ? false : true);
+            if (fromAdmin)
+            {
+                menuSet = "Admin";                
+            }
+            else
+            {
+                menuSet = "ADL";
+
+            }
+
+            buildMainMenu(menuSet);
+
+            getListRoles("ddlRoles");
             loadFacilities('ddlFacilities')
-            getList();
+            setTimeout(getList, 2000);
         }
      });
 
@@ -215,15 +231,15 @@
             "order": [[ 0, "asc" ]],
             "columns": [
                 {
-                    "data": 'fullName',
+                    "data": 'UserName',
                     "className": "text-align-left"
                 },
                 {
-                    "data": 'role',
+                    "data": 'Role',
                     "className": "text-align-left"
                 },
                 {
-                    "data": 'facilityName',
+                    "data": 'Facility',
                     "className": "text-align-left"
                 },
 /*                 {
@@ -360,18 +376,24 @@
             url += '&inIncludeDeleted=true';
         } */
 
+        setCurrentFacility();
+        
+        var inURL = ServicePrefix + "/usermember/ListByFacility/" + getTokenInput();
+        inURL = inURL + "&infacilityid=" + getFacilityFromControl("ddlFacilities");
+        inURL = inURL + "&inroleid=" + $("#ddlRoles").val();
+
+        //inURL = inURL + "&inroleid=" + cPatient;
+
+
         $.ajax({
-            url: testURL,
+            url: inURL,
             dataType: 'json',
-            //type: 'get',
-            type: 'post',
-            data: JSON.stringify(testURLData),
+            type: 'get',
             contentType: 'application/json',
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                data = testUserListData;
+                //data = testUserListData;
                 console.log(data);
-            
                 populateDataTable("dt", data);
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -457,7 +479,7 @@
 
     function approveNewsSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            GeneralErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
@@ -495,7 +517,7 @@
 
     function unapproveNewsSuccess(data, textStatus, jQxhr) {
         if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            GeneralErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
@@ -504,7 +526,7 @@
     }
 
         if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            GeneralErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
 
@@ -513,7 +535,7 @@
     }
 
     function loadSearchResults() {
-        loadReportParameters();
+        //loadReportParameters();
         //getNewsList();
     }
 
@@ -541,7 +563,7 @@
     function getProductListSuccess(data, textStatus, jQxhr) {
 
 /*         if (data.response.status != "SUCCESS") {
-            MKAErrorMessageRtn(data.response.errorMessage[0]);
+            GeneralErrorMessageRtn(data.response.errorMessage[0]);
             return;
         }
  */
