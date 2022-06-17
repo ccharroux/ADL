@@ -282,7 +282,7 @@ namespace ADLAPICore.Library.Facility
             DBClass dbClass = new DBClass();
             try
             {
-                dbClass.dbCmd = new MySqlCommand("insertFacility", dbClass.dbConn);
+                dbClass.dbCmd = new MySqlCommand("updateFacility", dbClass.dbConn);
                 dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);

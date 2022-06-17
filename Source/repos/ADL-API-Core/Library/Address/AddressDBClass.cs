@@ -48,8 +48,8 @@ namespace ADLAPICore.Library.Address
                 param = new MySqlParameter("inZipCode", input.inZipCode);
                 dbClass.dbCmd.Parameters.Add(param);
                 
-                param = new MySqlParameter("inPhone", input.inPhone);
-                dbClass.dbCmd.Parameters.Add(param);
+                //param = new MySqlParameter("inPhone", input.inPhone);
+                //dbClass.dbCmd.Parameters.Add(param);
 
                 result = dbClass.getDBResults();
 
@@ -97,8 +97,8 @@ namespace ADLAPICore.Library.Address
                 param = new MySqlParameter("inZipCode", input.inZipCode);
                 dbClass.dbCmd.Parameters.Add(param);
 
-                param = new MySqlParameter("inPhone", input.inPhone);
-                dbClass.dbCmd.Parameters.Add(param);
+                //param = new MySqlParameter("inPhone", input.inPhone);
+                //dbClass.dbCmd.Parameters.Add(param);
 
                 result = dbClass.getDBResults();
 
@@ -118,7 +118,7 @@ namespace ADLAPICore.Library.Address
             var result = new DBResult();
             try
             {
-                dbClass.dbCmd = new MySqlCommand("getAddress", dbClass.dbConn);
+                dbClass.dbCmd = new MySqlCommand("getAddressByAddressId", dbClass.dbConn);
                 dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);

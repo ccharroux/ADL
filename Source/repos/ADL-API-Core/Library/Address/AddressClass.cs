@@ -127,10 +127,10 @@ namespace ADLAPICore.Library.Address
                     throw new ApplicationException("ZipCode is required for this method.");
                 }
 
-                if (String.IsNullOrEmpty(input.inPhone))
-                {
-                    throw new ApplicationException("Phone is required for this method.");
-                }
+                //if (String.IsNullOrEmpty(input.inPhone))
+                //{
+                //    throw new ApplicationException("Phone is required for this method.");
+                //}
 
 
                 return result;
@@ -226,10 +226,10 @@ namespace ADLAPICore.Library.Address
                     throw new ApplicationException("ZipCode is required for this method.");
                 }
                 
-                if (String.IsNullOrEmpty(input.inPhone))
-                {
-                    throw new ApplicationException("Phone is required for this method.");
-                }
+                //if (String.IsNullOrEmpty(input.inPhone))
+                //{
+                //    throw new ApplicationException("Phone is required for this method.");
+                //}
 
                 return result;
             }
@@ -266,15 +266,15 @@ namespace ADLAPICore.Library.Address
 
                 foreach (DataRow row in dbResult.dt.Rows)
                 {
+                    result.addressRecord = new AddressRecord();
 
                     // address stuff
                     result.addressRecord.Address1 = row["address1"].ToString();
                     result.addressRecord.Address2 = row["address2"].ToString();
                     result.addressRecord.City = row["city"].ToString();
                     result.addressRecord.ZipCode = row["zipcode"].ToString();
-                    result.addressRecord.StateId = Convert.ToInt32(row["stateid"]);
-                    result.addressRecord.CountryId = Convert.ToInt32(row["countryid"]);
-                    result.addressRecord.Phone = row["phone"].ToString();
+                    result.addressRecord.StateId = Convert.ToInt32(row["idstate"]);
+                    result.addressRecord.CountryId = Convert.ToInt32(row["idcountry"]);
 
                 }
 

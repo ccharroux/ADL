@@ -12,6 +12,6 @@ namespace ADLAPICore.Models.Address
         public Int32 inStateId { get; set; }
         public Int32 inCountryId { get; set; }
         public string inZipCode { get; set; }
-        public string inPhone { get; set; }
+        //public string inPhone { get; set; }
     }
 }

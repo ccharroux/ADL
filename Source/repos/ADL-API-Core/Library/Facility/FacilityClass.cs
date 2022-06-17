@@ -18,7 +18,6 @@ namespace ADLAPICore.Library.Facility
         public string State { get; set; }
         public Int32 StateId { get; set; }
         public string Country { get; set; } 
-        public string Phone { get; set; }
         public string Owner { get; set; }   
         public Int32 UserId { get; set; }
     }
@@ -249,7 +248,6 @@ namespace ADLAPICore.Library.Facility
                         City = row["City"].ToString(),
                         State = row["StateAbbreviation"].ToString(),
                         Country = row["CountryAbbreviation"].ToString(),
-                        Phone = row["Phone"].ToString(),
                         Owner = row["OwnerName"].ToString(),
                         UserId = Convert.ToInt32(row["idUser"])
 
@@ -354,7 +352,6 @@ namespace ADLAPICore.Library.Facility
                             State = row["StateAbbreviation"].ToString(),
                             //StateId = Convert.ToInt32(row["idState"]),
                             Country = row["CountryAbbreviation"].ToString(),
-                            Phone = row["Phone"].ToString(),
                             Owner = row["OwnerName"].ToString(),
                             UserId = Convert.ToInt32(row["idUser"])
                            

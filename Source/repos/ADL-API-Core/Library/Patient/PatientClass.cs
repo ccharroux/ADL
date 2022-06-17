@@ -16,6 +16,7 @@ namespace ADLAPICore.Library.Patient
         public Int32 ADLPatientLogId { get; set; }
         public string TransactionDate { get; set; }
         public string UserName { get; set; }
+        public Int32 ADLPatientId { get; set; }
     }
 
     public class PatientADLRow
@@ -73,6 +74,7 @@ namespace ADLAPICore.Library.Patient
     public class PatientADLLogSummaryByDateRow
     {
         public string Patient{ get; set; }
+        public Int32 PatientId { get; set; }
         public Int32 TotalADLs { get; set; }
         public Int32 IncompleteADLs { get; set; }
         public Decimal PctComplete  { get; set; }
@@ -136,7 +138,7 @@ namespace ADLAPICore.Library.Patient
                     resultRow = new PatientADLByDayRow
                     {
                         SystemADL = row["systemADL"].ToString(),
-                        PatientId = Convert.ToInt32(row["iduser"]),
+                        ADLPatientId = Convert.ToInt32(row["idadlpatient"]),
                         SystemADLId = Convert.ToInt32(row["idsystemadl"]),
                         TimeOfDay = row["timeofday"].ToString(),
                         ADLPatientLogId = Convert.ToInt32(row["idadlpatientlog"]),
@@ -392,6 +394,7 @@ namespace ADLAPICore.Library.Patient
                         Patient = row["patient"].ToString(),
                         TotalADLs = Convert.ToInt32(row["ADLs"]),
                         IncompleteADLs = Convert.ToInt32(row["ADLsNotCompleted"]),
+                        PatientId = Convert.ToInt32(row["patientId"]),
                         PctComplete = 0
                     };
 

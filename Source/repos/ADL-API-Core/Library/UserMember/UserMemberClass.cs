@@ -366,7 +366,6 @@ namespace ADLAPICore.Library.UserMember
                     result.UserMemberAddress.ZipCode = row["zipcode"].ToString();
                     result.UserMemberAddress.StateId = Convert.ToInt32(row["stateid"]);
                     result.UserMemberAddress.CountryId = Convert.ToInt32(row["countryid"]);
-                    result.UserMemberAddress.Phone = row["phone"].ToString();
 
                     // user access
                     resultRow = new UserMemberResultRow
