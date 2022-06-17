@@ -6,6 +6,7 @@ const gMediaTypeNetwork = "NETWORK";
 const gMediaTypeSurvey = "SURVEY";
 
 const cPatient = "5";
+const cOwner = "2";
 
 
 var startLocation = "";
@@ -1404,8 +1405,7 @@ function MKAErrorMessageDeliveryRtn(message, postCallback) {
     }
     else {
 
-        bootbox.alert('Process Failed.\n\r\n\r' + message + '.' +
-            (gAJAXError == true ? '\n\r\n\rDevelopment has been notified and is looking into this issue.' : ''), function () {
+        bootbox.alert('Process Failed.\n\r\n\r' + message, function () {
 
                 if (!postCallback == false) {
                     postCallback();
@@ -3913,7 +3913,7 @@ function getStateListSuccess(data, textStatus, jQxhr, control)
 {
 
     if (data.response.status != "SUCCESS") {
-        bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0] + '.\n\r\n\rDevelopment has been notified and is looking into this issue.', function () {
+        bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () {
         });
     } 
     else {
@@ -3926,4 +3926,185 @@ function getStateListSuccess(data, textStatus, jQxhr, control)
         //convertToChosenSelect("ddlState", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
     }
     //getPositionList();
+}
+function getFacility(id) 
+{
+
+    var url = ServicePrefix + '/facility/' + getTokenInput() + "&inFacilityId=" + id;
+
+    var settings = {
+        dataType: 'json',
+        type: 'GET',
+        contentType: 'application/json',
+        procssData: false,
+        success: function (data, textStatus, jQxhr) {
+            console.log(data);
+            // function should be in the calling page
+            getFacilitySuccess(data, textStatus, jQxhr);
+        },
+        error: function (jQxhr, textStatus, errorThrown) {
+            genericAjaxError(jQxhr, textStatus, errorThrown);
+        }
+    }
+    $.ajax(url, settings);
+}
+function getFacilityAddress(id) 
+{
+
+    var url = ServicePrefix + '/facility/address/' + getTokenInput() + "&inFacilityId=" + id;
+
+    var settings = {
+        dataType: 'json',
+        type: 'GET',
+        contentType: 'application/json',
+        procssData: false,
+        success: function (data, textStatus, jQxhr) {
+            console.log(data);
+            // function should be in the calling page
+            getFacilityAddressSuccess(data, textStatus, jQxhr);
+        },
+        error: function (jQxhr, textStatus, errorThrown) {
+            genericAjaxError(jQxhr, textStatus, errorThrown);
+        }
+    }
+    $.ajax(url, settings);
+}
+function getAddress(id) 
+{
+
+    var url = ServicePrefix + '/address/' + getTokenInput() + "&inAddressId=" + id;
+
+    var settings = {
+        dataType: 'json',
+        type: 'GET',
+        contentType: 'application/json',
+        procssData: false,
+        success: function (data, textStatus, jQxhr) {
+            console.log(data);
+            // function should be in the calling page
+            getAddressSuccess(data, textStatus, jQxhr);
+        },
+        error: function (jQxhr, textStatus, errorThrown) {
+            genericAjaxError(jQxhr, textStatus, errorThrown);
+        }
+    }
+    $.ajax(url, settings);
+}
+
+function isEmail() {
+
+    var email = $("#txtEmailAddress").val().trim()
+    var regex = /^([a-zA-Z0-9_.+'-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    return regex.test(email);
+
+}
+function validationPassed() 
+{
+
+    var loopBreak = true;
+
+    $(".dataIsRequired").each(function (index, el) 
+    {
+
+        var eID = "#" + $(el).attr("id");
+        var errorMessage = $(el).attr("errorMessage");
+
+        if ($(eID).prop('tagName').toLowerCase() == "input") 
+        {
+            if ($(eID).val().trim() == "") 
+            {
+                bootbox.alert(errorMessage, function () { });
+                loopBreak = false;
+                return false;
+            }
+
+        }
+
+        if ($(eID).prop('tagName').toLowerCase() == "select") {
+            if ($(eID).val() == "-1") 
+            {
+                bootbox.alert(errorMessage, function () { });
+                loopBreak = false;
+                return false;
+            }
+        }
+
+    });
+
+    return loopBreak;
+}
+function updateAddressAPICall(updateData, addressId) 
+{
+    // set url
+    var url = ServicePrefix + '/Address';
+
+    //set method
+    var methodForCall = "";
+    if (addressId == 0)
+    {
+        methodForCall = "POST";
+    }
+    else
+    {
+        methodForCall = "PUT";
+    }
+
+    var settings = {
+        dataType: 'json',
+        type: methodForCall,
+        contentType: 'application/json',
+        data:   updateData,
+        success: function (data, textStatus, jQxhr) {
+            updateAddressSuccess(data, textStatus, jQxhr);
+        },
+        error: function (jQxhr, textStatus, errorThrown) {
+            genericAjaxError(jQxhr, textStatus, errorThrown);
+        }
+    };
+
+    $.ajax(url, settings);
+
+}
+function getUserListAPICall(facilityId, roleId) 
+{
+
+    var inURL = ServicePrefix + "/usermember/ListByFacility/" + getTokenInput();
+    inURL = inURL + "&infacilityid=" + facilityId;
+    inURL = inURL + "&inroleid=" + roleId;
+
+    $.ajax({
+        url: inURL,
+        dataType: 'json',
+        type: 'get',
+        contentType: 'application/json',
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+            getUserListSuccess(data);
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    });
+}
+
+function getPatientADLListByDayAPICall(patientId, transactionDate) 
+{
+
+    var inURL = ServicePrefix + "/patient/ADLListByDay/" + getTokenInput();
+    inURL = inURL + "&inPatientId=" + patientId;
+    inURL = inURL + "&inTransactionDate=" + transactionDate;
+
+    $.ajax({
+        url: inURL,
+        dataType: 'json',
+        type: 'get',
+        contentType: 'application/json',
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+            getPatientADLListByDaySuccess(data);
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    });
 }

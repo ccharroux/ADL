@@ -100,7 +100,7 @@ function getPartnersListSuccess(data, textStatus, jQxhr, marketId) {
         var str = '<div id="rwErrorMessage" class="row" style="display: none;"><div class="col-md-12 text-align-center" style="color: red;">&nbsp;*&nbsp;<span id="spErrorMessage"></span></div></div>';
         str = str + '<div class="row" style="margin-bottom: 10px;"><div class="col-md-3">&nbsp;</div>';
         str = str + '<div class="col-md-2"><label for="ddlUpdatePartnerList">Partners</label></div><div class="col-md-7 text-align-left">';
-        str = str + '<select id="ddlUpdatePartnerList" class="mkaRequired field-width-325" value="0" errorMessage="You must select a Partner.">';
+        str = str + '<select id="ddlUpdatePartnerList" class="dataIsRequired field-width-325" value="0" errorMessage="You must select a Partner.">';
 
         str = str + '<option value="-1">-- Select a Partner</option>';
         $.each(data.report.rows, function (index) {
