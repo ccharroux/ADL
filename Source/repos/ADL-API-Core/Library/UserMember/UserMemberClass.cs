@@ -15,13 +15,14 @@ namespace ADLAPICore.Library.UserMember
         public string LastName { get; set; }    
         public string EmailAddress { get; set; }
         public string MiddleName { get; set; }  
+        public string PhoneNumber   { get; set; }
     }
     public class UserMemberDetailRow
     {
         public ResponseModel response = new ResponseModel();
         public UserMemberProfile UserInfo { get; set; }
-        public AddressRecord UserMemberAddress { get; set; }
-        public List<UserMemberResultRow> UserMemberAccess { get; set; }
+        //public AddressRecord UserMemberAddress { get; set; }
+        //public List<UserMemberResultRow> UserMemberAccess { get; set; }
     }
     public class UserMemberResultRow
     {
@@ -349,36 +350,39 @@ namespace ADLAPICore.Library.UserMember
                 }
 
                 var resultRow = new UserMemberResultRow();
+                
 
                 foreach (DataRow row in dbResult.dt.Rows)
                 {
+                    result.UserInfo = new UserMemberProfile();
                     // user info
-                    result.UserInfo.EmailAddress = row["userName"].ToString();
+                    result.UserInfo.PhoneNumber = (string.IsNullOrEmpty(row["phonenumber"].ToString()) ? "" : row["phonenumber"].ToString());
+                    result.UserInfo.EmailAddress = row["emailaddress"].ToString();
                     result.UserInfo.FirstName = row["firstname"].ToString();
-                    result.UserInfo.LastName = row["firstname"].ToString();
+                    result.UserInfo.LastName = row["lastname"].ToString();
                     result.UserInfo.MiddleName = row["middlename"].ToString();
                     result.UserInfo.UserId = Convert.ToInt32(row["iduser"]);
 
-                    // address stuff
-                    result.UserMemberAddress.Address1 = row["address1"].ToString();
-                    result.UserMemberAddress.Address2 = row["address2"].ToString();
-                    result.UserMemberAddress.City = row["city"].ToString();
-                    result.UserMemberAddress.ZipCode = row["zipcode"].ToString();
-                    result.UserMemberAddress.StateId = Convert.ToInt32(row["stateid"]);
-                    result.UserMemberAddress.CountryId = Convert.ToInt32(row["countryid"]);
+                    //// address stuff
+                    //result.UserMemberAddress.Address1 = row["address1"].ToString();
+                    //result.UserMemberAddress.Address2 = row["address2"].ToString();
+                    //result.UserMemberAddress.City = row["city"].ToString();
+                    //result.UserMemberAddress.ZipCode = row["zipcode"].ToString();
+                    //result.UserMemberAddress.StateId = Convert.ToInt32(row["stateid"]);
+                    //result.UserMemberAddress.CountryId = Convert.ToInt32(row["countryid"]);
 
                     // user access
-                    resultRow = new UserMemberResultRow
-                    {
-                        UserName = row["userName"].ToString(),
-                        UserId = Convert.ToInt32(row["iduser"]),
-                        FacilityId = Convert.ToInt32(row["idfacility"]),
-                        Facility = row["facility"].ToString(),
-                        Role = row["rolename"].ToString(),
-                        RoleToken = row["roletoken"].ToString()
-                    };
+                    //resultRow = new UserMemberResultRow
+                    //{
+                    //    UserName = row["userName"].ToString(),
+                    //    UserId = Convert.ToInt32(row["iduser"]),
+                    //    FacilityId = Convert.ToInt32(row["idfacility"]),
+                    //    Facility = row["facility"].ToString(),
+                    //    Role = row["rolename"].ToString(),
+                    //    RoleToken = row["roletoken"].ToString()
+                    //};
 
-                    result.UserMemberAccess.Add(resultRow);
+                    //result.UserMemberAccess.Add(resultRow);
 
                 }
 

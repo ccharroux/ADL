@@ -8,6 +8,7 @@
         public string inMiddleName { get; set; }
         public string inLastName { get; set; }
         public string inEmailAddress { get; set; }
+        public string inPhoneNumber { get; set; }
     }
  
 }

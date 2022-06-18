@@ -71,6 +71,8 @@ namespace ADLAPICore.Library.UserMember
                 dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("inemailaddress", input.inEmailAddress);
                 dbClass.dbCmd.Parameters.Add(param);
+                param = new MySqlParameter("inphonenumber", input.inPhoneNumber);
+                dbClass.dbCmd.Parameters.Add(param);
 
                 result = dbClass.getDBResults();
 
@@ -106,6 +108,9 @@ namespace ADLAPICore.Library.UserMember
                 dbClass.dbCmd.Parameters.Add(param);
                 param = new MySqlParameter("inemailaddress", input.inEmailAddress);
                 dbClass.dbCmd.Parameters.Add(param);
+                param = new MySqlParameter("inphonenumber", input.inPhoneNumber);
+                dbClass.dbCmd.Parameters.Add(param);
+
 
                 result = dbClass.getDBResults();
 
