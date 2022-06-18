@@ -3844,7 +3844,6 @@ function getFacilityFromControl(control)
     return arr[0];
 
 }
-
 function getListRoles(control)
 {
 
@@ -3908,7 +3907,6 @@ function getStateList(control)
     }
     $.ajax(url, settings);
 }
-
 function getStateListSuccess(data, textStatus, jQxhr, control) 
 {
 
@@ -3990,7 +3988,6 @@ function getAddress(id)
     }
     $.ajax(url, settings);
 }
-
 function isEmail() {
 
     var email = $("#txtEmailAddress").val().trim()
@@ -4065,6 +4062,26 @@ function updateAddressAPICall(updateData, addressId)
     $.ajax(url, settings);
 
 }
+function getUserAccessListAPICall(userId) 
+{
+
+    var inURL = ServicePrefix + "/usermember/AccessList/" + getTokenInput();
+    inURL = inURL + "&inUserId=" + userId;
+
+    $.ajax({
+        url: inURL,
+        dataType: 'json',
+        type: 'get',
+        contentType: 'application/json',
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+            getUserListSuccess(data);
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    });
+}
 function getUserListAPICall(facilityId, roleId) 
 {
 
@@ -4086,7 +4103,6 @@ function getUserListAPICall(facilityId, roleId)
         }
     });
 }
-
 function getPatientADLListByDayAPICall(patientId, transactionDate) 
 {
 
@@ -4107,4 +4123,46 @@ function getPatientADLListByDayAPICall(patientId, transactionDate)
             genericAjaxError(jqXhr, textStatus, errorThrown);
         }
     });
+}
+function getUser(id) 
+{
+
+    var url = ServicePrefix + '/usermember/' + getTokenInput() + "&inUserId=" + id;
+
+    var settings = {
+        dataType: 'json',
+        type: 'GET',
+        contentType: 'application/json',
+        procssData: false,
+        success: function (data, textStatus, jQxhr) {
+            console.log(data);
+            // function should be in the calling page
+            getUserSuccess(data, textStatus, jQxhr);
+        },
+        error: function (jQxhr, textStatus, errorThrown) {
+            genericAjaxError(jQxhr, textStatus, errorThrown);
+        }
+    }
+    $.ajax(url, settings);
+}
+function getUserAddress(id) 
+{
+
+    var url = ServicePrefix + '/usermember/address/' + getTokenInput() + "&inUserId=" + id;
+
+    var settings = {
+        dataType: 'json',
+        type: 'GET',
+        contentType: 'application/json',
+        procssData: false,
+        success: function (data, textStatus, jQxhr) {
+            console.log(data);
+            // function should be in the calling page
+            getUserAddressSuccess(data, textStatus, jQxhr);
+        },
+        error: function (jQxhr, textStatus, errorThrown) {
+            genericAjaxError(jQxhr, textStatus, errorThrown);
+        }
+    }
+    $.ajax(url, settings);
 }
