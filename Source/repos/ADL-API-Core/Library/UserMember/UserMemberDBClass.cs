@@ -189,7 +189,7 @@ namespace ADLAPICore.Library.UserMember
             DBClass dbClass = new DBClass();
             try
             {
-                dbClass.dbCmd = new MySqlCommand("getUserAccessList", dbClass.dbConn);
+                dbClass.dbCmd = new MySqlCommand("getUserRoleFacilityList", dbClass.dbConn);
                 dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
@@ -270,7 +270,7 @@ namespace ADLAPICore.Library.UserMember
             DBClass dbClass = new DBClass();
             try
             {
-                dbClass.dbCmd = new MySqlCommand("updateuseraccess", dbClass.dbConn);
+                dbClass.dbCmd = new MySqlCommand("updateuserrolefacility", dbClass.dbConn);
                 dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
@@ -301,7 +301,7 @@ namespace ADLAPICore.Library.UserMember
             DBClass dbClass = new DBClass();
             try
             {
-                dbClass.dbCmd = new MySqlCommand("insertuseraccess", dbClass.dbConn);
+                dbClass.dbCmd = new MySqlCommand("insertuserrolefacility", dbClass.dbConn);
                 dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);

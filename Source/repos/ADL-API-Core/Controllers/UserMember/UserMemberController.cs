@@ -235,7 +235,7 @@ namespace ADLAPICore.Controllers.UserMember
         }
 
         [HttpPost("Access")]
-        public ActionResult AccessInsert([FromQuery] UserMemberAccessInsertInput input)
+        public ActionResult AccessInsert([FromBody] UserMemberAccessInsertInput input)
         {
             try
             {
@@ -261,7 +261,7 @@ namespace ADLAPICore.Controllers.UserMember
         }
 
         [HttpPut("Access")]
-        public ActionResult AccessUpdate([FromQuery] UserMemberAccessUpdateInput input)
+        public ActionResult AccessUpdate([FromBody] UserMemberAccessUpdateInput input)
         {
             try
             {

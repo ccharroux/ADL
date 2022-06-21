@@ -28,6 +28,7 @@ namespace ADLAPICore.Library.UserMember
     {
         public Int32 UserId { get; set; }
         public Int32 FacilityId { get; set; }
+        public Int32 RoleId { get; set; }
         public string UserName { get; set; }
         public string Facility { get; set; }
         public string Role { get; set; }
@@ -733,6 +734,7 @@ namespace ADLAPICore.Library.UserMember
                         UserName = row["userName"].ToString(),
                         UserId = Convert.ToInt32(row["iduser"]),
                         FacilityId = Convert.ToInt32(row["idfacility"]),
+                        RoleId = Convert.ToInt32(row["idrole"]),
                         Facility = row["facility"].ToString(),
                         Role = row["rolename"].ToString(),
                         RoleToken = row["roletoken"].ToString()
