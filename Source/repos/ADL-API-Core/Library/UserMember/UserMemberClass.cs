@@ -81,6 +81,26 @@ namespace ADLAPICore.Library.UserMember
             this.response = General.buildError("Unexpected error");
         }
     }
+    public class UserMemberAccessInsertResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public int ReturnCode { get; set; }
+
+        public UserMemberAccessInsertResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
+    public class UserMemberAccessUpdateResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public int ReturnCode { get; set; }
+
+        public UserMemberAccessUpdateResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
 
     public interface IUserMemberClass
     {
@@ -92,6 +112,8 @@ namespace ADLAPICore.Library.UserMember
         public UserMemberResult GetUserMemberAccessList(UserMemberAccessListGetInput input);
         public UserMemberDetailRow GetUserMember(UserMemberGetInput input);
         public UserMemberAddressResult GetUserMemberAddress(UserMemberAddressGetInput input);
+        public UserMemberAccessInsertResult InsertUserMemberAccess(UserMemberAccessInsertInput input);
+        public UserMemberAccessUpdateResult UpdateUserMemberAccess(UserMemberAccessUpdateInput input);
     }
 
     public class UserMemberClass : IUserMemberClass
@@ -744,6 +766,159 @@ namespace ADLAPICore.Library.UserMember
                 if (String.IsNullOrEmpty(input.inApiToken))
                 {
                     throw new ApplicationException("API Token is required for this method.");
+                }
+
+                if (input.inUserId < 1)
+                {
+                    throw new ApplicationException("User Id must be > 0.");
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
+                return result;
+            }
+        }
+
+        public UserMemberAccessInsertResult InsertUserMemberAccess(UserMemberAccessInsertInput input)
+        {
+
+            UserMemberAccessInsertResult result = new UserMemberAccessInsertResult();
+
+            try
+            {
+
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                AddressDBClass lDB = new AddressDBClass();
+
+                var dbResult = lDB.UserMemberAccessInsertDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    result.ReturnCode = Convert.ToInt32(row["returncode"]);
+                }
+
+                // now the result
+                result.response = General.buildSuccess();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new UserMemberAccessInsertResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(UserMemberAccessInsertInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+                if (input.inRoleId < 0)
+                {
+                    throw new ApplicationException("Role Id must be > -1.");
+                }
+
+                if (input.inFacilityId < 1)
+                {
+                    throw new ApplicationException("Facility Id must be > 0.");
+                }
+
+                if (input.inUserId < 1)
+                {
+                    throw new ApplicationException("User Id must be > 0.");
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
+                return result;
+            }
+        }
+        public UserMemberAccessUpdateResult UpdateUserMemberAccess(UserMemberAccessUpdateInput input)
+        {
+
+            UserMemberAccessUpdateResult result = new UserMemberAccessUpdateResult();
+
+            try
+            {
+
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                AddressDBClass lDB = new AddressDBClass();
+
+                var dbResult = lDB.UserMemberAccessUpdateDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    result.ReturnCode = Convert.ToInt32(row["returncode"]);
+                }
+
+                // now the result
+                result.response = General.buildSuccess();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new UserMemberAccessUpdateResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(UserMemberAccessUpdateInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+                if (input.inRoleId < 0)
+                {
+                    throw new ApplicationException("Role Id must be > -1.");
+                }
+
+                if (input.inFacilityId < 1)
+                {
+                    throw new ApplicationException("Facility Id must be > 0.");
                 }
 
                 if (input.inUserId < 1)

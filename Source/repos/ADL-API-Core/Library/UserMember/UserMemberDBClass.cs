@@ -20,6 +20,8 @@ namespace ADLAPICore.Library.UserMember
         public DBResult UserMemberAccessListDBCall(UserMemberAccessListGetInput input);
         public DBResult UserMemberDBCall(UserMemberGetInput input);
         public DBResult UserMemberAddressDBCall(UserMemberAddressGetInput input);
+        public DBResult UserMemberAccessUpdateDBCall(UserMemberAccessUpdateInput input);
+        public DBResult UserMemberAccessInsertDBCall(UserMemberAccessInsertInput input);
     }
 
     class AddressDBClass : IUserMemberDBClass
@@ -262,6 +264,67 @@ namespace ADLAPICore.Library.UserMember
             }
 
         }
+        public DBResult UserMemberAccessUpdateDBCall(UserMemberAccessUpdateInput input)
+        {
+            var result = new DBResult();
+            DBClass dbClass = new DBClass();
+            try
+            {
+                dbClass.dbCmd = new MySqlCommand("updateuseraccess", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
+                MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inroleid", input.inRoleId);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("infacilityid", input.inFacilityId);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inuserid", input.inUserId);
+                dbClass.dbCmd.Parameters.Add(param); result = dbClass.getDBResults();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new DBResult { dt = new DataTable(), response = result.response };
+            }
+
+        }
+        public DBResult UserMemberAccessInsertDBCall(UserMemberAccessInsertInput input)
+        {
+            var result = new DBResult();
+            DBClass dbClass = new DBClass();
+            try
+            {
+                dbClass.dbCmd = new MySqlCommand("insertuseraccess", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
+
+                MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inroleid", input.inRoleId);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("infacilityid", input.inFacilityId);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inuserid", input.inUserId);
+                dbClass.dbCmd.Parameters.Add(param); result = dbClass.getDBResults();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new DBResult { dt = new DataTable(), response = result.response };
+            }
+
+        }
     }
 }

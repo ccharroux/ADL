@@ -16,4 +16,12 @@
         public int inUserId { get; set; }
         public int inAddressId { get; set; }
     }
+
+    public class UserMemberAccessInsertInput
+    {
+        public string inApiToken { get; set; }
+        public int inUserId { get; set; }
+        public int inRoleId { get; set; }
+        public int inFacilityId { get; set; }
+    }
 }

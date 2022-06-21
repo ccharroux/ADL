@@ -10,5 +10,12 @@
         public string inEmailAddress { get; set; }
         public string inPhoneNumber { get; set; }
     }
- 
+    public class UserMemberAccessUpdateInput
+    {
+        public string inApiToken { get; set; }
+        public int inUserId { get; set; }
+        public int inRoleId { get; set; }
+        public int inFacilityId { get; set; }
+    }
+
 }

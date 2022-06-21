@@ -233,5 +233,57 @@ namespace ADLAPICore.Controllers.UserMember
                 return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
             }
         }
+
+        [HttpPost("Access")]
+        public ActionResult AccessInsert([FromQuery] UserMemberAccessInsertInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (UserMemberAccessInsertInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.InsertUserMemberAccess(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                UserMemberAccessInsertResult r = new UserMemberAccessInsertResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
+
+        [HttpPut("Access")]
+        public ActionResult AccessUpdate([FromQuery] UserMemberAccessUpdateInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (UserMemberAccessUpdateInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.UpdateUserMemberAccess(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                UserMemberAccessUpdateResult r = new UserMemberAccessUpdateResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
     }
 }
