@@ -4166,3 +4166,51 @@ function getUserAddress(id)
     }
     $.ajax(url, settings);
 }
+function insertUserAccessAPICall(updateData) 
+{
+    // set url
+    var url = ServicePrefix + '/UserMember/Access';
+
+    //set method
+    var methodForCall = "POST";
+
+    var settings = {
+        dataType: 'json',
+        type: methodForCall,
+        contentType: 'application/json',
+        data:   updateData,
+        success: function (data, textStatus, jQxhr) {
+            insertUserAccessSuccess(data, textStatus, jQxhr);
+        },
+        error: function (jQxhr, textStatus, errorThrown) {
+            genericAjaxError(jQxhr, textStatus, errorThrown);
+        }
+    };
+
+    $.ajax(url, settings);
+
+}
+function updateUserAccessAPICall(updateData) 
+{
+    // set url
+    var url = ServicePrefix + '/UserMember/Access';
+
+    //set method
+    var methodForCall = "PUT";
+    console.log(updateData);
+    var settings = {
+        dataType: 'json',
+        type: methodForCall,
+        contentType: 'application/json',
+        data:   updateData,
+        success: function (data, textStatus, jQxhr) {
+            updateUserAccessSuccess(data, textStatus, jQxhr);
+        },
+        error: function (jQxhr, textStatus, errorThrown) {
+            genericAjaxError(jQxhr, textStatus, errorThrown);
+        }
+    };
+
+    $.ajax(url, settings);
+
+}

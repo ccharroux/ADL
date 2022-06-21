@@ -290,6 +290,7 @@
     var userId = 0;
     var bDirty = false;
 
+
     $(document).ready(function ()
     {
         buildMainMenu("Admin");
@@ -342,9 +343,14 @@
 
                         var action = '';
 
-                            action = action + "<a href='#' onclick='editItem(" + row.userId + ");'>Remove</a><br>";
+                            action = action + "<a href='#' onclick='updateUserAccess(" + row.UserId;
+                            action = action + ", " + row.RoleId;
+                            action = action + ", " + row.FacilityId;
+                            
+                            action = action + ");'>Remove</a><br>";
 
                         return action;
+
                     },
                     "orderable": false,
                     "searchable": false,
@@ -655,5 +661,71 @@
                 
         }
     }
+   
+    function insertUserAccess(userId, roleId, facilityId)
+    {
 
+
+        if (validationPassed == false)
+        {
+            return;
+        }
+        else
+        {        // set object
+            var updateData = JSON.stringify({"inApiToken": getLocalStorage("APIToken"),
+                            "inuserId": parseInt(userId), 
+                            "infacilityId": parseInt(facilityId),
+                            "inRoleId": parseInt(roleId)}); 
+
+            insertUserAccessAPICall(updateData);                       
+
+        }
+
+    }
+
+    function insertUserAccessSuccess(data, textStatus, jQxhr) 
+    {
+        if (data.response.status != "SUCCESS") 
+        {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
+        } 
+        else 
+        {
+            bootbox.alert('Access is added.', function () { getUserAccessList(userId); });
+        }
+    }   
+    function updateUserAccess(userId, roleId, facilityId)
+    {
+
+        if (validationPassed == false)
+        {
+            return;
+        }
+        else
+        {        // set object
+            var updateData = JSON.stringify({"inApiToken": getLocalStorage("APIToken"),
+                            "inuserId": parseInt(userId), 
+                            "infacilityId": parseInt(facilityId),
+                            "inRoleId": parseInt(roleId)}); 
+            console.log(updateData);
+            updateUserAccessAPICall(updateData);                       
+
+        }
+
+    }
+
+    function updateUserAccessSuccess(data, textStatus, jQxhr) 
+    {
+        if (data.response.status != "SUCCESS") 
+        {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
+        } 
+        else 
+        {
+            bootbox.alert('Access is removed.', function () 
+            {
+                getUserAccessList(userId);
+            });
+        }
+    }       
 </script>
