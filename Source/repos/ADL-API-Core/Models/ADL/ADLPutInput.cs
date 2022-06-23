@@ -12,5 +12,11 @@
         public string inSystemADL { get; set; }
         public int inSystemADLTypeId { get; set; }
         public int inOrderNum { get; set; }
+
+        public ADLUpdateInput()
+        {
+            inSystemADLTypeId = 0;
+            inOrderNum = 1000;
+        }
     }
 }

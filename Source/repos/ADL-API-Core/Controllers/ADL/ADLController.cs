@@ -103,7 +103,7 @@ namespace ADLAPICore.Controllers.ADL
             }
         }
 
-        [HttpPut()]
+        [HttpDelete()]
         public ActionResult Delete([FromBody] ADLDeleteInput input)
         {
             try

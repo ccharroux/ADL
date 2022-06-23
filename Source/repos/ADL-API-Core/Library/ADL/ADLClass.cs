@@ -17,6 +17,7 @@ namespace ADLAPICore.Library.ADL
         public string ADL { get; set; }
         public bool isActive { get; set; }
         public Int32 orderNum { get; set; }
+        public string deleteDate { get; set; }
     }
     public class ADLResult
     {
@@ -185,16 +186,19 @@ namespace ADLAPICore.Library.ADL
                     foreach (DataRow row in dbResult.dt.Rows)
                     {
 
-                        resultRow = new ADLResultRow
-                        {
+                    resultRow = new ADLResultRow
+                    {
                             ADL = row["systemADL"].ToString(),
                             SystemADLId = Convert.ToInt32(row["idsystemadl"]),
                             ADLTypeId = Convert.ToInt32(row["idadltype"]),
                             isActive = (row["deleteDate"] == DBNull.Value ? true : false),
-                            orderNum = Convert.ToInt32(row["orderNum"])
-                        };
+                            orderNum = Convert.ToInt32(row["orderNum"]),
+                            deleteDate = (row["deleteDate"] == DBNull.Value ? "" : row["deleteDate"].ToString())
+                    };
 
                     }
+
+                    result.resultRow = resultRow;
 
                     // now the result
                     result.response.status = ResponseModel.responseSUCCESS;
@@ -300,6 +304,11 @@ namespace ADLAPICore.Library.ADL
                     {
                         throw new ApplicationException("System ADL Type Id must be > 0.");
                     }
+                    if (input.inOrderNum < 1)
+                    {
+                        throw new ApplicationException("Order number must be > 0.");
+                    }
+
                     return result;
                 }
                 catch (Exception ex)

@@ -7,23 +7,19 @@ namespace ADLAPICore.Library.utilities
     public static class DBCodes
     {
         public static string returnDBErrorMessage {get;set;}
-        private static List<Dictionary<int, string>> messages = new List<Dictionary<int, string>>();
+        private static Dictionary< int, string>  messages = new Dictionary<int, string> ();
         private static string defaultMessage = "Invalid Error Message";
         private static int inputCode { get;set;}
+        private static Dictionary<int, string> converted = new Dictionary<int, string>();
 
         static DBCodes()
         {
-            var item = new Dictionary<int, string>();
-            item[-10] = "Duplicate Record";
-            messages.Add(item);
+ 
+            messages.Add(-10, "Duplicate Record");
+            messages.Add(-20, "Record Not Found");
+            messages.Add(-30, "Existing Records Linked");
+ 
 
-            item = new Dictionary<int, string>();
-            item[-20] = "Record Not Found";
-            messages.Add(item);
-
-            item = new Dictionary<int, string>();
-            item[-30] = "Existing Records Linked";
-            messages.Add(item);
         }
 
 
@@ -31,13 +27,13 @@ namespace ADLAPICore.Library.utilities
         {
             try
             {
-                inputCode = inDBCode;
-                return messages[inDBCode].ToString();
+                
+                return messages[inDBCode];
             }
 
             catch (Exception)
             {
-                return defaultMessage + ": " + inputCode.ToString();
+                return defaultMessage + ": " + inDBCode.ToString();
             }
 
 

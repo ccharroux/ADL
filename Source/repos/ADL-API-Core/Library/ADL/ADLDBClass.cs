@@ -78,7 +78,7 @@ namespace ADLAPICore.Library.ADL
             DBClass dbClass = new DBClass();
             try
             {
-                dbClass.dbCmd = new MySqlCommand("insertadl", dbClass.dbConn);
+                dbClass.dbCmd = new MySqlCommand("insertsystemadl", dbClass.dbConn);
                 dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
@@ -89,6 +89,10 @@ namespace ADLAPICore.Library.ADL
 
                 param = new MySqlParameter("inSystemAdltypeId", input.inSystemADLTypeId);
                 dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inordernum", input.inOrderNum);
+                dbClass.dbCmd.Parameters.Add(param);
+
 
                 result = dbClass.getDBResults();
 
@@ -108,7 +112,7 @@ namespace ADLAPICore.Library.ADL
             DBClass dbClass = new DBClass();
             try
             {
-                dbClass.dbCmd = new MySqlCommand("updateadl", dbClass.dbConn);
+                dbClass.dbCmd = new MySqlCommand("updatesystemadl", dbClass.dbConn);
                 dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
