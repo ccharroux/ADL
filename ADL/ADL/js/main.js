@@ -1554,6 +1554,7 @@ function buildMainMenu(selectedItem) {
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Admin") + ' role="button" aria-expanded="false">System Settings <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block;"><a href="../../admin/patient intake/item.html?MenuItem=true">Patient Intake</a></li>';
+    menuItems += '                  <li style="display:block;"><a href="../../admin/patient offboarding/item.html?MenuItem=true">Patient Off-boarding</a></li>';
     menuItems += '                  <li style="display:block;"><a href="../../admin/facility/list.html?MenuItem=true">Facility Maintenance</a></li>';
     menuItems += '                  <li style="display:block;"><a href="../../admin/adl system/list.html?MenuItem=true">ADL Maintenance</a></li>';
     menuItems += '                  <li style="display:block;"><a href="../../admin/adl facility assignment/list.html?MenuItem=true">ADL Facility Assignment</a></li>';
@@ -3764,8 +3765,13 @@ function getPatientListByFacility(sourceControl, destinationControl)
 
 }
 
-function loadFacilities(control)
+function loadFacilities(control, bAddAll)
 {
+
+    if (!bAddAll)
+    {
+        bAddAll = false;
+    }
 
     $("#"+control).html("");
 
@@ -3784,6 +3790,14 @@ function loadFacilities(control)
         bootbox.alert('Logon expired.', function () {logout();}); 
     }
     var access = JSON.parse(accessRaw);
+
+
+    if (bAddAll == true)
+    {
+        str += '<option ';
+
+        str += ' value="-1|N/A">All</option>';       
+    }
 
     $.each(access, function (index) 
     {
@@ -3836,6 +3850,7 @@ function getTokenInput()
     return "?inapitoken=" + getLocalStorage("APIToken");
 }
 
+// UI Stuff
 function getFacilityFromControl(control)
 {
     var val = $("#" + control).val();
@@ -3844,7 +3859,9 @@ function getFacilityFromControl(control)
     return arr[0];
 
 }
-function getListRoles(control)
+
+
+function getRolesList(control)
 {
 
     var inURL = ServicePrefix + '/role/list' + getTokenInput();
@@ -4197,7 +4214,7 @@ function updateUserAccessAPICall(updateData)
 
     //set method
     var methodForCall = "PUT";
-    console.log(updateData);
+ 
     var settings = {
         dataType: 'json',
         type: methodForCall,
@@ -4212,5 +4229,54 @@ function updateUserAccessAPICall(updateData)
     };
 
     $.ajax(url, settings);
+
+}
+function getSystemADL(id) 
+{
+
+    var url = ServicePrefix + '/adl/' + getTokenInput() + "&inSystemADLId=" + id;
+
+    var settings = {
+        dataType: 'json',
+        type: 'GET',
+        contentType: 'application/json',
+        procssData: false,
+        success: function (data, textStatus, jQxhr) {
+            console.log(data);
+            // function should be in the calling page
+            getSystemADLSuccess(data, textStatus, jQxhr);
+        },
+        error: function (jQxhr, textStatus, errorThrown) {
+            genericAjaxError(jQxhr, textStatus, errorThrown);
+        }
+    }
+    $.ajax(url, settings);
+}
+
+
+// UI Stuff - Dialogs
+function buildUIDialogs(inControl, inTitle, inWidth, inHeight) 
+{
+
+    $(function () {
+        $("#" + inControl).dialog({
+            autoOpen: false,
+            resizable: false,
+            width: inWidth,
+            height: inHeight,
+            modal: true,
+            title: inTitle,
+            create: function (event, ui) {
+                $(event.target).parent().css('position', 'fixed');
+            }
+        });
+    });
+    
+    
+}
+
+function goTo(url)
+{
+    window.location = url;
 
 }

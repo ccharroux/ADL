@@ -27,9 +27,7 @@
 
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <link rel="shortcut icon" href="../../favicon.ico">
-
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
-
     <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700" rel="stylesheet">
 
     <!-- Animate.css -->
@@ -239,7 +237,18 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div>
-                                    <input value="Add Role" onclick="addRole();" class="default-button" type="button" />
+                                    <input id="btnAddRole" value="Add Role" onclick="addRole();" class="default-button" type="button" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <div class="default-button-section">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div>
+                                    <input value="Back to List" onclick="goTo('list.html');" class="default-button" type="button" />
                                 </div>
                             </div>
                         </div>
@@ -249,6 +258,40 @@
             </div>
         </div>
     </div>
+    <!-- Dialog -->
+    <div id="AddAccessDialog" title="" style="display:none">
+        <h3 id="patient"></h3>
+        <hr>
+        <div class="row input-row">
+            <div class="col-md-3 text-align-left">
+                <label for="ddlAccessFacility">Facility</label>
+            </div>
+            <div class="col-md-9 text-align-left">
+                <select id="ddlAccessFacility" class="field-width-325"></select>
+            </div>
+        </div>
+        <div class="row input-row">
+            <div class="col-md-3 text-align-left">
+                <label for="ddlAccessRole">Role</label>
+            </div>
+            <div class="col-md-9 text-align-left">
+                <select id="ddlAccessRole" class="field-width-325"></select>
+            </div>
+        </div>
+        <hr />
+
+        <div class="row input-row">
+
+            <div class="col-md-12 text-align-center">
+                <div>
+                    <input value="Add" onclick="addRoleFinalStep();" class="default-button" type="button" />
+                </div>
+            </div>
+        
+        </div>
+        <div id="addAccessErrorMessage" class="errroMessage"></div>
+
+    </div>   
 
     <!-- jQuery -->
     <script src="../../js/jquery.min.js"></script>
@@ -278,6 +321,9 @@
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
     <!-- plug-in to abbreviate HTML -->
     <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.20/dataRender/ellipsis.js"></script>    
+    <!-- jQuery UI NEEDED FOR DIALOG -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+ 
     <!--Chosen Dropdown-->
     <script src="../../js/chosen.jquery.min.js"></script>
 
@@ -289,7 +335,8 @@
     var holdAddressId = 0;
     var userId = 0;
     var bDirty = false;
-
+    var accessDialogControl = "AddAccessDialog";
+    var bIsThisAPatient = false;
 
     $(document).ready(function ()
     {
@@ -309,17 +356,69 @@
         {
             setTitle("New User");
         }
+        
+        buildUIDialogs(accessDialogControl, "Add Access", 700, 500);
 
         getStateList("ddlState");
+        
+        // for add dialog
+        getRolesList("ddlAccessRole");
+        loadFacilities('ddlAccessFacility', true);
 
+        // standard
         setTimeout(setupEvents, 1000);
 
     });
 
+    function validatedAddRole()
+    {
+ 
+        $("#addAccessErrorMessage").html('');
+        var index = $('#ddlAccessFacility option:selected').index();
+        if (index <= 0)
+        {
+            $("#addAccessErrorMessage").html('Please select a Facility');
+            return false;
+        }
+
+        var index = $('#ddlAccessRole option:selected').index();
+        if (index <= 0)
+        {
+            $("#addAccessErrorMessage").html('Please select a Role');
+            return false;
+        }
+        
+        return true;
+    }
+
+
+
+    function addRoleFinalStep()
+    {
+        if (validatedAddRole() == false)
+        {
+            return;
+        }
+        else
+        {
+            var facilityId = getFacilityFromControl("ddlAccessFacility");
+            var roleId = $("#ddlAccessRole").val();
+            insertUserAccess(userId, roleId, facilityId)
+
+    
+        }
+    }
+
+    function addRole()
+    {        
+        $("#addAccessErrorMessage").html('');
+        $("#"+accessDialogControl).dialog("open");           
+    }
 
     function setDataTable() 
     {
     
+        $("#btnAddRole").show();
  
         var exportColumns = returnTableColumnsByClass("dt", "exportColumn");
 
@@ -348,6 +447,11 @@
                             action = action + ", " + row.FacilityId;
                             
                             action = action + ");'>Remove</a><br>";
+                            if (row.RoleId == cPatient)
+                            {
+                                $("#btnAddRole").hide();
+
+                            }
 
                         return action;
 
@@ -367,6 +471,8 @@
         $(".dataTables_filter").hide();
         $(".dataTables_info").hide();
         $(".dataTables_paginate paging_full_numbers").hide();
+
+ 
 
     }
 
@@ -417,7 +523,7 @@
     function updateUser()
     {
 
-        if (validationPassed == false)
+        if (validationPassed() == false)
         {
             return;
         }
@@ -495,7 +601,7 @@
     function updateAddress()
     {
         holdAddressId = 0;
-        if (validationPassed == false)
+        if (validationPassed() == false)
         {
             return;
         }
@@ -556,7 +662,7 @@
     function insertUserAddressAssociation(userId, addressId)
     {
 
-        if (validationPassed == false)
+        if (validationPassed() == false)
         {
             return;
         }
@@ -665,21 +771,13 @@
     function insertUserAccess(userId, roleId, facilityId)
     {
 
-
-        if (validationPassed == false)
-        {
-            return;
-        }
-        else
-        {        // set object
+         // set object
             var updateData = JSON.stringify({"inApiToken": getLocalStorage("APIToken"),
                             "inuserId": parseInt(userId), 
                             "infacilityId": parseInt(facilityId),
                             "inRoleId": parseInt(roleId)}); 
 
             insertUserAccessAPICall(updateData);                       
-
-        }
 
     }
 
@@ -691,26 +789,28 @@
         } 
         else 
         {
+            $("#"+accessDialogControl).dialog("close"); 
             bootbox.alert('Access is added.', function () { getUserAccessList(userId); });
         }
     }   
     function updateUserAccess(userId, roleId, facilityId)
     {
 
-        if (validationPassed == false)
+        if (roleId == cPatient)
         {
-            return;
+            bootbox.alert('Patients can not be removed thru this process, they must be offboarded.', function () {return;});
         }
         else
-        {        // set object
+        {
+            // set object
             var updateData = JSON.stringify({"inApiToken": getLocalStorage("APIToken"),
                             "inuserId": parseInt(userId), 
                             "infacilityId": parseInt(facilityId),
                             "inRoleId": parseInt(roleId)}); 
             console.log(updateData);
             updateUserAccessAPICall(updateData);                       
-
         }
+ 
 
     }
 

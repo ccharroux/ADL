@@ -104,9 +104,9 @@
                     </div>
                     <div class="col-md-1 selectTd" style="padding-top:60px">
 
-                        <input type="button" value=">>" onclick="deleteADL()"><br>
+                        <input type="button" value="Remove ADL" onclick="deleteADL()"><br>
                         &nbsp;<br>
-                        <input type="button" value="<<" onclick="insertADL()"/>
+                        <input type="button" value="Add ADL" onclick="insertADL()"/>
                     </div>
                     <div class="col-md-5 selectTd">
                         
@@ -122,6 +122,7 @@
         </div>
         <!--<div id="map" data-animate-effect="fadeIn"></div>-->
     </div>
+
     <div id="DateDialog" title="" style="display:none">
         <div class="row">
             <div class="col-md-2 marketOnHoldDateLabel">Market:</div>
@@ -143,6 +144,7 @@
             </div>
         </div>
     </div>
+    
     <!-- jQuery -->
     <script src="../../js/jquery.min.js"></script>
     <!-- jQuery Easing -->
@@ -197,8 +199,7 @@
             loadFacilities("ddlFacilities");
             setDateControl();
             buildMainMenu("Admin");
-            //loadSearchResults();
-            //getProductList(); // success -> getNewsList()
+
             getListFacilityADLS('ddlAssignedADL');
 
         }
@@ -502,191 +503,11 @@
 
     }
     function getList() {
-
-/*         var url = ServicePrefix + '/api/News/GetNewsList';
-        url += '?inApiToken=' + getLocalStorage("APIToken");
-        
-        var productId = $("#ddlProduct").val();
-        if (productId != "") {
-            url += '&inProductId=' + productId;
-        }
-        if ($("#chkIncludeDeleted").prop("checked") || productId == "DEL" || productId == "UPD") {
-            url += '&inIncludeDeleted=true';
-        } */
-        
-        setCurrentFacility();
-
-        $.ajax({
-            url: testURL,
-            dataType: 'json',
-            //type: 'get',
-            type: 'post',
-            data: JSON.stringify(testURLData),
-            contentType: 'application/json',
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                data = testADLFacilityAssignmentata;
-                console.log(data);
-            
-                populateDataTable("dt", data);
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
+        getListFacilityADLS('ddlAssignedADL');
     }
 
-    // functional area
-    function addItem() {
-        functionalityNotAvailable();
-        return;
-
-        window.location = "/admin/news/news.html";
-    }
-
-    function editItem(id) {
-        functionalityNotAvailable();
-        return;
-
-        window.location = "/admin/news/news.html?NewsKey=" + id;
-    }
-
-    function deleteItem(id) {
-
-        bootbox.confirm("Are you sure you want to delete this Facility?", function (result) {
-            if (result == true) {
-                deleteItemConfirmed(id);
-             }
-        });
-    }
-
-
-
-    function approve(NewsKey) {
-        bootbox.confirm("Are you sure you want to approve this news article?", function (result) {
-            if (result == true) {
-                approveNewsConfirmed(NewsKey);
-            }
-        });
-    }
-    function approveNewsConfirmed(NewsKey) {
-        $.ajax({
-            url: ServicePrefix + '/api/News/UpdateNewsApprove',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inNewsKey": NewsKey
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                approveNewsSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function approveNewsSuccess(data, textStatus, jQxhr) 
-    {
-        if (data.response.status != "SUCCESS") 
-        {
-            GeneralErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        bootbox.alert('News article approved.');
-        getNewsList();
-    }
-
-    function unapproveNews(NewsKey) {
-        bootbox.confirm("Are you sure you want to unapprove this news article?", function (result) {
-            if (result == true) {
-                unapproveNewsConfirmed(NewsKey);
-            }
-        });
-    }
-
-    function unapproveNewsConfirmed(NewsKey) {
-        $.ajax({
-            url: ServicePrefix + '/api/News/UpdateNewsUnapprove',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inNewsKey": NewsKey
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                unapproveNewsSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function unapproveNewsSuccess(data, textStatus, jQxhr) 
-    {
-        if (data.response.status != "SUCCESS") 
-        {
-            GeneralErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        bootbox.alert('News article unapproved.');
-        getNewsList();
-    }
  
-
-    function loadSearchResults() {
-        //loadReportParameters();
-        //getNewsList();
-    }
-
-    function getProductList() {
-        $.ajax({
- //           url: ServicePrefix + '/api/Product/GetProductList',
-            url: testURL,
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-/*             data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
- */            data: JSON.stringify(testURLData),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getProductListSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function getProductListSuccess(data, textStatus, jQxhr) {
-
-/*         if (data.response.status != "SUCCESS") {
-            GeneralErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
- */
-        var str = '<option value="">-- All Products --</option>';
-        $.each(data.report.rows, function (index) {
-            var obj = data.report.rows[index];
-            var productId = obj.P_ProductID.toUpperCase();
-            str += '<option value="' + productId + '">' + obj.P_ProductName + '</option>';
-        });
-        str += '<option value="DEL">DEL (hidden on public web site)</option>';
-        str += '<option value="UPD">UPD (hidden on public web site)</option>';
-        $("#ddlProduct").html(str);
-
-        getNewsList();
-    }
+ 
 
     function moveMe(control1, control2)
     {

@@ -42,6 +42,10 @@
     <link rel="stylesheet" href="../../css/bootstrap.css">
     <!-- Theme style  -->
     <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css" />
+
     <!--Chosen Dropdown-->
     <link rel="stylesheet" href="../../css/chosen.min.css" />
     <!-- Modernizr JS -->
@@ -65,71 +69,76 @@
 
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
-                        <h2 id="pageTitle"></h2><br />
-                        <div class="hidden dropdown inline-block linkdropdown" id="ddlAssignments">
-                            <a role="button" aria-expanded="false">Assignments <span style="margin-right:10px;" class="caret"></span></a>
-                            <ul class="dropdown-menu linkdropdown-menu" role="menu">
-                                <li class="display-block"><a href="#" onclick="goToAssignments();">Assignments</a></li>
-                                <li class="display-block"><a href="#" onclick="goToCopyAssignments();">Copy Assignments</a></li>
-                                <li class="display-block"><a href="#" onclick="goToGroupAssignments();">Group Assignments</a></li>
-                            </ul>
-
-                        </div>
-
+                        <h2 id="pageTitle"></h2>
                     </div>
                 </div>
 
-
                 <div class="text-center margin-top-0">
 
-                    <!--ADL Name-->
-                    <div class="row input-row">
-                        <div class="col-md-3 text-align-left">
-                            <label for="txtFirstName">ADL Name</label>
-                        </div>
-                        <div class="col-md-5 text-align-left">
-                            <input type="text" class="dataIsRequired field-width-325" id="txtADLName" maxlength="35" errorMessage="You must enter an ADL Name." />
-                        </div>
-                        <div class="col-md-2 text-align-center">
-                            <div class="gray-label width-130">
-                                <span id="spnWebStatus"></span>
-                            </div>
-                        </div>
-                    </div>
+ 
 
-                    <!-- Category -->
-                    <div class="row input-row">
+                     <!--Personnel ID-->
+ <!--                   <div id="divuserId" class="row input-row hidden">
                         <div class="col-md-3 text-align-left">
-                            <label for="txtAddress1">Category</label>
+                            <label for="txtuserId">Personnel ID</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" maxlength="30" id="txtCategory" class="field-width-325" />
+                            <input type="text" readonly="readonly" class="field-width-325" id="txtuserId" />
                         </div>
+                    </div> -->
+
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtADLName">ADL</label>
+                        </div>
+                        <div class="col-md-7 text-align-left">
+                            <input type="text" class="dataIsRequired field-width-325" id="txtADLName" maxlength="45" errorMessage="You must enter an ADL Name." />
+                        </div>
+
+                    </div>
+
+                    <div class="row input-row">
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtOrderNum">Order Number</label>
+                        </div>
+                        <div class="col-md-7 text-align-left">
+                            <input type="text" class="dataIsRequired field-width-325" id="txtOrderNum" maxlength="4" errorMessage="You must enter an order number." />
+                        </div>
+
                     </div>
 
                     <!--Active-->
                     <div class="row input-row">
-                        <div class="col-md-3 text-align-left" for="txtActive">Active
+                        <div class="col-md-3 text-align-left">
+                            <label for="txtDeleteDate">Delete Date</label>
                         </div>
                         <div class="col-md-9 text-align-left">
-                            <input type="text" maxlength="30" id="txtActive" class="field-width-325" />
+                            <input type="text" maxlength="30" readonly="readonly" id="txtDeleteDate" class="field-width-325" />
                         </div>
                     </div>
-
 
                     <!--Buttons-->
                     <div class="default-button-section">
                         <div class="row">
                             <div class="col-md-12">
                                 <div>
-                                    <input value="Update" onclick="initiatePersonnelUpdate();" class="default-button" type="button" />
+                                    <input value="Update" onclick="updateSystemADL();" class="default-button" type="button" />
                                 </div>
-                                <!--<div class="back-button-div">
-                                    <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button" />
-                                </div>-->
                             </div>
                         </div>
                     </div>
+
+                    <hr>
+                    <div class="default-button-section">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div>
+                                    <input value="Back to List" onclick="goTo('list.html');" class="default-button" type="button" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -153,41 +162,51 @@
     <script src="../../js/main.js"></script>
     <!-- genericReport JS -->
     <script src="../../js/genericReport.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
+    <!-- plug-in to abbreviate HTML -->
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.20/dataRender/ellipsis.js"></script>    
     <!--Chosen Dropdown-->
     <script src="../../js/chosen.jquery.min.js"></script>
 
 </body>
 </html>
 <script>
-
-    var adlId = 0;
-    var personnelName = "";
-    var emailAddress = "";
-    var bSendUsernameChangeEmail = false;
-    var bSendUsernameAndPasswordChangeEmail = false;
+    
+    var systemADLId = 0;
+ 
     var bDirty = false;
 
     $(document).ready(function ()
     {
-        buildMainMenu("Personnel");
-        buildQuickReports(['personnel', 'owner', 'market', 'station']);
+        buildMainMenu("Admin");
 
-        facilityId = (getParameterByName("adlId") == null ? 0 : getParameterByName("adlId"));
-        setLocalStorage("gPageParameters", "");
-        if (adlId > 0)
+        systemADLId = (getParameterByName("adlId") == null ? 0 : getParameterByName("adlId"));
+
+        if (systemADLId > 0)
         {
-            setTitle("ADL System Maintenance");
-            getUser(userId);
+ 
+            setTitle("ADL Maintenance");
+            getSystemADL(systemADLId);
+
         }
         else
         {
-            setTitle("New System ADL");
+            setTitle("New ADL");
         }
 
-        //getStateList();
         setTimeout(setupEvents, 1000);
 
     });
+
+
+
     function setupEvents()
     {
         //$(window).on('beforeunload ', function () {
@@ -220,1397 +239,104 @@
             bDirty = true;
         });
     }
-    function getStateList() {
-        return;
 
-        var url = ServicePrefix + '/api/State/GetStateList';
-
-        var settings = {
-            dataType: 'json',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            procssData: false,
-            success: function (data, textStatus, jQxhr) {
-                getStateListSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        }
-        $.ajax(url, settings);
-    }
-
-    function getStateListSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () {
-
-            });
-        } else {
-            var str = '';
-            str = '<option value="-1">-- Select a State</option>';
-            $.each(data.report.rows, function (index) {
-                str = str + '<option value="' + data.report.rows[index].stateAbbr + '">' + data.report.rows[index].stateAbbr + '</option>';
-            });
-            $("#ddlState").html(str);
-            convertToChosenSelect("ddlState", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-        }
-        getPositionList();
-    }
-
-    function getPositionList() {
-        var url = ServicePrefix + '/api/Position/GetPositionList';
-
-        var settings = {
-            dataType: 'json',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getPositionListSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        }
-
-        $.ajax(url, settings);
-
-    }
-
-    function getPositionListSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () {
-            });
-        } else {
-            var str = '';
-            str = '<option value="-1">-- Select Position</option>';
-            $.each(data.report.rows, function (index) {
-                str = str + '<option value="' + data.report.rows[index]["Position Code"] + '">' + data.report.rows[index]["Position Title"] + '</option>';
-            });
-
-            $("#ddlPosition").html(str);
-            convertToChosenSelect("ddlPosition", gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-            if (userId <= 0) {
-                getOwnershipList();
-
-            } else {
-                $("#hideOwnerAndProduct").removeClass('hidden');
-                $("#aTProductList").removeClass('hidden');
-                $("#aTOwnershipList").removeClass('hidden');
-                $("#divResetPassword").removeClass('hidden');
-                $("#ddlAssignments").removeClass('hidden');
-                $("#txtuserId").val(userId);
-                $("#divuserId").removeClass('hidden');
-                $("#lkDashboard").removeClass('hidden');
-                $("#lkSettings").removeClass('hidden');
-                getProductList();
-            }
-        }
-    }
-
-    function getProductList() {
-        var url = ServicePrefix + '/api/Personnel/GetPersonnelAvailableProductList'
-            + '?inApiToken=' + getLocalStorage("APIToken")
-            + '&inuserId=' + userId;
-
-        var settings = {
-            dataType: 'json',
-            type: 'get',
-            contentType: 'application/json',
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getProductListSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-        $.ajax(url, settings);
-    }
-
-    function getProductListSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () {
-
-            });
-        }
-        else {
-
-            var str = '';
-            var ddlStr = "<option value=''>-- Select a Product</option>";
-
-            $("#productList").html("");
-
-            $.each(data.report.rows, function (index) {
-
-                var obj = data.report.rows[index];
-                var productId = obj.P_ProductID.toUpperCase();
-
-                str = str + '<div class="row" style="padding-top:3px;">';
-                str = str + '<div class="col-md-4" style="text-align:left">';
-                str = str + productId + " - " + obj.P_ProductName;
-                str = str + '</div>';
-                str = str + '<div class="col-md-2" style="text-align:left">';
-                str = str + '<div id="date' + productId + '" />';
-                str = str + '</div>';
-                str = str + '<div id="productButtons' + productId + '" class="col-md-6" style="text-align:left;">';
-                str = str + '<input type="button" id="productAdd' + productId + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="enableProduct(' + '\'' + productId + '\');" Value="Enable" />';
-                str = str + '<input type="button" id="productDisable' + productId + '" style="margin-right:3px;margin-left:3px;" class="hidden" onClick="disableProduct(' + '\'' + productId + '\');" Value="Disable" />';
-                str = str + '</div>';
-                str = str + '</div>';
-
-                ddlStr = ddlStr + "<option value='" + productId + "'>" + obj.P_ProductName + "</option>";
-
-            });
-
-            $("#ddlOwnershipProducts").html(ddlStr);
-
-            $("#productList").append(str);
-
-            if (userId > 0) {
-
-                getPersonnelProductList();
-
-            } else {
-                $("#productAddDMA").removeClass('hidden');
-                $("#productAddMRR").removeClass('hidden');
-                $("#productAddXRY").removeClass('hidden');
-                $("#productAddTVB").removeClass('hidden');
-                $("#productAddMSS").removeClass('hidden');
-            }
-        }
-    }
-
-    function getPersonnelProductList() {
-
-        var url = ServicePrefix + '/api/Personnel/GetPersonnelProductList';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inuserId": userId
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getPersonnelProductListSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
-
-    }
-
-    function getPersonnelProductListSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () {
-
-            });
-        } else {
-
-            $.each(data.report.rows, function (index) {
-
-                var obj = data.report.rows[index];
-                var productId = obj.productId.toUpperCase();
-
-                if (obj.activeDate != null && obj.active == true) {
-                    $("#productDisable" + productId).removeClass('hidden');
-                    $("#date" + productId).html(extractDateOnly(obj.activeDate));
-                    $("#date" + productId).css("color", "green");
-                }
-                else if (obj.disableDate != null && obj.active == false) {
-                    $("#productAdd" + productId).removeClass('hidden');
-                    $("#date" + productId).html(extractDateOnly(obj.disableDate));
-                    $("#date" + productId).css("color", "red");
-                }
-                else if (obj.disableDate == null && obj.activeDate == null) {
-                    $("#productAdd" + productId).removeClass('hidden');
-                }
-            })
-
-            getPersonnelAssignedOwnershipList();
-
-        }
-    }
-
-    function getPersonnelAssignedOwnershipList() {
-
-        var url = ServicePrefix + '/api/Personnel/GetPersonnelAssignedOwnershipList';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inuserId": userId
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getPersonnelAssignedOwnershipListSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-        $.ajax(url, settings);
-    }
-
-    function getPersonnelAssignedOwnershipListSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () {
-
-            });
-        } else {
-
-            var str = '';
-
-            $.each(data.report.rows, function (index) {
-
-                var obj = data.report.rows[index];
-                str = str + '<option value="' + obj.ownerId + '">' + obj.ownerName + ' (' + obj.ownerId + ')</option>';
-
-            })
-
-            $("#ddlAssignedOwnerships").html(str);
-
-            getOwnershipList();
-        }
-
-    }
-
-    function getOwnershipList(bAlsoLoadPersonnel) {
-
-        if (!bAlsoLoadPersonnel) {
-            bAlsoLoadPersonnel = true;
-        }
-
-        var url = ServicePrefix + '/api/Owner/GetOwnerListByProduct';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inProductId": $("#ddlOwnershipProducts").val(),
-                "inIncludeBA": true
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getOwnershipListSuccess(data, textStatus, jQxhr, bAlsoLoadPersonnel);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-        $.ajax(url, settings);
-    }
-
-    function getOwnershipListSuccess(data, textStatus, jQxhr, bAlsoLoadPersonnel) {
-
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () {
-
-            });
-        } else {
-            var str = '';
-
-            $.each(data.report.rows, function (index) {
-                var isAssigned = false;
-                var obj = data.report.rows[index];
-
-                $("#ddlAssignedOwnerships > option").each(function () {
-                    if (this.value == obj.ownerid) {
-                        isAssigned = true;
-                    }
-                });
-
-                if (isAssigned != true) {
-                    str = str + '<option value="' + obj.ownerid + '">' + obj.ownername + '</option>';
-                }
-                else {
-
-                }
-            });
-
-            $("#ddlOwnership").html(str);
-
-            if (bAlsoLoadPersonnel == true) {
-                getPersonnel();
-            }
-
-        }
-    }
-
-    function getUser() {
-
-        if (userId <= 0) {
-            return;
-        }
-
-        var url = ServicePrefix + '/api/Personnel/GetPersonnel';
-        url = testURL;
-var testURLData = { "EmailAddress": "CarlCharroux@yahoo.com", "PassKey": "123" };
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify(testURLData),
-/*             data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inuserId": userId
-            }), */
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                data = testUserData;
-                getUserSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
-
-    }
-
-    function getUserSuccess(data, textStatus, jQxhr) 
+ 
+    // update ADL
+    function updateSystemADL()
     {
 
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () {
-
-            });
-        } else {
-            $.each(data.report.rows,
-                function (index) {
-                    var obj = data.report.rows[index];
-
-                    $("#txtFirstName").val(obj["firstName"]);
-                    $("#txtLastName").val(obj["lastName"]);
-                    $("#txtMiddleInitial").val(obj["middleInitial"]);
-
-                    //$("#ddlPosition").val(obj["positionCode"]);
-                    $("#txtAddress1").val(obj["address1"]);
-                    $("#txtAddress2").val(obj["address2"]);
-                    $("#txtCity").val(obj["city"]);
-                    $("#ddlState").val(obj["stateAbbreviation"]);
-                    $("#txtZipCode").val(obj["zipCode"]);
-                    $("#txtPhoneNumber1").val(obj["phoneNumber1"]);
-                    $("#txtPhoneNumber2").val(obj["phoneNumber2"]);
-                    $("#txtEmailAddress").val(obj["emailAddress"]);
-                    //$("#txtComment").val(obj["comment"].trim());
-
-                    // personnelName = obj["lastName"] + ', ' + obj["firstName"] + ' (' + userId + ')';
-                    // emailAddress = obj["email"];
-
-                    // getPersonnelWebSetup();
-
-                    // loadFeatureButtons();
-
-                });
-        }
-
-    }
-
-    function getPersonnelWebSetup() {
-
-        var url = ServicePrefix + '/api/Personnel/GetPersonnelWebSetupStatus';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inuserId": userId
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getPersonnelWebSetupSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        }
-
-        $.ajax(url, settings);
-
-    }
-
-    function getPersonnelWebSetupSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () {
-
-            });
-        } else {
-
-            $.each(data.report.rows, function (index) {
-                var obj = data.report.rows[index];
-                var status = -1;
-
-
-                if (obj.status != null) {
-                    if (obj.status == 0) {
-                        status = 0;
-                    }
-                    if (obj.status == 2) {
-                        status = 2;
-                    }
-                }
-                if (obj.notificationStatus != null && obj.notificationStatus == 1) {
-                    status = 1
-                }
-
-                if (status == 0) {
-                    $("#spnWebStatus").text("WEB User");
-                }
-                if (status == 2) {
-                    $("#spnWebStatus").text("Notified");
-                }
-                if (status == 1) {
-                    $("#spnWebStatus").text("Pending");
-                }
-
-            });
-        }
-    }
-
-
-    function addOwnership() {
-
-        if ($('#ddlOwnership > option:selected').length == 0) {
-            bootbox.alert('Select an Ownership to add.');
+        if (validationPassed() == false)
+        {
             return;
         }
-
-        var ownerId = $('#ddlOwnership > option:selected').val();
-
-        var url = ServicePrefix + '/api/Personnel/InsertPersonnelOwner';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inOwnerId": ownerId,
-                "inuserId": userId
-            }),
-            success: function (data, textStatus, jQxhr) {
-                addOwnershipSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-        $.ajax(url, settings);
-
-    }
-
-    function addOwnershipSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
-        } else {
-
-            bootbox.alert("Ownership has been added successfully.");
-
-            $('#ddlOwnership > option:selected').each(function ()
+        else
+        {        // set object
+            var updateData =  {"inApiToken": getLocalStorage("APIToken"),
+                            "inSystemADL": $("#txtADLName").val(),
+                            "inSystemAdltypeId": 1,
+                            "inOrderNum": parseInt($("#txtOrderNum").val())
+                        };
+    
+            if (systemADLId > 0)
             {
-                if ($('#ddlAssignedOwnerships [value="' + $(this).val() + '"]').length == 0)
-                {
-                    $('#ddlAssignedOwnerships').html('<option value="' + $(this).val() + '">' + $(this).text() + '</option>' + $('#ddlAssignedOwnerships').html());
-                    $(this).remove();
-                }
-            });
-            //getPersonnelAssignedOwnershipList();
-            //getOwnershipList(true);
-            //getProductList(); // in case a product is now available due to the new owner
-            window.location = "/admin/personnel/personnel.html?userId=" + userId;
-        }
-    }
-
-    function removeOwnership() {
-
-
-        if ($('#ddlAssignedOwnerships > option:selected').length == 0) {
-            bootbox.alert('Select an Ownership to remove.');
-            return;
-        }
-
-        var ownerId = $('#ddlAssignedOwnerships > option:selected').val();
-
-        var url = ServicePrefix + '/api/Personnel/DeletePersonnelOwner';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inOwnerID": ownerId,
-                "inuserId": userId
-            }),
-            success: function (data, textStatus, jQxhr) {
-                removeOwnershipSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        }
-
-        $.ajax(url, settings);
-    }
-
-    function removeOwnershipSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
-        } else {
-            $.each(data.report.rows, function (index) {
-                var obj = data.report.rows[index];
-
-                if (obj['_updateStatus'] == -1) {
-                    bootbox.alert("Ownership has been removed but ContactId: " + userId + " has active/submitted surveys and hence can not be deleted from ContactMSS table. In order to delete this contact, first delete all survey assignments.");
-                } else {
-                    bootbox.alert("Ownership has been removed successfully.");
-                }
-                window.location = "/admin/personnel/personnel.html?userId=" + userId;
-                //getPersonnelAssignedOwnershipList();
-                //getOwnershipList(true);
-                //getProductList(); // in case a product was only available due to the owner that was just removed
-            });
-        }
-    }
-
-    function enableProduct(productId) {
-
-        var url = ServicePrefix + '/api/Personnel/UpdatePersonnelProduct';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inProductId": productId,
-                "inuserId": userId,
-                "inActivate": 1
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                enableProductSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
-
-    }
-
-
-    function enableProductSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
-        } else {
-            bootbox.alert("Product has been enabled successfully.", function () {
-                window.location = "/admin/personnel/personnel.html?userId=" + userId;
-            });
-        }
-
-    }
-
-    function disableProduct(productId) {
-        var url = ServicePrefix + '/api/Personnel/UpdatePersonnelProduct';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inProductId": productId,
-                "inuserId": userId,
-                "inActivate": 0
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                disableProductSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-        $.ajax(url, settings);
-    }
-
-    function disableProductSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
-        } else {
-            var message = $("#txtFirstName").val() + " no longer has any active products, delete all Personnel Notification History?"
-            $.each(data.report.rows, function (index) {
-                var obj = data.report.rows[index];
-
-                if (obj["_updateStatus"] == 2) {
-                    bootbox.confirm(message, function (result) {
-
-                        if (result) {
-                            deletePersonnelNotificationByuserId();
-                        } else {
-                            bootbox.alert("Product has been disabled successfully.", function () {
-                                window.location = "/admin/personnel/personnel.html?userId=" + userId;
-
-                            });
-                        }
-                    });
-                } else {
-                    bootbox.alert("Product has been disabled successfully.", function () {
-                        window.location = "/admin/personnel/personnel.html?userId=" + userId;
-
-                    });
-                }
-            });
-        }
-    }
-
-    function deletePersonnelNotificationByuserId() {
-        var url = ServicePrefix + '/api/Personnel/DeletePersonnelNotificationByuserId';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inuserId": userId
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                deletePersonnelNotificationSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-        $.ajax(url, settings);
-    }
-
-    function deletePersonnelNotificationSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () {
-
-            });
-        } else {
-            bootbox.alert("Product has been disabled successfully.", function () {
-                window.location = "/admin/personnel/personnel.html?userId=" + userId;
-
-            });
-        }
-    }
-
-
-    function initiatePersonnelUpdate() {
-
-        if (validationPassed() == false) {
-            return;
-        }
-
-        //user is new
-        //no need for email change check
-        //continue to create personnel
-        if (userId <= 0) {
-            $("#hdnuserId").val(userId);
-            updatePersonnel();
-
-        } else {
-
-            //User exists
-            //Email change check
-            if (emailAddress.toUpperCase().trim() !== $("#txtEmailAddress").val().toUpperCase().trim()) {
-                //Email change has been detected
-                //first step is SAML check
-                checkSAMLStatus();
-            } else {
-                //email was not changed, continue with update
-                updatePersonnel();
+                updateData["inSystemADLId"] = parseInt(systemADLId);
             }
 
-        }
-    }
+            // stringify
+            updateData = JSON.stringify(updateData);
 
-    function checkSAMLStatus() {
-        var url = ServicePrefix + '/api/Personnel/GetPersonnelSAMLStatus';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inuserId": userId
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                checkSAMLStatusSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
-    }
-
-    function checkSAMLStatusSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            GeneralErrorMessageRtn(data.response.errorMessage[0]);
-        } else {
-
-            switch (data.report.rows[0].passwordOrSAML) {
-                case 1:
-                    //SAML ONLY - These users do not get a notification if username is changed continue with update.
-                    updatePersonnel();
-                    break;
-                case 2:
-                    //SAML or Regular - user can use both saml or regular login
-                    checkWebStatusForUsernameChange();
-                    break;
-                case 0:
-                    //Regular Only - non saml user
-                    checkWebStatusForUsernameChange();
-                    break;
-                default:
-                    bootbox.alert("There was an issue when checking the SAML status of this user.");
-                    break;
-            }
-
-        }
-    }
-
-
-    function checkWebStatusForUsernameChange() {
-
-        //User does not have a Web Setup,
-        //mka team doesn't need to notify user
-        //when username/email is altered
-        if ($("#spnWebStatus").text() == "") {
-            //continue with user update
-            updatePersonnel();
-            return;
+            // send the request
+            updateSystemADLAPICall(updateData, systemADLId);
         }
 
-        //Check Web Status
-        switch ($("#spnWebStatus").text().toUpperCase().trim()) {
-            case "PENDING":
-                //User has pending notification,
-                //you cannot change their username if they have a pending notification
-                //Changes canceled.
-                showUsernameChangeDialogForPending();
-                break;
-            case "NOTIFIED":
-                //User is in the status of 'Notified'
-                //That means they have been sent an initial setup
-                //email and haven't set up their web account yet.
-                //Ask internal user if they are sure they want to change email.
-                showUsernameChangeDialogForNotified();
-                break;
-            case "WEB USER":
-                //Ask to send email
-                showUsernameChangeAskDialog();
-                break;
-            default:
-                //Issue happened cancel
-                bootbox.alert("There was an issue when checking the Web Status for this user. Update has been canceled.");
-                break;
-
-        }
     }
 
-    function showUsernameChangeDialogForPending() {
-        var strMessage = "This personnel has a PENDING notification. You must clear PENDING notification before you can alter the user's Email. Update has been canceled.";
-
-        bootbox.alert(strMessage, function () { });
-    }
-
-    function showUsernameChangeDialogForNotified() {
-        var strMessage = "This user has not completed their web setup yet. Are you sure you want to change their username/email?";
-
-        bootbox.dialog({
-            message: strMessage,
-            buttons: {
-                btnCancel: {
-                    label: "Cancel",
-                    callback: function () {
-                        usernamePasswordChangeCancelDialog();
-                        return;
-                    }
-                },
-                btnYes: {
-                    label: "Yes",
-                    callback: function () {
-                        showUsernameChangeAskDialog();
-                    }
-                }
-            }
-
-
-        });
-    }
-
-    function showUsernameChangeAskDialog() {
-        var strMessage = "The email for this personnel will be changed. Reset their password as well?";
-
-        bootbox.dialog({
-            message: strMessage,
-            buttons: {
-                btnCancel: {
-                    label: "Cancel",
-                    callback: function () {
-                        usernamePasswordChangeCancelDialog();
-                        return;
-                    }
-                },
-                btnYes: {
-                    label: "Yes",
-                    callback: function () {
-                        //Email will be updated
-                        //and password will be reset
-                        showUsernameAndPasswordChangeDialog();
-                    }
-                },
-                btnNo: {
-                    label: "No",
-                    callback: function () {
-                        //only email will be updated
-                        showUsernameChangeDialog();
-                    }
-                }
-            }
-        });
-    }
-
-    function showUsernameChangeDialog() {
-        var strMessage = "The email for this personnel will be changed. Password will not be reset. Send email now?";
-
-        bootbox.dialog({
-            message: strMessage,
-            buttons: {
-                btnCancel: {
-                    label: "Cancel",
-                    callback: function () {
-                        usernamePasswordChangeCancelDialog();
-                        return;
-                    }
-                },
-                btnYes: {
-                    label: "Send Email",
-                    callback: function () {
-                        bSendUsernameChangeEmail = true;
-                        updatePersonnel();
-                    }
-                },
-                btnNo: {
-                    label: "No",
-                    callback: function () {
-                        //email will not be sent
-                        //but pending notification will be
-                        //created for internal user to send
-                        //when they are ready.
-                        insertPendingNotification(gEmailTokenUsernameChange);
-                    }
-                }
-            }
-        });
-    }
-
-    function usernamePasswordChangeCancelDialog() {
-        bootbox.alert("Process has been canceled. No emails have been sent and Update has been canceled.", function () {
-            return;
-        });
-    }
-
-    function showUsernameAndPasswordChangeDialog() {
-        var strMessage = "Email for this user will be updated and password will be reset. Send email now?";
-
-        bootbox.dialog({
-            message: strMessage,
-            buttons: {
-                btnCancel: {
-                    label: "Cancel",
-                    callback: function () {
-                        usernamePasswordChangeCancelDialog();
-                        return;
-                    }
-                },
-                btnYes: {
-                    label: "Send Email",
-                    callback: function () {
-                        bSendUsernameAndPasswordChangeEmail = true;
-                        updatePersonnel();
-                    }
-                },
-                btnNo: {
-                    label: "No",
-                    callback: function () {
-                        //email will not be sent
-                        //but pending notification will be
-                        //created for internal user to send
-                        //when they are ready.
-                        insertPendingNotification(gEmailTokenPassAndUsernameChange);
-                    }
-                }
-
-            }
-        });
-
-
-    }
-
-    function initiateWebNotification(emailToken) {
-
-        if (emailToken == "" || emailToken == null) {
-            //throw error
-            bootbox.alert("There was an issue checking for an email token. Email could not be sent.", function () {
-                return;
-            });
-        }
-        if ($("#txtEmailAddress").val() == "" || $("#txtEmailAddress").val() == null) {
-            //throw error
-            bootbox.alert("Email Address missing - Email could not be sent.", function () {
-                return;
-            });
-        }
-        var url = ServicePrefix + '/api/Notification/InitiateWebNotification';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inuserId": userId,
-                "inNotificationToken": emailToken,
-                "inEmail": $("#txtEmailAddress").val()
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                initiateWebNotificationSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-        $.ajax(url, settings);
-    }
-
-    function initiateWebNotificationSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            GeneralErrorMessageRtn(data.response.errorMessage[0]);
-        } else {
-            $.each(data.report.rows, function (index) {
-
-                bootbox.alert("Email has been sent.", function () {
-                    window.location = "/admin/personnel/personnel.html?userId=" + userId;
-                });
-
-            });
-        }
-    }
-
-    function insertPendingNotification(emailToken) {
-        var url = ServicePrefix + '/api/Personnel/InsertPersonnelNotification';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inuserId": userId,
-                "inActionToken": emailToken
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                insertPendingNotificationSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-
-        $.ajax(url, settings);
-    }
-
-    function insertPendingNotificationSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            GeneralErrorMessageRtn(data.response.errorMessage[0]);
-        } else {
-
-            bootbox.alert("Pending record has been created for this user.", function () {
-                //Pending record for username change has been created
-                //Show new Web Status and
-                //Continue with personnel update
-                //Internal user will be able to send
-                //Pending notification from webnotification page
-                getPersonnelWebSetup();
-                updatePersonnel();
-                window.location = "/admin/personnel/personnel.html?userId=" + userId;
-            });
-
-        }
-    }
-
-    function updatePersonnel() {
-
-        var url = ServicePrefix + '/api/Personnel/UpdatePersonnel';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inuserId": userId,
-                "inSalutation": $("#txtSalutation").val().trim(),
-                "inLastName": $("#txtLastName").val().trim(),
-                "inFirstName": $("#txtFirstName").val().trim(),
-                "inMiddleInitial": $("#txtMiddleInitial").val().trim(),
-                "inSuffix": $("#txtSuffix").val().trim(),
-                "inPositionCode": $("#ddlPosition").val().trim(),
-                "inTitle": $("#txtTitle").val().trim(),
-                "inAddress1": $("#txtAddress1").val().trim(),
-                "inAddress2": $("#txtAddress2").val().trim(),
-                "inAddress3": $("#txtAddress3").val().trim(),
-                "inCity": $("#txtCity").val().trim(),
-                "inStateAbbreviation": $("#ddlState").val() !== "-1" ? $("#ddlState").val() : "",
-                "inZipCode": $("#txtZipCode").val().trim(),
-                "inZip4": $("#txtZip4").val().trim(),
-                "inAreaCode": $("#txtPhoneAreaCode").val().trim(),
-                "inPhone": $("#txtPhoneNumber").val().trim(),
-                "inExtension": $("#txtPhoneNumberExt").val().trim(),
-                "inFaxAreaCode": $("#txtFaxAreaCode").val().trim(),
-                "inFaxPhone": $("#txtFaxNumber").val().trim(),
-                "inMobileAreaCode": $("#txtMobileAreaCode").val().trim(),
-                "inMobilePhone": $("#txtMobileNumber").val().trim(),
-                "inEmail": $("#txtEmailAddress").val().trim(),
-                "inAltEmail": $("#txtAltEmailAddress").val().trim(),
-                "inComment": $("#txtComment").val().trim()
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                updatePersonnelSuccess(data, textStatus, jQxhr);
-                bDirty = false;
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-        $.ajax(url, settings);
-    }
-
-    function updatePersonnelSuccess(data, textStatus, jQxhr) {
-
-        if (data.response.status != "SUCCESS") {
-            bootbox.alert(data.response.errorMessage[0], function () {
-
-            });
-        } else {
-
-            var bReloadPage = false;
-
-            $.each(data.report.rows, function (index) {
-
-                var obj = data.report.rows[index];
-
-                if ($("#hdnuserId").val() === '0') {
-                    bReloadPage = true;
-                    $("#hdnuserId").val(obj["_updateStatus"]);
-                }
-
-                bootbox.alert('Personnel update successful.', function () {
-
-                    if (bSendUsernameChangeEmail) {
-                        //Username has been changed and
-                        //update has been successful, send username change email
-                        initiateWebNotification(gEmailTokenUsernameChange);
-                        return;
-                    }
-
-                    if (bSendUsernameAndPasswordChangeEmail) {
-                        //Username has been changed and
-                        //password has been reset, send username and password change email
-                        checkIfPasswordResetIsAllowed(gEmailTokenPassAndUsernameChange);
-                        return;
-                    }
-
-                    if (bReloadPage) {
-                        window.location = "/admin/personnel/personnel.html?userId=" + $("#hdnuserId").val();
-                    }
-
-                });
-
-            });
-        }
-    }
-
-
-    function isEmail() {
-
-        var email = $("#txtEmailAddress").val().trim()
-        var regex = /^([a-zA-Z0-9_.+'-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-        return regex.test(email);
-
-    }
-
-    function validationPassed() {
-
-        if (isEmail() == false) {
-            bootbox.alert("You must enter a valid email address.");
-            return false;
-        }
-
-        var loopBreak = true;
-        $(".dataIsRequired").each(function (index, el) {
-
-            var eID = "#" + $(el).attr("id");
-            var errorMessage = $(el).attr("errorMessage");
-
-            if ($(eID).prop('tagName').toLowerCase() == "input") {
-                if ($(eID).val().trim() == "") {
-                    bootbox.alert(errorMessage, function () { });
-                    loopBreak = false;
-                    return false;
-                }
-
-            }
-
-            if ($(eID).prop('tagName').toLowerCase() == "select") {
-                if ($(eID).val() == "-1") {
-                    bootbox.alert(errorMessage, function () { });
-                    loopBreak = false;
-                    return false;
-                }
-            }
-
-        });
-
-        return loopBreak;
-    }
-
-    function checkIfPasswordResetIsAllowed(emailToken) {
-
-        //if (bDirty == true)
-        //{
-
-
-        //}
-        //else
-        //{
-            checkIfPasswordResetIsAllowedContinued(emailToken);
-        //}
-    }
-
-    function checkIfPasswordResetIsAllowedContinued(emailToken)
+    function updateSystemADLAPICall(updateData, systemADLId) 
     {
-        var url = ServicePrefix + '/api/Personnel/GetPersonnelOkayToResetPasswordFromInternal'
-            + '?inApiToken=' + getLocalStorage("APIToken")
-            + '&inuserId=' + userId;
+        // set url
+        var url = ServicePrefix + '/ADL';
+
+        //set method
+        var methodForCall = "";
+        if (systemADLId == 0)
+        {
+            methodForCall = "POST";
+        }
+        else
+        {
+            methodForCall = "PUT";
+        }
 
         var settings = {
             dataType: 'json',
-            type: 'get',
+            type: methodForCall,
             contentType: 'application/json',
-            processData: false,
+            data:   updateData,
             success: function (data, textStatus, jQxhr) {
-                checkIfPasswordResetIsAllowedSuccess(data, textStatus, jQxhr, emailToken);
+                updateSystemADLSuccess(data, textStatus, jQxhr);
             },
             error: function (jQxhr, textStatus, errorThrown) {
                 genericAjaxError(jQxhr, textStatus, errorThrown);
             }
         };
+
         $.ajax(url, settings);
+
     }
 
-    function checkIfPasswordResetIsAllowedSuccess(data, textStatus, jQxhr, emailToken) {
+    function updateSystemADLSuccess(data, textStatus, jQxhr) 
+    {
+        if (data.response.status != "SUCCESS") 
+        {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
+        } 
+        else 
+        {            
+            systemADLId = data.ReturnCode;
+            bootbox.alert('ADL is updated.', function () {bDirty = false; });
+        }
+         
+    }
+
+     
+    // get system adl
+    function getSystemADLSuccess(data, textStatus, jQxhr) 
+    {
+
         if (data.response.status != "SUCCESS") {
-            GeneralErrorMessageRtn(data.response.errorMessage[0]);
-            window.location = "/admin/personnel/personnel.html?userId=" + userId;
-            return;
-        }
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () {});
+        } 
+        else 
+        {
+        
+            $("#txtADLName").val(data.resultRow.ADL);    
+            $("#txtOrderNum").val(data.resultRow.orderNum);    
+            $("#txtDeleteDate").val(data.resultRow.deleteDate);    
 
-        if (data.report.rows.length == 0) {
-            GeneralErrorMessageRtn("Can't reset password: Failed to get result from GetPersonnelOkayToResetPasswordFromInternal");
-            window.location = "/admin/personnel/personnel.html?userId=" + userId;
-            return;
         }
-
-        if (data.report.rows[0].okayToReset == null || data.report.rows[0].okayToReset == "" || data.report.rows[0].okayToReset <= 0) {
-            var failureReason = data.report.rows[0].failureReason;
-            if (failureReason == null || failureReason.trim() == "") {
-                failureReason = "(unknown)";
-            }
-            bootbox.alert("Can't reset password: " + failureReason, function () {
-                 window.location = "/admin/personnel/personnel.html?userId=" + userId;
-            });
-
-            return;
-        }
-
-        switch (emailToken.toUpperCase()) {
-            case gEmailTokenPassAndUsernameChange.toUpperCase():
-                initiateWebNotification(gEmailTokenPassAndUsernameChange);
-                break;
-            case gEmailTokenPasswordChange.toUpperCase():
-                showResetPasswordDialog();
-                break;
-            default:
-                bootbox.alert("There was an issue when finding an email token. Invalid email token: " + emailToken, function () {
-                    window.location = "/admin/personnel/personnel.html?userId=" + userId;
-                });
-                break;
-        }
+    }
  
 
-    }
-
-    function showResetPasswordDialog() {
-        var strMessage = "User's password will be reset. Send email now?";
-
-        bootbox.dialog({
-            message: strMessage,
-            buttons: {
-                btnCancel: {
-                    label: "Cancel",
-                    callback: function () {
-                        usernamePasswordChangeCancelDialog();
-                        return;
-                    }
-                },
-                btnYes: {
-                    label: "Send Email",
-                    callback: function () {
-                        resetPassword();
-                    }
-                },
-                btnNo: {
-                    label: "No",
-                    callback: function () {
-                        //email will not be sent
-                        //but pending notification will be
-                        //created for internal user to send
-                        //when they are ready.
-                        insertPendingNotification(gEmailTokenPasswordChange);
-                    }
-                }
-
-            }
-        });
-
-
-
-    }
-
-
-
-
-    function resetPassword() {
-
-        var url = ServicePrefix + '/api/Personnel/ResetPasswordFromInternal';
-
-        var settings = {
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inuserId": userId,
-                "inEmail": $("#txtEmailAddress").val()
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                resetPasswordSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        };
-        $.ajax(url, settings);
-    }
-
-    function resetPasswordSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            GeneralErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        bootbox.alert("Password reset initiated successfully.", function () {
-            getPersonnelWebSetup();
-        });
-    }
-
-    function goToPersonnelSettings()
-    {
-        setPageParameters();
-        window.location = "/admin/personnel/personnelsystemsettings.html?userId=" + userId;
-    }
-    function goToPersonnelSnapshot() {
-        setPageParameters();
-        window.location = "/admin/personnel/personnelview.html?userId=" + userId;
-
-    }
-    function goToAssignments() {
-        setPageParameters();
-        window.location = "/admin/personnel/personnelAssignment.html?userId=" + userId;
-    }
-
-    function goToCopyAssignments() {
-        setPageParameters();
-        window.location = "/admin/personnel/copyassignments.html?userId=" + userId;
-    }
-
-    function goToGroupAssignments() {
-        setPageParameters();
-        window.location = "/admin/personnel/personnelgroupassignment.html?userId=" + userId;
-    }
-
-    function setPageParameters() {
-        var pageParameters = {};
-        pageParameters["personnelName"] = personnelName;
-        pageParameters["emailAddress"] = emailAddress;
-        setLocalStorage("gPageParameters", JSON.stringify(pageParameters));
-
-    }
-
-    function loadFeatureButtons() {
-        if (userId > 0) {
-            var bIsInternalUser = false;
-            if ($("#txtEmailAddress").val().toLowerCase().indexOf("millerkaplan.com") != -1 ||
-                $("#txtEmailAddress").val().toLowerCase().indexOf("mkasystems.com") != -1) {
-                bIsInternalUser = true;
-            }
-
-            getFeatureButtons("userId", userId, bIsInternalUser);
-        }
-    }
+ 
 
 </script>
