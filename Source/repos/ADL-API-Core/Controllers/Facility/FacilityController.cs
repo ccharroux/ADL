@@ -100,7 +100,32 @@ namespace ADLAPICore.Controllers.Facility
                 return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
             }
         }
-        
+
+        [HttpGet("EntireList")]
+        public ActionResult EntireList([FromQuery] FacilityEntireListGetInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (FacilityEntireListGetInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.GetFacilityEntireList(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+                FacilityEntireListResult fr = new FacilityEntireListResult();
+                fr.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
+            }
+        }
+
         [HttpGet("OwnerList")]
         public ActionResult OwnerList([FromQuery] FacilityOwnerListGetInput input)
         {

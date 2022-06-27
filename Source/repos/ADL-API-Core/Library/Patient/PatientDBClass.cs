@@ -12,15 +12,16 @@ namespace ADLAPICore.Library.Patient
 {
     interface IPatientDBClass
     {
-        public DBResult PatientADLListByDay(PatientADLListByDayGetInput input);
-        public DBResult PatientADLList(PatientADLListGetInput input);
-        public DBResult PatientADLLogSummaryListByDate(PatientADLLogSummaryListByDateGetInput input);
+        public DBResult PatientADLListByDayDBCall(PatientADLListByDayGetInput input);
+        public DBResult PatientADLListDBCall(PatientADLListGetInput input);
+        public DBResult PatientADLLogSummaryListByDateDBCall(PatientADLLogSummaryListByDateGetInput input);
+        public DBResult DeletePatientADLDBCall(PatientADLDeleteInput input);
 
     }
 
     class PatientDBClass : IPatientDBClass
     {
-        public DBResult PatientADLListByDay(PatientADLListByDayGetInput input)
+        public DBResult PatientADLListByDayDBCall(PatientADLListByDayGetInput input)
         {
             var result = new DBResult();
             DBClass dbClass = new DBClass();
@@ -49,7 +50,7 @@ namespace ADLAPICore.Library.Patient
             }
 
         }
-        public DBResult PatientADLList(PatientADLListGetInput input)
+        public DBResult PatientADLListDBCall(PatientADLListGetInput input)
         {
             var result = new DBResult();
             DBClass dbClass = new DBClass();
@@ -75,7 +76,7 @@ namespace ADLAPICore.Library.Patient
             }
 
         }
-        public DBResult PatientADLLogSummaryListByDate(PatientADLLogSummaryListByDateGetInput input)
+        public DBResult PatientADLLogSummaryListByDateDBCall(PatientADLLogSummaryListByDateGetInput input)
         {
             var result = new DBResult();
             DBClass dbClass = new DBClass();
@@ -104,6 +105,34 @@ namespace ADLAPICore.Library.Patient
             }
 
         }
+        public DBResult DeletePatientADLDBCall(PatientADLDeleteInput input)
+        {
+            var result = new DBResult();
+            DBClass dbClass = new DBClass();
+            try
+            {
+                dbClass.dbCmd = new MySqlCommand("deletePatientADL", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
+                MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inUserId", input.inPatientId);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inSystemADL", input.inSystemADLId);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                result = dbClass.getDBResults();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new DBResult { dt = new DataTable(), response = result.response };
+            }
+
+        }
     }
 }

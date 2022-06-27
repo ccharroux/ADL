@@ -55,6 +55,8 @@ namespace ADLAPICore.Controllers.Patient
                 return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
             }
         }
+
+
         [HttpGet("ADLList")]
         public ActionResult ADLList([FromQuery] PatientADLListGetInput input)
         {
@@ -128,6 +130,32 @@ namespace ADLAPICore.Controllers.Patient
             {
 
                 PatientADLLogSummaryByDateResult r = new PatientADLLogSummaryByDateResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
+
+        [HttpDelete("ADL")]
+        public ActionResult DeleteADL([FromQuery] PatientADLDeleteInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (PatientADLDeleteInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.DeletePatientADL(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                PatientADLDeleteResult r = new PatientADLDeleteResult();
                 r.response = General.buildError(ex.Message);
 
                 return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);

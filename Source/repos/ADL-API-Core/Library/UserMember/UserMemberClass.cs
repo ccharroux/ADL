@@ -550,11 +550,12 @@ namespace ADLAPICore.Library.UserMember
 
                     resultRow = new UserMemberResultRow();
                     result.rows = new List<UserMemberResultRow>();
-                
+                    var holdUserId = -1;
+
                     foreach (DataRow row in dbResult.dt.Rows)
                     {
 
-                    resultRow = new UserMemberResultRow
+                        resultRow = new UserMemberResultRow
                         {
                             UserName = row["userName"].ToString(),
                             UserId = Convert.ToInt32(row["iduser"]),
@@ -563,8 +564,19 @@ namespace ADLAPICore.Library.UserMember
                             Role = row["rolename"].ToString(),
                             RoleToken = row["roletoken"].ToString()
                         };
-                        
-                        result.rows.Add(resultRow);
+
+                        if (holdUserId != resultRow.UserId)
+                        {
+                            result.rows.Add(resultRow);
+                        }
+                        else
+                        {
+                            result.rows[result.rows.Count - 1].RoleToken = "Multiple";
+                            result.rows[result.rows.Count - 1].Role = "Multiple";
+                        }
+
+                        holdUserId = resultRow.UserId;
+
 
                     }
 
@@ -635,6 +647,7 @@ namespace ADLAPICore.Library.UserMember
 
                 resultRow = new UserMemberResultRow();
                 result.rows = new List<UserMemberResultRow>();
+                var holdUserId = -1;
 
                 foreach (DataRow row in dbResult.dt.Rows)
                 {
@@ -649,7 +662,18 @@ namespace ADLAPICore.Library.UserMember
                         RoleToken = row["roletoken"].ToString()
                     };
 
-                    result.rows.Add(resultRow);
+                    if (holdUserId != resultRow.UserId)
+                    {
+                        result.rows.Add(resultRow);
+                    }
+                    else
+                    { 
+                        result.rows[result.rows.Count - 1].RoleToken = "Multiple";
+                        result.rows[result.rows.Count - 1].Role = "Multiple";
+                    }
+
+                    holdUserId = resultRow.UserId;
+
 
                 }
 

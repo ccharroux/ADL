@@ -84,6 +84,9 @@ namespace ADLAPICore.Library.Login
                     resultRow = new loginResultRow();
                     loginResult.rows = new List<loginResultRow>();
                     bool bLoaded = false;
+                    // hold logic added for multiple roles in one 
+                    // facility
+                    int holdFacilityId = -1;
 
                     foreach (DataRow row in dbResult.dt.Rows)
                     {
@@ -104,7 +107,11 @@ namespace ADLAPICore.Library.Login
                             fa.Facility = row["facility"].ToString();
                             fa.Role = row["roleToken"].ToString();
                             fa.FacilityId = Convert.ToInt32(row["idFacility"]);
-                            resultRow.fa.Add(fa);
+                            if (fa.FacilityId != holdFacilityId)
+                            {
+                                resultRow.fa.Add(fa);
+                            }
+                            holdFacilityId = fa.FacilityId;
                         }
 
 

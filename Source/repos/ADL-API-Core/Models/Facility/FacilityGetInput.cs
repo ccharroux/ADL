@@ -26,5 +26,9 @@ namespace ADLAPICore.Models.Facility
         public string inApiToken { get; set; }
         public int inFacilityId { get; set; }
     }
+    public class FacilityEntireListGetInput
+    {
+        public string inApiToken { get; set; }
+    }
 
 }

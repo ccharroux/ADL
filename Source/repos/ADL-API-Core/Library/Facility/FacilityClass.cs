@@ -101,7 +101,17 @@ namespace ADLAPICore.Library.Facility
             this.response = General.buildError("Unexpected error");
         }
     }
- 
+    public class FacilityEntireListResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public List<FacilityResultRow> rows = new List<FacilityResultRow>();
+        private FacilityResultRow resultRow = new FacilityResultRow();
+
+        public FacilityEntireListResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
 
     public interface IFacilityClass
     {
@@ -115,6 +125,7 @@ namespace ADLAPICore.Library.Facility
         public FacilityAddressResult GetFacilityAddress(FacilityAddressGetInput input);
         public FacilityPostResult InsertFacility(FacilityInsertInput input);
         public FacilityPutResult UpdateFacility(FacilityUpdateInput input);
+        public FacilityEntireListResult GetFacilityEntireList(FacilityEntireListGetInput input);
     }
 
     public class FacilityClass : IFacilityClass
@@ -907,6 +918,106 @@ namespace ADLAPICore.Library.Facility
                 {
                     throw new ApplicationException("Facility must be supplied.");
                 }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
+                return result;
+            }
+        }
+
+        public FacilityEntireListResult GetFacilityEntireList(FacilityEntireListGetInput input)
+        {
+
+            FacilityEntireListResult result = new FacilityEntireListResult();
+            FacilityResultRow resultRow = new FacilityResultRow();
+
+            try
+            {
+
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                FacilityDBClass lDB = new FacilityDBClass();
+
+                var dbResult = lDB.FacilityEntireListDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                resultRow = new FacilityResultRow();
+                result.rows = new List<FacilityResultRow>();
+
+                var holdFacilityid = -1;
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+
+                    resultRow = new FacilityResultRow
+                    {
+                        Facility = row["facility"].ToString(),
+                        FacilityId = Convert.ToInt32(row["idFacility"]),
+                        Address1 = row["Address1"].ToString(),
+                        Address2 = row["Address2"].ToString(),
+                        City = row["City"].ToString(),
+                        State = row["StateAbbreviation"].ToString(),
+                        //StateId = Convert.ToInt32(row["idState"]),
+                        Country = row["CountryAbbreviation"].ToString(),
+                        Owner = row["OwnerName"].ToString(),
+                        UserId = Convert.ToInt32(row["idUser"])
+
+                    };
+
+                    // this is here so we don't add multiple 
+                    // facility owner lines
+                    // set prior to Multiple / user -1
+                    if (holdFacilityid == resultRow.FacilityId)
+                    {
+                        result.rows[result.rows.Count - 1].UserId = -1;
+                        result.rows[result.rows.Count - 1].Owner = "Multiple";
+                    }
+                    else
+                    {
+                        result.rows.Add(resultRow);
+                    }
+
+                    holdFacilityid = resultRow.FacilityId;
+
+                }
+
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new FacilityEntireListResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(FacilityEntireListGetInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+
                 return result;
             }
             catch (Exception ex)
