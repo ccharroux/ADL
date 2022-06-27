@@ -5,8 +5,17 @@ const gMediaTypeOutOfHome = "OUT OF HOME";
 const gMediaTypeNetwork = "NETWORK";
 const gMediaTypeSurvey = "SURVEY";
 
-const cPatient = "5";
+const cSystemAdminText = "systemadmin";
+const cOwnerText = "owner";
+const cManagerText = "manager";
+const cCaregiverText = "caregiver";
+const cPatientText = "patient";
+
+const cSystemAdmin = "1";
 const cOwner = "2";
+const cManager = "3";
+const cCaregiver = "4";
+const cPatient = "5";
 
 
 var startLocation = "";
@@ -1461,6 +1470,13 @@ function sendErrorEmail(message, AJAXErrorURL, AJAXErrorData)
 function buildDashboard()
 {
     setLocalStorage("currentFacility", $("#ddlFacilityAccess").val());
+
+    var facilityText = $("#ddlFacilityAccess").val().toString();
+    var facilityArray = facilityText.split("|");
+
+    setLocalStorage("currentRole", facilityArray[1]);
+    buildMainMenu("");
+
 }
 
 function buildMainMenu(selectedItem) {
@@ -1476,7 +1492,11 @@ function buildMainMenu(selectedItem) {
     // only show it on the dashboard
     
     var currentPage = window.location.toString().toLowerCase();
-    
+    var currentRole = getLocalStorage("currentRole");
+    console.log(currentRole);
+
+    // build access list only if you are 
+    // on the dashboard page
     if (currentPage.indexOf("dashboard.html") > -1)
     {
         menuItems += '<div style="padding-top:12px"><select id="ddlFacilityAccess" onchange="buildDashboard();">';
@@ -1493,7 +1513,7 @@ function buildMainMenu(selectedItem) {
             {
                 menuItems += " SELECTED ";
             }
-            menuItems += 'value="' + access[index].FacilityId + '|' + access[index].Role +'">' + access[index].Facility + '</option>';
+            menuItems += 'value="' + access[index].FacilityId + '|' + access[index].Role +'">' + access[index].Facility + ' - ' + access[index].Role + ' </option>';
         });
         menuItems += '</select></div>'; 
     }
@@ -1517,8 +1537,20 @@ function buildMainMenu(selectedItem) {
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "ADL") + '">Daily Work Area <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
     menuItems += '                  <li style="display:block"><a href="../../admin/adl care/list.html?MenuItem=true">Patient Care</a></li>';
-    menuItems += '                  <li style="display:block"><a href="../../admin/users/list.html?MenuItem=true&patientsOnly=true">Patient Maintenance</a></li>';
-    menuItems += '                  <li style="display:block"><a href="../../admin/patient scheduling/list.html?MenuItem=true">Patient Scheduling</a></li>';
+    
+    // Patient Maintenance
+    if (currentRole == cSystemAdminText || 
+        currentRole == cOwnerText || 
+        currentRole == cManagerText)
+    {
+        menuItems += '                  <li style="display:block"><a href="../../admin/users/list.html?MenuItem=true&patientsOnly=true">Patient Maintenance</a></li>';
+    }
+    // patient scheduling
+    if (currentRole == cSystemAdminText || 
+        currentRole == cOwnerText )
+    {
+        menuItems += '                  <li style="display:block"><a href="../../admin/patient scheduling/list.html?MenuItem=true">Patient Scheduling</a></li>';
+    }    
     menuItems += '              </ul>';
     menuItems += '        </li>';
     /*
@@ -1553,13 +1585,43 @@ function buildMainMenu(selectedItem) {
     // SYSTEM SETTINGS
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Admin") + ' role="button" aria-expanded="false">System Settings <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/patient intake/item.html?MenuItem=true">Patient Intake</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/patient offboarding/item.html?MenuItem=true">Patient Off-boarding</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/facility/list.html?MenuItem=true">Facility Maintenance</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/adl system/list.html?MenuItem=true">ADL Maintenance</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/adl facility assignment/list.html?MenuItem=true">ADL Facility Assignment</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/users/list.html?Admin=true&MenuItem=true">User Maintenance</a></li>';
- 
+
+    // patient onboarding
+    if (currentRole == cSystemAdminText || 
+        currentRole == cOwnerText )
+    {    
+        menuItems += '                  <li style="display:block;"><a href="../../admin/patient intake/item.html?MenuItem=true">Patient Intake</a></li>';
+    }
+    // patient off boarding
+    if (currentRole == cSystemAdminText || 
+        currentRole == cOwnerText )
+    {    
+        menuItems += '                  <li style="display:block;"><a href="../../admin/patient offboarding/item.html?MenuItem=true">Patient Off-boarding</a></li>';
+    }
+
+    // facility maintenance
+    if (currentRole == cSystemAdminText )
+    {    
+        menuItems += '                  <li style="display:block;"><a href="../../admin/facility/list.html?MenuItem=true">Facility Maintenance</a></li>';
+    }
+    // adl maintenance
+    if (currentRole == cSystemAdminText)
+    {
+        menuItems += '                  <li style="display:block;"><a href="../../admin/adl system/list.html?MenuItem=true">ADL Maintenance</a></li>';
+    }
+    // adl facility assignment
+    if (currentRole == cSystemAdminText || 
+        currentRole == cOwnerText )
+    {    
+        menuItems += '                  <li style="display:block;"><a href="../../admin/adl facility assignment/list.html?MenuItem=true">ADL Facility Assignment</a></li>';
+    }
+    // user maintenance
+    if (currentRole == cSystemAdminText || 
+        currentRole == cOwnerText || 
+        currentRole == cManagerText)
+    { 
+           menuItems += '                  <li style="display:block;"><a href="../../admin/users/list.html?Admin=true&MenuItem=true">User Maintenance</a></li>';
+    }
     //menuItems += '                  <li style="display:block;"><a href="../../admin/customersupport/customersupportlist.html?MenuItem=true">ADL Schedule</a></li>';
     //menuItems += '                  <li style="display:block;"><a href="../../admin/relationship/relationshiplists.html?MenuItem=true">ADL Patient</a></li>';
 
@@ -1593,350 +1655,6 @@ function buildMainMenu(selectedItem) {
     $("#menu").html(menuItems);
 }
 
-function buildXRYMenu(selectedItem) {
-
-
-    var menuItems = "";
-
-    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">'+ companyName+'</a></h1>';
-    menuItems +='<font color="Red">CArl Charroux</font><BR>';
-    menuItems += '<nav role="navigation" style="margin-top:20px">';
-
-    menuItems += '<ul>';
-
-    menuItems += buildGenericReportsLink2(selectedItem);
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += productDashboard('mrr');
-    menuItems += productDashboard('xry');
-    menuItems += productDashboard('tvb');
-    menuItems += productDashboard('mss');
-    menuItems += productDashboard('dma');
-    menuItems += productDashboard('dmx');
-
-    menuItems += '              </ul>';
-    menuItems += '        </li>';
-    menuItems += '        </li>';
-
-    menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '<ul class="dropdown-menu" role="menu">';
-    menuItems += '        <li style="display:block;"><a href="../../products/xry/revenue/xryreportstatus.html?MenuItem=true">Report Status</a></li>';
-    menuItems += '        <li style="display:block"><a href="../../products/xry/xryrelease.html?MenuItem=true">Release</a></li>';
-    menuItems += '        <li style="display:block"><a href="../../products/xry/xryreminders.html?MenuItem=true">Reminders</a></li>';
-    menuItems += '        <li style="display:block;"><a href="../../products/xry/xryownershipmappinglist.html?MenuItem=true">Ownership Mapping</a></li>';
-    menuItems += '        <li style="display:block;"><a href="../../products/xry/revenue/xrydatacollection.html?MenuItem=true">Data Collection</a></li>';
-    menuItems += '        <li style="display:block;"><a href="../../products/xry/revenue/xrydelivery.html?MenuItem=true">Delivery</a></li>';
-
-    menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">Matching <span style="margin-right:10px;" class="caret"></span></a>'
-    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
-    menuItems += '                          <li style="display:block;"><a href="../../products/xry/revenue/xrymatch.html?MatchPage=adv&MenuItem=true">Advertiser Matching</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="../../products/xry/revenue/xrymatch.html?MatchPage=agy&MenuItem=true">Agency Matching</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="../../products/xry/revenue/xrymatch.html?MatchPage=media&MenuItem=true">Media Matching</a></li>';
-    menuItems += '                      </ul>';
-    menuItems += '                  </li>';
-
-
-    menuItems += '</ul>';
-    menuItems += '</li>';
-
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "XRay Reports") + ' href="" role="button" aria-expanded="false"> XRay Reports <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="../../utilities/genericreport/genericreportlist.html?tag=XRY Data Review&MenuItem=true" role="button" aria-expanded="false">XRY Data Review Reports </a></li>';
-
-    menuItems += '                  <li style="display:block;"><a href="../../utilities/genericreport/genericreportlist.html?tag=xry&MenuItem=true" role="button" aria-expanded="false">XRay Reports </a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../utilities/genericreport/genericreportlist.html?tag=corporate&MenuItem=true" role="button" aria-expanded="false">Corporate Reports </a></li>';
-    menuItems += '              </ul>';
-    menuItems += '       </li>';
-
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">Advertiser <span style="margin-right:10px;" class="caret"></span></a>'
-    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
-    menuItems += '                          <li style="display:block;"><a href="../../admin/advertiser/advertiserlist.html?MenuItem=true" role="button" aria-expanded="false">Market Advertiser</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="../../admin/stationadvertiser/stationadvertiserlist.html?MenuItem=true">Station Advertiser</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="../../admin/mediaadvertiser/mediaadvertiserlist.html?MenuItem=true">Media Advertiser</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="../../admin/parentadvertiser/parentadvertiserlist.html?MenuItem=true">Parent Advertiser</a></li>';
-    menuItems += '                      </ul>';
-    menuItems += '                  </li>';
-
- 
-    menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">Agency <span style="margin-right:10px;" class="caret"></span></a>'
-    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
-    menuItems += '                          <li style="display:block;"><a href="../../admin/agency/agencylist.html?MenuItem=true" role="button" aria-expanded="false">Market Agency</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="../../admin/stationagency/stationagencylist.html?MenuItem=true">Station Agency</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="../../admin/parentagency/parentagencylist.html?MenuItem=true">Parent Agency</a></li>';
-    menuItems += '                      </ul>';
-    menuItems += '                  </li>';
-
-    menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">Imports <span style="margin-right:10px;" class="caret"></span></a>'
-    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
-    menuItems += '                          <li style="display:block;"><a href="../../products/xry/import/xryimportdatainputlist.html?MenuItem=true">Data Import Scripts</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="../../products/xry/import/xryimportacctrevvalidationtypelist.html?MenuItem=true">Import Setup</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="../../products/xry/import/xryimportdatamappingrulelist.html?MenuItem=true">Data Mapping</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="../../products/xry/import/xryimportmappingcolumnrulelist.html?MenuItem=true" role="button" aria-expanded="false">Column Mapping</a></li>';
-    menuItems += '                      </ul>';
-    menuItems += '                  </li>';
-
-
-
-    menuItems += '                  <li style="display:block;"><a href="../../admin/industry/industrylist.html?MenuItem=true">Industry</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/subindustry/subindustrylist.html?MenuItem=true">Sub Industry</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/nielsenmarketname/nielsenmarketnamelist.html?MenuItem=true">Nielsen Market</a></li>';
-    menuItems += '              </ul>';
-    menuItems += '        </li>';
-
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Audit") + ' href="" role="button" aria-expanded="false">Audit <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '              <ul class="dropdown-menu" role="menu">';
-
-    menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">Advertiser <span style="margin-right:10px;" class="caret"></span></a>'
-    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
-
-    menuItems += '                          <li style="display:block;"><a href="../../products/xry/bulkupdates/xrymarketadvertiserbulkupdate.html?MenuItem=true">Market Advertiser Audit</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="../../products/xry/bulkupdates/xrystationadvertiserbulkupdate.html?MenuItem=true">Station Advertiser Audit</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="../../products/xry/bulkupdates/xrymediaadvertiserbulkupdate.html?MenuItem=true">Media Advertiser Audit</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="../../products/xry/bulkupdates/xryadvertiserrevenuebulkupdate.html?MenuItem=true">Advertiser Revenue Research Audit</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="../../products/xry/bulkupdates/xrymediarevenuebulkupdate.html?MenuItem=true">Media Revenue Research Audit</a></li>';
-    menuItems += '                      </ul>';
-    menuItems += '                  </li>';
-
-    menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">Agency <span style="margin-right:10px;" class="caret"></span></a>'
-    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
-    menuItems += '                          <li style="display:block;"><a href="../../products/xry/bulkupdates/xrymarketagencybulkupdate.html?MenuItem=true">Market Agency Audit</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="../../products/xry/bulkupdates/xrystationagencybulkupdate.html?MenuItem=true">Station Agency Audit</a></li>';
-    menuItems += '                      </ul>';
-    menuItems += '                  </li>';
-
-    menuItems += '              </ul>';
-    menuItems += '        </li>';
-
-    menuItems += productDashboard('');
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
-    menuItems += '    </ul>';
-    menuItems += '</nav>';
-
-    $("#menu").html(menuItems);
-
-}
-
-function buildMRRMenu(selectedItem) {
-
-    var menuItems = '';
-
-    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">ADL System</a></h1>';
-    menuItems += '<nav role="navigation" style="margin-top:20px">';
-
-    menuItems += '<ul>';
-    menuItems += buildGenericReportsLink(selectedItem);
-
-    menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '<ul class="dropdown-menu" role="menu">';
-    menuItems += productDashboard('mrr');
-    menuItems += productDashboard('xry');
-    menuItems += productDashboard('tvb');
-    menuItems += productDashboard('mss');
-    menuItems += productDashboard('dma');
-    menuItems += productDashboard('dmx');
-
-    menuItems += '</ul>';
-    menuItems += '</li>';
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "MRR Reports") + ' href="" role="button" aria-expanded="false">MRR Reports <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="../../utilities/genericreport/genericreportlist.html?tag=MRR Data Review&MenuItem=true" role="button" aria-expanded="false">MRR Data Review</a></li>';
-
-    menuItems += '                  <li style="display:block;"><a href="../../utilities/genericreport/genericreportlist.html?tag=MRR Security and Analysis&MenuItem=true" role="button" aria-expanded="false">MRR Security and Analysis</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../utilities/genericreport/genericreportlist.html?tag=MRR Setup Info&MenuItem=true" role="button" aria-expanded="false">MRR Setup Info</a></li>';
-    menuItems += '              </ul>';
-    menuItems += '       </li>';
-    menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '<ul class="dropdown-menu" role="menu">';
-    menuItems += '        <li style="display:block"><a href="../../products/mrr/mrrrelease.html?MenuItem=true">Release</a></li>';
-    menuItems += '        <li style="display:block"><a href="../../products/mrr/mrrreminders.html?MenuItem=true">Reminders</a></li>';
-    menuItems += '        <li style="display:block"><a href="../../products/mrr/mrrrevenuedetail.html?MenuItem=true">Revenue Detail</a></li>';
-    menuItems += '        <li style="display:block"><a href="../../products/mrr/mrrmarketdelivery.html?MenuItem=true">Report Delivery</a></li>';
-    menuItems += '        <li style="display:block"><a href="../../products/mrr/mrrsnapshot.html?MenuItem=true">Snapshot</a></li>';
-    menuItems += '</ul>';
-    menuItems += '</li>';
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/revenuecategory/revenuecategorylist.html?MenuItem=true">Revenue Categories</a></li>';
-
-    menuItems += '                  <li style="display:block;"><a href="../../products/mrr/mrrmarketcategorydefinitionlist.html?MenuItem=true" role="button" aria-expanded="false">Market Categories</a></li>';
-    menuItems += '              </ul>';
-    menuItems += '        </li>';
-    menuItems += productDashboard('');
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
-    menuItems += '    </ul>';
-    menuItems += '</nav>';
-
-    $("#menu").html(menuItems);
-
-
-}
-
-function buildTVBMenu(selectedItem) {
-
-    var menuItems = '';
-
-    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">ADL System</a></h1>';
-    menuItems += '<nav role="navigation" style="margin-top:20px">';
-
-    menuItems += '<ul>';
-    menuItems += buildGenericReportsLink(selectedItem);
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += productDashboard('mrr');
-    menuItems += productDashboard('xry');
-    menuItems += productDashboard('tvb');
-    menuItems += productDashboard('mss');
-    menuItems += productDashboard('dma');
-    menuItems += productDashboard('dmx');
-
-    menuItems += '              </ul>';
-    menuItems += '        </li>';
-    menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '<ul class="dropdown-menu" role="menu">';
-
-    menuItems += '        <li style="display:block"><a href="../../products/tvb/tvbreminders.html?MenuItem=true">Reminders</a></li>';
-    menuItems += '        <li style="display:block"><a href="../../products/tvb/tvbreportstatus.html?MenuItem=true" class="approved">Report Status</a></li>';
-    menuItems += '        <li style="display:block"><a href="../../products/tvb/tvbmarketdelivery.html?MenuItem=true">Report Delivery</a></li>';
-    menuItems += '        <li style="display:block"><a href="../../products/tvb/tvbrevenuedetailrepbilling.html?MenuItem=true">Edit Rep Billing</a></li>';
-    menuItems += '        <li style="display:block"><a href="../../products/tvb/tvbrevenuedetail.html?MenuItem=true" class="approved">Edit Time Sales</a></li>';
-    menuItems += '        <li style="display:block"><a href="../../products/tvb/tvbestimates.html?MenuItem=true" class="approved">TS Estimates</a></li>';
- 
-    menuItems += '        <li style="display:block"><a href="../../products/tvb/tvbrepfirmstationmappinglist.html?MenuItem=true">Rep Station Mapping</a></li>';
-    menuItems += '</ul>';
-    menuItems += '</li>';
-    menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Confirm") + ' href="" role="button" aria-expanded="false">Confirm <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '<ul class="dropdown-menu" role="menu">';
-    menuItems += '        <li style="display:block"><a href="../../products/tvb/tvbconfirm.html?MenuItem=true" class="approved">Time Sales</a></li>';
-    menuItems += '        <li style="display:block"><a href="../../products/tvb/tvbconfirmrepfirm.html?MenuItem=true" class="approved">Rep Firm</a></li>';
-    menuItems += '        <li style="display:block"><a href="../../products/tvb/tvbconfirmrepbillingestimate.html?MenuItem=true">Estimate (Kantar)</a></li>';
- 
-    menuItems += '</ul>';
-    menuItems += '</li>';
-    menuItems += productDashboard('');
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
-    menuItems += '    </ul>';
-    menuItems += '</nav>';
-
-    $("#menu").html(menuItems);
-    //console.log(menuItems);
-}
-
-function buildMSSMenu(selectedItem) {
-    var menuItems = '';
-
-    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">ADL System</a></h1>';
-    menuItems += '<nav role="navigation" style="margin-top:20px">';
-
-    menuItems += '<ul>';
-    menuItems += buildGenericReportsLink(selectedItem);
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += productDashboard('mrr');
-    menuItems += productDashboard('xry');
-    menuItems += productDashboard('tvb');
-    menuItems += productDashboard('mss');
-    menuItems += productDashboard('dma');
-    menuItems += productDashboard('dmx');
-    menuItems += '              </ul>';
-    menuItems += '        </li>';
-    menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Utility") + ' href="" role="button" aria-expanded="false">Utility <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '     <ul class="dropdown-menu" role="menu">';
-    menuItems += '        <li style="display:block"><a href="../../products/mss/msssurveydefinitionlist.html?MenuItem=true">Survey Definitions</a></li>';
-    menuItems += '     </ul>';
-    menuItems += '</li>';
-    menuItems += productDashboard('');
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
-    menuItems += '    </ul>';
-    menuItems += '</nav>';
-
-    $("#menu").html(menuItems);
-
-}
-function buildDMXMenu(selectedItem) {
-
-    var menuItems = '';
-
-    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">ADL System</a></h1>';
-    menuItems += '<nav role="navigation" style="margin-top:20px">';
-
-    menuItems += '<ul>';
-
-    //    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="../../Products/DMA/dmarelease.html">Release</a></li>';
-    menuItems += buildGenericReportsLink2(selectedItem);
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += productDashboard('mrr');
-    menuItems += productDashboard('xry');
-    menuItems += productDashboard('tvb');
-    menuItems += productDashboard('mss');
-    menuItems += productDashboard('dma');
-    menuItems += productDashboard('dmx');
-    menuItems += '              </ul>';
-    menuItems += '        </li>';
-
-
-    menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '<ul class="dropdown-menu" role="menu">';
-
-    menuItems += '        <li style="display:block"><a href="../../Products/DMX/dmxrelease.html?MenuItem=true">Release</a></li>';
-    menuItems += '</ul>';
-    menuItems += '</li>';
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "DMX Reports") + ' href="../../utilities/genericreport/genericreportlist.html?tag=dmx&MenuItem=true" role="button" aria-expanded="false">DMX Reports </span></a>';
-    menuItems += '       </li>';
-
-    menuItems += productDashboard('');
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
-    menuItems += '    </ul>';
-    menuItems += '</nav>';
-
-    $("#menu").html(menuItems);
-
-
-}
-function buildDMAMenu(selectedItem) {
-
-    var menuItems = '';
-
-    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">ADL System</a></h1>';
-    menuItems += '<nav role="navigation" style="margin-top:20px">';
-
-    menuItems += '<ul>';
-
-    //    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Release") + 'href="../../Products/DMA/dmarelease.html">Release</a></li>';
-    menuItems += buildGenericReportsLink2(selectedItem);
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += productDashboard('mrr');
-    menuItems += productDashboard('xry');
-    menuItems += productDashboard('tvb');
-    menuItems += productDashboard('mss');
-    menuItems += productDashboard('dma');
-    menuItems += productDashboard('dmx');
-
-    menuItems += '              </ul>';
-    menuItems += '        </li>';
-
-
-    menuItems += '<li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Revenue") + ' href="" role="button" aria-expanded="false">Revenue <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '<ul class="dropdown-menu" role="menu">';
-
-    menuItems += '        <li style="display:block"><a href="../../Products/DMA/dmarelease.html?MenuItem=true">Release</a></li>';
-    menuItems += '</ul>';
-    menuItems += '</li>';
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "DMA Reports") + ' href="../../utilities/genericreport/genericreportlist.html?tag=dma&MenuItem=true" role="button" aria-expanded="false">DMA Reports </span></a>';
-    menuItems += '       </li>';
-
-    menuItems += productDashboard('');
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
-    menuItems += '    </ul>';
-    menuItems += '</nav>';
-
-    $("#menu").html(menuItems);
-
-
-}
 
 function buildCancelMenu(selectedItem)
 {
