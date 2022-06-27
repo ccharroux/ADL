@@ -120,7 +120,7 @@ namespace ADLAPICore.Library.Patient
                 param = new MySqlParameter("inUserId", input.inPatientId);
                 dbClass.dbCmd.Parameters.Add(param);
 
-                param = new MySqlParameter("inSystemADL", input.inSystemADLId);
+                param = new MySqlParameter("inSystemADLId", input.inSystemADLId);
                 dbClass.dbCmd.Parameters.Add(param);
 
                 result = dbClass.getDBResults();

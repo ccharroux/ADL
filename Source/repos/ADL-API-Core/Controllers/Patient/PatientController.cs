@@ -137,7 +137,7 @@ namespace ADLAPICore.Controllers.Patient
         }
 
         [HttpDelete("ADL")]
-        public ActionResult DeleteADL([FromQuery] PatientADLDeleteInput input)
+        public ActionResult DeleteADL([FromBody] PatientADLDeleteInput input)
         {
             try
             {
