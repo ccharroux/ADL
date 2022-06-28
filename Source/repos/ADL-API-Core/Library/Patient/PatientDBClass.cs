@@ -16,6 +16,7 @@ namespace ADLAPICore.Library.Patient
         public DBResult PatientADLListDBCall(PatientADLListGetInput input);
         public DBResult PatientADLLogSummaryListByDateDBCall(PatientADLLogSummaryListByDateGetInput input);
         public DBResult DeletePatientADLDBCall(PatientADLDeleteInput input);
+        public DBResult UpdatePatientADLDBCall(PatientADLUpdateDBRow input);
 
     }
 
@@ -121,6 +122,44 @@ namespace ADLAPICore.Library.Patient
                 dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inSystemADLId", input.inSystemADLId);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                result = dbClass.getDBResults();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new DBResult { dt = new DataTable(), response = result.response };
+            }
+
+        }
+        public DBResult UpdatePatientADLDBCall(PatientADLUpdateDBRow input)
+        {
+            var result = new DBResult();
+            DBClass dbClass = new DBClass();
+            try
+            {
+                dbClass.dbCmd = new MySqlCommand("updatePatientADL", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
+
+                MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inUserId", input.inPatientId);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inSystemADLId", input.inSystemADLId);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inDayOfTheWeek", input.inDayOfTheWeek);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inTimeOfDay", input.inTimeOfDay);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inDayOfTheWeek", input.inDayOfTheWeek);
                 dbClass.dbCmd.Parameters.Add(param);
 
                 result = dbClass.getDBResults();

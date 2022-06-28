@@ -161,5 +161,31 @@ namespace ADLAPICore.Controllers.Patient
                 return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
             }
         }
+
+        [HttpPut("ADL")]
+        public ActionResult UpdateADL([FromBody] PatientADLUpdateInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (PatientADLUpdateInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.UpdatePatientADL(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                PatientADLUpdateResult r = new PatientADLUpdateResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
     }
 }

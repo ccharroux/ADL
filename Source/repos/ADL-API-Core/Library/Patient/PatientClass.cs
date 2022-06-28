@@ -100,6 +100,18 @@ namespace ADLAPICore.Library.Patient
             this.response = General.buildError("Unexpected error");
         }
     }
+
+    public class PatientADLUpdateResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public int ReturnCode { get; set; }
+
+        public PatientADLUpdateResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
+
     public interface IPatientClass
     {
         public PatientADLByDayResult GetPatientADLListByDay(PatientADLListByDayGetInput input);
@@ -107,6 +119,7 @@ namespace ADLAPICore.Library.Patient
         public PatientADLSummaryResult GetPatientADLSummaryList(PatientADLListGetInput input);
         public PatientADLLogSummaryByDateResult GetPatientADLLogSummaryListByDate(PatientADLLogSummaryListByDateGetInput input);
         public PatientADLDeleteResult DeletePatientADL(PatientADLDeleteInput input);
+        public PatientADLUpdateResult UpdatePatientADL(PatientADLUpdateInput input);
     }
 
     public class PatientClass : IPatientClass
@@ -545,6 +558,119 @@ namespace ADLAPICore.Library.Patient
                 return result;
             }
         }
+
+
+        public PatientADLUpdateResult UpdatePatientADL(PatientADLUpdateInput input)
+        {
+
+            PatientADLUpdateResult result = new PatientADLUpdateResult();
+
+            try
+            {
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                PatientDBClass lDB = new PatientDBClass();
+                foreach (PatientADLUpdateRow r in input.rows)
+                {
+                    // build DB Row
+                    PatientADLUpdateDBRow dr = new PatientADLUpdateDBRow();
+
+                    dr.inPatientId = input.inPatientId;
+                    dr.inApiToken = input.inApiToken;
+                    dr.inSystemADLId = input.inSystemADLId;
+                    // items in loop
+                    dr.inDayOfTheWeek = r.inDayOfTheWeek;
+                    dr.inDelete = (r.inDelete == false ? 1 : 0);
+                    dr.inTimeOfDay = r.inTimeOfDay.Replace(":", "");
+
+                    var dbResult = lDB.UpdatePatientADLDBCall(dr);
+
+                    if (dbResult.response.status == ResponseModel.responseFAIL)
+                    {
+                        result.response = dbResult.response;
+                        return result;
+                    }
+
+                    foreach (DataRow row in dbResult.dt.Rows)
+                    {
+                        result.ReturnCode = Convert.ToInt32(row["returnCode"]);
+                    }
+
+                    if (result.ReturnCode < 0)
+                    {
+                        throw new ApplicationException(DBCodes.Get(result.ReturnCode));
+                    }
+                }
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new PatientADLUpdateResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(PatientADLUpdateInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {               
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+
+                if (input.inPatientId <= 0)
+                {
+                    throw new ApplicationException("Patient Id must be greater than 0.");
+                }
+
+                if (input.inSystemADLId <= 0)
+                {
+                    throw new ApplicationException("System ADL Id must be greater than 0.");
+                }
+
+                // validate all rows...
+                foreach (PatientADLUpdateRow r in input.rows)
+                {
+                    if (r.inDayOfTheWeek <= 0 || r.inDayOfTheWeek > 7)
+                    {
+                        throw new ApplicationException("Day of the Week must be between 1 and 7.");
+                    }
+
+                    if (r.inDelete == false)
+                    {
+                        if (String.IsNullOrEmpty(r.inTimeOfDay))
+                        {
+                            throw new ApplicationException("Time of the Day is required for this method.");
+                        }
+                    }
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.status = ResponseModel.responseFAIL;
+                result.errorMessage = new List<string>();
+                result.errorMessage.Add(ex.Message);
+                return result;
+            }
+        }
+
+
+
         /* private */
         private string ConvertDay(int inDay, string currentVal)
         {
