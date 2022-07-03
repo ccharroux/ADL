@@ -66,6 +66,7 @@
             vertical-align: middle!important;
             text-align: center;
         }
+
     </style>
 </head>
 <body>
@@ -78,6 +79,8 @@
         </header>
         <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
+
+
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-center fh5co-heading">
                         <h2 id="pageTitle"></h2>
@@ -349,12 +352,8 @@
                     mRender: function (data, type, row) {
 
                         var action = '';
-
-                            action = action + "<a href='#' onclick='editItem(" + row["SystemADLId"] + ");'>Edit</a><br>";
-                            action = action + "<a href='#' onclick='deleteItem(" + row["SystemADLId"] + ");'>Delete</a>";
-
-                        
- 
+                        action = action + "<a href='#' onclick='editItem(" + row["SystemADLId"] + ',"' +row["SystemADL"] + '"' + ");'>Edit</a><br>";
+                        action = action + "<a href='#' onclick='deleteItem(" + row["SystemADLId"] + ");'>Delete</a>";
                         return action;
                     },
                     "orderable": false,
@@ -402,24 +401,14 @@
                        }
                    }
                }
-               //,
-               //this button is supposed to handle column visibility
-               //however it isn't working on our site
-               //'colvis'
+
             ],
-/*             initComplete: function () {
-                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="../../images/red-x.png" /></button>');
-            }, */
+
             createdRow: function (row, data, index) {
                 //this adds the class to every row
                 $(row).addClass('single-line-height');
             }
-            /*,
-            language: {
-                //this changes search box label from Search: to Filter Results:
-                search: "Filter Results:"
-            }
-            */
+
         });
 
     }
@@ -603,11 +592,6 @@
     // functional area
     function addItem() 
     {
-    
-       //alert ($("#ddlSystemADL").attr('selected'));
-
- 
-
         var ind = $('#ddlSystemADL option:selected').index();
 
         if (ind < 0)
@@ -615,7 +599,7 @@
             bootbox.alert("Please select an ADL.", function (result) { return; });
         }
 
-        setLocalStorage("PatientADL_SystemADLId", ind);
+        setLocalStorage("PatientADL_SystemADLId", $('#ddlSystemADL option:selected').val());
         setLocalStorage("PatientADL_SystemADL", $('#ddlSystemADL option:selected').text());
         setLocalStorage("PatientADL_PatientId", $("#ddlPatients").val());
         setLocalStorage("PatientADL_Patient", $("#ddlPatients option:selected").text());
@@ -623,10 +607,12 @@
         window.location = '../../admin/patient scheduling/item.html?adlPatientAssignmentId=0';
     }
 
-    function editItem(id) 
+    function editItem(id, systemADL) 
     {
+        setLocalStorage("PatientADL_SystemADLId", id);
+        setLocalStorage("PatientADL_SystemADL", systemADL);
         setLocalStorage("PatientADL_PatientId", $("#ddlPatients").val());
-        window.location = "../../admin/patient scheduling/item.html?adlPatientAssignmentId=" + id;
+        window.location = "../../admin/patient scheduling/item.html?adlSystemADLId=" + id + "&patientId=" + $("#ddlPatients").val();
     }
 
     function deleteItem(id) {

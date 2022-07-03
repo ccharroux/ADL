@@ -24,7 +24,7 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
     <style>
-        td, tr, table
+      /*  td, tr, table
         {
             border:silver 1px solid;
             text-align: center;
@@ -36,7 +36,7 @@
             width: 50%;
             height: 240px;
             vertical-align: middle!important;
-        }
+        }*/
         dt {
             float: left;
             padding: 4px;
@@ -92,32 +92,42 @@
                     <!--<div id="divFavoriteList" style="padding-top:20px; padding-bottom:20px;display:none;width:90%;border:solid 1px silver;border-radius:15px"></div>-->
                     <!-- start datatable coding-->
                     <div class="container">
-                        <div class="dataTable-top-margin">
-                            <table id="dtResults" class="dataTable-border dataTable-headers dataTable-cell-border"></table>
-                            <div id="noDataFound" style="display:none; color: red">No data found</div>
-                        </div>
+ 
 
-                        <table style="width:100%;margin-top:10px">
+                        <table style="width:100%;margin-top:30px">
                             <tr>
-                                <td colspan="2"style="height:60px;width:100%; border:silver 1px solid"><h3>My Dashboard</h3></td>
+                                <td colspan="2"><h2 style="margin:0">My Dashboard</h2></td>
                             </tr>
                             <tr>
-                                <td tyle="width:50%;">
-                                    Facility List goes here...
+                                <td style="width:50%;" class="text-align-center">
+                                    Number of ADLs that are <font color='red'>LATE</font><br>
+                                    <div class="blink" style="font-size:96px; color:red" id="spnADLsLate"></div>
+                                    <input type="button" class="default-button smallButton" onclick="goTo('../../admin/adl care/list.html')" value="Patient Care" >
                                 </td>
-                                <td tyle="width:50%;">
-                                    Open ADL's List
-                                </td>
-                            </tr>
-                            <tr>
-                                <td tyle="width:50%;">
-                                    Patient Open ADL List
-                                </td>
-                                <td tyle="width:50%;">
-                                        More data here
+                                <td style="width:50%;" class="text-align-center">
+                                    Number of ADLs that need to be done today<br>
+                                    <div style="font-size:96px;" id="spnADLsNotCompleted"></div>
+                                    <input type="button" class="default-button smallButton" onclick="goTo('../../admin/adl care/list.html')" value="Patient Care" >
                                 </td>
                             </tr>
+                        </table>
+
+                        <div class="dataTable-top-margin">
+                            <table id="dt" class="dataTable-border dataTable-headers dataTable-cell-border">
+                                <thead>
+                                    <tr>
+                                        <th class="exportColumn">Transaction Time</th>
+                                        <th class="exportColumn">Patient</th>
+                                        <th class="exportColumn">ADL</th>
+                                        <th class="exportColumn">Caregiver</th>
+                                        <th class="exportColumn">Scheduled Time</th>
+                                        <th class="exportColumn">Difference</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                            </table>
                         </div>
+                        <!-- end datatable -->
                     </div>
                     <!-- end datatable coding-->
 
@@ -160,172 +170,161 @@
 
 
     $(document).ready(function () {
- 
 
-
-
- 
-        buildFavoriteList();
         buildMainMenu("");
-
-        buildDashboard()
+        buildDashboard();
+        setDataTable();
         
     });
+    function setDataTable() 
+    {
+    
+        var reportTitle = "Patient Care";
+        var exportColumns = returnTableColumnsByClass("dt", "exportColumn");
 
-    function buildFavoriteList() {
 
-        $("#btnAddAsFavorite").hide();
-        $(".favoriteButtonClass").hide();
-        return;
-        
-        $.ajax({
-            url: ServicePrefix + '/api/InternalFavorite/GetInternalFavoriteList',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
 
-                if (data.response.status != "SUCCESS") {
-                    GeneralErrorMessageRtn(data.response.errorMessage[0]);
+        $("#dt").DataTable({
+            "dom": "Blfrtip",
+            "pageLength": gDataTableDefaultRows,
+            "data": [],
+            "columns": [
+                {
+                    "data": 'TransactionDate',
+                    "className": "text-align-left"
+                },
+                {
+                    "data": 'Patient',
+                    "className": "text-align-left"
+                },
+                {
+                    "data": 'SystemADL',
+                    "className": "text-align-left"
+                },
+                {
+                    "data": 'UserName',
+                    "className": "text-align-left"
+                },
+                {
+                    "data": 'TimeOfDay',
+                    "className": "text-align-left"
+                },
+                {
+
+                    mRender: function (data, type, row) {
+
+                        var action = "calculation goes here";
+                        return action;
+                    },
+                    "orderable": true,
+                    "searchable": true,
+                    "className": "text-align-center"
+                },
+                {
+                    mRender: function (data, type, row) {
+
+                        var action = '';
+                            action = action + "<a href='#' onclick='patientCare(" + row.PateintId + ");'>Patient Care</a><br>";
+                            action = action + "<a href='#' onclick='patientScheduling(" + row.PateintId + ");'>Patient Schedule</a><br>";
+                            action = action + "<a href='#' onclick='patienceMaintenance(" + row.PateintId + ");'>Patient Maintenance</a>";
+
+                        return action;
+                    },
+                    "orderable": false,
+                    "searchable": false,
+                    "className": "text-align-center"
                 }
-                else {
-
-                    //$.each(data.report.rows, function (index) {
-
-                    //    var id = data.report.rows[index]["Internal Favorite Id"];
-                    //    var title = data.report.rows[index].Title;
-                    //    var url = data.report.rows[index].URL;
-                    //    var str = "<div class='row'>";
-                    //    str = str + "<div class='col-md-8 textAlignLeft'><a href='" + url + "'><b>" + title + "</b></a><br>";
-                    //    str = str + "&nbsp;&nbsp;&nbsp;&nbsp;<a href='" + url + "' style='font-size:13px'><i>" + url + "</i></a></div>";
-                    //    str = str + "<div class='col-md-1 textAlignRight'><a href='" + url + "'>go</a></div>";
-                    //    str = str + "<div class='col-md-1 textAlignRight'><a href='#' onclick='editFavorite(\"" + title + "\",\"" + url + "\"," + id + ")'>edit</a></div>";
-                    //    str = str + "<div class='col-md-1 textAlignRight'><a href='#' onclick='deleteFavorite(" + id + ")'>delete</a></div>";
-
-                    //    str = str + "</div>"
-                    //    $("#divFavoriteList").append(str);
-                    //    $("#divFavoriteList").show();
-                    //});
-
-                    var dataColumns = buildDataTableColumns();
-
-
-                    var results = data["report"]["rows"];
-
-                    var searchTable;
-
-                    if ($.fn.DataTable.isDataTable('#dtResults')) {
-
-                        searchTable = $('#dtResults').DataTable();
-                        searchTable.destroy();
-                    }
-
-                    searchTable = $("#dtResults").DataTable({
-                        "dom": "Blfrtip",
-                        //"pageLength": gDataTableDefaultRows,
-                        "order": [],
-                        "data": results,
-                        "columns": dataColumns,
-                        "paging": false,
-                        "select": true,
-                        language: {
-                            search: "Filter Results:",
-                            emptyTable: "No favorites available"
-                        },
-                        "buttons": [
-                           
-                        ],
-                        initComplete: function () {
-                            $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="../../images/red-x.png" /></button>');
-                        },
-                        createdRow: function (row, data, index) {
-                            //this adds the class to every row
-                            $(row).addClass('single-line-height');
-                        }
-                    });
-
-                }
-
-
+            ],
+            "pagingType": "full_numbers",
+            "buttons": [
+ 
+               {
+                   extend: 'excel',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dt", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+  
+               {
+                   extend: 'pdf',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dt", data, columnIdx);
+                           }
+                       }
+                   }
+               },
+               {
+                   extend: 'print',
+                   title: reportTitle,
+                   exportOptions: {
+                       columns: exportColumns,
+                       format: {
+                           header: function (data, columnIdx) {
+                               return returnExportColumnHeadingTitle("dt", data, columnIdx);
+                           }
+                       }
+                   }
+               }
+               //,
+               //this button is supposed to handle column visibility
+               //however it isn't working on our site
+               //'colvis'
+            ],
+            initComplete: function () {
+                $(".dataTables_filter").append('<button type="button" class="clear-button" id="clear_search_button"><img width="29" height="29" src="../../images/red-x.png" /></button>');
             },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
+            createdRow: function (row, data, index) {
+                //this adds the class to every row
+                $(row).addClass('single-line-height');
+            },
+            language: {
+                //this changes search box label from Search: to Filter Results:
+                search: "Filter Results:"
             }
         });
+
+    }
+    function getFacilityDashboardDataByDay()
+    {
+        var thisFacilityId = getFacilityFromControl("ddlFacilityAccess");
+
+        getFacilityDashboardDataByDayAPICall(thisFacilityId, currentDate());
     }
 
-    function buildDataTableColumns() {
-        var columns = new Array();
+    function getFacilityDashboardDataByDaySuccess(data, textStatus, jQxhr)
+    {
+        
+        if (data.response.status != "SUCCESS") 
+        {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
+        } 
+        else 
+        {        
+            $("#spnADLsLate").html(data.ADLsLate);    
+            $("#spnADLsNotCompleted").html(data.ADLsNotCompleted);
+         }
+    }
+    function getFacilityADLLogByDay()
+    {
+        var thisFacilityId = getFacilityFromControl("ddlFacilityAccess");
 
-        columns.push({
-            "title": "Favorite Name",
-            "mRender": function (data, type, row) {
-
-                var action = "<div class='top-title'><a href='" + row.URL + "'><b>" + row.Title + "</b></a></div>";
-                action += "<div class='bottom-url'><a href='" +
-                    row.URL +
-                    "' style='font-size:13px'><i>" +
-                    row.URL +
-                    "</i></a></div>";
-                return action;
-            },
-            "orderable": true,
-            "searchable": true,
-            "className": "textAlignLeft"
-        });
-
-        //columns.push({
-        //    "title":"Favorite URL",
-        //    "mRender": function (data, type, row) {
-        //        return "<a href='" + row.URL + "' style='font-size:13px'><i>" + row.URL + "</i></a>";
-        //    },
-        //    "orderable": true,
-        //    "searchable": true,
-        //    "className": "textAlignLeft"
-        //});
-
-        columns.push({
-            "mRender": function (data, type, row) {
-                return "<a href='" + row.URL + "'>go</a>";
-            },
-            "orderable": false,
-            "searchable": false,
-            "className": "text-align-center"
-        });
-
-        columns.push({
-            "mRender": function (data, type, row) {
-                var id = row["Internal Favorite Id"];
-                return "<a href='#' onclick='editFavorite(\"" + row.Title + "\",\"" + row.URL + "\"," + id + ")'>edit</a>";
-            },
-            "orderable": false,
-            "searchable": false,
-            "className": "text-align-center"
-        });
-
-        columns.push({
-            "mRender": function (data, type, row) {
-                var id = row["Internal Favorite Id"];
-                return "<a href='#' onclick='deleteFavorite(" + id + ")'>delete</a>";
-            },
-            "orderable": false,
-            "searchable": false,
-            "className": "text-align-center"
-        });
-
-        return columns;
+        getFacilityADLLogByDayAPICall(thisFacilityId, currentDate());   
     }
 
-    function clearSearchButtonSetup() {
-        $("body").on("click", "#clear_search_button", function () {
-            var table = $("#dtResults").DataTable();
-            table.search('').draw();
-        });
-
+    function getFacilityADLLogByDaySuccess(data, textStatus, jQxhr)
+    {
+        console.log(data);
+        populateDataTable("dt", data);
     }
 
     function drawSegmentLabel(canvas, context, i) {

@@ -50,7 +50,14 @@
     <!--[if lt IE 9]>
     <script src="js/respond.min.js"></script>
     <![endif]-->
-
+        <style>
+        .tomorrowWarning
+        {
+            width: 100% !important;
+            background-color: red !important;
+            color: white !important;
+        }
+        </style>
 </head>
 <body>
     <div id="fh5co-page">
@@ -67,7 +74,7 @@
                         <h2 id="pageTitle">Patient ADL Scheduling</h2>
                     </div>
                 </div>
-                <div class="text-center margin-top-0">
+                <div class="text-align-left margin-top-0">
 
  
                     <div class="row input-row">
@@ -108,7 +115,7 @@
                             <table>
                                 <tr>
                                     <td>
-                                        <input type="checkbox" id="chkSunday" value="1"  />&nbsp;Sunday&nbsp;
+                                        <input type="checkbox" id="chkDay_1" value="1"  />&nbsp;Sunday&nbsp;
                                     </td>
                                     <td>
                                         <select  id="ddlHour_1">
@@ -128,7 +135,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <input type="checkbox" id="chkMonday" value="2"  />&nbsp;Monday&nbsp;
+                                        <input type="checkbox" id="chkDay_2" value="2"  />&nbsp;Monday&nbsp;
                                     </td>
                                     <td>
                                         <select  id="ddlHour_2">
@@ -148,7 +155,7 @@
                                 </tr>                                
                                 <tr>
                                     <td>
-                                        <input type="checkbox" id="chkTuesday" value="3"  />&nbsp;Tuesday&nbsp;
+                                        <input type="checkbox" id="chkDay_3" value="3"  />&nbsp;Tuesday&nbsp;
                                     </td>
                                     <td>
                                         <select  id="ddlHour_3">
@@ -168,7 +175,7 @@
                                 </tr>                                
                                 <tr>
                                     <td>
-                                        <input type="checkbox" id="chkWednesday" value="4"  />&nbsp;Wednesday&nbsp;
+                                        <input type="checkbox" id="chkDay_4" value="4"  />&nbsp;Wednesday&nbsp;
                                     </td>
                                     <td>
                                         <select  id="ddlHour_4">
@@ -188,7 +195,7 @@
                                 </tr>                                
                                 <tr>
                                     <td>
-                                        <input type="checkbox" id="chkThursday" value="5"  />&nbsp;Thursday&nbsp;
+                                        <input type="checkbox" id="chkDay_5" value="5"  />&nbsp;Thursday&nbsp;
                                     </td>
                                     <td>
                                         <select  id="ddlHour_5">
@@ -208,7 +215,7 @@
                                 </tr>                                
                                 <tr>
                                     <td>
-                                        <input type="checkbox" id="chkFriday" value="6"  />&nbsp;Friday&nbsp;
+                                        <input type="checkbox" id="chkDay_6" value="6"  />&nbsp;Friday&nbsp;
                                     </td>
                                     <td>
                                         <select  id="ddlHour_6">
@@ -228,7 +235,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <input type="checkbox" id="chkSaturday" value="7"  />&nbsp;Saturday&nbsp;
+                                        <input type="checkbox" id="chkDay_7" value="7"  />&nbsp;Saturday&nbsp;
                                     </td>
                                     <td>
                                         <select  id="ddlHour_7">
@@ -256,9 +263,9 @@
                     <!--Buttons-->
                     <div class="default-button-section">
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-12 text-align-center">
                                 <div>
-                                    <input value="Update" onclick="initiatePersonnelUpdate();" class="default-button" type="button" />
+                                    <input value="Update" onclick="updateADLPatient();" class="default-button" type="button" />
                                 </div>
                                 <hr>
                                 <div class="back-button-div">
@@ -299,7 +306,8 @@
 </html>
 <script>
 
-    var adlPatientAssignmentId = 0;
+    var systemADLId = 0;
+    var patientId = 0;
  
     var bDirty = false;
 
@@ -307,13 +315,14 @@
     {
         buildMainMenu("Admin");
  
-        adlPatientAssignmentId = (getParameterByName("adlPatientAssignmentId") == null ? 0 : getParameterByName("adlPatientAssignmentId"));
+        systemADLId = (getParameterByName("adlSystemADLId") == null ? 0 : getParameterByName("adlSystemADLId"));
+        patientId = (getParameterByName("patientId") == null ? 0 : getParameterByName("patientId"));
 
-        if (adlPatientAssignmentId > 0)
+        if (systemADLId > 0)
         {
-            // get the data
-            // load the control
- 
+            $("#txtADLName").val(getLocalStorage("PatientADL_SystemADL"));
+            $("#txtPatient").val(getLocalStorage("PatientADL_Patient"));
+            getPatientADLItemAPICall(systemADLId, patientId);
         }
         else
         {
@@ -321,20 +330,20 @@
             $("#txtPatient").val(getLocalStorage("PatientADL_Patient"));
         }
         buildLists();
-        //getStateList();
+
         setTimeout(setupEvents, 1000);
 
     });
 
     function selectAllDays()
     {
-        $("#chkSunday").attr('checked','checked')
-        $("#chkMonday").attr('checked','checked')
-        $("#chkTuesday").attr('checked','checked')
-        $("#chkWednesday").attr('checked','checked')
-        $("#chkThursday").attr('checked','checked')
-        $("#chkFriday").attr('checked','checked')
-        $("#chkSaturday").attr('checked','checked')
+        $("#chkDay_1").attr('checked','checked')
+        $("#chkDay_2").attr('checked','checked')
+        $("#chkDay_3").attr('checked','checked')
+        $("#chkDay_4").attr('checked','checked')
+        $("#chkDay_5").attr('checked','checked')
+        $("#chkDay_6").attr('checked','checked')
+        $("#chkDay_7").attr('checked','checked')
     }
     function selectAllTimes()
     {
@@ -410,9 +419,103 @@
 
     }
     
+    function updateADLPatient()
+    {
  
+        var str = "";
+        var obj = new Object();
 
+        obj["inApiToken"] = getLocalStorage("APIToken"); 
+        obj["inPatientId"] = parseInt(getLocalStorage("PatientADL_PatientId"));
+        obj["inSystemADLId"] = parseInt(getLocalStorage("PatientADL_SystemADLId"));
+
+        var objRow = new Object();
+        var objArray = new Array();
+
+
+        for (var i=1; i<=7; i++)
+        {
+            str = "";
+            objRow = new Object();
+            objRow["inDayOfTheWeek"] = parseInt(i);
+            if ($("#ddlAMPM_" + i).val() == "PM")
+            {
+                str = (parseInt($("#ddlHour_" + i).val()) + 12);
+            }
+            else
+            {
+                str = (parseInt($("#ddlHour_" + i).val()));
+            }
+
+            if (parseInt(str) < 10)
+            {
+                str = "0" + str;
+            }
+
+            var str = str + ":" + $("#ddlMinute_" + i).val() +":00";
+
+            objRow["inTimeOfDay"] = str;
+            objRow["inDelete"] = !$("#chkDay_" + i).is(':checked');
  
+            objArray.push(objRow);
+ 
+        }
+        obj["rows"] = objArray;
+
+        console.log(obj);
+        // stringify
+        obj = JSON.stringify(obj);
+        //objArray = JSON.stringify(objArray);
+
+        updateADLPatientAPICall(obj);
+
+    
+    }
+    function updateADLPatientSuccess(data, textStatus, jQxhr)
+    {
+        if (data.response.status != "SUCCESS") 
+        {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
+        } 
+        else 
+        {            
+            bootbox.alert('Patient Schedule Updated!', function () { });
+         }
+    }
+
+    function getPatientADLItemSuccess(data, textStatus, jQxhr)
+    {
+        $("#txtADLName").val(getLocalStorage("PatientADL_SystemADL"));
+        $("#txtPatient").val(getLocalStorage("PatientADL_Patient"));
+
+        if (data.response.status != "SUCCESS") 
+        {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () {});
+        }
+        else {
+
+             $.each(data.rows, function (index) {
+
+                var obj = data.rows[index];
+                var DayOfWeek = obj.DayOfWeek;
+                var timeOfDayArray = obj.TimeOfDay.split(":");
+                var hour = parseInt(timeOfDayArray[0]);
+                var bPM = false;
+                if (hour > 12)
+                {
+                    hour = hour - 12;
+                    bPM = true;
+                }
+                var minute = timeOfDayArray[1];
+                $("#chkDay_" + DayOfWeek).prop("checked", "checked");
+                $("#ddlHour_" + DayOfWeek).val(hour);
+                $("#ddlMinute_" + DayOfWeek).val(minute);
+                $("#ddlAMPM_" + DayOfWeek).val((bPM == false ? "AM" : "PM")) ;
+
+            });
+
+        }
+    }
  
  
  

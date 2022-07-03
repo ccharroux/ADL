@@ -579,7 +579,7 @@ var delayForLastPage = 1 * 1000;
 var maxHoldEntries = 10;
 var bLongQuery = false;
 var environment = "";
-var gDataTableDefaultRows = 50;
+var gDataTableDefaultRows = 10;
 var gSearchTextPlaceholder = "Enter search text here...";
 var navTool = {
     buildNavComponent: function (parentContainer, parentElement, functionToRun, bAllowAllSelection) {
@@ -1443,6 +1443,7 @@ function sendErrorEmail(message, AJAXErrorURL, AJAXErrorData)
         return;
     }
 
+    /*
     $.ajax({
         url: ServicePrefix + '/api/Email/EmailAPIError',
         dataType: 'json',
@@ -1466,6 +1467,8 @@ function sendErrorEmail(message, AJAXErrorURL, AJAXErrorData)
             //alert(errorThrown);
         }
     });
+    */
+
 }
 function buildDashboard()
 {
@@ -1476,6 +1479,8 @@ function buildDashboard()
 
     setLocalStorage("currentRole", facilityArray[1]);
     buildMainMenu("");
+    getFacilityDashboardDataByDay();
+    getFacilityADLLogByDay();
 
 }
 
@@ -3573,6 +3578,7 @@ function getFacilityFromControl(control)
 {
     var val = $("#" + control).val();
     var arr = val.split("|");
+    console.log(val);
 
     return arr[0];
 
@@ -3652,7 +3658,8 @@ function getStateListSuccess(data, textStatus, jQxhr, control)
     else {
         var str = '';
         str = '<option value="-1">-- Select a State</option>';
-        $.each(data.rows, function (index) {
+        $.each(data.rows, function (index) 
+        {
             str = str + '<option value="' + data.rows[index].StateId + '">' + data.rows[index].State + '</option>';
         });
         $("#" + control).html(str);
@@ -3816,6 +3823,7 @@ function getUserAccessListAPICall(userId)
             genericAjaxError(jqXhr, textStatus, errorThrown);
         }
     });
+
 }
 function getUserListAPICall(facilityId, roleId) 
 {
@@ -3887,9 +3895,9 @@ function getUserAddress(id)
 
     var settings = {
         dataType: 'json',
-        type: 'GET',
+        type: 'get',
         contentType: 'application/json',
-        procssData: false,
+        processData: false,
         success: function (data, textStatus, jQxhr) {
             console.log(data);
             // function should be in the calling page
@@ -3971,7 +3979,30 @@ function getSystemADL(id)
     $.ajax(url, settings);
 }
 
+function updateADLPatientAPICall(updateData) 
+{
+    // set url
+    var url = ServicePrefix + '/Patient/ADL';
 
+    //set method
+    var methodForCall = "PUT";
+ 
+    var settings = {
+        dataType: 'json',
+        type: methodForCall,
+        contentType: 'application/json',
+        data:   updateData,
+        success: function (data, textStatus, jQxhr) {
+            updateADLPatientSuccess(data, textStatus, jQxhr);
+        },
+        error: function (jQxhr, textStatus, errorThrown) {
+            genericAjaxError(jQxhr, textStatus, errorThrown);
+        }
+    };
+
+    $.ajax(url, settings);
+
+}
 // UI Stuff - Dialogs
 function buildUIDialogs(inControl, inTitle, inWidth, inHeight) 
 {
@@ -3997,4 +4028,141 @@ function goTo(url)
 {
     window.location = url;
 
+}
+function getPatientADLItemAPICall(id, patientId) 
+{
+ 
+    var url = ServicePrefix + '/patient/ADLItem/';
+    url = url + getTokenInput();
+    url = url + "&inPatientId=" + patientId;
+    url = url + "&inSystemADLId=" + id;
+ 
+    var settings = {
+        dataType: 'json',
+        type: 'get',
+        contentType: 'application/json',
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+            console.log(data);
+            // function should be in the calling page
+            getPatientADLItemSuccess(data, textStatus, jQxhr);
+        },
+        error: function (jQxhr, textStatus, errorThrown) {
+            genericAjaxError(jQxhr, textStatus, errorThrown);
+        }
+    }
+    $.ajax(url, settings);
+}
+
+function insertPatientADLLogAPICall(updateData) 
+{
+    // set url
+    var url = ServicePrefix + '/Patient/ADLLog';
+
+    //set method
+    var methodForCall = "POST";
+
+    var settings = {
+        dataType: 'json',
+        type: methodForCall,
+        contentType: 'application/json',
+        data:   updateData,
+        success: function (data, textStatus, jQxhr) {
+            insertPatientADLLogSuccess(data, textStatus, jQxhr);
+        },
+        error: function (jQxhr, textStatus, errorThrown) {
+            genericAjaxError(jQxhr, textStatus, errorThrown);
+        }
+    };
+
+    $.ajax(url, settings);
+
+}
+
+function getFacilityDashboardDataByDayAPICall(facilityId, transactionDate) 
+{
+ 
+    var url = ServicePrefix + '/facility/dashboard/';
+    url = url + getTokenInput();
+    url = url + "&infacilityId=" + facilityId;
+    url = url + "&inTransactionDate=" + transactionDate;
+ 
+    var settings = {
+        dataType: 'json',
+        type: 'get',
+        contentType: 'application/json',
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+            console.log(data);
+            // function should be in the calling page
+            getFacilityDashboardDataByDaySuccess(data, textStatus, jQxhr);
+        },
+        error: function (jQxhr, textStatus, errorThrown) {
+            genericAjaxError(jQxhr, textStatus, errorThrown);
+        }
+    }
+    $.ajax(url, settings);
+}
+function convertFromMilitaryToStandard(time, returnSeconds)
+{
+  
+    time = time.split(':'); // convert to array
+
+    // fetch
+    var hours = Number(time[0]);
+    var minutes = Number(time[1]);
+    var seconds = Number(time[2]);
+
+    // calculate
+    var timeValue;
+
+    if (hours > 0 && hours <= 12) 
+    {
+        timeValue= "" + hours;
+    } 
+    else if (hours > 12) 
+    {
+        timeValue= "" + (hours - 12);
+    } else if (hours == 0) 
+    {
+        timeValue= "12";
+    }
+    if (timeValue.length == 1)
+    {
+        timeValue = '&nbsp;' + timeValue;
+    }
+    
+    timeValue += (minutes < 10) ? ":0" + minutes : ":" + minutes;  // get minutes
+    
+    if (returnSeconds == true)
+    {
+        timeValue += (seconds < 10) ? ":0" + seconds : ":" + seconds;  // get seconds
+    }
+
+    timeValue += (hours >= 12) ? " PM" : " AM";  // get AM/PM
+
+    return timeValue;
+}
+function getFacilityADLLogByDayAPICall(facilityId, transactionDate) {
+
+    
+    var url = ServicePrefix + "/facility/ADLLogByDay/";
+    url = url + getTokenInput();
+    url = url + "&inFacilityId=" + facilityId;
+    url = url + "&inTransactionDate=" + transactionDate;
+    
+    $.ajax({
+        url: url,
+        dataType: 'json',
+        type: 'get',
+
+        contentType: 'application/json',
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+            getFacilityADLLogByDaySuccess(data, textStatus, jQxhr);
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    });
 }

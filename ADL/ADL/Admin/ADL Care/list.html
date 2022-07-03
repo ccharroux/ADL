@@ -92,9 +92,6 @@
                         <div class="col-md-2 DateLabel" class="dropdown-label">Date</div><br>
                         <div class="col-md-7 DateValue"><input type="text" id="dtDate" /></div>
                    </div>
-                    <div class="col-md-2">
-                        <input type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="addItem();" />
-                    </div>
                 </div>
 
                 <!-- start datatable-->
@@ -103,6 +100,7 @@
                         <thead>
                             <tr>
                                 <th class="exportColumn">Patient</th>
+                                <th class="exportColumn">Late</th>
                                 <th class="exportColumn">% Complete</th>
                                 <th></th>
                             </tr>
@@ -161,6 +159,8 @@
 <script>
 
     var currentPatient = "";
+    var currentPatientId = 0;
+
     $(document).ready(function () {
 
         if (doesUserHaveAccessToFeature("adl care") == false)
@@ -213,7 +213,9 @@
     }
     function setEventListeners() {
         
-
+        $("body").on("click", ".ui-icon-closethick", function () {
+            getList();
+        });
 
         $("body").on("click", "#clear_search_button", function () {
             //this gets the datatable and gives access to the apis
@@ -243,17 +245,44 @@
                     "className": "text-align-left"
                 },
                 {
+                    "data": 'LateADLs',
+                    "className": "text-align-center"
+                },
+                {
 
                     mRender: function (data, type, row) {
 
-                        var action = row.PctComplete;
-
-                        if (action != '100%')
+                        var action = row.PctComplete +'%';
+                       // <input value="Select All Days" onclick="selectAllDays();" class="default-button" type="button" />
+ 
+ 
+                        action = action + "<table style='margin-top:2px;margin-bottom:2px' width='100%'>";
+                        action = action + "<tr>";
+                        
+                        if (row.PctComplete == '100')
                         {
-                             action = action + "<br><a href='#' onclick='openItem(";
-                             action = action + row.PatientId + ',"';
-                             action = action + row.Patient + '")' + ";'>Update Care</a>";
+                            action = action + "<td style='background:green' width='100%'></td>";
+
                         }
+                        else if (row.PctComplete == 0)
+                        {
+                            action = action + "<td style='background:red' width='100%'></td>";
+
+                        }
+                        else
+                        {
+                            action = action + "<td style='background:green' width='"+ row.PctComplete +"%'></td>";
+                            var notDone = (100 - parseInt(row.PctComplete));
+                            action = action + "<td style='background:red' width='"+ notDone +"%'></td>";
+
+                        }
+                         
+                        action = action + "</tr>";
+                        action = action + "</table>";
+
+                        action = action + "<input type='button' class='default-button smallButton' onclick='openItem(";
+                        action = action + row.PatientId + ',"';
+                        action = action + row.Patient + '")' + ";' value='" + (row.PctComplete == '100' ? "View" : "Update") + "" + "' />";
 
                         return action;
                     },
@@ -341,20 +370,23 @@
         document.location = '../../admin/patient scheduling/list.html';
     }
 
+    function whatDateAreWeWorkingWith()
+    {
+        var td = $("#dtDate").val();
+        var tdArray = td.split('/');
+        var tdTransformed = tdArray[2] + '-' + tdArray[0] + '-' + tdArray[1];
+        return tdTransformed;
+    }
     function openItem(patientId, patient)
     {
         // validation first
 
-        var td = $("#dtDate").val();
-        var tdArray = td.split('/');
-        var tdTransformed = tdArray[2] + '-' + tdArray[0] + '-' + tdArray[1];
-        
+        var tdTransformed = whatDateAreWeWorkingWith();
+
         currentPatient = patient;
+        currentPatientId = patientId;
 
         getPatientADLListByDayAPICall(patientId, tdTransformed);
-
-
-
 
     }
     function getList() {
@@ -391,31 +423,11 @@
     {
         window.location = "../../admin/users/item.html?userId=" + id;
     }
-    function getDate()
-    {
-        var currentdate = new Date(); 
-        var datetime = 
-                 (currentdate.getMonth()+1)  + "/"  
-                + currentdate.getDate() + "/"
-                + currentdate.getFullYear() + " ";
-        return datetime;
 
-    }
-    function getCurrentDate()
-    {
-        var currentdate = new Date(); 
-        var datetime = 
-                 (currentdate.getMonth()+1)  + "/"  
-                + currentdate.getDate() + "/"
-                + currentdate.getFullYear() + " "  
-                + ('0' + currentdate.getHours()).slice(-2)  + ":"  
-                + ('0' + currentdate.getMinutes()).slice(-2) + ":" 
-                + ('0' + currentdate.getSeconds()).slice(-2) ;
-        return datetime;
-    }
+ 
     function enterCare(control)
     {
-        $("#" + control).html(getCurrentDate());
+        $("#" + control).html(currentDate());
     }
 
     function getPatientADLListByDaySuccess(data, textStatus, jQxhr)
@@ -427,19 +439,20 @@
         else 
         {
             var str = "";
-            console.log(data);
+ 
             $.each(data.rows, function (index) 
             {
                 
                 var obj = data.rows[index];
                 
-                str = str + "<tr style='height:40px'>";
-                str = str + "<td width='70%'>" + obj.TimeOfDay + " - " + obj.SystemADL + "</td>";
-                str = str + "<td width='30%'>";
+                str = str + "<tr style='height:60px'>";
+                str = str + "<td width='20%' class='text-align-center'>" + convertFromMilitaryToStandard(obj.TimeOfDay, false) +"</td>";
+                str = str + "<td width='50%'>" + obj.SystemADL + "</td>";
+                str = str + "<td width='30%' class='text-align-center'>";
                 
                 if (obj.TransactionDate == "")
                 {
-                    str = str + '<input value="Update" onclick="markItDone('+ obj.ADLPatientId +');" class="default-button" type="button" />';
+                    str = str + '<input value="Update" onclick="markItDone('+ obj.ADLPatientId +');" class="default-button smallButton" type="button" />';
    
                 }
                 else
@@ -461,8 +474,33 @@
     }
     function markItDone( logId)
     {
-        alert(getLocalStorage("userId"));
-        alert(logId);
-    }
 
+        var obj = new Object();
+
+        obj["inApiToken"] = getLocalStorage("APIToken"); 
+        obj["inUserId"] = parseInt(getLocalStorage("userId"));
+        obj["inADLPatientId"] = parseInt(logId);
+
+        console.log(obj);
+        // stringify
+        obj = JSON.stringify(obj);
+ 
+        insertPatientADLLogAPICall(obj);
+
+    }
+    function insertPatientADLLogSuccess(data, textStatus, jQxhr)
+    {
+        if (data.response.status != "SUCCESS") 
+        {
+            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () {});
+        }
+        else {
+            var tdTransformed = whatDateAreWeWorkingWith();
+            getPatientADLListByDayAPICall(currentPatientId, tdTransformed);
+        }
+    }
+    function afterClose()
+    {
+        getList();
+    }
 </script>
