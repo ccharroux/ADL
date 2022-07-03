@@ -17,6 +17,8 @@ namespace ADLAPICore.Library.Patient
         public DBResult PatientADLLogSummaryListByDateDBCall(PatientADLLogSummaryListByDateGetInput input);
         public DBResult DeletePatientADLDBCall(PatientADLDeleteInput input);
         public DBResult UpdatePatientADLDBCall(PatientADLUpdateDBRow input);
+        public DBResult PatientADLItemDBCall(PatientADLItemGetInput input);
+        public DBResult InsertPatientADLLogDBCall(PatientADLLogInsertInput input);
 
     }
 
@@ -112,7 +114,7 @@ namespace ADLAPICore.Library.Patient
             DBClass dbClass = new DBClass();
             try
             {
-                dbClass.dbCmd = new MySqlCommand("deletePatientADL", dbClass.dbConn);
+                dbClass.dbCmd = new MySqlCommand("deleteADLPatient", dbClass.dbConn);
                 dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
@@ -141,7 +143,7 @@ namespace ADLAPICore.Library.Patient
             DBClass dbClass = new DBClass();
             try
             {
-                dbClass.dbCmd = new MySqlCommand("updatePatientADL", dbClass.dbConn);
+                dbClass.dbCmd = new MySqlCommand("updateADLPatient", dbClass.dbConn);
                 dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
                 MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
@@ -159,7 +161,65 @@ namespace ADLAPICore.Library.Patient
                 param = new MySqlParameter("inTimeOfDay", input.inTimeOfDay);
                 dbClass.dbCmd.Parameters.Add(param);
 
-                param = new MySqlParameter("inDayOfTheWeek", input.inDayOfTheWeek);
+                param = new MySqlParameter("inDelete", input.inDelete);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                result = dbClass.getDBResults();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new DBResult { dt = new DataTable(), response = result.response };
+            }
+
+        }
+        public DBResult PatientADLItemDBCall(PatientADLItemGetInput input)
+        {
+            var result = new DBResult();
+            DBClass dbClass = new DBClass();
+            try
+            {
+                dbClass.dbCmd = new MySqlCommand("getADLPatientItem", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
+
+                MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inPatientId", input.inPatientId);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inSystemADLId", input.inSystemADLId);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                result = dbClass.getDBResults();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new DBResult { dt = new DataTable(), response = result.response };
+            }
+
+        }
+        public DBResult InsertPatientADLLogDBCall(PatientADLLogInsertInput input)
+        {
+            var result = new DBResult();
+            DBClass dbClass = new DBClass();
+            try
+            {
+                dbClass.dbCmd = new MySqlCommand("insertADLPatientLog", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
+
+                MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inUserId", input.inUserId);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inadlpatientid", input.inADLPatientId);
                 dbClass.dbCmd.Parameters.Add(param);
 
                 result = dbClass.getDBResults();

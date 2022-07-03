@@ -74,7 +74,7 @@ namespace ADLAPICore.Library.Login
 
                     LoginDBClass lDB = new LoginDBClass();
 
-                    var dbResult = lDB.LoginDBCall(input.inEmailAddress, ePassword);
+                    var dbResult = lDB.LoginDBCall(input.inEmailAddress, ePassword, input.inOffset);
                     if (dbResult.response.status == ResponseModel.responseFAIL)
                     {
                         loginResult.response = dbResult.response;
@@ -136,7 +136,7 @@ namespace ADLAPICore.Library.Login
                     return loginResult;
                 }
             }
-            private ResponseModel Validate(string inEmailAddress, string inPassword)
+            private ResponseModel Validate(string inEmailAddress, string inPassword )
             {
                 ResponseModel result = new ResponseModel();
 
@@ -152,7 +152,7 @@ namespace ADLAPICore.Library.Login
                     {
                         throw new ApplicationException("Password is required for this method.");
                     }
-
+ 
                     return result;
                 }
                 catch (Exception ex)

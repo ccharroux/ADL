@@ -6,5 +6,6 @@ namespace ADLAPICore.Models.Login
     {
         public string inEmailAddress { get; set; }
         public string inPassword { get; set; }
+        public int inOffset { get; set; }
     }
 }

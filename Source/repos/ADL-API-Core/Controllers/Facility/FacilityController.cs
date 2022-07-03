@@ -301,7 +301,59 @@ namespace ADLAPICore.Controllers.Facility
                 return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
             }
         }
+
+        [HttpGet("Dashboard")]
+        public ActionResult Dashboard([FromQuery] FacilityDashboardDataByDayGetInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (FacilityDashboardDataByDayGetInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.GetFacilityDashboardDataByDay(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+                FacilityDashboardDataByDayResult fr = new FacilityDashboardDataByDayResult();
+                fr.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
+            }
+        }
+
+        [HttpGet("ADLLogByDay")]
+        public ActionResult ADLLogByDay([FromQuery] FacilityADLLogByDayGetInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (FacilityADLLogByDayGetInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.GetFacilityADLLogByDay(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+                FacilityADLLogByDayResult fr = new FacilityADLLogByDayResult();
+                fr.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
+            }
+        }
+
     }
- 
+
+
 
 }

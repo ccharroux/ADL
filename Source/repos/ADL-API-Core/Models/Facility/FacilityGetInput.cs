@@ -30,5 +30,17 @@ namespace ADLAPICore.Models.Facility
     {
         public string inApiToken { get; set; }
     }
+    public class FacilityDashboardDataByDayGetInput
+    {
+        public string inApiToken { get; set; }
+        public int inFacilityId { get; set; }
+        public DateTime inTransactionDate { get; set; }
+    }
+    public class FacilityADLLogByDayGetInput
+    {
+        public string inApiToken { get; set; }
+        public int inFacilityId { get; set; }
+        public DateTime inTransactionDate { get; set; }
+    }
 
 }

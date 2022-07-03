@@ -10,13 +10,13 @@ namespace ADLAPICore.Library.Login
 {
     interface ILoginDBClass
     {
-        public DBResult LoginDBCall(string emailAddress, string password);
+        public DBResult LoginDBCall(string emailAddress, string password, int offset);
     }
 
     class LoginDBClass : ILoginDBClass
     {
 
-        public DBResult LoginDBCall(string emailAddress, string password)
+        public DBResult LoginDBCall(string emailAddress, string password, int offset)
         {
             DBClass dbClass = new DBClass();
             try
@@ -28,6 +28,9 @@ namespace ADLAPICore.Library.Login
                 dbClass.dbCmd.Parameters.Add(param);
 
                 param = new MySqlParameter("inPassword", password);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                param = new MySqlParameter("inOffset", offset);
                 dbClass.dbCmd.Parameters.Add(param);
 
                 return dbClass.getDBResults();

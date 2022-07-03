@@ -56,7 +56,6 @@ namespace ADLAPICore.Controllers.Patient
             }
         }
 
-
         [HttpGet("ADLList")]
         public ActionResult ADLList([FromQuery] PatientADLListGetInput input)
         {
@@ -108,7 +107,6 @@ namespace ADLAPICore.Controllers.Patient
                 return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
             }
         }
-
 
         [HttpGet("ADLLogSummaryListByDate")]
         public ActionResult ADLLogSummaryListByDate([FromQuery] PatientADLLogSummaryListByDateGetInput input)
@@ -168,6 +166,9 @@ namespace ADLAPICore.Controllers.Patient
             try
             {
 
+                //var input = rows;
+
+
                 //----------------------------------
                 // Clean inputs using reflection
                 //----------------------------------
@@ -187,5 +188,62 @@ namespace ADLAPICore.Controllers.Patient
                 return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
             }
         }
+
+        [HttpGet("ADLItem")]
+        public ActionResult ADLItem([FromQuery] PatientADLItemGetInput input)
+        {
+            try
+            {
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (PatientADLItemGetInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.GetPatientADLItem(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                PatientADLItemResult r = new PatientADLItemResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
+
+        [HttpPost("ADLLog")]
+        public ActionResult ADLLog([FromBody] PatientADLLogInsertInput input)
+        {
+            try
+            {
+
+                //var input = rows;
+
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (PatientADLLogInsertInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.InsertPatientADLLog(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                PatientADLLogInsertResult r = new PatientADLLogInsertResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
+
+
     }
 }

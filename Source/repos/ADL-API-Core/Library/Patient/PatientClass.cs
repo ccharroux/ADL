@@ -7,6 +7,26 @@ using ADLAPICore.Models.Patient;
 
 namespace ADLAPICore.Library.Patient
 {
+    public class PatientADLItemRow
+    {
+        public Int32 PatientId { get; set; }
+        public Int32 SystemADLId { get; set; }
+        public Int32 DayOfWeek { get; set; }
+        public string TimeOfDay { get; set; }
+        public string StartDate { get; set; }
+    }
+    public class PatientADLItemResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public List<PatientADLItemRow> rows = new List<PatientADLItemRow>();
+        private PatientADLRow resultRow = new PatientADLRow();
+
+        public PatientADLItemResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
+
     public class PatientADLByDayRow
     {
         public Int32 PatientId { get; set; }
@@ -26,7 +46,6 @@ namespace ADLAPICore.Library.Patient
         public string SystemADL { get; set; }
         public string TimeOfDay { get; set; }
     }
-
 
     public class PatientADLByDayResult
     {
@@ -77,6 +96,7 @@ namespace ADLAPICore.Library.Patient
         public Int32 PatientId { get; set; }
         public Int32 TotalADLs { get; set; }
         public Int32 IncompleteADLs { get; set; }
+        public Int32 LateADLs { get; set; }
         public Decimal PctComplete  { get; set; }
     }
     public class PatientADLLogSummaryByDateResult
@@ -111,6 +131,16 @@ namespace ADLAPICore.Library.Patient
             this.response = General.buildError("Unexpected error");
         }
     }
+    public class PatientADLLogInsertResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public int ReturnCode { get; set; }
+
+        public PatientADLLogInsertResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
 
     public interface IPatientClass
     {
@@ -120,6 +150,8 @@ namespace ADLAPICore.Library.Patient
         public PatientADLLogSummaryByDateResult GetPatientADLLogSummaryListByDate(PatientADLLogSummaryListByDateGetInput input);
         public PatientADLDeleteResult DeletePatientADL(PatientADLDeleteInput input);
         public PatientADLUpdateResult UpdatePatientADL(PatientADLUpdateInput input);
+        public PatientADLItemResult GetPatientADLItem(PatientADLItemGetInput input);
+        public PatientADLLogInsertResult InsertPatientADLLog(PatientADLLogInsertInput input);
     }
 
     public class PatientClass : IPatientClass
@@ -417,6 +449,7 @@ namespace ADLAPICore.Library.Patient
                         Patient = row["patient"].ToString(),
                         TotalADLs = Convert.ToInt32(row["ADLs"]),
                         IncompleteADLs = Convert.ToInt32(row["ADLsNotCompleted"]),
+                        LateADLs = Convert.ToInt32(row["ADLsLate"]),
                         PatientId = Convert.ToInt32(row["patientId"]),
                         PctComplete = 0
                     };
@@ -433,7 +466,7 @@ namespace ADLAPICore.Library.Patient
                     }
                     else
                     {
-                        resultRow.PctComplete = 100 * ((resultRow.TotalADLs - resultRow.IncompleteADLs) / resultRow.TotalADLs);
+                        resultRow.PctComplete = (int) (100 * (decimal)(((decimal)resultRow.TotalADLs - (decimal)resultRow.IncompleteADLs) / (decimal)resultRow.TotalADLs));
                     }
                     result.rows.Add(resultRow);
 
@@ -559,7 +592,6 @@ namespace ADLAPICore.Library.Patient
             }
         }
 
-
         public PatientADLUpdateResult UpdatePatientADL(PatientADLUpdateInput input)
         {
 
@@ -585,8 +617,8 @@ namespace ADLAPICore.Library.Patient
                     dr.inSystemADLId = input.inSystemADLId;
                     // items in loop
                     dr.inDayOfTheWeek = r.inDayOfTheWeek;
-                    dr.inDelete = (r.inDelete == false ? 1 : 0);
-                    dr.inTimeOfDay = r.inTimeOfDay.Replace(":", "");
+                    dr.inDelete = (r.inDelete == true ? 1 : 0);
+                    dr.inTimeOfDay = " " + r.inTimeOfDay.Replace(":", ",");
 
                     var dbResult = lDB.UpdatePatientADLDBCall(dr);
 
@@ -669,7 +701,177 @@ namespace ADLAPICore.Library.Patient
             }
         }
 
+        public PatientADLItemResult GetPatientADLItem(PatientADLItemGetInput input)
+        {
 
+            PatientADLItemResult result = new PatientADLItemResult();
+            PatientADLItemRow resultRow = new PatientADLItemRow();
+
+            try
+            {
+
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                PatientDBClass lDB = new PatientDBClass();
+
+                var dbResult = lDB.PatientADLItemDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                resultRow = new PatientADLItemRow();
+                result.rows = new List<PatientADLItemRow>();
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    resultRow = new PatientADLItemRow
+                    {
+                        PatientId = Convert.ToInt32(row["iduser"]),
+                        SystemADLId = Convert.ToInt32(row["idsystemadl"]),
+                        TimeOfDay = row["timeofday"].ToString(),
+                        DayOfWeek = Convert.ToInt32(row["dayofweek"]),
+                        StartDate = row["StartDate"].ToString()
+                    };
+
+                    result.rows.Add(resultRow);
+
+                }
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new PatientADLItemResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(PatientADLItemGetInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+
+                if (input.inPatientId <= 0)
+                {
+                    throw new ApplicationException("Patient Id must be greater than 0.");
+                }
+
+                if (input.inSystemADLId <= 0)
+                {
+                    throw new ApplicationException("System ADL Id must be greater than 0.");
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.status = ResponseModel.responseFAIL;
+                result.errorMessage = new List<string>();
+                result.errorMessage.Add(ex.Message);
+                return result;
+            }
+        }
+
+
+        public PatientADLLogInsertResult InsertPatientADLLog(PatientADLLogInsertInput input)
+        {
+
+            PatientADLLogInsertResult result = new PatientADLLogInsertResult();
+
+            try
+            {
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                PatientDBClass lDB = new PatientDBClass();
+
+                var dbResult = lDB.InsertPatientADLLogDBCall(input);
+
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    result.ReturnCode = Convert.ToInt32(row["returnCode"]);
+                }
+
+                if (result.ReturnCode < 0)
+                {
+                    throw new ApplicationException(DBCodes.Get(result.ReturnCode));
+                }
+                
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new PatientADLLogInsertResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(PatientADLLogInsertInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+
+                if (input.inUserId <= 0)
+                {
+                    throw new ApplicationException("User Id must be greater than 0.");
+                }
+
+                if (input.inADLPatientId <= 0)
+                {
+                    throw new ApplicationException("ADL Patient Id must be greater than 0.");
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.status = ResponseModel.responseFAIL;
+                result.errorMessage = new List<string>();
+                result.errorMessage.Add(ex.Message);
+                return result;
+            }
+        }
 
         /* private */
         private string ConvertDay(int inDay, string currentVal)
