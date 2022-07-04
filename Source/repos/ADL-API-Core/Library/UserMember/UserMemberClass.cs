@@ -708,9 +708,9 @@ namespace ADLAPICore.Library.UserMember
                     throw new ApplicationException("Role Id must be > -1.");
                 }
 
-                if (input.inFacilityId < 1)
+                if (input.inFacilityId == 0)
                 {
-                    throw new ApplicationException("Facility Id must be > 0.");
+                    throw new ApplicationException("Facility Id must not be equal to 0.");
                 }
 
                 return result;
