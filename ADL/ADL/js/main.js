@@ -17,6 +17,7 @@ const cManager = "3";
 const cCaregiver = "4";
 const cPatient = "5";
 
+ 
 
 var startLocation = "";
 
@@ -1478,10 +1479,12 @@ function buildDashboard()
     var facilityArray = facilityText.split("|");
 
     setLocalStorage("currentRole", facilityArray[1]);
+
     buildMainMenu("");
+    
     getFacilityDashboardDataByDay();
     getFacilityADLLogByDay();
-
+ 
 }
 
 function buildMainMenu(selectedItem) {
@@ -1608,6 +1611,12 @@ function buildMainMenu(selectedItem) {
     if (currentRole == cSystemAdminText )
     {    
         menuItems += '                  <li style="display:block;"><a href="../../admin/facility/list.html?MenuItem=true">Facility Maintenance</a></li>';
+    }
+    if (currentRole == cOwnerText )
+    {    
+        menuItems += '                  <li style="display:block;"><a href="../../admin/facility/item.html?facilityId=';
+        menuItems += getLocalStorage("currentFacility").split('|')[0];
+        menuItems += '">Facility Maintenance</a></li>';
     }
     // adl maintenance
     if (currentRole == cSystemAdminText)
@@ -1852,6 +1861,7 @@ function populateDataTable(tableName, data) {
      
     table.columns.adjust().draw();
     $.unblockUI();
+ 
 }
 
 //ajax error function
@@ -3584,9 +3594,13 @@ function getFacilityFromControl(control)
 
 }
 
-
-function getRolesList(control)
+function getRolesList(control, filter)
 {
+
+    if (!filter)
+    {
+        filter = "";
+    }
 
     var inURL = ServicePrefix + '/role/list' + getTokenInput();
     
@@ -3598,19 +3612,25 @@ function getRolesList(control)
         //data: JSON.stringify(testURLData),
         processData: false,
         success: function (data, textStatus, jQxhr) {
-            console.log("ROLE");
-            console.log(data);
+ 
             if (data.response.status != "SUCCESS") {
                 GeneralErrorMessageRtn(data.response.errorMessage[0]);
             }
             else {
 
-                var str = '<option value="0">All</option>';
+                var str = '';
+
+                if (filter == "")
+                {
+                    str = '<option value="0">All</option>';
+                }
 
                 $.each(data.rows, function (index) {
 
-                    str = str + '<option value="' + data.rows[index].RoleId + '">' + data.rows[index].Role + '</option>';
-
+                    if (filter == "" || data.rows[index].RoleId == filter)
+                    {
+                        str = str + '<option value="' + data.rows[index].RoleId + '">' + data.rows[index].Role + '</option>';
+                    }
                 });
 
                 $("#"+control).html(str);
@@ -4163,6 +4183,15 @@ function getFacilityADLLogByDayAPICall(facilityId, transactionDate) {
         },
         error: function (jqXhr, textStatus, errorThrown) {
             genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    });
+}
+function deleteADDLEntry(control, valToDelete)
+{
+    $("#" + control + " > option").each(function() {
+        if (this.value == valToDelete)
+        {
+            this.remove();
         }
     });
 }

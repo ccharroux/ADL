@@ -160,33 +160,37 @@
                             </div>
                         </div>
                     </div>
-                    <!--Buttons-->
-                    <h3>Owners</h3>
+                    <div id="divOwners" style="display:none">
+                        <!--Buttons-->
+                        <h3>Owners</h3>
 
-                    <!-- start datatable-->
-                    <div class="dataTable-top-margin">
-                        <table id="dt" class="dataTable-border dataTable-headers dataTable-cell-border">
-                            <thead>
-                                <tr>
-                                    <th class="exportColumn">Owner</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
+                        <!-- start datatable-->
+                        <div class="dataTable-top-margin">
+                            <table id="dt" class="dataTable-border dataTable-headers dataTable-cell-border">
+                                <thead>
+                                    <tr>
+                                        <th class="exportColumn">Owner</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
 
-                        </table>
-                    </div>
-                    <!-- end datatable -->
+                            </table>
+                        </div>
+                        <!-- end datatable -->
 
-                    <div class="default-button-section">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div>
-                                    <input value="Add Owner" onclick="addOwner();" class="default-button" type="button" />
+                        <div id="divAddOwner" style="display:none">
+                            <div class="default-button-section">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div>
+                                            <input value="Add Owner" onclick="addOwner();" class="default-button" type="button" />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                            <hr>
                         </div>
                     </div>
-                    <hr>
                     <div class="default-button-section">
                         <div class="row">
                             <div class="col-md-12">
@@ -247,10 +251,20 @@
     {
         buildMainMenu("Admin");
 
+        if (getLocalStorage("currentRole") == cSystemAdminText)
+        {
+            $("#divAddOwner").show();
+        }
+        else
+        {
+            $("#divAddOwner").hide();
+        }
+
         facilityId = (getParameterByName("facilityId") == null ? 0 : getParameterByName("facilityId"));
 
         if (facilityId > 0)
         {
+            $("#divOwners").show();
             setDataTable();
             setTitle("Facility Maintenance");
             getFacility(facilityId);
@@ -258,7 +272,8 @@
             getUserList();
         }
         else
-        {
+        {            
+            $("#divOwners").hide();
             setTitle("New Facility");
         }
 
@@ -599,6 +614,33 @@
     function removeItem(id)
     {
         functionalityNotAvailable();
+    }
+
+
+    function addOwner()
+    {
+        var dialog = bootbox.dialog({
+        title: 'Add an Owner',
+        message: "<p>Would you like to add a new user, or select an existing one to be this Facilities Owner?</p>",
+        size: 'large',
+        buttons: {
+ 
+            new: {
+                label: "New User",
+                className: 'btn-info',
+                callback: function(){
+                    goTo('../../admin/users/item.html?userId=0&addOwner=true&facilityId=' + facilityId);
+                }
+            },
+            existing: {
+                label: "Existing User",
+                className: 'btn-info',
+                callback: function(){
+                    functionalityNotAvailable();
+                }
+            }
+        }
+    });
     }
 
 </script>

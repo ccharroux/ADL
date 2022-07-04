@@ -12,8 +12,6 @@
     <title>ADL System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-
-
     <!-- Facebook and Twitter integration -->
     <meta property="og:title" content="" />
     <meta property="og:image" content="" />
@@ -61,7 +59,7 @@
                 <div class="header-inner" id="menu"></div>
             </div>
         </header>
-
+        <input type="hidden" id="patientAccess" value="true" />
         <div id="fh5co-contact-section" class="contact-section">
             <div class="container">
 
@@ -73,17 +71,6 @@
 
                 <div class="text-center margin-top-0">
 
- 
-
-                     <!--Personnel ID-->
- <!--                   <div id="divuserId" class="row input-row hidden">
-                        <div class="col-md-3 text-align-left">
-                            <label for="txtuserId">Personnel ID</label>
-                        </div>
-                        <div class="col-md-9 text-align-left">
-                            <input type="text" readonly="readonly" class="field-width-325" id="txtuserId" />
-                        </div>
-                    </div> -->
 
                     <!--First Name-->
                     <div class="row input-row">
@@ -216,34 +203,37 @@
                         </div>
                     </div>
 
-                    <!--Buttons-->
-                    <h3>Access</h3>
+                    <div id="divAccess" style="display:none;width:100%">
+                        <!--Buttons-->
+                        <h3>Access</h3>
 
-                    <!-- start datatable-->
-                    <div class="dataTable-top-margin">
-                        <table id="dt" class="dataTable-border dataTable-headers dataTable-cell-border">
-                            <thead>
-                                <tr>
-                                    <th class="exportColumn">Facility</th>
-                                    <th class="exportColumn">Role</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
-                    <!-- end datatable -->
+                        <!-- start datatable-->
+                        <div class="dataTable-top-margin" style="width:100%">
+                            <table  style="width:100%" id="dt" class="dataTable-border dataTable-headers dataTable-cell-border">
+                                <thead>
+                                    <tr>
+                                        <th class="exportColumn">Facility</th>
+                                        <th class="exportColumn">Role</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- end datatable -->
 
-                    <div class="default-button-section">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div>
-                                    <input id="btnAddRole" value="Add Role" onclick="addRole();" class="default-button" type="button" />
+                        <div class="default-button-section">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div>
+                                        <input id="btnAddRole" value="Add Role" onclick="addRole();" class="default-button" type="button" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
+                        <hr>
                     </div>
 
-                    <hr>
                     <div class="default-button-section">
                         <div class="row">
                             <div class="col-md-12">
@@ -337,35 +327,72 @@
     var bDirty = false;
     var accessDialogControl = "AddAccessDialog";
     var bIsThisAPatient = false;
+    var entryUserId = 0;
+    var addOwner = false;
+    var facilityId = 0;
 
     $(document).ready(function ()
     {
-        buildMainMenu("Admin");
-
-        userId = (getParameterByName("userId") == null ? 0 : getParameterByName("userId"));
-
-        if (userId > 0)
-        {
-            setDataTable();
-            setTitle("User Maintenance");
-            getUser(userId);
-            // this is roles
-            getUserAccessList(userId);
-        }
-        else
-        {
-            setTitle("New User");
-        }
-        
-        buildUIDialogs(accessDialogControl, "Add Access", 700, 500);
-
-        getStateList("ddlState");
-        
+                
         // for add dialog
         getRolesList("ddlAccessRole");
         loadFacilities('ddlAccessFacility', true);
 
-        // standard
+        // override All with No Facility
+
+ 
+
+        // data for user screen
+        getStateList("ddlState");
+        // menu
+        buildMainMenu("Admin");
+
+        // hide/show role button
+        if (getLocalStorage("currentRole") == cSystemAdminText || 
+            getLocalStorage("currentRole") == cOwnerText)
+        {
+            $("#btnAddRole").show();
+        }
+        else
+        {
+            $("#btnAddRole").hide();
+        }
+
+        // query string vars
+        addOwner = (getParameterByName("addOwner") == null ? false : Boolean(getParameterByName("addOwner")));
+        userId = (getParameterByName("userId") == null ? 0 : getParameterByName("userId"));
+        facilityId = (getParameterByName("facilityId") == null ? 0 : getParameterByName("facilityId"));
+        entryUserId = userId;
+
+        // setup the data table
+        setDataTable();
+
+        // new vs existing
+        if (userId > 0)
+        {
+            setTitle("User Maintenance");
+            getUser(userId);
+            // this is roles
+            getUserAccessList(userId);
+            $("#divAccess").show();
+        }
+        else
+        {
+            $("#divAccess").hide();
+            if (addOwner == true )
+            {
+                setTitle("New Owner");
+            }
+            else
+            {
+                setTitle("New User");
+            }
+        }
+
+        // ui dialogs
+        buildUIDialogs(accessDialogControl, "Add Access", 700, 500);
+
+        // standard events
         setTimeout(setupEvents, 1000);
 
     });
@@ -374,15 +401,16 @@
     {
  
         $("#addAccessErrorMessage").html('');
-        var index = $('#ddlAccessFacility option:selected').index();
-        if (index <= 0)
+
+        var index = $('#ddlAccessFacility option:selected').val();
+        if (index == "-1|N/A")
         {
             $("#addAccessErrorMessage").html('Please select a Facility');
             return false;
         }
 
-        var index = $('#ddlAccessRole option:selected').index();
-        if (index <= 0)
+        var index = $('#ddlAccessRole option:selected').val();
+        if (index == "0")
         {
             $("#addAccessErrorMessage").html('Please select a Role');
             return false;
@@ -390,8 +418,6 @@
         
         return true;
     }
-
-
 
     function addRoleFinalStep()
     {
@@ -404,20 +430,34 @@
             var facilityId = getFacilityFromControl("ddlAccessFacility");
             var roleId = $("#ddlAccessRole").val();
             insertUserAccess(userId, roleId, facilityId)
-
-    
         }
     }
 
     function addRole()
-    {        
+    {       
+        if (addOwner == true)
+        {
+            deleteADDLEntry("ddlAccessRole", "0");
+            deleteADDLEntry("ddlAccessRole", cSystemAdmin);
+            deleteADDLEntry("ddlAccessRole", cManager);
+            deleteADDLEntry("ddlAccessRole", cCaregiver);
+            deleteADDLEntry("ddlAccessRole", cPatient);
+        }
+        if ($("#patientAccess").val() == "false")
+        {
+            deleteADDLEntry("ddlAccessRole", cPatient);
+        }
+        if (getLocalStorage("currentRole") != cSystemAdminText)
+        {
+            deleteADDLEntry("ddlAccessRole", cSystemAdmin);
+        }
+
         $("#addAccessErrorMessage").html('');
         $("#"+accessDialogControl).dialog("open");           
     }
 
     function setDataTable() 
     {
-    
         $("#btnAddRole").show();
  
         var exportColumns = returnTableColumnsByClass("dt", "exportColumn");
@@ -450,7 +490,11 @@
                             if (row.RoleId == cPatient)
                             {
                                 $("#btnAddRole").hide();
-
+                                $("#patientAccess").val("true");
+                            }
+                            else
+                            {
+                                $("#patientAccess").val("false");
                             }
 
                         return action;
@@ -476,9 +520,30 @@
 
     }
 
-
     function setupEvents()
     {
+        if (addOwner == true)
+        {
+            $("#ddlAccessRole").mousedown(function()
+            {
+                return false;
+            });
+
+            $("#ddlAccessRole").keydown(function()
+            {
+                return false;
+            });
+ 
+            $("#ddlAccessFacility").mousedown(function()
+            {
+                return false;
+            });
+
+            $("#ddlAccessFacility").keydown(function()
+            {
+                return false;
+            });
+        }
         //$(window).on('beforeunload ', function () {
         //    //if (bDirty == true) {
         //    //    bootbox.confirm("You have made changes to this user. Would you like to save them now?", function (result) {
@@ -512,13 +577,15 @@
 
     function getUserAccessList(userId)
     {
+        $("#divAccess").show();
         getUserAccessListAPICall(userId);
     }
     function getUserListSuccess(data)
     {
-            console.log(data);
-            populateDataTable("dt", data);
+        console.log(data);
+        populateDataTable("dt", data);
     }
+
     // update user
     function updateUser()
     {
@@ -651,8 +718,7 @@
             }
                 else 
             {
-                bootbox.alert('User is updated.', function () {  bDirty = false; });
-                
+                userUpdateResponse();
             }
 
         }
@@ -708,10 +774,33 @@
         } 
         else 
         {
-            bootbox.alert('User is updated.', function () {bDirty = false; });
+            userUpdateResponse();
         }
     }   
     
+    function userUpdateResponse()
+    {
+        var message = "User is ";
+            if (entryUserId == 0)
+            {
+                message = message + " Added. Now let's go setup this User's Access.";
+            }
+            else
+            {
+                message = message + " Updated.";
+
+            }
+            bootbox.alert(message, function () 
+            {   
+                bDirty = false;
+                if (entryUserId == 0)
+                {
+                    addRole();
+                    entryUserId = userId;
+                }
+            });
+
+    }
     // get user
     function getUserSuccess(data, textStatus, jQxhr) 
     {
@@ -790,7 +879,17 @@
         else 
         {
             $("#"+accessDialogControl).dialog("close"); 
-            bootbox.alert('Access is added.', function () { getUserAccessList(userId); });
+            bootbox.alert('Access is added.', function () { 
+                if (addOwner == true)
+                {
+                    // send back to facility page
+                    goTo('../../admin/facility/item.html?facilityId=' + facilityId);
+                }
+                else
+                {
+                    getUserAccessList(userId); 
+                }
+            });
         }
     }   
     function updateUserAccess(userId, roleId, facilityId)

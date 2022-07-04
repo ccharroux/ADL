@@ -162,11 +162,14 @@
             return;
         }
         else {
-            setTitle("User Maintenance");
+            
+
+
             setEventListeners();
             setDataTable();
 
             var menuSet = "";
+
             var fromAdmin = (getParameterByName("admin") == null ? false : true);
             if (fromAdmin)
             {
@@ -180,9 +183,22 @@
 
             buildMainMenu(menuSet);
 
-            getRolesList("ddlRoles");
-            loadFacilities('ddlFacilities');
+            var filter = (getParameterByName("patientsOnly") == null ? null : cPatient);
+    
+            if (filter == null)
+            {
+                setTitle("User Maintenance");
+            }
+            else
+            {
+                setTitle("Patient Maintenance");
+            }
 
+            getRolesList("ddlRoles", filter);
+            
+            loadFacilities('ddlFacilities', true);
+            
+            $('#ddlFacilities option[value="-1|N/A"]').text("No Facility Assigned");
             setTimeout(getList, 100);
         }
      });
@@ -384,7 +400,6 @@
 
         window.location = "../../admin/users/item.html?userId=" + id;
     }
-
 
     function deleteItem(id) {
 
