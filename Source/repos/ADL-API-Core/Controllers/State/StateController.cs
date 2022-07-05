@@ -33,6 +33,14 @@ namespace ADLAPICore.Controllers.State
         {
             try
             {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection

@@ -35,6 +35,14 @@ namespace ADLAPICore.Controllers.Patient
         {
             try
             {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection
@@ -61,6 +69,14 @@ namespace ADLAPICore.Controllers.Patient
         {
             try
             {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection
@@ -87,6 +103,14 @@ namespace ADLAPICore.Controllers.Patient
         {
             try
             {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection
@@ -113,6 +137,14 @@ namespace ADLAPICore.Controllers.Patient
         {
             try
             {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection
@@ -139,6 +171,14 @@ namespace ADLAPICore.Controllers.Patient
         {
             try
             {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection
@@ -166,8 +206,14 @@ namespace ADLAPICore.Controllers.Patient
             try
             {
 
-                //var input = rows;
-
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection
@@ -194,6 +240,14 @@ namespace ADLAPICore.Controllers.Patient
         {
             try
             {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection
@@ -221,8 +275,14 @@ namespace ADLAPICore.Controllers.Patient
             try
             {
 
-                //var input = rows;
-
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection

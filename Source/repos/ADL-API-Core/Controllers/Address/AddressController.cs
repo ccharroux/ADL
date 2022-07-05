@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Net.Mime;
+using ADLAPICore.Models.General;
 
 namespace ADLAPICore.Controllers.Address
 {
@@ -31,7 +32,14 @@ namespace ADLAPICore.Controllers.Address
         {
             try
             {
-
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
                 //----------------------------------
                 // Clean inputs using reflection
                 //----------------------------------
@@ -57,7 +65,14 @@ namespace ADLAPICore.Controllers.Address
         {
             try
             {
-
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
                 //----------------------------------
                 // Clean inputs using reflection
                 //----------------------------------
@@ -83,7 +98,14 @@ namespace ADLAPICore.Controllers.Address
         {
             try
             {
-
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
                 //----------------------------------
                 // Clean inputs using reflection
                 //----------------------------------

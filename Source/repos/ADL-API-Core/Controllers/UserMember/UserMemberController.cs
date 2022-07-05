@@ -1,6 +1,7 @@
 ﻿using ADLAPICore.Library.Base;
 using ADLAPICore.Library.UserMember;
 using ADLAPICore.Library.utilities;
+using ADLAPICore.Models.General;
 using ADLAPICore.Models.UserMember;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -31,6 +32,14 @@ namespace ADLAPICore.Controllers.UserMember
         {
             try
             {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection
@@ -57,6 +66,14 @@ namespace ADLAPICore.Controllers.UserMember
         {
             try
             {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection
@@ -83,6 +100,14 @@ namespace ADLAPICore.Controllers.UserMember
         {
             try
             {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection
@@ -109,6 +134,14 @@ namespace ADLAPICore.Controllers.UserMember
         {
             try
             {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection
@@ -135,6 +168,14 @@ namespace ADLAPICore.Controllers.UserMember
         {
             try
             {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection
@@ -161,6 +202,14 @@ namespace ADLAPICore.Controllers.UserMember
         {
             try
             {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection
@@ -187,6 +236,14 @@ namespace ADLAPICore.Controllers.UserMember
         {
             try
             {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection
@@ -213,6 +270,14 @@ namespace ADLAPICore.Controllers.UserMember
         {
             try
             {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection
@@ -239,6 +304,14 @@ namespace ADLAPICore.Controllers.UserMember
         {
             try
             {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection
@@ -265,6 +338,14 @@ namespace ADLAPICore.Controllers.UserMember
         {
             try
             {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
 
                 //----------------------------------
                 // Clean inputs using reflection
