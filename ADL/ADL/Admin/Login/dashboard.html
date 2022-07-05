@@ -174,17 +174,29 @@
         setDataTable();
         buildMainMenu("");
         buildDashboard();
- 
         
     });
+
+    function patientCare(id)
+    {
+        window.location = '../../admin/adl%20care/list.html?patientId=' + id;
+
+    }
+    function patientMaintenance(id)
+    {
+        window.location = '../../admin/users/item.html?userId=' + id;
+    }
+
+    function patientScheduling(id)
+    {
+        window.location = '../../admin/patient%20scheduling/list.html?patientId=' + id;
+    }
 
     function setDataTable() 
     {
     
         var reportTitle = "Patient Care";
         var exportColumns = returnTableColumnsByClass("dt", "exportColumn");
-
-
 
         $("#dt").DataTable({
             "dom": "Blfrtip",
@@ -228,7 +240,7 @@
                         var action = '';
                             action = action + "<a href='#' onclick='patientCare(" + row.PatientId + ");'>Patient Care</a><br>";
                             action = action + "<a href='#' onclick='patientScheduling(" + row.PatientId + ");'>Patient Schedule</a><br>";
-                            action = action + "<a href='#' onclick='patienceMaintenance(" + row.PatientId + ");'>Patient Maintenance</a>";
+                            action = action + "<a href='#' onclick='patientMaintenance(" + row.PatientId + ");'>Patient Maintenance</a>";
 
                         return action;
                     },
@@ -308,7 +320,7 @@
         
         if (data.response.status != "SUCCESS") 
         {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
+            ADLErrorMessage(data.response.errorMessage[0]);
         } 
         else 
         {        
@@ -327,10 +339,16 @@
 
     function getFacilityADLLogByDaySuccess(data, textStatus, jQxhr)
     {
-        console.log(data);
- 
-        populateDataTable("dt", data);
- 
+        console.log(data);        
+        
+        if (data.response.status != "SUCCESS") 
+        {
+            ADLErrorMessage(data.response.errorMessage[0]);
+        } 
+        else 
+        {        
+             populateDataTable("dt", data);
+        }
     }
 
     function drawSegmentLabel(canvas, context, i) {

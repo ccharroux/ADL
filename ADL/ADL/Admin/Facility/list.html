@@ -75,40 +75,39 @@
 
                 <!-- search / filter area -->
                 <div class="row search-section">
-                    <div class="col-md-10">
- <!--                        <label for="ddlProduct" class="dropdown-label">Product</label>
-                        <select id="ddlProduct" class="search-ddl-select dropdown-select report-filter" onchange="getNewsList();"></select>
-                    </div>
-                    <div class="col-md-5">
-                        <label for="chkIncludeDeleted" class="dropdown-label">Include Deleted&nbsp;</label>
-                        <input type="checkbox" id="chkIncludeDeleted" class="report-filter" onchange="getNewsList();" />
- -->                    </div>
+                    <div class="col-md-10"></div>
                     <div class="col-md-2">
                         <input id="btnAddFacility" type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="addItem();" />
                     </div>
                 </div>
+                <!-- search / filter area -->
+                <div class="row search-section">
+                    <div class="col-md-6">
+                        <!-- start datatable-->
+                        <div class="dataTable-top-margin">
+                            <table id="dt" class="dataTable-border dataTable-headers dataTable-cell-border">
+                                <thead>
+                                    <tr>
+                                        <th class="exportColumn">Facility</th>
+                                        <th class="exportColumn">Address</th>
+                                        <th class="exportColumn">City/State</th>
+                                        <th class="exportColumn">Owner</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
 
-                <!-- start datatable-->
-                <div class="dataTable-top-margin">
-                    <table id="dt" class="dataTable-border dataTable-headers dataTable-cell-border">
-                        <thead>
-                            <tr>
-                                <th class="exportColumn">Facility</th>
-                                <th class="exportColumn">Address</th>
-                                <th class="exportColumn">City/State</th>
-                                <th class="exportColumn">Owner</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-
-                    </table>
+                            </table>
+                        </div>
+                        <!-- end datatable -->
+                        <div class="col-md-2">
+                            &nbsp;
+                        </div>
+                    </div>
                 </div>
-                <!-- end datatable -->
             </div>
+            <!--<div id="map" data-animate-effect="fadeIn"></div>-->
         </div>
-        <!--<div id="map" data-animate-effect="fadeIn"></div>-->
     </div>
-
     <!-- jQuery -->
     <script src="../../js/jquery.min.js"></script>
     <!-- jQuery Easing -->
@@ -355,46 +354,7 @@
         //getNewsList();
     }
 
-    function getProductList() {
-        $.ajax({
- //           url: ServicePrefix + '/api/Product/GetProductList',
-            url: testURL,
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-/*             data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
- */            data: JSON.stringify(testURLData),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getProductListSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function getProductListSuccess(data, textStatus, jQxhr) {
-
-/*         if (data.response.status != "SUCCESS") {
-            GeneralErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
- */
-        var str = '<option value="">-- All Products --</option>';
-        $.each(data.report.rows, function (index) {
-            var obj = data.report.rows[index];
-            var productId = obj.P_ProductID.toUpperCase();
-            str += '<option value="' + productId + '">' + obj.P_ProductName + '</option>';
-        });
-        str += '<option value="DEL">DEL (hidden on public web site)</option>';
-        str += '<option value="UPD">UPD (hidden on public web site)</option>';
-        $("#ddlProduct").html(str);
-
-        getNewsList();
-    }
+  
 
     function getList() {
 
@@ -442,111 +402,8 @@
 
         functionalityNotAvailable();
         return;
-
-        $.ajax({
-            url: ServicePrefix + '/api/News/UpdateNewsSoftDelete',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inNewsKey": id
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                deleteItemSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        });
+ 
     }
     
-    function deleteItemSuccess(data, textStatus, jQxhr) {
-
-        // not used here
-
-    function approve(NewsKey) {
-        bootbox.confirm("Are you sure you want to approve this news article?", function (result) {
-            if (result == true) {
-                approveNewsConfirmed(NewsKey);
-            }
-        });
-    }
-    function approveNewsConfirmed(NewsKey) {
-        $.ajax({
-            url: ServicePrefix + '/api/News/UpdateNewsApprove',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inNewsKey": NewsKey
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                approveNewsSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function approveNewsSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            GeneralErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        bootbox.alert('News article approved.');
-        getNewsList();
-    }
-
-    function unapproveNews(NewsKey) {
-        bootbox.confirm("Are you sure you want to unapprove this news article?", function (result) {
-            if (result == true) {
-                unapproveNewsConfirmed(NewsKey);
-            }
-        });
-    }
-
-    function unapproveNewsConfirmed(NewsKey) {
-        $.ajax({
-            url: ServicePrefix + '/api/News/UpdateNewsUnapprove',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inNewsKey": NewsKey
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                unapproveNewsSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function unapproveNewsSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            GeneralErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        bootbox.alert('News article unapproved.');
-        getNewsList();
-    }
-
-        if (data.response.status != "SUCCESS") {
-            GeneralErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        bootbox.alert('not approved.');
-        getList();
-    }
+ 
 </script>

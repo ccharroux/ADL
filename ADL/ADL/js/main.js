@@ -1336,9 +1336,24 @@ function goBackToDashboard() {
     // Fall thru
     window.location = "/admin/login/dashboard.html";
 }
+function ADLErrorMessage(message)
+{
+    bootbox.alert('Process Failed.\n\r\n\r' + message, function () {
+
+        if(message.toLowerCase().indexOf("token failed") > -1 )
+        {
+            goTo("../../admin/login/login.html");
+        }
+
+     });
+}
 
 function GeneralErrorMessageRtn(message, preCallback, postCallback) {
+    
+    ADLErrorMessage(message);
+    return;
 
+    
     var newMessage = "";
 
     var AJAXErrorURL = window.localStorage.getItem("AJAXErrorURL");
@@ -4194,4 +4209,22 @@ function deleteADDLEntry(control, valToDelete)
             this.remove();
         }
     });
+}
+function findFacilityByFacilityId(control, val)
+{
+    var valToReturn = "";
+
+    $("#" + control + " > option").each(function() 
+    {
+        
+        var arr = this.value.split('|');
+        
+        if (arr[0] == val)
+        {
+            valToReturn = this.value;
+        }
+    });
+
+    return valToReturn;
+
 }

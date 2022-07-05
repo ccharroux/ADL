@@ -154,6 +154,8 @@
 </html>
 <script>
 
+    var assignFacilityId = 0;
+
 
     $(document).ready(function () {
 
@@ -163,13 +165,17 @@
         }
         else {
             
-
-
+            // assignment from facility page
+            assignFacilityId = (getParameterByName("assignFacilityId") == null ? 0 : getParameterByName("assignFacilityId"));
+ 
+            // setup events
             setEventListeners();
+
+            // table prework
             setDataTable();
 
+            // user correct menu
             var menuSet = "";
-
             var fromAdmin = (getParameterByName("admin") == null ? false : true);
             if (fromAdmin)
             {
@@ -178,14 +184,19 @@
             else
             {
                 menuSet = "ADL";
-
             }
 
+            // build menu
             buildMainMenu(menuSet);
 
+            // filter
             var filter = (getParameterByName("patientsOnly") == null ? null : cPatient);
-    
-            if (filter == null)
+
+            if (assignFacilityId > 0)
+            {
+                setTitle("Add Owner");
+            }
+            else if (filter == null)
             {
                 setTitle("User Maintenance");
             }
@@ -193,15 +204,30 @@
             {
                 setTitle("Patient Maintenance");
             }
-
+            // load roles
             getRolesList("ddlRoles", filter);
-            
+ 
+            // load facilities
             loadFacilities('ddlFacilities', true);
             
-            $('#ddlFacilities option[value="-1|N/A"]').text("No Facility Assigned");
-            setTimeout(getList, 100);
+            // get the data
+            setTimeout(getList, 500);
         }
      });
+
+     $(document).ajaxStop(function () 
+     {       
+
+
+            // relabel not assigns 
+            $('#ddlFacilities option[value="-1|N/A"]').text("No Facility Assigned");
+
+            // can't assign a patient
+            if (assignFacilityId > 0)
+            {
+                 deleteADDLEntry("ddlRoles", cPatient);
+            }
+    });
 
     function setEventListeners() {
         //var input = document.getElementById("searchTextNumber");
@@ -259,40 +285,6 @@
                     "data": 'Facility',
                     "className": "text-align-left"
                 },
-/*                 {
-                    mRender: function (data, type, row) {
-
-                        var action = '';
-                        
-                        if (row["ProductID"] == 'DEL')
-                        {
-                            action = action + '<font color="red">';
-
-                        }
-                        
-                        action = action + row["ProductID"];
-
-                        if (row["ProductID"] == 'DEL')
-                        {
-                            action = action + '</font>';
-                        }
-
-                        return action;
-                    },
-                    "orderable": true,
-                    "searchable": true,
-                    "className": "text-align-center"
-                },
-                { "data": 'NewsTitle' },
-                {
-                    "data": 'NewsDateTime',
-                    "className": "text-align-center"
-                },
-                { "data": 'NewsText', "render": $.fn.dataTable.render.ellipsis(200, true, false) },
-                {
-                    "data": 'Creator',
-                    "className": "text-align-center"
-                }, */
                 {
                     mRender: function (data, type, row) {
 
@@ -300,19 +292,9 @@
 
                             action = action + "<a href='#' onclick='editItem(" + row.UserId + ");'>Edit</a><br>";
                             action = action + "<a href='#' onclick='deleteItem(" + row.UserId + ");'>Delete</a>";
+                            action = action + "<hr style='margin-top:2px;margin-bottom:2px'>";
+                            action = action + "<a href='#' onclick='assignItem(" + row.UserId + ");'>Assign</a>";
 
-                        
-/*                             if (row["IsPublic"].toUpperCase() == "YES")
-                            {
-                                action = action + " <a href='#' onclick='unapproveNews(" + row.NewsKey + ");'>Unapprove</a><br>";
-                            }
-                            else
-                            {
-                                action = action + " <a href='#' onclick='approveNews(" + row.NewsKey + ");'>Approve</a><br>";
-                            }
-                        
-                            action = action + " <a href='#' onclick='deleteNews(" + row.NewsKey + ");'>Delete</a><br>"; */
- 
                         return action;
                     },
                     "orderable": false,
@@ -380,6 +362,23 @@
 
     }
 
+    function assignItem(id)
+    {
+        var url = "../../admin/users/item.html?userId=" + id;
+
+        // normal assignment
+        if (assignFacilityId==0)
+        {
+            url = url + "&assign=true";
+        }
+        else // force owner + facility
+        {
+            url = url + "&assign=true&addowner=true&facilityid=" + assignFacilityId;
+        }
+        
+        window.location =  url;
+        
+    }
     function getList() {
 
         setCurrentFacility();
@@ -387,8 +386,15 @@
    
     }
     function getUserListSuccess(data)
-    {
-        populateDataTable("dt", data);
+    {  
+        if (data.response.status != "SUCCESS") 
+        {
+            ADLErrorMessage(data.response.errorMessage[0]);
+        } 
+        else 
+        {
+            populateDataTable("dt", data);
+        }
     }
 
     // functional area
@@ -401,171 +407,8 @@
         window.location = "../../admin/users/item.html?userId=" + id;
     }
 
-    function deleteItem(id) {
-
-        bootbox.confirm("Are you sure you want to delete this User?", function (result) {
-            if (result == true) {
-                deleteItemConfirmed(id);
-             }
-        });
-    }
-
-    function deleteItemConfirmed(id) {
-
-        functionalityNotAvailable();
-        return;
-
-        $.ajax({
-            url: ServicePrefix + '/api/News/UpdateNewsSoftDelete',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inNewsKey": id
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                deleteItemSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        });
-    }
     
-    function deleteItemSuccess(data, textStatus, jQxhr) {
+    
 
-        // not used here
-
-    function approve(NewsKey) {
-        bootbox.confirm("Are you sure you want to approve this news article?", function (result) {
-            if (result == true) {
-                approveNewsConfirmed(NewsKey);
-            }
-        });
-    }
-    function approveNewsConfirmed(NewsKey) {
-        $.ajax({
-            url: ServicePrefix + '/api/News/UpdateNewsApprove',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inNewsKey": NewsKey
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                approveNewsSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function approveNewsSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            GeneralErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        bootbox.alert('News article approved.');
-        getNewsList();
-    }
-
-    function unapproveNews(NewsKey) {
-        bootbox.confirm("Are you sure you want to unapprove this news article?", function (result) {
-            if (result == true) {
-                unapproveNewsConfirmed(NewsKey);
-            }
-        });
-    }
-
-    function unapproveNewsConfirmed(NewsKey) {
-        $.ajax({
-            url: ServicePrefix + '/api/News/UpdateNewsUnapprove',
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken"),
-                "inNewsKey": NewsKey
-            }),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                unapproveNewsSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function unapproveNewsSuccess(data, textStatus, jQxhr) {
-        if (data.response.status != "SUCCESS") {
-            GeneralErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        bootbox.alert('News article unapproved.');
-        getNewsList();
-    }
-
-        if (data.response.status != "SUCCESS") {
-            GeneralErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
-
-        bootbox.alert('not approved.');
-        getList();
-    }
-
-    function loadSearchResults() {
-        //loadReportParameters();
-        //getNewsList();
-    }
-
-    function getProductList() {
-        $.ajax({
- //           url: ServicePrefix + '/api/Product/GetProductList',
-            url: testURL,
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-/*             data: JSON.stringify({
-                "inApiToken": getLocalStorage("APIToken")
-            }),
- */            data: JSON.stringify(testURLData),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                getProductListSuccess(data, textStatus, jQxhr);
-            },
-            error: function (jQxhr, textStatus, errorThrown) {
-                genericAjaxError(jQxhr, textStatus, errorThrown);
-            }
-        });
-    }
-
-    function getProductListSuccess(data, textStatus, jQxhr) {
-
-/*         if (data.response.status != "SUCCESS") {
-            GeneralErrorMessageRtn(data.response.errorMessage[0]);
-            return;
-        }
- */
-        var str = '<option value="">-- All Products --</option>';
-        $.each(data.report.rows, function (index) {
-            var obj = data.report.rows[index];
-            var productId = obj.P_ProductID.toUpperCase();
-            str += '<option value="' + productId + '">' + obj.P_ProductName + '</option>';
-        });
-        str += '<option value="DEL">DEL (hidden on public web site)</option>';
-        str += '<option value="UPD">UPD (hidden on public web site)</option>';
-        $("#ddlProduct").html(str);
-
-        getNewsList();
-    }
 
 </script>

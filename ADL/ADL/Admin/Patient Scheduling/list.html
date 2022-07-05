@@ -197,7 +197,7 @@
 <script>
 
     var systemALS = new Object();
-
+    var patientId = 0;
 
     $(document).ready(function () {
 
@@ -206,6 +206,8 @@
             return;
         }
         else {     
+
+            patientId = (getParameterByName("patientId") == null ? 0 : getParameterByName("patientId"));
 
             getListSystemADLS();       
             buildUIDialogs();
@@ -221,10 +223,18 @@
             setDateControl();
             buildMainMenu("Admin");
 
+            if (patientId > 0)
+            {
+                setTimeout(selectPatient, 1000);
+            }
 
         }
      });
 
+     function selectPatient(id)
+     {
+        $("#ddlPatients").val(patientId);
+     }
     function getPatientADLS()
     {
 
@@ -665,12 +675,11 @@
     }
     function deleteItemSuccess(data, textStatus, jQxhr) {
 
-        if (data.response.status != "SUCCESS") 
-        {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
+        if (data.response.status != "SUCCESS") {
+            ADLErrorMessage(data.response.errorMessage[0]);
         } 
         else 
-        {            
+        {          
             bootbox.alert('ADL Removed', function () { });
             getPatientADLS();
          }

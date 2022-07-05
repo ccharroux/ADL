@@ -330,6 +330,7 @@
     var entryUserId = 0;
     var addOwner = false;
     var facilityId = 0;
+    var assign = false;
 
     $(document).ready(function ()
     {
@@ -337,10 +338,6 @@
         // for add dialog
         getRolesList("ddlAccessRole");
         loadFacilities('ddlAccessFacility', true);
-
-        // override All with No Facility
-
- 
 
         // data for user screen
         getStateList("ddlState");
@@ -359,6 +356,7 @@
         }
 
         // query string vars
+        assign = (getParameterByName("assign") == null ? false : Boolean(getParameterByName("assign")));
         addOwner = (getParameterByName("addOwner") == null ? false : Boolean(getParameterByName("addOwner")));
         userId = (getParameterByName("userId") == null ? 0 : getParameterByName("userId"));
         facilityId = (getParameterByName("facilityId") == null ? 0 : getParameterByName("facilityId"));
@@ -392,9 +390,16 @@
         // ui dialogs
         buildUIDialogs(accessDialogControl, "Add Access", 700, 500);
 
-        // standard events
-        setTimeout(setupEvents, 1000);
+    });
 
+    $(document).ajaxStop(function ()
+    {
+        if (assign == true)
+        {
+            addRole();
+        }
+        // standard events
+        setupEvents();
     });
 
     function validatedAddRole()
@@ -435,6 +440,12 @@
 
     function addRole()
     {       
+        if (facilityId != 0)
+        {
+            var valueToUse = findFacilityByFacilityId("ddlAccessFacility", facilityId);
+            $("#ddlAccessFacility").val(valueToUse);
+        }
+
         if (addOwner == true)
         {
             deleteADDLEntry("ddlAccessRole", "0");
@@ -582,8 +593,13 @@
     }
     function getUserListSuccess(data)
     {
-        console.log(data);
-        populateDataTable("dt", data);
+        if (data.response.status != "SUCCESS") {
+            ADLErrorMessage(data.response.errorMessage[0]);
+        } 
+        else 
+        {
+            populateDataTable("dt", data);
+        }
     }
 
     // update user
@@ -653,12 +669,11 @@
 
     function updateUserSuccess(data, textStatus, jQxhr) 
     {
-        if (data.response.status != "SUCCESS") 
-        {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
+        if (data.response.status != "SUCCESS") {
+            ADLErrorMessage(data.response.errorMessage[0]);
         } 
         else 
-        {            
+        {           
             userId = data.ReturnCode;
             updateAddress(addressId);
          }
@@ -702,9 +717,8 @@
 
     function updateAddressSuccess(data, textStatus, jQxhr) 
     {
-        if (data.response.status != "SUCCESS") 
-        {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
+        if (data.response.status != "SUCCESS") {
+            ADLErrorMessage(data.response.errorMessage[0]);
         } 
         else 
         {
@@ -768,9 +782,8 @@
     }
     function insertUserAddressAssociationSuccess(data, textStatus, jQxhr) 
     {
-        if (data.response.status != "SUCCESS") 
-        {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
+        if (data.response.status != "SUCCESS") {
+            ADLErrorMessage(data.response.errorMessage[0]);
         } 
         else 
         {
@@ -827,7 +840,7 @@
     function getUserAddressSuccess(data, textStatus, jQxhr)
     {
         if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () {});
+            ADLErrorMessage(data.response.errorMessage[0]);
         } 
         else 
         {
@@ -843,7 +856,7 @@
     function getAddressSuccess(data, textStatus, jQxhr)
     {
         if (data.response.status != "SUCCESS") {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () {});
+            ADLErrorMessage(data.response.errorMessage[0]);
         } 
         else 
         {
@@ -872,9 +885,8 @@
 
     function insertUserAccessSuccess(data, textStatus, jQxhr) 
     {
-        if (data.response.status != "SUCCESS") 
-        {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
+        if (data.response.status != "SUCCESS") {
+            ADLErrorMessage(data.response.errorMessage[0]);
         } 
         else 
         {
@@ -915,9 +927,8 @@
 
     function updateUserAccessSuccess(data, textStatus, jQxhr) 
     {
-        if (data.response.status != "SUCCESS") 
-        {
-            bootbox.alert('Process Failed.\n\r\n\r' + data.response.errorMessage[0], function () { });
+        if (data.response.status != "SUCCESS") {
+            ADLErrorMessage(data.response.errorMessage[0]);
         } 
         else 
         {
