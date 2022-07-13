@@ -93,10 +93,18 @@ namespace ADLAPICore.Library.Password
                     result.response = dbResult.response;
                     return result;
                 }
-
+                var resetToken = "";
                 foreach (DataRow row in dbResult.dt.Rows)
                 {
+                    resetToken = row["resetToken"].ToString();
                     result.ReturnCode = Convert.ToInt32(row["returncode"]);
+                }
+
+                result.response = SendResetRequestEmail(resetToken);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
                 }
 
                 // now the result
@@ -160,6 +168,13 @@ namespace ADLAPICore.Library.Password
                 foreach (DataRow row in dbResult.dt.Rows)
                 {
                     result.ReturnCode = Convert.ToInt32(row["returncode"]);
+                }
+
+                result.response = SendPasswordUpdateConfirmationEmail(input.inPasswordResetToken)
+                
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
                 }
 
                 // now the result
@@ -259,6 +274,38 @@ namespace ADLAPICore.Library.Password
             }
         }
 
+        private ResponseModel SendResetRequestEmail(string inRequestToken)
+        {
+            ResponseModel result = new ResponseModel();
+
+            // call proc to get results
+
+            // load class
+
+            // get email from config?
+            // replace token / url
+
+            Email e = new Email();
+            //e.SendEmail();
+
+            return result;
+        }
+
+        private ResponseModel SendPasswordUpdateConfirmationEmail(string inRequestToken)
+        {
+            ResponseModel result = new ResponseModel();
+
+            // call proc to get results
+
+            // load class
+
+            // get email from config?
+
+            Email e = new Email();
+            //e.SendEmail();
+
+            return result;
+        }
     }
 
 }

@@ -30,7 +30,6 @@ namespace ADLAPICore.Library.Password
 
                 MySqlParameter param = new MySqlParameter("inemailaddress", input.inEmailAddress);
                 dbClass.dbCmd.Parameters.Add(param);
-
  
                 result = dbClass.getDBResults();
 
