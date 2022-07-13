@@ -16,7 +16,7 @@ namespace ADLAPICore.Library.Address
         public DBResult AddressGetDBCall(AddressGetInput input);
     }
 
-    class AddressDBClass : IAddressDBClass
+    class PasswordDBClass : IAddressDBClass
     {
         public DBResult AddressInsertDBCall(AddressInsertInput input)
         {

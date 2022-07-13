@@ -56,12 +56,11 @@ namespace ADLAPICore.Library.Login
                 loginResultRow resultRow = new loginResultRow();
                 FacilityAccess fa = new FacilityAccess();
 
-
                 try
                 {
                     var ePassword = AesEncryption.Encrypt(input.inPassword);
                     // temp here    
-                    ePassword = input.inPassword;
+                    //ePassword = input.inPassword;
 
                     loginResult.response = Validate(input.inEmailAddress, input.inPassword);
 

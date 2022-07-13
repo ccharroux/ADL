@@ -12,6 +12,7 @@ using ADLAPICore.Library.UserMember;
 using ADLAPICore.Library.ADL;
 using ADLAPICore.Library.Role;
 using ADLAPICore.Library.Address;
+using ADLAPICore.Library.Password;
 
 namespace ADLAPICore
 {
@@ -38,9 +39,10 @@ namespace ADLAPICore
             services.AddTransient<IRoleClass, RoleClass>();
             services.AddTransient<IStateClass, StateClass>();
             services.AddTransient<IUserMemberClass, UserMemberClass>();
+            services.AddTransient<IPasswordClass, PasswordClass>();
 
-             // Cors
-             services.AddCors(options =>
+            // Cors
+            services.AddCors(options =>
             {
                 options.AddPolicy(
                   "CorsPolicy",

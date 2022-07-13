@@ -63,7 +63,7 @@ namespace ADLAPICore.Library.Address
                     return result;
                 }
 
-                AddressDBClass lDB = new AddressDBClass();
+                PasswordDBClass lDB = new PasswordDBClass();
 
                 var dbResult = lDB.AddressInsertDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -157,7 +157,7 @@ namespace ADLAPICore.Library.Address
                     return result;
                 }
 
-                AddressDBClass lDB = new AddressDBClass();
+                PasswordDBClass lDB = new PasswordDBClass();
 
                 var dbResult = lDB.AddressUpdateDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -255,7 +255,7 @@ namespace ADLAPICore.Library.Address
                     return result;
                 }
 
-                AddressDBClass lDB = new AddressDBClass();
+                PasswordDBClass lDB = new PasswordDBClass();
 
                 var dbResult = lDB.AddressGetDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)

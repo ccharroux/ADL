@@ -5,51 +5,62 @@ using System.Data;
 using ADLAPICore.Models.General;
 using ADLAPICore.Models.Address;
 using ADLAPICore.Library.utilities;
+using ADLAPICore.Models.Password;
 
-namespace ADLAPICore.Library.Address
+namespace ADLAPICore.Library.Password
 {
 
-    interface IAddressDBClass
+    interface IPasswordDBClass
     {
-        public DBResult AddressInsertDBCall(AddressInsertInput input);
-        public DBResult AddressUpdateDBCall(AddressUpdateInput input);
-        public DBResult AddressGetDBCall(AddressGetInput input);
+        public DBResult PasswordRequestInsertDBCall(PasswordRequestInsertInput input);
+        public DBResult PasswordUpdateDBCall(PasswordUpdateInput input);
+        public DBResult PasswordResetTokenGetDBCall(PasswordResetTokenGetInput input);
     }
 
-    class AddressDBClass : IAddressDBClass
+    class PasswordDBClass : IPasswordDBClass
     {
-        public DBResult AddressInsertDBCall(AddressInsertInput input)
+        public DBResult PasswordRequestInsertDBCall(PasswordRequestInsertInput input)
         {
             DBClass dbClass = new DBClass();
             var result = new DBResult();
             try
             {
-                dbClass.dbCmd = new MySqlCommand("insertAddress", dbClass.dbConn);
+                dbClass.dbCmd = new MySqlCommand("insertResetToken", dbClass.dbConn);
                 dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
-                MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
+                MySqlParameter param = new MySqlParameter("inemailaddress", input.inEmailAddress);
                 dbClass.dbCmd.Parameters.Add(param);
 
-                param = new MySqlParameter("inAddress1", input.inAddress1);
+ 
+                result = dbClass.getDBResults();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new DBResult { dt = new DataTable(), response = result.response };
+            }
+
+        }
+        public DBResult PasswordUpdateDBCall(PasswordUpdateInput input)
+        {
+            var result = new DBResult();
+            DBClass dbClass = new DBClass();
+            try
+            {
+
+                var password = AesEncryption.Encrypt(input.inPassword);
+
+                dbClass.dbCmd = new MySqlCommand("updateLoginPassword", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
+
+                MySqlParameter param = new MySqlParameter("inresettoken", password) ;
                 dbClass.dbCmd.Parameters.Add(param);
-                
-                param = new MySqlParameter("inAddress2", input.inAddress2);
+
+                param = new MySqlParameter("inpassword", input.inPassword);
                 dbClass.dbCmd.Parameters.Add(param);
-                
-                param = new MySqlParameter("inCity", input.inCity);
-                dbClass.dbCmd.Parameters.Add(param);
-                
-                param = new MySqlParameter("inStateId", input.inStateId);
-                dbClass.dbCmd.Parameters.Add(param);
-                
-                param = new MySqlParameter("inCountryId", input.inCountryId);
-                dbClass.dbCmd.Parameters.Add(param);
-                
-                param = new MySqlParameter("inZipCode", input.inZipCode);
-                dbClass.dbCmd.Parameters.Add(param);
-                
-                //param = new MySqlParameter("inPhone", input.inPhone);
-                //dbClass.dbCmd.Parameters.Add(param);
 
                 result = dbClass.getDBResults();
 
@@ -63,68 +74,16 @@ namespace ADLAPICore.Library.Address
             }
 
         }
-        public DBResult AddressUpdateDBCall(AddressUpdateInput input)
-        {
-            var result = new DBResult();
-            DBClass dbClass = new DBClass();
-            try
-            {
-
-                dbClass.dbCmd = new MySqlCommand("updateAddress", dbClass.dbConn);
-                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
-
-                MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                dbClass.dbCmd.Parameters.Add(param);
-
-                param = new MySqlParameter("inAddressId", input.inAddressId);
-                dbClass.dbCmd.Parameters.Add(param);
-
-                param = new MySqlParameter("inAddress1", input.inAddress1);
-                dbClass.dbCmd.Parameters.Add(param);
-
-                param = new MySqlParameter("inAddress2", input.inAddress2);
-                dbClass.dbCmd.Parameters.Add(param);
-
-                param = new MySqlParameter("inCity", input.inCity);
-                dbClass.dbCmd.Parameters.Add(param);
-
-                param = new MySqlParameter("inStateId", input.inStateId);
-                dbClass.dbCmd.Parameters.Add(param);
-
-                param = new MySqlParameter("inCountryId", input.inCountryId);
-                dbClass.dbCmd.Parameters.Add(param);
-
-                param = new MySqlParameter("inZipCode", input.inZipCode);
-                dbClass.dbCmd.Parameters.Add(param);
-
-                //param = new MySqlParameter("inPhone", input.inPhone);
-                //dbClass.dbCmd.Parameters.Add(param);
-
-                result = dbClass.getDBResults();
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                result.response = General.buildError(ex.Message);
-
-                return new DBResult { dt = new DataTable(), response = result.response };
-            }
-
-        }
-        public DBResult AddressGetDBCall(AddressGetInput input)
+        public DBResult PasswordResetTokenGetDBCall(PasswordResetTokenGetInput input)
         {
             DBClass dbClass = new DBClass();
             var result = new DBResult();
             try
             {
-                dbClass.dbCmd = new MySqlCommand("getAddressByAddressId", dbClass.dbConn);
+                dbClass.dbCmd = new MySqlCommand("hasResetTokenExpired", dbClass.dbConn);
                 dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
-                MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
-                dbClass.dbCmd.Parameters.Add(param);
-
-                param = new MySqlParameter("inAddressid", input.inAddressId);
+                MySqlParameter param = new MySqlParameter("inapitoken", input.inPasswordResetToken);
                 dbClass.dbCmd.Parameters.Add(param);
 
                 result = dbClass.getDBResults();

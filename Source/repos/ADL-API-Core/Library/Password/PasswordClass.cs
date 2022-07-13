@@ -4,26 +4,38 @@ using System.Data;
 using ADLAPICore.Models.General;
 using ADLAPICore.Library.utilities;
 using ADLAPICore.Models.Address;
+using ADLAPICore.Models.Password;
 
-namespace ADLAPICore.Library.Address
+namespace ADLAPICore.Library.Password
 {
 
-    public class AddressDetailRow
-    {
-        public ResponseModel response = new ResponseModel();
-        public AddressRecord addressRecord { get; set; }
-    }
+    //public class AddressDetailRow
+    //{
+    //    public ResponseModel response = new ResponseModel();
+    //    public AddressRecord addressRecord { get; set; }
+    //}
 
-    public class AddressInsertResult
+    public class PasswordRequestInsertResult
     {
         public ResponseModel response = new ResponseModel();
         public int ReturnCode { get; set; }
 
-        public AddressInsertResult()
+        public PasswordRequestInsertResult()
         {
             this.response = General.buildError("Unexpected error");
         }
     }
+    public class PasswordResetTokenGetResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public int ReturnCode { get; set; }
+
+        public PasswordResetTokenGetResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
+
     public class AddressUpdateResult
     {
         public ResponseModel response = new ResponseModel();
@@ -34,24 +46,34 @@ namespace ADLAPICore.Library.Address
             this.response = General.buildError("Unexpected error");
         }
     }
-
-    public interface IAddressClass
+    public class PasswordUpdateResult
     {
-        public AddressInsertResult InsertAddress(AddressInsertInput input);
-        public AddressUpdateResult UpdateAddress(AddressUpdateInput input);
-        public AddressDetailRow GetAddress(AddressGetInput input);
+        public ResponseModel response = new ResponseModel();
+        public int ReturnCode { get; set; }
+
+        public PasswordUpdateResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
     }
 
-    public class AddressClass : IAddressClass
+    public interface IPasswordClass
+    {
+        public PasswordRequestInsertResult InsertPasswordRequest(PasswordRequestInsertInput input);
+        public PasswordUpdateResult UpdatePassword(PasswordUpdateInput input);
+        public PasswordResetTokenGetResult GetPasswordResetToken(PasswordResetTokenGetInput input);
+    }
+
+    public class PasswordClass : IPasswordClass
     {
             
-        public AddressClass()
+        public PasswordClass()
         { }
 
-        public AddressInsertResult InsertAddress(AddressInsertInput input)
+        public PasswordRequestInsertResult InsertPasswordRequest(PasswordRequestInsertInput input)
         {
 
-            AddressInsertResult result = new AddressInsertResult();
+            PasswordRequestInsertResult result = new PasswordRequestInsertResult();
 
             try
             {
@@ -63,9 +85,9 @@ namespace ADLAPICore.Library.Address
                     return result;
                 }
 
-                AddressDBClass lDB = new AddressDBClass();
+                PasswordDBClass lDB = new PasswordDBClass();
 
-                var dbResult = lDB.AddressInsertDBCall(input);
+                var dbResult = lDB.PasswordRequestInsertDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
                 {
                     result.response = dbResult.response;
@@ -87,51 +109,20 @@ namespace ADLAPICore.Library.Address
             {
                 result.response = General.buildError(ex.Message);
 
-                return new AddressInsertResult { response = result.response };
+                return new PasswordRequestInsertResult { response = result.response };
             }
         }
-        private ResponseModel Validate(AddressInsertInput input)
+        private ResponseModel Validate(PasswordRequestInsertInput input)
         {
             ResponseModel result = new ResponseModel();
 
             try
             {
 
-                if (String.IsNullOrEmpty(input.inApiToken))
-                {
-                    throw new ApplicationException("API Token is required for this method.");
+                if (String.IsNullOrEmpty(input.inEmailAddress))
+                { 
+                    throw new ApplicationException("Email Address is required for this method.");
                 }
-
-                if (String.IsNullOrEmpty(input.inAddress1))
-                {
-                    throw new ApplicationException("Address1 is required for this method.");
-                }
-
-                if (String.IsNullOrEmpty(input.inCity))
-                {
-                    throw new ApplicationException("City is required for this method.");
-                }
-
-                if (input.inStateId < 1)
-                {
-                    throw new ApplicationException("State Id must be > 0.");
-                }
-
-                if (input.inCountryId < 1)
-                {
-                    throw new ApplicationException("Country Id must be > 0.");
-                }
-
-                if (String.IsNullOrEmpty(input.inZipCode))
-                {
-                    throw new ApplicationException("ZipCode is required for this method.");
-                }
-
-                //if (String.IsNullOrEmpty(input.inPhone))
-                //{
-                //    throw new ApplicationException("Phone is required for this method.");
-                //}
-
 
                 return result;
             }
@@ -142,10 +133,10 @@ namespace ADLAPICore.Library.Address
             }
         }
         
-        public AddressUpdateResult UpdateAddress(AddressUpdateInput input)
+        public PasswordUpdateResult UpdatePassword(PasswordUpdateInput input)
         {
 
-            AddressUpdateResult result = new AddressUpdateResult();
+            PasswordUpdateResult result = new PasswordUpdateResult();
 
             try
             {
@@ -157,9 +148,9 @@ namespace ADLAPICore.Library.Address
                     return result;
                 }
 
-                AddressDBClass lDB = new AddressDBClass();
+                PasswordDBClass lDB = new PasswordDBClass();
 
-                var dbResult = lDB.AddressUpdateDBCall(input);
+                var dbResult = lDB.PasswordUpdateDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
                 {
                     result.response = dbResult.response;
@@ -181,56 +172,25 @@ namespace ADLAPICore.Library.Address
             {
                 result.response = General.buildError(ex.Message);
 
-                return new AddressUpdateResult { response = result.response };
+                return new PasswordUpdateResult { response = result.response };
             }
         }
-        private ResponseModel Validate(AddressUpdateInput input)
+        private ResponseModel Validate(PasswordUpdateInput input)
         {
             ResponseModel result = new ResponseModel();
 
             try
             {
 
-                if (String.IsNullOrEmpty(input.inApiToken))
+                if (String.IsNullOrEmpty(input.inPasswordResetToken))
                 {
-                    throw new ApplicationException("API Token is required for this method.");
+                    throw new ApplicationException("Password Reset Token is required for this method.");
                 }
-                
-                if (input.inAddressId < 1)
+ 
+                if (String.IsNullOrEmpty(input.inPassword))
                 {
-                    throw new ApplicationException("Address Id must be > 0.");
+                    throw new ApplicationException("Password is required for this method.");
                 }
-
-                if (String.IsNullOrEmpty(input.inAddress1))
-                {
-                    throw new ApplicationException("Address1 is required for this method.");
-                }
-
-                if (String.IsNullOrEmpty(input.inCity))
-                {
-                    throw new ApplicationException("City is required for this method.");
-                }
-                
-                if (input.inStateId < 1)
-                {
-                    throw new ApplicationException("State Id must be > 0.");
-                }
-                
-                if (input.inCountryId < 1)
-                {
-                    throw new ApplicationException("Country Id must be > 0.");
-                }
-                
-                if (String.IsNullOrEmpty(input.inZipCode))
-                {
-                    throw new ApplicationException("ZipCode is required for this method.");
-                }
-                
-                //if (String.IsNullOrEmpty(input.inPhone))
-                //{
-                //    throw new ApplicationException("Phone is required for this method.");
-                //}
-
                 return result;
             }
             catch (Exception ex)
@@ -239,12 +199,12 @@ namespace ADLAPICore.Library.Address
                 return result;
             }
         }
-       
-        public AddressDetailRow GetAddress(AddressGetInput input)
+
+        public PasswordResetTokenGetResult GetPasswordResetToken(PasswordResetTokenGetInput input)
         {
 
-            AddressDetailRow result = new AddressDetailRow();
- 
+            PasswordResetTokenGetResult result = new PasswordResetTokenGetResult();
+
             try
             {
 
@@ -255,27 +215,13 @@ namespace ADLAPICore.Library.Address
                     return result;
                 }
 
-                AddressDBClass lDB = new AddressDBClass();
+                PasswordDBClass lDB = new PasswordDBClass();
 
-                var dbResult = lDB.AddressGetDBCall(input);
+                var dbResult = lDB.PasswordResetTokenGetDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
                 {
                     result.response = dbResult.response;
                     return result;
-                }
-
-                foreach (DataRow row in dbResult.dt.Rows)
-                {
-                    result.addressRecord = new AddressRecord();
-
-                    // address stuff
-                    result.addressRecord.Address1 = row["address1"].ToString();
-                    result.addressRecord.Address2 = row["address2"].ToString();
-                    result.addressRecord.City = row["city"].ToString();
-                    result.addressRecord.ZipCode = row["zipcode"].ToString();
-                    result.addressRecord.StateId = Convert.ToInt32(row["idstate"]);
-                    result.addressRecord.CountryId = Convert.ToInt32(row["idcountry"]);
-
                 }
 
                 // now the result
@@ -289,24 +235,19 @@ namespace ADLAPICore.Library.Address
             {
                 result.response = General.buildError(ex.Message);
 
-                return new AddressDetailRow { response = result.response };
+                return new PasswordResetTokenGetResult { response = result.response };
             }
         }
-        private ResponseModel Validate(AddressGetInput input)
+        private ResponseModel Validate(PasswordResetTokenGetInput input)
         {
             ResponseModel result = new ResponseModel();
 
             try
             {
 
-                if (String.IsNullOrEmpty(input.inApiToken))
+                if (String.IsNullOrEmpty(input.inPasswordResetToken))
                 {
-                    throw new ApplicationException("API Token is required for this method.");
-                }
-
-                if (input.inAddressId < 1)
-                {
-                    throw new ApplicationException("Address Id must be > 0.");
+                    throw new ApplicationException("Password Reset Token is required for this method.");
                 }
 
                 return result;
