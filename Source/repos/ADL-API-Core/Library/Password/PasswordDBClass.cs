@@ -55,10 +55,10 @@ namespace ADLAPICore.Library.Password
                 dbClass.dbCmd = new MySqlCommand("updateLoginPassword", dbClass.dbConn);
                 dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
-                MySqlParameter param = new MySqlParameter("inresettoken", password) ;
+                MySqlParameter param = new MySqlParameter("inresettoken", input.inPasswordResetToken) ;
                 dbClass.dbCmd.Parameters.Add(param);
 
-                param = new MySqlParameter("inpassword", input.inPassword);
+                param = new MySqlParameter("inpassword", password);
                 dbClass.dbCmd.Parameters.Add(param);
 
                 result = dbClass.getDBResults();
@@ -82,7 +82,7 @@ namespace ADLAPICore.Library.Password
                 dbClass.dbCmd = new MySqlCommand("hasResetTokenExpired", dbClass.dbConn);
                 dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
 
-                MySqlParameter param = new MySqlParameter("inapitoken", input.inPasswordResetToken);
+                MySqlParameter param = new MySqlParameter("inresettoken", input.inPasswordResetToken);
                 dbClass.dbCmd.Parameters.Add(param);
 
                 result = dbClass.getDBResults();

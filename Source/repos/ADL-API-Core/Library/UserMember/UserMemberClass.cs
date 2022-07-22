@@ -8,6 +8,7 @@ using System.Data;
 
 namespace ADLAPICore.Library.UserMember
 {
+ 
     public class UserMemberProfile
     {
        public Int32 UserId { get; set; }
@@ -16,6 +17,7 @@ namespace ADLAPICore.Library.UserMember
         public string EmailAddress { get; set; }
         public string MiddleName { get; set; }  
         public string PhoneNumber   { get; set; }
+        public string UserName { get; set; }
     }
     public class UserMemberDetailRow
     {
@@ -138,7 +140,7 @@ namespace ADLAPICore.Library.UserMember
                     return result;
                 }
 
-                AddressDBClass lDB = new AddressDBClass();
+                UserMemberDBClass lDB = new UserMemberDBClass();
 
                 var dbResult = lDB.UserAddressInsertDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -209,7 +211,7 @@ namespace ADLAPICore.Library.UserMember
                     return result;
                 }
 
-                AddressDBClass lDB = new AddressDBClass();
+                UserMemberDBClass lDB = new UserMemberDBClass();
 
                 var dbResult = lDB.UserMemberInsertDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -284,7 +286,7 @@ namespace ADLAPICore.Library.UserMember
                     return result;
                 }
 
-                AddressDBClass lDB = new AddressDBClass();
+                UserMemberDBClass lDB = new UserMemberDBClass();
 
                 var dbResult = lDB.UserMemberUpdateDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -363,7 +365,7 @@ namespace ADLAPICore.Library.UserMember
                     return result;
                 }
 
-                AddressDBClass lDB = new AddressDBClass();
+                UserMemberDBClass lDB = new UserMemberDBClass();
 
                 var dbResult = lDB.UserMemberDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -464,7 +466,7 @@ namespace ADLAPICore.Library.UserMember
                     return result;
                 }
 
-                AddressDBClass lDB = new AddressDBClass();
+                UserMemberDBClass lDB = new UserMemberDBClass();
 
                 var dbResult = lDB.UserMemberAddressDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -539,7 +541,7 @@ namespace ADLAPICore.Library.UserMember
                         return result;
                     }
 
-                    AddressDBClass lDB = new AddressDBClass();
+                    UserMemberDBClass lDB = new UserMemberDBClass();
 
                     var dbResult = lDB.UserMemberListDBCall(input);
                     if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -636,7 +638,7 @@ namespace ADLAPICore.Library.UserMember
                     return result;
                 }
 
-                AddressDBClass lDB = new AddressDBClass();
+                UserMemberDBClass lDB = new UserMemberDBClass();
 
                 var dbResult = lDB.UserMemberListByFacilityDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -738,7 +740,7 @@ namespace ADLAPICore.Library.UserMember
                     return result;
                 }
 
-                AddressDBClass lDB = new AddressDBClass();
+                UserMemberDBClass lDB = new UserMemberDBClass();
 
                 var dbResult = lDB.UserMemberAccessListDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -823,7 +825,7 @@ namespace ADLAPICore.Library.UserMember
                     return result;
                 }
 
-                AddressDBClass lDB = new AddressDBClass();
+                UserMemberDBClass lDB = new UserMemberDBClass();
 
                 var dbResult = lDB.UserMemberAccessInsertDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -899,7 +901,7 @@ namespace ADLAPICore.Library.UserMember
                     return result;
                 }
 
-                AddressDBClass lDB = new AddressDBClass();
+                UserMemberDBClass lDB = new UserMemberDBClass();
 
                 var dbResult = lDB.UserMemberAccessUpdateDBCall(input);
                 if (dbResult.response.status == ResponseModel.responseFAIL)
@@ -950,6 +952,81 @@ namespace ADLAPICore.Library.UserMember
                 if (input.inUserId < 1)
                 {
                     throw new ApplicationException("User Id must be > 0.");
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
+                return result;
+            }
+        }
+
+        public UserMemberDetailRow GetUserMemberFromResetToken(UserMemberFromResetTokenGetInput input)
+        {
+
+            UserMemberDetailRow result = new UserMemberDetailRow();
+
+            try
+            {
+
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                UserMemberDBClass lDB = new UserMemberDBClass();
+
+                var dbResult = lDB.UserMemberFromRequestTokenDBCall (input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+
+                    result.UserInfo = new UserMemberProfile();
+                    // user info
+                    result.UserInfo.PhoneNumber = (string.IsNullOrEmpty(row["phonenumber"].ToString()) ? "" : row["phonenumber"].ToString());
+                    result.UserInfo.EmailAddress = row["emailaddress"].ToString();
+                    result.UserInfo.FirstName = row["firstname"].ToString();
+                    result.UserInfo.LastName = row["lastname"].ToString();
+                    result.UserInfo.MiddleName = row["middlename"].ToString();
+                    result.UserInfo.UserName = row["UserName"].ToString();
+
+                    result.UserInfo.UserId = Convert.ToInt32(row["iduser"]);
+
+                }
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new UserMemberDetailRow { response = result.response };
+            }
+        }
+        private ResponseModel Validate(UserMemberFromResetTokenGetInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inResetToken))
+                {
+                    throw new ApplicationException("Reset Token is required for this method.");
                 }
 
                 return result;

@@ -7,6 +7,8 @@ namespace ADLAPICore.Library.utilities
 {
     public class Email
     {
+
+
         public class EmailSendRequest
         {
             public string Subject { get; set; }
@@ -14,6 +16,7 @@ namespace ADLAPICore.Library.utilities
             public string ToAddress { get; set; }
             public string ToFirstName { get; set; }
             public string ToLastName { get; set; }
+            public string ToFullName { get; set; }
         }
 
         public ResponseModel SendEmail(EmailSendRequest input)

@@ -22,9 +22,10 @@ namespace ADLAPICore.Library.UserMember
         public DBResult UserMemberAddressDBCall(UserMemberAddressGetInput input);
         public DBResult UserMemberAccessUpdateDBCall(UserMemberAccessUpdateInput input);
         public DBResult UserMemberAccessInsertDBCall(UserMemberAccessInsertInput input);
+        public DBResult UserMemberFromRequestTokenDBCall(UserMemberFromResetTokenGetInput input);
     }
 
-    class AddressDBClass : IUserMemberDBClass
+    class UserMemberDBClass : IUserMemberDBClass
     {
         public DBResult UserAddressInsertDBCall(UserAddressInsertInput input)
         {
@@ -315,6 +316,30 @@ namespace ADLAPICore.Library.UserMember
 
                 param = new MySqlParameter("inuserid", input.inUserId);
                 dbClass.dbCmd.Parameters.Add(param); result = dbClass.getDBResults();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new DBResult { dt = new DataTable(), response = result.response };
+            }
+
+        }
+        public DBResult UserMemberFromRequestTokenDBCall(UserMemberFromResetTokenGetInput input)
+        {
+            var result = new DBResult();
+            DBClass dbClass = new DBClass();
+            try
+            {
+                dbClass.dbCmd = new MySqlCommand("getuserfromresettoken", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
+
+                MySqlParameter param = new MySqlParameter("inresettoken", input.inResetToken);
+                dbClass.dbCmd.Parameters.Add(param);
+
+                result = dbClass.getDBResults();
 
                 return result;
             }

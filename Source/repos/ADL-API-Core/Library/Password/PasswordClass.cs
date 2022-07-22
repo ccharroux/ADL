@@ -5,15 +5,12 @@ using ADLAPICore.Models.General;
 using ADLAPICore.Library.utilities;
 using ADLAPICore.Models.Address;
 using ADLAPICore.Models.Password;
+using static ADLAPICore.Library.utilities.Email;
+using ADLAPICore.Library.UserMember;
+using ADLAPICore.Models.UserMember;
 
 namespace ADLAPICore.Library.Password
 {
-
-    //public class AddressDetailRow
-    //{
-    //    public ResponseModel response = new ResponseModel();
-    //    public AddressRecord addressRecord { get; set; }
-    //}
 
     public class PasswordRequestInsertResult
     {
@@ -56,6 +53,17 @@ namespace ADLAPICore.Library.Password
             this.response = General.buildError("Unexpected error");
         }
     }
+    public class EmailUserInfoResult
+    {
+        public Email.EmailSendRequest emailInfo = new Email.EmailSendRequest();
+        public ResponseModel response = new ResponseModel();
+        public int ReturnCode { get; set; }
+
+        public EmailUserInfoResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
 
     public interface IPasswordClass
     {
@@ -66,10 +74,17 @@ namespace ADLAPICore.Library.Password
 
     public class PasswordClass : IPasswordClass
     {
-            
-        public PasswordClass()
-        { }
 
+        public string PasswordUpdateConfirmationRequest { get; set; }
+        public string EmailPasswordRequest { get; set; }
+
+        public PasswordClass()
+        {
+            PasswordUpdateConfirmationRequest = "PasswordUpdateConfirmationRequest";
+            EmailPasswordRequest = "EmailPasswordRequest";
+        }
+
+  
         public PasswordRequestInsertResult InsertPasswordRequest(PasswordRequestInsertInput input)
         {
 
@@ -170,7 +185,7 @@ namespace ADLAPICore.Library.Password
                     result.ReturnCode = Convert.ToInt32(row["returncode"]);
                 }
 
-                result.response = SendPasswordUpdateConfirmationEmail(input.inPasswordResetToken)
+                result.response = SendPasswordUpdateConfirmationEmail(input.inPasswordResetToken);
                 
                 if (result.response.status == ResponseModel.responseFAIL)
                 {
@@ -278,33 +293,98 @@ namespace ADLAPICore.Library.Password
         {
             ResponseModel result = new ResponseModel();
 
-            // call proc to get results
+            EmailSendRequest mailIt = new EmailSendRequest();
 
-            // load class
+            try
+            {
 
-            // get email from config?
-            // replace token / url
 
-            Email e = new Email();
-            //e.SendEmail();
+                mailIt.Subject = Startup.Configuration.GetSection(this.EmailPasswordRequest).GetSection("Subject").Value;
+                mailIt.Message = Startup.Configuration.GetSection(this.EmailPasswordRequest).GetSection("Message").Value; ;
+                
+                var URL = Startup.Configuration.GetSection("EmailSettings").GetSection("ResetURL").Value;
+                URL = URL.Replace("[TOKEN]", inRequestToken);
 
-            return result;
+                mailIt.Message = mailIt.Message.Replace("[URL]", URL);
+
+                UserMemberClass uc = new UserMemberClass();
+                UserMemberFromResetTokenGetInput i = new UserMemberFromResetTokenGetInput();
+                i.inResetToken = inRequestToken;
+
+                UserMemberDetailRow dataResult = uc.GetUserMemberFromResetToken(i);
+
+                // load class
+                mailIt.ToAddress = dataResult.UserInfo.EmailAddress;
+                mailIt.ToFullName = dataResult.UserInfo.UserName;
+                mailIt.ToFirstName = dataResult.UserInfo.FirstName;
+ 
+
+                Email e = new Email();
+                result = e.SendEmail(mailIt);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
+
+                return result;
+            }
+
         }
 
         private ResponseModel SendPasswordUpdateConfirmationEmail(string inRequestToken)
         {
             ResponseModel result = new ResponseModel();
 
-            // call proc to get results
+            EmailSendRequest mailIt = new EmailSendRequest();
 
-            // load class
+            try
+            {
 
-            // get email from config?
+                mailIt.Subject = Startup.Configuration.GetSection(this.PasswordUpdateConfirmationRequest).GetSection("Subject").Value;
+                mailIt.Message = Startup.Configuration.GetSection(this.PasswordUpdateConfirmationRequest).GetSection("Message").Value; ;
+ 
+                UserMemberClass uc = new UserMemberClass();
+                UserMemberFromResetTokenGetInput i = new UserMemberFromResetTokenGetInput();
+                i.inResetToken = inRequestToken;
 
-            Email e = new Email();
-            //e.SendEmail();
+                UserMemberDetailRow dataResult = uc.GetUserMemberFromResetToken(i);
 
-            return result;
+                // load class
+                mailIt.ToAddress = dataResult.UserInfo.EmailAddress;
+                mailIt.ToFullName = dataResult.UserInfo.UserName;
+                mailIt.ToFirstName = dataResult.UserInfo.FirstName;
+                mailIt.ToLastName = dataResult.UserInfo.LastName;
+
+                Email e = new Email();
+                result = e.SendEmail(mailIt);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
+
+                return result;
+            }
+        }
+
+        private EmailUserInfoResult BuildUserEmailInfoFromResetToken()
+        {
+            EmailUserInfoResult result = new EmailUserInfoResult();
+
+            try
+            {
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return result;
+            }
+
         }
     }
 
