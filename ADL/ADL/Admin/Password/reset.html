@@ -37,21 +37,19 @@
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3  fh5co-heading" style="border:solid 1px silver;border-radius:10px; padding:10px 10px 10px 10px">
                         <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input id="email" value="carlcharroux@yahoo.com" style="width:100%" />
-                        </div>
-                        <div class="form-group">
                             <label for="password">Password</label>
-                            <input type="password" id="password" value="123" style="width:100%"/>
+                            <input type="password" id="password" value="" style="width:100%"/>
 
                         </div>
                         <br />
-                        <div style='text-align:center'>
-                            <input type="button" value="Login" onclick="login();" style="width:100%" />
+                        <div class="form-group">
+                            <label for="password2">Re-Enter Password</label>
+                            <input type="password" id="password2" value="" style="width:100%"/>
+
                         </div>
                         <hr /> 
                         <div style='text-align:center'>
-                            <input type="button" value="Forgot Password" onclick="forgotPassword();" style="width:100%" />
+                            <input type="button" value="Reset Password" onclick="updatePassword();" style="width:100%" />
                         </div>
                     </div>
                 </div>
@@ -85,8 +83,19 @@
 </body>
 </html>
 <script>
+    var passwordResetToken = "";
+    
+    
     $(document).ready(function () {
 
+        passwordResetToken = (getParameterByName("PasswordResetToken") == null ? "" : getParameterByName("PasswordResetToken"));
+        validateToken(passwordResetToken);
+        setPageEvents();
+
+    });
+
+    function setPageEvents()
+    {
         var input = document.getElementById("password");
         input.addEventListener("keyup", function (event) {
             // Cancel the default action, if needed
@@ -98,14 +107,48 @@
             }
         });
 
-        document.getElementById("email").focus();
-    });
+        document.getElementById("password").focus();
+   
 
-    function forgotPassword()
+    }
+
+    function validateToken(inToken)
     {
-        if ($("#email").val() == "")
+        var inURL = ServicePrefix + '/password'  + "?inPasswordResetToken=" + inToken;
+ 
+        $.ajax({
+            url: inURL,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") 
+                {
+                    ADLErrorMessage(data.response.errorMessage[0], '../../admin/login/login.html');
+                } 
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+    }
+
+    function updatePassword()
+    {
+        if ($("#password").val() == "")
         {
-            bootbox.alert("Please enter an email address", function () {
+            bootbox.alert("Please enter a password", function () {
+
+            });
+            return false;
+        }
+
+        if ($("#password").val() == "" != $("#password2").val() == "")
+        {
+            bootbox.alert("Passwords do not equal", function () {
 
             });
             return false;
@@ -116,9 +159,9 @@
 	    $.ajax({
             url: inURL,
             dataType: 'json',
-            type: 'post',
+            type: 'put',
             contentType: 'application/json',
-            data: JSON.stringify({ "inEmailAddress": $("#email").val() }),
+            data: JSON.stringify({ "inPasswordResetToken": passwordResetToken, "inPassword": $("#password").val() }),
             processData: false,
             success: function (data, textStatus, jQxhr) {
 
@@ -127,7 +170,8 @@
                 }
                 else {
 
-                    bootbox.alert("Password Request sent. You will recieve an email shortly.", function () {
+                    bootbox.alert("Password Reset completed.", function () {
+                        window.location = '../../admin/login/login.html';
                     });
                   }
 

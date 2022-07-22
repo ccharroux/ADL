@@ -752,6 +752,7 @@ $(document).ready(function ()
     // build a generic back button...
 
     var nonLoggedInPages = new Array();
+    nonLoggedInPages.push('/admin/password/reset.html');
     nonLoggedInPages.push('/admin/login/login.html');
     nonLoggedInPages.push('index.html');
 
@@ -1336,13 +1337,20 @@ function goBackToDashboard() {
     // Fall thru
     window.location = "/admin/login/dashboard.html";
 }
-function ADLErrorMessage(message)
+function ADLErrorMessage(message, url)
 {
     bootbox.alert('Process Failed.\n\r\n\r' + message, function () {
 
         if(message.toLowerCase().indexOf("token failed") > -1 )
         {
             goTo("../../admin/login/login.html");
+        }
+        else
+        {
+            if (!url == false)
+            {
+                goTo(url);
+            }
         }
 
      });
@@ -1353,7 +1361,7 @@ function GeneralErrorMessageRtn(message, preCallback, postCallback) {
     ADLErrorMessage(message);
     return;
 
-    
+
     var newMessage = "";
 
     var AJAXErrorURL = window.localStorage.getItem("AJAXErrorURL");
@@ -1548,12 +1556,8 @@ function buildMainMenu(selectedItem) {
     
 
     menuItems += '<ul>';
-   // menuItems += buildGenericReportsLink(selectedItem);
-
-   //menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "ADL") + '">Daily Work Area <span style="margin-right:10px;" class="caret"></span></a>';
-
-   //menuItems += '        </li>';
-
+    menuItems += buildGenericReportsLink(selectedItem);
+ 
 
     
     // daily work area
@@ -1576,35 +1580,9 @@ function buildMainMenu(selectedItem) {
     }    
     menuItems += '              </ul>';
     menuItems += '        </li>';
-    /*
-    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Stations") + ' role="button" aria-expended="false">Stations<span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block"><a href="../../admin/station/stationlist.html?MenuItem=true" class="approved">Stations</a></li>';
-    menuItems += '                  <li style="display:block"><a href="">MRR/X-Ray Link</a></li>';
-    menuItems += '              </ul>';
-    menuItems += '        </li>';
-    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Markets") + '">Markets<span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block"><a href="../../admin/market/marketlist.html?MenuItem=true" role="button" aria-expanded="false" class="approved">Primary</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/market/marketlist.html?NonPrimaryOnly=true&MenuItem=true">Complimentary</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/parentmarket/parentmarketlist.html?MenuItem=true">Parent</a></li>';
-    menuItems += '              </ul>';
-    menuItems += '        </li>';
-    */
+ 
 
-    //-----------------------
-    // one or the other
-    //-----------------------
-
-    // Facility Admin
- //   menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "My Settings") + '">My Settings<span style="margin-right:10px;" class="caret"></span></a>';
-//    menuItems += '              <ul class="dropdown-menu" role="menu">';
-  //  menuItems += '                  <li style="display:block;"><a href="../../admin/adl system/list.html?MenuItem=true">ADL Maintenance</a></li>';
- //   menuItems += '                  <li style="display:block;"><a href="../../admin/facility/list.html?MenuItem=true">Facility Maintenance </a></li>';
- //   menuItems += '                  <li style="display:block;"><a href="../../admin/users/item.html?userId='+ getLocalStorage("userId") +'&MenuItem=true" role="button" aria-expanded="false">Profile </a>';
- //   menuItems += '              </ul>';
-    //menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Virtual Groups") + 'href="../../admin/login/dashboard.html?MenuItem=true">Virtual Groups</a></li>';
-    
+ 
     // SYSTEM SETTINGS
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Admin") + ' role="button" aria-expanded="false">System Settings <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
@@ -1651,25 +1629,8 @@ function buildMainMenu(selectedItem) {
     { 
            menuItems += '                  <li style="display:block;"><a href="../../admin/users/list.html?Admin=true&MenuItem=true">User Maintenance</a></li>';
     }
-    //menuItems += '                  <li style="display:block;"><a href="../../admin/customersupport/customersupportlist.html?MenuItem=true">ADL Schedule</a></li>';
-    //menuItems += '                  <li style="display:block;"><a href="../../admin/relationship/relationshiplists.html?MenuItem=true">ADL Patient</a></li>';
-
-    // if (bIsDemo == false) {
-    //     menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">Demo Maintenance <span style="margin-right:10px;" class="caret"></span></a>'
-    //     menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
-    //     menuItems += '                          <li style="display:block;"><a href="../../admin/demo/demomarketlist.html?MenuItem=true">Demo Markets</a></li>';
-    //     menuItems += '                          <li style="display:block;"><a href="../../admin/demo/demohybridmarketstationlist.html?MenuItem=true">Demo Hybrids</a></li>';
-    //     menuItems += '                      </ul>';
-    //     menuItems += '                  </li>';
-    // }
-
-/*     menuItems += '                  <li style="display:block;"><a href="../../admin/techtools/techtoolsdashboard.html?MenuItem=true">Tech Tools</a></li>';
-    menuItems += '                  <li style="display:block;text-align:center;">----------------------</li>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/format/formatlist.html?MenuItem=true">Formats</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/marketsize/marketsizelist.html?MenuItem=true">Market Sizes</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/position/positionlist.html?MenuItem=true">Positions</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/region/regionlist.html?MenuItem=true">Regions</a></li>';
-  */   
+ 
+ 
     menuItems += '                  <li style="display:block;"><a href="../../admin/users/item.html?userId='+ getLocalStorage("userId") +'&MenuItem=true">Profile</a></li>';
     menuItems += '              </ul>';
     menuItems += '        </li>';

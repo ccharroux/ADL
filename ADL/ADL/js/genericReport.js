@@ -8,7 +8,8 @@ var reportActionsArray = new Array();
 reportActionsArray.push("edit");
 
 var reportName = new Array();
-reportName.push("rptMRRMarketSummary");
+reportName.push("rptFacilityDailyActivity");
+/*
 reportName.push("rptXRAYUsage");
 reportName.push("rptMRRUsage");
 reportName.push("rptTVBUsage");
@@ -263,7 +264,7 @@ reportName.push("rptStationParticipationMRR");
 reportName.push("rptMRRCategoryMissingDefinitionList");
 reportName.push("rptDMXUserListing");
 reportName.push("rptDMAUserListing");
-
+*/
 
 
 function buildReportArray()
@@ -388,7 +389,7 @@ function getQuickReport(reportId)
 {
     if (reportId > -1)
     {
-        var reportPath = '/utilities/genericreport/genericReport.html';
+        var reportPath = '../../utilities/genericreport/genericReport.html';
 
         if (!reportObjectArray[reportId].reportPath == false)
         {
@@ -411,6 +412,7 @@ function getQuickReport(reportId)
         //window.location = url;
     }
 }
+
 function getDMAReportObjectByKeyValue(inKey, inValue) {
     //get the item by the key with a value
 
@@ -557,6 +559,67 @@ function buildReportLink(row, reportNameToFind)
 // REPORT AREA
 //-------------------------
 
+ 
+function getReportFilterArray_FacilityDailyActivity()
+{
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+//
+
+    arrayObject = {
+        token: "Facilities",
+        jsCall: "loadFacilitiesWithoutRole",
+        jsCallParameters: null,
+        objectName: "ddlFacilities",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token:  "TransactionDate",
+        jsCall:  null,
+        objectName:  "dtTransactionDate",
+        required:  true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_FacilityDailyActivity()
+{
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+/*    columnsToDisplay.push("Category");
+    columnsToDisplay.push("Current Amount");
+    columnsToDisplay.push("Previous Amount");
+    columnsToDisplay.push("Period Pct");
+    columnsToDisplay.push("Current Amount YTD");
+    columnsToDisplay.push("Previous Amount YTD");
+    columnsToDisplay.push("YTD Pct");
+*/
+    tempObject =
+    {
+        reportTitle:  "Facility Daily Activity",
+        apiControllerAction:  "/Facility/ADLLogByDay",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product: ['Facility'],
+        approved : true
+    }
+
+    return tempObject;
+}
+
+
+
+
+///////////////////////////////////////////////////////////////
+
 // Parent Ownership
 function getReportFilterArray_ParentOwnershipList() {
 
@@ -611,69 +674,6 @@ function getReportObject_OwnershipList() {
     return tempObject;
 }
 
- 
-function getReportFilterArray_MRRMarketSummary()
-{
-
-    var arrayFilters = new Array();
-    var arrayObject = new Object();
-
-    arrayObject = {
-        token: "Market",
-        jsCall: "getMarketListByProduct",
-        jsCallParameters: ['MRR'],
-        objectName: "ddlMarket",
-        required: true
-    }
-    arrayFilters.push(arrayObject);
-
-    arrayObject = new Object();
-    arrayObject = {
-        token:  "Year",
-        jsCall:  "getYearList",
-        objectName:  "ddlYear",
-        required:  true
-    }
-    arrayFilters.push(arrayObject);
-
-    arrayObject = new Object();
-    arrayObject = {
-        token:  "Period",
-        objectName:  "ddlPeriod",
-        jsCall:  "getPeriodList",
-        required:  true
-    }
-    arrayFilters.push(arrayObject);
-
-    return arrayFilters;
-}
-function getReportObject_MRRMarketSummary()
-{
-
-    var tempObject = new Object();
-
-    columnsToDisplay = new Array();
-    columnsToDisplay.push("Category");
-    columnsToDisplay.push("Current Amount");
-    columnsToDisplay.push("Previous Amount");
-    columnsToDisplay.push("Period Pct");
-    columnsToDisplay.push("Current Amount YTD");
-    columnsToDisplay.push("Previous Amount YTD");
-    columnsToDisplay.push("YTD Pct");
-
-    tempObject =
-    {
-        // id: rptMRRMarketSummary,
-        reportTitle:  "MRR Market Summary",
-        apiControllerAction:  "/api/MRRReport/GetMarketSummary",
-        apiType:  "get",
-        columnsToDisplay:  columnsToDisplay,
-        product: ['mrr', 'MRR Data Review', 'mrr delivery', 'mrr pre-release'],
-        approved : true
-    }
-
-    return tempObject;
-}
 
 // XRAY Usage
 function getReportFilterArray_XRAYUsage() {
