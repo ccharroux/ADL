@@ -13,6 +13,7 @@ using ADLAPICore.Library.ADL;
 using ADLAPICore.Library.Role;
 using ADLAPICore.Library.Address;
 using ADLAPICore.Library.Password;
+using ADLAPICore.Library.Form;
 
 namespace ADLAPICore
 {
@@ -34,6 +35,7 @@ namespace ADLAPICore
             services.AddTransient<IADLClass, ADLClass>();
             services.AddTransient<ICountryClass, CountryClass>();
             services.AddTransient<IFacilityClass, FacilityClass>();
+            services.AddTransient<IFormClass, FormClass>();
             services.AddTransient<ILoginClass, LoginClass>();
             services.AddTransient<IPatientClass, PatientClass>();
             services.AddTransient<IRoleClass, RoleClass>();

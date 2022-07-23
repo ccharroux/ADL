@@ -258,6 +258,72 @@ namespace ADLAPICore.Controllers.Facility
             }
         }
 
+
+        [HttpPost("FormInsert")]
+        public ActionResult FormInsert([FromBody] FacilityFormInsertInput input)
+        {
+            try
+            {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (FacilityFormInsertInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.InsertFacilityForm(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+                FacilityPostResult fr = new FacilityPostResult();
+                fr.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
+            }
+        }
+
+        [HttpPut("FormDelete")]
+        public ActionResult FormDelete([FromBody] FacilityFormDeleteInput input)
+        {
+            try
+            {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (FacilityFormDeleteInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.DeleteFacilityForm(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+                FacilityPutResult fr = new FacilityPutResult();
+                fr.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
+            }
+        }
         [HttpPost("Address")]
         public ActionResult InsertFacilityAddress([FromBody] FacilityAddressInsertInput input)
         {

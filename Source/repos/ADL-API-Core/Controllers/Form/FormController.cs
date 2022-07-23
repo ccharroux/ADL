@@ -9,6 +9,8 @@ using ADLAPICore.Library.ADL;
 using ADLAPICore.Models.General;
 using System.Collections.Generic;
 using ADLAPICore.Library.utilities;
+using ADLAPICore.Library.Form;
+using ADLAPICore.Models.Form;
 
 namespace ADLAPICore.Controllers.ADL
 {
@@ -19,17 +21,17 @@ namespace ADLAPICore.Controllers.ADL
     public class FormController : ControllerBase
     {
         private readonly ILogger<FormController> _logger;
-        private readonly IADLClass _controllerClass;
+        private readonly IFormClass _controllerClass;
 
         public FormController(ILogger<FormController> logger,
-                                    IADLClass controllerClass)
+                                    IFormClass controllerClass)
         {
             _logger = logger;
             _controllerClass = controllerClass;
         }
 
         [HttpGet("List")]
-        public ActionResult List([FromQuery] ADLListGetInput input)
+        public ActionResult List([FromQuery] FormListGetInput input)
         {
             try
             {
@@ -45,16 +47,16 @@ namespace ADLAPICore.Controllers.ADL
                 //----------------------------------
                 // Clean inputs using reflection
                 //----------------------------------
-                var cleanInput = (ADLListGetInput)genericLogic.cleanAllTextFromObject(input);
+                var cleanInput = (FormListGetInput)genericLogic.cleanAllTextFromObject(input);
 
-                var result = _controllerClass.GetADLList(cleanInput);
+                var result = _controllerClass.GetFormList(cleanInput);
 
                 return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
             }
 
             catch (Exception ex)
             {
-                ADLResultList r = new ADLResultList();
+                FormResultList r = new FormResultList();
                 r.response = General.buildError(ex.Message);
 
                 return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
@@ -62,7 +64,7 @@ namespace ADLAPICore.Controllers.ADL
         }
 
         [HttpGet()]
-        public ActionResult Get([FromQuery] ADLGetInput input)
+        public ActionResult Get([FromQuery] FormGetInput input)
         {
             try
             {
@@ -78,16 +80,16 @@ namespace ADLAPICore.Controllers.ADL
                 //----------------------------------
                 // Clean inputs using reflection
                 //----------------------------------
-                var cleanInput = (ADLGetInput)genericLogic.cleanAllTextFromObject(input);
+                var cleanInput = (FormGetInput)genericLogic.cleanAllTextFromObject(input);
 
-                var result = _controllerClass.GetADL(cleanInput);
+                var result = _controllerClass.GetForm(cleanInput);
 
                 return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
             }
 
             catch (Exception ex)
             {
-                ADLResult r = new ADLResult();
+                FormResult r = new FormResult();
                 r.response = General.buildError(ex.Message);
 
                 return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
@@ -95,7 +97,7 @@ namespace ADLAPICore.Controllers.ADL
         }
 
         [HttpPost()]
-        public ActionResult Post([FromBody] ADLInsertInput input)
+        public ActionResult Post([FromBody] FormInsertInput input)
         {
             try
             {
@@ -111,16 +113,16 @@ namespace ADLAPICore.Controllers.ADL
                 //----------------------------------
                 // Clean inputs using reflection
                 //----------------------------------
-                var cleanInput = (ADLInsertInput)genericLogic.cleanAllTextFromObject(input);
+                var cleanInput = (FormInsertInput)genericLogic.cleanAllTextFromObject(input);
 
-                var result = _controllerClass.InsertADL(cleanInput);
+                var result = _controllerClass.InsertForm(cleanInput);
 
                 return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
             }
 
             catch (Exception ex)
             {
-                ADLPostResult fr = new ADLPostResult();
+                FormPostResult fr = new FormPostResult();
                 fr.response = General.buildError(ex.Message);
 
                 return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
@@ -128,7 +130,7 @@ namespace ADLAPICore.Controllers.ADL
         }
 
         [HttpDelete()]
-        public ActionResult Delete([FromBody] ADLDeleteInput input)
+        public ActionResult Delete([FromBody] FormDeleteInput input)
         {
             try
             {
@@ -144,16 +146,16 @@ namespace ADLAPICore.Controllers.ADL
                 //----------------------------------
                 // Clean inputs using reflection
                 //----------------------------------
-                var cleanInput = (ADLDeleteInput)genericLogic.cleanAllTextFromObject(input);
+                var cleanInput = (FormDeleteInput)genericLogic.cleanAllTextFromObject(input);
 
-                var result = _controllerClass.DeleteADL(cleanInput);
+                var result = _controllerClass.DeleteForm(cleanInput);
 
                 return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
             }
 
             catch (Exception ex)
             {
-                ADLPutResult fr = new ADLPutResult();
+                FormPutResult fr = new FormPutResult();
                 fr.response = General.buildError(ex.Message);
 
                 return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
@@ -161,7 +163,7 @@ namespace ADLAPICore.Controllers.ADL
         }
 
         [HttpPut()]
-        public ActionResult Put([FromBody] ADLUpdateInput input)
+        public ActionResult Put([FromBody] FormUpdateInput input)
         {
             try
             {
@@ -177,16 +179,16 @@ namespace ADLAPICore.Controllers.ADL
                 //----------------------------------
                 // Clean inputs using reflection
                 //----------------------------------
-                var cleanInput = (ADLUpdateInput)genericLogic.cleanAllTextFromObject(input);
+                var cleanInput = (FormUpdateInput)genericLogic.cleanAllTextFromObject(input);
 
-                var result = _controllerClass.UpdateADL(cleanInput);
+                var result = _controllerClass.UpdateForm(cleanInput);
 
                 return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
             }
 
             catch (Exception ex)
             {
-                ADLPutResult fr = new ADLPutResult();
+                FormPutResult fr = new FormPutResult();
                 fr.response = General.buildError(ex.Message);
 
                 return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);

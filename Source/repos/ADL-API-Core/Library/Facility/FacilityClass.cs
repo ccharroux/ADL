@@ -21,6 +21,7 @@ namespace ADLAPICore.Library.Facility
         public string Owner { get; set; }   
         public Int32 UserId { get; set; }
     }
+    
     public class FacilityADLResultRow
     {
         public Int32 FacilityId { get; set; }
@@ -38,6 +39,7 @@ namespace ADLAPICore.Library.Facility
             this.response = General.buildError("Unexpected error");
         }
     }
+    
     public class FacilityResult
     {
         public ResponseModel response = new ResponseModel();
@@ -60,6 +62,7 @@ namespace ADLAPICore.Library.Facility
             this.response = General.buildError("Unexpected error");
         }
     }
+
     public class FacilityPutResult
     {
         public ResponseModel response = new ResponseModel();
@@ -80,6 +83,7 @@ namespace ADLAPICore.Library.Facility
             this.response = General.buildError("Unexpected error");
         }
     }
+
     public class FacilityAddressPostResult
     {
         public ResponseModel response = new ResponseModel();
@@ -154,8 +158,13 @@ namespace ADLAPICore.Library.Facility
         public FacilityResult GetFacility(FacilityGetInput input);
         public FacilityListResult GetFacilityList(FacilityListGetInput input);
         public FacilityListResult GetFacilityOwnerList(FacilityOwnerListGetInput input);
+
         public FacilityPostResult InsertFacilityADL(FacilityADLInsertInput input);
         public FacilityPutResult DeleteFacilityADL(FacilityADLDeleteInput input);
+
+        public FacilityPostResult InsertFacilityForm(FacilityFormInsertInput input);
+        public FacilityPutResult DeleteFacilityForm(FacilityFormDeleteInput input);
+
         public FacilityAddressPostResult InsertFacilityAddress(FacilityAddressInsertInput input);
         public FacilityAddressResult GetFacilityAddress(FacilityAddressGetInput input);
         public FacilityPostResult InsertFacility(FacilityInsertInput input);
@@ -675,7 +684,158 @@ namespace ADLAPICore.Library.Facility
                 return result;
             }
         }
-        
+
+        public FacilityPostResult InsertFacilityForm(FacilityFormInsertInput input)
+        {
+
+            FacilityPostResult result = new FacilityPostResult();
+
+            try
+            {
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                FacilityDBClass lDB = new FacilityDBClass();
+
+                var dbResult = lDB.FacilityFormInsertDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    result.ReturnCode = Convert.ToInt32(row["returnCode"]);
+                }
+
+                if (result.ReturnCode < 0)
+                {
+                    throw new ApplicationException(DBCodes.Get(result.ReturnCode));
+                }
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new FacilityPostResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(FacilityFormInsertInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+                if (input.inFacilityId < 1)
+                {
+                    throw new ApplicationException("Facility Id must be > 0.");
+                }
+                if (input.inSystemFormId < 1)
+                {
+                    throw new ApplicationException("Form Id must be > 0.");
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
+                return result;
+            }
+        }
+
+        public FacilityPutResult DeleteFacilityForm(FacilityFormDeleteInput input)
+        {
+
+            FacilityPutResult result = new FacilityPutResult();
+
+            try
+            {
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                FacilityDBClass lDB = new FacilityDBClass();
+
+                var dbResult = lDB.FacilityFormDeleteDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    result.ReturnCode = Convert.ToInt32(row["returnCode"]);
+                }
+
+                if (result.ReturnCode < 0)
+                {
+                    throw new ApplicationException(DBCodes.Get(result.ReturnCode));
+                }
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new FacilityPutResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(FacilityFormDeleteInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+                if (input.inFacilityId < 1)
+                {
+                    throw new ApplicationException("Facility Id must be > 0.");
+                }
+                if (input.inSystemFormId < 1)
+                {
+                    throw new ApplicationException("Form Id must be > 0.");
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
+                return result;
+            }
+        }
+
+
+
+
         public FacilityAddressPostResult InsertFacilityAddress(FacilityAddressInsertInput input)
         {
 
