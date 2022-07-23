@@ -17,4 +17,10 @@
         public string inApiToken { get; set; }
         public string inFacility { get; set; }
     }
+    public class FacilityFormInsertInput
+    {
+        public string inApiToken { get; set; }
+        public int inFacilityId { get; set; }
+        public int inSystemFormId { get; set; }
+    }
 }
