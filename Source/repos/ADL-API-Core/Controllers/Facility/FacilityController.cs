@@ -92,7 +92,40 @@ namespace ADLAPICore.Controllers.Facility
                 return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
             }
         }
-        
+
+        [HttpGet("FormList")]
+        public ActionResult FormList([FromQuery] FacilityFormListGetInput input)
+        {
+            try
+            {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (FacilityFormListGetInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.GetFacilityFormList(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+                FacilityFormResult fr = new FacilityFormResult();
+                fr.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
+            }
+        }
+
         [HttpGet("List")]
         public ActionResult List([FromQuery] FacilityListGetInput input)
         {

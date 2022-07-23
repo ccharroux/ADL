@@ -39,7 +39,24 @@ namespace ADLAPICore.Library.Facility
             this.response = General.buildError("Unexpected error");
         }
     }
-    
+    public class FacilityFormResultRow
+    {
+        public Int32 FacilityId { get; set; }
+        public string SystemForm { get; set; }
+        public Int32 SystemFormId { get; set; }
+    }
+    public class FacilityFormResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public List<FacilityFormResultRow> rows = new List<FacilityFormResultRow>();
+        private FacilityFormResultRow resultRow = new FacilityFormResultRow();
+
+        public FacilityFormResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
+
     public class FacilityResult
     {
         public ResponseModel response = new ResponseModel();
@@ -154,6 +171,7 @@ namespace ADLAPICore.Library.Facility
 
     public interface IFacilityClass
     {
+        public FacilityFormResult GetFacilityFormList(FacilityFormListGetInput input);
         public FacilityADLResult GetFacilityADLList(FacilityADLListGetInput input);
         public FacilityResult GetFacility(FacilityGetInput input);
         public FacilityListResult GetFacilityList(FacilityListGetInput input);
@@ -180,6 +198,88 @@ namespace ADLAPICore.Library.Facility
 
         public FacilityClass()
         { }
+        public FacilityFormResult GetFacilityFormList(FacilityFormListGetInput input)
+        {
+
+            FacilityFormResult result = new FacilityFormResult();
+            FacilityFormResultRow resultRow = new FacilityFormResultRow();
+
+            try
+            {
+
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                FacilityDBClass lDB = new FacilityDBClass();
+
+                var dbResult = lDB.FacilityFormListDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                resultRow = new FacilityFormResultRow();
+                result.rows = new List<FacilityFormResultRow>();
+
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    resultRow = new FacilityFormResultRow
+                    {
+                        SystemForm = row["systemForm"].ToString(),
+                        SystemFormId = Convert.ToInt32(row["idsystemForm"]),
+                        FacilityId = Convert.ToInt32(row["idfacility"])
+
+                    };
+
+                    result.rows.Add(resultRow);
+
+                }
+
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new FacilityFormResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(FacilityFormListGetInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+
+                if (input.inFacilityId <= 0)
+                {
+                    throw new ApplicationException("Facility Id must be greater than 0.");
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = General.buildError(ex.Message);
+                return result;
+            }
+        }
+
 
         public FacilityADLResult GetFacilityADLList(FacilityADLListGetInput input)
         {

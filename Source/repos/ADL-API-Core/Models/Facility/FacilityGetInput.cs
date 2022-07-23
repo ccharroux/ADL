@@ -26,6 +26,11 @@ namespace ADLAPICore.Models.Facility
         public string inApiToken { get; set; }
         public int inFacilityId { get; set; }
     }
+    public class FacilityFormListGetInput
+    {
+        public string inApiToken { get; set; }
+        public int inFacilityId { get; set; }
+    }
     public class FacilityEntireListGetInput
     {
         public string inApiToken { get; set; }
@@ -43,10 +48,6 @@ namespace ADLAPICore.Models.Facility
         public DateTime inTransactionDate { get; set; }
     }
 
-    public class FacilityFormListGetInput
-    {
-        public string inApiToken { get; set; }
-        public int inFacilityId { get; set; }
-    }
+ 
 
 }

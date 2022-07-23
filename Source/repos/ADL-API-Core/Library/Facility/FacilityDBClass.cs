@@ -16,6 +16,7 @@ namespace ADLAPICore.Library.Facility
     {
         public DBResult FacilityAddressInsertDBCall(FacilityAddressInsertInput input);
         public DBResult FacilityADLListDBCall(FacilityADLListGetInput input);
+        public DBResult FacilityFormListDBCall(FacilityFormListGetInput input);
         public DBResult FacilityOwnerListDBCall(FacilityOwnerListGetInput input);
         public DBResult FacilityListDBCall(FacilityListGetInput input);
         public DBResult FacilityDBCall(FacilityGetInput input);
@@ -86,6 +87,32 @@ namespace ADLAPICore.Library.Facility
 
         }
 
+        public DBResult FacilityFormListDBCall(FacilityFormListGetInput input)
+        {
+            var result = new DBResult();
+            DBClass dbClass = new DBClass();
+            try
+            {
+                dbClass.dbCmd = new MySqlCommand("getFacilityFormList", dbClass.dbConn);
+                dbClass.dbCmd.CommandType = CommandType.StoredProcedure;
+
+                MySqlParameter param = new MySqlParameter("inapitoken", input.inApiToken);
+                dbClass.dbCmd.Parameters.Add(param);
+                param = new MySqlParameter("infacilityId", input.inFacilityId);
+                dbClass.dbCmd.Parameters.Add(param);
+                result = dbClass.getDBResults();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new DBResult { dt = new DataTable(), response = result.response };
+
+            }
+
+        }
+
         public DBResult FacilityOwnerListDBCall(FacilityOwnerListGetInput input)
         {
             var result = new DBResult();
@@ -135,7 +162,6 @@ namespace ADLAPICore.Library.Facility
             }
 
         }
-
 
         public DBResult FacilityEntireListDBCall(FacilityEntireListGetInput input)
         {
@@ -217,7 +243,6 @@ namespace ADLAPICore.Library.Facility
             }
 
         }
-
         public DBResult FacilityADLDeleteDBCall(FacilityADLDeleteInput input)
         {
             var result = new DBResult();
@@ -277,7 +302,6 @@ namespace ADLAPICore.Library.Facility
             }
 
         }
-
         public DBResult FacilityFormDeleteDBCall(FacilityFormDeleteInput input)
         {
             var result = new DBResult();
