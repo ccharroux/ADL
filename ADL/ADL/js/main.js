@@ -1616,12 +1616,26 @@ function buildMainMenu(selectedItem) {
     {
         menuItems += '                  <li style="display:block;"><a href="../../admin/adl system/list.html?MenuItem=true">ADL Maintenance</a></li>';
     }
+    // form maintenance
+    if (currentRole == cSystemAdminText)
+    {
+        menuItems += '                  <li style="display:block;"><a href="../../admin/form system/list.html?MenuItem=true">Form Maintenance</a></li>';
+    }
+
     // adl facility assignment
     if (currentRole == cSystemAdminText || 
         currentRole == cOwnerText )
     {    
         menuItems += '                  <li style="display:block;"><a href="../../admin/adl facility assignment/list.html?MenuItem=true">ADL Facility Assignment</a></li>';
     }
+
+    // form facility assignment
+    if (currentRole == cSystemAdminText || 
+        currentRole == cOwnerText )
+    {    
+        menuItems += '                  <li style="display:block;"><a href="../../admin/form facility assignment/list.html?MenuItem=true">Form Facility Assignment</a></li>';
+    }
+
     // user maintenance
     if (currentRole == cSystemAdminText || 
         currentRole == cOwnerText || 
@@ -3974,7 +3988,27 @@ function getSystemADL(id)
     }
     $.ajax(url, settings);
 }
+function getSystemForm(id) 
+{
 
+    var url = ServicePrefix + '/form/' + getTokenInput() + "&inSystemFormId=" + id;
+
+    var settings = {
+        dataType: 'json',
+        type: 'GET',
+        contentType: 'application/json',
+        procssData: false,
+        success: function (data, textStatus, jQxhr) {
+            console.log(data);
+            // function should be in the calling page
+            getSystemFormSuccess(data, textStatus, jQxhr);
+        },
+        error: function (jQxhr, textStatus, errorThrown) {
+            genericAjaxError(jQxhr, textStatus, errorThrown);
+        }
+    }
+    $.ajax(url, settings);
+}
 function updateADLPatientAPICall(updateData) 
 {
     // set url

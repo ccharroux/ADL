@@ -48,12 +48,23 @@
     <script src="js/respond.min.js"></script>
     <![endif]-->
     <style>
+        select
+        {
+           width: 300px;
+        }
+
         a {
             white-space: nowrap !important;
         }
 
         td {
             max-width: 100px !important;
+        }
+        .selectTd
+        {
+            height:265px;
+            vertical-align: middle!important;
+            text-align: center;
         }
     </style>
 </head>
@@ -72,42 +83,48 @@
                         <h2 id="pageTitle"></h2>
                     </div>
                 </div>
+                <div class="row">
+                    <div>
+                        <label for="ddlFacilities" class="dropdown-label">Facility</label><br>
+                        <select id="ddlFacilities" class="search-ddl-select dropdown-select report-filter" onchange="getList();"></select>
 
-                <!-- search / filter area -->
-                <div class="row search-section">
-                    <div class="col-md-10"></div>
-                    <div class="col-md-2">
-                        <input id="btnAddFacility" type="button" value="+" class="addNewButton addNewButton-list-pages" onclick="addItem();" />
                     </div>
-                </div>
-                <!-- search / filter area -->
-                <div class="row search-section">
-                    <div class="col-md-12">
-                        <!-- start datatable-->
-                        <div class="dataTable-top-margin">
-                            <table id="dt" class="dataTable-border dataTable-headers dataTable-cell-border">
-                                <thead>
-                                    <tr>
-                                        <th class="exportColumn">Facility</th>
-                                        <th class="exportColumn">Address</th>
-                                        <th class="exportColumn">City/State</th>
-                                        <th class="exportColumn">Owner</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
 
-                            </table>
-                        </div>
-                        <!-- end datatable -->
-                        <div class="col-md-2">
-                            &nbsp;
-                        </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-5 selectTd" >
+                        <!-- search / filter area -->
+                        <hr>
+                        <label id="currentFacility" >Assigned Forms for </label>
+                        <br>
+                        <select id="ddlAssignedForm" size="10">
+
+                        </select>
+                    </div>
+                    <div class="col-md-1 selectTd" style="padding-top:60px">
+
+                        <input type="button" value="Remove Form" onclick="deleteForm()"><br>
+                        &nbsp;<br>
+                        <input type="button" value="Add Form" onclick="insertForm()"/>
+                    </div>
+                    <div class="col-md-5 selectTd">
+                        
+                        <hr>
+                        <label>Available Forms</label>
+                        <br>
+                        <select id="ddlSystemForm" size=10>
+                            
+                        </select>
                     </div>
                 </div>
             </div>
-            <!--<div id="map" data-animate-effect="fadeIn"></div>-->
         </div>
+        <!--<div id="map" data-animate-effect="fadeIn"></div>-->
     </div>
+
+ 
+    
     <!-- jQuery -->
     <script src="../../js/jquery.min.js"></script>
     <!-- jQuery Easing -->
@@ -136,6 +153,8 @@
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
     <!-- plug-in to abbreviate HTML -->
     <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.20/dataRender/ellipsis.js"></script>
+    <!-- jQuery UI -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <!--Chosen Dropdown-->
     <script src="../../js/chosen.jquery.min.js"></script>
 </body>
@@ -143,32 +162,63 @@
 <script>
 
 
-    var bSecondaryMarketsOnly = false;
-
     $(document).ready(function () {
-        // no adding facilities
-        if (getLocalStorage("currentRole") != cSystemAdminText)
-        {
-            goTo("../../admin/login/dashboard.html");
-        }
 
-        if (doesUserHaveAccessToFeature("updatenews") == false)
+        if (doesUserHaveAccessToFeature("form facility assignment") == false)
         {
             return;
         }
-        else {
-            setTitle("Facility Maintenance");
+        else {            
+            buildUIDialogs();
+            setTitle("Form Facility Assigment Maintenance");
             setEventListeners();
             setDataTable();
+           // addDialogComponents();
+            loadFacilities("ddlFacilities");
+            setDateControl();
             buildMainMenu("Admin");
-            //loadSearchResults();
-            //getProductList(); // success -> getNewsList()
-            getList();
+
+            getListFacilityForms('ddlAssignedForm');
+
         }
      });
 
+    function setDateControl()
+    {
+        var holdDate  = currentDate();
 
+        $("#dtDate").val(holdDate);
+        $("#dtDate").datepicker({
+                                maxDate: "0",
+                                onSelect: function(dateText, inst) { 
+                        getList();
+                    }
+                                }); 
+    }
+
+    function buildUIDialogs() {
+
+        $(function () {
+            $("#DateDialog").dialog({
+                autoOpen: false,
+                resizable: false,
+                width: 700,
+                height: 500,
+                modal: true,
+                title: "Patient Care",
+                create: function (event, ui) {
+                    $(event.target).parent().css('position', 'fixed');
+                }
+            });
+        });
+        
+
+
+    }
     function setEventListeners() {
+        
+
+
         //var input = document.getElementById("searchTextNumber");
         //input.addEventListener("keyup", function (event) {
         //    // Cancel the default action, if needed
@@ -203,8 +253,9 @@
     function setDataTable() 
     {
     
-        var reportTitle = "Facility Maintenance";
+        var reportTitle = "Form Facility Assigment Maintenance";
         var exportColumns = returnTableColumnsByClass("dt", "exportColumn");
+
 
         $("#dt").DataTable({
             "dom": "Blfrtip",
@@ -213,21 +264,9 @@
             "order": [[ 0, "asc" ]],
             "columns": [
                 {
-                    "data": 'Facility',
+                    "data": 'form',
                     "className": "text-align-left"
                 },
-                {
-                    "data": 'City',
-                    "className": "text-align-left"
-                },
-                {
-                    "data": 'State',
-                    "className": "text-align-left"
-                },
-                {
-                    "data": 'Owner',
-                    "className": "text-align-left"
-                },                
 /*                 {
                     mRender: function (data, type, row) {
 
@@ -267,8 +306,8 @@
 
                         var action = '';
 
-                            action = action + "<a href='#' onclick='editItem(" + row.FacilityId + ");'>Edit</a><br>";
-                            action = action + "<a href='#' onclick='deleteItem(" + row.FacilityId + ");'>Delete</a>";
+                            action = action + "<a href='#' onclick='editItem(" + row.formId + ");'>Edit</a><br>";
+                            action = action + "<a href='#' onclick='deleteItem(" + row.formId + ");'>Delete</a>";
 
                         
 /*                             if (row["IsPublic"].toUpperCase() == "YES")
@@ -349,61 +388,210 @@
 
     }
 
-    function loadSearchResults() {
-        //loadReportParameters();
-        //getNewsList();
-    }
-
-  
-
-    function getList() {
-
-        var inURL = ServicePrefix + '/facility/entirelist' + getTokenInput();
+    function getListFacilityForms(control)
+    {
+ 
+        var inURL = ServicePrefix + '/facility/formlist' + getTokenInput();
+        inURL = inURL + "&infacilityid=" + getFacilityFromControl("ddlFacilities"); 
         
         $.ajax({
             url: inURL,
             dataType: 'json',
             type: 'get',
             contentType: 'application/json',
+            //data: JSON.stringify(testURLData),
             processData: false,
-            success: function (data, textStatus, jQxhr) 
-            {
-                populateDataTable("dt", data);
+            success: function (data, textStatus, jQxhr) {
+                console.log(data);
+                if (data.response.status != "SUCCESS") {
+                    ADLErrorMessage(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+   
+                    $.each(data.rows, function (index) {
+
+                        str = str + '<option value="' + data.rows[index].SystemFormId + '">' + data.rows[index].SystemForm + '</option>';
+
+                    });
+ 
+                    $("#"+control).html(str);
+ 
+                    getListSystemForms('ddlSystemForm','ddlAssignedForm');
+                    //convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
+
+                }
+
+
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 genericAjaxError(jqXhr, textStatus, errorThrown);
             }
         });
+
+
+    }
+    function getListSystemForms(control, controlToCheck)
+    {
+ 
+        $.ajax({
+            url: ServicePrefix + '/form/list' + getTokenInput(),
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            //data: JSON.stringify(testURLData),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+ 
+                console.log(data);
+                if (data.response.status != "SUCCESS") 
+                {
+                    ADLErrorMessage(data.response.errorMessage[0]);
+                }
+                else {
+
+                    var str = '';
+   
+                    $.each(data.rows, function (index) {
+
+                        if (inThisList(data.rows[index].SystemFormId, controlToCheck) == false)
+                        {
+                            str = str + '<option value="' + data.rows[index].SystemFormId + '">' + data.rows[index].Form + '</option>';
+                        }
+                    });
+ 
+                    $("#"+control).html(str);
+
+                }
+
+
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                genericAjaxError(jqXhr, textStatus, errorThrown);
+            }
+        });
+
+
+
+    }
+    function getList() {
+        getListFacilityForms('ddlAssignedForm');
     }
 
-    // functional area
-    function addItem() 
+ 
+ 
+
+    function moveMe(control1, control2)
+    {
+        var text = $('#' + control1 + ' option:selected').text();
+        var val = $('#' + control1 + ' option:selected').text();
+        if (val == "")
+        {
+            return;
+        }
+
+        $('#' + control2).append('<option value=' + val + '>'+ text +'</option>');
+    
+        $("#" + control1).find("option:selected").remove();
+        
+        $('#' + control1 + " option:selected").removeAttr("selected");
+        $('#' + control2 + " option:selected").removeAttr("selected");
+        // get control 1
+        // add to control 2
+        // remove from control 1
+
+    }
+
+    function deleteForm() 
     {
 
-        editItem(0);
-    }
+        // edit goes here...
+        var ind = $('#ddlAssignedForm option:selected').index();
 
-    function editItem(id) {
+        if (ind < 0)
+        {
+            bootbox.alert("Please select a Form you would like to remove.", function (result) { return; });
+        }
 
-        window.location = "../../admin/facility/item.html?facilityId=" + id;
-    }
+        var SystemFormId = $("#ddlAssignedForm").val();
+        var FacilityId = getFacilityFromControl("ddlFacilities");
 
+        var obj = 
+        {
+            "inApiToken": getLocalStorage("APIToken"),
+            "inFacilityId": parseInt(FacilityId),
+            "inSystemFormId": parseInt(SystemFormId),
+        }
 
-    function deleteItem(id) {
-
-        bootbox.confirm("Are you sure you want to delete this Facility?", function (result) {
-            if (result == true) {
-                deleteItemConfirmed(id);
-             }
+        $.ajax({
+            url: ServicePrefix + '/facility/formdelete',
+            dataType: 'json',
+            type: 'put',
+            contentType: 'application/json',
+            data: JSON.stringify(obj),
+            processData: false,
+            success: function (data, textStatus, jQxhr) {
+                if (data.response.status != "SUCCESS") 
+                {
+                    ADLErrorMessage(data.response.errorMessage[0]);
+                    return;
+                }
+                else
+                {
+                    moveMe('ddlAssignedForm','ddlSystemForm');
+                }
+            },
+            error: function (jQxhr, textStatus, errorThrown) {
+                genericAjaxError(jQxhr, textStatus, errorThrown);
+            }
         });
+}
+
+    function insertForm() 
+        {
+
+            // edit goes here...
+            var ind = $('#ddlSystemForm option:selected').index();
+
+            if (ind < 0)
+            {
+                bootbox.alert("Please select a Form yow would like to add.", function (result) { return; });
+            }
+
+            var SystemFormId = $("#ddlSystemForm").val();
+            var FacilityId = getFacilityFromControl("ddlFacilities");
+
+            var obj = 
+            {
+                "inApiToken": getLocalStorage("APIToken"),
+                "inFacilityId": parseInt(FacilityId),
+                "inSystemFormId": parseInt(SystemFormId),
+            }
+
+            $.ajax({
+                url: ServicePrefix + '/facility/forminsert',
+                dataType: 'json',
+                type: 'post',
+                contentType: 'application/json',
+                data: JSON.stringify(obj),
+                processData: false,
+                success: function (data, textStatus, jQxhr) {
+                    
+                    if (data.response.status != "SUCCESS") 
+                    {
+                        GeneralErrorMessageRtn(data.response.errorMessage[0]);
+                        return;
+                    }
+                    else
+                    {
+                        moveMe('ddlSystemForm', 'ddlAssignedForm');
+                    }
+                },
+                error: function (jQxhr, textStatus, errorThrown) {
+                    genericAjaxError(jQxhr, textStatus, errorThrown);
+                }
+            });
     }
 
-    function deleteItemConfirmed(id) {
-
-        functionalityNotAvailable();
-        return;
- 
-    }
-    
- 
 </script>
