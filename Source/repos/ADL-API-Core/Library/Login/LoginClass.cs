@@ -87,6 +87,11 @@ namespace ADLAPICore.Library.Login
                     // facility
                     int holdFacilityId = -1;
 
+                    if (dbResult.dt.Rows.Count < 1)
+                    {
+                        throw new Exception("Invalid Login.");
+                    }
+
                     foreach (DataRow row in dbResult.dt.Rows)
                     {
                         if (bLoaded == false)
