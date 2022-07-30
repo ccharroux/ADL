@@ -23,7 +23,7 @@ var startLocation = "";
 
 if (window.location.toString().toLowerCase().indexOf("pixxsports") > -1)
 {
-    startLocation = "http://www.pixxsports.com/adl/";
+    startLocation = "http://www.pixxsports.com/";
 }
 
 // TEMP AREA
@@ -1341,7 +1341,7 @@ function ADLErrorMessage(message, url)
 {
     bootbox.alert('Process Failed.\n\r\n\r' + message, function () {
 
-        if(message.toLowerCase().indexOf("token failed") > -1 )
+        if(message.toLowerCase().indexOf("token expired") > -1 )
         {
             goTo("../../admin/login/login.html");
         }
@@ -1588,17 +1588,17 @@ function buildMainMenu(selectedItem) {
     menuItems += '              <ul class="dropdown-menu" role="menu">';
 
     // patient onboarding
-    if (currentRole == cSystemAdminText || 
-        currentRole == cOwnerText )
-    {    
-        menuItems += '                  <li style="display:block;"><a href="../../admin/patient intake/item.html?MenuItem=true">Patient Intake</a></li>';
-    }
+    //if (currentRole == cSystemAdminText || 
+    //    currentRole == cOwnerText )
+    //{    
+    //    menuItems += '                  <li style="display:block;"><a href="../../admin/patient intake/item.html?MenuItem=true">Patient Intake</a></li>';
+    //}
     // patient off boarding
-    if (currentRole == cSystemAdminText || 
-        currentRole == cOwnerText )
-    {    
-        menuItems += '                  <li style="display:block;"><a href="../../admin/patient offboarding/item.html?MenuItem=true">Patient Off-boarding</a></li>';
-    }
+    //if (currentRole == cSystemAdminText || 
+    //    currentRole == cOwnerText )
+    //{    
+    //    menuItems += '                  <li style="display:block;"><a href="../../admin/patient offboarding/item.html?MenuItem=true">Patient Off-boarding</a></li>';
+   // }
 
     // facility maintenance
     if (currentRole == cSystemAdminText )
@@ -3856,6 +3856,7 @@ function getUserListAPICall(facilityId, roleId)
         }
     });
 }
+
 function getPatientADLListByDayAPICall(patientId, transactionDate) 
 {
 
@@ -3870,13 +3871,36 @@ function getPatientADLListByDayAPICall(patientId, transactionDate)
         contentType: 'application/json',
         processData: false,
         success: function (data, textStatus, jQxhr) {
-            getPatientADLListByDaySuccess(data);
+            getPatientFormListSuccess(data);
         },
         error: function (jqXhr, textStatus, errorThrown) {
             genericAjaxError(jqXhr, textStatus, errorThrown);
         }
     });
 }
+
+function getPatientFormListAPICall(patientId) 
+{
+
+    var inURL = ServicePrefix + "/patient/FormListByDay/" + getTokenInput();
+    inURL = inURL + "&inPatientId=" + patientId;
+
+    $.ajax({
+        url: inURL,
+        dataType: 'json',
+        type: 'get',
+        contentType: 'application/json',
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+            getPatientFormListSuccess(data);
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    });
+}
+
+
 function getUser(id) 
 {
 
@@ -4108,6 +4132,30 @@ function insertPatientADLLogAPICall(updateData)
     $.ajax(url, settings);
 
 }
+function insertPatientFormLogAPICall(updateData) 
+{
+    // set url
+    var url = ServicePrefix + '/Patient/FormLog';
+
+    //set method
+    var methodForCall = "POST";
+
+    var settings = {
+        dataType: 'json',
+        type: methodForCall,
+        contentType: 'application/json',
+        data:   updateData,
+        success: function (data, textStatus, jQxhr) {
+            insertPatientFormLogSuccess(data, textStatus, jQxhr);
+        },
+        error: function (jQxhr, textStatus, errorThrown) {
+            genericAjaxError(jQxhr, textStatus, errorThrown);
+        }
+    };
+
+    $.ajax(url, settings);
+
+}
 
 function getFacilityDashboardDataByDayAPICall(facilityId, transactionDate) 
 {
@@ -4222,4 +4270,38 @@ function findFacilityByFacilityId(control, val)
 
     return valToReturn;
 
+}
+
+function getUserNameFromMemory()
+{
+    var str = "";
+    str = getLocalStorage("firstName");
+    str = str + trim(" " + getLocalStorage("middleName"));
+    str = str + trim(" " + getLocalStorage("lastName"));
+
+
+    return str;
+}
+
+function getPatientFormStatusAPICall(patientId) {
+
+    
+    var url = ServicePrefix + "/patient/FormStatus/";
+    url = url + getTokenInput();
+    url = url + "&inPatientId=" + patientId;
+    
+    $.ajax({
+        url: url,
+        dataType: 'json',
+        type: 'get',
+
+        contentType: 'application/json',
+        processData: false,
+        success: function (data, textStatus, jQxhr) {
+            getPatientFormStatusSuccess(data, textStatus, jQxhr);
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            genericAjaxError(jqXhr, textStatus, errorThrown);
+        }
+    });
 }

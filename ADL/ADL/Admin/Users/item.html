@@ -202,7 +202,43 @@
                             </div>
                         </div>
                     </div>
+                    <div id="patientForm" style="display:none" class="default-button-section">
+                        <div class="row">
+                            <div class="col-md-12 text-align-center">
+                                    <center><h3 style="margin-bottom:10px;">Patient Forms</h3>
+                                    <table style="margin-bottom:10px;width:50%">
+                                        <tr>
+                                            <td  width="60%"  class="text-align-left">
+                                                Total Forms
+                                            </td>
+                                            <td width="40%"  id="divTotalForms" class="text-align-center">
 
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td width="60%" class="text-align-left">
+                                                Total Signed Forms
+                                            </td>
+                                            <td id="divTotalSigned" width="40%" class="text-align-center">
+
+                                            </td>
+                                        </tr>  
+                                    </table>
+                                </center>
+                            </div>
+                        </div>
+                            
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div>
+                                    <input value="View Patient Forms" onclick="goToPatientForms();" class="default-button" type="button" />
+                                </div>
+                                <!--<div class="back-button-div">
+                                    <input value="Back" onclick="goBackToDashboard();" class="default-button" type="button" />
+                                </div>-->
+                            </div>
+                        </div>
+                    </div>
                     <div id="divAccess" style="display:none;width:100%">
                         <!--Buttons-->
                         <h3>Access</h3>
@@ -233,6 +269,9 @@
 
                         <hr>
                     </div>
+
+
+
 
                     <div class="default-button-section">
                         <div class="row">
@@ -373,6 +412,12 @@
             // this is roles
             getUserAccessList(userId);
             $("#divAccess").show();
+
+            if ($("#patientAccess").val() == "true")
+            {
+                getPatientFormStatusAPICall(userId)
+            }
+        
         }
         else
         {
@@ -392,12 +437,19 @@
 
     });
 
+    function goToPatientForms()
+    {
+        goTo('../../admin/patient intake/item.html?userId=' + userId);
+    }
+
     $(document).ajaxStop(function ()
     {
         if (assign == true)
         {
             addRole();
         }
+ 
+
         // standard events
         setupEvents();
     });
@@ -502,10 +554,14 @@
                             {
                                 $("#btnAddRole").hide();
                                 $("#patientAccess").val("true");
+                                $("#patientForm").show();
+
                             }
                             else
                             {
                                 $("#patientAccess").val("false");
+                                $("#patientForm").hide();
+
                             }
 
                         return action;
@@ -938,4 +994,16 @@
             });
         }
     }       
+    function getPatientFormStatusSuccess(data, textStatus, jQxhr)
+    {
+        if (data.response.status != "SUCCESS") 
+        {
+            ADLErrorMessage(data.response.errorMessage[0]);
+        } 
+        else 
+        {      
+            $("#divTotalForms").text(data.TotalForms);    
+            $("#divTotalSigned").text(data.TotalSigned);   
+        }
+    }
 </script>

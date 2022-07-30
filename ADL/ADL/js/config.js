@@ -4,13 +4,13 @@ var bForceDR = false;
 var bIsDemo = false;
 var bNonProd = true;
 
-ServicePrefix = "http://www.pixxsports.com/";
 ServicePrefix = "https://localhost:44398";
 
-// if (window.location.toString().toLowerCase().indexOf("devmediainternal.millerkaplan.com") > -1) {
-//     ServicePrefix = "https://devservices.millerkaplan.com/";
-//     bNonProd = true;
-// }
+ if (window.location.toString().toLowerCase().indexOf("pixxsports") > -1) {
+     ServicePrefix = "http://www.pixxsports.com/services";
+
+ }
+
 // else if (window.location.toString().toLowerCase().indexOf("stagingmediainternal.millerkaplan.com") > -1) {
 //     ServicePrefix = "https://stagingservices.millerkaplan.com/";
 //     bNonProd = true;
