@@ -13,6 +13,16 @@ namespace ADLAPICore.Models.Patient
  
     }
 
- 
+    public class PatientFormLogInsertInput
+    {
+        public string inApiToken { get; set; }
+        public int inUserId { get; set; }
+        public int inPatientId { get; set; }
+        public int inFormFacilityId { get; set; }
+
+
+    }
+
+
 
 }

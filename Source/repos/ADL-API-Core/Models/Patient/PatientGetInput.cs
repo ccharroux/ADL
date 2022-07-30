@@ -37,4 +37,14 @@ namespace ADLAPICore.Models.Patient
         public int inPatientId { get; set; }
         public int inSystemADLId { get; set; }
     }
+    public class PatientFormListGetInput
+    {
+        public string inApiToken { get; set; }
+        public int inPatientId { get; set; }
+    }
+    public class PatientFormStatusGetInput
+    {
+        public string inApiToken { get; set; }
+        public int inPatientId { get; set; }
+    }
 }

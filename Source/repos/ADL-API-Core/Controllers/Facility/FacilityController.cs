@@ -291,7 +291,6 @@ namespace ADLAPICore.Controllers.Facility
             }
         }
 
-
         [HttpPost("FormInsert")]
         public ActionResult FormInsert([FromBody] FacilityFormInsertInput input)
         {
@@ -357,6 +356,7 @@ namespace ADLAPICore.Controllers.Facility
                 return Content(JsonConvert.SerializeObject(fr), MediaTypeNames.Application.Json);
             }
         }
+        
         [HttpPost("Address")]
         public ActionResult InsertFacilityAddress([FromBody] FacilityAddressInsertInput input)
         {

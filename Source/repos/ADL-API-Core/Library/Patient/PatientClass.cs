@@ -46,7 +46,27 @@ namespace ADLAPICore.Library.Patient
         public string SystemADL { get; set; }
         public string TimeOfDay { get; set; }
     }
+    public class PatientFormRow
+    {
+        public Int32 PatientId { get; set; }
+        public Int32 SystemFormId { get; set; }
+        public string SystemForm { get; set; }
+        public Int32 FormPatientLogId { get; set; }
+        public string TransactionDate { get; set; }
+        public string UserName { get; set; }
+        public Int32 FormFacilityId { get; set; }
+    }
+    public class PatientFormResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public List<PatientFormRow> rows = new List<PatientFormRow>();
+        private PatientFormRow resultRow = new PatientFormRow();
 
+        public PatientFormResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
     public class PatientADLByDayResult
     {
         public ResponseModel response = new ResponseModel();
@@ -141,7 +161,28 @@ namespace ADLAPICore.Library.Patient
             this.response = General.buildError("Unexpected error");
         }
     }
+    public class PatientFormLogInsertResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public int ReturnCode { get; set; }
 
+        public PatientFormLogInsertResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
+    public class PatientFormStatusResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public int TotalForms;
+        public int TotalSigned;
+        private PatientFormRow resultRow = new PatientFormRow();
+
+        public PatientFormStatusResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
     public interface IPatientClass
     {
         public PatientADLByDayResult GetPatientADLListByDay(PatientADLListByDayGetInput input);
@@ -152,6 +193,9 @@ namespace ADLAPICore.Library.Patient
         public PatientADLUpdateResult UpdatePatientADL(PatientADLUpdateInput input);
         public PatientADLItemResult GetPatientADLItem(PatientADLItemGetInput input);
         public PatientADLLogInsertResult InsertPatientADLLog(PatientADLLogInsertInput input);
+        public PatientFormResult GetPatientFormList(PatientFormListGetInput input);
+        public PatientFormLogInsertResult InsertPatientFormLog(PatientFormLogInsertInput input);
+        public PatientFormStatusResult GetPatientFormStatus(PatientFormStatusGetInput input);
     }
 
     public class PatientClass : IPatientClass
@@ -159,7 +203,96 @@ namespace ADLAPICore.Library.Patient
 
         public PatientClass()
         { }
+        public PatientFormResult GetPatientFormList(PatientFormListGetInput input)
+        {
 
+            PatientFormResult result = new PatientFormResult();
+            PatientFormRow resultRow = new PatientFormRow();
+
+            try
+            {
+
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                PatientDBClass lDB = new PatientDBClass();
+
+                var dbResult = lDB.PatientFormListDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                resultRow = new PatientFormRow();
+                result.rows = new List<PatientFormRow>();
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    resultRow = new PatientFormRow
+                    {
+                        SystemForm = row["systemForm"].ToString(),
+                        FormFacilityId = Convert.ToInt32(row["idformfacility"]),
+                        SystemFormId = Convert.ToInt32(row["idsystemform"]),
+                        FormPatientLogId = Convert.ToInt32(row["idformpatientlog"]),
+                        TransactionDate = row["transactiondate"].ToString(),
+                        UserName = row["userName"].ToString()
+                    };
+
+                    result.rows.Add(resultRow);
+
+                }
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new PatientFormResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(PatientFormListGetInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+
+                if (input.inPatientId <= 0)
+                {
+                    throw new ApplicationException("Patient Id must be greater than 0.");
+                }
+
+                //DateTime temp;
+                //if (DateTime.TryParse(input.inTransactionDate.to, out temp) == false)
+                //{
+                //    throw new ApplicationException("Must pass a valid transaction date.");
+                //}
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.status = ResponseModel.responseFAIL;
+                result.errorMessage = new List<string>();
+                result.errorMessage.Add(ex.Message);
+                return result;
+            }
+        }
         public PatientADLByDayResult GetPatientADLListByDay(PatientADLListByDayGetInput input)
         {
 
@@ -872,6 +1005,173 @@ namespace ADLAPICore.Library.Patient
                 return result;
             }
         }
+
+
+        public PatientFormLogInsertResult InsertPatientFormLog(PatientFormLogInsertInput input)
+        {
+
+            PatientFormLogInsertResult result = new PatientFormLogInsertResult();
+
+            try
+            {
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                PatientDBClass lDB = new PatientDBClass();
+
+                var dbResult = lDB.InsertPatientFormLogDBCall(input);
+
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    result.ReturnCode = Convert.ToInt32(row["returnCode"]);
+                }
+
+                if (result.ReturnCode < 0)
+                {
+                    throw new ApplicationException(DBCodes.Get(result.ReturnCode));
+                }
+
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+                return new PatientFormLogInsertResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(PatientFormLogInsertInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+
+                if (input.inUserId <= 0)
+                {
+                    throw new ApplicationException("User Id must be greater than 0.");
+                }
+
+                if (input.inPatientId <= 0)
+                {
+                    throw new ApplicationException("Patient Id must be greater than 0.");
+                }
+
+                if (input.inFormFacilityId <= 0)
+                {
+                    throw new ApplicationException("Form Facility Id must be greater than 0.");
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.status = ResponseModel.responseFAIL;
+                result.errorMessage = new List<string>();
+                result.errorMessage.Add(ex.Message);
+                return result;
+            }
+        }
+
+        public PatientFormStatusResult GetPatientFormStatus(PatientFormStatusGetInput input)
+        {
+
+            PatientFormStatusResult result = new PatientFormStatusResult();
+
+            try
+            {
+
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                PatientDBClass lDB = new PatientDBClass();
+
+                var dbResult = lDB.PatientFormStatusDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    result.TotalForms = Convert.ToInt32(row["TotalForms"]);
+                    result.TotalSigned = Convert.ToInt32(row["TotalSigned"]);
+                }
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new PatientFormStatusResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(PatientFormStatusGetInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+
+                if (input.inPatientId <= 0)
+                {
+                    throw new ApplicationException("Patient Id must be greater than 0.");
+                }
+
+                //DateTime temp;
+                //if (DateTime.TryParse(input.inTransactionDate.to, out temp) == false)
+                //{
+                //    throw new ApplicationException("Must pass a valid transaction date.");
+                //}
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.status = ResponseModel.responseFAIL;
+                result.errorMessage = new List<string>();
+                result.errorMessage.Add(ex.Message);
+                return result;
+            }
+        }
+
+
 
         /* private */
         private string ConvertDay(int inDay, string currentVal)

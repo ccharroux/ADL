@@ -30,6 +30,40 @@ namespace ADLAPICore.Controllers.Patient
             _controllerClass = controllerClass;
         }
 
+        [HttpGet("FormListByDay")]
+        public ActionResult FormListByDay([FromQuery] PatientFormListGetInput input)
+        {
+            try
+            {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (PatientFormListGetInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.GetPatientFormList(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                PatientFormResult r = new PatientFormResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
+
         [HttpGet("ADLListByDay")]
         public ActionResult ADLListByDay([FromQuery] PatientADLListByDayGetInput input)
         {
@@ -304,6 +338,74 @@ namespace ADLAPICore.Controllers.Patient
             }
         }
 
+        [HttpPost("FormLog")]
+        public ActionResult FormLog([FromBody] PatientFormLogInsertInput input)
+        {
+            try
+            {
+
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (PatientFormLogInsertInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.InsertPatientFormLog(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                PatientFormLogInsertResult r = new PatientFormLogInsertResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
+
+        [HttpGet("FormStatus")]
+        public ActionResult FormLogStatus([FromQuery] PatientFormStatusGetInput input)
+        {
+            try
+            {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (PatientFormStatusGetInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.GetPatientFormStatus(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                PatientFormStatusResult r = new PatientFormStatusResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
 
     }
 }
