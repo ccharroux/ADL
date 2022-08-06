@@ -83,7 +83,7 @@
             /*border-bottom: solid 1px black!important;*/
             border-right: solid 1px black!important;
             color:white!important;
-            background-color:#566573!important;
+            background-color:black!important;
             border-top: solid 1px black!important;
         }
         td
@@ -140,10 +140,7 @@
                         <h2 id="reportTitle"></h2>
                     </div>
                 </div>
-                <div id="divQuickReport" style="padding-right:30px" >
-                    <label for="ddlQuickReport" class="search-ddl-label" style="text-align:right">Reports:&nbsp;</label>
-                    <select class="search-ddl-select" onchange="getQuickReport(this.value)" style="width:207px;font-size:14px" id="ddlQuickReport"></select>
-                 </div>
+
                 <!-- search / filter area -->
                 <div class="row search-section">
                     <div class="col-md-12 ">
@@ -231,9 +228,14 @@
                             <label for="ddlMediaType" class="dropdown-label rptView rptMediaType">Media Type</label>
                             <select id="ddlMediaType" apiInput="inMediaTypeId" onchange="updateDependentLists(this)" class="dropdown-select rptView rptMediaType report-filter"></select>
                         </div>
+
                         <div class="form-group rptView rptFacilities" >
                             <label for="ddlFacilities" class="dropdown-label rptView rptFacilities">Facilities</label>
                             <select id="ddlFacilities" apiInput="inFacilityId" onchange="updateDependentLists(this)" class="dropdown-select rptView rptFacilities report-filter"></select>
+                        </div>
+                        <div class="form-group rptView rptPatient" >
+                            <label for="ddlPatient" class="dropdown-label rptView rptPatient">Patients</label>
+                            <select id="ddlPatient" apiInput="inPatientId" onchange="updateDependentLists(this)" class="dropdown-select rptView rptPatient report-filter"></select>
                         </div>
 
 
@@ -355,6 +357,14 @@
                         <div class="form-group rptTransactionDate rptView" >
                             <label for="dtTransactionDate" class="dropdown-label rptTransactionDate rptView">Transaction Date</label>
                             <input type="text" id="dtTransactionDate" class="rptTransactionDate rptView report-filter" style="max-width:100px;" apiInput="inTransactionDate">
+                        </div>
+                        <div class="form-group rptTransactionDateFrom rptView" >
+                            <label for="dtTransactionDateFrom" class="dropdown-label rptTransactionDateFrom rptView">From Date</label>
+                            <input type="text" id="dtTransactionDateFrom" class="rptTransactionDateFrom rptView report-filter" style="max-width:100px;" apiInput="inTransactionDateFrom">
+                        </div>
+                        <div class="form-group rptTransactionDateTo rptView" >
+                            <label for="dtTransactionDateTo" class="dropdown-label rptTransactionDateTo rptView">To Date</label>
+                            <input type="text" id="dtTransactionDateTo" class="rptTransactionDateTo rptView report-filter" style="max-width:100px;" apiInput="inTransactionDateTo">
                         </div>
                         <!-- ADL -->
 
@@ -702,6 +712,8 @@
         // setup date pickers
         $(function () {
             $("#dtTransactionDate").datepicker();
+            $("#dtTransactionDateFrom").datepicker();
+            $("#dtTransactionDateTo").datepicker();
             $("#dtStartDate").datepicker();
             $("#dtFromDate").datepicker();
             $("#dtEndDate").datepicker();
@@ -742,6 +754,33 @@
             var params = new Array();
             var thisControl = "";
  
+
+            if (objectValue.reloadBasedFacilities != undefined)
+            {
+
+                thisControl = "ddlFacilities";
+                //alert(thisControl);
+                //alert($("#" + thisControl).val());
+
+                if ($("#" + thisControl).val() != "") {
+                    // add value to array
+                    params.push($("#" + thisControl).val()); // this will be the Facility value...
+                }
+                else
+                {
+                    params.push(null);
+                }
+                if (controlThatWasClicked.id == thisControl) {
+                    bReloadNeeded = true;
+                }
+ 
+            } else {
+                params.push(null);
+ 
+            }
+
+
+
 
             if (objectValue.reloadBasedProduct != undefined && objectValue.reloadBasedProduct == true)
             {
@@ -970,7 +1009,15 @@
         $("#dtEndDate").val(currentMonth + "/" + lastDayOfTheMonth.getDate() + "/" + currentYear);
         $("#dtTransactionDate").val(currentMonth + "/" + currentDay + "/" + currentYear);
 
+
+        $("#dtTransactionDateFrom").val(1 + "/" + 1 + "/" + currentYear);
+        $("#dtTransactionDateTo").val(12 + "/" + 31 + "/" + currentYear);
+
+
         saveLoadedControlSelection("dtTransactionDate");
+        saveLoadedControlSelection("dtTransactionDateFrom");
+        saveLoadedControlSelection("dtTransactionDateTo");
+
         saveLoadedControlSelection("dtFromDate");
         saveLoadedControlSelection("dtStartDate");
         saveLoadedControlSelection("dtEndDate");
@@ -3292,13 +3339,13 @@
             else {
                 if (isRequired)
                 {
-
+                    console.log(nameOfParm);
                     var paramWithIssue = nameOfParm.toLowerCase().replace("in", "").replace("id", "");
 
                     // overrides here for business reasons                   
                     // relationshiplist --> personnelGroup
 
-                    paramWithIssue = paramWithIssue.toLowerCase().replace("relationshiplist", "mka user group");
+                    // paramWithIssue = paramWithIssue.toLowerCase().replace("relationshiplist", "mka user group");
 
                     var msg = "Please select a " + paramWithIssue
                     if (bSilent == false) {

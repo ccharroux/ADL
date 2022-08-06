@@ -26,331 +26,11 @@ if (window.location.toString().toLowerCase().indexOf("pixxsports") > -1)
     startLocation = "http://www.pixxsports.com/";
 }
 
-// TEMP AREA
-
-var testURL = ServicePrefix + "services/PixxGet.asmx/GetMemberID";
-var testURLData = { "EmailAddress": "CarlCharroux@yahoo.com", "PassKey": "123" };
-testURL = " https://localhost:44398/login?inEmailAddress=carlcharroux@yahoo.com&inPassword=123";
-
 function functionalityNotAvailable ()
 {
     bootbox.alert('Functionality coming soon!!!', function () {}); 
 }
-    //if (data.response.status.toUpperCase() === "SUCCESS") {
-        //data = JSON.stringify(data.report.rows);
-/*         console.log(data);
-
-        tableJson = $.parseJSON(data); */
-
-    //} else {
-//
-  //      GeneralErrorMessageRtn(data.response.errorMessage[0]);
-    //    tableJson = data;
-var testADLPatientADLSData = {
-    "response" : {
-        "status" : "SUCCESS",
-        "errorList" : new Array()
-    },
-    "report": {
-        "rows" :[
-            {
-                "adlTime" : "08:00",
-                "adl": "Meal Preparation + Feeding: Breakfast",
-                "adlFrequency": "Daily"
-            },
-            {
-                "adlTime" : "10:00",
-                "adl" : "Medication Adminstration",
-                "adlFrequency" : "Mon,Wed,Fri"
-            },
-            {
-                "adlTime" : "11:30",
-                "adl" : "Meal Preparation + Feeding: Lunch",
-                "adlFrequency" : "Daily"
-            },
-            {
-                "adlTime" : "15:00",
-                "adl" : "Bed Bath / Shower",
-                "adlFrequency" : "Mon,Wed,Fri"
-            },
-            {
-                "adlTime" : "17:00",
-                "adl" : "Meal Preparation + Feeding: Dinner",
-                "adlFrequency" : "Daily"
-            },
-            {
-                "adlTime" : "20:00",
-                "adl" : "Transfer to Bed",
-                "adlFrequency" : "Daily"
-            }
-        ]
-    }
-};
-var testUserData = {
-    "response" : {
-        "status" : "SUCCESS",
-        "errorList" : new Array()
-    },
-    "report": {
-        "rows" :[
-            {
-                "userId" : 1,
-                "firstName": "Carl",
-                "lastName": "Charroux",
-                "middleInitial": "",
-                "address1": "123 Main st",
-                "address2":"",
-                "city": "North Hills",
-                "stateAbbreviation":"CA",
-                "zipCode":"12345",
-                "country":"US",
-                "phone1":"818-219-1528",
-                "phone2":"",
-                "emailAddress":"",
-                "roles":
-                        [
-                            {
-                                "role" : "patient",
-                                "facilityId" : 1
-                            }
-                        ]
-            }
-        ]
-    }
-};
-var testADLFacilityAssignmentData = {
-        "response" : {
-            "status" : "SUCCESS",
-            "errorList" : new Array()
-        },
-        "report": {
-            "rows" :
-                    [
-                        {
-                            "adlId" : 1,
-                            "adl" : "Meal Preparation + Feeding",
-                            "adlCategory" : "Care"
-                        },
-                        {
-                            "adlId" : 2,
-                            "adl" : "Medication Adminstration",
-                            "adlCategory" : "Medical"
-                        },
-                        {
-                            "adlId" : 3,
-                              "adl" : "Toileting / Diaper Change",
-                            "adlCategory" : "Care"
-                        }
-                    ]        
-                }
-            };
-var testADLPatientCareData = {
-    "response" : {
-        "status" : "SUCCESS",
-        "errorList" : new Array()
-    },
-    "report": {
-        "rows" :
-                [
-                    {
-                        "adlTranId" : 1,
-                        "patient" : "Charroux, Carl",
-                        "pctComplete" : "50%",
-                        "userId" : 1
-                    },
-                    {
-                        "adlTranId" : 2,
-                        "patient" : "Alino, Alex",
-                        "pctComplete" : "100%",
-                        "userId" : 2
-                    },
-                    {
-                        "adlTranId" : 3,
-                        "patient" : "Dones, Noel",
-                        "pctComplete" : "25%",
-                        "userId" : 3
-                    }
-                ]        
-            }
-        };
-var testADLSystemData = {
-    "response" : {
-        "status" : "SUCCESS",
-        "errorList" : new Array()
-    },
-    "report": {
-        "rows" :
-                [
-                    {
-                        "adlId" : 1,
-                        "userId": 1,
-                        "adl" : "Meal Preparation + Feeding",
-                        "adlCategory" : "Care"
-                    },
-                    {
-                        "adlId" : 2,
-                        "userId": 6,
-                        "adl" : "Medication Adminstration",
-                        "adlCategory" : "Medical"
-                    },
-                    {
-                        "adlId" : 3,
-                        "userId": 13,
-                        "adl" : "Toileting / Diaper Change",
-                        "adlCategory" : "Care"
-                    },
-                    {
-                        "adlId" : 4,
-                        "userId": 14,
-                        "adl" : "Bed Bath / Shower",
-                        "adlCategory" : "Care"
-                    },
-                    {
-                        "adlId" : 5,
-                        "userId": 17,
-                        "adl" : "Transfer to Bed",
-                        "adlCategory" : "Care"
-                    }
-                ]        
-            }
-        };
-
-var testFacilityListData = {
-    "response" : {
-        "status" : "SUCCESS",
-        "errorList" : new Array()
-    },
-    "report": {
-        "rows" : 
-                [
-                    {
-                    "facilityId" : 1,
-                    "facilityName" : "Issa's House",
-                    "city": "North Hills",
-                    "state" : "CA",
-                    "owner" : "Charroux, Issa"
-                    
-                    },
-                    {
-                        "facilityId" : 2,
-                        "facilityName" : "Janet's House",
-                        "city": "Anahiem",
-                        "state" : "CA",
-                        "owner" : "Alino, Janet"
-                    },
-                    {
-                        "facilityId" : 3,
-                        "facilityName" : "Rozida's House",
-                        "city": "Anahiem Hills",
-                        "state" : "CA",
-                        "owner" : "Cabanilla, Rozida"
-                    },
-                    {
-                        "facilityId" : 4,
-                        "facilityName" : "Noel's House",
-                        "city": "Rancho Cucamonga",
-                        "state" : "CA",
-                        "owner" : "Dones, Noel"
-                    },
-                    {
-                        "facilityId" : 5,
-                        "facilityName" : "Stephanie's House",
-                        "city": "Los Angeles",
-                        "state" : "CA",
-                        "owner" : "Johnson, Stephanie"
-                    },
-                    {
-                        "facilityId" : 6,
-                        "facilityName" : "Lou's House",
-                        "city": "Rodondo Beach",
-                        "state" : "CA",
-                        "owner" : "Ralwings, Lou"
-                    },
-                    {
-                        "facilityId" : 7,
-                        "facilityName" : "Wanda's House",
-                        "city": "San Francisco",
-                        "state" : "CA",
-                        "owner" : "Styles, Wanda"
-                    },
-                    {
-                        "facilityId" : 8,
-                        "facilityName" : "Agelica's House",
-                        "city": "Santa Monica",
-                        "state" : "CA",
-                        "owner" : "Dimapasok, Angelica"
-                    }
-                                                                            
-                ]            
-            }
-        };
-
-        var testUserListData = {
-            "response" : {
-                "status" : "SUCCESS",
-                "errorList" : new Array()
-            },
-            "report": {
-                "rows" : 
-                        [
-                            {
-                            "userId" : 1,
-                            "facilityName" : "Issa's House",
-                            "role": "Owner",
-                            "fullName" : "Charroux, Issa"
-                            
-                            },
-                            {
-                                "userId" : 2,
-                                "facilityName" : "Janet's House",
-                                "role": "Owner",
-                                "fullName" : "Alino, Janet"
-                            },
-                            {
-                                "userId" : 3,
-                                "facilityName" : "Rozida's House",
-                                "role": "Caregiver",
-                                "fullName" : "Cabanilla, Tony"
-                            },
-                            {
-                                "userId" : 4,
-                                "facilityName" : "Noel's House",
-                                "role": "Manager",
-                                "fullName" : "Dones, Elaine"
-                            },
-                            {
-                                "userId" : 5,
-                                "facilityName" : "All",
-                                "role": "Super Admin",
-                                "fullName" : "Johnson, Stephanie"
-                            },
-                            {
-                                "userId" : 6,
-                                "facilityName" : "Lakeview House",
-                                "role": "Patient",
-                                "fullName" : "Ralwings, Lou"
-                            },
-                            {
-                                "userId" : 7,
-                                "facilityName" : "Wanda's House",
-                                "role": "Patient",
-                                "fullName" : "Styles, Jane"
-                            },
-                            {
-                                "userId" : 8,
-                                "facilityName" : "Agelica's House",
-                                "role": "Caregiver",
-                                "fullName" : "Walters, Tim"
-                            }
-                                                                                    
-                        ]            
-                    }
-                };
-        
-const gEmailTokenUsernameChange = "USERNAMECHANGE";
-const gEmailTokenPassAndUsernameChange = "PASSWORDANDUSERNAMECHANGE";
-const gEmailTokenPasswordChange = "PASSWORDCHANGE";
-
+ 
 const gChosenParams = {
     allowSearchContains: true,
     allowSplitWordSearch: false
@@ -359,18 +39,7 @@ var gShowHeader = true;
 var gAJAXError = false;
 const companyName = "ADL System";
 
-var release =
-{
-    "DEV": "N/A",
-    "STAGING": "04/21/2021",
-    "PRODUCTION": "",
-    "DEMO": ""
-}
-release["DEMO"] = release["STAGING"];
-release["PRODUCTION"] = release["STAGING"];
-
 var dateOfCode = new Date();
-release["DEV"] = (dateOfCode.getMonth() + 1) + '-' + dateOfCode.getDate() + '-' + dateOfCode.getFullYear();
 
 const gMonths = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
@@ -662,6 +331,7 @@ $(document).ready(function ()
 {
 
     $("#fh5co-page").find('a').text(companyName);
+    $("title").text(companyName);
     //$(document).ajaxStart(function ( ) {
 
 
@@ -3451,8 +3121,13 @@ function loadPatients(control)
  
 }
 
-function getPatientListByFacility(sourceControl, destinationControl)
+function getPatientListByFacility(sourceControl, destinationControl, bLoadADLS)
 {
+    if (!bLoadADLS == false)
+    {
+        bLoadADLS = true;
+    }
+
     var inURL = ServicePrefix + "/usermember/ListByFacility/" + getTokenInput();
     inURL = inURL + "&infacilityid=" + getFacilityFromControl(sourceControl);
     inURL = inURL + "&inroleid=" + cPatient;
@@ -3478,7 +3153,11 @@ function getPatientListByFacility(sourceControl, destinationControl)
                 });
             }
             $("#" + destinationControl).html(str);
-            getPatientADLS();
+            
+            if (bLoadADLS == true)
+            {            
+                getPatientADLS();
+            }
         },
         error: function (jqXhr, textStatus, errorThrown) {
             genericAjaxError(jqXhr, textStatus, errorThrown);
@@ -3577,11 +3256,18 @@ function getTokenInput()
 function getFacilityFromControl(control)
 {
     var val = $("#" + control).val();
-    var arr = val.split("|");
-    console.log(val);
 
-    return arr[0];
-
+    // includes role...
+    if (val.indexOf('|') > -1)
+    {
+        var arr = val.split("|");
+        console.log(val);
+        return arr[0];
+    }
+    else
+    {
+        return val;
+    }
 }
 
 function getRolesList(control, filter)
@@ -3599,7 +3285,6 @@ function getRolesList(control, filter)
         dataType: 'json',
         type: 'get',
         contentType: 'application/json',
-        //data: JSON.stringify(testURLData),
         processData: false,
         success: function (data, textStatus, jQxhr) {
  

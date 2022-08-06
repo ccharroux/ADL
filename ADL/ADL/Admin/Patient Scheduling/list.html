@@ -139,27 +139,7 @@
         </div>
         <!--<div id="map" data-animate-effect="fadeIn"></div>-->
     </div>
-    <div id="DateDialog" title="" style="display:none">
-        <div class="row">
-            <div class="col-md-2 marketOnHoldDateLabel">Market:</div>
-            <div class="col-md-7 marketOnHoldDateValue"><span id="spanMarketOnHoldDate_Market"></span></div>
-        </div>
-        <div class="row">
-            <div class="col-md-2 marketOnHoldDateLabel">Product:</div>
-            <div class="col-md-7 marketOnHoldDateValue"><span id="spanMarketOnHoldDate_Product"></span></div>
-        </div>
-        <div class="row">
-            <div class="col-md-2 marketOnHoldDateLabel">Hold Date:</div>
-            <div class="col-md-7 marketOnHoldDateValue"><input type="text" id="dtMarketOnHoldDate_Date" /></div>
-        </div>
-        <div class="row">
-            <div class="col-md-3 col-md-offset-9">
-                <input type="button" onclick="productMarketOnHoldConfirm();" Value="Confirm" />
-                <br /> &nbsp; <br />
-                <input type="button" onclick="productMarketOnHoldCancel();" Value="Cancel" />
-            </div>
-        </div>
-    </div>
+ 
     <!-- jQuery -->
     <script src="../../js/jquery.min.js"></script>
     <!-- jQuery Easing -->
@@ -207,7 +187,7 @@
         }
         else {     
 
-            patientId = (getParameterByName("patientId") == null ? 0 : getParameterByName("patientId"));
+            // patientId = (getParameterByName("patientId") == null ? 0 : getParameterByName("patientId"));
 
             getListSystemADLS();       
             buildUIDialogs();
@@ -215,26 +195,22 @@
 
             setEventListeners();
             setDataTable();
-           // addDialogComponents();
+ 
             loadFacilities("ddlFacilities");
-            //loadPatients("ddlPatients");
-            getPatientListByFacility("ddlFacilities", "ddlPatients");
+        
+            getPatientListByFacility("ddlFacilities", "ddlPatients", true);
 
-            setDateControl();
+ 
             buildMainMenu("Admin");
 
-            if (patientId > 0)
-            {
-                setTimeout(selectPatient, 1000);
-            }
+   
+            //setTimeout(getPatientADLS, 500);
+ 
 
         }
      });
 
-     function selectPatient(id)
-     {
-        $("#ddlPatients").val(patientId);
-     }
+ 
     function getPatientADLS()
     {
 
@@ -247,8 +223,6 @@
             url: inURL,
             dataType: 'json',
             type: 'get',
-            //type: 'post',
-            //data: JSON.stringify(testURLData),
             contentType: 'application/json',
             processData: false,
             success: function (data, textStatus, jQxhr) {
@@ -261,39 +235,9 @@
             }
         });
     }
+ 
 
-    function setDateControl()
-    {
-        var holdDate  = currentDate();
-
-        $("#dtDate").val(holdDate);
-        $("#dtDate").datepicker({
-                                maxDate: "0",
-                                onSelect: function(dateText, inst) { 
-                        getList();
-                    }
-                                }); 
-    }
-
-    function buildUIDialogs() {
-
-        $(function () {
-            $("#DateDialog").dialog({
-                autoOpen: false,
-                resizable: false,
-                width: 700,
-                height: 500,
-                modal: true,
-                title: "Patient Care",
-                create: function (event, ui) {
-                    $(event.target).parent().css('position', 'fixed');
-                }
-            });
-        });
-        
-
-
-    }
+ 
     function setEventListeners() {
         
 
@@ -423,48 +367,6 @@
 
     }
 
-    function getListFacilityADLS(control)
-    {
- 
-        $.ajax({
-            //url: ServicePrefix + '/api/Market/GetMarketListByProduct',
-            url: testURL,
-            dataType: 'json',
-            type: 'post',
-            contentType: 'application/json',
-            data: JSON.stringify(testURLData),
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                data = testADLFacilityAssignmentData;
-                console.log(data);
-                if (data.response.status != "SUCCESS") {
-                    GeneralErrorMessageRtn(data.response.errorMessage[0]);
-                }
-                else {
-
-                    var str = '';
-   
-                    $.each(data.report.rows, function (index) {
-
-                        str = str + '<option value="' + data.report.rows[index].adlId + '">' + data.report.rows[index].adl + '</option>';
-
-                    });
- 
-                    $("#"+control).html(str);
- 
-                    //convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
-                }
-
-
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-
-
-    }
     function getListSystemADLS()
     {
  
@@ -473,11 +375,9 @@
             dataType: 'json',
             type: 'get',
             contentType: 'application/json',
-            //data: JSON.stringify(testURLData),
             processData: false,
             success: function (data, textStatus, jQxhr) {
-                //data = testADLSystemData;
-                console.log(data);
+ 
                 if (data.response.status != "SUCCESS") {
                     GeneralErrorMessageRtn(data.response.errorMessage[0]);
                 }
@@ -486,21 +386,6 @@
                     // set the object
                     systemALS = data.rows;
                     return;
-
-    //                var str = '';
-   
-   //                 $.each(data.rows, function (index) {
-
-  //                      if (inThisList(data.rows[index].SystemADLId, controlToCheck) == false)
-   //                     {
-   //                         str = str + '<option value="' + data.rows[index].SystemADLId + '">' + data.rows[index].ADL + '</option>';
- //                       }
- //                   });
- 
-//                    $("#"+control).html(str);
- 
-                    //convertToChosenSelect(control, gChosenParams.allowSearchContains, gChosenParams.allowSplitWordSearch);
-
                 }
 
 
@@ -566,38 +451,7 @@
 
         return bReturn;
     }
-    function getList() {
-
-/*         var url = ServicePrefix + '/api/News/GetNewsList';
-        url += '?inApiToken=' + getLocalStorage("APIToken");
-        
-        var productId = $("#ddlProduct").val();
-        if (productId != "") {
-            url += '&inProductId=' + productId;
-        }
-        if ($("#chkIncludeDeleted").prop("checked") || productId == "DEL" || productId == "UPD") {
-            url += '&inIncludeDeleted=true';
-        } */
-
-        $.ajax({
-            url: testURL,
-            dataType: 'json',
-            //type: 'get',
-            type: 'post',
-            data: JSON.stringify(testURLData),
-            contentType: 'application/json',
-            processData: false,
-            success: function (data, textStatus, jQxhr) {
-                data = testADLFacilityAssignmentData;
-                console.log(data);
-            
-                populateDataTable("dt", data);
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                genericAjaxError(jqXhr, textStatus, errorThrown);
-            }
-        });
-    }
+ 
 
     // functional area
     function addItem() 

@@ -9,6 +9,9 @@ reportActionsArray.push("edit");
 
 var reportName = new Array();
 reportName.push("rptFacilityDailyActivity");
+reportName.push("rptPateintADLReport");
+reportName.push("rptFacilityADLReport");
+
 /*
 reportName.push("rptXRAYUsage");
 reportName.push("rptMRRUsage");
@@ -325,14 +328,7 @@ function buildQuickReports(rptType, control, container, postfix)
     var reportNameArray = new Array();
     var reportNumberArray = new Array();
 
-    if (!control)
-    {
-        control = 'ddlQuickReport';
-    }
-
-    if (!control) {
-        control = 'divQuickReport';
-    }
+ 
 
     var rptHit = false;
 
@@ -559,7 +555,7 @@ function buildReportLink(row, reportNameToFind)
 // REPORT AREA
 //-------------------------
 
- 
+// Facility Daily Activity 
 function getReportFilterArray_FacilityDailyActivity()
 {
 
@@ -615,9 +611,155 @@ function getReportObject_FacilityDailyActivity()
     return tempObject;
 }
 
+// Patient ADL Report
+function getReportFilterArray_PateintADLReport()
+{
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+//
+
+    arrayObject = {
+        token: "Facilities",
+        jsCall: "loadFacilitiesWithoutRole",
+        jsCallParameters: null,
+        objectName: "ddlFacilities",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token:  "TransactionDateFrom",
+        jsCall:  null,
+        jsCallParameters: null,        
+        objectName:  "dtTransactionDateFrom",
+        required:  true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token:  "TransactionDateTo",
+        jsCall:  null,
+        jsCallParameters: null,        
+        objectName:  "dtTransactionDateTo",
+        required:  true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = {
+        token: "Patient",
+        jsCall: "getPatientListByFacility",
+        jsCallParameters: new Array("ddlFacilities", "ddlPatient"),
+        objectName: "ddlPatient",
+        required: true,
+        reloadBasedFacilities: true
+    }
+    arrayFilters.push(arrayObject);
+
+    return arrayFilters;
+}
+
+function getReportObject_PateintADLReport()
+{
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+/*    columnsToDisplay.push("Category");
+    columnsToDisplay.push("Current Amount");
+    columnsToDisplay.push("Previous Amount");
+    columnsToDisplay.push("Period Pct");
+    columnsToDisplay.push("Current Amount YTD");
+    columnsToDisplay.push("Previous Amount YTD");
+    columnsToDisplay.push("YTD Pct");
+*/
+    tempObject =
+    {
+        reportTitle:  "Patient ADL Report",
+        apiControllerAction:  "/Patient/ADLReport",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product: ['Patient'],
+        approved : true
+    }
+
+    return tempObject;
+}
+
+// Facility ADL Report
+function getReportFilterArray_FacilityADLReport()
+{
+
+    var arrayFilters = new Array();
+    var arrayObject = new Object();
+//
+
+    arrayObject = {
+        token: "Facilities",
+        jsCall: "loadFacilitiesWithoutRole",
+        jsCallParameters: null,
+        objectName: "ddlFacilities",
+        required: true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token:  "TransactionDateFrom",
+        jsCall:  null,
+        jsCallParameters: null,        
+        objectName:  "dtTransactionDateFrom",
+        required:  true
+    }
+    arrayFilters.push(arrayObject);
+
+    arrayObject = new Object();
+    arrayObject = {
+        token:  "TransactionDateTo",
+        jsCall:  null,
+        jsCallParameters: null,        
+        objectName:  "dtTransactionDateTo",
+        required:  true
+    }
+    arrayFilters.push(arrayObject);
+
+ 
+
+    return arrayFilters;
+}
+
+function getReportObject_FacilityADLReport()
+{
+
+    var tempObject = new Object();
+
+    columnsToDisplay = new Array();
+/*    columnsToDisplay.push("Category");
+    columnsToDisplay.push("Current Amount");
+    columnsToDisplay.push("Previous Amount");
+    columnsToDisplay.push("Period Pct");
+    columnsToDisplay.push("Current Amount YTD");
+    columnsToDisplay.push("Previous Amount YTD");
+    columnsToDisplay.push("YTD Pct");
+*/
+    tempObject =
+    {
+        reportTitle:  "Facility ADL Report",
+        apiControllerAction:  "/Facility/ADLReport",
+        apiType:  "get",
+        columnsToDisplay:  columnsToDisplay,
+        product: ['Patient', 'Facility'],
+        approved : true
+    }
+
+    return tempObject;
+}
 
 
-
+////////////////////////////////////////////////////////////////
+// old ones for reference
 ///////////////////////////////////////////////////////////////
 
 // Parent Ownership
