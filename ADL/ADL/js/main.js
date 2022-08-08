@@ -129,7 +129,7 @@ const gYearsToGoBack = 5;
 
 
     var offcanvasMenu = function () {
-        return;
+        // return;
         $('body').prepend('<div id="fh5co-offcanvas" />');
         $('#fh5co-offcanvas').prepend('<ul id="fh5co-side-links">');
         $('body').prepend('<a href="#" class="js-fh5co-nav-toggle fh5co-nav-toggle"><i></i></a>');
@@ -142,7 +142,7 @@ const gYearsToGoBack = 5;
 
         $('body').on('click', '.js-fh5co-nav-toggle', function (event) {
             var $this = $(this);
-            return;
+            //return;
             
             $('body').toggleClass('fh5co-overflow offcanvas-visible');
             $this.toggleClass('active');
@@ -151,7 +151,7 @@ const gYearsToGoBack = 5;
         });
 
         $(window).resize(function () {
-            return;
+            //return;
 
             if ($('body').hasClass('offcanvas-visible')) {
                 $('body').removeClass('offcanvas-visible');
@@ -160,7 +160,7 @@ const gYearsToGoBack = 5;
         });
 
         $(window).scroll(function () {
-            return;
+            // return;
             if ($('body').hasClass('offcanvas-visible')) {
                 $('body').removeClass('offcanvas-visible');
                 $('.js-fh5co-nav-toggle').removeClass('active');
@@ -1183,24 +1183,25 @@ function buildDashboard()
 function buildMainMenu(selectedItem) {
 
     var menuItems = '';
+    var menuItemsLeft = '';
 
-    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">' + companyName + '</a></h1>';
-    menuItems += '<div style="top: 55px;position: fixed;margin-bottom:20px">';
-    menuItems += '<span style="color: white;">' + getLocalStorage("firstName") + ' ' + getLocalStorage("lastName");
-    menuItems += '</span>';
+    menuItemsLeft += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">' + companyName + '</a></h1>';
+    menuItemsLeft += '<div style="top: 55px;position: fixed;margin-bottom:20px">';
+    menuItemsLeft += '<span style="color: white;">' + getLocalStorage("firstName") + ' ' + getLocalStorage("lastName");
+    menuItemsLeft += '</span>';
     
     // create masterlist of facilies
     // only show it on the dashboard
     
     var currentPage = window.location.toString().toLowerCase();
     var currentRole = getLocalStorage("currentRole");
-    console.log(currentRole);
+  
 
     // build access list only if you are 
     // on the dashboard page
     if (currentPage.indexOf("dashboard.html") > -1)
     {
-        menuItems += '<div style="padding-top:12px"><select id="ddlFacilityAccess" onchange="buildDashboard();">';
+        menuItemsLeft += '<div style="padding-top:12px"><select id="ddlFacilityAccess" onchange="buildDashboard();">';
         var access = JSON.parse(getLocalStorage("fa"));
         var ctr = 0;
         var str = "";
@@ -1209,18 +1210,20 @@ function buildMainMenu(selectedItem) {
         {
             ctr++;
             key = access[index].FacilityId + '|' + access[index].Role;
-            menuItems += '<option ';
+            menuItemsLeft += '<option ';
             if (key == getLocalStorage("currentFacility"))
             {
-                menuItems += " SELECTED ";
+                menuItemsLeft += " SELECTED ";
             }
-            menuItems += 'value="' + access[index].FacilityId + '|' + access[index].Role +'">' + access[index].Facility + ' - ' + access[index].Role + ' </option>';
+            menuItemsLeft += 'value="' + access[index].FacilityId + '|' + access[index].Role +'">' + access[index].Facility + ' - ' + access[index].Role + ' </option>';
         });
-        menuItems += '</select></div>'; 
+        menuItemsLeft += '</select></div>'; 
     }
 
-    menuItems += '</div>'; 
+    menuItemsLeft += '</div>'; 
     
+    // now start the menu items
+
     menuItems += '<nav role="navigation" style="margin-top:20px">';
 
     
@@ -1256,19 +1259,6 @@ function buildMainMenu(selectedItem) {
     // SYSTEM SETTINGS
     menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Admin") + ' role="button" aria-expanded="false">System Settings <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-
-    // patient onboarding
-    //if (currentRole == cSystemAdminText || 
-    //    currentRole == cOwnerText )
-    //{    
-    //    menuItems += '                  <li style="display:block;"><a href="../../admin/patient intake/item.html?MenuItem=true">Patient Intake</a></li>';
-    //}
-    // patient off boarding
-    //if (currentRole == cSystemAdminText || 
-    //    currentRole == cOwnerText )
-    //{    
-    //    menuItems += '                  <li style="display:block;"><a href="../../admin/patient offboarding/item.html?MenuItem=true">Patient Off-boarding</a></li>';
-   // }
 
     // facility maintenance
     if (currentRole == cSystemAdminText )
@@ -1326,7 +1316,8 @@ function buildMainMenu(selectedItem) {
     menuItems += '    </ul>';
     menuItems += '</nav>';
 
-    $("#menu").html(menuItems);
+    $("#menu").html(menuItemsLeft + menuItems);
+    $("#fh5co-side-links").html(menuItems);
 }
 
 
@@ -1346,42 +1337,7 @@ function buildCancelMenu(selectedItem)
     $("#menu").html(menuItems);
 }
 
-function productDashboard(productId) {
-    var strOut = '';
-    var style = '';
 
-    switch (productId.toLowerCase()) {
-        case '':
-            strOut = '<a href="../../admin/login/dashboard.html?MenuItem=true">Dashboard</a>';
-            break;
-        case 'mrr':
-            style = 'display:block;';
-            strOut = '<a href="../../products/mrr/mrrreminders.html?MenuItem=true">MRR</a>';
-            break;
-        case 'xry':
-            style = 'display:block;';
-            strOut = '<a href="../../products/xry/xrydashboard.html?MenuItem=true">XRY</a>';
-            break;
-        case 'tvb':
-            style = 'display:block;';
-            strOut = '<a href="../../products/tvb/tvbdashboard.html?MenuItem=true">TVB</a>';
-            break;
-        case 'mss':
-            style = 'display:block;';
-            strOut = '<a href="../../products/mss/mssdashboard.html?MenuItem=true">MSS</a>';
-            break;
-        case 'dma':
-            style = 'display:block;';
-            strOut = '<a href="../../Products/DMA/dmadashboard.html?MenuItem=true">DMA</a>';
-            break;
-        case 'dmx':
-            style = 'display:block;';
-            strOut = '<a href="../../Products/DMX/dmxdashboard.html?MenuItem=true">DMX</a>';
-            break;
-    }
-
-    return '<li style="' + style + '">' + strOut + '</li>';
-}
 function buildGenericReportsLink(selectedItem) {
     var strOut = '';
     var style = '';
@@ -1428,73 +1384,7 @@ function returnTableColumnsByClass(tableName, className) {
     return arrExportColumn;
 }
 
-function returnProductListLinks(row) {
-    var productList = "";
-
-    productList += row.MRR.trim().length > 0 ? '<a href="#" onclick="editProduct(\'' + row.MRR.toUpperCase() + '\')">' + row.MRR.toUpperCase() + '</a>&nbsp;' : '';
-    productList += row.XRY.trim().length > 0 ? '<a href="#" onclick="editProduct(\'' + row.XRY.toUpperCase() + '\')">' + row.XRY.toUpperCase() + '</a>&nbsp;' : '';
-    productList += row.MSS.trim().length > 0 ? '<a href="#" onclick="editProduct(\'' + row.MSS.toUpperCase() + '\')">' + row.MSS.toUpperCase() + '</a>&nbsp;' : '';
-    productList += row.TVB.trim().length > 0 ? '<a href="#" onclick="editProduct(\'' + row.TVB.toUpperCase() + '\')">' + row.TVB.toUpperCase() + '</a>&nbsp;' : '';
-    productList += row.DMA.trim().length > 0 ? '<a href="#" onclick="editProduct(\'' + row.DMA.toUpperCase() + '\')">' + row.DMA.toUpperCase() + '</a>&nbsp;' : '';
-    productList += row.DMX.trim().length > 0 ? '<a href="#" onclick="editProduct(\'' + row.DMX.toUpperCase() + '\')">' + row.DMX.toUpperCase() + '</a>&nbsp;' : '';
-
-    return productList;
-}
-
-function returnProductMarketLinks(row) {
-    
-    var productList = "";
-
-    if (row.MRR.trim().length > 0)
-    {
-        productList = productList + '<a href="#" onclick="goTo(';
-        productList = productList + "'/products/mrr/mrrmarketproduct.html?marketId=" + row.marketId;
-        productList = productList + "')";
-        productList = productList + ';">' + row.MRR.toUpperCase() + "</a>&nbsp;";
-    }
-
-    if (row.XRY.trim().length > 0) {
-        productList = productList + '<a href="#" onclick="goTo(';
-        productList = productList + "'/products/xry/xrymarketproduct.html?marketId=" + row.marketId;
-        productList = productList + "')";
-        productList = productList + ';">' + row.XRY.toUpperCase() + "</a>&nbsp;";
-    }
-
-    if (row.TVB.trim().length > 0) {
-        productList = productList + '<a href="#" onclick="goTo(';
-        productList = productList + "'/products/tvb/tvbmarketproduct.html?marketId=" + row.marketId;
-        productList = productList + "')";
-        productList = productList + ';">' + row.TVB.toUpperCase() + "</a>&nbsp;";
-    }
-
-    if (row.DMA.trim().length > 0) {
-        productList = productList + '<a href="#" onclick="goTo(';
-        productList = productList + "'/products/DMA/DMAmarketproduct.html?marketId=" + row.marketId;
-        productList = productList + "')";
-        productList = productList + ';">' + row.DMA.toUpperCase() + "</a>&nbsp;";
-    }
-
-    if (row.DMX.trim().length > 0) {
-        productList = productList + '<a href="#" onclick="goTo(';
-        productList = productList + "'/products/DMX/DMXmarketproduct.html?marketId=" + row.marketId;
-        productList = productList + "')";
-        productList = productList + ';">' + row.DMX.toUpperCase() + "</a>&nbsp;";
-    }
-
-    if (row.MSS.trim().length > 0) {
-        productList = productList + '<a href="#" onclick="goTo(';
-        productList = productList + "'/products/mss/mssmarketproduct.html?marketId=" + row.marketId;
-        productList = productList + "')";
-        productList = productList + ';">' + row.MSS.toUpperCase() + "</a>&nbsp;";
-    }
-
-    //productList += row.MSS.trim().length > 0 ? row.MSS.toUpperCase() + '&nbsp;' : '';
-    //productList += row.DMA.trim().length > 0 ? row.DMA.toUpperCase() + '&nbsp;' : '';
-    //productList += row.DMX.trim().length > 0 ? row.DMX.toUpperCase() + '&nbsp;' : '';
-
-    return productList;
-}
-
+ 
 
 function populateDataTable(tableName, data) {
  
@@ -1535,71 +1425,7 @@ function addZero(n) {
     return n < 10 ? '0' + n : '' + n;
 }
 
-function buildTechMenu(selectedItem) {
 
-    var menuItems = '';
-
-    menuItems += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">ADL System</a></h1>';
-    menuItems += '<nav role="navigation" style="margin-top:20px">';
-
-    menuItems += '<ul>';
-    menuItems += buildGenericReportsLink2(selectedItem);
-    menuItems += '       <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "Products") + ' href="" role="button" aria-expanded="false">Products <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += productDashboard('mrr');
-    menuItems += productDashboard('xry');
-    menuItems += productDashboard('tvb');
-    menuItems += productDashboard('mss');
-    menuItems += productDashboard('dma');
-    menuItems += productDashboard('dmx');
-
-    menuItems += '              </ul>';
-    menuItems += '        </li>';
-    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "TechTools") + ' role="button" aria-expanded="false">Tools <span style="margin-right:10px;" class="caret"></span></a>';
-    menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/techtools/techtoolsdashboard.html?MenuItem=true">Tech Tools</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/email/emaillist.html?MenuItem=true">Email Tool</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/news/newslist.html?MenuItem=true">News Tool</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/techtools/matchednotification/matchednotificationlist.html?MenuItem=true">Matched Notification Tool</a></li>';
-
-    menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">MRR <span style="margin-right:10px;" class="caret"></span></a>'
-    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
-    menuItems += '                          <li style="display:block;"><a href="../../products/mrr/mrrarchiverollover.html?MenuItem=true">MRR Rollover</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="../../products/mrr/mrrmarkethistorydatamatrix.html?MenuItem=true">MRR Market History Maintenance</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="../../products/mrr/mrrstationownerchanged.html?MenuItem=true">MRR Station Ownership Change</a></li>';
-    menuItems += '                      </ul>';
-    menuItems += '                  </li>';
-
-    menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">XRY <span style="margin-right:10px;" class="caret"></span></a>'
-    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
-    menuItems += '                          <li style="display:block;"><a href="../../products/xry/xrymarkethistorydatamatrix.html?MenuItem=true">XRY Market History Maintenance</a></li>';
-    menuItems += '                          <li style="display:block;"><a href="../../products/xry/xrystationownerchanged.html?MenuItem=true">XRY Station Ownership Change</a></li>';
-    menuItems += '                      </ul>';
-    menuItems += '                  </li>';
-
-    menuItems += '                  <li class="dropdown" style="display:block"><a href="#" role="button" aria-expanded="true">TVB <span style="margin-right:10px;" class="caret"></span></a>'
-    menuItems += '                      <ul class="dropdown-menu" style="margin-left:60px;" role="menu">';
-    menuItems += '                          <li style="display:block;"><a href="../../products/tvb/tvbMarketHistoryDataMatrix.html?MenuItem=true">TVB Market History Maintenance</a></li>';
-    menuItems += '                      </ul>';
-    menuItems += '                  </li>';
-
-    //menuItems += '                  <li style="display:block;"><a href="../../Admin/FAQ/faqlist.html?MenuItem=true">Media FAQ</a></li>';
-
-    menuItems += '                  <li style="display:block;"><a href="../../Admin/TOTP/totpdevicelist.html?MenuItem=true">Admin Device Management</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../Admin/LoadProfile/loadprofile.html?MenuItem=true">Admin Load Profile</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../Admin/TechTools/passedQAList.html?MenuItem=true">Passed QA List</a></li>';
-    menuItems += '                  <li style="display:block;"><a href="../../admin/techtools/encryptdecrypt.html?MenuItem=true">Encryption/Decryption Tool</a></li>';
-
-    menuItems += '              </ul>';
-    menuItems += '        </li>';
-    menuItems += productDashboard('');
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
-    menuItems += '    </ul>';
-    menuItems += '</nav>';
-
-    $("#menu").html(menuItems);
-
-}
 
 function removeCharacter(object, charToRemove) {
 
