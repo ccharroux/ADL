@@ -2993,14 +2993,14 @@ function getPatientListByFacility(sourceControl, destinationControl, bLoadADLS)
 
 }
 
-function loadFacilities(control, bAddAll)
+function loadFacilities(control, bAddAll, callback)
 {
 
     if (!bAddAll)
     {
         bAddAll = false;
     }
-
+    
     $("#"+control).html("");
 
     var accessRaw = getLocalStorage("fa");
@@ -3042,6 +3042,13 @@ function loadFacilities(control, bAddAll)
      });   
 
     $("#"+control).append(str);
+
+    if (!callback == false)
+    {
+        callback();
+    }
+
+   
 
 }
 

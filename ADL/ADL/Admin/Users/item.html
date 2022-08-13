@@ -277,7 +277,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div>
-                                    <input value="Back to List" onclick="goTo('list.html');" class="default-button" type="button" />
+                                    <input value="Back to List" onclick="backToList();" class="default-button" type="button" />
                                 </div>
                             </div>
                         </div>
@@ -359,7 +359,7 @@
 </body>
 </html>
 <script>
-    
+    var patientMaintenance = false;
     var addressId = 0;
     var holdAddressId = 0;
     var userId = 0;
@@ -380,8 +380,7 @@
 
         // data for user screen
         getStateList("ddlState");
-        // menu
-        buildMainMenu("Admin");
+
 
         // hide/show role button
         if (getLocalStorage("currentRole") == cSystemAdminText || 
@@ -395,6 +394,7 @@
         }
 
         // query string vars
+        patientMaintenance = (getParameterByName("pateintMaintenance") == null ? false : true);
         assign = (getParameterByName("assign") == null ? false : Boolean(getParameterByName("assign")));
         addOwner = (getParameterByName("addOwner") == null ? false : Boolean(getParameterByName("addOwner")));
         userId = (getParameterByName("userId") == null ? 0 : getParameterByName("userId"));
@@ -407,8 +407,21 @@
         // new vs existing
         if (userId > 0)
         {
-            setTitle("User Maintenance");
+            if (patientMaintenance == true)
+            {
+                // menu
+                buildMainMenu("ADL");
+                setTitle("Patient Maintenance");
+            }
+            else
+            {
+                // menu
+                buildMainMenu("Admin");
+                setTitle("User Maintenance");
+            }
+
             getUser(userId);
+
             // this is roles
             getUserAccessList(userId);
             $("#divAccess").show();
@@ -436,7 +449,17 @@
         buildUIDialogs(accessDialogControl, "Add Access", 700, 500);
 
     });
-
+    function backToList()
+    {
+        if (patientMaintenance == true)
+        {
+            goTo('list.html?patientsOnly=true');
+        }
+        else
+        {
+            goTo('list.html');
+        }
+    }
     function goToPatientForms()
     {
         goTo('../../admin/patient intake/item.html?userId=' + userId);
