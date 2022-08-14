@@ -1186,9 +1186,9 @@ function buildMainMenu(selectedItem) {
     var menuItemsLeft = '';
 
     menuItemsLeft += '<h1><a href="../../admin/login/dashboard.html?MenuItem=true">' + companyName + '</a></h1>';
-    menuItemsLeft += '<div style="top: 55px;position: fixed;margin-bottom:20px">';
-    menuItemsLeft += '<span style="color: white;">' + getLocalStorage("firstName") + ' ' + getLocalStorage("lastName");
-    menuItemsLeft += '</span>';
+    //menuItemsLeft += '<div style="top: 55px;position: fixed;margin-bottom:20px">';
+    //menuItemsLeft += '<span style="color: white;">' + getLocalStorage("firstName") + ' ' + getLocalStorage("lastName");
+    //menuItemsLeft += '</span>';
     
     // create masterlist of facilies
     // only show it on the dashboard
@@ -1201,7 +1201,8 @@ function buildMainMenu(selectedItem) {
     // on the dashboard page
     if (currentPage.indexOf("dashboard.html") > -1)
     {
-        menuItemsLeft += '<div style="padding-top:12px"><select id="ddlFacilityAccess" onchange="buildDashboard();">';
+        var accessHTML = "";
+        //menuItemsLeft += '<div style="padding-top:12px"><select id="ddlFacilityAccess" onchange="buildDashboard();">';
         var access = JSON.parse(getLocalStorage("fa"));
         var ctr = 0;
         var str = "";
@@ -1210,14 +1211,15 @@ function buildMainMenu(selectedItem) {
         {
             ctr++;
             key = access[index].FacilityId + '|' + access[index].Role;
-            menuItemsLeft += '<option ';
+            accessHTML += '<option ';
             if (key == getLocalStorage("currentFacility"))
             {
-                menuItemsLeft += " SELECTED ";
+                accessHTML += " SELECTED ";
             }
-            menuItemsLeft += 'value="' + access[index].FacilityId + '|' + access[index].Role +'">' + access[index].Facility + ' - ' + access[index].Role + ' </option>';
+            accessHTML += 'value="' + access[index].FacilityId + '|' + access[index].Role +'">' + access[index].Facility + ' - ' + access[index].Role + ' </option>';
         });
-        menuItemsLeft += '</select></div>'; 
+        // menuItemsLeft += '</select></div>'; 
+        $("#ddlFacilityAccess").html(accessHTML);
     }
 
     menuItemsLeft += '</div>'; 
@@ -1234,22 +1236,22 @@ function buildMainMenu(selectedItem) {
 
     
     // daily work area
-    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "ADL") + '">Daily Work Area <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "ADL") + '">Patients <span style="margin-right:10px;" class="caret"></span></a>';
     menuItems += '              <ul class="dropdown-menu" role="menu">';
-    menuItems += '                  <li style="display:block"><a href="../../admin/adl care/list.html?MenuItem=true">Patient Care</a></li>';
+    menuItems += '                  <li style="display:block"><a href="../../admin/adl care/list.html?MenuItem=true">Care</a></li>';
     
     // Patient Maintenance
     if (currentRole == cSystemAdminText || 
         currentRole == cOwnerText || 
         currentRole == cManagerText)
     {
-        menuItems += '                  <li style="display:block"><a href="../../admin/users/list.html?MenuItem=true&patientsOnly=true">Patient Maintenance</a></li>';
+        menuItems += '                  <li style="display:block"><a href="../../admin/users/list.html?MenuItem=true&patientsOnly=true">Maintenance</a></li>';
     }
     // patient scheduling
     if (currentRole == cSystemAdminText || 
         currentRole == cOwnerText )
     {
-        menuItems += '                  <li style="display:block"><a href="../../admin/patient scheduling/list.html?MenuItem=true">Patient Scheduling</a></li>';
+        menuItems += '                  <li style="display:block"><a href="../../admin/patient scheduling/list.html?MenuItem=true">Scheduling</a></li>';
     }    
     menuItems += '              </ul>';
     menuItems += '        </li>';
@@ -1309,9 +1311,16 @@ function buildMainMenu(selectedItem) {
     menuItems += '              </ul>';
     menuItems += '        </li>';
  
-    
+    // NEW logout
+
+    menuItems += '        <li class="dropdown"><a ' + getSelectedItemClass(selectedItem, "User") + ' role="button" aria-expanded="false">' + getLocalStorage("firstName") + ' ' + getLocalStorage("lastName") + ' <span style="margin-right:10px;" class="caret"></span></a>';
+    menuItems += '              <ul class="dropdown-menu" role="menu">';
+    menuItems += '                  <li style="display:block;"><a href="../../admin/users/item.html?profileMaintenance=true&userId='+ getLocalStorage("userId") +'&MenuItem=true">Profile</a></li>';
+    menuItems += '                  <li style="display:block;"><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
+    menuItems += '              </ul>';
+    menuItems += '        </li>';
+
     // logout
-    menuItems += '        <li><a ' + getSelectedItemClass(selectedItem, "Logout") + 'href="#" onclick="logout()">Logout</a></li>';
     
     menuItems += '    </ul>';
     menuItems += '</nav>';
@@ -3389,7 +3398,7 @@ function getPatientADLListByDayAPICall(patientId, transactionDate)
         contentType: 'application/json',
         processData: false,
         success: function (data, textStatus, jQxhr) {
-            getPatientFormListSuccess(data);
+            getPatientADLListByDaySuccess(data);
         },
         error: function (jqXhr, textStatus, errorThrown) {
             genericAjaxError(jqXhr, textStatus, errorThrown);
