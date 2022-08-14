@@ -47,4 +47,11 @@ namespace ADLAPICore.Models.Patient
         public string inApiToken { get; set; }
         public int inPatientId { get; set; }
     }
+    public class PatientADLReportGetInput
+    {
+        public string inApiToken { get; set; }
+        public int inPatientId { get; set; }
+        public DateTime inTransactionDateFrom { get; set; }
+        public DateTime inTransactionDateTo { get; set; }
+    }
 }

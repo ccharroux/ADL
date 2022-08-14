@@ -1,10 +1,9 @@
-﻿using System;
+﻿using ADLAPICore.Library.utilities;
+using ADLAPICore.Models.Facility;
+using ADLAPICore.Models.General;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using ADLAPICore.Models.General;
-using ADLAPICore.Library.utilities;
-using ADLAPICore.Models.Facility;
-using ADLAPICore.Library.Patient;
 
 namespace ADLAPICore.Library.Facility
 {
@@ -168,6 +167,17 @@ namespace ADLAPICore.Library.Facility
 		public string UserName { get; set; }
 		public string Patient { get; set; }
     }
+    public class FacilityADLReportResult
+    {
+        public ResponseModel response = new ResponseModel();
+        public List<Object> rows = new List<Object>();
+        //private PatientFormRow resultRow = new PatientFormRow();
+
+        public FacilityADLReportResult()
+        {
+            this.response = General.buildError("Unexpected error");
+        }
+    }
 
     public interface IFacilityClass
     {
@@ -190,6 +200,7 @@ namespace ADLAPICore.Library.Facility
         public FacilityEntireListResult GetFacilityEntireList(FacilityEntireListGetInput input);
         public FacilityDashboardDataByDayResult GetFacilityDashboardDataByDay(FacilityDashboardDataByDayGetInput input);
         public FacilityADLLogByDayResult GetFacilityADLLogByDay(FacilityADLLogByDayGetInput input);
+        public FacilityADLReportResult GetFacilityADLReport(FacilityADLReportGetInput input);
     }
 
     public class FacilityClass : IFacilityClass
@@ -933,9 +944,6 @@ namespace ADLAPICore.Library.Facility
             }
         }
 
-
-
-
         public FacilityAddressPostResult InsertFacilityAddress(FacilityAddressInsertInput input)
         {
 
@@ -1475,6 +1483,93 @@ namespace ADLAPICore.Library.Facility
                 return result;
             }
         }
+
+        public FacilityADLReportResult GetFacilityADLReport(FacilityADLReportGetInput input)
+        {
+
+            FacilityADLReportResult result = new FacilityADLReportResult();
+
+            try
+            {
+
+                result.response = Validate(input);
+
+                if (result.response.status == ResponseModel.responseFAIL)
+                {
+                    return result;
+                }
+
+                FacilityDBClass lDB = new FacilityDBClass();
+
+                var dbResult = lDB.FacilityADLReportDBCall(input);
+                if (dbResult.response.status == ResponseModel.responseFAIL)
+                {
+                    result.response = dbResult.response;
+                    return result;
+                }
+
+                Dictionary<string, string> cols = new Dictionary<string, string>();
+                ClassBuilder dc = new ClassBuilder();
+                var output = new Object();
+
+                foreach (DataRow row in dbResult.dt.Rows)
+                {
+                    foreach (DataColumn col in dbResult.dt.Columns)
+                    {
+                        cols[col.ColumnName] = row[col.ColumnName].ToString();
+                    }
+                    output = dc.GetTheClass(cols);
+                    result.rows.Add(output);
+                }
+
+                // now the result
+                result.response.status = ResponseModel.responseSUCCESS;
+                result.response.errorMessage = new List<string>();
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                result.response = General.buildError(ex.Message);
+
+                return new FacilityADLReportResult { response = result.response };
+            }
+        }
+        private ResponseModel Validate(FacilityADLReportGetInput input)
+        {
+            ResponseModel result = new ResponseModel();
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(input.inApiToken))
+                {
+                    throw new ApplicationException("API Token is required for this method.");
+                }
+
+                if (input.inFacilityId < 0)
+                {
+                    throw new ApplicationException("Facility Id must be greater than 0.");
+                }
+
+                //DateTime temp;
+                //if (DateTime.TryParse(input.inTransactionDate.to, out temp) == false)
+                //{
+                //    throw new ApplicationException("Must pass a valid transaction date.");
+                //}
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.status = ResponseModel.responseFAIL;
+                result.errorMessage = new List<string>();
+                result.errorMessage.Add(ex.Message);
+                return result;
+            }
+        }
+
+
     }
 
 }

@@ -407,5 +407,38 @@ namespace ADLAPICore.Controllers.Patient
             }
         }
 
+        [HttpGet("ADLReport")]
+        public ActionResult ADLReport([FromQuery] PatientADLReportGetInput input)
+        {
+            try
+            {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (PatientADLReportGetInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.GetPatientADLReport(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                PatientADLReportResult r = new PatientADLReportResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
     }
 }

@@ -24,7 +24,7 @@ namespace ADLAPICore.Library.Common
 
         public DBClass()
         {
-            dbConn.ConnectionString = Startup.Configuration.GetSection("ConnectionStrings").GetSection("ADLDB").Value;
+            dbConn.ConnectionString = Startup.Configuration.GetSection("ConnectionStrings").GetSection("LiveDB").Value;
             dbConn.Open();
         }
         public ResponseModel executeDB()

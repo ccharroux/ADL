@@ -557,6 +557,39 @@ namespace ADLAPICore.Controllers.Facility
             }
         }
 
+        [HttpGet("ADLReport")]
+        public ActionResult ADLReport([FromQuery] FacilityADLReportGetInput input)
+        {
+            try
+            {
+                //------------------------------------
+                // exception will be thrown
+                //------------------------------------
+                var resultToken = Token.checkToken(input.inApiToken);
+                if (resultToken.response.status == ResponseModel.responseFAIL)
+                {
+                    throw new Exception(resultToken.response.errorMessage[0]);
+                }
+
+                //----------------------------------
+                // Clean inputs using reflection
+                //----------------------------------
+                var cleanInput = (FacilityADLReportGetInput)genericLogic.cleanAllTextFromObject(input);
+
+                var result = _controllerClass.GetFacilityADLReport(cleanInput);
+
+                return Content(JsonConvert.SerializeObject(result), MediaTypeNames.Application.Json);
+            }
+
+            catch (Exception ex)
+            {
+
+                FacilityADLReportResult r = new FacilityADLReportResult();
+                r.response = General.buildError(ex.Message);
+
+                return Content(JsonConvert.SerializeObject(r), MediaTypeNames.Application.Json);
+            }
+        }
     }
 
 
